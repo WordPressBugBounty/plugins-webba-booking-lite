@@ -1,0 +1,29 @@
+{
+    "name": "webba-booking",
+    "version": "5.0.14",
+    "description": "=== Appointment & Event Booking Calendar Plugin - Webba Booking ===\r Contributors: Webba agency, freemius\r Donate link: https://webba-booking.com/\r Tags: appointment booking, booking calendar, online scheduling, event booking, service reservations\r Requires at least: 5.6\r Tested up to: 6.3.1\r Stable tag: 5.0.9\r Requires PHP: 7.4\r License: GPLv3 or later\r License URI: https://www.gnu.org/licenses/gpl-3.0.html",
+    "main": "build/index.js",
+    "scripts": {
+        "start": "wp-scripts start",
+        "build": "wp-scripts build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://wordpress.org/plugins/webba-booking-lite/"
+    },
+    "author": "WebbaPlugins",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://bitbucket.org/gvaha/webba-booking/issues"
+    },
+    "homepage": "https://webba-booking.com",
+    "devDependencies": {
+        "@prettier/plugin-php": "^0.22.1",
+        "@wordpress/scripts": "^26.19.0",
+        "prettier": "^3.1.1"
+    },
+    "dependencies": {
+        "react-loading-skeleton": "^3.4.0",
+        "react-select": "^5.8.0"
+    }
+}
