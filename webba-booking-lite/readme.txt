@@ -192,6 +192,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 - Bugfix: resolved an issue with the message displayed when a user cancels a PayPal payment.
 - Bugfix: resolved issues where certain strings were not translatable.
 - Bugfix: resolved an issue with the title display in the mobile layout.
+- Security: Fixed a vulnerability. Credits to Lucio Sá.
 
 5.0.48
 
