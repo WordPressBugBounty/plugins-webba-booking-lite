@@ -8307,7 +8307,7 @@ input.slider-range-working-hours-time-wb {
     position: relative;
     height: 34px;
     word-break: break-all;
-    width: 300px !important;
+    width: 200px;
 }
 
 .status-select-wb .nice-select .list li {
@@ -11784,4 +11784,10 @@ span.smal_id_wbk {
 .wbk_backend_calendar_booking_details {
     padding: 10px 2px !important;
     font-size: 12px !important;
+}
+.wbk_dashboard_bookings_table table th:nth-child(2),
+.wbk_dashboard_bookings_table table td:nth-child(2),
+.wbk_dashboard_bookings_table table th:nth-child(6),
+.wbk_dashboard_bookings_table table td:nth-child(6) {
+    display: none !important;
 }

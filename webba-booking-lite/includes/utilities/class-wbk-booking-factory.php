@@ -427,9 +427,7 @@ class WBK_Booking_Factory {
         $curent_invoice++;
         update_option( 'wbk_email_current_invoice_number', $curent_invoice );
         if ( count( $booking_ids ) > 0 ) {
-            foreach ( $booking_ids as $booking_id ) {
-                wbk_email_processing_send_on_payment( [$booking_id] );
-            }
+            WBK_Email_Processor::send( $booking_ids, 'payment' );
         }
         do_action( 'wbk_after_set_as_paid', $booking_ids );
         date_default_timezone_set( 'UTC' );

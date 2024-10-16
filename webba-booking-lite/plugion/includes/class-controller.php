@@ -299,7 +299,6 @@ class Controller
         if (false === Plugion()->tables->get_element_at($table)) {
             $response = new \WP_REST_Response($data);
             $response->set_status(400);
-
             return $response;
         }
         $removed = [];

@@ -308,7 +308,6 @@ class WBK_Price_Processor
         }
         return array($service_fee_total, $service_fees, $service_fee_descriptions);
     }
-
     static function get_total_tax_fees($bookings)
     {
         $total_amount = self::get_multiple_booking_price($bookings);

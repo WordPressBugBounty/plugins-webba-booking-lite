@@ -19,7 +19,8 @@ function wbk_plugion_dashboard_before_table($table_name)
     if (!is_wbk_table($table_name)) {
         return;
     } ?>
-    <div class="custom-table-wrapper-wb <?php echo $table_name; ?>-custom-table-wb" custom-table-wrapper>
+    <div class="wbk_dashboard_bookings_table custom-table-wrapper-wb <?php echo $table_name; ?>-custom-table-wb"
+        custom-table-wrapper>
         <div class="table-area-wb">
             <div class="block-heading-wb">
                 <h2 class="block-title-wb">

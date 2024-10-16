@@ -30,10 +30,12 @@ class WBK_Email_Processor
                 ) {
                     $message = get_option('wbk_email_customer_approve_message');
                     $template_id = $service->get_on_approval_template();
+
                     if ($template_id != false) {
                         $template_obj = new WBK_Email_Template($template_id);
                         $message = $template_obj->get_template();
                     }
+
                     $message = WBK_Placeholder_Processor::process($message, $bookings);
                     $subject = WBK_Placeholder_Processor::process(get_option('wbk_email_customer_approve_subject'), $bookings);
 

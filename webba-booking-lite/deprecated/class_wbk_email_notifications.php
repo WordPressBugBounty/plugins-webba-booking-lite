@@ -79,6 +79,8 @@ class WBK_Email_Notifications {
 
     public $customer_invoice_subject;
 
+    public $customer_cancel_email;
+
     // service_id: int
     // appointment_id: int
     public function __construct( $service_id, $appointment_id, $current_category = 0 ) {

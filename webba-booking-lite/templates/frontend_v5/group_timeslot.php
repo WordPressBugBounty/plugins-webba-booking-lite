@@ -116,30 +116,30 @@ if ($timeslot->get_free_places() > 0) {
                         ); ?>" data-service="<?php esc_html(
                              $service->get_id()
                          ); ?>">
-                    <span class="wbk_time_slot_time_string"></span> <?php echo esc_html($time); ?></span>
+                    <span class="wbk_time_slot_time_string"> <?php echo esc_html($time); ?></span></span>
 
-            </span>
-            <?php if (
-                get_option('wbk_show_details_of_previous_bookings', '') ==
-                'true'
-            ) { ?><span class="available-w1">
-                    <?php
-                    $booking_ids = WBK_Model_Utils::get_booking_ids_by_service_and_time(
-                        $service->get_id(),
-                        $timeslot->getStart()
-                    );
-                    foreach ($booking_ids as $booking_id) {
-                        $booking = new WBK_Booking($booking_id);
-                        if (!$booking->is_loaded()) {
-                            continue;
+
+                <?php if (
+                    get_option('wbk_show_details_of_previous_bookings', '') ==
+                    'true'
+                ) { ?><span class="available-w1">
+                        <?php
+                        $booking_ids = WBK_Model_Utils::get_booking_ids_by_service_and_time(
+                            $service->get_id(),
+                            $timeslot->getStart()
+                        );
+                        foreach ($booking_ids as $booking_id) {
+                            $booking = new WBK_Booking($booking_id);
+                            if (!$booking->is_loaded()) {
+                                continue;
+                            }
+                            echo '</br><span>   ' . $booking->get_name() .
+                                ' ' .
+                                $booking->get_custom_field_value('last_name') .
+                                '</span>';
                         }
-                        echo '</br><span>' . $booking->get_name() .
-                            ' ' .
-                            $booking->get_custom_field_value('last_name') .
-                            '</span>';
-                    }
-                    ?>
-                </span>
+                        ?>
+                    </span> </span>
 
             <?php } ?>
             <?php do_action('wbk_group_time_slot_custom_html'); ?>

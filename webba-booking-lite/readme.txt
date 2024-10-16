@@ -4,7 +4,7 @@ Donate link: https://webba-booking.com/
 Tags: appointment booking, booking calendar, online scheduling, event booking, service reservations
 Requires at least: 5.6
 Tested up to: 6.6.2
-Stable tag: 5.0.51
+Stable tag: 5.0.52
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -178,6 +178,13 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+5.0.52
+
+16/10/2024
+
+- Bugfix: minor bugfix.
+- SDK update.
+
 5.0.51
 
 18/09/2024
@@ -192,7 +199,6 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 - Bugfix: resolved an issue with the message displayed when a user cancels a PayPal payment.
 - Bugfix: resolved issues where certain strings were not translatable.
 - Bugfix: resolved an issue with the title display in the mobile layout.
-- Security: Fixed a vulnerability. Credits to Lucio Sá.
 
 5.0.48
 

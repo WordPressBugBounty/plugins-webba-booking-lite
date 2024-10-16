@@ -653,7 +653,7 @@ class WEBBA5_Form {
                                 clearIfNotMatch: true,
                             })
                     }
-
+                    get_this().update_amount()
                     get_this().validate_form()
                     return
                     break
@@ -2103,6 +2103,7 @@ class WEBBA5_Form {
     }
 
     do_request(action) {
+        console.log('doing request: ' + action)
         return new Promise((resolve) => {
             var form_data = new FormData(this.container.find('form')[0])
             var offset = new Date().getTimezoneOffset()
