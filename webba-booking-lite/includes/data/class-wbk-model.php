@@ -740,7 +740,7 @@ class WBK_Model {
             ],
             '',
             false,
-            true,
+            false,
             false
         );
         $table->add_field(
@@ -853,7 +853,8 @@ class WBK_Model {
             ],
             '',
             true,
-            in_array( 'moment_price', $allowed_fields ),
+            false,
+            //in_array('moment_price', $allowed_fields),
             false
         );
         $table->add_field(

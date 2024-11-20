@@ -1460,7 +1460,17 @@ class WBK_Db_Utils {
         $message = str_replace( '#zoom_pass', $zoom_pass, $message );
         $message = str_replace( '#zoom_meeting_id', $zoom_meeting_id, $message );
         $message = str_replace( '#coupon', $coupon_name, $message );
-        $message = str_replace( '#service_description', $service->getDescription(), $message );
+        $service_description = $service->getDescription();
+        if ( function_exists( 'pll__' ) ) {
+            $service_description = pll__( stripcslashes( $service_description ) );
+        }
+        $value = apply_filters(
+            'wpml_translate_single_string',
+            stripcslashes( $service_description ),
+            'webba-booking-lite',
+            'Service description id ' . $service->getId()
+        );
+        $message = str_replace( '#service_description', $service_description, $message );
         $message = str_replace( '#booked_on_date', wp_date( $date_format, $created_on, $timezone_to_use ), $message );
         $message = str_replace( '#booked_on_time', wp_date( $time_format, $created_on, $timezone_to_use ), $message );
         $message = str_replace( '#uniqueid', $short_token, $message );

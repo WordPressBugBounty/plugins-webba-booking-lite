@@ -1173,4 +1173,15 @@ class WBK_Model_Utils {
         return [$field_value_1, $field_value_2];
     }
 
+    public static function switch_locale_by_booking_id( $booking_id ) {
+        $booking = new WBK_Booking($booking_id);
+        if ( !$booking->is_loaded() ) {
+            return;
+        }
+        if ( $booking->get( 'lang' ) != false && $booking->get( 'lang' ) != '' ) {
+            $locale = str_replace( '-', '_', $booking->get( 'lang' ) );
+            switch_to_locale( trim( $locale ) );
+        }
+    }
+
 }

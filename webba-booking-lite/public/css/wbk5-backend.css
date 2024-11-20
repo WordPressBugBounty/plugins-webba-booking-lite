@@ -11791,3 +11791,37 @@ span.smal_id_wbk {
 .wbk_dashboard_bookings_table table td:nth-child(6) {
     display: none !important;
 }
+.button-wb-mini {
+    line-height: 27px;
+    border-radius: 7px;
+}
+.button-wb-mini:disabled {
+    cursor: default;
+}
+.wbk_resend_container {
+    margin-top: 10px;
+    display: block;
+}
+.wbk_resend_email {
+    margin-right: 5px !important;
+    margin-top: 5px !important;
+    border-radius: 7px !important;
+}
+.resend_email_btn {
+    margin-top: 5px !important;
+}
+.wbk_email_resend_result {
+    clear: both;
+    display: block;
+    font-weight: normal;
+}
+span.wbk_email_resend_result {
+    display: block;
+    margin-top: 10px;
+}
+.wbk_font_green {
+    color: #1f6763;
+}
+.wbk_font_red {
+    color: red;
+}

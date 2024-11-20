@@ -47,11 +47,7 @@ class WBK_Email_Notifications {
 
     public $customer_email_message;
 
-    public $customer_daily_message;
-
     public $admin_daily_message;
-
-    public $customer_daily_subject;
 
     public $admin_daily_subject;
 
@@ -84,21 +80,16 @@ class WBK_Email_Notifications {
     // service_id: int
     // appointment_id: int
     public function __construct( $service_id, $appointment_id, $current_category = 0 ) {
-        if ( $appointment_id != 0 ) {
-            WBK_Db_Utils::switchLanguageByAppointmentId( $appointment_id );
-        }
         $this->customer_book_status = get_option( 'wbk_email_customer_book_status', '' );
         $this->admin_book_status = get_option( 'wbk_email_admin_book_status', '' );
         $this->customer_daily_status = get_option( 'wbk_email_customer_daily_status', '' );
         $this->admin_daily_status = get_option( 'wbk_email_admin_daily_status', '' );
         $this->customer_email_message = get_option( 'wbk_email_customer_book_message', '' );
         $this->admin_email_message = get_option( 'wbk_email_admin_book_message', '' );
-        $this->customer_daily_message = get_option( 'wbk_email_customer_daily_message', '' );
         $this->admin_daily_message = get_option( 'wbk_email_admin_daily_message', '' );
         $this->secondary_email_message = get_option( 'wbk_email_secondary_book_message', '' );
         $this->customer_email_subject = get_option( 'wbk_email_customer_book_subject', '' );
         $this->admin_email_subject = get_option( 'wbk_email_admin_book_subject', '' );
-        $this->customer_daily_subject = get_option( 'wbk_email_customer_daily_subject', '' );
         $this->admin_daily_subject = stripslashes( get_option( 'wbk_email_admin_daily_subject', '' ) );
         $this->secondary_email_subject = get_option( 'wbk_email_secondary_book_subject', '' );
         $this->super_admin_email = get_option( 'wbk_super_admin_email', '' );
@@ -259,7 +250,7 @@ class WBK_Email_Notifications {
                 if ( !WBK_Validator::check_string_size( $this->admin_daily_message, 1, 50000 ) || !WBK_Validator::check_string_size( $this->admin_daily_subject, 1, 200 ) || !WBK_Validator::check_email( $this->from_email ) || !WBK_Validator::check_string_size( $this->from_name, 1, 100 ) ) {
                     $this->admin_daily_status = false;
                 }
-                if ( !WBK_Validator::check_string_size( $this->customer_daily_message, 1, 50000 ) || !WBK_Validator::check_string_size( $this->customer_daily_subject, 1, 200 ) || !WBK_Validator::check_email( $this->from_email ) || !WBK_Validator::check_string_size( $this->from_name, 1, 100 ) ) {
+                if ( !WBK_Validator::check_string_size( get_option( 'wbk_email_customer_daily_message', '' ), 1, 50000 ) || !WBK_Validator::check_string_size( get_option( 'wbk_email_customer_daily_subject', '' ), 1, 200 ) || !WBK_Validator::check_email( $this->from_email ) || !WBK_Validator::check_string_size( $this->from_name, 1, 100 ) ) {
                     $this->customer_daily_status = false;
                 }
                 $headers = 'From: ' . $this->from_name . ' <' . $this->from_email . '>' . "\r\n";
@@ -291,9 +282,6 @@ class WBK_Email_Notifications {
                     $app_found = false;
                     $days_before = intval( get_option( 'wbk_email_reminder_days', '1' ) );
                     foreach ( $appointment_ids as $appointment_id ) {
-                        WBK_Db_Utils::switchLanguageByAppointmentId( $appointment_id );
-                        $this->customer_daily_message = get_option( 'wbk_email_customer_daily_message', '' );
-                        $this->customer_daily_subject = get_option( 'wbk_email_customer_daily_subject', '' );
                         $appointment = new WBK_Appointment_deprecated();
                         if ( !$appointment->setId( $appointment_id ) ) {
                             continue;
@@ -344,18 +332,19 @@ class WBK_Email_Notifications {
                         if ( $days_before == 1 ) {
                             if ( $this->customer_daily_status ) {
                                 $customer_daily_message = '';
+                                WBK_Model_Utils::switch_locale_by_booking_id( $appointment->getId() );
                                 if ( $service->getReminderTemplate() != 0 ) {
                                     $template = WBK_Db_Utils::getEmailTemplate( $service->getReminderTemplate() );
                                     if ( !is_null( $template ) ) {
                                         $customer_daily_message = htmlspecialchars_decode( stripslashes( $template ) );
                                     }
                                 } else {
-                                    $customer_daily_message = $this->customer_daily_message;
+                                    $customer_daily_message = get_option( 'wbk_email_customer_daily_message', '' );
                                 }
                                 date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
                                 if ( !WBK_Validator::check_email_loop( $customer_daily_message ) ) {
                                     $customer_daily_message = $this->message_placeholder_processing( $customer_daily_message, $appointment, $service );
-                                    $subject = $this->subject_placeholder_processing( $this->customer_daily_subject, $appointment, $service );
+                                    $subject = $this->subject_placeholder_processing( get_option( 'wbk_email_customer_daily_subject', '' ), $appointment, $service );
                                     $subject = wbk_cleanup_loop( $subject );
                                     $customer_daily_message = wbk_cleanup_loop( $customer_daily_message );
                                     date_default_timezone_set( 'UTC' );
@@ -402,12 +391,13 @@ class WBK_Email_Notifications {
                             $customer_daily_message = htmlspecialchars_decode( stripslashes( $template ) );
                         }
                     } else {
-                        $customer_daily_message = $this->customer_daily_message;
+                        $customer_daily_message = get_option( 'wbk_email_customer_daily_message', '' );
                     }
                     if ( $days_before == 0 ) {
                         if ( $this->customer_daily_status ) {
                             $appointment_ids = WBK_Model_Utils::get_booking_ids_for_today_by_service( $service_id );
                             foreach ( $appointment_ids as $appointment_id ) {
+                                WBK_Model_Utils::switch_locale_by_booking_id( $appointment_id );
                                 if ( get_option( 'wbk_email_reminders_only_for_approved', '' ) == 'true' ) {
                                     $status = WBK_Db_Utils::getStatusByAppointmentId( $appointment_id );
                                     $skip_status = ['pending', 'paid', 'arrived'];
@@ -415,17 +405,15 @@ class WBK_Email_Notifications {
                                         continue;
                                     }
                                 }
-                                WBK_Db_Utils::switchLanguageByAppointmentId( $appointment_id );
                                 if ( $service->getReminderTemplate() != 0 ) {
                                     $template = WBK_Db_Utils::getEmailTemplate( $service->getReminderTemplate() );
                                     if ( !is_null( $template ) ) {
                                         $customer_daily_message = htmlspecialchars_decode( stripslashes( $template ) );
                                     }
                                 } else {
-                                    $customer_daily_message = $this->customer_daily_message;
+                                    $customer_daily_message = get_option( 'wbk_email_customer_daily_message', '' );
                                 }
                                 $customer_daily_subject = get_option( 'wbk_email_customer_daily_subject', '' );
-                                WBK_Db_Utils::switchLanguageByAppointmentId( $appointment_id );
                                 $appointment = new WBK_Appointment_deprecated();
                                 if ( !$appointment->setId( $appointment_id ) ) {
                                     continue;
@@ -456,6 +444,7 @@ class WBK_Email_Notifications {
                         if ( $this->customer_daily_status ) {
                             $appointment_ids = WBK_Db_Utils::getFutureAppointmentsForService( $service_id, $days_before );
                             foreach ( $appointment_ids as $appointment_id ) {
+                                WBK_Model_Utils::switch_locale_by_booking_id( $appointment_id );
                                 if ( get_option( 'wbk_email_reminders_only_for_approved', '' ) == 'true' ) {
                                     $status = WBK_Db_Utils::getStatusByAppointmentId( $appointment_id );
                                     $skip_status = ['pending', 'paid', 'arrived'];
@@ -463,17 +452,15 @@ class WBK_Email_Notifications {
                                         continue;
                                     }
                                 }
-                                WBK_Db_Utils::switchLanguageByAppointmentId( $appointment_id );
                                 if ( $service->getReminderTemplate() != 0 ) {
                                     $template = WBK_Db_Utils::getEmailTemplate( $service->getReminderTemplate() );
                                     if ( !is_null( $template ) ) {
                                         $customer_daily_message = htmlspecialchars_decode( stripslashes( $template ) );
                                     }
                                 } else {
-                                    $customer_daily_message = $this->customer_daily_message;
+                                    $customer_daily_message = get_option( 'wbk_email_customer_daily_message', '' );
                                 }
                                 $customer_daily_subject = get_option( 'wbk_email_customer_daily_subject', '' );
-                                WBK_Db_Utils::switchLanguageByAppointmentId( $appointment_id );
                                 $appointment = new WBK_Appointment_deprecated();
                                 if ( !$appointment->setId( $appointment_id ) ) {
                                     continue;
@@ -509,10 +496,11 @@ class WBK_Email_Notifications {
                                 $customer_daily_message = htmlspecialchars_decode( stripslashes( $template ) );
                             }
                         } else {
-                            $customer_daily_message = $this->customer_daily_message;
+                            $customer_daily_message = get_option( 'wbk_email_customer_daily_message', '' );
                         }
                         $customer_daily_subject = get_option( 'wbk_email_customer_daily_subject', '' );
                         $appointment = WBK_Db_Utils::initAppointmentById( $appointment_ids[0] );
+                        WBK_Model_Utils::switch_locale_by_booking_id( $appointment_ids[0] );
                         if ( $appointment != false ) {
                             $this->sendMultipleNotification(
                                 $appointment_ids,
@@ -536,9 +524,6 @@ class WBK_Email_Notifications {
         $recipient,
         $generate_ical = ''
     ) {
-        if ( count( $appointment_ids ) > 0 ) {
-            WBK_Db_Utils::switchLanguageByAppointmentId( $appointment_ids[0] );
-        }
         date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
         $date_format = WBK_Format_Utils::get_date_format();
         $time_format = WBK_Date_Time_Utils::get_time_format();
@@ -735,9 +720,6 @@ class WBK_Email_Notifications {
 
     public function sendMultipleCustomerNotification( $appointment_ids ) {
         if ( $this->customer_book_status != '' ) {
-            if ( count( $appointment_ids ) > 0 ) {
-                WBK_Db_Utils::switchLanguageByAppointmentId( $appointment_ids[0] );
-            }
             $message = $this->customer_email_message;
             $subject = $this->customer_email_subject;
             $appointment = new WBK_Appointment_deprecated();
@@ -766,9 +748,6 @@ class WBK_Email_Notifications {
 
     public function sendMultipleAdminNotification( $appointment_ids ) {
         if ( $this->admin_book_status != '' ) {
-            if ( count( $appointment_ids ) > 0 ) {
-                WBK_Db_Utils::switchLanguageByAppointmentId( $appointment_ids[0] );
-            }
             if ( count( $appointment_ids ) == 0 ) {
                 return;
             }
@@ -803,9 +782,6 @@ class WBK_Email_Notifications {
     }
 
     public function sendMultipleToSecondary( $appointment_ids, $data ) {
-        if ( count( $appointment_ids ) > 0 ) {
-            WBK_Db_Utils::switchLanguageByAppointmentId( $appointment_ids[0] );
-        }
         //	generall class validation
         if ( !WBK_Validator::check_string_size( $this->secondary_email_message, 1, 50000 ) || !WBK_Validator::check_string_size( $this->secondary_email_subject, 1, 200 ) || !WBK_Validator::check_email( $this->from_email ) || !WBK_Validator::check_string_size( $this->from_name, 1, 200 ) ) {
             return;
@@ -1139,9 +1115,6 @@ class WBK_Email_Notifications {
         if ( count( $appointment_ids ) == 0 ) {
             return;
         }
-        if ( count( $appointment_ids ) > 0 ) {
-            WBK_Db_Utils::switchLanguageByAppointmentId( $appointment_ids[0] );
-        }
         $appointment = new WBK_Appointment_deprecated();
         if ( !$appointment->setId( $appointment_ids[0] ) ) {
             return;
@@ -1357,9 +1330,6 @@ class WBK_Email_Notifications {
     }
 
     public function sendMultiplePaymentReceived( $to, $appointment_ids ) {
-        if ( count( $appointment_ids ) > 0 ) {
-            WBK_Db_Utils::switchLanguageByAppointmentId( $appointment_ids[0] );
-        }
         if ( $to == 'customer' ) {
             $message = get_option( 'wbk_email_customer_paymentrcvd_message', '' );
             $subject = get_option( 'wbk_email_customer_paymentrcvd_subject', '' );

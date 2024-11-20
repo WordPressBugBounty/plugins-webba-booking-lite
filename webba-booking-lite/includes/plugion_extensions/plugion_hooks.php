@@ -400,6 +400,7 @@ function wbk_plugion_formated_row_value($input, $data)
             '</div>';
     }
 
+
     return $input;
 }
 
@@ -490,6 +491,20 @@ function wbk_plugion_cell_content($input, $data)
 
         }
         return $category_name;
+    }
+    if ($data[1] == 'appointment_email') {
+        $html = '<span class="wbk_resend_container">';
+        $html .= '<span>' . esc_html__('(Re)send Email notifications:', 'webba-booking-lite') . '</span>';
+        $html .= '<select class="wbk_resend_email">';
+        $html .= '<option value="confirmation">' . esc_html__('On booking', 'webba-booking-lite') . '</option>';
+        $html .= '<option value="payment">' . esc_html__('On payment', 'webba-booking-lite') . '</option>';
+        $html .= '<option value="approval">' . esc_html__('On approval', 'webba-booking-lite') . '</option>';
+        $html .= '<option value="arrival">' . esc_html__('On arrival', 'webba-booking-lite') . '</option>';
+        $html .= '</select>';
+        $html .= '<button type="button" data-action-text="' . esc_attr(__('sending...', 'webba-booking-lite')) . '" class="button-wb button-wb-mini resend_email_btn">' . esc_html__('Send', 'webba-booking-lite') . '</button>';
+        $html .= '<span class="wbk_email_resend_result"></span">';
+        $input .= $html;
+
     }
     if ($data[1] == 'appointment_name') {
         $template = get_option('wbk_customer_name_output', '#name');

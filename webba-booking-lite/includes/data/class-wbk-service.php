@@ -33,7 +33,7 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_interval_between()
     {
-        if (!isset ($this->fields['interval_between'])) {
+        if (!isset($this->fields['interval_between'])) {
             return null;
         }
         return $this->fields['interval_between'];
@@ -45,7 +45,7 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_duration()
     {
-        if (!isset ($this->fields['duration'])) {
+        if (!isset($this->fields['duration'])) {
             return null;
         }
         return $this->fields['duration'];
@@ -57,7 +57,7 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_step()
     {
-        if (!isset ($this->fields['step'])) {
+        if (!isset($this->fields['step'])) {
             return null;
         }
         return $this->fields['step'];
@@ -69,7 +69,7 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_prepare_time()
     {
-        if (!isset ($this->fields['prepare_time'])) {
+        if (!isset($this->fields['prepare_time'])) {
             return null;
         }
         return $this->fields['prepare_time'];
@@ -81,7 +81,7 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_business_hours()
     {
-        if (!isset ($this->fields['business_hours_v4'])) {
+        if (!isset($this->fields['business_hours_v4'])) {
             return null;
         }
         return $this->fields['business_hours_v4'];
@@ -93,7 +93,7 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_quantity($time = null)
     {
-        if (!isset ($this->fields['quantity'])) {
+        if (!isset($this->fields['quantity'])) {
             return null;
         }
         return apply_filters(
@@ -110,7 +110,7 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_min_quantity($time = null)
     {
-        if (!isset ($this->fields['min_quantity'])) {
+        if (!isset($this->fields['min_quantity'])) {
             return null;
         }
         return apply_filters(
@@ -127,7 +127,7 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_availability_range()
     {
-        if (!isset ($this->fields['date_range'])) {
+        if (!isset($this->fields['date_range'])) {
             return null;
         }
         $date_range = explode('-', $this->fields['date_range']);
@@ -144,7 +144,7 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_price()
     {
-        if (!isset ($this->fields['price'])) {
+        if (!isset($this->fields['price'])) {
             return null;
         }
         return $this->fields['price'];
@@ -167,6 +167,17 @@ class WBK_Service extends WBK_Model_Object
         }
         return [];
     }
+    /**
+     * get on confirmation (On booking) template
+     * @return int id of the on changed template or false 
+     */
+    public function get_on_booking_template()
+    {
+        if (!is_null($this->fields['notification_template'])) {
+            return $this->fields['notification_template'];
+        }
+        return false;
+    }
 
     /**
      * get on changes template
@@ -185,7 +196,7 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_on_approval_template()
     {
-        if (!is_null($this->fields['approval_template'])) {
+        if (isset($this->fields['approval_template'])) {
             return $this->fields['approval_template'];
         }
         return false;
@@ -207,7 +218,7 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_fee()
     {
-        if (!isset ($this->fields['service_fee'])) {
+        if (!isset($this->fields['service_fee'])) {
             return 0;
         }
         return $this->fields['service_fee'];
@@ -216,11 +227,22 @@ class WBK_Service extends WBK_Model_Object
     public function get_description($unescaped = false)
     {
         $value = '';
-        if (isset ($this->fields['description'])) {
+        if (isset($this->fields['description'])) {
             $value = $this->fields['description'];
             if ($unescaped) {
                 $value = stripcslashes($value);
             }
+        }
+        if ($value != '') {
+            if (function_exists('pll__')) {
+                $value = pll__(stripcslashes($value));
+            }
+            $value = apply_filters(
+                'wpml_translate_single_string',
+                stripcslashes($value),
+                'webba-booking-lite',
+                'Service description id ' . $this->get_id()
+            );
         }
         return $value;
     }

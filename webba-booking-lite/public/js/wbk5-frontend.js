@@ -1390,7 +1390,13 @@ class WEBBA5_Form {
                 }
             }
         }
-
+        if (jQuery('.wbk_services_hidden').length > 0) {
+            jQuery('.wbk_services_hidden option').each(function () {
+                if (jQuery(this).attr('data-consecutive') == 'yes') {
+                    services.push(jQuery(this).attr('value'))
+                }
+            })
+        }
         return services
     }
     get_limited_services() {
@@ -1970,6 +1976,7 @@ class WEBBA5_Form {
         this.container
             .find('.wbk_horizontal_calendar_container')
             .append('<div class="calendar-horizontal-w" id="' + id + '"></div>')
+
         var locale = jQuery('html').attr('lang')
         if (typeof locale == 'undefined') {
             locale = 'en'
@@ -2023,9 +2030,14 @@ class WEBBA5_Form {
         const get_this = () => {
             return this
         }
+        
         this.container.find('.day_cell').click(function (e) {
             if (jQuery(this).hasClass('disabledDay')) {
                 e.preventDefault()
+                return
+            }
+            if(jQuery('.wbk-loading').length > 0){
+                e.preventDefault() 
                 return
             }
             get_this().set_horizontal_calendar_event()
@@ -2103,7 +2115,6 @@ class WEBBA5_Form {
     }
 
     do_request(action) {
-        console.log('doing request: ' + action)
         return new Promise((resolve) => {
             var form_data = new FormData(this.container.find('form')[0])
             var offset = new Date().getTimezoneOffset()
@@ -2116,7 +2127,14 @@ class WEBBA5_Form {
             form_data.append('offset', offset)
             form_data.append('time_zone_client', time_zone_client)
             form_data.append('action', action)
-
+            var locale = jQuery('html').attr('lang')
+            if (typeof locale == 'undefined') {
+                locale = 'en-US'
+            }
+            if (locale == '') {
+                locale = 'en-US'
+            }
+            form_data.append('locale', locale)
             const result = jQuery.ajax({
                 url: wbkl10n.ajaxurl,
                 type: 'POST',

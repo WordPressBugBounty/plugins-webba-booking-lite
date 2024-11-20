@@ -3,6 +3,23 @@
 if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
+function wbk_woocommerce_checkout_process() {
+    $cart = WC()->cart;
+    if ( !$cart->is_empty() ) {
+        foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
+            if ( isset( $cart_item['wbk_appointment_ids'] ) ) {
+                $booking_ids = explode( ',', $cart_item['wbk_appointment_ids'] );
+                foreach ( $booking_ids as $booking_id ) {
+                    $booking = new WBK_Booking($booking_id);
+                    if ( !$booking->is_loaded() ) {
+                        wc_add_notice( __( 'Your booking has already been canceled due to non-payment within the required timeframe.', 'webba-booking-lite' ), 'error' );
+                    }
+                }
+            }
+        }
+    }
+}
+
 function wbk_woocommerce_checkout_fields(  $fields  ) {
     if ( get_option( 'wbk_woo_prefil_fields', '' ) != 'true' ) {
         return $fields;
@@ -173,9 +190,15 @@ function wbk_add_booking_text_to_order_items(
     if ( empty( $values['wbk_appointment_ids'] ) ) {
         return;
     }
+    if ( !isset( $values['wbk_appointment_ids'] ) ) {
+        return;
+    }
     date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
     $booking_ids = explode( ',', wc_clean( $values['wbk_appointment_ids'] ) );
     $payment_details = WBK_Price_Processor::get_payment_items( $booking_ids, 0 );
+    if ( !is_array( $payment_details ) ) {
+        return;
+    }
     $booking_order_text = get_option( 'wbk_woo_cart_title', '' );
     if ( $booking_order_text != '' ) {
         $order_text = WBK_Placeholder_Processor::process_placeholders( $booking_order_text, $booking_ids );
@@ -373,27 +396,6 @@ function wbk_woocommerce_coupon_get_discount_amount(
         }
     }
     return $overriden_discount_amount;
-}
-
-add_action( 'woocommerce_before_checkout_process', 'custom_before_checkout_process' );
-function custom_before_checkout_process() {
-    $prevent_payment = false;
-    foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-        if ( isset( $cart_item['wbk_appointment_ids'] ) ) {
-            $booking_ids = explode( ',', $cart_item['wbk_appointment_ids'] );
-            if ( is_array( $booking_ids ) ) {
-                foreach ( $booking_ids as $booking_id ) {
-                    $booking = new WBK_Booking($booking_id);
-                    if ( !$booking->is_loaded() ) {
-                        $prevent_payment = true;
-                    }
-                }
-            }
-        }
-    }
-    if ( $prevent_payment ) {
-        wc_add_notice( __( 'Unfortunately, you cannot proceed with the payment as the booking has already been cancelled.', 'webba-booking-lite' ), 'error' );
-    }
 }
 
 function wbk_complete_payment(  $order_id  ) {

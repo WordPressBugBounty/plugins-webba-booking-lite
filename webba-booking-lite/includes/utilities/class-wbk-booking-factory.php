@@ -106,11 +106,10 @@ class WBK_Booking_Factory {
             }
             $data['expiration_time'] = $expiration_value;
         }
-        if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
-            $data['lang'] = ICL_LANGUAGE_CODE;
-        } else {
-            $data['lang'] = '';
+        if ( !isset( $data['locale'] ) ) {
+            $data['locale'] = '';
         }
+        $data['lang'] = $data['locale'];
         $booking = new WBK_Booking($data);
         if ( $booking->save() == false ) {
             return [false, 'Unknown error'];

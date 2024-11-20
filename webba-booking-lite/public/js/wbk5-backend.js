@@ -1201,6 +1201,7 @@ class Plugion_WBK {
         get_this().table_checkbox_add_class_to_row()
         get_this().toggle_business_hours()
         get_this().appointments_status_change_init()
+        get_this().resend_email()
 
         jQuery(document).trigger('plugion_properties_form_initialized')
     }
@@ -1484,6 +1485,7 @@ class Plugion_WBK {
                         get_this().unfreeze_form()
                         get_this().filter_form_values[table] = filters
                         get_this().appointments_status_change_init()
+                        get_this().resend_email()
                         get_this().initialize_property_form()
                         get_this().set_properties_default()
                     },
@@ -2550,6 +2552,49 @@ class Plugion_WBK {
                 row.removeAttr('disabled')
             }
         })
+    }
+
+    resend_email(){
+        const resend_btn = jQuery('.resend_email_btn')
+        resend_btn.unbind('click')
+        resend_btn.on('click', function () {
+            const normal_text = jQuery(this).html();
+            const button =  jQuery(this)
+            button.html(button.attr('data-action-text'));
+            button.attr('disabled', true);
+            button.siblings('.wbk_email_resend_result').html('')
+            button.siblings('.wbk_email_resend_result').removeClass('wbk_font_green')
+            button.siblings('.wbk_email_resend_result').removeClass('wbk_font_red')
+            const notification_type = jQuery(this).siblings('.wbk_resend_email').val();
+            const booking_id = parseInt(jQuery(this).closest('tr').find('td:first-child').html().replace(/<[^>]*>/g, "").replace(/\s+/g, "").replace(/\D/g, ""));       
+            let data = {
+                id: booking_id,
+                notification_type: notification_type,
+            }        
+            jQuery.ajax(
+                plugionl10n.rest_url + 'wbk/v1/resend-email',
+                {
+                    method: 'POST',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-WP-Nonce', plugionl10n.nonce)
+                    },
+                    data: data,
+                    complete: function(xhr, status) {                    
+                        button.html(normal_text);
+                        button.attr('disabled', false);
+                        button.siblings('.wbk_email_resend_result').html(xhr.responseJSON.message);
+                    },  
+                    success: function (response) {
+                        button.siblings('.wbk_email_resend_result').addClass('wbk_font_green')
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        button.siblings('.wbk_email_resend_result').addClass('wbk_font_red') 
+                    }
+                    
+                }
+            )
+            
+        });
     }
 
     appointments_status_change_init() {

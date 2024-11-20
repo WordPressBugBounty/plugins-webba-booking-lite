@@ -77,5 +77,13 @@
             <key name="wbk_back_button_text"/>
             <key name="wbk_payment_item_name"/>
             <key name="wbk_readmore_text"/>
+            <key name="wbk_email_admin_daily_subject"/>
+            <key name="wbk_email_admin_daily_message"/>
+            <key name="wbk_email_customer_daily_subject"/>
+            <key name="wbk_email_customer_daily_message"/>
+            <key name="wbk_payment_methods_title"/>
+            <key name="wbk_approve_button_text"/> 
+            <key name="wbk_coupon_label"/>
+            <key name="wbk_coupon_apply_text"/>
 	</admin-texts>
 </wpml-config>

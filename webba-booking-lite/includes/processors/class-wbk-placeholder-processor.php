@@ -201,6 +201,7 @@ class WBK_Placeholder_Processor
                 $price_format
             );
             $form_label = str_replace('#price', $price, $form_label);
+
             $form_label = str_replace(
                 '#description',
                 $service->get_description(),
@@ -765,9 +766,10 @@ class WBK_Placeholder_Processor
 
         $message = str_replace('#attachment', $attachment, $message);
         $message = str_replace('#coupon', $coupon_name, $message);
+
         $message = str_replace(
             '#service_description',
-            $service->get('description'),
+            $service->get_description(),
             $message
         );
         $message = str_replace(

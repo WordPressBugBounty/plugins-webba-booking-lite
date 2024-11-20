@@ -27,6 +27,11 @@ class WBK_Request_Manager {
                 'callback'            => [$this, 'appointments_status_change'],
                 'permission_callback' => [$this, 'appointments_status_change_permission'],
             ] );
+            register_rest_route( 'wbk/v1', '/resend-email/', [
+                'methods'             => 'POST',
+                'callback'            => [$this, 'resend_email'],
+                'permission_callback' => [$this, 'resend_email_permission'],
+            ] );
             register_rest_route( 'wbk/v1', '/get-wp-users/', [
                 'methods'             => 'POST',
                 'callback'            => [$this, 'get_wp_users'],
@@ -533,6 +538,10 @@ class WBK_Request_Manager {
         return true;
     }
 
+    public function resend_email_permission( $request ) {
+        return current_user_can( 'manage_options' );
+    }
+
     public function appointments_status_change_permission( $request ) {
         $table = sanitize_text_field( $request['table'] );
         if ( false === Plugion()->tables->get_element_at( $table ) ) {
@@ -542,6 +551,45 @@ class WBK_Request_Manager {
             return Plugion()->tables->get_element_at( $table )->current_user_can_update();
         }
         return Plugion()->tables->get_element_at( $table )->current_user_can_add();
+    }
+
+    public function resend_email( $request ) {
+        $booking_id = sanitize_text_field( $request['id'] );
+        $error_status = false;
+        $error_messages = [];
+        if ( !WBK_Validator::check_integer( $booking_id, 1, 2758537351 ) ) {
+            $error_status = true;
+            $error_messages[] = 'Wrong booking id.';
+        }
+        $booking = new WBK_Booking($booking_id);
+        if ( !$booking->is_loaded() ) {
+            $error_status = true;
+            $error_messages[] = 'Unable to open booking.';
+        }
+        $action = sanitize_text_field( $request['notification_type'] );
+        $actions = [
+            'confirmation',
+            'payment',
+            'approval',
+            'arrival'
+        ];
+        if ( !in_array( $action, $actions ) ) {
+            $error_status = true;
+            $error_messages[] = 'Wrong notification type.';
+        }
+        if ( $error_status ) {
+            $response = new \WP_REST_Response([
+                'message' => implode( ',', $error_messages ) . '.',
+            ]);
+            $response->set_status( 400 );
+            return $response;
+        }
+        WBK_Email_Processor::send( [$booking_id], $action, true );
+        $response = new \WP_REST_Response([
+            'message' => __( 'Email sent', 'webba-booking-lite' ),
+        ]);
+        $response->set_status( 200 );
+        return $response;
     }
 
     public function get_wp_users( $request ) {
@@ -1169,6 +1217,9 @@ class WBK_Request_Manager {
         } else {
             $time_zone_client = '';
         }
+        if ( isset( $_POST['locale'] ) ) {
+            $booking_data['locale'] = esc_html( $_POST['locale'] );
+        }
         $per_serv_quantity_result = [];
         if ( isset( $_POST['service'] ) && $_POST['service'] != 'undefined' ) {
             $service_id = $_POST['service'];
@@ -1306,6 +1357,7 @@ class WBK_Request_Manager {
                     'phone'          => $booking_data_this['phone'],
                     'time'           => $booking_data_this['time'],
                     'serice id'      => $booking_data_this['service_id'],
+                    'service_id'     => $booking_data_this['service_id'],
                     'duration'       => $booking_data_this['duration'],
                     'comment'        => $booking_data_this['description'],
                     'quantity'       => $booking_data_this['quantity'],
