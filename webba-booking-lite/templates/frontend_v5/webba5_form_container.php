@@ -19,34 +19,34 @@ if (isset($appearance_data['wbk_appearance_field_2'])) {
 }
 ?>
 <div class="main-block-w">
-    <div class="appointment-box-w">             
+    <div class="appointment-box-wbk">
         <?php if ($message == '') { ?>
-                <div class="appointment-status-wrapper-w">
-                    <ul class="appointment-status-list-w">           
-                    </ul>
-                    <div class="circle-chart-wb" data-circle-color="<?php echo esc_attr(
-                        $circle_color
-                    ); ?>" data-percent="25"><span class="circle-chart-text-wb"></span></div>
-                    
-                    <div class="appointment-status-text-mobile-w">
-                        <p class="current-step-w"></p>
-                        <p class="next-step-w"></p>
-                    </div>      
-                </div>    
+            <div class="appointment-status-wrapper-w">
+                <ul class="appointment-status-list-w">
+                </ul>
+                <div class="circle-chart-wbk" data-circle-color="<?php echo esc_attr(
+                    $circle_color
+                ); ?>" data-percent="25"><span class="circle-chart-text-wbk"></span></div>
+
+                <div class="appointment-status-text-mobile-wbk">
+                    <p class="current-step-wbk"></p>
+                    <p class="next-step-wbk"></p>
+                </div>
+            </div>
         <?php } ?>
-        <div class="appointment-content-w">            
+        <div class="appointment-content-wbk">
             <?php if ($message != '') { ?>
-                    <div class="thank-you-block-w">
-                        <div class="thank-you-content-w">
-                            <p style="text-align:center;">
-                        <?php echo $message; ?>
-                            </p>
-                        </div>
+                <div class="thank-you-block-w">
+                    <div class="thank-you-content-w">
+                        <p style="text-align:center;">
+                            <?php echo $message; ?>
+                        </p>
                     </div>
-                <?php } else { ?>
-            <form>
-                <div class="appointment-content-scroll-w" data-scrollbar="true" tabindex="-1" style="overflow: hidden; outline: none;">
-                    
+                </div>
+            <?php } else { ?>
+                <form>
+                    <div class="appointment-content-scroll-wbk" data-scrollbar="true" tabindex="-1"
+                        style="overflow: hidden; outline: none;">
                         <?php
                         $i = 0;
                         foreach ($scenario as $screen) {
@@ -68,48 +68,53 @@ if (isset($appearance_data['wbk_appearance_field_2'])) {
                             ?>
                             <div class=" <?php echo esc_attr(
                                 $class
-                            ); ?>"  <?php echo $final_request_attr; ?>  data-slug="<?php echo esc_attr(
-      $screen['slug']
-  ); ?>"  data-title="<?php echo $title; ?>"  data-request="<?php echo esc_attr(
-    $screen['request']
-); ?>">
-                            <?php if (
-                                isset($screen['templates']) &&
-                                is_array($screen['templates'])
-                            ) {
-                                foreach (
-                                    $screen['templates']
-                                    as $template => $args
+                            ); ?>" <?php echo $final_request_attr; ?> data-slug="<?php echo esc_attr(
+                                     $screen['slug']
+                                 ); ?>" data-title="<?php echo $title; ?>" data-request="<?php echo esc_attr(
+                                         $screen['request']
+                                     ); ?>">
+                                <?php if (
+                                    isset($screen['templates']) &&
+                                    is_array($screen['templates'])
                                 ) {
-                                    WBK_Renderer::load_template(
-                                        $template,
-                                        $args
-                                    );
-                                }
-                            } ?>                             
+                                    foreach ($screen['templates'] as $template => $args) {
+                                        WBK_Renderer::load_template(
+                                            $template,
+                                            $args
+                                        );
+                                    }
+                                } ?>
                             </div>
-                        <?php $i++;
+                            <?php $i++;
                         }
-                        ?>               
-                     
-                <div class="scrollbar-track scrollbar-track-x show" style="display: none;"><div class="scrollbar-thumb scrollbar-thumb-x" style="width: 480px; transform: translate3d(0px, 0px, 0px);"></div></div><div class="scrollbar-track scrollbar-track-y show" style="display: none;"><div class="scrollbar-thumb scrollbar-thumb-y" style="height: 500px; transform: translate3d(0px, 0px, 0px);"></div></div></div><!-- /.appointent-content-scroll-w -->
-                
-                <div class="button-block-w two-buttons-w">
-                    <button type="button" class="button-w button-prev-w"><?php echo esc_html(
-                        get_option('wbk_back_button_text', __('Back'))
-                    ); ?></button>
-                    <button type="button" class="button-w button-next-w"><?php echo esc_html(
-                        get_option('wbk_next_button_text', __('Next'))
-                    ); ?><span class="btn-ring-wb"></span></button>
-                </div><!-- /.button-block-w -->
-                <div class="form-error-w" style="display: none;">
-                    <img class="warning-img-w" src="<?php echo WP_WEBBA_BOOKING__PLUGIN_URL .
-                        '/public/images/error-icon.png'; ?>" alt="error">
-                    <span class="form-error-message-w"></span>  
-                </div>
-            </form>
+                        ?>
+
+                        <div class="scrollbar-track scrollbar-track-x show" style="display: none;">
+                            <div class="scrollbar-thumb scrollbar-thumb-x"
+                                style="width: 480px; transform: translate3d(0px, 0px, 0px);"></div>
+                        </div>
+                        <div class="scrollbar-track scrollbar-track-y show" style="display: none;">
+                            <div class="scrollbar-thumb scrollbar-thumb-y"
+                                style="height: 500px; transform: translate3d(0px, 0px, 0px);"></div>
+                        </div>
+                    </div><!-- /.appointent-content-scroll-w -->
+
+                    <div class="button-block-wbk two-buttons-wbk">
+                        <button type="button" class="button-wbk button-prev-wbk"><?php echo esc_html(
+                            get_option('wbk_back_button_text', __('Back'))
+                        ); ?></button>
+                        <button type="button" class="button-wbk button-next-wbk"><?php echo esc_html(
+                            get_option('wbk_next_button_text', __('Next'))
+                        ); ?><span class="btn-ring-wbk"></span></button>
+                    </div><!-- /.button-block-wbk -->
+                    <div class="form-error-w" style="display: none;">
+                        <img class="warning-img-w" src="<?php echo WP_WEBBA_BOOKING__PLUGIN_URL .
+                            '/public/images/error-icon.png'; ?>" alt="error">
+                        <span class="form-error-message-w"></span>
+                    </div>
+                </form>
             <?php } ?>
-        </div><!-- /.appointment-content-w -->
-        
+        </div><!-- /.appointment-content-wbk -->
+
     </div>
 </div>

@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 5.0.53
+ * Version: 5.0.55
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -64,7 +64,7 @@ if ( !defined( 'WP_WEBBA_BOOKING__PLUGIN_DIR' ) ) {
     define( 'WP_WEBBA_BOOKING__PLUGIN_URL', plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( 'WP_WEBBA_BOOKING__VERSION' ) ) {
-    define( 'WP_WEBBA_BOOKING__VERSION', '5.0.53.1' );
+    define( 'WP_WEBBA_BOOKING__VERSION', '5.0.54' );
 }
 if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_textdomain' ) ) {
     include 'vendor/autoload.php';
@@ -134,6 +134,8 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     include 'includes/processors/class-wbk-placeholder-processor.php';
     include 'includes/processors/class-wbk-options-processor.php';
     include 'includes/processors/class-wbk-email-processor.php';
+    // user controller
+    include 'includes/class-wbk-booking-user.php';
     // Assets manager
     include 'includes/class-wbk-assets-manager.php';
     // Renderer
@@ -333,6 +335,14 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
         ],
         WP_WEBBA_BOOKING__VERSION
     ];
+    $js_array[] = [
+        'frontend-ud',
+        null,
+        'wbk-frontend-v7-script',
+        WP_WEBBA_BOOKING__PLUGIN_URL . '/build/frontend/index.js',
+        ['wp-element', 'wp-api-fetch', 'wp-data'],
+        WP_WEBBA_BOOKING__VERSION
+    ];
     $css_array = [];
     $css_array[] = [
         'frontend5',
@@ -395,7 +405,8 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
             'wbk-coupons',
             'wbk-service-categories',
             'wbk-email-templates',
-            'wbk-dashboard'
+            'wbk-dashboard',
+            'wbk-spa'
         ],
         'wbk-backend-style',
         WP_WEBBA_BOOKING__PLUGIN_URL . '/public/css/wbk5-backend.css',
@@ -553,6 +564,14 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
         ];
     }
     $css_array[] = [
+        'frontend-ud',
+        null,
+        'wbk-frontend-v7',
+        WP_WEBBA_BOOKING__PLUGIN_URL . '/build/frontend/index.css',
+        [],
+        WP_WEBBA_BOOKING__VERSION
+    ];
+    $css_array[] = [
         'backend',
         ['wbk-appearance'],
         'wbk-frontend5-style',
@@ -664,7 +683,7 @@ if ( !function_exists( 'wbk_init' ) ) {
         WBK_Model_Updater::create_ht_file();
         WBK_Model_Updater::run_previous_update();
         WBK_Model_Updater::run_update();
-        register_block_type( __DIR__ . DIRECTORY_SEPARATOR . 'build' );
+        register_block_type( __DIR__ . DIRECTORY_SEPARATOR . 'build' . DIRECTORY_SEPARATOR . 'block' );
         WBK_Email_Processor::send_late_notifications( 'arrival' );
     }
 

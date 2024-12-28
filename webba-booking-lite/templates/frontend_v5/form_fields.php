@@ -97,7 +97,7 @@ if ($form == 0) {
 
     $cf7_form = str_replace('<p>', '', $cf7_form);
     $cf7_form = str_replace('</p>', '', $cf7_form);
-    $cf7_form = str_replace('<label', '<label class="wbk-input-label" ', $cf7_form);
+    $cf7_form = str_replace('<label', '<label class="input-label-wbk" ', $cf7_form);
     $cf7_form = str_replace('type="checkbox"', 'type="checkbox" class="wbk-checkbox" ', $cf7_form);
     $cf7_form = str_replace('wbk-checkbox', ' wbk-checkbox wbk-checkbox-custom ', $cf7_form);
     $cf7_form = str_replace('wpcf7-list-item-label', 'wbk-checkbox-label', $cf7_form);

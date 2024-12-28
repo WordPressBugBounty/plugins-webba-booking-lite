@@ -52,10 +52,35 @@ class WBK_Request_Manager {
                 'callback'            => [$this, 'get_dashboard'],
                 'permission_callback' => [$this, 'get_dashboard_permission'],
             ] );
-            register_rest_route( 'wbk/v2', '/get-environment/', [
+            register_rest_route( 'wbk/v2', '/get-preset/', [
                 'methods'             => 'GET',
-                'callback'            => [$this, 'get_environment'],
-                'permission_callback' => [$this, 'get_environment_permission'],
+                'callback'            => [$this, 'get_preset'],
+                'permission_callback' => [$this, 'get_preset_permission'],
+            ] );
+            register_rest_route( 'wbk/v2', '/login', [
+                'methods'             => 'POST',
+                'callback'            => [$this, 'login'],
+                'permission_callback' => [$this, 'login_permission'],
+            ] );
+            register_rest_route( 'wbk/v2', '/get-user-bookings', [
+                'methods'             => 'GET',
+                'callback'            => [$this, 'get_user_bookings'],
+                'permission_callback' => [$this, 'get_user_bookings_permission'],
+            ] );
+            register_rest_route( 'wbk/v2', '/get-time-slots', [
+                'methods'             => 'GET',
+                'callback'            => [$this, 'get_time_slots'],
+                'permission_callback' => [$this, 'get_time_slots_permission'],
+            ] );
+            register_rest_route( 'wbk/v2', '/update-booking', [
+                'methods'             => 'POST',
+                'callback'            => [$this, 'update_booking'],
+                'permission_callback' => [$this, 'update_booking_permission'],
+            ] );
+            register_rest_route( 'wbk/v2', '/delete-booking', [
+                'methods'             => 'POST',
+                'callback'            => [$this, 'delete_booking'],
+                'permission_callback' => [$this, 'delete_booking_permission'],
             ] );
         } );
         add_action( 'wp_ajax_wbk_calculate_amounts', [$this, 'calculate_amounts'] );
@@ -85,7 +110,27 @@ class WBK_Request_Manager {
         add_action( 'wp_ajax_wbk_backend_hide_notice', [$this, 'wbk_backend_hide_notice'] );
     }
 
-    public function get_environment( $request ) {
+    function login( $request ) {
+        $params = $request->get_json_params();
+        $credentials = [
+            'user_login'    => $params['username'],
+            'user_password' => $params['password'],
+            'remember'      => true,
+        ];
+        $user = wp_signon( $credentials );
+        if ( is_wp_error( $user ) ) {
+            return new WP_Error('invalid_login', 'Invalid username or password.', [
+                'status' => 403,
+            ]);
+        }
+        wp_set_current_user( $user->ID );
+        return new \WP_REST_Response([
+            'token' => wp_create_nonce( 'wp_rest' ),
+            'user'  => $user->data,
+        ], 200);
+    }
+
+    public function get_preset( $request ) {
         $services = WBK_Model_Utils::get_services();
         $services_arr = [];
         foreach ( $services as $id => $name ) {
@@ -97,12 +142,33 @@ class WBK_Request_Manager {
             if ( strip_tags( $service->get_description() ) == '' ) {
                 $has_description = false;
             }
+            $business_hours = json_decode(
+                $service->get_business_hours(),
+                false,
+                512,
+                JSON_THROW_ON_ERROR
+            );
+            $business_days = [];
+            try {
+                if ( isset( $business_hours->dow_availability ) && is_array( $business_hours->dow_availability ) ) {
+                    foreach ( $business_hours->dow_availability as $item ) {
+                        if ( isset( $item->day_of_week ) ) {
+                            $business_days[] = $item->day_of_week;
+                        }
+                    }
+                    $business_days = array_unique( $business_days );
+                }
+            } catch ( Exception $e ) {
+                $business_days = [];
+            }
             $service_data = [
+                'id'              => $id,
                 'value'           => $id,
                 'label'           => $name,
                 'payable'         => $service->is_payable(),
                 'description'     => $service->get_description(),
                 'has_description' => $has_description,
+                'business_days'   => $business_days,
                 'duration'        => $service->get_duration() . ' ' . esc_html( get_option( 'wbk_minutes_label', __( 'min', 'webba-booking-lite' ) ) ),
             ];
             if ( $service->get_price() > 0 ) {
@@ -123,18 +189,38 @@ class WBK_Request_Manager {
             }
             $categories_arr[] = $category_data;
         }
+        $user = false;
+        if ( is_user_logged_in() ) {
+            $current_user = wp_get_current_user();
+            $user = $current_user->user_login;
+        }
         $data = [
             'services'   => $services_arr,
             'categories' => $categories_arr,
             'plugin_url' => WP_WEBBA_BOOKING__PLUGIN_URL,
             'settings'   => [
-                'service_label'    => get_option( 'wbk_service_label', __( 'Select a service', 'webba-booking-lite' ) ),
-                'category_label'   => get_option( 'wbk_category_label', __( 'Select category', 'webba-booking-lite' ) ),
-                'date_label'       => get_option( 'wbk_date_basic_label', __( 'Book an appointment on', 'webba-booking-lite' ) ),
-                'date_placeholder' => get_option( 'wbk_date_input_placeholder', __( 'date', 'webba-booking-lite' ) ),
-                'narrow_form'      => get_option( 'wbk_form_layout' ) == 'narrow',
+                'narrow_form' => get_option( 'wbk_form_layout' ) == 'narrow',
+                'week_start'  => get_option( 'start_of_week', '1' ),
+            ],
+            'wording'    => [
+                'service_label'        => get_option( 'wbk_service_label', __( 'Select a service', 'webba-booking-lite' ) ),
+                'category_label'       => get_option( 'wbk_category_label', __( 'Select category', 'webba-booking-lite' ) ),
+                'date_label'           => get_option( 'wbk_date_basic_label', __( 'Book an appointment on', 'webba-booking-lite' ) ),
+                'date_placeholder'     => get_option( 'wbk_date_input_placeholder', __( 'date', 'webba-booking-lite' ) ),
+                'cancel'               => get_option( 'wbk_user_dashboard_link_text_cancel', __( 'Cancel booking', 'webba-booking-lite' ) ),
+                'confirm_cancel'       => get_option( 'wbk_user_dashboard_link_text_confirm_cancellation', __( 'Confirm cancellation', 'webba-booking-lite' ) ),
+                'bookings'             => get_option( 'wbk_user_dashboard_section_bookings_label', __( 'My Bookings', 'webba-booking-lite' ) ),
+                'booking_history'      => get_option( 'wbk_user_dashboard_section_past_bookings_label', __( 'History', 'webba-booking-lite' ) ),
+                'reschedule'           => get_option( 'wbk_user_dashboard_link_text_reschedule', __( 'Reschedule', 'webba-booking-lite' ) ),
+                'loading'              => get_option( 'wbk_user_dashboard_please_wait_state', __( 'Please wait...', 'webba-booking-lite' ) ),
+                'label_login_user'     => __( 'Username or Email Address' ),
+                'label_login_password' => __( 'Password' ),
+                'label_login_button'   => __( 'Login' ),
+                'no_booking'           => get_option( 'wbk_user_dashboard_no_bookings_available', __( 'No bookings available', 'webba-booking-lite' ) ),
+                'label_login_title'    => get_option( 'wbk_user_dashboard_login_title', __( 'Login to your booking manager', 'webba-booking-lite' ) ),
             ],
             'appearance' => WBK_Model_Utils::get_appearance_data(),
+            'user'       => $user,
         ];
         $response = new \WP_REST_Response($data);
         $response->set_status( 200 );
@@ -2046,12 +2132,12 @@ class WBK_Request_Manager {
         }
         $allowed_classes = [
             'appointment-status-wrapper-w',
-            'button-w',
+            'button-wbk',
             'wb_slot_checked',
             'middleDay',
             'checkmark-w',
             'checkbox-subtitle-w',
-            'circle-chart-wb',
+            'circle-chart-wbk',
             'wbk_service_item_active'
         ];
         $allowed_properties = [
@@ -2193,8 +2279,156 @@ class WBK_Request_Manager {
         return $response;
     }
 
-    public function get_environment_permission( $request ) {
+    public function get_preset_permission( $request ) {
         return true;
+    }
+
+    public function login_permission( $request ) {
+        return true;
+    }
+
+    public function get_user_bookings( $request ) {
+        $current_user = wp_get_current_user();
+        $bookings_ids = WBK_Model_Utils::get_bookings_by_customer_email( $current_user->user_email, !isset( $request['pastBookings'] ) && $request['pastBookings'] !== true );
+        $bookings = [];
+        foreach ( $bookings_ids as $booking_id ) {
+            $booking_data = WBK_Model_Utils::get_booking_data( $booking_id );
+            if ( $booking_data !== false ) {
+                $bookings[] = $booking_data;
+            }
+        }
+        $data = [
+            'bookings' => $bookings,
+        ];
+        $response = new \WP_REST_Response($data, 200);
+        $response->set_status( 200 );
+        return $response;
+    }
+
+    public function get_user_bookings_permission( $request ) {
+        return is_user_logged_in();
+    }
+
+    public function response_error( $error_message ) {
+        $data = [
+            'description' => $error_message,
+        ];
+        $response = new \WP_REST_Response($data);
+        $response->set_status( 400 );
+        return $response;
+    }
+
+    public function get_time_slots_permission( $request ) {
+        return is_user_logged_in();
+    }
+
+    public function get_time_slots( $request ) {
+        $day = explode( '00:00:00', $request['date'] );
+        $day = $day[0];
+        if ( !WBK_Validator::is_date( $day ) ) {
+            return $this->response_error( 'Wrong date.' );
+        }
+        date_default_timezone_set( 'UTC' );
+        $day = date( 'd-m-Y', strtotime( $day ) - $request['offset'] * 60 );
+        date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
+        $day = strtotime( $day . ' 00:00:00' );
+        $services = [];
+        if ( isset( $request['services'] ) && $request['services'] != '' ) {
+            $services = explode( ',', $request['services'] );
+        }
+        if ( isset( $request['booking'] ) ) {
+            if ( ctype_digit( $request['booking'] ) ) {
+                $booking = new WBK_Booking($request['booking']);
+                if ( $booking->is_loaded() ) {
+                    $services = [$booking->get_service()];
+                }
+            }
+        }
+        if ( count( $services ) == 0 ) {
+            return $this->response_error( 'No valid services found.' );
+        }
+        foreach ( $services as $service_id ) {
+            if ( !WBK_Validator::is_service_exists( $service_id ) ) {
+                return $this->response_error( 'Wrong service ID.' );
+            }
+            $sp = new WBK_Schedule_Processor();
+            $timeslots = $sp->get_time_slots_by_day( $day, $service_id, [
+                'skip_gg_calendar'       => false,
+                'ignore_preparation'     => false,
+                'calculate_availability' => true,
+                'calculate_night_hours'  => false,
+                'filter_availability'    => false,
+            ] );
+            if ( $booking->is_loaded() ) {
+                $filtered = array_values( array_filter( $timeslots, fn( $obj ) => $obj->get_free_places() >= $booking->get_quantity() ) );
+            } else {
+                $filtered = $timeslots;
+            }
+        }
+        return new \WP_REST_Response([
+            'status'    => 'success',
+            'timeslots' => $filtered,
+        ], 200);
+    }
+
+    public function update_booking_permission( $request ) {
+        if ( !isset( $request['booking'] ) || !ctype_digit( $request['booking'] ) ) {
+            return false;
+        }
+        if ( current_user_can( 'manage_options' ) ) {
+            return true;
+        }
+        return WBK_Validator::is_booking_made_by_current_user( $request['booking'] );
+    }
+
+    public function update_booking( $request ) {
+        if ( !isset( $request['booking'] ) || !ctype_digit( $request['booking'] ) ) {
+            return $this->response_error( 'Wrong booking passed.' );
+        }
+        if ( !ctype_digit( $request['time'] ) ) {
+            return $this->response_error( 'Wrong time.' );
+        }
+        $time = intval( $request['time'] );
+        if ( $time < time() ) {
+            return $this->response_error( 'Wrong time.' );
+        }
+        $booking = new WBK_Booking($request['booking']);
+        if ( $booking->is_loaded() ) {
+            $booking->set( 'time', $time );
+            $booking->save();
+            $bf = new WBK_Booking_Factory();
+            $bf->update( [$request['booking']] );
+            $data = [
+                'booking' => WBK_Model_Utils::get_booking_data( $request['booking'] ),
+            ];
+            $response = new \WP_REST_Response($data, 200);
+            $response->set_status( 200 );
+            return $response;
+        }
+        return $this->response_error( 'Something went wrong.' );
+    }
+
+    public function delete_booking_permission( $request ) {
+        if ( !isset( $request['booking'] ) || !ctype_digit( $request['booking'] ) ) {
+            return false;
+        }
+        if ( current_user_can( 'manage_options' ) ) {
+            return true;
+        }
+        return WBK_Validator::is_booking_made_by_current_user( $request['booking'] );
+    }
+
+    public function delete_booking( $request ) {
+        if ( !isset( $request['booking'] ) || !ctype_digit( $request['booking'] ) ) {
+            return $this->response_error( 'Wrong booking passed.' );
+        }
+        $bf = new WBK_Booking_Factory();
+        if ( $bf->destroy( $request['booking'], 'customer', true ) == false ) {
+            return $this->response_error( 'Something went wrong.' );
+        }
+        return new \WP_REST_Response([
+            'status' => 'success',
+        ], 200);
     }
 
 }

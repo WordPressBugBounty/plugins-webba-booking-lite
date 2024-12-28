@@ -488,12 +488,12 @@ function wbk_update_appearance_preview(elem) {
 function wbk_change_button_status(elem, status) {
     if (status == 'loading') {
         elem.addClass('loading-btn-wb')
-        elem.find('.btn-ring-wb').css('opacity', '1')
+        elem.find('.btn-ring-wbk').css('opacity', '1')
         elem.attr('disabled', true)
     }
     if (status == 'regular') {
         elem.removeClass('loading-btn-wb')
-        elem.find('.btn-ring-wb').css('opacity', '0')
+        elem.find('.btn-ring-wbk').css('opacity', '0')
         elem.attr('disabled', false)
     }
 }

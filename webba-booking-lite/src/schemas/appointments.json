@@ -1,0 +1,72 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "appointment_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Customer"
+        },
+        "appointment_service_id": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Service"
+        },
+        "appointment_day": {
+            "type": "string",
+            "input_type": "date",
+            "hidden": true,
+            "title": "Date"
+        },
+        "appointment_time": {
+            "type": "string",
+            "input_type": "time",
+            "hidden": true,
+            "title": "Time"
+        },
+        "appointment_quantity": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Places booked"
+        },
+        "appointment_email": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Email"
+        },
+        "appointment_phone": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Phone"
+        },
+        "appointment_description": {
+            "type": "string",
+            "input_type": "textarea",
+            "hidden": true,
+            "title": "Comment"
+        },
+        "appointment_extra": {
+            "type": "string",
+            "input_type": "webba_custom_data",
+            "hidden": true,
+            "title": "Custom fields"
+        },
+        "appointment_moment_price": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Payment"
+        },
+        "appointment_status": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Status"
+        }
+    }
+}

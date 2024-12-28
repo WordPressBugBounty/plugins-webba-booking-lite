@@ -33,10 +33,9 @@ $payment_methods_html = '';
         }
         ?>
         <li>
-            <label class="custom-radiobutton-w">
+            <label class="custom-radiobutton-wbk">
                 <span style="display:inline-block"><?php echo $titles[$payment_method]; ?></span><br>
-                <input type="radio" class="wbk-input" name="payment-method"
-                    value="<?php echo esc_attr($payment_method) ?>">
+                <input type="radio" class="wbk-input" name="payment-method" value="<?php echo esc_attr($payment_method) ?>">
                 <span class="checkmark-w"></span>
             </label>
             <div class="wbk_payment_method_desc" style="display:none"><?php echo $descriptions[$payment_method]; ?></div>

@@ -186,5 +186,13 @@
                 editor.insertContent( content );
             }
         });
+        editor.addButton( 'wbk_user_dashboard_link', {
+            text: 'User Dashboard link',
+            icon: false,
+            onclick: function() {
+                var content = '#dashboard_page';
+                editor.insertContent( content );
+            }
+        });
     });
 })();

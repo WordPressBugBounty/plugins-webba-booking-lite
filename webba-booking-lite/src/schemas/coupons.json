@@ -1,0 +1,42 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "coupon_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Coupon"
+        },
+        "coupon_date_range": {
+            "type": "string",
+            "input_type": "date_range",
+            "hidden": false,
+            "title": "Available on"
+        },
+        "coupon_services": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Services"
+        },
+        "coupon_maximum": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Usage limit"
+        },
+        "coupon_amount_fixed": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Discount (fixed)"
+        },
+        "coupon_amount_percentage": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Discount (percentage)"
+        }
+    }
+}

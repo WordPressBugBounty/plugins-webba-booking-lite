@@ -84,7 +84,9 @@
             selectOtherMonths: true,
             dayNamesMin: jQuery.datepicker._defaults.dayNamesShort,
             onSelect: function () {
-                jQuery('[data-js="next-step-button-w"]').removeAttr('disabled')
+                jQuery('[data-js="next-step-button-wbk"]').removeAttr(
+                    'disabled'
+                )
             },
         })
 
@@ -391,7 +393,7 @@
             var jQuerywbk_sidebar_roll_wb = jQuery(this)
 
             jQuerywbk_sidebar_roll_wb
-                .find('[data-js="close-button-wb"]')
+                .find('[data-js="close-button-wbkb"]')
                 .click(function () {
                     jQuerywbk_sidebar_roll_wb.removeClass('slide-wb')
 
@@ -434,7 +436,7 @@
             )
 
             jQuerycopy_fieldset_wb
-                .find('[data-js="copy-button-wb"]')
+                .find('[data-js="copy-button-wbkb"]')
                 .click(function (e) {
                     e.preventDefault()
 
@@ -773,11 +775,11 @@
                 jQuery(this).addClass('active-wb')
 
                 if (jQuery(this).hasClass('toggle-item-mobile-wb')) {
-                    jQuery('[data-js-appointment-box-wrapper]').addClass(
+                    jQuery('[data-js-appointment-box-wbkrapper]').addClass(
                         'mobile-version-wb'
                     )
                 } else {
-                    jQuery('[data-js-appointment-box-wrapper]').removeClass(
+                    jQuery('[data-js-appointment-box-wbkrapper]').removeClass(
                         'mobile-version-wb'
                     )
                 }
@@ -832,7 +834,7 @@
 
         jQuerydatepicker_w.datepicker('show')
 
-        jQuery('[data-js="next-step-button-w"]').attr('disabled', 'disabled')
+        jQuery('[data-js="next-step-button-wbk"]').attr('disabled', 'disabled')
     }
 
     /* END clear datepicker */
@@ -1814,12 +1816,12 @@
 function wbk_change_button_status_options(elem, status) {
     if (status == 'loading') {
         elem.addClass('loading-btn-wb')
-        elem.find('.btn-ring-wb').css('opacity', '1')
+        elem.find('.btn-ring-wbk').css('opacity', '1')
         elem.attr('disabled', true)
     }
     if (status == 'regular') {
         elem.removeClass('loading-btn-wb')
-        elem.find('.btn-ring-wb').css('opacity', '0')
+        elem.find('.btn-ring-wbk').css('opacity', '0')
         elem.attr('disabled', false)
     }
 }

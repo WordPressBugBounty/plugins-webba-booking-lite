@@ -44,7 +44,7 @@ if (isset($_GET['ggeventadd'])) {
             'Add to my Google Calendar'
         );
         $message .=
-            '<input type="button" class="button-w mt-30-w wbk-addgg-link" data-link="' .
+            '<input type="button" class="button-wbk mt-30-w wbk-addgg-link" data-link="' .
             esc_url($auth_url) .
             '" value="' .
             esc_html($link_text) .

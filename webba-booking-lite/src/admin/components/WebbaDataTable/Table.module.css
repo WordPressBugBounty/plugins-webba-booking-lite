@@ -1,0 +1,83 @@
+.webbaDataTable {
+    border-collapse: collapse;
+    width: 100%;
+    text-align: center;
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+.tableHead {
+    background-color: #cbe7e7;
+}
+
+.tableHeader {
+    padding: 15px;
+}
+
+.tableHeader:first-child {
+    border-radius: 10px 0 0 10px;
+}
+
+.tableHeader:last-child {
+    border-radius: 0 10px 10px 0;
+}
+
+.tableCell {
+    padding: 15px;
+}
+
+.tableRow {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.tableRowExpanded {
+    background-color: #f5fafa;
+}
+
+.menuBtn {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.menuBtn {
+    transition:
+        opacity 200ms,
+        transform 500ms;
+}
+
+.menuBtn:hover {
+    opacity: 0.7;
+}
+
+.menuBtn.hidden {
+    visibility: hidden;
+}
+
+.menuBtn.open {
+    transform: rotate(180deg);
+}
+
+.tableContainer {
+    box-shadow: 0 0 15px rgba(161, 164, 182, 0.5);
+    border-radius: 20px;
+    padding: 35px 35px 35px 35px;
+    margin: 30px 30px 30px 0;
+    background: #fff;
+}
+
+.tableTitleContainer {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.tableTitle {
+    font-family: poppins-medium, arial;
+    font-weight: normal;
+    font-size: 32px;
+}
+
+.expandedData {
+    padding: 15px;
+}

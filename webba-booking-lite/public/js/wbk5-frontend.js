@@ -21,6 +21,7 @@ class WEBBA5_Form {
                 .trigger('click')
         })
         jQuery('.wbk_service_description_switcher').click(function (e) {
+            console.log('open')
             e.preventDefault()
             jQuery(this).siblings('.wbk_read_more').toggle()
             jQuery(this).toggleClass('wbk_rotate_90')
@@ -33,7 +34,7 @@ class WEBBA5_Form {
 
         if (container.find('.wbk_service_categories').length == 0) {
             get_this()
-                .container.find('.wbk_service_label')
+                .container.find('.service-label-wbk')
                 .removeClass('wbk_hidden')
 
             get_this()
@@ -47,7 +48,7 @@ class WEBBA5_Form {
             container.find('.wbk_services').trigger('change')
             if (jQuery(this).val() == 0) {
                 get_this()
-                    .container.find('.wbk_service_label')
+                    .container.find('.service-label-wbk')
                     .addClass('wbk_hidden')
 
                 get_this()
@@ -98,7 +99,7 @@ class WEBBA5_Form {
             .first()
             .addClass('active-w')
 
-        container.find('.button-next-w').click(function () {
+        container.find('.button-next-wbk').click(function () {
             if (
                 jQuery('.appointment-content-screen-active-w').attr(
                     'data-slug'
@@ -109,7 +110,7 @@ class WEBBA5_Form {
             get_this().next_step()
             return false
         })
-        container.find('.button-prev-w').click(function () {
+        container.find('.button-prev-wbk').click(function () {
             get_this().prev_step()
             return false
         })
@@ -214,7 +215,7 @@ class WEBBA5_Form {
     }
     async get_service_data() {
         this.container
-            .find('.appointment-content-scroll-w')
+            .find('.appointment-content-scroll-wbk')
             .append('<div class="wbk-loading"></div>')
         var response = await this.do_request('wbk_prepare_service_data')
         response = jQuery.parseJSON(response)
@@ -228,9 +229,9 @@ class WEBBA5_Form {
     }
     circle_chart() {
         var color = this.container
-            .find('.circle-chart-wb')
+            .find('.circle-chart-wbk')
             .attr('data-circle-color')
-        this.container.find('.circle-chart-wb').easyPieChart({
+        this.container.find('.circle-chart-wbk').easyPieChart({
             animate: false,
             barColor: '#ffffff',
             trackColor: color,
@@ -408,7 +409,7 @@ class WEBBA5_Form {
                     } else {
                         value = get_this()
                             .container.find('.wbk_services:checked')
-                            .closest('.custom-radiobutton-w')
+                            .closest('.custom-radiobutton-wbk')
                             .find('.wbk_single_service_title')
                             .text()
                         value = [value]
@@ -464,7 +465,7 @@ class WEBBA5_Form {
                                 "label[for='" + chk_id + "']"
                             ).html()
                             var new_checkbox_html =
-                                '<div class="wbk_checkbox_container"><label class="wbk-input-label" for="' +
+                                '<div class="wbk_checkbox_container"><label class="input-label-wbk" for="' +
                                 chk_id +
                                 '" >' +
                                 chk_label +
@@ -687,21 +688,21 @@ class WEBBA5_Form {
             return this
         }
 
-        this.container.find('.button-prev-w').remove()
+        this.container.find('.button-prev-wbk').remove()
         this.container
-            .find('.button-next-w')
+            .find('.button-next-wbk')
             .html(
                 wbkl10n.continue +
-                    '<span class="btn-ring-wb" style="opacity: 0;"></span>'
+                    '<span class="btn-ring-wbk" style="opacity: 0;"></span>'
             )
         this.container
-            .find('.button-next-w')
+            .find('.button-next-wbk')
             .after(
-                '<button type="button" style="display:none" class="button-w button-approve-stripe-payment" disabled>' +
+                '<button type="button" style="display:none" class="button-wbk button-approve-stripe-payment" disabled>' +
                     wbkl10n.approve_payment_text +
-                    '<span class="btn-ring-wb" style="opacity: 0;"></span></button>'
+                    '<span class="btn-ring-wbk" style="opacity: 0;"></span></button>'
             )
-        this.container.find('.button-next-w').prop('disabled', true)
+        this.container.find('.button-next-wbk').prop('disabled', true)
         get_this().init_scroll_bars()
         this.init_nice_select()
 
@@ -739,7 +740,7 @@ class WEBBA5_Form {
                     .slideToggle()
 
                 if (method == 'stripe') {
-                    get_this().container.find('.button-next-w').toggle(false)
+                    get_this().container.find('.button-next-wbk').toggle(false)
                     get_this()
                         .container.find('.button-approve-stripe-payment')
                         .toggle(true)
@@ -792,7 +793,7 @@ class WEBBA5_Form {
                         get_this().container.find('')
                     }
                 } else {
-                    get_this().container.find('.button-next-w').toggle(true)
+                    get_this().container.find('.button-next-wbk').toggle(true)
                     get_this()
                         .container.find('.button-approve-stripe-payment')
                         .toggle(false)
@@ -862,7 +863,7 @@ class WEBBA5_Form {
         }
 
         if (get_this().container.find('[name="payment-method"').length == 0) {
-            jQuery('.button-next-w').remove()
+            jQuery('.button-next-wbk').remove()
             return
         }
 
@@ -924,7 +925,7 @@ class WEBBA5_Form {
             }
             var amount_token = Math.random().toString(36).substr(2)
             jQuery('.wbk_amount_update_token').val(amount_token)
-            jQuery('.appointment-content-w').attr(
+            jQuery('.appointment-content-wbk').attr(
                 'data-amount-token',
                 amount_token
             )
@@ -940,7 +941,7 @@ class WEBBA5_Form {
             }
             if (
                 response.amount_token ==
-                jQuery('.appointment-content-w').attr('data-amount-token')
+                jQuery('.appointment-content-wbk').attr('data-amount-token')
             ) {
                 this.container
                     .find('.wbk_loader_s')
@@ -1064,9 +1065,9 @@ class WEBBA5_Form {
                     .find('.nice-select')
                     .attr('data-slug') == 'form'
             ) {
-                jQuery('.appointment-content-scroll-w').css('height', 'auto')
+                jQuery('.appointment-content-scroll-wbk').css('height', 'auto')
                 if (jQuery('.wbk_custom_form_spacer').length == 0) {
-                    jQuery('.appointment-content-scroll-w').append(
+                    jQuery('.appointment-content-scroll-wbk').append(
                         '<div class="wbk_custom_form_spacer"></div>'
                     )
                 }
@@ -1074,7 +1075,7 @@ class WEBBA5_Form {
             }
         }
         if (!this.check_mobile()) {
-            jQuery('.appointment-content-scroll-w').css('height', '555px')
+            jQuery('.appointment-content-scroll-wbk').css('height', '555px')
         }
         Scrollbar.initAll({ alwaysShowTracks: true, damping: 0.5 })
     }
@@ -1088,7 +1089,7 @@ class WEBBA5_Form {
         }
         this.container.find('.dynamic-slots-w').remove()
         this.container
-            .find('.appointment-content-scroll-w')
+            .find('.appointment-content-scroll-wbk')
             .append('<div class="wbk-loading"></div>')
         var response = await this.do_request('wbk_search_time')
         if (response == false) {
@@ -1311,7 +1312,7 @@ class WEBBA5_Form {
 
         this.render_selected_time_slots_list()
         if (wbkl10n.auto_next == 'enabled') {
-            this.container.find('.button-next-w').trigger('click')
+            this.container.find('.button-next-wbk').trigger('click')
         }
     }
     select_time_slots_by_list() {
@@ -2086,12 +2087,12 @@ class WEBBA5_Form {
     change_button_status(elem, status) {
         if (status == 'loading') {
             elem.addClass('loading-btn-wb')
-            elem.find('.btn-ring-wb').css('opacity', '1')
+            elem.find('.btn-ring-wbk').css('opacity', '1')
             elem.attr('disabled', true)
         }
         if (status == 'regular') {
             elem.removeClass('loading-btn-wb')
-            elem.find('.btn-ring-wb').css('opacity', '0')
+            elem.find('.btn-ring-wbk').css('opacity', '0')
             elem.attr('disabled', false)
         }
     }
@@ -2278,7 +2279,7 @@ class WEBBA5_Form {
 
                 if (!passed) {
                     get_this()
-                        .container.find('.button-next-w')
+                        .container.find('.button-next-wbk')
                         .prop('disabled', true)
                     if (typeof wbk_external_validation === 'function') {
                         wbk_external_validation(passed)
@@ -2348,9 +2349,9 @@ class WEBBA5_Form {
             })
         }
         if (!passed) {
-            get_this().container.find('.button-next-w').prop('disabled', true)
+            get_this().container.find('.button-next-wbk').prop('disabled', true)
         } else {
-            get_this().container.find('.button-next-w').prop('disabled', false)
+            get_this().container.find('.button-next-wbk').prop('disabled', false)
         }
 
         return passed
@@ -2384,11 +2385,11 @@ class WEBBA5_Form {
         var step = parseInt(get_this().container.attr('data-step'))
         if (step == 1) {
             get_this()
-                .container.find('.button-prev-w')
+                .container.find('.button-prev-wbk')
                 .addClass('wbk_invisible')
         } else {
             get_this()
-                .container.find('.button-prev-w')
+                .container.find('.button-prev-wbk')
                 .removeClass('wbk_invisible')
         }
     }
@@ -2399,7 +2400,7 @@ class WEBBA5_Form {
         }
         this.container.find('.appointment-status-wrapper-w').fadeOut('fast')
         this.container
-            .find('.appointment-content-w')
+            .find('.appointment-content-wbk')
             .fadeOut('fast', function () {
                 if (typeof response !== 'object') {
                     response = jQuery.parseJSON(response)
@@ -2437,7 +2438,7 @@ class WEBBA5_Form {
 
         Scrollbar.destroyAll()
         get_this().change_button_status(
-            get_this().container.find('.button-next-w'),
+            get_this().container.find('.button-next-wbk'),
             'regular'
         )
 
@@ -2485,7 +2486,7 @@ class WEBBA5_Form {
         }
         var step = parseInt(this.container.attr('data-step'))
         this.container
-            .find('.circle-chart-text-wb')
+            .find('.circle-chart-text-wbk')
             .html(step + ' ' + wbkl10n.of + ' ' + total_steps)
 
         var acive_step_title = this.container
@@ -2493,22 +2494,22 @@ class WEBBA5_Form {
             .find('.text-title-w')
             .html()
 
-        this.container.find('.current-step-w').html(acive_step_title)
+        this.container.find('.current-step-wbk').html(acive_step_title)
         var next_li = this.container
             .find('.appointment-status-list-w > li.active-w')
             .nextAll('li')
 
         if (next_li.length > 0) {
-            var next_text = this.container.find('.button-next-w').html()
+            var next_text = this.container.find('.button-next-wbk').html()
             this.container
-                .find('.next-step-w')
+                .find('.next-step-wbk')
                 .html(next_text + ': ' + next_li.find('.text-title-w').html())
         } else {
-            this.container.find('.next-step-w').html('')
+            this.container.find('.next-step-wbk').html('')
         }
         var progress = parseInt((100 * step) / total_steps)
         this.container
-            .find('.circle-chart-wb')
+            .find('.circle-chart-wbk')
             .data('easyPieChart')
             .update(progress)
     }
@@ -2527,7 +2528,7 @@ class WEBBA5_Form {
         var next_screen = get_this().get_next_screen()
         if (next_screen.length == 0) {
             get_this().change_button_status(
-                get_this().container.find('.button-next-w'),
+                get_this().container.find('.button-next-wbk'),
                 'loading'
             )
 
@@ -2538,7 +2539,7 @@ class WEBBA5_Form {
         var response = null
         if (next_screen.attr('data-request') != '') {
             get_this().change_button_status(
-                get_this().container.find('.button-next-w'),
+                get_this().container.find('.button-next-wbk'),
                 'loading'
             )
             response = await this.do_request(next_screen.attr('data-request'))
@@ -2551,7 +2552,7 @@ class WEBBA5_Form {
                 response = jQuery.parseJSON(response)
                 if (response.status == 'fail') {
                     get_this().change_button_status(
-                        get_this().container.find('.button-next-w'),
+                        get_this().container.find('.button-next-wbk'),
                         'regular'
                     )
                     this.show_error(response.description)
@@ -2607,7 +2608,7 @@ class WEBBA5_Form {
                 .container.find('.appointment-content-screen-active-w')
                 .fadeOut('fast', function () {
                     get_this().change_button_status(
-                        get_this().container.find('.button-next-w'),
+                        get_this().container.find('.button-next-wbk'),
                         'regular'
                     )
                     get_this()
@@ -2636,7 +2637,7 @@ class WEBBA5_Form {
 
 let webba_forms = []
 jQuery(function ($) {
-    jQuery('.appointment-box-w').each(function () {
+    jQuery('.appointment-box-wbk').each(function () {
         var form = new WEBBA5_Form(jQuery(this))
         webba_forms.push(form)
     })

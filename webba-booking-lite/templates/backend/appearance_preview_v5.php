@@ -3,7 +3,7 @@ if (!defined('ABSPATH'))
     exit;
 ?>
 
-<div class="appointment-box-w" data-step="2">
+<div class="appointment-box-wbk" data-step="2">
     <div class="appointment-status-wrapper-w">
         <ul class="appointment-status-list-w">
             <li data-slug="services" class="completed-w">
@@ -52,22 +52,22 @@ if (!defined('ABSPATH'))
                 </div>
             </li>
         </ul>
-        <div class="circle-chart-wb" data-percent="25"><span class="circle-chart-text-wb">2 of 3</span><canvas
+        <div class="circle-chart-wbk" data-percent="25"><span class="circle-chart-text-wbk">2 of 3</span><canvas
                 height="110" width="110"></canvas></div>
-        <div class="appointment-status-text-mobile-w">
-            <p class="current-step-w">Date and time</p>
-            <p class="next-step-w">Next<span class="btn-ring-wb" style="opacity: 1;"></span>: Details</p>
+        <div class="appointment-status-text-mobile-wbk">
+            <p class="current-step-wbk">Date and time</p>
+            <p class="next-step-wbk">Next<span class="btn-ring-wbk" style="opacity: 1;"></span>: Details</p>
         </div>
     </div>
-    <div class="appointment-content-w">
+    <div class="appointment-content-wbk">
         <form>
-            <div class="appointment-content-scroll-w" data-scrollbar="true" tabindex="-1"
+            <div class="appointment-content-scroll-wbk" data-scrollbar="true" tabindex="-1"
                 style="outline: none; overflow: hidden;">
                 <div class="scroll-content" style="transform: translate3d(0px, -19px, 0px);">
                     <div class="appointment-content-screen-w" data-slug="services" data-title="Service" data-request=""
                         style="display: none;">
                         <div class="field-row-w wbk_services_row_container ">
-                            <label class="wbk-input-label">Select a service</label>
+                            <label class="input-label-wbk">Select a service</label>
                             <div class="custom-select-w">
                                 <select class="wbk-select wbk-input wbk_services linear-animation-w" name="service"
                                     data-validation="positive" data-validationmsg="Please, select a service."
@@ -105,7 +105,7 @@ if (!defined('ABSPATH'))
                             </div>
                         </div>
                         <div class="wbk_description_holder">
-                            <label class="wbk-input-label">
+                            <label class="input-label-wbk">
                             </label>
                         </div>
                     </div>
@@ -285,11 +285,11 @@ if (!defined('ABSPATH'))
                 </div>
             </div><!-- /.appointent-content-scroll-w -->
 
-            <div class="button-block-w two-buttons-w">
-                <button class="button-w button-prev-w wbk_demo_button">Back</button>
-                <button class="button-w button-next-w wbk_demo_button">Next<span class="btn-ring-wb"
+            <div class="button-block-wbk two-buttons-wbk">
+                <button class="button-wbk button-prev-wbk wbk_demo_button">Back</button>
+                <button class="button-wbk button-next-wbk wbk_demo_button">Next<span class="btn-ring-wbk"
                         style="opacity: 0;"></span></button>
-            </div><!-- /.button-block-w -->
+            </div><!-- /.button-block-wbk -->
             <div class="form-error-w" style="display: none;">
                 <img class="warning-img-w"
                     src="http://localhost/wbk4/wp-content/plugins/webba-booking/public/images/error-icon.png"
@@ -297,6 +297,6 @@ if (!defined('ABSPATH'))
                 <span class="form-error-message-w"></span>
             </div>
         </form>
-    </div><!-- /.appointment-content-w -->
+    </div><!-- /.appointment-content-wbk -->
 
 </div>

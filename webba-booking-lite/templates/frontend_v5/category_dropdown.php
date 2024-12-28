@@ -6,7 +6,7 @@ $category_ids = $data[0];
 ?>
 
 <div class="field-row-w">
-    <label class="wbk-input-label">
+    <label class="input-label-wbk">
         <?php echo WBK_Validator::kses(get_option('wbk_category_label', __('Select category', 'webba-booking-lite'))); ?>
     </label>
     <div class="custom-select-w">

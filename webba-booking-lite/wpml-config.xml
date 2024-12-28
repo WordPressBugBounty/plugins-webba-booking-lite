@@ -1,6 +1,6 @@
 <wpml-config>
     <admin-texts>
-			<key name="wbk_service_label"/>
+			<key name="service-label-wbk"/>
 			<key name="wbk_date_extended_label"/>
             <key name="wbk_date_basic_label"/>
             <key name="wbk_category_label"/>
@@ -85,5 +85,15 @@
             <key name="wbk_approve_button_text"/> 
             <key name="wbk_coupon_label"/>
             <key name="wbk_coupon_apply_text"/>
+            <key name="wbk_coupon_apply_text"/>
+            <key name="wbk_user_dashboard_login_title"/>
+            <key name="wbk_user_dashboard_no_bookings_available"/>
+            <key name="wbk_user_dashboard_please_wait_state"/>
+            <key name="wbk_user_dashboard_link_text_confirm_cancellation"/>
+            <key name="wbk_user_dashboard_link_text_cancel"/>
+            <key name="wbk_user_dashboard_link_text_reschedule"/>
+            <key name="wbk_user_dashboard_section_past_bookings_label"/>
+            <key name="wbk_user_dashboard_section_bookings_label"/>
+            <key name="wbk_user_dashboard_link_label"/>           
 	</admin-texts>
 </wpml-config>

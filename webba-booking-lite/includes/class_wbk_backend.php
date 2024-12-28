@@ -28,8 +28,23 @@ class WBK_Backend {
             10,
             2
         );
+        add_action( 'admin_enqueue_scripts', [$this, 'register_and_enqueue_react_admin'] );
         $backend_schedule = new WBK_Backend_Schedule();
         $backend_options = new WBK_Backend_Options();
+    }
+
+    public function register_and_enqueue_react_admin() {
+        /*
+        $script_name = 'wbk-react-admin';
+        wp_register_script(
+            $script_name,
+            WP_WEBBA_BOOKING__PLUGIN_URL . '/build/admin/index.js',
+            ['wp-element'],
+            '1.0.0',
+            true
+        );
+        wp_enqueue_script($script_name);
+        */
     }
 
     public function prefix_plugin_update_message( $data, $response ) {

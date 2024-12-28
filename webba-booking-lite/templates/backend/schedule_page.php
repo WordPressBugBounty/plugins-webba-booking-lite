@@ -2,7 +2,7 @@
 // check if accessed directly
 if (!defined('ABSPATH'))
     exit;
-if (isset ($_GET['schedule-tools']) && $_GET['schedule-tools'] == 'true') {
+if (isset($_GET['schedule-tools']) && $_GET['schedule-tools'] == 'true') {
     WBK_Renderer::load_template('backend/backend_page_v5', array(), true);
     return;
 }
@@ -47,7 +47,7 @@ date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
     <?php do_action('wbk_backend_schedule_days_container'); ?>
     <div id="control_container">
     </div>
-    <a class="button-wb" style="float: right; margin-right: 20px;display: block; clear: both;"
+    <a class="button-wbkb" style="float: right; margin-right: 20px;display: block; clear: both;"
         href="<?php echo get_admin_url() . 'admin.php?page=wbk-schedule&tools=true' ?>"
         data-name="sidebar-schedule-tools" data-js="open-sidebar-wb">
         <?php echo esc_html__('Schedule Tools', 'webba-booking-lite'); ?>

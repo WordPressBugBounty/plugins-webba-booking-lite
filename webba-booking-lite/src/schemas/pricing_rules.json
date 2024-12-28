@@ -1,0 +1,126 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "pricing_rule_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Name"
+        },
+        "pricing_rule_priority": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Priority"
+        },
+        "pricing_rule_type": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Type"
+        },
+        "pricing_rule_date_range": {
+            "type": "string",
+            "input_type": "date_range",
+            "hidden": true,
+            "title": "Date range"
+        },
+        "pricing_rule_days_number": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Minimum number of days before the booked date"
+        },
+        "pricing_rule_custom_field_id": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Custom field ID"
+        },
+        "pricing_rule_custom_field_operator": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Operator"
+        },
+        "pricing_rule_custom_field_value": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Custom field value"
+        },
+        "pricing_rule_number_of_seats_operator": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Operator"
+        },
+        "pricing_rule_number_of_seats_value": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Number of seats"
+        },
+        "pricing_rule_number_of_timeslots_operator": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Operator"
+        },
+        "pricing_rule_number_of_timeslots_value": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Number of timeslots"
+        },
+        "pricing_rule_only_same_service": {
+            "type": "string",
+            "input_type": "textarea",
+            "hidden": true,
+            "title": "Only timeslots in the same service"
+        },
+        "pricing_rule_day_time": {
+            "type": "json",
+            "input_type": "business_hours",
+            "hidden": true,
+            "title": "Day of week and time range"
+        },
+        "pricing_rule_action": {
+            "type": "json",
+            "input_type": "business_hours",
+            "hidden": false,
+            "title": "Action"
+        },
+        "pricing_rule_amount": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Amount"
+        },
+        "pricing_rule_fixed_percent": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Fixed / percent"
+        },
+        "pricing_rule_multiply_amount": {
+            "type": "string",
+            "input_type": "textarea",
+            "hidden": true,
+            "title": "Multiply amount by the field value"
+        },
+        "pricing_rule_related_to_seats_number": {
+            "type": "string",
+            "input_type": "textarea",
+            "hidden": true,
+            "title": "The field is related to the number of seats booked"
+        },
+        "pricing_rule_is_for_entire_order": {
+            "type": "string",
+            "input_type": "textarea",
+            "hidden": true,
+            "title": "Apply the pricing rule to the entire order instead of individual time slots."
+        }
+    }
+}

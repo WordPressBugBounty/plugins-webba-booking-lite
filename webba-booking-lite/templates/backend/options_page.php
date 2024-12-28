@@ -80,7 +80,7 @@ if (isset($_GET['timereset'])) {
             <?php foreach ($settings_fields as $section => $fields) { ?>
                 <div class="sidebar-roll-wb" data-js="sidebar-roll-wb" data-name="<?php echo esc_attr($section); ?>">
                     <form action="" method="POST" class="wb-settings-fields-form">
-                        <span class="close-button-wb" data-js="close-button-wb"><img
+                        <span class="close-button-wbkb" data-js="close-button-wbkb"><img
                                 src="<?php echo WP_WEBBA_BOOKING__PLUGIN_URL; ?>/public/images/close-icon2.png"
                                 alt="close"></span>
                         <div class="sidebar-roll-title-wb">
@@ -120,18 +120,18 @@ if (isset($_GET['timereset'])) {
                         </div>
                         <div class="buttons-block-wb">
                             <input type="hidden" name="section" value="<?php echo esc_attr($section); ?>" />
-                            <button type="button" data-js="close-button-wb" class="button-wb button-light-wb">
+                            <button type="button" data-js="close-button-wbkb" class="button-wbkb button-light-wb">
                                 <?php echo esc_html__('Cancel', 'webba-booking-lite') ?>
                             </button>
-                            <button type="submit" class="wb-save-options button-wb">
-                                <?php echo esc_html__('Save', 'webba-booking-lite') ?><span class="btn-ring-wb"></span>
+                            <button type="submit" class="wb-save-options button-wbkb">
+                                <?php echo esc_html__('Save', 'webba-booking-lite') ?><span class="btn-ring-wbk"></span>
                             </button>
                         </div>
                     </form>
                 </div>
             <?php } ?>
         </div>
-        <a class="button-wb" href="<?php echo get_admin_url() . 'admin.php?page=wbk-options&wbk-activation=true'; ?>">
+        <a class="button-wbkb" href="<?php echo get_admin_url() . 'admin.php?page=wbk-options&wbk-activation=true'; ?>">
             <?php echo __('Launch Setup Wizard', 'webba-booking-lite'); ?>
         </a>
     </div>

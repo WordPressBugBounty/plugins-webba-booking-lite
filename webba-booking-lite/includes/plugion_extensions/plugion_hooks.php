@@ -99,7 +99,7 @@ function wbk_plugion_before_table($table_name)
                         get_option('wbk_db_prefix', '') .
                         'wbk_cancelled_appointments'
                     ) { ?>
-                        <button class="button-wb plugion_table_add_button" data-name="<?php echo $table_name; ?>"
+                        <button class="button-wbkb plugion_table_add_button" data-name="<?php echo $table_name; ?>"
                             data-js="open-sidebar-wb">
                             <span class="text-wb">
                                 <?php echo __('Add', 'webba-booking-lite') . ' ' . strtolower(
@@ -501,7 +501,7 @@ function wbk_plugion_cell_content($input, $data)
         $html .= '<option value="approval">' . esc_html__('On approval', 'webba-booking-lite') . '</option>';
         $html .= '<option value="arrival">' . esc_html__('On arrival', 'webba-booking-lite') . '</option>';
         $html .= '</select>';
-        $html .= '<button type="button" data-action-text="' . esc_attr(__('sending...', 'webba-booking-lite')) . '" class="button-wb button-wb-mini resend_email_btn">' . esc_html__('Send', 'webba-booking-lite') . '</button>';
+        $html .= '<button type="button" data-action-text="' . esc_attr(__('sending...', 'webba-booking-lite')) . '" class="button-wbkb button-wbkb-mini resend_email_btn">' . esc_html__('Send', 'webba-booking-lite') . '</button>';
         $html .= '<span class="wbk_email_resend_result"></span">';
         $input .= $html;
 

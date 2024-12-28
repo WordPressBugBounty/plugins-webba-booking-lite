@@ -129,7 +129,6 @@ if (isset($_GET['test'])) {
             WBK_Renderer::load_template('backend/dashboard', array(), true);
             break;
 
-
         default:
             break;
     }

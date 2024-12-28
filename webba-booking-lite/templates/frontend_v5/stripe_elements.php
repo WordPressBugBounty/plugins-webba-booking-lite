@@ -1,33 +1,36 @@
 <?php
-if ( !defined( 'ABSPATH' ) ) exit;
- 
+if (!defined('ABSPATH'))
+    exit;
+
 ?>
 <div class="wbk_mt_25 wbk-clear-block"></div>
- 
+
 <div id="card-element"></div>
 <div id="card-errors"></div>
 
 <?php
- 
 
-$additional_fields = get_option( 'wbk_stripe_additional_fields', '' );
-if( !is_array( $additional_fields ) ){
+
+$additional_fields = get_option('wbk_stripe_additional_fields', '');
+if (!is_array($additional_fields)) {
     $additional_fields = array();
 }
 
-$payment_fields =  WBK_Model_Utils::get_payment_fields();
+$payment_fields = WBK_Model_Utils::get_payment_fields();
 
-foreach( $additional_fields as $key  ) {
+foreach ($additional_fields as $key) {
     $value = $payment_fields[$key];
-?>
-    <label class="wbk-input-label"><?php echo $value; ?></label>
-<?php
-    if( $key != 'country' ){
-?>
-        <input name="wbk-<?php echo esc_attr( $key ) ?>"  data-field="<?php echo esc_attr( $key ); ?>" class="wbk-text wbk-input wbk-stripe-additional-field" id="wbk-<?php echo esc_attr( $key ); ?>" autocomplete="false"   type="text">
-<?php
+    ?>
+    <label class="input-label-wbk"><?php echo $value; ?></label>
+    <?php
+    if ($key != 'country') {
+        ?>
+        <input name="wbk-<?php echo esc_attr($key) ?>" data-field="<?php echo esc_attr($key); ?>"
+            class="wbk-text wbk-input wbk-stripe-additional-field" id="wbk-<?php echo esc_attr($key); ?>" autocomplete="false"
+            type="text">
+        <?php
     } else {
-        $countries = array (
+        $countries = array(
             'AF' => 'Afghanistan',
             'AX' => 'Aland Islands',
             'AL' => 'Albania',
@@ -274,22 +277,22 @@ foreach( $additional_fields as $key  ) {
             'ZM' => 'Zambia',
             'ZW' => 'Zimbabwe'
         );
-?>
-        <select name="wbk-<?php echo esc_attr( $key ); ?>"  data-field="<?php echo esc_attr( $key ); ?>" class="wbk-text wbk-input wbk-stripe-additional-field wbk-select" id="wbk-<?php echo esc_attr( $key ); ?>" autocomplete="false">
-<?php
-        foreach( $countries as $key => $value ){
-?>
-        <option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_attr( $value ); ?></option>
-<?php
-        }
-?>
+        ?>
+        <select name="wbk-<?php echo esc_attr($key); ?>" data-field="<?php echo esc_attr($key); ?>"
+            class="wbk-text wbk-input wbk-stripe-additional-field wbk-select" id="wbk-<?php echo esc_attr($key); ?>"
+            autocomplete="false">
+            <?php
+            foreach ($countries as $key => $value) {
+                ?>
+                <option value="<?php echo esc_attr($key); ?>"><?php echo esc_attr($value); ?></option>
+                <?php
+            }
+            ?>
         </select>
-<?php
+        <?php
     }
 }
 ?>
- 
+
 <input type="hidden" class="wbk-input wbk_stripe_payment_method_id" name="payment_method_id">
 <input type="hidden" class="wbk-input wbk_stripe_payment_intent_id" name="payment_intent_id">
-
- 

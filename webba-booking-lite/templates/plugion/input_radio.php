@@ -33,7 +33,7 @@ switch ($field->get_name()) {
 <div class="field-wrapper-wb">
     <div class="custom-radio-list-wb">
         <?php foreach ($field->get_extra_data() as $slug => $title) { ?>
-            <label class="radiobutton-block-wb">
+            <label class="radiobutton-block-wbkb">
                 <input class="plugion_property_input plugion_input plugion_input_radio" type="radio"
                     name="<?php echo esc_attr($field->get_name()); ?>" value="<?php echo esc_attr($slug); ?>" <?php checked($slug, $field->get_default_value()); ?> data-setter="radio" data-getter="radio"
                     data-validation="radio" />

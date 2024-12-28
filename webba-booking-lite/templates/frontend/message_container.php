@@ -1,5 +1,6 @@
 <?php
-if ( !defined( 'ABSPATH' ) ) exit;
+if (!defined('ABSPATH'))
+    exit;
 $message = $data[0];
 
 ?>
@@ -7,9 +8,9 @@ $message = $data[0];
     <div class="wbk-inner-container">
         <div class="wbk-frontend-row">
             <div class="wbk-col-12-12">
-                <div class="wbk-input-label">
+                <div class="input-label-wbk">
                     <?php
-                        echo esc_html( $message );
+                    echo esc_html($message);
                     ?>
                 </div>
             </div>

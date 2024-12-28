@@ -1056,6 +1056,17 @@ class WBK_Model_Utils {
         ], ['%d'] );
     }
 
+    public static function get_bookings_by_customer_email( $email, $future = true ) {
+        global $wpdb;
+        if ( $future ) {
+            $time_sql = " AND time >" . time();
+        } else {
+            $time_sql = " AND time <" . time();
+        }
+        $booking_ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments WHERE email = %s" . $time_sql, $email ) );
+        return $booking_ids;
+    }
+
     public static function get_bookings_by_service_and_time( $service_id, $time ) {
         global $wpdb;
         $booking_ids = $wpdb->get_col( $wpdb->prepare( "\r\n\t\t\tSELECT      id\r\n\t\t\tFROM        " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments\r\n \t\t\tWHERE       service_id = %d\r\n\t\t\tAND \t\ttime  = %d\r\n\t\t\t", $service_id, $time ) );
@@ -1182,6 +1193,30 @@ class WBK_Model_Utils {
             $locale = str_replace( '-', '_', $booking->get( 'lang' ) );
             switch_to_locale( trim( $locale ) );
         }
+    }
+
+    public static function get_booking_data( $booking_id ) {
+        $booking = new WBK_Booking($booking_id);
+        if ( !$booking->is_loaded() ) {
+            return false;
+        }
+        $service = new WBK_Service($booking->get_service());
+        if ( !$service->is_loaded() ) {
+            return false;
+        }
+        if ( $booking->get_price() > 0 ) {
+            $price = WBK_Format_Utils::format_price( $booking->get_price() );
+        }
+        return [
+            'id'            => $booking_id,
+            'service_id'    => $service->get_id(),
+            'service_name'  => $service->get_name(),
+            'quantity'      => $booking->get_quantity(),
+            'date'          => WBK_Format_Utils::format_booking_time( $booking, 'date' ),
+            'time_formated' => WBK_Format_Utils::format_booking_time( $booking ),
+            'time'          => $booking->get_start(),
+            'price'         => $price,
+        ];
     }
 
 }

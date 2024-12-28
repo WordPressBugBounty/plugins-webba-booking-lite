@@ -27,7 +27,8 @@ class WBK_Assets_Manager {
             'wbk-coupons',
             'wbk-gg-calendars',
             'wbk-pricing-rules',
-            'wbk-dashboard'
+            'wbk-dashboard',
+            'wbk-spa'
         ];
         if ( isset( $_GET['page'] ) && in_array( $_GET['page'], $admin_pages ) ) {
             Plugion()->initialize_assets( false, false );
@@ -149,9 +150,8 @@ class WBK_Assets_Manager {
         if ( $this->has_shortcode( 'webba_booking' ) || $this->has_shortcode( 'webba_email_landing' ) || $this->has_shortcode( 'webbabooking' ) || $this->has_shortcode( 'webba_multi_service_booking' ) ) {
             $has_shortcode = true;
         }
-        if ( isset( $_GET['ct_builder'] ) || !$has_shortcode ) {
-            return;
-        }
+        $has_ud_shortcode = $this->has_shortcode( 'webba_user_dashboard' );
+        error_log( var_export( $has_shortcode, true ) );
         if ( isset( $_GET['action'] ) && $_GET['action'] == 'oxy_render_oxy-site-navigation' ) {
             return;
         }
@@ -163,7 +163,7 @@ class WBK_Assets_Manager {
         }
         wp_enqueue_script( 'jquery-effects-fade' );
         foreach ( $this->css as $item ) {
-            if ( $item[0] == 'frontend5' && get_option( 'wbk_mode', 'webba5' ) == 'webba5' ) {
+            if ( $item[0] == 'frontend5' && $has_shortcode && get_option( 'wbk_mode', 'webba5' ) == 'webba5' ) {
                 wp_enqueue_style(
                     $item[2],
                     $item[3],
@@ -172,6 +172,14 @@ class WBK_Assets_Manager {
                 );
             }
             if ( $item[0] == 'frontend' && get_option( 'wbk_mode', 'webba5' ) != 'webba5' ) {
+                wp_enqueue_style(
+                    $item[2],
+                    $item[3],
+                    $item[4],
+                    $item[5]
+                );
+            }
+            if ( $item[0] == 'frontend-ud' && $has_ud_shortcode ) {
                 wp_enqueue_style(
                     $item[2],
                     $item[3],
@@ -181,13 +189,17 @@ class WBK_Assets_Manager {
             }
         }
         foreach ( $this->js as $item ) {
-            if ( $item[0] == 'frontend5' && get_option( 'wbk_mode', 'webba5' ) == 'webba5' ) {
+            if ( $item[0] == 'frontend5' && $has_shortcode && get_option( 'wbk_mode', 'webba5' ) == 'webba5' ) {
+                $this_in_footer = $in_footer;
+                if ( $item[2] == 'wbk-frontend-v7' ) {
+                    $this_in_footer = true;
+                }
                 wp_enqueue_script(
                     $item[2],
                     $item[3],
                     $item[4],
                     $item[5],
-                    $in_footer
+                    $this_in_footer
                 );
             }
             if ( $item[0] == 'frontend' && get_option( 'wbk_mode', 'webba5' ) != 'webba5' ) {
@@ -197,6 +209,15 @@ class WBK_Assets_Manager {
                     $item[4],
                     $item[5],
                     $in_footer
+                );
+            }
+            if ( $item[0] == 'frontend-ud' && $has_ud_shortcode ) {
+                wp_enqueue_script(
+                    $item[2],
+                    $item[3],
+                    $item[4],
+                    $item[5],
+                    true
                 );
             }
         }
@@ -331,7 +352,7 @@ class WBK_Assets_Manager {
     }
 
     private function has_shortcode( $shortcode = '' ) {
-        if ( get_option( 'wbk_check_short_code', '' ) == '' ) {
+        if ( get_option( 'wbk_check_short_code', '' ) == '' && $shortcode != 'webba_user_dashboard' ) {
             return true;
         }
         $post_to_check = get_post( get_the_ID() );

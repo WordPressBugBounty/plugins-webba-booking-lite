@@ -971,7 +971,7 @@ class Plugion_WBK {
             }
         })
 
-        jQuery('[data-js="close-button-wb"]').click(function () {
+        jQuery('[data-js="close-button-wbkb"]').click(function () {
             jQuery(this)
                 .parent()
                 .find('.delete-confirm-wb')
@@ -2753,7 +2753,7 @@ jQuery(function () {
         selectOtherMonths: true,
         dayNamesMin: jQuery.datepicker._defaults.dayNamesShort,
         onSelect: function () {
-            jQuery('[data-js="next-step-button-w"]').removeAttr('disabled')
+            jQuery('[data-js="next-step-button-wbk"]').removeAttr('disabled')
         },
     })
 
@@ -2871,7 +2871,7 @@ jQuery(function () {
 
     /** Graph */
     dashboard_graph()
-    jQuery('.button-wb-appearance-save').click(function () {
+    jQuery('.button-wbkb-appearance-save').click(function () {
         var appearance_data = []
         var btn = jQuery(this)
         wbk_change_button_status(btn, 'loading')
@@ -3066,7 +3066,7 @@ function copy_to_clipboard() {
         )
 
         jQuerycopy_fieldset_wb
-            .find('[data-js="copy-button-wb"]')
+            .find('[data-js="copy-button-wbkb"]')
             .click(function (e) {
                 e.preventDefault()
 
@@ -3391,11 +3391,11 @@ function toggle_switcher_mobile() {
             jQuery(this).addClass('active-wb')
 
             if (jQuery(this).hasClass('toggle-item-mobile-wb')) {
-                jQuery('[data-js-appointment-box-wrapper]').addClass(
+                jQuery('[data-js-appointment-box-wbkrapper]').addClass(
                     'mobile-version-wb'
                 )
             } else {
-                jQuery('[data-js-appointment-box-wrapper]').removeClass(
+                jQuery('[data-js-appointment-box-wbkrapper]').removeClass(
                     'mobile-version-wb'
                 )
             }
@@ -3448,7 +3448,7 @@ function clear_datepicker_w() {
 
     jQuerydatepicker_w.datepicker('show')
 
-    jQuery('[data-js="next-step-button-w"]').attr('disabled', 'disabled')
+    jQuery('[data-js="next-step-button-wbk"]').attr('disabled', 'disabled')
 }
 
 /* END clear datepicker */

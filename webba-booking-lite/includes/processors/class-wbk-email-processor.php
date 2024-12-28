@@ -18,7 +18,7 @@ class WBK_Email_Processor {
             return;
         }
         $headers[] = 'From: ' . stripslashes( get_option( 'wbk_from_name' ) ) . ' <' . get_option( 'wbk_from_email' ) . '>';
-        $attachment = [];
+        $attachments = [];
         $queue = array();
         switch ( $action ) {
             case 'confirmation':
@@ -97,12 +97,19 @@ class WBK_Email_Processor {
                 if ( get_option( 'wbk_email_customer_paymentrcvd_status', '' ) == 'true' || $ignore_off_state ) {
                     $message = get_option( 'wbk_email_customer_paymentrcvd_message' );
                     $subject = get_option( 'wbk_email_customer_paymentrcvd_subject', '' );
+                    $attachments = apply_filters(
+                        'wbk_payment_notification_attachmets',
+                        $attachments,
+                        $bookings,
+                        $booking->get( 'email' )
+                    );
                     $message = WBK_Placeholder_Processor::process( $message, $bookings );
                     $subject = WBK_Placeholder_Processor::process( $subject, $bookings );
                     $queue[] = array(
-                        'address' => $booking->get( 'email' ),
-                        'message' => $message,
-                        'subject' => $subject,
+                        'address'     => $booking->get( 'email' ),
+                        'message'     => $message,
+                        'subject'     => $subject,
+                        'attachments' => $attachments,
                     );
                 }
                 break;
@@ -128,13 +135,22 @@ class WBK_Email_Processor {
                     }
                 }
                 break;
+            case 'user_created':
+                $subject = WBK_Placeholder_Processor::process( get_option( 'wbk_user_welcome_email_subject' ), $bookings );
+                $message = WBK_Placeholder_Processor::process( get_option( 'wbk_user_welcome_email_body' ), $bookings );
+                $queue[] = array(
+                    'address' => $booking->get( 'email' ),
+                    'message' => $message,
+                    'subject' => $subject,
+                );
+                break;
             default:
                 break;
         }
         foreach ( $queue as $notification ) {
             if ( WBK_Validator::check_string_size( $notification['message'], 1, 50000 ) && WBK_Validator::check_string_size( $notification['subject'], 1, 200 ) ) {
                 add_filter( 'wp_mail_content_type', 'wbk_wp_mail_content_type' );
-                if ( count( $attachment ) > 0 ) {
+                if ( count( $attachments ) > 0 ) {
                     wp_mail(
                         $notification['address'],
                         $notification['subject'],

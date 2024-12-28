@@ -1,0 +1,358 @@
+.appointment-box-w {
+    display: flex;
+    max-width: 760px;
+    min-height: 650px;
+    background: #fff;
+    padding: 20px 20px 20px 20px;
+    margin: 0 auto;
+    border-radius: 20px;
+    box-shadow: 0 0 60px rgba(161, 163, 182, 0.2);
+}
+.appointment-box-w .appointment-status-wrapper-w {
+    background: #428a89;
+    border-radius: 20px;
+    color: #fff;
+    padding: 20px;
+    min-width: 250px;
+    max-width: 250px;
+    margin: 0 10px 0 0;
+    box-sizing: border-box;
+}
+.wbk_narrow_form .appointment-status-wrapper-w {
+    max-width: 215px;
+    min-width: 215px;
+}
+.circle__box-w {
+    width: 26px;
+    height: 26px;
+    margin: 0 10px 0 0;
+    position: relative;
+}
+.circle__wrapper-w {
+    width: 13px;
+    height: 26px;
+    position: absolute;
+    top: 0;
+    overflow: hidden;
+}
+.circle__wrapper--right-w {
+    right: 0;
+}
+.circle__whole-w {
+    width: 26px;
+    height: 26px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    position: absolute;
+    top: 0;
+    transform: rotate(-135deg);
+}
+.circle__left-w {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    border-left: 2px solid rgba(255, 255, 255, 0.2);
+    left: 0;
+    animation: circleLeft-w 0.4s linear forwards;
+}
+
+li.completed-w .circle-digit-w {
+    animation: append-animate-w 0.4s linear;
+    background: #fff;
+    text-indent: 100px;
+    overflow: hidden;
+}
+
+.circle-digit-w {
+    display: flex;
+    max-width: 26px;
+    max-height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+    margin: 5px 16px;
+}
+.appointment-box-w .appointment-status-list-w {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.appointment-box-w .appointment-status-list-w > li {
+    display: flex;
+    align-items: center;
+    margin: 0 0 10px 0;
+    opacity: 0.6;
+    align-items: flex-start;
+}
+.appointment-box-w .appointment-status-list-w > li.active-w {
+    opacity: 1;
+}
+.appointment-box-w .appointment-status-list-w > li.completed-w .circle-digit-w {
+    animation: append-animate-w 0.4s linear;
+    text-indent: 100px;
+    overflow: hidden;
+}
+.appointment-box-w .appointment-status-list-w .circle-digit-w {
+    display: flex;
+    max-width: 26px;
+    max-height: 26px;
+    min-width: 26px;
+    min-height: 26px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+    margin: 0 10px 0 0;
+}
+.appointment-box-w .appointment-status-list-w .text-w {
+    padding: 2px 0 0 0;
+}
+.appointment-box-w .appointment-status-list-w .text-w .text-title-w {
+    font-size: 16px;
+    margin: 0 0 10px 0;
+    padding: 0 !important;
+    font-family: poppins, arial;
+}
+.appointment-box-w .appointment-status-list-w .text-w .subtitle-list-w {
+    list-style: disc;
+    margin: 0 0 0 20px;
+    max-width: 200px;
+    font-size: 14px;
+    padding: 0 !important;
+}
+.appointment-box-w .appointment-status-list-w .text-w .subtitle-list-w li + li {
+    margin-top: 10px;
+}
+.components-radio-control__input,
+.components-checkbox-control__input {
+    box-shadow: none !important;
+}
+.wbk_v5_service_list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+li.wbk_service_item {
+    position: relative;
+    margin: 0 0 20px 0 !important;
+    padding: 10px !important;
+    box-shadow: 0 0 10px rgba(161, 164, 182, 0.26);
+    border-radius: 10px;
+    cursor: pointer;
+}
+.timeslot-animation-w {
+    animation: append-animate-w 0.3s linear;
+}
+.appointment-content-w .wbk-input-label {
+    display: block;
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #000;
+    font-family: poppins, arial;
+}
+
+.appointment-content-w:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.appointment-status-text-mobile-wb {
+    display: none;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.current-step-w {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: poppins-medium, arial;
+    font-size: 16px;
+}
+.next-step-w {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 14px;
+}
+
+@media (max-width: 1200px) {
+    .appointment-box-w {
+        display: block;
+        box-shadow: none;
+        padding: 5px 0 10px 0;
+        min-height: 0;
+    }
+    .appointment-box-w .appointment-status-wrapper-w {
+        display: flex;
+        padding: 20px 25px 20px 25px;
+        align-items: center;
+        min-width: 0;
+        max-width: none;
+        margin: 0 15px 20px 15px;
+    }
+    .appointment-status-list-w {
+        display: none;
+    }
+    .appointment-status-text-mobile-w {
+        display: block;
+    }
+}
+.circle-chart-wb {
+    display: none;
+    width: 80px;
+    height: 80px;
+    background: #428a89;
+    position: relative;
+    margin: 0 15px 0 0;
+}
+@media (max-width: 950px) {
+    .circle-chart-wb {
+        display: inline-block;
+    }
+}
+
+@media (max-width: 500px) {
+    .appointment-box-w .appointment-status-wrapper-w {
+        padding: 10px;
+    }
+}
+
+.custom-radiobutton-w {
+    display: inline-block;
+    position: relative;
+    padding-left: 25px;
+    line-height: 23px;
+    cursor: pointer;
+    user-select: none;
+    box-sizing: border-box;
+    font-weight: normal;
+}
+.wbk_single_service_title {
+    font-family: poppins, arial;
+    font-size: 16px;
+    display: block;
+    margin-bottom: 10px !important;
+    color: #000;
+}
+.wbk_service_sub_img,
+.wbk_service_sub_img_active {
+    display: inline-block !important;
+    margin-right: 10px;
+    width: 20px !important;
+    vertical-align: middle;
+}
+.wbk_single_service_sub_title {
+    font-family: poppins, arial;
+    font-size: 16px;
+    color: #686080 !important;
+    margin-right: 30px !important;
+}
+.circle-chart-wb .circle-chart-text-wb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wbk_text {
+    border: 1px solid #cdcfde !important;
+    border-radius: 15px !important;
+    height: 50px !important;
+    padding: 0 20px 0 20px !important;
+    font-family: poppins, arial !important;
+    font-size: 16px !important;
+    color: #212121 !important;
+    outline: none !important;
+    background: #fff !important;
+    width: 80% !important;
+    margin: 0 0 20px 0 !important;
+}
+.wbk_hidden {
+    display: none !important;
+}
+.checkmark-w {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    height: 16px;
+    width: 16px;
+    border: 1px solid #212121;
+    border-radius: 50%;
+    box-sizing: border-box;
+    transition: 0.2s;
+}
+.checkmark-multiple-w {
+    border-radius: 0 !important;
+}
+.wbk_service_description_switcher_holder {
+    display: flex;
+}
+.wbk_service_description_switcher {
+    display: block;
+    height: 25px;
+    width: 25px;
+    position: absolute;
+    background: transparent url(chevron_rigth.png) no-repeat;
+    background-size: contain;
+    outline: none;
+    position: relative;
+    margin-top: 10px !important;
+}
+.wbk_read_more {
+    position: relative;
+    float: left;
+    line-height: 46px;
+    font-size: 16px;
+    font-family: poppins, arial;
+}
+.wbk_narrow_form {
+    max-width: 600px;
+}
+.appointment-content-scroll-w {
+    padding: 0 25px 30px 10px;
+    position: relative;
+    margin: 0 0 23px;
+    height: 555px;
+    overflow: hidden !important;
+}
+.appointment-content-w {
+    flex-grow: 1;
+}
+.button-block-w {
+    display: flex;
+    justify-content: right;
+    padding: 0 25px 0 0;
+}
+.button-w {
+    font-family: poppins-semibold, arial !important;
+    display: flex;
+    align-items: center;
+    background: #1f6763;
+    border-radius: 15px !important;
+    color: #fff !important;
+    border: 0 !important;
+    padding: 8px 25px !important;
+    font-size: 16px !important;
+    transition: 0.2s !important;
+    cursor: pointer !important;
+    min-width: 155px !important;
+    outline: none !important;
+    height: 50px !important;
+    text-align: center !important;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-left: 5px;
+}
+
+.loading_holder_w {
+    display: block !important;
+}

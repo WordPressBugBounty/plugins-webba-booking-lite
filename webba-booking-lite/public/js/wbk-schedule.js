@@ -379,7 +379,7 @@ function wbk_load_schedule(start, service_id) {
         setEvents()
         var next_week = parseInt(start) + 1
         jQuery('#control_container').html(
-            '<div class="wbk-schedule-row"><a class="button-wb" id="show_next_week_' +
+            '<div class="wbk-schedule-row"><a class="button-wbkb" id="show_next_week_' +
                 service_id +
                 '_' +
                 next_week +

@@ -275,7 +275,7 @@ class WBK_Booking_Factory {
     public function destroy( $booking_id, $by = '', $force_deletion = false ) {
         $booking = new WBK_Booking($booking_id);
         if ( !$booking->is_loaded() ) {
-            return;
+            return false;
         }
         date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
         // sending emails
@@ -299,6 +299,7 @@ class WBK_Booking_Factory {
             WBK_Model_Utils::delete_booking( $booking_id );
         }
         date_default_timezone_set( 'UTC' );
+        return true;
     }
 
     public function set_as_approved( $booking_ids ) {

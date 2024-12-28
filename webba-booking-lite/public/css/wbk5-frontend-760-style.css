@@ -29,18 +29,18 @@ body {
 span.wbk_single_service_title {
     color: #000;
 }
-.appointment-box-w {
+.appointment-box-wbk {
     color: #000;
 }
 .appointment-status-wrapper-w {
     background-color: #213f5b;
     border-color: #213f5b;
 }
-.circle-chart-wb {
+.circle-chart-wbk {
     background-color: #213f5b;
     border-color: #213f5b;
 }
-.button-w {
+.button-wbk {
     background-color: #1f6763;
     border-color: #1f6763;
 }
@@ -107,12 +107,12 @@ span.wbk_single_service_title {
 .wbk_service_item_active .wbk_service_description_holder {
     color: #fff;
 }
-.wbk_v5_service_list {
+.service-list-v5-wbk {
     list-style: none !important;
     padding: 0 !important;
     margin: 0 !important;
 }
-.wbk_v5_service_list li,
+.service-list-v5-wbk li,
 .wbk_service_checkbox_holder {
     cursor: pointer;
 }
@@ -326,7 +326,7 @@ li.wbk_service_item {
     margin: 0;
 }
 
-.appointment-box-w {
+.appointment-box-wbk {
     display: flex;
     max-width: 760px;
     min-height: 650px;
@@ -337,7 +337,7 @@ li.wbk_service_item {
     box-shadow: 0 0 60px rgba(161, 163, 182, 0.2);
 }
 
-.appointment-box-w .appointment-status-wrapper-w {
+.appointment-box-wbk .appointment-status-wrapper-w {
     background: #428a89;
     border-radius: 20px;
     color: #fff;
@@ -346,28 +346,31 @@ li.wbk_service_item {
     max-width: 250px;
     margin: 0 10px 0 0;
 }
-.appointment-box-w .appointment-status-list-w {
+.appointment-box-wbk .appointment-status-list-w {
     list-style: none;
     padding: 0;
     margin: 0;
 }
-.appointment-box-w .appointment-status-list-w > li {
+.appointment-box-wbk .appointment-status-list-w > li {
     display: flex;
     align-items: center;
     margin: 0 0 10px 0;
     opacity: 0.6;
     align-items: start;
 }
-.appointment-box-w .appointment-status-list-w > li.active-w {
+.appointment-box-wbk .appointment-status-list-w > li.active-w {
     opacity: 1;
 }
-.appointment-box-w .appointment-status-list-w > li.completed-w .circle-digit-w {
+.appointment-box-wbk
+    .appointment-status-list-w
+    > li.completed-w
+    .circle-digit-w {
     animation: append-animate-w 0.4s linear;
     background: #fff url(../images/checkmark-green.png) center center no-repeat;
     text-indent: 100px;
     overflow: hidden;
 }
-.appointment-box-w .appointment-status-list-w .circle-digit-w {
+.appointment-box-wbk .appointment-status-list-w .circle-digit-w {
     display: flex;
     max-width: 26px;
     max-height: 26px;
@@ -379,38 +382,43 @@ li.wbk_service_item {
     border-radius: 100%;
     margin: 0 10px 0 0;
 }
-.appointment-box-w .appointment-status-list-w .text-w {
+.appointment-box-wbk .appointment-status-list-w .text-w {
     padding: 2px 0 0 0;
 }
-.appointment-box-w .appointment-status-list-w .text-w .text-title-w {
+.appointment-box-wbk .appointment-status-list-w .text-w .text-title-w {
     font-size: 16px;
     margin: 0 0 10px 0;
     padding: 0 !important;
 }
-.appointment-box-w .appointment-status-list-w .text-w .subtitle-list-w {
+.appointment-box-wbk .appointment-status-list-w .text-w .subtitle-list-w {
     list-style: disc;
     margin: 0 0 0 20px;
     max-width: 200px;
     font-size: 14px;
     padding: 0 !important;
 }
-.appointment-box-w .appointment-status-list-w .text-w .subtitle-list-w li + li {
+.appointment-box-wbk
+    .appointment-status-list-w
+    .text-w
+    .subtitle-list-w
+    li
+    + li {
     margin-top: 10px;
 }
 
-.appointment-content-w {
+.appointment-content-wbk {
     flex-grow: 1;
     position: relative;
     text-align: left !important;
 }
-.appointment-content-scroll-w {
+.appointment-content-scroll-wbk {
     padding: 0 25px 30px 10px;
     position: relative;
     margin: 0 0 23px 0;
     height: 555px;
     overflow-x: hidden !important;
 }
-.appointment-content-scroll-w[data-scrollbar]:after {
+.appointment-content-scroll-wbk[data-scrollbar]:after {
     content: '';
     position: absolute;
     left: 0;
@@ -547,17 +555,17 @@ li.wbk_service_item {
     margin: 0 4px 0 0;
 }
 
-.appointment-content-w .button-block-w {
+.appointment-content-wbk .button-block-wbk {
     display: flex;
     justify-content: right;
     padding: 0 25px 0 0;
 }
-.appointment-content-w .button-block-w .button-w {
+.appointment-content-wbk .button-block-wbk .button-wbk {
     margin-left: 30px;
 }
 
-.button-w,
-.button-w:focus {
+.button-wbk,
+.button-wbk:focus {
     font-family: poppins-semibold, arial !important;
     display: inline-block;
     background: #1f6763;
@@ -574,23 +582,23 @@ li.wbk_service_item {
     height: 50px !important;
     text-align: center !important;
 }
-.button-w:hover {
+.button-wbk:hover {
     opacity: 0.8;
     color: #fff !important;
 }
 
-.button-w[disabled] {
+.button-wbk[disabled] {
     background: #d5d7e7;
     color: #a1a3b6;
     cursor: default;
     opacity: 0.6;
 }
-.button-w[disabled]:hover {
+.button-wbk[disabled]:hover {
     opacity: 1;
     opacity: 0.6;
 }
 
-.button-w.simple-w {
+.button-wbk.simple-w {
     background: #fff;
     color: #000;
     border: 1px solid #1f6763;
@@ -699,7 +707,7 @@ li.wbk_service_item {
     border-radius: 4px;
 }
 
-.appointment-content-w .custom-select-w.last-w .select-items-w {
+.appointment-content-wbk .custom-select-w.last-w .select-items-w {
     top: auto;
     bottom: 100%;
 }
@@ -727,10 +735,10 @@ li.wbk_service_item {
     background-position: bottom right;
 }
 
-.appointment-status-text-mobile-w {
+.appointment-status-text-mobile-wbk {
     display: none;
 }
-.appointment-status-text-mobile-w .current-step-w {
+.appointment-status-text-mobile-wbk .current-step-wbk {
     font-size: 20px;
     font-family: poppins-medium, arial;
 }
@@ -863,7 +871,7 @@ li.wbk_service_item {
         background: #fff;
     }
 
-    .appointment-box-w .appointment-status-wrapper-w {
+    .appointment-box-wbk .appointment-status-wrapper-w {
         display: flex;
         padding: 20px 25px 20px 25px;
         align-items: center;
@@ -876,13 +884,13 @@ li.wbk_service_item {
         display: none;
     }
 
-    .appointment-box-w {
+    .appointment-box-wbk {
         display: block;
         box-shadow: none;
         padding: 5px 0 10px 0;
         min-height: 0;
     }
-    .appointment-content-scroll-w {
+    .appointment-content-scroll-wbk {
         margin-bottom: 30px;
         padding: 0 15px 0 15px;
         height: calc(100vh - 300px);
@@ -890,18 +898,18 @@ li.wbk_service_item {
     .scrollbar-track-x {
         display: none !important;
     }
-    .appointment-content-scroll-w:after {
+    .appointment-content-scroll-wbk:after {
         display: none;
     }
-    .appointment-content-scroll-w[data-scrollbar] {
+    .appointment-content-scroll-wbk[data-scrollbar] {
         padding: 0 15px 0 15px;
     }
 
-    .appointment-content-w .button-block-w {
+    .appointment-content-wbk .button-block-wbk {
         padding: 0 15px 0 15px;
         justify-content: start;
     }
-    .appointment-content-w .button-block-w .button-w {
+    .appointment-content-wbk .button-block-wbk .button-wbk {
         margin-left: 0;
         min-width: 300px;
     }
@@ -909,16 +917,16 @@ li.wbk_service_item {
     .appointement-status-mobile-w {
         display: flex;
     }
-    .appointment-status-text-mobile-w {
+    .appointment-status-text-mobile-wbk {
         display: block;
     }
 }
 
 @media (max-width: 500px) {
-    .appointment-content-w .button-block-w {
+    .appointment-content-wbk .button-block-wbk {
         padding: 0 15px 0 15px;
     }
-    .appointment-content-w .button-w {
+    .appointment-content-wbk .button-wbk {
         display: block;
         width: 100%;
     }
@@ -1152,11 +1160,11 @@ li.wbk_service_item {
         min-width: 345px;
     }
 
-    .appointment-content-w .two-buttons-w {
+    .appointment-content-wbk .two-buttons-wbk {
         justify-content: space-between;
         padding: 0;
     }
-    .appointment-content-w .two-buttons-w .button-w {
+    .appointment-content-wbk .two-buttons-wbk .button-wbk {
         min-width: 160px;
         max-width: 160px;
         margin: 0;
@@ -1202,7 +1210,7 @@ li.wbk_service_item {
 .thank-you-block-w .buttons-block-w {
     text-align: center;
 }
-.thank-you-block-w .buttons-block-w .button-w {
+.thank-you-block-w .buttons-block-w .button-wbk {
     min-width: 240px;
 }
 .thank-you-block-w .thank-you-mobile-w {
@@ -1220,7 +1228,7 @@ li.wbk_service_item {
     .thank-you-block-w .image-wrapper-w {
         margin-bottom: 40px;
     }
-    .thank-you-block-w .buttons-block-w .button-w {
+    .thank-you-block-w .buttons-block-w .button-wbk {
         width: 100%;
     }
     .thank-you-block-w .text-sent-w {
@@ -1247,20 +1255,20 @@ li.wbk_service_item {
     }
 }
 
-.appointment-content-w .first-text-w {
+.appointment-content-wbk .first-text-w {
     margin: 0 0 30px 0;
 }
 
-.appointment-content-w .input-text-w {
+.appointment-content-wbk .input-text-w {
     max-width: 345px;
     width: 100%;
 }
 
-.appointment-content-w .checkbox-row-w.one-row-w .checkbox-text-w {
+.appointment-content-wbk .checkbox-row-w.one-row-w .checkbox-text-w {
     display: block;
     padding: 3px 0 0 0;
 }
-.appointment-content-w
+.appointment-content-wbk
     .checkbox-row-w.one-row-w
     .checkbox-text-w
     .checkbox-title-w {
@@ -2558,10 +2566,10 @@ li.wbk_service_item {
 }
 
 @media (max-width: 600px) {
-    .appointment-content-w .first-text-w {
+    .appointment-content-wbk .first-text-w {
         text-align: center;
     }
-    .appointment-content-w .input-text-w {
+    .appointment-content-wbk .input-text-w {
         max-width: none;
     }
 
@@ -2570,7 +2578,7 @@ li.wbk_service_item {
     }
 }
 
-.custom-radiobutton-w {
+.custom-radiobutton-wbk {
     display: block;
     position: relative;
     padding-left: 25px;
@@ -2581,13 +2589,13 @@ li.wbk_service_item {
     font-weight: normal;
 }
 
-.custom-radiobutton-w input {
+.custom-radiobutton-wbk input {
     position: absolute;
     opacity: 0;
     cursor: pointer;
 }
 
-.custom-radiobutton-w .checkmark-w {
+.custom-radiobutton-wbk .checkmark-w {
     position: absolute;
     top: 4px;
     left: 0;
@@ -2599,15 +2607,15 @@ li.wbk_service_item {
     transition: 0.2s;
 }
 
-.custom-radiobutton-w:hover input ~ .checkmark-w {
+.custom-radiobutton-wbk:hover input ~ .checkmark-w {
     opacity: 0.7;
 }
 
-.custom-radiobutton-w input:checked ~ .checkmark-w {
+.custom-radiobutton-wbk input:checked ~ .checkmark-w {
     border-width: 3px;
 }
 
-.custom-radiobutton-w input:checked:hover ~ .checkmark-w {
+.custom-radiobutton-wbk input:checked:hover ~ .checkmark-w {
     opacity: 1;
 }
 
@@ -2790,7 +2798,7 @@ li.wbk_service_item {
 }
 
 @media (max-width: 1200px) {
-    .appointment-content-w .first-text-w.custom-w {
+    .appointment-content-wbk .first-text-w.custom-w {
         text-align: left;
         margin: 0 0 25px 0;
     }
@@ -2821,7 +2829,7 @@ li.wbk_service_item {
     color: #8a9393;
 }
 
-.appointment-content-w .time-select-w {
+.appointment-content-wbk .time-select-w {
     max-width: none;
     margin: 0 0 30px 0 !important;
     padding: 0 !important;
@@ -3174,7 +3182,7 @@ td.disabledDay {
 }
 
 @media (max-width: 950px) {
-    .appointment-status-text-mobile-w .btn-ring-wb {
+    .appointment-status-text-mobile-wbk .btn-ring-wbk {
         display: none !important;
     }
     .rescalendar_day_cells td:last-child {
@@ -3210,7 +3218,7 @@ td.disabledDay {
     .appontment-time-list-w {
         grid-template-columns: 1fr 1fr 1fr;
     }
-    .appointment-content-w .wbk-input {
+    .appointment-content-wbk .wbk-input {
         width: 100% !important;
         max-width: 100% !important;
     }
@@ -3224,17 +3232,17 @@ td.disabledDay {
         grid-template-columns: 1fr 1fr;
     }
 
-    .appointment-box-w .appointment-status-wrapper-w {
+    .appointment-box-wbk .appointment-status-wrapper-w {
         padding: 10px;
     }
-    .appointment-status-text-mobile-w .current-step-w {
+    .appointment-status-text-mobile-wbk .current-step-wbk {
         font-size: 16px;
     }
-    .appointment-status-text-mobile-w .next-step-w {
+    .appointment-status-text-mobile-wbk .next-step-wbk {
         font-size: 14px;
     }
 
-    .appointment-content-w .two-buttons-w .button-w {
+    .appointment-content-wbk .two-buttons-wbk .button-wbk {
         padding-left: 10px;
         padding-right: 10px;
         min-width: 120px;
@@ -3351,7 +3359,7 @@ select.wbk-select {
     padding-right: 60px;
 }
 
-.btn-ring-wb {
+.btn-ring-wbk {
     position: absolute;
     top: 3px;
 
@@ -3360,7 +3368,7 @@ select.wbk-select {
     opacity: 0;
 }
 
-.btn-ring-wb:after {
+.btn-ring-wbk:after {
     content: '';
     display: block;
     width: 22px;
@@ -3469,19 +3477,19 @@ select.wbk-select {
     padding: 10px 15px !important;
 }
 
-.appointment-content-w .wbk-input-label {
+.appointment-content-wbk .input-label-wbk {
     display: block;
     margin: 0 0 5px 0;
     font-size: 14px;
     font-weight: bold;
 }
 
-.appointment-content-w .wbk-input {
+.appointment-content-wbk .wbk-input {
     width: 80%;
     margin: 0 0 20px 0;
 }
 
-.appointment-content-w .wbk-textarea {
+.appointment-content-wbk .wbk-textarea {
     border: 1px solid #cdcfde;
     border-radius: 15px;
     min-height: 100px;
@@ -3498,7 +3506,7 @@ select.wbk-select {
     margin-bottom: 0 !important;
 }
 @media (min-width: 768px) {
-    .appointment-content-scroll-w {
+    .appointment-content-scroll-wbk {
     }
 }
 .wb-thank-you-image {
@@ -3508,7 +3516,7 @@ select.wbk-select {
 
 /* START new percentage circle */
 
-.circle-chart-wb {
+.circle-chart-wbk {
     display: none;
     width: 80px;
     height: 80px;
@@ -3516,11 +3524,11 @@ select.wbk-select {
     position: relative;
     margin: 0 15px 0 0;
 }
-.circle-chart-wb canvas {
+.circle-chart-wbk canvas {
     width: 100% !important;
     height: 100% !important;
 }
-.circle-chart-wb .circle-chart-text-wb {
+.circle-chart-wbk .circle-chart-text-wbk {
     position: absolute;
     top: 0;
     left: 0;
@@ -3532,7 +3540,7 @@ select.wbk-select {
 }
 
 @media (max-width: 950px) {
-    .circle-chart-wb {
+    .circle-chart-wbk {
         display: inline-block;
     }
 }

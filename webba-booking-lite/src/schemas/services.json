@@ -1,0 +1,198 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "service_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Service name"
+        },
+        "service_description": {
+            "type": "string",
+            "input_type": "editor",
+            "hidden": true,
+            "title": "Description"
+        },
+        "service_date_range": {
+            "type": "string",
+            "input_type": "date_range",
+            "hidden": true,
+            "title": "Availability date range"
+        },
+        "service_business_hours": {
+            "type": "json",
+            "input_type": "business_hours",
+            "hidden": true,
+            "title": "Business hours"
+        },
+        "service_price": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Price"
+        },
+        "service_email": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Email"
+        },
+        "service_priority": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Priority"
+        },
+        "service_min_quantity": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Minimum booking count per time slot"
+        },
+        "service_quantity": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Maximum booking count per time slot"
+        },
+        "service_form": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Booking form"
+        },
+        "service_gg_calendars": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Google calendar"
+        },
+        "service_extcalendar": {
+            "type": "string",
+            "input_type": "textarea",
+            "hidden": true,
+            "title": "Take into account the external calendar (ics)"
+        },
+        "service_extcalendar_group_mode": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "External calendar for group services"
+        },
+        "service_users": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Users"
+        },
+        "service_users_allow_edit": {
+            "type": "string",
+            "input_type": "textarea",
+            "hidden": true,
+            "title": "Allow users edit service parameters"
+        },
+        "service_duration": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Duration (minutes)"
+        },
+        "service_prepare_time": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Preparation time (minutes)"
+        },
+        "service_interval_between": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Gap (minutes)"
+        },
+        "service_step": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Step (minutes)"
+        },
+        "service_notification_template": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "'On Booking' notification template"
+        },
+        "service_reminder_template": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Reminder notification template"
+        },
+        "service_invoice_template": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Invoice notification template"
+        },
+        "service_booking_changed_template": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Booking changes template"
+        },
+        "service_arrived_template": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Status \"arrived\" template"
+        },
+        "service_payment_methods": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Payment methods"
+        },
+        "service_service_fee": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Add amount to order (deposit)"
+        },
+        "service_pricing_rules": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Pricing rules"
+        },
+        "service_woo_product": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "WooCommerce product ID"
+        },
+        "service_zoom": {
+            "type": "string",
+            "input_type": "textarea",
+            "hidden": true,
+            "title": "Create Zoom events"
+        },
+        "service_multi_mode_low_limit": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Minimum time slots per booking"
+        },
+        "service_multi_mode_limit": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Maximum time slots per booking"
+        },
+        "service_consecutive_timeslots": {
+            "type": "string",
+            "input_type": "textarea",
+            "hidden": true,
+            "title": "Consecutive time slots"
+        }
+    }
+}

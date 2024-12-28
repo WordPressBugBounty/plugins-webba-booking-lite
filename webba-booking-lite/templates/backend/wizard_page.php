@@ -211,7 +211,7 @@ if (!defined('ABSPATH'))
                                         <?php echo esc_html__('Do you need to allow users book multiple time slotsin one checkout?', 'webba-booking-lite'); ?>
                                     </p>
                                     <div class="radio-row-wb">
-                                        <label class="custom-radiobutton-wb">
+                                        <label class="custom-radiobutton-wbkb">
                                             <input type="radio" value="no" checked="" name="allow_multiple_slots">
                                             <span class="checkmark-wb"></span>
                                             <span class="radio-title-wb">
@@ -221,7 +221,7 @@ if (!defined('ABSPATH'))
                                     </div><!-- /.radio-row-wb -->
 
                                     <div class="radio-row-wb">
-                                        <label class="custom-radiobutton-wb">
+                                        <label class="custom-radiobutton-wbkb">
                                             <input type="radio" value="yes" name="allow_multiple_slots">
                                             <span class="checkmark-wb"></span>
                                             <span class="radio-title-wb">
@@ -236,7 +236,7 @@ if (!defined('ABSPATH'))
                                         <?php echo esc_html__('Can user book multiple services at a time?', 'webba-booking-lite'); ?>
                                     </p>
                                     <div class="radio-row-wb">
-                                        <label class="custom-radiobutton-wb">
+                                        <label class="custom-radiobutton-wbkb">
                                             <input type="radio" value="yes" class="allow_multiple_services"
                                                 name="allow_multiple_services">
                                             <span class="checkmark-wb"></span>
@@ -246,7 +246,7 @@ if (!defined('ABSPATH'))
                                         </label>
                                     </div><!-- /.radio-row-wb -->
                                     <div class="radio-row-wb">
-                                        <label class="custom-radiobutton-wb">
+                                        <label class="custom-radiobutton-wbkb">
                                             <input type="radio" value="no" checked="" name="allow_multiple_services">
                                             <span class="checkmark-wb"></span>
                                             <span class="radio-title-wb">
@@ -303,7 +303,7 @@ if (!defined('ABSPATH'))
                                         <input type="text" id="shortcode-booking-form-wb" value="" class="input-text-wb"
                                             data-js="copy-value-wb">
                                         <button type="button" class="inner-submit-wb" onclick="wbk_copy_shortcode()"
-                                            data-js="copy-button-wb"><span class="inner_copy_wb">Copy </span><img
+                                            data-js="copy-button-wbkb"><span class="inner_copy_wb">Copy </span><img
                                                 src="<?php echo WP_WEBBA_BOOKING__PLUGIN_URL ?>/public/images/copy-icon.png"
                                                 alt="copy"></button>
                                     </fieldset><!-- /.field-wrapper-wb -->
@@ -358,15 +358,15 @@ if (!defined('ABSPATH'))
                         <div class="container-medium-wb">
                             <div class="buttons-block-wb">
                                 <a href="https://www.youtube.com/watch?v=dZF0jve7jxE" rel="noopener" target="_blank"
-                                    class="button-wb button-light-wb wbk_wizard_youtube_link">
+                                    class="button-wbkb button-light-wb wbk_wizard_youtube_link">
                                     <?php echo esc_html__('Watch getting started video', 'webba-booking-lite'); ?>
                                 </a>
-                                <button class="button-wb button-light-wb button-prev-w wbk_hidden">
+                                <button class="button-wbkb button-light-wb button-prev-wbk wbk_hidden">
                                     <?php echo esc_html__('Previous', 'webba-booking-lite'); ?>
                                 </button>
-                                <button class="button-wb button-next-w " disabled>
+                                <button class="button-wbkb button-next-wbk " disabled>
                                     <?php echo esc_html__('Next', 'webba-booking-lite'); ?>
-                                    <span class="btn-ring-wb"></span>
+                                    <span class="btn-ring-wbk"></span>
                                 </button>
                             </div><!-- /.buttons-block-wb -->
                         </div>

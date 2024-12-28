@@ -190,7 +190,7 @@ body {
     margin: 0;
 }
 
-.appointment-box-w {
+.appointment-box-wbk {
     display: flex;
     max-width: 920px;
     min-height: 650px;
@@ -201,7 +201,7 @@ body {
     box-shadow: 0 0 60px rgba(161, 163, 182, 0.2);
 }
 
-.appointment-box-w .appointment-status-wrapper-w {
+.appointment-box-wbk .appointment-status-wrapper-w {
     background: #428a89;
     border-radius: 20px;
     color: #fff;
@@ -210,28 +210,31 @@ body {
     max-width: 360px;
     margin: 0 20px 0 0;
 }
-.appointment-box-w .appointment-status-list-w {
+.appointment-box-wbk .appointment-status-list-w {
     list-style: none;
     padding: 0;
     margin: 0;
 }
-.appointment-box-w .appointment-status-list-w > li {
+.appointment-box-wbk .appointment-status-list-w > li {
     display: flex;
     align-items: center;
     margin: 0 0 25px 0;
     opacity: 0.6;
     align-items: start;
 }
-.appointment-box-w .appointment-status-list-w > li.active-w {
+.appointment-box-wbk .appointment-status-list-w > li.active-w {
     opacity: 1;
 }
-.appointment-box-w .appointment-status-list-w > li.completed-w .circle-digit-w {
+.appointment-box-wbk
+    .appointment-status-list-w
+    > li.completed-w
+    .circle-digit-w {
     animation: append-animate-w 0.4s linear;
     background: #fff url(../images/checkmark-green.png) center center no-repeat;
     text-indent: 100px;
     overflow: hidden;
 }
-.appointment-box-w .appointment-status-list-w .circle-digit-w {
+.appointment-box-wbk .appointment-status-list-w .circle-digit-w {
     display: flex;
     max-width: 36px;
     max-height: 36px;
@@ -243,20 +246,25 @@ body {
     border-radius: 100%;
     margin: 0 10px 0 0;
 }
-.appointment-box-w .appointment-status-list-w .text-w {
+.appointment-box-wbk .appointment-status-list-w .text-w {
     padding: 2px 0 0 0;
 }
-.appointment-box-w .appointment-status-list-w .text-w .text-title-w {
+.appointment-box-wbk .appointment-status-list-w .text-w .text-title-w {
     font-size: 22px;
     margin: 0 0 10px 0;
 }
-.appointment-box-w .appointment-status-list-w .text-w .subtitle-list-w {
+.appointment-box-wbk .appointment-status-list-w .text-w .subtitle-list-w {
     list-style: disc;
     margin: 0 0 0 20px !important;
     max-width: 200px;
     padding: 0 !important;
 }
-.appointment-box-w .appointment-status-list-w .text-w .subtitle-list-w li + li {
+.appointment-box-wbk
+    .appointment-status-list-w
+    .text-w
+    .subtitle-list-w
+    li
+    + li {
     margin-top: 10px;
 }
 
@@ -407,17 +415,17 @@ body {
     margin: 0 4px 0 0;
 }
 
-.wizard-content-w .button-block-w {
+.wizard-content-w .button-block-wbk {
     display: flex;
     justify-content: right;
     padding: 0 25px 0 0;
 }
-.wizard-content-w .button-block-w .button-w {
+.wizard-content-w .button-block-wbk .button-wbk {
     margin-left: 30px;
 }
 
-.button-w,
-.button-w:focus {
+.button-wbk,
+.button-wbk:focus {
     font-family: poppins-semibold, arial;
     display: inline-block;
     background: #1f6763;
@@ -433,21 +441,21 @@ body {
     position: relative;
     height: 45px !important;
 }
-.button-w:hover {
+.button-wbk:hover {
     opacity: 0.8;
     background: #d5d7e7 !important;
 }
 
-.button-w[disabled] {
+.button-wbk[disabled] {
     background: #d5d7e7;
     color: #a1a3b6;
     cursor: default;
 }
-.button-w[disabled]:hover {
+.button-wbk[disabled]:hover {
     opacity: 1;
 }
 
-.button-w.simple-w {
+.button-wbk.simple-w {
     background: #fff;
     color: #000;
     border: 1px solid #1f6763;
@@ -562,10 +570,10 @@ body {
     background-position: bottom right;
 }
 
-.appointment-status-text-mobile-w {
+.appointment-status-text-mobile-wbk {
     display: none;
 }
-.appointment-status-text-mobile-w .current-step-w {
+.appointment-status-text-mobile-wbk .current-step-wbk {
     font-size: 20px;
     font-family: poppins-medium, arial;
 }
@@ -698,7 +706,7 @@ body {
         background: #fff;
     }
 
-    .appointment-box-w .appointment-status-wrapper-w {
+    .appointment-box-wbk .appointment-status-wrapper-w {
         display: flex;
         padding: 20px 25px 20px 25px;
         align-items: center;
@@ -711,7 +719,7 @@ body {
         display: none;
     }
 
-    .appointment-box-w {
+    .appointment-box-wbk {
         display: block;
         box-shadow: none;
         padding: 0;
@@ -729,11 +737,11 @@ body {
         padding: 0 15px 0 15px;
     }
 
-    .wizard-content-w .button-block-w {
+    .wizard-content-w .button-block-wbk {
         padding: 0 15px 0 15px;
         justify-content: start;
     }
-    .wizard-content-w .button-block-w .button-w {
+    .wizard-content-w .button-block-wbk .button-wbk {
         margin-left: 0;
         min-width: 300px;
     }
@@ -741,17 +749,17 @@ body {
     .appointement-status-mobile-w {
         display: flex;
     }
-    .appointment-status-text-mobile-w {
+    .appointment-status-text-mobile-wbk {
         display: block;
         max-width: 150px;
     }
 }
 
 @media (max-width: 500px) {
-    .wizard-content-w .button-block-w {
+    .wizard-content-w .button-block-wbk {
         padding: 0 15px 0 15px;
     }
-    .wizard-content-w .button-w {
+    .wizard-content-w .button-wbk {
         display: block;
         width: 100%;
     }
@@ -970,11 +978,11 @@ body {
         min-width: 345px;
     }
 
-    .wizard-content-w .two-buttons-w {
+    .wizard-content-w .two-buttons-wbk {
         justify-content: space-between;
         padding: 0 15px 0 15px;
     }
-    .wizard-content-w .two-buttons-w .button-w {
+    .wizard-content-w .two-buttons-wbk .button-wbk {
         min-width: 160px;
         max-width: 160px;
         margin: 0;
@@ -1020,7 +1028,7 @@ body {
 .thank-you-block-w .buttons-block-w {
     text-align: center;
 }
-.thank-you-block-w .buttons-block-w .button-w {
+.thank-you-block-w .buttons-block-w .button-wbk {
     min-width: 240px;
 }
 .thank-you-block-w .thank-you-mobile-w {
@@ -1038,7 +1046,7 @@ body {
     .thank-you-block-w .image-wrapper-w {
         margin-bottom: 40px;
     }
-    .thank-you-block-w .buttons-block-w .button-w {
+    .thank-you-block-w .buttons-block-w .button-wbk {
         width: 100%;
     }
     .thank-you-block-w .text-sent-w {
@@ -2385,7 +2393,7 @@ body {
     }
 }
 
-.custom-radiobutton-w {
+.custom-radiobutton-wbk {
     display: block;
     position: relative;
     padding-left: 25px;
@@ -2395,13 +2403,13 @@ body {
     box-sizing: border-box;
 }
 
-.custom-radiobutton-w input {
+.custom-radiobutton-wbk input {
     position: absolute;
     opacity: 0;
     cursor: pointer;
 }
 
-.custom-radiobutton-w .checkmark-w {
+.custom-radiobutton-wbk .checkmark-w {
     position: absolute;
     top: 4px;
     left: 0;
@@ -2413,16 +2421,16 @@ body {
     transition: 0.2s;
 }
 
-.custom-radiobutton-w:hover input ~ .checkmark-w {
+.custom-radiobutton-wbk:hover input ~ .checkmark-w {
     opacity: 0.7;
 }
 
-.custom-radiobutton-w input:checked ~ .checkmark-w {
+.custom-radiobutton-wbk input:checked ~ .checkmark-w {
     border-color: #1f6763;
     border-width: 4px;
 }
 
-.custom-radiobutton-w input:checked:hover ~ .checkmark-w {
+.custom-radiobutton-wbk input:checked:hover ~ .checkmark-w {
     opacity: 1;
 }
 
@@ -3092,7 +3100,7 @@ select.wbk-select {
     padding-right: 60px;
 }
 
-.btn-ring-wb {
+.btn-ring-wbk {
     position: absolute;
     top: 3px;
     left: 60%;
@@ -3101,7 +3109,7 @@ select.wbk-select {
     opacity: 0;
 }
 
-.btn-ring-wb:after {
+.btn-ring-wbk:after {
     content: '';
     display: block;
     width: 22px;
@@ -3236,7 +3244,7 @@ select.wbk-select {
     background: #fff;
 }
 
-.appointment-box-w .appointment-status-wrapper-w {
+.appointment-box-wbk .appointment-status-wrapper-w {
     display: flex;
     padding: 20px 25px 20px 25px;
     align-items: center;
@@ -3249,7 +3257,7 @@ select.wbk-select {
     display: none;
 }
 
-.appointment-box-w {
+.appointment-box-wbk {
     display: block;
     box-shadow: 0 0 60px rgba(161, 163, 182, 0.2);
     padding: 20px 0 20px 0;
@@ -3267,11 +3275,11 @@ select.wbk-select {
     padding: 0 15px 0 15px;
 }
 
-.wizard-content-w .button-block-w {
+.wizard-content-w .button-block-wbk {
     padding: 0 15px 0 15px;
     justify-content: start;
 }
-.wizard-content-w .button-block-w .button-w {
+.wizard-content-w .button-block-wbk .button-wbk {
     margin-left: 0;
     min-width: 300px;
 }
@@ -3279,16 +3287,16 @@ select.wbk-select {
 .appointement-status-mobile-w {
     display: flex;
 }
-.appointment-status-text-mobile-w {
+.appointment-status-text-mobile-wbk {
     display: block;
     max-width: 150px;
 }
 
 @media (max-width: 500px) {
-    .wizard-content-w .button-block-w {
+    .wizard-content-w .button-block-wbk {
         padding: 0 15px 0 15px;
     }
-    .wizard-content-w .button-w {
+    .wizard-content-w .button-wbk {
         display: block;
         width: 100%;
     }
@@ -3300,11 +3308,11 @@ select.wbk-select {
     min-width: 345px;
 }
 
-.wizard-content-w .two-buttons-w {
+.wizard-content-w .two-buttons-wbk {
     justify-content: space-between;
     padding: 0 15px 0 15px;
 }
-.wizard-content-w .two-buttons-w .button-w {
+.wizard-content-w .two-buttons-wbk .button-wbk {
     min-width: 160px;
     max-width: 160px;
     margin: 0;
@@ -3323,7 +3331,7 @@ select.wbk-select {
 .thank-you-block-w .image-wrapper-w {
     margin-bottom: 40px;
 }
-.thank-you-block-w .buttons-block-w .button-w {
+.thank-you-block-w .buttons-block-w .button-wbk {
     width: 100%;
 }
 .thank-you-block-w .text-sent-w {

@@ -49,11 +49,11 @@ if (isset($appearance_data['wbk_appearance_field_4'])) {
                                 <div class="field-wrapper-wb" data-js-block="color-picker-wrapper-wb">
                                     <input type="color" value="<?php echo esc_attr($field_value_1); ?>"
                                         class="color-picker-wb input-wb"
-                                        data-class="appointment-status-wrapper-w,circle-chart-wb"
+                                        data-class="appointment-status-wrapper-w,circle-chart-wbk"
                                         data-property="background-color,border-color">
                                     <input type="text" class="input-text-color-wb input-text-wb input-wb"
                                         value="<?php echo esc_attr($field_value_1); ?>"
-                                        data-class="appointment-status-wrapper-w,circle-chart-wb"
+                                        data-class="appointment-status-wrapper-w,circle-chart-wbk"
                                         id="wbk_appearance_field_1" data-property="background-color,border-color">
                                 </div><!-- /.field-wrapper-wb -->
                             </div><!-- /.field-block-wb -->
@@ -66,11 +66,11 @@ if (isset($appearance_data['wbk_appearance_field_4'])) {
                                 <div class="field-wrapper-wb" data-js-block="color-picker-wrapper-wb">
                                     <input type="color" value="<?php echo esc_attr($field_value_2); ?>"
                                         class="color-picker-wb input-wb"
-                                        data-class="button-w,wb_slot_checked,middleDay,checkmark-w,checkbox-subtitle-w,wbk_service_item_active"
+                                        data-class="button-wbk,wb_slot_checked,middleDay,checkmark-w,checkbox-subtitle-w,wbk_service_item_active"
                                         data-property="background-color,border-color">
                                     <input type="text" class="input-text-color-wb input-text-wb input-wb"
                                         value="<?php echo esc_attr($field_value_2); ?>"
-                                        data-class="button-w,wb_slot_checked,middleDay,checkmark-w,checkbox-subtitle-w,wbk_service_item_active"
+                                        data-class="button-wbk,wb_slot_checked,middleDay,checkmark-w,checkbox-subtitle-w,wbk_service_item_active"
                                         id="wbk_appearance_field_2" data-property="background-color,border-color">
                                 </div>
                             </div>
@@ -78,8 +78,8 @@ if (isset($appearance_data['wbk_appearance_field_4'])) {
                     </div>
 
                     <div class="buttons-block-wb">
-                        <button type="submit" class="button-wb button-wb-appearance-save">
-                            <?php echo __('Save', 'webba-booking-lite') ?><span class="btn-ring-wb"></span>
+                        <button type="submit" class="button-wbkb button-wbkb-appearance-save">
+                            <?php echo __('Save', 'webba-booking-lite') ?><span class="btn-ring-wbk"></span>
                         </button>
                     </div>
                 </div><!-- /.left-part-wb -->
@@ -88,8 +88,8 @@ if (isset($appearance_data['wbk_appearance_field_4'])) {
                         <?php echo '<a style="display: block;color: #000; margin: 0px auto; text-align: center; margin-bottom: 30px;" target="_blank" rel="noopener" href="https://webba-booking.com/documentation/how-to-add-booking-form/">' . __('How to add the booking from to my website?', 'webba-booking-lite') . '</a>' ?>
                     </label>
                     <div class="appearance-result-block-wb">
-                        <div class="appointment-box-wrapper-wb" data-appearance-font=""
-                            data-js-appointment-box-wrapper="">
+                        <div class="appointment-box-wbkrapper-wb" data-appearance-font=""
+                            data-js-appointment-box-wbkrapper="">
                             <?php
                             WBK_Renderer::load_template('backend/appearance_preview_v5', array(), true);
                             ?>

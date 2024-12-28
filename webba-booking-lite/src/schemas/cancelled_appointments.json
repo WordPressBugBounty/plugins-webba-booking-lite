@@ -1,0 +1,24 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "appointment_created_on": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "created_on"
+        },
+        "appointment_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Name"
+        },
+        "appointment_description": {
+            "type": "string",
+            "input_type": "textarea",
+            "hidden": true,
+            "title": "Comment"
+        }
+    }
+}

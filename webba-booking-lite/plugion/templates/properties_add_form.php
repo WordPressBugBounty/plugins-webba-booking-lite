@@ -8,7 +8,7 @@ do_action('plugion_before_properties_add_form', $slug);
 <div class="plugion_property_container_add_form sidebar-roll-part-wrapper-wb">
     <div class="sidebar-roll-wb" data-js="sidebar-roll-wb" data-name="<?php echo $slug; ?>">
         <form>
-            <span class="close-button-wb" data-js="close-button-wb"><img
+            <span class="close-button-wbkb" data-js="close-button-wbkb"><img
                     src="<?php echo WP_WEBBA_BOOKING__PLUGIN_URL; ?>/public/images/close-icon2.png" alt="close"></span>
 
             <div class="sidebar-roll-title-wb">
@@ -137,9 +137,9 @@ do_action('plugion_before_properties_add_form', $slug);
             </div><!-- /.sidebar-roll-content-wb -->
 
             <div class="buttons-block-wb">
-                <button class="button-wb button-light-wb">Cancel</button>
+                <button class="button-wbkb button-light-wb">Cancel</button>
                 <button id="plugion_properties_save"
-                    class="button-wb"><?php echo esc_html(__('Save', 'webba-booking-lite')); ?></button>
+                    class="button-wbkb"><?php echo esc_html(__('Save', 'webba-booking-lite')); ?></button>
             </div><!-- /.buttons-block-wb -->
 
         </form>

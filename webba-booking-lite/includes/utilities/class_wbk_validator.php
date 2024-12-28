@@ -220,7 +220,7 @@ class WBK_Validator
     }
     /**
      * check if service exists
-     * @param  interface  $service_id service id
+     * @param  int $service_id service id
      * @return boolean true if service exists
      */
     public static function is_service_exists($service_id)
@@ -285,8 +285,6 @@ class WBK_Validator
     }
     public static function kses($input)
     {
-
-
         $style_attr = array(
             'background',
             'background-color',
@@ -295,7 +293,6 @@ class WBK_Validator
             'background-size',
             'background-attachment',
             'background-blend-mode',
-
             'border',
             'border-radius',
             'border-width',
@@ -325,11 +322,9 @@ class WBK_Validator
             'border-top-width',
             'border-top-left-radius',
             'border-top-right-radius',
-
             'border-spacing',
             'border-collapse',
             'caption-side',
-
             'columns',
             'column-count',
             'column-fill',
@@ -337,7 +332,6 @@ class WBK_Validator
             'column-rule',
             'column-span',
             'column-width',
-
             'color',
             'display',
             'filter',
@@ -353,15 +347,12 @@ class WBK_Validator
             'text-decoration',
             'text-indent',
             'text-transform',
-
             'height',
             'min-height',
             'max-height',
-
             'width',
             'min-width',
             'max-width',
-
             'margin',
             'margin-right',
             'margin-bottom',
@@ -371,7 +362,6 @@ class WBK_Validator
             'margin-block-end',
             'margin-inline-start',
             'margin-inline-end',
-
             'padding',
             'padding-right',
             'padding-bottom',
@@ -381,7 +371,6 @@ class WBK_Validator
             'padding-block-end',
             'padding-inline-start',
             'padding-inline-end',
-
             'flex',
             'flex-basis',
             'flex-direction',
@@ -389,11 +378,9 @@ class WBK_Validator
             'flex-grow',
             'flex-shrink',
             'flex-wrap',
-
             'gap',
             'column-gap',
             'row-gap',
-
             'grid-template-columns',
             'grid-auto-columns',
             'grid-column-start',
@@ -405,14 +392,12 @@ class WBK_Validator
             'grid-row-end',
             'grid-row-gap',
             'grid-gap',
-
             'justify-content',
             'justify-items',
             'justify-self',
             'align-content',
             'align-items',
             'align-self',
-
             'clear',
             'cursor',
             'direction',
@@ -422,7 +407,6 @@ class WBK_Validator
             'object-position',
             'overflow',
             'vertical-align',
-
             'position',
             'top',
             'right',
@@ -452,7 +436,13 @@ class WBK_Validator
             'cellspacing' => array(),
             'cellpadding' => array(),
             'border' => array(),
-            'align' => array()
+            'align' => array(),
+            'height' => array(),
+            'frameborder' => array(),
+            'allow' => array(),
+            'referrerpolicy' => array(),
+            'allowfullscreen' => array(),
+
         );
         $allowed_tags = array(
             'h1' => $default_attribs,
@@ -492,7 +482,8 @@ class WBK_Validator
             'td' => $default_attribs,
             'th' => $default_attribs,
             'style' => $default_attribs,
-            'img' => $default_attribs
+            'img' => $default_attribs,
+            'iframe' => $default_attribs
         );
         $input = wp_kses($input, $allowed_tags);
         return $input;
@@ -540,6 +531,21 @@ class WBK_Validator
         $clean_text = preg_replace($regexDingbats, '', $clean_text);
 
         return $clean_text;
+    }
+
+    public static function is_booking_made_by_current_user($booking_id)
+    {
+        if (is_user_logged_in()) {
+            $allowed = false;
+            $booking = new WBK_Booking($booking_id);
+            if ($booking->is_loaded()) {
+                if ($booking->get('email') == wp_get_current_user()->user_email) {
+                    $allowed = true;
+                }
+            }
+            return $allowed;
+        }
+        return false;
     }
 }
 ?>

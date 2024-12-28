@@ -256,7 +256,7 @@ class WBK_Form {
                         get_this()
                             .container.find('.wbk_description_holder')
                             .html(
-                                '<label class="wbk-input-label">' +
+                                '<label class="input-label-wbk">' +
                                     service_desc +
                                     '</label>'
                             )
@@ -291,7 +291,7 @@ class WBK_Form {
                         get_this()
                             .container.find('.wbk_description_holder')
                             .html(
-                                '<label class="wbk-input-label">' +
+                                '<label class="input-label-wbk">' +
                                     service_desc +
                                     '</label>'
                             )

@@ -3,8 +3,8 @@ Contributors: Webba agency, freemius
 Donate link: https://webba-booking.com/
 Tags: appointment booking, booking calendar, online scheduling, event booking, service reservations
 Requires at least: 5.6
-Tested up to: 6.7
-Stable tag: 5.0.53
+Tested up to: 6.7.1
+Stable tag: 5.0.55
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -178,14 +178,30 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+5.0.55
+
+28/12/2024
+
+- Improvements: Users dashboard
+- Improvements: iframes in the mssages to emebed videos
+- Bugfix: bug with Schedule tools
+
+5.0.54
+
+21/11/2024
+
+- Bugfix: bug with CSV export
+
 5.0.53
 
+20/11/2024
+
+- Improvements: Bookings page layout improved.
+- Improvements: block WooCommerce order creation if the booking has been automatically cancelled.
+- Improvements: option to (re)send email notifications manually
 - Bugfix: issue with the horizontal calendar when selecting multiple days.
 - Bugfix: bug with proper language detection in certain types of notifications..
 - Bugfix: consecutive bookings are not functioning on single-service forms.
-- Improvements: Bookings page layout improved.
-- Improvements: option to (re)send email notifications manually.
-- Improvements: block WooCommerce order creation if the booking has been automatically cancelled..
 
 5.0.52
 

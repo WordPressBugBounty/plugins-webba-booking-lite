@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "calendar_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Name"
+        },
+        "calendar_user_id": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "User"
+        },
+        "calendar_id": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Calendar ID"
+        },
+        "calendar_mode": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Mode"
+        }
+    }
+}

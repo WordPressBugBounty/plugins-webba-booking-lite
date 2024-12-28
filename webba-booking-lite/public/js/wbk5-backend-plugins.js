@@ -36,8 +36,6 @@
                 if ($('.nice-select').length == 0) {
                     $(document).off('.nice_select')
                 }
-            } else {
-                console.log('Method "' + method + '" does not exist.')
             }
             return this
         }

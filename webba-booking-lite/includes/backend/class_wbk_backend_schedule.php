@@ -842,13 +842,13 @@ class WBK_Backend_Schedule
             }
         }
         $start = $_POST['start'];
-        if (!WBK_Validator::check_integer($service_id, 1, 99999)) {
+        if (!WBK_Validator::check_integer($service_id, 1, 9999999)) {
             echo '-1';
             date_default_timezone_set('UTC');
             die();
             return;
         }
-        if (!WBK_Validator::check_integer($start, 0, 99999)) {
+        if (!WBK_Validator::check_integer($start, 0, 9999999)) {
             echo '-2';
             date_default_timezone_set('UTC');
             die();
@@ -942,7 +942,7 @@ class WBK_Backend_Schedule
                     return;
                 }
             }
-            if (!WBK_Validator::check_integer($service_id, 1, 99999)) {
+            if (!WBK_Validator::check_integer($service_id, 1, 9999999)) {
                 echo '-1';
                 date_default_timezone_set('UTC');
                 die();
@@ -1112,14 +1112,14 @@ class WBK_Backend_Schedule
                 return;
             }
         }
-        if (!WBK_Validator::check_integer($service_id, 1, 99999)) {
+        if (!WBK_Validator::check_integer($service_id, 1, 9999999)) {
             echo -1;
             date_default_timezone_set('UTC');
             die();
             return;
         }
         $day = $_POST['day'];
-        if (!WBK_Validator::check_integer($day, 1438426800, 1754046000)) {
+        if (!WBK_Validator::check_integer($day, 1438426800, 2754046000)) {
             echo -1;
             date_default_timezone_set('UTC');
             die();
@@ -1194,14 +1194,14 @@ class WBK_Backend_Schedule
                 return;
             }
         }
-        if (!WBK_Validator::check_integer($service_id, 1, 99999)) {
+        if (!WBK_Validator::check_integer($service_id, 1, 9999999)) {
             echo -1;
             date_default_timezone_set('UTC');
             die();
             return;
         }
         $day = $_POST['day'];
-        if (!WBK_Validator::check_integer($day, 1438426800, 1754046000)) {
+        if (!WBK_Validator::check_integer($day, 1438426800, 2754046000)) {
             echo -1;
             date_default_timezone_set('UTC');
             die();
@@ -1274,14 +1274,14 @@ class WBK_Backend_Schedule
                 return;
             }
         }
-        if (!WBK_Validator::check_integer($service_id, 1, 99999)) {
+        if (!WBK_Validator::check_integer($service_id, 1, 9999999)) {
             echo -1;
             date_default_timezone_set('UTC');
             die();
             return;
         }
         $time = $_POST['time'];
-        if (!WBK_Validator::check_integer($time, 1438426800, 1754046000)) {
+        if (!WBK_Validator::check_integer($time, 1438426800, 2754046000)) {
             echo -1;
             date_default_timezone_set('UTC');
             die();
@@ -1353,14 +1353,14 @@ class WBK_Backend_Schedule
                 return;
             }
         }
-        if (!WBK_Validator::check_integer($service_id, 1, 99999)) {
+        if (!WBK_Validator::check_integer($service_id, 1, 9999999)) {
             echo -1;
             date_default_timezone_set('UTC');
             die();
             return;
         }
         $time = $_POST['time'];
-        if (!WBK_Validator::check_integer($time, 1438426800, 1754046000)) {
+        if (!WBK_Validator::check_integer($time, 1438426800, 2754046000)) {
             echo -1;
             date_default_timezone_set('UTC');
             die();

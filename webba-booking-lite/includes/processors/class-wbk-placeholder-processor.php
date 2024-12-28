@@ -951,6 +951,21 @@ class WBK_Placeholder_Processor
         );
         $message = str_replace('#appprice', $moment_price, $message);
 
+        $user_dashboard_page_link = sprintf(
+            '<a href="%s" target="_blank">%s</a>',
+            esc_url(get_option('wbk_user_dashboard_page_link', '')),
+            esc_html(get_option('wbk_user_dashboard_link_label', ''))
+        );
+        $message = str_replace('#dashboard_page', $user_dashboard_page_link, $message);
+
+        $userdata = get_query_var('wbk_user_data', false);
+
+        if ($userdata && is_array($userdata) && !empty($userdata)) {
+            foreach($userdata as $placeholder => $value){
+                $message = str_replace('#' . $placeholder, $value, $message);
+            }
+        }
+
         $dynamic_placehodlers = get_option('wbk_general_dynamic_placeholders');
         if ($dynamic_placehodlers != '') {
             $items = explode(',', $dynamic_placehodlers);

@@ -118,7 +118,7 @@ date_default_timezone_set('UTC');
                         'webba-booking-lite'
                     ); ?></b></label>
                     <div class="radio-row-wb">
-                        <label class="custom-radiobutton-wb">
+                        <label class="custom-radiobutton-wbkb">
                             <input type="radio" checked="" class="schedule-tools-action-lock"
                                 name="schedule-tools-time-action" data-js="radio-schedule-tools-action-wb"
                                 data-name="lock">
@@ -128,7 +128,7 @@ date_default_timezone_set('UTC');
                         </label>
                     </div>
                     <div class="radio-row-wb">
-                        <label class="custom-radiobutton-wb">
+                        <label class="custom-radiobutton-wbkb">
                             <input type="radio" class="schedule-tools-action-unlock" name="schedule-tools-time-action"
                                 data-js="radio-schedule-tools-action-wb" data-name="unlock">
                             <span class="checkmark-wb"></span>
@@ -247,7 +247,7 @@ date_default_timezone_set('UTC');
                         'webba-booking-lite'
                     ); ?></b></label>
                     <div class="radio-row-wb">
-                        <label class="custom-radiobutton-wb">
+                        <label class="custom-radiobutton-wbkb">
                             <input type="radio" checked="" class="schedule-tools-action-lock"
                                 name="schedule-tools-date-action" data-js="radio-schedule-tools-action-wb"
                                 data-name="lock">
@@ -256,7 +256,7 @@ date_default_timezone_set('UTC');
                         </label>
                     </div>
                     <div class="radio-row-wb">
-                        <label class="custom-radiobutton-wb">
+                        <label class="custom-radiobutton-wbkb">
                             <input type="radio" class="schedule-tools-action-unlock" name="schedule-tools-date-action"
                                 data-js="radio-schedule-tools-action-wb" data-name="unlock">
                             <span class="checkmark-wb"></span>
@@ -425,10 +425,10 @@ date_default_timezone_set('UTC');
                 parse_url(rest_url(), PHP_URL_PATH)
             ); ?> data-nonce="<?php echo wp_create_nonce(
                   'wp_rest'
-              ); ?>" class="button-wb schedule_tools_start_btn wbk_hidden"><?php echo __(
+              ); ?>" class="button-wbkb schedule_tools_start_btn wbk_hidden"><?php echo __(
                    'Start',
                    'webba-booking-lite'
-               ); ?><span class="btn-ring-wb"></span></button>
+               ); ?><span class="btn-ring-wbk"></span></button>
 
         </div><!-- /.buttons-block-wb -->
 

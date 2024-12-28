@@ -1,7 +1,8 @@
 <?php
-if ( !defined( 'ABSPATH' ) ) exit;
+if (!defined('ABSPATH'))
+    exit;
 $count = $data[0];
-if( !is_numeric( $count) ){
+if (!is_numeric($count)) {
     return;
 }
 ?>
@@ -9,15 +10,15 @@ if( !is_numeric( $count) ){
     <div class="wbk-inner-container">
         <div class="wbk-frontend-row">
             <div class="wbk-col-12-12">
-                <div class="wbk-input-label">
+                <div class="input-label-wbk">
                     <?php
-                        $message = esc_html( get_option( 'wbk_booking_canceled_message_admin', __( 'Bookings canceled: #count', 'webba-booking-lite' ) ) );
-                        if( $count > 1 ){
-                            $count =  '<span class="wbk_mutiple_counter">: ' .  $count . '</span>';
-                         } else {
-                            $count = '';
-                        }
-                        echo str_replace( '#count', $count, $message );
+                    $message = esc_html(get_option('wbk_booking_canceled_message_admin', __('Bookings canceled: #count', 'webba-booking-lite')));
+                    if ($count > 1) {
+                        $count = '<span class="wbk_mutiple_counter">: ' . $count . '</span>';
+                    } else {
+                        $count = '';
+                    }
+                    echo str_replace('#count', $count, $message);
                     ?>
                 </div>
 

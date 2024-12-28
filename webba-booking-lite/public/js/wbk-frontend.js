@@ -194,7 +194,7 @@ function wbk_setServiceEvent() {
                 .attr('data-desc')
             if (wbkl10n.show_desc == 'enabled') {
                 WBK_jQuery('#wbk_description_holder').html(
-                    '<label class="wbk-input-label">' +
+                    '<label class="input-label-wbk">' +
                         service_desc +
                         '</label>'
                 )
@@ -346,7 +346,7 @@ function wbk_renderSetDate(scroll) {
                 date_label = date_label.replace('#service', service_name)
                 WBK_jQuery('#wbk-date-container').html(
                     sep_html +
-                        '<div class="wbk-col-12-12"><label class="wbk-input-label">' +
+                        '<div class="wbk-col-12-12"><label class="input-label-wbk">' +
                         date_label +
                         '</label><input value="' +
                         wbkl10n.selectdate +
@@ -359,7 +359,7 @@ function wbk_renderSetDate(scroll) {
                 date_label = date_label.replace('#service', service_name)
                 WBK_jQuery('#wbk-date-container').html(
                     sep_html +
-                        '<div class="wbk-col-12-12"><label class="wbk-input-label">' +
+                        '<div class="wbk-col-12-12"><label class="input-label-wbk">' +
                         date_label +
                         '</label><input value="' +
                         wbkl10n.selectdate +
@@ -381,7 +381,7 @@ function wbk_renderSetDate(scroll) {
             if (response_obj.abilities == '') {
                 WBK_jQuery('#wbk-date-container').html(
                     sep_html +
-                        '<div class="wbk-col-12-12"><label class="wbk-input-label">' +
+                        '<div class="wbk-col-12-12"><label class="input-label-wbk">' +
                         wbkl10n.no_available_dates +
                         '</label>'
                 )
@@ -393,7 +393,7 @@ function wbk_renderSetDate(scroll) {
                 date_label = date_label.replace('#service', service_name)
                 WBK_jQuery('#wbk-date-container').html(
                     sep_html +
-                        '<div class="wbk-col-12-12"><label class="wbk-input-label">' +
+                        '<div class="wbk-col-12-12"><label class="input-label-wbk">' +
                         date_label +
                         '</label><select name="wbk-date_submit" class="wbk-input wbk_date" id="wbk-date" /></select></div>'
                 )
@@ -402,7 +402,7 @@ function wbk_renderSetDate(scroll) {
                 date_label = date_label.replace('#service', service_name)
                 WBK_jQuery('#wbk-date-container').html(
                     sep_html +
-                        '<div class="wbk-col-12-12"><label class="wbk-input-label">' +
+                        '<div class="wbk-col-12-12"><label class="input-label-wbk">' +
                         date_label +
                         '</label><select name="wbk-date_submit" class="wbk-input wbk_date" id="wbk-date" /></select></div>'
                 )

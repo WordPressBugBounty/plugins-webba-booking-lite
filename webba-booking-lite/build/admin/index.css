@@ -1,0 +1,138 @@
+/*!******************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./src/admin/App.module.css ***!
+  \******************************************************************************************************************************************************************************/
+.s2rDycni5BYmMHH0zrMX {
+    margin-bottom: 20px;
+    padding-right: 20px;
+}
+
+/*!**********************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./src/admin/components/WebbaDataTable/Table.module.css ***!
+  \**********************************************************************************************************************************************************************************************************/
+.fbTEtHaL4wP5U2lqQjJV {
+    border-collapse: collapse;
+    width: 100%;
+    text-align: center;
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+.YcB_ZA2z48jREEfT7_WJ {
+    background-color: #cbe7e7;
+}
+
+.bEibNfF_foYskTTVzf1a {
+    padding: 15px;
+}
+
+.bEibNfF_foYskTTVzf1a:first-child {
+    border-radius: 10px 0 0 10px;
+}
+
+.bEibNfF_foYskTTVzf1a:last-child {
+    border-radius: 0 10px 10px 0;
+}
+
+.ToKIuRzU541tzdhiRqkT {
+    padding: 15px;
+}
+
+.ISotL3rUQIM39qRpBrmA {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.HfNJvQmlRw5qiQdRKGSg {
+    background-color: #f5fafa;
+}
+
+.nCSihwfpZBZU2X48SJJx {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.nCSihwfpZBZU2X48SJJx {
+    transition:
+        opacity 200ms,
+        transform 500ms;
+}
+
+.nCSihwfpZBZU2X48SJJx:hover {
+    opacity: 0.7;
+}
+
+.nCSihwfpZBZU2X48SJJx.gLoi2GMxAIp3JHyfP7q_ {
+    visibility: hidden;
+}
+
+.nCSihwfpZBZU2X48SJJx.mVy68qG59gOKsB59Q9LY {
+    transform: rotate(180deg);
+}
+
+.N9PXLeAtYxkFhpsyO0XM {
+    box-shadow: 0 0 15px rgba(161, 164, 182, 0.5);
+    border-radius: 20px;
+    padding: 35px 35px 35px 35px;
+    margin: 30px 30px 30px 0;
+    background: #fff;
+}
+
+.PetWQcMychmapWawv7Mz {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.hy0FidSttNaubKkImmyQ {
+    font-family: poppins-medium, arial;
+    font-weight: normal;
+    font-size: 32px;
+}
+
+.GX6Myie72HIN0mjSaVzs {
+    padding: 15px;
+}
+
+/*!*****************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./src/admin/components/Sidebar/Sidebar.module.css ***!
+  \*****************************************************************************************************************************************************************************************************/
+.pmQ0A63yyRriBwMmbPCC {
+    display: none;
+}
+
+.pmQ0A63yyRriBwMmbPCC.TtX3MLadnAA3p8Egic3H {
+    --header-height: 32px;
+
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 100000;
+}
+
+.EV6UjgdNk_20jUBFOP35 {
+    --sidebar-width: 540px;
+
+    position: absolute;
+    top: 0;
+    right: calc(var(--sidebar-width) * -1);
+    height: 100%;
+    width: var(--sidebar-width);
+    transition: right 150ms ease;
+    background-color: white;
+}
+
+.EV6UjgdNk_20jUBFOP35.TtX3MLadnAA3p8Egic3H {
+    right: 0;
+    z-index: 2;
+}
+
+.zW2bW2M1d8Uoq1UXkQG0 {
+    overflow: hidden;
+}
+
+
+/*# sourceMappingURL=index.css.map*/

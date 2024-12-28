@@ -23,7 +23,7 @@ if ($valid == true) {
         <div class="wbk-inner-container">
             <div class="wbk-frontend-row">
                 <div class="wbk-col-12-12">
-                    <div class="wbk-input-label">
+                    <div class="input-label-wbk">
                         <?php echo $title . $content; ?>
                     </div>
                 </div>

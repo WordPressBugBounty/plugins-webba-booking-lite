@@ -30,7 +30,7 @@ function wbk_plugion_dashboard_before_table($table_name)
                     <a href="#" class="past-bookings-link-wb">
                         <?php echo esc_html__('Show past bookings', 'webba-booking-lite'); ?>
                     </a>
-                    <button class="button-wb"><span class="text-wb">
+                    <button class="button-wbkb"><span class="text-wb">
                             <?php echo esc_html__('New booking', 'webba-booking-lite'); ?>
                         </span> <span class="plus-icon-wb"></span></button>
                 </div>

@@ -38,7 +38,7 @@ $wp_editor_args = [
                 </div>
             <?php } ?>
         </div>
-        <button type="button" class="button-wb button-small-wb wbk_option_toggle_editor">
+        <button type="button" class="button-wbkb button-small-wb wbk_option_toggle_editor">
             <?php echo esc_html__('Toggle editor', 'webba-booking-lite') ?>
         </button>
     </div>

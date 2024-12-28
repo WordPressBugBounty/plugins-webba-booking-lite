@@ -12,7 +12,7 @@ if (get_option('wbk_show_service_description', 'disabled') == 'enabled') {
 
     ?>
     <div class="wbk_description_holder" id="wbk_description_holder">
-        <label class="wbk-input-label">
+        <label class="input-label-wbk">
             <p><?php echo $service_description; ?></p>
         </label>
     </div>

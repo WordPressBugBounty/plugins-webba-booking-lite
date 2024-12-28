@@ -35,6 +35,7 @@ class WBK_Model_Updater {
         self::update_5_0_37();
         self::update_5_0_44();
         self::update_5_0_46();
+        self::update_5_0_55();
     }
 
     public static function run_previous_update() {
@@ -1384,6 +1385,26 @@ class WBK_Model_Updater {
             }
             self::set_update_as_complete( 'update_5_0_46' );
         }
+    }
+
+    /**
+     * Initialize automatic user creation and create booking customer role
+     *
+     * @return void
+     */
+    static function update_5_0_55() : void {
+        if ( !self::is_update_required( 'update_5_0_55' ) ) {
+            return;
+        }
+        if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+            return;
+        }
+        $services = WBK_Model_Utils::get_services();
+        if ( count( $services ) > 0 ) {
+            return;
+        }
+        update_option( 'wbk_create_user_on_booking', true );
+        self::set_update_as_complete( 'update_5_0_55' );
     }
 
 }

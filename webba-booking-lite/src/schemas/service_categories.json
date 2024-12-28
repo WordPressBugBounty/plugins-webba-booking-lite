@@ -1,0 +1,18 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "category_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Category name"
+        },
+        "category_list": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Services"
+        }
+    }
+}
