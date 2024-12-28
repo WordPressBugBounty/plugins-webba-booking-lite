@@ -3,7 +3,7 @@ Contributors: Webba agency, freemius
 Donate link: https://webba-booking.com/
 Tags: appointment booking, booking calendar, online scheduling, event booking, service reservations
 Requires at least: 5.6
-Tested up to: 6.7.1
+Tested up to: 6.7
 Stable tag: 5.0.55
 Requires PHP: 7.4
 License: GPLv3 or later
