@@ -22,7 +22,7 @@ const store = createReduxStore('webba_booking/assets_store', {
         *getData(item) {
             const path = 'wbk/v2/get-preset/'
             const data = yield actions.fetchFromAPI(path)
-            console.log(data)
+
             return actions.setData(data)
         },
     },

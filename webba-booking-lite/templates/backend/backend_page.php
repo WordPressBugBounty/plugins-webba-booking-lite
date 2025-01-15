@@ -7,10 +7,7 @@ if (isset($_GET['wbk-activation'])) {
     $container_extra_class = ' mail-block-wb-wizard ';
 }
 
-if (isset($_GET['test'])) {
-    $bf = new WBK_Booking_Factory();
-    $bf->destroy(13, __('Service administrator (dashboard)', 'webba-booking-lite'));
-}
+WBK_Mixpanel::update_configuration(true);
 
 ?>
 

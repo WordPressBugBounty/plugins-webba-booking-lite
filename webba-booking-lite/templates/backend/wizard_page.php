@@ -2,6 +2,9 @@
 if (!defined('ABSPATH'))
     exit;
 ?>
+<?php
+WBK_Mixpanel::track_event("setup wizard launched", []);
+?>
 
 <style>
     h2:not(.block-heading-wb),
@@ -283,7 +286,7 @@ if (!defined('ABSPATH'))
                                     <?php echo esc_html__('Congrats! You are all set!', 'webba-booking-lite'); ?>
                                 </h2>
                                 <p class="text-center-wb mb-10-wb">
-                                    <?php echo esc_html__('Add a "Webba Booking Form" block using Gutenberg.', 'webba-booking-lite'); ?>
+                                    <?php echo esc_html__('Add a "Webba Booking Form" block using WordPress Block Editor (Gutenberg).', 'webba-booking-lite'); ?>
 
                                 </p>
                                 <p class="text-center-wb mb-10-wb">

@@ -85,7 +85,7 @@ final class WBK_Options_Processor
         $args = array_merge($default_args, $args);
 
         // update default values
-        if(!empty($args['default']) && get_option($slug) === false && $args['default'] !== false){
+        if (!empty($args['default']) && get_option($slug) === false && $args['default'] !== false) {
             update_option($slug, $args['default']);
         }
 

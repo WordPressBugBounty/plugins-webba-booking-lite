@@ -152,6 +152,7 @@ class WBK_Frontend_Booking {
         extract( shortcode_atts( [
             'compatibility' => 'no',
         ], $attr ) );
+        $tracking_service = $service;
         if ( $category > 0 ) {
             $service_ids = WBK_Model_Utils::get_services_in_category( $category );
         } else {
@@ -259,6 +260,18 @@ class WBK_Frontend_Booking {
         $compatibility_html = '';
         if ( $compatibility == 'yes' ) {
             $compatibility_html = '<span class="wbk_compatibility"></span>';
+        }
+        if ( get_option( 'wbk_initial_shortcode_render_tracked', '' ) != 'true' ) {
+            if ( WBK_Model_Utils::get_total_count_of_bookings() == 0 ) {
+                $data['service'] = $tracking_service;
+                $data['category'] = $category;
+                $data['category_list'] = $category_list;
+                $data['multiservice'] = $multiservice;
+                WBK_Mixpanel::track_event( "1st shortcode rendering", $data );
+                update_option( 'wbk_initial_shortcode_render_tracked', 'true' );
+            } else {
+                update_option( 'wbk_initial_shortcode_render_tracked', 'true' );
+            }
         }
         return $compatibility_html . WBK_Renderer::load_template( 'frontend_v5/webba5_form_container', [$this->scenario], false );
     }

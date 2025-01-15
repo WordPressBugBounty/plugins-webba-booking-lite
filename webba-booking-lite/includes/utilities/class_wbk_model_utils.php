@@ -85,7 +85,11 @@ class WBK_Model_Utils {
                 if ( in_array( 'administrator', $user->roles, true ) || is_multisite() && !is_super_admin() ) {
                     $result[$item['id']] = $item['name'];
                 } else {
-                    $users = json_decode( $item['users'] );
+                    if ( isset( $item['users'] ) ) {
+                        $users = json_decode( $item['users'] );
+                    } else {
+                        $users = [];
+                    }
                     if ( is_array( $users ) ) {
                         if ( in_array( get_current_user_id(), $users ) ) {
                             $result[$item['id']] = $item['name'];
@@ -1217,6 +1221,13 @@ class WBK_Model_Utils {
             'time'          => $booking->get_start(),
             'price'         => $price,
         ];
+    }
+
+    static function get_total_count_of_bookings() {
+        global $wpdb;
+        $count_bookings = $wpdb->get_var( $wpdb->prepare( ' SELECT COUNT(*) FROM ' . get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments ' ) );
+        $count_bookings += $wpdb->get_var( $wpdb->prepare( ' SELECT COUNT(*) FROM ' . get_option( 'wbk_db_prefix', '' ) . 'wbk_cancelled_appointments ' ) );
+        return $count_bookings;
     }
 
 }

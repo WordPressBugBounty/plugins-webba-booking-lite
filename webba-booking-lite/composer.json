@@ -5,6 +5,10 @@
         "johngrogg/ics-parser": "^3",
         "twilio/sdk": "^6.39",
         "voku/anti-xss": "^4.1",
-        "eluceo/ical": "^2.13"
+        "eluceo/ical": "^2.13",
+        "mixpanel/mixpanel-php": "2.*"
+    },
+    "config": {
+        "platform-check": false
     }
 }

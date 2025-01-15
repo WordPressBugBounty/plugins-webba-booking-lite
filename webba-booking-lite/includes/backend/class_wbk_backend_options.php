@@ -48,6 +48,7 @@ class WBK_Backend_Options {
             }
         }
         do_action( 'wbk_options_saved' );
+        WBK_Mixpanel::update_configuration( false );
         wp_send_json_success();
     }
 

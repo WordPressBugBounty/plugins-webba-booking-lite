@@ -102,7 +102,6 @@ class WBK_Wizard
         $dow_availability = '{"dow_availability":[ ' . implode(',', $dows_result) . ']}';
 
 
-
         $service->set('business_hours_v4', $dow_availability);
         $service->set('min_quantity', '1');
         $service->set('quantity', $quantity);
@@ -137,7 +136,7 @@ class WBK_Wizard
             }
         }
         echo json_encode(array('status' => 'success', 'shortcode' => $shortcode));
-
+        WBK_Mixpanel::track_event("setup wizard basic setup complete", []);
         wp_die();
         return;
     }
@@ -194,6 +193,7 @@ class WBK_Wizard
         $url = esc_url(get_admin_url() . 'admin.php?page=wbk-services');
 
         echo json_encode(array('status' => 'success', 'url' => $url));
+        WBK_Mixpanel::track_event("setup wizard full setup complete", []);
         wp_die();
         return;
 

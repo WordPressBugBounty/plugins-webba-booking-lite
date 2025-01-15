@@ -151,7 +151,9 @@ class WBK_Assets_Manager {
             $has_shortcode = true;
         }
         $has_ud_shortcode = $this->has_shortcode( 'webba_user_dashboard' );
-        error_log( var_export( $has_shortcode, true ) );
+        if ( isset( $_GET['ct_builder'] ) ) {
+            return;
+        }
         if ( isset( $_GET['action'] ) && $_GET['action'] == 'oxy_render_oxy-site-navigation' ) {
             return;
         }

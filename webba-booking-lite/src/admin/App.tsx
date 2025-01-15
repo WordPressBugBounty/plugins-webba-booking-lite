@@ -81,7 +81,6 @@ const App = () => {
     })
     const handleGetServices = async () => {
         const services = await getItems('services')
-        console.log(services)
     }
     const handleUpdateService = async () => {
         const data = {

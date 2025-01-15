@@ -21,7 +21,6 @@ class WEBBA5_Form {
                 .trigger('click')
         })
         jQuery('.wbk_service_description_switcher').click(function (e) {
-            console.log('open')
             e.preventDefault()
             jQuery(this).siblings('.wbk_read_more').toggle()
             jQuery(this).toggleClass('wbk_rotate_90')

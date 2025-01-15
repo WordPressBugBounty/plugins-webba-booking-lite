@@ -12,9 +12,7 @@ const ServiceCalendar = ({ onChange }) => {
     const service = services.find(
         (service) => service.id == formData.services[0]
     )
-
     const daysOfWeekToDisable = Object.values(service.business_days).map(Number)
-    console.log(daysOfWeekToDisable)
     const tileDisabled = ({ date }) => {
         const today = new Date()
         today.setHours(0, 0, 0, 0)

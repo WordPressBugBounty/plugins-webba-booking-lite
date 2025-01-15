@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 5.0.56
+ * Version: 5.0.57
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -64,7 +64,7 @@ if ( !defined( 'WP_WEBBA_BOOKING__PLUGIN_DIR' ) ) {
     define( 'WP_WEBBA_BOOKING__PLUGIN_URL', plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( 'WP_WEBBA_BOOKING__VERSION' ) ) {
-    define( 'WP_WEBBA_BOOKING__VERSION', '5.0.56' );
+    define( 'WP_WEBBA_BOOKING__VERSION', '5.0.57' );
 }
 if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_textdomain' ) ) {
     include 'vendor/autoload.php';
@@ -142,6 +142,8 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     include 'includes/class-wbk-renderer.php';
     // Frontend
     include 'includes/class_wbk_frontend_booking.php';
+    // Mixpanel
+    include 'includes/class_wbk_mixpanel.php';
     add_action( 'init', 'wbk_init', 30 );
     add_action( 'wbk_daily_event', 'wbk_daily' );
     add_action( 'plugins_loaded', 'wbk_plugins_loaded', 10 );
@@ -831,4 +833,26 @@ if ( !function_exists( 'wbk_admin_permission' ) ) {
         }
     }
 
+}
+add_action( 'current_screen', 'wbk_admin_init' );
+if ( !function_exists( 'wbk_admin_init' ) ) {
+    function wbk_admin_init() {
+        if ( is_admin() && isset( $_GET['page'] ) && $_GET['page'] == 'wbk-main-pricing' ) {
+            WBK_Mixpanel::track_event( "pricing page opened", [] );
+        }
+    }
+
+}
+if ( !function_exists( 'add_wbk_custom_permission' ) ) {
+    function add_wbk_custom_permission(  $permissions  ) {
+        $permissions['helpscout'] = array(
+            'icon-class' => 'dashicons dashicons-admin-generic',
+            'label'      => wbk_fs()->get_text_inline( 'Anonymous Usage Data', 'webba-config' ),
+            'desc'       => wbk_fs()->get_text_inline( 'Anonymous data collected to enhance product functionality and experience', 'webba-config' ),
+            'priority'   => 16,
+        );
+        return $permissions;
+    }
+
+    wbk_fs()->add_filter( 'permission_list', 'add_wbk_custom_permission' );
 }

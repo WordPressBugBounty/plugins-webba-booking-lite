@@ -277,8 +277,12 @@ body {
 }
 
 .header-main-wb .add-service-button-wbkb:hover,
-.button-wbkb:hover {
-    opacity: 1;
+.button-wbkb:hover,
+.button-wbkb:focus,
+.button-wbkb:active {
+    opacity: 0.9 !important;
+    color: #fff !important;
+    text-decoration: underline !important;
 }
 
 .header-main-wb .add-service-button-wbkb .text-wb {

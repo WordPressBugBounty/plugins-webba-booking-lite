@@ -1493,6 +1493,9 @@ class WBK_Request_Manager {
             $_SESSION['wbk_last_name'] = $last_name;
         }
         $boking_factory->post_production( $booking_ids, 'on_booking' );
+        WBK_Mixpanel::track_event( "booking created", [
+            'booking_type' => 'frontend',
+        ] );
         $payment_methods = WBK_Model_Utils::get_payment_methods_for_bookings_intersected( $booking_ids );
         if ( get_option( 'wbk_appointments_default_status', '' ) == 'pending' && get_option( 'wbk_appointments_allow_payments', '' ) == 'enabled' ) {
             $payable = false;
@@ -2217,6 +2220,7 @@ class WBK_Request_Manager {
         }
         file_put_contents( $dir . DIRECTORY_SEPARATOR . 'index.html', '' );
         file_put_contents( $dir . DIRECTORY_SEPARATOR . 'wbk5-frontend-custom-style.css', $css_content );
+        WBK_Mixpanel::track_event( "appearance saved", [] );
     }
 
     public function wbk_report_error() {

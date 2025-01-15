@@ -668,6 +668,16 @@ function wbk_plugion_on_after_row_add(
     if ($table_name == get_option('wbk_db_prefix', '') . 'wbk_appointments') {
         $bf = new WBK_Booking_Factory();
         $bf->post_production([$row->id], 'on_manual_booking');
+        WBK_Mixpanel::track_event("booking created", ['booking_type' => 'backend']);
+    }
+    if ($table_name == get_option('wbk_db_prefix', '') . 'wbk_services') {
+        WBK_Mixpanel::track_event("service created", []);
+    }
+    if ($table_name == get_option('wbk_db_prefix', '') . 'wbk_service_categories') {
+        WBK_Mixpanel::track_event("service category created", []);
+    }
+    if ($table_name == get_option('wbk_db_prefix', '') . 'wbk_pricing_rules') {
+        WBK_Mixpanel::track_event("pricing rule created", []);
     }
 }
 
