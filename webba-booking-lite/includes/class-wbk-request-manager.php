@@ -625,7 +625,21 @@ class WBK_Request_Manager {
     }
 
     public function resend_email_permission( $request ) {
-        return current_user_can( 'manage_options' );
+        if ( current_user_can( 'manage_options' ) ) {
+            return true;
+        }
+        if ( isset( $request['id'] ) && is_numeric( $request['id'] ) ) {
+            $booking = new WBK_Booking($request['id']);
+            if ( !$booking->is_loaded() ) {
+                return false;
+            }
+            $service = new WBK_Service($booking->get_service());
+            if ( !$service->is_loaded() ) {
+                return false;
+            }
+            return WBK_Validator::check_access_to_service( $booking->get_service() );
+        }
+        return false;
     }
 
     public function appointments_status_change_permission( $request ) {

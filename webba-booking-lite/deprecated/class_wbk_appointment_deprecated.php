@@ -181,7 +181,7 @@ class WBK_Appointment_deprecated extends WBK_Entity
     public function setTime($value)
     {
         $value = absint($value);
-        if (WBK_Validator::check_integer($value, 1438426800, 1754046000)) {
+        if (WBK_Validator::check_integer($value, 1438426800, 9754046000)) {
             $this->time = $value;
             return true;
         } else {
@@ -207,7 +207,7 @@ class WBK_Appointment_deprecated extends WBK_Entity
     public function setDay($value)
     {
         $value = absint($value);
-        if (WBK_Validator::check_integer($value, 1438426800, 1754046000)) {
+        if (WBK_Validator::check_integer($value, 1438426800, 9754046000)) {
             $this->day = $value;
             return true;
         } else {

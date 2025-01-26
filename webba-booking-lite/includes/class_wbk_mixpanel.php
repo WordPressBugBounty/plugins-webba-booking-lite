@@ -9,7 +9,9 @@ class WBK_Mixpanel
     public static function update_configuration($initial = true)
     {
         global $wp_settings_sections, $wp_settings_fields;
-        if (self::is_localhost() || ($initial && get_option('wbk_initial_configuration_tracked') == 'true')) {
+        $initial_tracking_version = 'wbk_tracking_v5058';
+
+        if (self::is_localhost() || ($initial && get_option($initial_tracking_version) == 'true')) {
             return;
         }
 
@@ -19,7 +21,9 @@ class WBK_Mixpanel
             return;
         }
         $settings_fields = $wp_settings_fields['wbk-options'];
+        $fields_to_remove = [];
         foreach ($settings_fields as $section => $fields) {
+
             foreach ($fields as $field) {
                 if (
                     $field['id'] == 'wbk_gg_clientid' ||
@@ -37,10 +41,10 @@ class WBK_Mixpanel
                     $field['id'] == 'wbk_zoom_client_secret' ||
                     $field['id'] == 'wbk_zoom_auth_stat' ||
                     $field['id'] == 'wbk_email_current_invoice_number'
-
                 ) {
                     continue;
                 }
+                $fields_to_remove[] = $field['title'];
                 $value = get_option($field['id']);
                 if (is_array($value)) {
                     $value = implode(',', $value);
@@ -49,7 +53,11 @@ class WBK_Mixpanel
                 if ($value == '') {
                     $value = '[empty]';
                 }
-                $data[$field['title']] = $value;
+
+                if (isset($field['args']) && isset($field['args']['not_translated_title']) && $field['args']['not_translated_title'] != '') {
+                    $title = $field['args']['not_translated_title'];
+                    $data[$title] = $value;
+                }
             }
         }
 
@@ -58,12 +66,15 @@ class WBK_Mixpanel
             if (!is_array($data) || empty($data)) {
                 throw new InvalidArgumentException('Invalid data provided. Expected a non-empty array.');
             }
-            $mp->people->set(self::get_host(), $data, $ip = 0);
+            if ($initial) {
+                $mp->people->remove(self::get_host(), $fields_to_remove, 0);
+            }
+            $mp->people->set(self::get_host(), $data, 0);
         } catch (Exception $e) {
             error_log('Error in tracking: ' . $e->getMessage());
         }
         if ($initial) {
-            update_option('wbk_initial_configuration_tracked', 'true');
+            update_option($initial_tracking_version, 'true');
         }
     }
     public static function is_localhost()
@@ -89,7 +100,6 @@ class WBK_Mixpanel
         if (self::is_localhost()) {
             return;
         }
-
         try {
             $mp = Mixpanel::getInstance(self::PROJECT_TOKEN);
             $mp->identify(self::get_host());
@@ -97,7 +107,6 @@ class WBK_Mixpanel
         } catch (Exception $e) {
             error_log('Error in tracking: ' . $e->getMessage());
         }
-
     }
 
 }

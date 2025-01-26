@@ -136,6 +136,7 @@ class WBK_Wizard
             }
         }
         echo json_encode(array('status' => 'success', 'shortcode' => $shortcode));
+        WBK_Mixpanel::track_event("service created", []);
         WBK_Mixpanel::track_event("setup wizard basic setup complete", []);
         wp_die();
         return;

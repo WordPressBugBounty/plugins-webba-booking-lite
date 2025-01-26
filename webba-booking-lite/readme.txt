@@ -4,7 +4,7 @@ Donate link: https://webba-booking.com/
 Tags: appointment booking, appointment, booking, scheduling, booking system
 Requires at least: 5.6
 Tested up to: 6.7.1
-Stable tag: 5.0.57
+Stable tag: 5.0.58
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -169,6 +169,13 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  
 
 == Changelog ==
+
+5.0.58
+
+26/01/2025
+
+Bugfix: bug with email notifications for bookings scheduled far in advance
+Bugfix: bug with permissions for resending emails
 
 5.0.57
 

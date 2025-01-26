@@ -231,9 +231,10 @@ class WBK_Backend_Options {
             __( 'Timezone', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'extra'   => array_combine( timezone_identifiers_list(), timezone_identifiers_list() ),
-                'default' => 'Europe/London',
-                'popup'   => __( 'Select your local timezone for both the backend and booking form.', 'webba-booking-lite' ),
+                'extra'                => array_combine( timezone_identifiers_list(), timezone_identifiers_list() ),
+                'default'              => 'Europe/London',
+                'not_translated_title' => 'Timezone',
+                'popup'                => __( 'Select your local timezone for both the backend and booking form.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -242,12 +243,13 @@ class WBK_Backend_Options {
             __( 'Form layout', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default' => 'default',
-                'extra'   => [
+                'default'              => 'default',
+                'extra'                => [
                     'default' => __( 'Default', 'webba-booking-lite' ),
                     'narrow'  => __( 'For themes with narrow columns', 'webba-booking-lite' ),
                 ],
-                'popup'   => __( 'Choose between the default layout or the layout optimized for themes with narrow columns.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Form layout',
+                'popup'                => __( 'Choose between the default layout or the layout optimized for themes with narrow columns.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -256,8 +258,9 @@ class WBK_Backend_Options {
             __( 'Show suitable hours', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'checkbox_value' => 'yes',
-                'dependency'     => [
+                'not_translated_title' => 'Show suitable hours',
+                'checkbox_value'       => 'yes',
+                'dependency'           => [
                     'wbk_mode' => 'extended',
                 ],
             ]
@@ -268,9 +271,10 @@ class WBK_Backend_Options {
             __( 'Multiple bookings in one session', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'popup'          => __( 'Turn on to activate the multiple booking mode that allows booking multiple time slots in the same booking.', 'webba-booking-lite' ),
-                'default'        => '',
-                'checkbox_value' => 'enabled',
+                'not_translated_title' => 'Multiple bookings in one session',
+                'popup'                => __( 'Turn on to activate the multiple booking mode that allows booking multiple time slots in the same booking.', 'webba-booking-lite' ),
+                'default'              => '',
+                'checkbox_value'       => 'enabled',
             ]
         );
         wbk_opt()->add_option(
@@ -279,10 +283,11 @@ class WBK_Backend_Options {
             __( 'Auto-advance to the next step in the booking form', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'popup'          => __( 'Turn on to automatically go to the next step after selecting a time interval in the booking form\'s Date and time step.', 'webba-booking-lite' ),
-                'default'        => '',
-                'checkbox_value' => 'enabled',
-                'dependency'     => [
+                'not_translated_title' => 'Auto-advance to the next step in the booking form',
+                'popup'                => __( 'Turn on to automatically go to the next step after selecting a time interval in the booking form\'s Date and time step.', 'webba-booking-lite' ),
+                'default'              => '',
+                'checkbox_value'       => 'enabled',
+                'dependency'           => [
                     'wbk_multi_booking' => 'not_checked',
                 ],
             ]
@@ -293,13 +298,14 @@ class WBK_Backend_Options {
             __( 'Phone number masked input', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default'    => 'enabled',
-                'extra'      => [
+                'default'              => 'enabled',
+                'not_translated_title' => 'Phone number masked input',
+                'extra'                => [
                     'enabled'             => __( 'jQuery Masked Input Plugin', 'webba-booking-lite' ),
                     'enabled_mask_plugin' => __( 'jQuery Mask Plugin', 'webba-booking-lite' ),
                     'disabled'            => __( 'Disabled', 'webba-booking-lite' ),
                 ],
-                'dependency' => [
+                'dependency'           => [
                     'wbk_mode' => 'extended|simple',
                 ],
             ]
@@ -310,8 +316,9 @@ class WBK_Backend_Options {
             __( 'Phone format', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default' => '(000)000-0000',
-                'popup'   => __( 'Customize phone number formats using "0" for mandatory digits and "9" for optional ones. E.g , (000) 000 00 00 requires 10 digits, while (000) 000 000 9 requires 9 digits with the 10th optional. Leave blank to disable formatting.', 'webba-booking-lite' ),
+                'default'              => '(000)000-0000',
+                'not_translated_title' => 'Phone format',
+                'popup'                => __( 'Customize phone number formats using "0" for mandatory digits and "9" for optional ones. E.g , (000) 000 00 00 requires 10 digits, while (000) 000 000 9 requires 9 digits with the 10th optional. Leave blank to disable formatting.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -321,9 +328,10 @@ class WBK_Backend_Options {
             __( 'Phone field is mandatory', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'popup'          => __( 'Turn on to make the phone field mandatory.', 'webba-booking-lite' ),
-                'checkbox_value' => '3',
-                'default'        => '',
+                'not_translated_title' => 'Phone field is mandatory',
+                'popup'                => __( 'Turn on to make the phone field mandatory.', 'webba-booking-lite' ),
+                'checkbox_value'       => '3',
+                'default'              => '',
             ],
             'advanced'
         );
@@ -333,7 +341,8 @@ class WBK_Backend_Options {
             __( 'Show booked time slots', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'popup' => __( 'Turn on to show booked time slots as "Booked".', 'webba-booking-lite' ),
+                'not_translated_title' => 'Show booked time slots',
+                'popup'                => __( 'Turn on to show booked time slots as "Booked".', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -343,7 +352,8 @@ class WBK_Backend_Options {
             __( 'Autolock bookings', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup' => __( 'When one service is booked, it will automatically lock another one, preventing conflicting bookings.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Autolock bookings',
+                'popup'                => __( 'When one service is booked, it will automatically lock another one, preventing conflicting bookings.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -352,13 +362,14 @@ class WBK_Backend_Options {
             __( 'Perform autolock on', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup'      => __( 'Choose whether the autolock feature applies to all services or only services within the same category.', 'webba-booking-lite' ),
-                'default'    => 'all',
-                'extra'      => [
+                'not_translated_title' => 'Perform autolock on',
+                'popup'                => __( 'Choose whether the autolock feature applies to all services or only services within the same category.', 'webba-booking-lite' ),
+                'default'              => 'all',
+                'extra'                => [
                     'all'        => __( 'All services', 'webba-booking-lite' ),
                     'categories' => __( 'Services in the same category', 'webba-booking-lite' ),
                 ],
-                'dependency' => [
+                'dependency'           => [
                     'wbk_appointments_auto_lock' => ':checked',
                 ],
             ]
@@ -369,13 +380,14 @@ class WBK_Backend_Options {
             __( 'Autolock for group booking services', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'default'    => 'lock',
-                'popup'      => __( 'Choose to either "Lock time slot" or "Reduce count of available places" when a group booking is turned on.', 'webba-booking-lite' ),
-                'extra'      => [
+                'default'              => 'lock',
+                'not_translated_title' => 'Autolock for group booking services',
+                'popup'                => __( 'Choose to either "Lock time slot" or "Reduce count of available places" when a group booking is turned on.', 'webba-booking-lite' ),
+                'extra'                => [
                     'lock'   => __( 'Lock time slot', 'webba-booking-lite' ),
                     'reduce' => __( 'Reduce count of available places', 'webba-booking-lite' ),
                 ],
-                'dependency' => [
+                'dependency'           => [
                     'wbk_appointments_auto_lock' => ':checked',
                 ],
             ]
@@ -386,9 +398,10 @@ class WBK_Backend_Options {
             __( 'Default booking status', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup'   => __( 'Specify the default status assigned to newly created bookings.', 'webba-booking-lite' ),
-                'default' => 'approved',
-                'extra'   => [
+                'not_translated_title' => 'Default booking status',
+                'popup'                => __( 'Specify the default status assigned to newly created bookings.', 'webba-booking-lite' ),
+                'default'              => 'approved',
+                'extra'                => [
                     'approved' => __( 'Approved', 'webba-booking-lite' ),
                     'pending'  => __( 'Awaiting approval', 'webba-booking-lite' ),
                 ],
@@ -400,7 +413,8 @@ class WBK_Backend_Options {
             __( 'Allow payments only for approved bookings', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup' => __( 'Turn on to restrict payment functionality to approved bookings only.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Allow payments only for approved bookings',
+                'popup'                => __( 'Turn on to restrict payment functionality to approved bookings only.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -410,7 +424,8 @@ class WBK_Backend_Options {
             __( 'Coupons', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup' => __( 'Turn on to activate the coupon feature in the booking system. Read more about <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/set-up-frontend-booking-process/coupons/">Coupns setup</a>.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Coupons',
+                'popup'                => __( 'Turn on to activate the coupon feature in the booking system. Read more about <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/set-up-frontend-booking-process/coupons/">Coupns setup</a>.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -420,29 +435,31 @@ class WBK_Backend_Options {
             __( 'Delete unpaid bookings', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'default' => 'on_booking',
-                'extra'   => [
+                'default'              => 'on_booking',
+                'extra'                => [
                     'disabled'   => __( 'Disabled', 'webba-booking-lite' ),
                     'on_booking' => __( 'Set expiration time on booking', 'webba-booking-lite' ),
                     'on_approve' => __( 'Set expiration time on approve', 'webba-booking-lite' ),
                 ],
-                'popup'   => __( 'Turn on to automatically delete unpaid bookings.', 'webba-booking-lite' ) . '<br />',
+                'not_translated_title' => 'Delete unpaid bookings',
+                'popup'                => __( 'Turn on to automatically delete unpaid bookings.', 'webba-booking-lite' ) . '<br />',
             ],
             'advanced'
         );
         wbk_opt()->add_option(
             'wbk_appointments_delete_payment_started',
             'select',
-            __( 'Delete unpaid bookings with started payment.', 'webba-booking-lite' ),
+            __( 'Delete unpaid bookings with started payment', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'default'    => 'delete',
-                'extra'      => [
+                'default'              => 'delete',
+                'extra'                => [
                     'skip'   => __( 'Do not delete bookings with started transaction', 'webba-booking-lite' ),
                     'delete' => __( 'Delete bookings with started transaction', 'webba-booking-lite' ),
                 ],
-                'popup'      => __( 'Choose whether to automatically remove unpaid bookings that have already initiated the payment process.', 'webba-booking-lite' ),
-                'dependency' => [
+                'not_translated_title' => 'Delete unpaid bookings with started payment',
+                'popup'                => __( 'Choose whether to automatically remove unpaid bookings that have already initiated the payment process.', 'webba-booking-lite' ),
+                'dependency'           => [
                     'wbk_appointments_delete_not_paid_mode' => 'on_booking|on_approve',
                 ],
             ],
@@ -454,9 +471,10 @@ class WBK_Backend_Options {
             __( 'Time to pay (in minutes)', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'default'    => '10',
-                'popup'      => __( 'Specify the time given to the customer (in minutes) for completing the payment before the booking is automatically deleted.', 'webba-booking-lite' ),
-                'dependency' => [
+                'default'              => '10',
+                'not_translated_title' => 'Time to pay (in minutes)',
+                'popup'                => __( 'Specify the time given to the customer (in minutes) for completing the payment before the booking is automatically deleted.', 'webba-booking-lite' ),
+                'dependency'           => [
                     'wbk_appointments_delete_not_paid_mode' => 'on_booking|on_approve',
                 ],
             ],
@@ -468,7 +486,8 @@ class WBK_Backend_Options {
             __( 'Cancellation buffer (in minutes)', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup' => __( 'Set the cutoff time (in minutes) before the scheduled booking when customers cannot cancel or modify their bookings.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Cancellation buffer (in minutes)',
+                'popup'                => __( 'Set the cutoff time (in minutes) before the scheduled booking when customers cannot cancel or modify their bookings.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -478,12 +497,13 @@ class WBK_Backend_Options {
             __( 'Allow cancellation of paid bookings', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'default' => 'disallow',
-                'extra'   => [
+                'default'              => 'disallow',
+                'extra'                => [
                     'allow'    => __( 'Allow', 'webba-booking-lite' ),
                     'disallow' => __( 'Disallow', 'webba-booking-lite' ),
                 ],
-                'popup'   => __( 'Turn on to allow customers to cancel their paid bookings.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Allow cancellation of paid bookings',
+                'popup'                => __( 'Turn on to allow customers to cancel their paid bookings.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -493,7 +513,8 @@ class WBK_Backend_Options {
             __( 'Allow only one booking per time slot from an email', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup' => __( 'Turn on to restrict customers from making multiple bookings for the same time slot using the same email address.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Allow only one booking per time slot from an email',
+                'popup'                => __( 'Turn on to restrict customers from making multiple bookings for the same time slot using the same email address.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -503,7 +524,8 @@ class WBK_Backend_Options {
             __( 'Allow only one booking per day from an email', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup' => __( 'Turn on to restrict customers from making multiple bookings for the same day using the same email address.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Allow only one booking per day from an email',
+                'popup'                => __( 'Turn on to restrict customers from making multiple bookings for the same day using the same email address.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -513,7 +535,8 @@ class WBK_Backend_Options {
             __( 'Allow only one booking per service from an email', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup' => __( 'Turn on to restrict customers from making multiple bookings for the same service using the same email address.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Allow only one booking per service from an email',
+                'popup'                => __( 'Turn on to restrict customers from making multiple bookings for the same service using the same email address.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -523,8 +546,9 @@ class WBK_Backend_Options {
             __( 'Delete pending bookings (in minutes)', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'default' => '0',
-                'popup'   => __( 'Specify the minutes (X) after which "Awaiting Approval" bookings will be automatically deleted. To disable automatic deletion, set the value to 0.', 'webba-booking-lite' ),
+                'default'              => '0',
+                'not_translated_title' => 'Delete pending bookings (in minutes)',
+                'popup'                => __( 'Specify the minutes (X) after which "Awaiting Approval" bookings will be automatically deleted. To disable automatic deletion, set the value to 0.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -534,7 +558,8 @@ class WBK_Backend_Options {
             __( 'Maximum number of bookings at a specific time', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup' => __( 'Set the system-wide maximum number of bookings allowed at any given time for all services. Leave it empty for no restrictions.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Maximum number of bookings at a specific time',
+                'popup'                => __( 'Set the system-wide maximum number of bookings allowed at any given time for all services. Leave it empty for no restrictions.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -544,7 +569,8 @@ class WBK_Backend_Options {
             __( 'Maximum number of bookings on a specific day', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup' => __( 'Set the limit for the maximum number of bookings across all services in a day. Leave it empty for no restrictions.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Maximum number of bookings on a specific day',
+                'popup'                => __( 'Set the limit for the maximum number of bookings across all services in a day. Leave it empty for no restrictions.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -554,8 +580,9 @@ class WBK_Backend_Options {
             __( 'Lock time slot if at least one place is booked', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'extra' => WBK_Model_Utils::get_services(),
-                'popup' => __( 'Select the services for which a time slot will be automatically locked once at least one place is booked. Note: With autolock turned on, connected service bookings are considered when locking time slots.', 'webba-booking-lite' ),
+                'extra'                => WBK_Model_Utils::get_services(),
+                'not_translated_title' => 'Lock time slot if at least one place is booked',
+                'popup'                => __( 'Select the services for which a time slot will be automatically locked once at least one place is booked. Note: With autolock turned on, connected service bookings are considered when locking time slots.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -565,8 +592,9 @@ class WBK_Backend_Options {
             __( 'Lock whole day if at least one time slot is booked', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'extra' => WBK_Model_Utils::get_services(),
-                'popup' => __( '"Select the services for which a whole day will be automatically locked once at least one time slot is booked. Note: With autolock turned on, connected service bookings are considered when locking a day."', 'webba-booking-lite' ),
+                'extra'                => WBK_Model_Utils::get_services(),
+                'not_translated_title' => 'Lock whole day if at least one time slot is booked',
+                'popup'                => __( '"Select the services for which a whole day will be automatically locked once at least one time slot is booked. Note: With autolock turned on, connected service bookings are considered when locking a day."', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -576,8 +604,9 @@ class WBK_Backend_Options {
             __( 'Lock one time slot before and after booking', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'extra' => WBK_Model_Utils::get_services(),
-                'popup' => __( '"Select the services for which time slots before and after the booking will be automatically locked.
+                'extra'                => WBK_Model_Utils::get_services(),
+                'not_translated_title' => 'Lock one time slot before and after booking',
+                'popup'                => __( '"Select the services for which time slots before and after the booking will be automatically locked.
 Note: With autolock turned on, connected service bookings are considered when locking time slots."', 'webba-booking-lite' ),
             ],
             'advanced'
@@ -588,7 +617,8 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Special business hours', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup' => __( 'Modify the business hours of specific services on particular dates.', 'webba-booking-lite' ) . '<br />' . __( 'Example 1: 1 01/15/2023 15:00-18:00', 'webba-booking-lite' ) . '<br />' . __( 'This indicates that the service with the ID 1 will be available on 01/15/2023 from 15:00 to 18:00.', 'webba-booking-lite' ) . '<br />' . __( 'Example 2: 01/15/2023 15:00-18:00', 'webba-booking-lite' ) . '<br />' . __( 'This means that all services will be available on 01/15/2023 from 15:00 to 18:00.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Special business hours',
+                'popup'                => __( 'Modify the business hours of specific services on particular dates.', 'webba-booking-lite' ) . '<br />' . __( 'Example 1: 1 01/15/2023 15:00-18:00', 'webba-booking-lite' ) . '<br />' . __( 'This indicates that the service with the ID 1 will be available on 01/15/2023 from 15:00 to 18:00.', 'webba-booking-lite' ) . '<br />' . __( 'Example 2: 01/15/2023 15:00-18:00', 'webba-booking-lite' ) . '<br />' . __( 'This means that all services will be available on 01/15/2023 from 15:00 to 18:00.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -598,7 +628,8 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Load CSS & JS only on the booking page', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'popup' => __( 'Turn on to load CSS and JS files only when the booking form shortcode is detected on the page, optimizing performance for non-booking pages.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Load CSS & JS only on the booking page',
+                'popup'                => __( 'Turn on to load CSS and JS files only when the booking form shortcode is detected on the page, optimizing performance for non-booking pages.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -608,13 +639,14 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Disable booked dates in calendar', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default' => 'foreach',
-                'extra'   => [
+                'default'              => 'foreach',
+                'extra'                => [
                     'disabled'     => __( 'No', 'webba-booking-lite' ),
                     'enabled'      => __( 'Yes', 'webba-booking-lite' ),
                     'enabled_plus' => __( 'Yes (including bookings from neighboring services.)', 'webba-booking-lite' ),
                 ],
-                'popup'   => __( 'Disable date in the calendar if no free time slots found.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Disable booked dates in calendar',
+                'popup'                => __( 'Disable date in the calendar if no free time slots found.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -623,8 +655,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Holidays', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'popup'   => __( 'Set dates when your business is closed, and no new bookings will be accepted.', 'webba-booking-lite' ),
-                'default' => '',
+                'not_translated_title' => 'Holidays',
+                'popup'                => __( 'Set dates when your business is closed, and no new bookings will be accepted.', 'webba-booking-lite' ),
+                'default'              => '',
             ]
         );
         wbk_opt()->add_option(
@@ -633,9 +666,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Recurring holidays', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to set holidays as recurring yearly.', 'webba-booking-lite' ),
-                'default'        => 'true',
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Recurring holidays',
+                'popup'                => __( 'Turn on to set holidays as recurring yearly.', 'webba-booking-lite' ),
+                'default'              => 'true',
             ]
         );
         wbk_opt()->add_option(
@@ -644,9 +678,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send booking confirmation email (to customer)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'default'        => 'true',
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to automatically send a booking confirmation email to the customer after booking.', 'webba-booking-lite' ),
+                'default'              => 'true',
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Send booking confirmation email (to customer)',
+                'popup'                => __( 'Turn on to automatically send a booking confirmation email to the customer after booking.', 'webba-booking-lite' ),
             ]
         );
         if ( wbk_fs()->is__premium_only() && wbk_fs()->can_use_premium_code() ) {
@@ -656,10 +691,11 @@ Note: With autolock turned on, connected service bookings are considered when lo
                 __( 'Attach iCal file to the email', 'webba-booking-lite' ),
                 'wbk_email_settings_section',
                 [
-                    'default'        => '',
-                    'checkbox_value' => 'true',
-                    'popup'          => __( 'Turn on to attach iCal file to the booking confirmation email sent to customer.', 'webba-booking-lite' ),
-                    'dependency'     => [
+                    'default'              => '',
+                    'checkbox_value'       => 'true',
+                    'not_translated_title' => 'Attach iCal file to the email',
+                    'popup'                => __( 'Turn on to attach iCal file to the booking confirmation email sent to customer.', 'webba-booking-lite' ),
+                    'dependency'           => [
                         'wbk_email_customer_book_status' => ':checked',
                     ],
                 ]
@@ -671,9 +707,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking confirmation email subject line (booking done by the customer)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'default'    => 'Time reserved',
-                'popup'      => __( 'Customize the subject line for the email sent to the customer after they make a booking', 'webba-booking-lite' ) . '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency' => [
+                'default'              => 'Time reserved',
+                'not_translated_title' => 'Booking confirmation email subject line (booking done by the customer)',
+                'popup'                => __( 'Customize the subject line for the email sent to the customer after they make a booking', 'webba-booking-lite' ) . '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'dependency'           => [
                     'wbk_email_customer_book_status' => ':checked',
                 ],
             ]
@@ -684,9 +721,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking confirmation email message (booking done by the customer)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'popup'      => __( 'Customize the email message sent to the customer after they make a booking. ', 'webba-booking-lite' ) . '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'default'    => '<p>Dear #customer_name,</p><p>You have successfully booked #service_name on #appointment_day at #appointment_time.</p>',
-                'dependency' => [
+                'not_translated_title' => 'Booking confirmation email message (booking done by the customer)',
+                'popup'                => __( 'Customize the email message sent to the customer after they make a booking. ', 'webba-booking-lite' ) . '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'default'              => '<p>Dear #customer_name,</p><p>You have successfully booked #service_name on #appointment_day at #appointment_time.</p>',
+                'dependency'           => [
                     'wbk_email_customer_book_status' => ':checked',
                 ],
             ]
@@ -697,10 +735,11 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking confirmation email subject line (booking done by the admin)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency' => [
+                'dependency'           => [
                     'wbk_email_customer_book_status' => ':checked',
                 ],
-                'popup'      => __( 'Customize the subject line for the email sent to the customer after a booking is made by an admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'not_translated_title' => 'Booking confirmation email subject line (booking done by the admin)',
+                'popup'                => __( 'Customize the subject line for the email sent to the customer after a booking is made by an admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ]
         );
         wbk_opt()->add_option(
@@ -709,8 +748,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking confirmation email message (booking done by the admin)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'popup'      => __( 'Customize the email message sent to the customer after a booking is made by an admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency' => [
+                'not_translated_title' => 'Booking confirmation email message (booking done by the admin)',
+                'popup'                => __( 'Customize the email message sent to the customer after a booking is made by an admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'dependency'           => [
                     'wbk_email_customer_book_status' => ':checked',
                 ],
             ]
@@ -721,8 +761,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send booking approval email (to customer)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to automatically send a notification email to the customer once their booking request is approved. ', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Send booking approval email (to customer)',
+                'popup'                => __( 'Turn on to automatically send a notification email to the customer once their booking request is approved. ', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -732,9 +773,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking approval email subject line', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'default'    => __( 'Your booking has been approved', 'webba-booking-lite' ),
-                'popup'      => __( 'Customize the subject line for the booking approval email. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/#subjectplaceholders">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency' => [
+                'default'              => __( 'Your booking has been approved', 'webba-booking-lite' ),
+                'not_translated_title' => 'Booking approval email subject line',
+                'popup'                => __( 'Customize the subject line for the booking approval email. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/#subjectplaceholders">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'dependency'           => [
                     'wbk_email_customer_approve_status' => ':checked',
                 ],
             ],
@@ -746,9 +788,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking approval email message', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'default'    => '<p>Your booking on #appointment_day at #appointment_time has been approved.</p>',
-                'popup'      => 'Customize the email message for the booking approval email. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/#subjectplaceholders">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency' => [
+                'default'              => '<p>Your booking on #appointment_day at #appointment_time has been approved.</p>',
+                'not_translated_title' => 'Booking approval email message',
+                'popup'                => 'Customize the email message for the booking approval email. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/#subjectplaceholders">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'dependency'           => [
                     'wbk_email_customer_approve_status' => ':checked',
                 ],
             ],
@@ -760,9 +803,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send admin a copy of booking approval email', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on if you want to send a copy of the booking approval email to the admin. Please note that the copy will be sent only if the booking is approved via the approval link.', 'webba-booking-lite' ),
-                'dependency'     => [
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Send admin a copy of booking approval email',
+                'popup'                => __( 'Turn on if you want to send a copy of the booking approval email to the admin. Please note that the copy will be sent only if the booking is approved via the approval link.', 'webba-booking-lite' ),
+                'dependency'           => [
                     'wbk_email_customer_approve_status' => ':checked',
                 ],
             ],
@@ -774,8 +818,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send booking cancelation email (to admin)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to automatically send a booking cancelation email to the admin after a booking is canceled.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Send booking cancelation email (to admin)',
+                'popup'                => __( 'Turn on to automatically send a booking cancelation email to the admin after a booking is canceled.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -785,9 +830,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking cancelation email subject line', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'default'    => __( 'Booking canceled', 'webba-booking-lite' ),
-                'popup'      => __( 'Customize the subject line for the booking cancelation email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency' => [
+                'default'              => __( 'Booking canceled', 'webba-booking-lite' ),
+                'not_translated_title' => 'Booking cancelation email subject line',
+                'popup'                => __( 'Customize the subject line for the booking cancelation email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'dependency'           => [
                     'wbk_email_adimn_appointment_cancel_status' => ':checked',
                 ],
             ],
@@ -799,11 +845,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking cancelation email message', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'default'    => '<p>#customer_name canceled the appointment with #service_name on #appointment_day at #appointment_time</p>',
-                'dependency' => [
+                'default'              => '<p>#customer_name canceled the appointment with #service_name on #appointment_day at #appointment_time</p>',
+                'dependency'           => [
                     'wbk_email_adimn_appointment_cancel_status' => ':checked',
                 ],
-                'popup'      => __( 'Customize the email message for the booking cancelation email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'not_translated_title' => 'Booking cancelation email message',
+                'popup'                => __( 'Customize the email message for the booking cancelation email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -813,8 +860,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send booking cancelation email (to customer)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to automatically send a booking cancelation email to the customer after a booking is canceled.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Send booking cancelation email (to customer)',
+                'popup'                => __( 'Turn on to automatically send a booking cancelation email to the customer after a booking is canceled.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -824,11 +872,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking cancelation email subject line', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency' => [
+                'dependency'           => [
                     'wbk_email_customer_appointment_cancel_status' => ':checked',
                 ],
-                'default'    => __( 'Your appointment canceled', 'webba-booking-lite' ),
-                'popup'      => __( 'Customize the subject line for the booking cancelation email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'default'              => __( 'Your appointment canceled', 'webba-booking-lite' ),
+                'not_translated_title' => 'Booking cancelation email subject line',
+                'popup'                => __( 'Customize the subject line for the booking cancelation email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -838,11 +887,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking cancelation email message (cancelation done by the admin)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency' => [
+                'dependency'           => [
                     'wbk_email_customer_appointment_cancel_status' => ':checked',
                 ],
-                'default'    => '<p>Your appointment with #service_name on #appointment_day at #appointment_time has been canceled</p>',
-                'popup'      => __( 'Customize the email message for the booking cancelation email sent to the customer when the cancellation is initiated by the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'default'              => '<p>Your appointment with #service_name on #appointment_day at #appointment_time has been canceled</p>',
+                'not_translated_title' => 'Booking cancelation email message (cancelation done by the admin)',
+                'popup'                => __( 'Customize the email message for the booking cancelation email sent to the customer when the cancellation is initiated by the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -852,11 +902,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking cancelation email message  (cancelation done by the customer)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency' => [
+                'dependency'           => [
                     'wbk_email_customer_appointment_cancel_status' => ':checked',
                 ],
-                'default'    => '<p>Your appointment with #service_name on #appointment_day at #appointment_time has been canceled</p>',
-                'popup'      => 'Customize the email message for the booking cancelation email sent to the customer when the cancellation is initiated by the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'default'              => '<p>Your appointment with #service_name on #appointment_day at #appointment_time has been canceled</p>',
+                'not_translated_title' => 'Booking cancelation email message  (cancelation done by the customer)',
+                'popup'                => 'Customize the email message for the booking cancelation email sent to the customer when the cancellation is initiated by the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -866,8 +917,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send booking confirmation email (to other customers in the group booking)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to automatically send a booking confirmation email to all the customers added to the group booking.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Send booking confirmation email (to other customers in the group booking)',
+                'popup'                => __( 'Turn on to automatically send a booking confirmation email to all the customers added to the group booking.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -877,9 +929,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking confirmation email subject line', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => 'Customize the email message for the booking confirmation email sent to the customers in the group booking. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'     => [
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Booking confirmation email subject line',
+                'popup'                => 'Customize the email message for the booking confirmation email sent to the customers in the group booking. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'dependency'           => [
                     'wbk_email_secondary_book_status' => ':checked',
                 ],
             ],
@@ -891,9 +944,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking confirmation email message', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => 'Customize the email message for the booking confirmation email sent to the customers in the group booking. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'     => [
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Booking confirmation email message',
+                'popup'                => 'Customize the email message for the booking confirmation email sent to the customers in the group booking. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'dependency'           => [
                     'wbk_email_secondary_book_status' => ':checked',
                 ],
             ],
@@ -905,9 +959,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send booking confirmation email (to admin)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'default'        => 'true',
-                'popup'          => __( 'Turn on to automatically send a booking confirmation email to the admin.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'default'              => 'true',
+                'not_translated_title' => 'Send booking confirmation email (to admin)',
+                'popup'                => __( 'Turn on to automatically send a booking confirmation email to the admin.', 'webba-booking-lite' ),
             ]
         );
         if ( wbk_fs()->is__premium_only() && wbk_fs()->can_use_premium_code() ) {
@@ -917,11 +972,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
                 __( 'Attach iCal file to the email', 'webba-booking-lite' ),
                 'wbk_email_settings_section',
                 [
-                    'dependency'     => [
+                    'dependency'           => [
                         'wbk_email_admin_book_status' => ':checked',
                     ],
-                    'checkbox_value' => 'true',
-                    'popup'          => __( 'Turn on to attach iCal file to the booking confirmation email sent to the admin.', 'webba-booking-lite' ),
+                    'checkbox_value'       => 'true',
+                    'not_translated_title' => 'Attach iCal file to the email',
+                    'popup'                => __( 'Turn on to attach iCal file to the booking confirmation email sent to the admin.', 'webba-booking-lite' ),
                 ]
             );
         }
@@ -931,11 +987,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking confirmation mail subject line', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'default'    => __( 'New booking of #service_name', 'webba-booking-lite' ),
-                'dependency' => [
+                'default'              => __( 'New booking of #service_name', 'webba-booking-lite' ),
+                'dependency'           => [
                     'wbk_email_admin_book_status' => ':checked',
                 ],
-                'popup'      => __( 'Customize the subject line for the email sent to the admin after a booking has been made. List of available placeholders. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'not_translated_title' => 'Booking confirmation mail subject line',
+                'popup'                => __( 'Customize the subject line for the email sent to the admin after a booking has been made. List of available placeholders. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ]
         );
         wbk_opt()->add_option(
@@ -944,11 +1001,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking confirmation email message', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'default'    => '<p>Details of booking:</p><p>Date: #appointment_day<br/>Time: #appointment_time<br/>Customer name: #customer_name<br/>Customer phone: #customer_phone<br/>Customer email: #customer_email<br/>Customer comment: #customer_comment</p><p></p>',
-                'dependency' => [
+                'default'              => '<p>Details of booking:</p><p>Date: #appointment_day<br/>Time: #appointment_time<br/>Customer name: #customer_name<br/>Customer phone: #customer_phone<br/>Customer email: #customer_email<br/>Customer comment: #customer_comment</p><p></p>',
+                'dependency'           => [
                     'wbk_email_admin_book_status' => ':checked',
                 ],
-                'popup'      => __( 'Customize the email message sent to the admin after a booking has been made. List of available placeholders. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'not_translated_title' => 'Booking confirmation email message',
+                'popup'                => __( 'Customize the email message sent to the admin after a booking has been made. List of available placeholders. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ]
         );
         wbk_opt()->add_option(
@@ -957,8 +1015,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send payment received email (to admin)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to automatically send an email notification to the administrator when a payment for a booking is received. ', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Send payment received email (to admin)',
+                'popup'                => __( 'Turn on to automatically send an email notification to the administrator when a payment for a booking is received. ', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -968,11 +1027,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Payment received email subject line', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency' => [
+                'dependency'           => [
                     'wbk_email_admin_paymentrcvd_status' => ':checked',
                 ],
-                'defaul'     => 'Payment from #customer_name received',
-                'popup'      => 'Customize the subject line for the payment received email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'defaul'               => 'Payment from #customer_name received',
+                'not_translated_title' => 'Payment received email subject line',
+                'popup'                => 'Customize the subject line for the payment received email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -982,8 +1042,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Payment received email message', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'popup'      => 'Customize the email message for the payment received email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency' => [
+                'not_translated_title' => 'Payment received email message',
+                'popup'                => 'Customize the email message for the payment received email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'dependency'           => [
                     'wbk_email_admin_paymentrcvd_status' => ':checked',
                 ],
             ],
@@ -995,9 +1056,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send payment received email (to customer)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'default'        => '',
-                'popup'          => __( 'Turn on to automatically send an email notification to the customer when a payment for a booking is received. ', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'default'              => '',
+                'not_translated_title' => 'Send payment received email (to customer)',
+                'popup'                => __( 'Turn on to automatically send an email notification to the customer when a payment for a booking is received. ', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1007,11 +1069,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Payment received email subject line', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency' => [
+                'dependency'           => [
                     'wbk_email_customer_paymentrcvd_status' => ':checked',
                 ],
-                'default'    => 'Your payment received',
-                'popup'      => 'Customize the subject line for the payment received email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'default'              => 'Your payment received',
+                'not_translated_title' => 'Payment received email subject line',
+                'popup'                => 'Customize the subject line for the payment received email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -1021,11 +1084,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Payment received email message', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'default'    => 'Payment from #customer_name for booking of #service_name on #appointment_day at #appointment_time received. <br>Total amount: #total_amount',
-                'dependency' => [
+                'default'              => 'Payment from #customer_name for booking of #service_name on #appointment_day at #appointment_time received. <br>Total amount: #total_amount',
+                'dependency'           => [
                     'wbk_email_customer_paymentrcvd_status' => ':checked',
                 ],
-                'popup'      => 'Customize the email message for the payment received email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'not_translated_title' => 'Payment received email message',
+                'popup'                => 'Customize the email message for the payment received email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -1036,9 +1100,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send payment received email for \'Pay on arrival\' method', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'default'        => '',
-                'popup'          => __( 'Turn on to automatically send an email notification to the customer after they choose the \'Pay on Arrival\' payment method.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'default'              => '',
+                'not_translated_title' => 'Send payment received email for Pay on arrival method',
+                'popup'                => __( 'Turn on to automatically send an email notification to the customer after they choose the \'Pay on Arrival\' payment method.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1048,8 +1113,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send status "Arrived" email (to customer)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to automatically send an email notification to the customer when the status of their booking is changed to "Arrived."', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Send status Arrived email (to customer)',
+                'popup'                => __( 'Turn on to automatically send an email notification to the customer when the status of their booking is changed to "Arrived."', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1059,10 +1125,11 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Status "Arrived" email subject line', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency' => [
+                'dependency'           => [
                     'wbk_email_customer_arrived_status' => ':checked',
                 ],
-                'popup'      => 'Customize the subject line for the status "Arrived" email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'not_translated_title' => 'Status Arrived email subject line',
+                'popup'                => 'Customize the subject line for the status "Arrived" email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -1072,8 +1139,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Status "Arrived" email message', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'popup'      => 'Customize the email message for the status "Arrived" email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency' => [
+                'not_translated_title' => 'Status Arrived email message',
+                'popup'                => 'Customize the email message for the status "Arrived" email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'dependency'           => [
                     'wbk_email_customer_arrived_status' => ':checked',
                 ],
             ],
@@ -1085,11 +1153,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Set delay for "Arrived" email', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency' => [
+                'dependency'           => [
                     'wbk_email_customer_arrived_status' => ':checked',
                 ],
-                'default'    => '',
-                'popup'      => __( 'Specify the delay (in hours) for the "Arrived" email notification. Alternatively, leave this field empty to send the notification immediately after the status is changed', 'webba-booking-lite' ),
+                'default'              => '',
+                'not_translated_title' => 'Set delay for Arrived email',
+                'popup'                => __( 'Specify the delay (in hours) for the "Arrived" email notification. Alternatively, leave this field empty to send the notification immediately after the status is changed', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1099,8 +1168,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send reminder email (to admin)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to send admin automatic email reminders for upcoming bookings.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Send reminder email (to admin)',
+                'popup'                => __( 'Turn on to send admin automatic email reminders for upcoming bookings.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1110,8 +1180,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Reminder email subject line', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'popup'      => 'Customize the subject line for reminder email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency' => [
+                'not_translated_title' => 'Reminder email subject line',
+                'popup'                => 'Customize the subject line for reminder email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'dependency'           => [
                     'wbk_email_admin_daily_status' => ':checked',
                 ],
             ],
@@ -1123,8 +1194,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Reminder email message', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'popup'      => 'Customize the email message for reminder email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency' => [
+                'not_translated_title' => 'Reminder email message',
+                'popup'                => 'Customize the email message for reminder email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'dependency'           => [
                     'wbk_email_admin_daily_status' => ':checked',
                 ],
             ],
@@ -1136,8 +1208,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send reminder email (to customer)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to send customers automatic email reminders for their upcoming bookings.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Send reminder email (to customer)',
+                'popup'                => __( 'Turn on to send customers automatic email reminders for their upcoming bookings.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1147,24 +1220,26 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send reminders to customers in X days', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency' => [
+                'dependency'           => [
                     'wbk_email_customer_daily_status' => ':checked',
                 ],
-                'default'    => '1',
-                'popup'      => __( 'Select the timing for the reminder notification. For instance, set the value to 0 for the day of booking, 1 for one day before the booking, 2 for two days before, and so on.', 'webba-booking-lite' ),
+                'default'              => '1',
+                'not_translated_title' => 'Send reminders to customers in X days',
+                'popup'                => __( 'Select the timing for the reminder notification. For instance, set the value to 0 for the day of booking, 1 for one day before the booking, 2 for two days before, and so on.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
         wbk_opt()->add_option(
             'wbk_email_customer_daily_subject',
             'text',
-            __( 'Reminder email subject line ', 'webba-booking-lite' ),
+            __( 'Reminder email subject line', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency' => [
+                'dependency'           => [
                     'wbk_email_customer_daily_status' => ':checked',
                 ],
-                'popup'      => 'Customize the subject line for reminder email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'not_translated_title' => 'Reminder email subject line',
+                'popup'                => 'Customize the subject line for reminder email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -1174,8 +1249,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Reminder email message', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'popup'      => 'Customize the email message for reminder email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency' => [
+                'not_translated_title' => 'Reminder email message',
+                'popup'                => 'Customize the email message for reminder email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'dependency'           => [
                     'wbk_email_customer_daily_status' => ':checked',
                 ],
             ],
@@ -1196,40 +1272,43 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Reminder sending time', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'default' => '43200',
-                'extra'   => $data_time,
-                'popup'   => __( 'Set the preferred hour for email reminders sent to customers and admins, based on your local timezone.', 'webba-booking-lite' ),
+                'default'              => '43200',
+                'extra'                => $data_time,
+                'not_translated_title' => 'Reminder sending time',
+                'popup'                => __( 'Set the preferred hour for email reminders sent to customers and admins, based on your local timezone.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
         wbk_opt()->add_option(
             'wbk_email_reminders_only_for_approved',
             'checkbox',
-            __( 'Send reminders only for approved bookings.', 'webba-booking-lite' ),
+            __( 'Send reminders only for approved bookings', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency'     => [
+                'dependency'           => [
                     'wbk_email_customer_daily_status' => ':checked',
                 ],
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to send reminder email notifications only for approved bookings.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Send reminders only for approved bookings',
+                'popup'                => __( 'Turn on to send reminder email notifications only for approved bookings.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
         wbk_opt()->add_option(
             'wbk_email_customer_send_invoice',
             'select',
-            __( 'Send invoice to a customer (HTML format) ', 'webba-booking-lite' ),
+            __( 'Send invoice to a customer (HTML format)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'default' => 'disabled',
-                'extra'   => [
+                'default'              => 'disabled',
+                'extra'                => [
                     'disabled'   => __( 'Do not send invoice', 'webba-booking-lite' ),
                     'onbooking'  => __( 'Send invoice on booking', 'webba-booking-lite' ),
                     'onapproval' => __( 'Send invoice on approval', 'webba-booking-lite' ),
                     'onpayment'  => __( 'Send invoice on payment complete', 'webba-booking-lite' ),
                 ],
-                'popup'   => __( 'Choose whether you would like to send an invoice to the customer and specify when the invoice email should be sent.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Send invoice to a customer (HTML format)',
+                'popup'                => __( 'Choose whether you would like to send an invoice to the customer and specify when the invoice email should be sent.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1239,11 +1318,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Invoice email subject line', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency' => [
+                'dependency'           => [
                     'wbk_email_customer_send_invoice' => 'onbooking|onapproval|onpayment',
                 ],
-                'default'    => __( 'Invoice', 'webba-booking-lite' ),
-                'popup'      => 'Customize the subject line for invoice email. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'default'              => __( 'Invoice', 'webba-booking-lite' ),
+                'not_translated_title' => 'Invoice email subject line',
+                'popup'                => 'Customize the subject line for invoice email. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -1253,11 +1333,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Current invoice number', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency' => [
+                'dependency'           => [
                     'wbk_email_customer_send_invoice' => 'onbooking|onapproval|onpayment',
                 ],
-                'default'    => '1',
-                'popup'      => __( 'Set the starting number for your invoices. Use the placeholder #invoice_number in your notifications. Each time a customer makes a payment, the value of this option will be increased by one.' ),
+                'default'              => '1',
+                'not_translated_title' => 'Current invoice number',
+                'popup'                => __( 'Set the starting number for your invoices. Use the placeholder #invoice_number in your notifications. Each time a customer makes a payment, the value of this option will be increased by one.' ),
             ],
             'advanced'
         );
@@ -1267,11 +1348,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send admin a copy of invoice email', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency'     => [
+                'dependency'           => [
                     'wbk_email_customer_send_invoice' => 'onbooking|onapproval|onpayment',
                 ],
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on if you want to send a copy of the invoice email to the admin.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Send admin a copy of invoice email',
+                'popup'                => __( 'Turn on if you want to send a copy of the invoice email to the admin.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1281,7 +1363,8 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Notification subject (when booking changes)', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'popup' => __( 'Customize the subject line for booking changes notification email.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Notification subject (when booking changes)',
+                'popup'                => __( 'Customize the subject line for booking changes notification email.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1291,8 +1374,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Override default reply-to headers with booking-related data', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'When Enabled:Customer Notifications: The reply-to email address is set to the email specified in the service settings. Admin Notifications: The reply-to email address is set to the customer\'s email address. When Disabled: The \'From: email\' value is used as the reply-to address for notifications.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Override default reply-to headers with booking-related data',
+                'popup'                => __( 'When Enabled:Customer Notifications: The reply-to email address is set to the email specified in the service settings. Admin Notifications: The reply-to email address is set to the customer\'s email address. When Disabled: The \'From: email\' value is used as the reply-to address for notifications.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1302,7 +1386,8 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'From: name', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'popup' => __( 'Enter the name that will be displayed as the sender in the email notifications.', 'webba-booking-lite' ),
+                'not_translated_title' => 'From: name',
+                'popup'                => __( 'Enter the name that will be displayed as the sender in the email notifications.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1311,7 +1396,8 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'From: email', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'popup' => __( 'Enter the email that will be displayed as the sender in the email notifications.', 'webba-booking-lite' ),
+                'not_translated_title' => 'From: email',
+                'popup'                => __( 'Enter the email that will be displayed as the sender in the email notifications.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1320,7 +1406,8 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send copies of admin email notifications to addresses', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'popup' => __( 'Enter the email addresses where you want to receive copies of admin notifications. Separate multiple email addresses with comma.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Send copies of admin email notifications to addresses',
+                'popup'                => __( 'Enter the email addresses where you want to receive copies of admin notifications. Separate multiple email addresses with comma.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1330,7 +1417,8 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Notifications landing page', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'popup' => __( 'Specify the landing page URL for payment or cancelation. This page should include the [webbabooking] shortcode.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Notifications landing page',
+                'popup'                => __( 'Specify the landing page URL for payment or cancelation. This page should include the [webbabooking] shortcode.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1340,9 +1428,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Number of dates in the dropdown input', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default'    => '30',
-                'popup'      => __( 'Used only for dropdown date select', 'webba-booking-lite' ),
-                'dependency' => [
+                'default'              => '30',
+                'not_translated_title' => 'Number of dates in the dropdown input',
+                'popup'                => __( 'Used only for dropdown date select', 'webba-booking-lite' ),
+                'dependency'           => [
                     'wbk_date_input' => 'dropdown',
                 ],
             ]
@@ -1353,8 +1442,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Number of dates in the calendar', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default' => '360',
-                'popup'   => __( 'Specify the number of dates displayed in the calendar.', 'webba-booking-lite' ),
+                'default'              => '360',
+                'not_translated_title' => 'Number of dates in the calendar',
+                'popup'                => __( 'Specify the number of dates displayed in the calendar.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1364,9 +1454,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Time slot format', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'popup'   => __( 'Choose between displaying only the start time or both the start and end times in the time slots.', 'webba-booking-lite' ),
-                'default' => 'start',
-                'extra'   => [
+                'not_translated_title' => 'Time slot format',
+                'popup'                => __( 'Choose between displaying only the start time or both the start and end times in the time slots.', 'webba-booking-lite' ),
+                'default'              => 'start',
+                'extra'                => [
                     'start'     => __( 'Start', 'webba-booking-lite' ),
                     'start_end' => __( 'Start', 'webba-booking-lite' ) . ' - ' . __( 'end', 'webba-booking-lite' ),
                 ],
@@ -1378,9 +1469,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'CSV delimiter', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'default' => 'Semicolon',
-                'popup'   => __( 'If your date format includes a comma, use a semicolon. Otherwise, select the comma.', 'webba-booking-lite' ),
-                'extra'   => [
+                'default'              => 'Semicolon',
+                'not_translated_title' => 'CSV delimiter',
+                'popup'                => __( 'If your date format includes a comma, use a semicolon. Otherwise, select the comma.', 'webba-booking-lite' ),
+                'extra'                => [
                     'comma'     => __( 'Comma', 'webba-booking-lite' ),
                     'semicolon' => __( 'Semicolon', 'webba-booking-lite' ),
                 ],
@@ -1393,9 +1485,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Load Pickadate javascript', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'checkbox_value' => 'yes',
-                'default'        => 'yes',
-                'popup'          => __( 'Turn off if other plugins in your WordPress installation are using the pickadate date picker.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'yes',
+                'default'              => 'yes',
+                'not_translated_title' => 'Load Pickadate javascript',
+                'popup'                => __( 'Turn off if other plugins in your WordPress installation are using the pickadate date picker.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1405,8 +1498,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Tax', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'popup'   => __( 'Tax used for online payments.', 'webba-booking-lite' ),
-                'default' => '0',
+                'not_translated_title' => 'Tax',
+                'popup'                => __( 'Tax used for online payments.', 'webba-booking-lite' ),
+                'default'              => '0',
             ]
         );
         wbk_opt()->add_option(
@@ -1415,8 +1509,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Do not tax the deposit (service fee)', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to avoid adding tax to the deposit. Important note: when this is turned on, do not use subtotal and tax placeholders.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Do not tax the deposit (service fee)',
+                'popup'                => __( 'Turn on to avoid adding tax to the deposit. Important note: when this is turned on, do not use subtotal and tax placeholders.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1426,8 +1521,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Fractional digits in price', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'default' => '2',
-                'popup'   => __( 'Write the number of decimal places to show for prices. E.g. Write 1 for prices to appear as 25.1 or 2 for prices to appear as 25.10.', 'webba-booking-lite' ),
+                'default'              => '2',
+                'not_translated_title' => 'Fractional digits in price',
+                'popup'                => __( 'Write the number of decimal places to show for prices. E.g. Write 1 for prices to appear as 25.1 or 2 for prices to appear as 25.10.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1437,8 +1533,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Fraction separator in prices', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'default' => '.',
-                'popup'   => __( 'Choose the symbol or character to separate decimals in prices. E.g. Use either a period (.) or a comma (,).', 'webba-booking-lite' ),
+                'default'              => '.',
+                'not_translated_title' => 'Fraction separator in prices',
+                'popup'                => __( 'Choose the symbol or character to separate decimals in prices. E.g. Use either a period (.) or a comma (,).', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1447,8 +1544,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'List of dynamic placeholders', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'default' => '',
-                'popup'   => __( 'Enter a comma-separated list of placeholders to remove from the string if they are not replaced with values. This is useful if you are using different custom fields for services and as a result some custom field placeholders are not replaced.', 'webba-booking-lite' ),
+                'default'              => '',
+                'not_translated_title' => 'List of dynamic placeholders',
+                'popup'                => __( 'Enter a comma-separated list of placeholders to remove from the string if they are not replaced with values. This is useful if you are using different custom fields for services and as a result some custom field placeholders are not replaced.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1458,8 +1556,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Load javascript files in the footer', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Enabling this option may increase page loading time in some cases.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Load javascript files in the footer',
+                'popup'                => __( 'Enabling this option may increase page loading time in some cases.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1469,8 +1568,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Service label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Select a service', 'webba-booking-lite' ),
-                'popup'   => __( 'Service label on the booking form.', 'webba-booking-lite' ),
+                'default'              => __( 'Select a service', 'webba-booking-lite' ),
+                'not_translated_title' => 'Service label',
+                'popup'                => __( 'Service label on the booking form.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1479,8 +1579,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Category label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Select category', 'webba-booking-lite' ),
-                'popup'   => __( 'Category label on the booking form.', 'webba-booking-lite' ),
+                'default'              => __( 'Select category', 'webba-booking-lite' ),
+                'not_translated_title' => 'Category label',
+                'popup'                => __( 'Category label on the booking form.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1489,8 +1590,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Date label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Book an appointment on', 'webba-booking-lite' ),
-                'popup'   => __( 'Date label on the booking form.', 'webba-booking-lite' ),
+                'default'              => __( 'Book an appointment on', 'webba-booking-lite' ),
+                'not_translated_title' => 'Date label',
+                'popup'                => __( 'Date label on the booking form.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1499,8 +1601,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Select date input placeholder', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'date', 'webba-booking-lite' ),
-                'popup'   => __( 'Select date input placeholder on the booking form.', 'webba-booking-lite' ),
+                'default'              => __( 'date', 'webba-booking-lite' ),
+                'not_translated_title' => 'Select date input placeholder',
+                'popup'                => __( 'Select date input placeholder on the booking form.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1509,8 +1612,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Service \'Read more\' label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Read more' ),
-                'popup'   => __( 'Text of the \'Read more\' link.', 'webba-booking-lite' ),
+                'default'              => __( 'Read more' ),
+                'not_translated_title' => 'Service Read more label',
+                'popup'                => __( 'Text of the \'Read more\' link.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1520,8 +1624,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking form title', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => '',
-                'popup'   => __( 'Text above the booking form. List of available placeholders.', 'webba-booking-lite' ),
+                'default'              => '',
+                'not_translated_title' => 'Booking form title',
+                'popup'                => __( 'Text above the booking form. List of available placeholders.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1531,8 +1636,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booked time slot text', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Booked', 'webba-booking-lite' ),
-                'popup'   => __( 'Text on a booked time slot.', 'webba-booking-lite' ),
+                'default'              => __( 'Booked', 'webba-booking-lite' ),
+                'not_translated_title' => 'Booked time slot text',
+                'popup'                => __( 'Text on a booked time slot.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1542,8 +1648,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Name label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Name', 'webba-booking-lite' ),
-                'popup'   => __( 'Name label on the booking form.', 'webba-booking-lite' ),
+                'default'              => __( 'Name', 'webba-booking-lite' ),
+                'not_translated_title' => 'Name label',
+                'popup'                => __( 'Name label on the booking form.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1552,8 +1659,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Email label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Email', 'webba-booking-lite' ),
-                'popup'   => __( 'Email label on the booking form.', 'webba-booking-lite' ),
+                'default'              => __( 'Email', 'webba-booking-lite' ),
+                'not_translated_title' => 'Email label',
+                'popup'                => __( 'Email label on the booking form.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1562,8 +1670,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Phone label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Phone', 'webba-booking-lite' ),
-                'popup'   => __( 'Phone label on the booking form.', 'webba-booking-lite' ),
+                'default'              => __( 'Phone', 'webba-booking-lite' ),
+                'not_translated_title' => 'Phone label',
+                'popup'                => __( 'Phone label on the booking form.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1572,8 +1681,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Comment label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Comment', 'webba-booking-lite' ),
-                'popup'   => __( 'Comment label on the booking form.', 'webba-booking-lite' ),
+                'default'              => __( 'Comment', 'webba-booking-lite' ),
+                'not_translated_title' => 'Comment label',
+                'popup'                => __( 'Comment label on the booking form.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1582,8 +1692,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Quantity label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'How many people per time slot?', 'webba-booking-lite' ),
-                'popup'   => __( 'Quantity label on the booking form for group bookings. Available placeholders: #service', 'webba-booking-lite' ),
+                'default'              => __( 'How many people per time slot?', 'webba-booking-lite' ),
+                'not_translated_title' => 'Quantity label',
+                'popup'                => __( 'Quantity label on the booking form for group bookings. Available placeholders: #service', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1592,8 +1703,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Thank you message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => '',
-                'popup'   => __( 'Customize the thank you message displayed after a booking is made. Leave it empty to use the default formatted thank you message.', 'webba-booking-lite' ),
+                'default'              => '',
+                'not_translated_title' => 'Thank you message',
+                'popup'                => __( 'Customize the thank you message displayed after a booking is made. Leave it empty to use the default formatted thank you message.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1603,8 +1715,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Time slots not found message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Unfortunately we were unable to meet your search criteria. Please change the criteria and try again.', 'webba-booking-lite' ),
-                'popup'   => __( 'Message displayed when no time slots are found for the selected service and date.', 'webba-booking-lite' ),
+                'default'              => __( 'Unfortunately we were unable to meet your search criteria. Please change the criteria and try again.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Time slots not found message',
+                'popup'                => __( 'Message displayed when no time slots are found for the selected service and date.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1614,8 +1727,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'PayPal option label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Pay now with PayPal', 'webba-booking-lite' ),
-                'popup'   => __( 'Label for PayPal payment method', 'webba-booking-lite' ),
+                'default'              => __( 'Pay now with PayPal', 'webba-booking-lite' ),
+                'not_translated_title' => 'PayPal option label',
+                'popup'                => __( 'Label for PayPal payment method', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1625,8 +1739,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Credit card option label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Pay with credit card', 'webba-booking-lite' ),
-                'popup'   => __( 'Label for Stripe payment method', 'webba-booking-lite' ),
+                'default'              => __( 'Pay with credit card', 'webba-booking-lite' ),
+                'not_translated_title' => 'Credit card option label',
+                'popup'                => __( 'Label for Stripe payment method', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1636,8 +1751,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Stripe card element error message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'incorrect input', 'webba-booking-lite' ),
-                'popup'   => __( 'Error message that appears if an issue occurs with the Stripe payment method. To show this message go to Stripe -> Advanced Settings and turn on "override Stripe card element error messages".', 'webba-booking-lite' ),
+                'default'              => __( 'incorrect input', 'webba-booking-lite' ),
+                'not_translated_title' => 'Stripe card element error message',
+                'popup'                => __( 'Error message that appears if an issue occurs with the Stripe payment method. To show this message go to Stripe -> Advanced Settings and turn on "override Stripe card element error messages".', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1647,8 +1763,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Stripe API error message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Payment failed: #response', 'webba-booking-lite' ),
-                'popup'   => __( 'Stripe API error message during payment processing. Placeholders: #response.', 'webba-booking-lite' ),
+                'default'              => __( 'Payment failed: #response', 'webba-booking-lite' ),
+                'not_translated_title' => 'Stripe API error message',
+                'popup'                => __( 'Stripe API error message during payment processing. Placeholders: #response.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1658,8 +1775,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Pay on arrival option label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Pay on arrival', 'webba-booking-lite' ),
-                'popup'   => __( 'Label for Pay on arrival payment method.', 'webba-booking-lite' ),
+                'default'              => __( 'Pay on arrival', 'webba-booking-lite' ),
+                'not_translated_title' => 'Pay on arrival option label',
+                'popup'                => __( 'Label for Pay on arrival payment method.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1669,8 +1787,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Message for Pay on arrival payment method', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Pay on arrival', 'webba-booking-lite' ),
-                'popup'   => __( 'Message for Pay on arrival payment method.', 'webba-booking-lite' ),
+                'default'              => __( 'Pay on arrival', 'webba-booking-lite' ),
+                'not_translated_title' => 'Message for Pay on arrival payment method',
+                'popup'                => __( 'Message for Pay on arrival payment method.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1680,8 +1799,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Bank transfer option label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Pay by bank transfer', 'webba-booking-lite' ),
-                'popup'   => __( 'Label for Bank transfer payment method.', 'webba-booking-lite' ),
+                'default'              => __( 'Pay by bank transfer', 'webba-booking-lite' ),
+                'not_translated_title' => 'Bank transfer option label',
+                'popup'                => __( 'Label for Bank transfer payment method.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1691,32 +1811,21 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Message for Bank transfer payment method', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Pay by the bank transfer.', 'webba-booking-lite' ),
-                'popup'   => __( 'Message for Bank transfer payment method.', 'webba-booking-lite' ),
+                'default'              => __( 'Pay by the bank transfer.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Message for Bank transfer payment method',
+                'popup'                => __( 'Message for Bank transfer payment method.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
-        /*
-        wbk_opt()->add_option( 'wbk_coupon_applied', 'text_alfa_numeric', __( 'Coupon success message', 'webba-booking-lite' ), 'wbk_translation_settings_section',
-            array(
-                'default' => __( 'Coupon applied', 'webba-booking-lite' ),
-                'popup' => __( 'Message shown when  shown in the coupon field', 'webba-booking-lite' )
-            )
-        );
-        wbk_opt()->add_option( 'wbk_coupon_not_applied', 'text', __( 'Coupon failed message', 'webba-booking-lite' ), 'wbk_translation_settings_section',
-            array(
-                'default' => __( 'Coupon not applied', 'webba-booking-lite' )
-            )
-        );
-        */
         wbk_opt()->add_option(
             'wbk_product_meta_key',
             'text',
             __( 'Meta key for WooCommerce product', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Booking', 'webba-booking-lite' ),
-                'popup'   => __( 'Label for services in WooCommerce.', 'webba-booking-lite' ),
+                'default'              => __( 'Booking', 'webba-booking-lite' ),
+                'not_translated_title' => 'Meta key for WooCommerce product',
+                'popup'                => __( 'Label for services in WooCommerce.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1726,8 +1835,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'WooCommerce option label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Add to cart', 'webba-booking-lite' ),
-                'popup'   => __( 'User in the cart item', 'webba-booking-lite' ),
+                'default'              => __( 'Add to cart', 'webba-booking-lite' ),
+                'not_translated_title' => 'WooCommerce option label',
+                'popup'                => __( 'User in the cart item', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1737,8 +1847,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Add to cart error message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Booking not added to cart', 'webba-booking-lite' ),
-                'popup'   => __( 'Error message that appears if an issue occurs with adding a booking to WooCommerce cart.', 'webba-booking-lite' ),
+                'default'              => __( 'Booking not added to cart', 'webba-booking-lite' ),
+                'not_translated_title' => 'Add to cart error message',
+                'popup'                => __( 'Error message that appears if an issue occurs with adding a booking to WooCommerce cart.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1748,8 +1859,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Payment details title', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Payment details', 'webba-booking-lite' ),
-                'popup'   => __( 'Message above the payment details.', 'webba-booking-lite' ),
+                'default'              => __( 'Payment details', 'webba-booking-lite' ),
+                'not_translated_title' => 'Payment details title',
+                'popup'                => __( 'Message above the payment details.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1759,8 +1871,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Payment item text', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => '#service_name on #appointment_day at #appointment_time',
-                'popup'   => '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'default'              => '#service_name on #appointment_day at #appointment_time',
+                'not_translated_title' => 'Payment item text',
+                'popup'                => '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -1770,8 +1883,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Price format', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => '$#price',
-                'popup'   => __( 'Price format on the booking form. Required placeholder: #price. E.g.: $#price.', 'webba-booking-lite' ),
+                'default'              => '$#price',
+                'not_translated_title' => 'Price format',
+                'popup'                => __( 'Price format on the booking form. Required placeholder: #price. E.g.: $#price.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1780,8 +1894,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Subtotal title', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Subtotal', 'webba-booking-lite' ),
-                'popup'   => __( 'Label for the subtotal amount in payment details', 'webba-booking-lite' ),
+                'default'              => __( 'Subtotal', 'webba-booking-lite' ),
+                'not_translated_title' => 'Subtotal title',
+                'popup'                => __( 'Label for the subtotal amount in payment details', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1791,8 +1906,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Tax label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Tax', 'webba-booking-lite' ),
-                'popup'   => __( 'Label for the tax in payment details', 'webba-booking-lite' ),
+                'default'              => __( 'Tax', 'webba-booking-lite' ),
+                'not_translated_title' => 'Tax label',
+                'popup'                => __( 'Label for the tax in payment details', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1802,8 +1918,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Service fee label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Service fee', 'webba-booking-lite' ),
-                'popup'   => __( 'Label for the service fee in payment details', 'webba-booking-lite' ),
+                'default'              => __( 'Service fee', 'webba-booking-lite' ),
+                'not_translated_title' => 'Service fee label',
+                'popup'                => __( 'Label for the service fee in payment details', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1813,8 +1930,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Discount label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Discount', 'webba-booking-lite' ),
-                'popup'   => __( 'Label for the discount', 'webba-booking-lite' ),
+                'default'              => __( 'Discount', 'webba-booking-lite' ),
+                'not_translated_title' => 'Discount label',
+                'popup'                => __( 'Label for the discount', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1824,8 +1942,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Total title', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Total', 'webba-booking-lite' ),
-                'popup'   => __( 'Label for the total amount in payment details', 'webba-booking-lite' ),
+                'default'              => __( 'Total', 'webba-booking-lite' ),
+                'not_translated_title' => 'Total title',
+                'popup'                => __( 'Label for the total amount in payment details', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1835,8 +1954,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'No bookings for payment message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'There are no bookings available for payment.', 'webba-booking-lite' ),
-                'popup'   => __( 'Message shown when there are no bookings available for payment', 'webba-booking-lite' ),
+                'default'              => __( 'There are no bookings available for payment.', 'webba-booking-lite' ),
+                'not_translated_title' => 'No bookings for payment message',
+                'popup'                => __( 'Message shown when there are no bookings available for payment', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1847,8 +1967,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Show locked time slots as booked', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'popup'          => __( 'Turn on to show locked time slots as "Booked".', 'webba-booking-lite' ),
-                'checkbox_value' => 'yes',
+                'not_translated_title' => 'Show locked time slots as booked',
+                'popup'                => __( 'Turn on to show locked time slots as "Booked".', 'webba-booking-lite' ),
+                'checkbox_value'       => 'yes',
             ],
             'advanced'
         );
@@ -1858,8 +1979,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Allow attachments', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'checkbox_value' => 'yes',
-                'popup'          => __( 'Turn on to allow users to attach files in the booking form. Please include the file input field in the custom form. For more information, see <a href="https://webba-booking.com/documentation/set-up-frontend-booking-process/using-custom-fields-in-the-booking-form/" target="_blank" rel="noopener noreferrer">Custom fields</a>.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'yes',
+                'not_translated_title' => 'Allow attachments',
+                'popup'                => __( 'Turn on to allow users to attach files in the booking form. Please include the file input field in the custom form. For more information, see <a href="https://webba-booking.com/documentation/set-up-frontend-booking-process/using-custom-fields-in-the-booking-form/" target="_blank" rel="noopener noreferrer">Custom fields</a>.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1869,9 +1991,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Automatically delete attachments', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'checkbox_value' => 'yes',
-                'default'        => 'yes',
-                'popup'          => __( 'Highly Recommended: Turn this on to automatically delete the attachment as soon as the notification is sent.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'yes',
+                'default'              => 'yes',
+                'not_translated_title' => 'Automatically delete attachments',
+                'popup'                => __( 'Highly Recommended: Turn this on to automatically delete the attachment as soon as the notification is sent.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1881,9 +2004,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Disable advanced security checks', 'webba-booking-lite' ),
             'wbk_general_settings_section',
             [
-                'checkbox_value' => 'true',
-                'default'        => 'true',
-                'popup'          => __( 'IMPORTANT: if you disable this option, make sure to not cache pages with the booking form.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'default'              => 'true',
+                'not_translated_title' => 'Disable advanced security checks',
+                'popup'                => __( 'IMPORTANT: if you disable this option, make sure to not cache pages with the booking form.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1893,9 +2017,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Order service by', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'popup'   => __( 'Choose between alphabetical order (A - Z) or order by priority for displaying services on the booking form.', 'webba-booking-lite' ),
-                'default' => 'a-z',
-                'extra'   => [
+                'not_translated_title' => 'Order service by',
+                'popup'                => __( 'Choose between alphabetical order (A - Z) or order by priority for displaying services on the booking form.', 'webba-booking-lite' ),
+                'default'              => 'a-z',
+                'extra'                => [
                     'a-z'        => __( 'A-Z', 'webba-booking-lite' ),
                     'priority'   => __( 'Priority (descending)', 'webba-booking-lite' ),
                     'priority_a' => __( 'Priority (ascending)', 'webba-booking-lite' ),
@@ -1908,8 +2033,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Show night hours time slots in previous day', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default' => '0',
-                'popup'   => __( 'Specify the number of hours after midnight to display on the next day\'s calendar.', 'webba-booking-lite' ),
+                'default'              => '0',
+                'not_translated_title' => 'Show night hours time slots in previous day',
+                'popup'                => __( 'Specify the number of hours after midnight to display on the next day\'s calendar.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1919,8 +2045,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Allow time slots to cross midnight', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on to allow time slots that extend beyond midnight.', 'webba-booking-lite' ),
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Allow time slots to cross midnight',
+                'popup'                => __( 'Turn on to allow time slots that extend beyond midnight.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1930,8 +2057,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Block time slots after X hours from the current time', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'default' => '0',
-                'popup'   => __( 'Set 0 to not disable time slots', 'webba-booking-lite' ),
+                'default'              => '0',
+                'not_translated_title' => 'Block time slots after X hours from the current time',
+                'popup'                => __( 'Set 0 to not disable time slots', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1941,7 +2069,8 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'EU GDPR Compliance', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup' => __( 'Turn on to align the booking system with GDPR guidelines, providing enhanced data protection and privacy for customer information.', 'webba-booking-lite' ),
+                'not_translated_title' => 'EU GDPR Compliance',
+                'popup'                => __( 'Turn on to align the booking system with GDPR guidelines, providing enhanced data protection and privacy for customer information.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1950,9 +2079,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Disallow booking of the current time slot', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'default'        => 'disallow',
-                'checkbox_value' => 'disallow',
-                'popup'          => __( 'Turn on to prevent customers from making bookings for the current time slot.', 'webba-booking-lite' ),
+                'default'              => 'disallow',
+                'checkbox_value'       => 'disallow',
+                'not_translated_title' => 'Disallow booking of the current time slot',
+                'popup'                => __( 'Turn on to prevent customers from making bookings for the current time slot.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1961,9 +2091,10 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Consider the availability of overlapping time intervals', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'default'        => 'true',
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Turn on this option to control the availability of time slots for the same service when they overlap. When turned on, the system will automatically adjust the availability to avoid double booking.', 'webba-booking-lite' ),
+                'default'              => 'true',
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Consider the availability of overlapping time intervals',
+                'popup'                => __( 'Turn on this option to control the availability of time slots for the same service when they overlap. When turned on, the system will automatically adjust the availability to avoid double booking.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1973,7 +2104,8 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Set the status to "Arrived" X minutes after the end of the booking', 'webba-booking-lite' ),
             'wbk_appointments_settings_section',
             [
-                'popup' => __( 'Specify the number of minutes after the end of the booking when the status should be automatically changed to "Arrived." Leave the field empty to keep the status unchanged.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Set the status to Arrived X minutes after the end of the booking',
+                'popup'                => __( 'Specify the number of minutes after the end of the booking when the status should be automatically changed to "Arrived." Leave the field empty to keep the status unchanged.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1983,8 +2115,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'PayPal payment cancelation message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Payment canceled.', 'webba-booking-lite' ),
-                'popup'   => __( 'Message shown when payment with PayPal is canceled', 'webba-booking-lite' ),
+                'default'              => __( 'Payment canceled.', 'webba-booking-lite' ),
+                'not_translated_title' => 'PayPal payment cancelation message',
+                'popup'                => __( 'Message shown when payment with PayPal is canceled', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1994,8 +2127,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Cancellation form label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Please, enter your email to confirm cancelation', 'webba-booking-lite' ),
-                'popup'   => __( 'Text of the cancelation form label', 'webba-booking-lite' ),
+                'default'              => __( 'Please, enter your email to confirm cancelation', 'webba-booking-lite' ),
+                'not_translated_title' => 'Cancellation form label',
+                'popup'                => __( 'Text of the cancelation form label', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2005,8 +2139,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Cancellation form title', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Cancellation', 'webba-booking-lite' ),
-                'popup'   => __( 'Cancellation form title. Appears on the sidebar (on desktop) and top bar (on mobile)', 'webba-booking-lite' ),
+                'default'              => __( 'Cancellation', 'webba-booking-lite' ),
+                'not_translated_title' => 'Cancellation form title',
+                'popup'                => __( 'Cancellation form title. Appears on the sidebar (on desktop) and top bar (on mobile)', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2016,8 +2151,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Cancellation button text', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Cancel booking', 'webba-booking-lite' ),
-                'popup'   => __( 'Text of the cancelation button', 'webba-booking-lite' ),
+                'default'              => __( 'Cancel booking', 'webba-booking-lite' ),
+                'not_translated_title' => 'Cancellation button text',
+                'popup'                => __( 'Text of the cancelation button', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2027,8 +2163,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Booking details', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Booking', 'webba-booking-lite' ),
-                'popup'   => __( '"Message shown when customers pay for a booking or cancel their booking using the link sent in the email notification.
+                'default'              => __( 'Booking', 'webba-booking-lite' ),
+                'not_translated_title' => 'Booking details',
+                'popup'                => __( '"Message shown when customers pay for a booking or cancel their booking using the link sent in the email notification.
 Available placeholders: #name (customer name), #id (appointment id), #service (service name), #date (appointment date), #time (appointment time), #dt (appointment date and time), #start_end (appointment time in start-end format)."', 'webba-booking-lite' ),
             ],
             'advanced'
@@ -2039,8 +2176,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Cancellation error message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Unable to cancel booking, please check the email you\'ve entered.', 'webba-booking-lite' ),
-                'popup'   => __( 'Message shown when an error occurs on cancelation', 'webba-booking-lite' ),
+                'default'              => __( 'Unable to cancel booking, please check the email you\'ve entered.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Cancellation error message',
+                'popup'                => __( 'Message shown when an error occurs on cancelation', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2050,8 +2188,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Warning message on cancel booking (reason: paid booking)', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Paid booking can\'t be canceled.', 'webba-booking-lite' ),
-                'popup'   => __( 'Displayed when customer tries to cancel paid booking.', 'webba-booking-lite' ),
+                'default'              => __( 'Paid booking can\'t be canceled.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Warning message on cancel booking (reason: paid booking)',
+                'popup'                => __( 'Displayed when customer tries to cancel paid booking.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2061,8 +2200,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Warning message on cancel booking (buffer)', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Sorry, you can not cancel because you have exceeded the time allowed to do so.', 'webba-booking-lite' ),
-                'popup'   => __( 'Message shown when a customer tries to cancel a booking within a time frame that does not allow cancellations. Buffer time is set in Booking rules -> Cancellation buffer (in minutes)', 'webba-booking-lite' ),
+                'default'              => __( 'Sorry, you can not cancel because you have exceeded the time allowed to do so.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Warning message on cancel booking (buffer)',
+                'popup'                => __( 'Message shown when a customer tries to cancel a booking within a time frame that does not allow cancellations. Buffer time is set in Booking rules -> Cancellation buffer (in minutes)', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2072,8 +2212,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Text of the payment link sent to a customer', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Click here to pay for your booking.', 'webba-booking-lite' ),
-                'popup'   => __( 'Text of the payment link sent to a customer in the email notification.', 'webba-booking-lite' ),
+                'default'              => __( 'Click here to pay for your booking.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Text of the payment link sent to a customer',
+                'popup'                => __( 'Text of the payment link sent to a customer in the email notification.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2083,8 +2224,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Text of the cancelation link sent to a customer', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Click here to cancel your booking.', 'webba-booking-lite' ),
-                'popup'   => __( 'Text of the booking cancelation link sent to a customer in the email notification.', 'webba-booking-lite' ),
+                'default'              => __( 'Click here to cancel your booking.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Text of the cancelation link sent to a customer',
+                'popup'                => __( 'Text of the booking cancelation link sent to a customer in the email notification.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2094,8 +2236,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Text of the cancellation link sent to an admin', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Click here to cancel this booking.', 'webba-booking-lite' ),
-                'popup'   => __( 'Text of the booking cancelation link sent to the admin in the email notification.', 'webba-booking-lite' ),
+                'default'              => __( 'Click here to cancel this booking.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Text of the cancellation link sent to an admin',
+                'popup'                => __( 'Text of the booking cancelation link sent to the admin in the email notification.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2105,8 +2248,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Cancellation success message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Your booking has been cancelled.', 'webba-booking-lite' ),
-                'popup'   => __( 'Text of the shown to a customer when booking is cancelled.', 'webba-booking-lite' ),
+                'default'              => __( 'Your booking has been cancelled.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Cancellation success message',
+                'popup'                => __( 'Text of the shown to a customer when booking is cancelled.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2116,8 +2260,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Text of the approval link sent to an admin', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Click here to approve this booking.', 'webba-booking-lite' ),
-                'popup'   => __( 'Text of the booking approval link sent to the admin in the email notification.', 'webba-booking-lite' ),
+                'default'              => __( 'Click here to approve this booking.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Text of the approval link sent to an admin',
+                'popup'                => __( 'Text of the booking approval link sent to the admin in the email notification.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2127,8 +2272,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Text of the link for adding event to customer\'s Google Calendar', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Click here to add this event to your Google Calendar.', 'webba-booking-lite' ),
-                'popup'   => __( 'Text of the link to add a booking to Google Calendar. Sent to a customer in the email notification.', 'webba-booking-lite' ),
+                'default'              => __( 'Click here to add this event to your Google Calendar.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Text of the link for adding event to customers Google Calendar',
+                'popup'                => __( 'Text of the link to add a booking to Google Calendar. Sent to a customer in the email notification.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2138,8 +2284,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Add to customer\'s Google Calendar button text', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Add to my Google Calendar', 'webba-booking-lite' ),
-                'popup'   => __( 'Text of the link included in the email notification', 'webba-booking-lite' ),
+                'default'              => __( 'Add to my Google Calendar', 'webba-booking-lite' ),
+                'not_translated_title' => 'Add to customer Google Calendar button text',
+                'popup'                => __( 'Text of the link included in the email notification', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2149,8 +2296,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Google calendar event adding success message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Booking data added to Google Calendar.', 'webba-booking-lite' ),
-                'popup'   => __( 'Message shown when booking is added to the Google Calendar.', 'webba-booking-lite' ),
+                'default'              => __( 'Booking data added to Google Calendar.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Google calendar event adding success message',
+                'popup'                => __( 'Message shown when booking is added to the Google Calendar.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2160,8 +2308,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Google calendar event adding error message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Appointment data not added to Google Calendar.', 'webba-booking-lite' ),
-                'popup'   => __( 'Message shown when there was an issue with adding a booking to the Google Calendar.', 'webba-booking-lite' ),
+                'default'              => __( 'Appointment data not added to Google Calendar.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Google calendar event adding error message',
+                'popup'                => __( 'Message shown when there was an issue with adding a booking to the Google Calendar.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2171,8 +2320,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Booking token error message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Booking doesn\'t exist.', 'webba-booking-lite' ),
-                'popup'   => __( 'Message shown when booking link (cancelation, approval, payment) is invalid in the email notification.', 'webba-booking-lite' ),
+                'default'              => __( 'Booking token error message', 'webba-booking-lite' ),
+                'not_translated_title' => 'Booking token error message',
+                'popup'                => __( 'Message shown when booking link (cancelation, approval, payment) is invalid in the email notification.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2182,8 +2332,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Google calendar event / iCal summary (for admin)', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => '#customer_name',
-                'popup'   => __( 'Available placeholders:', 'webba-booking-lite' ) . ' #customer_name, #customer_phone, #customer_email, #customer_comment, #items_count, #appointment_id, #customer_custom, #total_amount, #service_name, #status' . '<br />' . __( 'Placeholder for custom field:', 'webba-booking-lite' ) . ' #field_ + custom field id. Example: #field_custom-field-1',
+                'default'              => '#customer_name',
+                'not_translated_title' => 'Google calendar event / iCal summary (for admin)',
+                'popup'                => __( 'Available placeholders:', 'webba-booking-lite' ) . ' #customer_name, #customer_phone, #customer_email, #customer_comment, #items_count, #appointment_id, #customer_custom, #total_amount, #service_name, #status' . '<br />' . __( 'Placeholder for custom field:', 'webba-booking-lite' ) . ' #field_ + custom field id. Example: #field_custom-field-1',
             ],
             'advanced'
         );
@@ -2193,8 +2344,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Google calendar event / iCal description (for admin)', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => '#customer_name #customer_phone',
-                'popup'   => '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'default'              => '#customer_name #customer_phone',
+                'not_translated_title' => 'Google calendar event / iCal description (for admin)',
+                'popup'                => '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -2204,8 +2356,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Google calendar event / iCal summary (for customer)', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => '#service_name',
-                'popup'   => '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'default'              => '#service_name',
+                'not_translated_title' => 'Google calendar event / iCal summary (for customer)',
+                'popup'                => '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -2215,8 +2368,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Google calendar event / iCal description (for customer)', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Your appointment id is #appointment_id', 'webba-booking-lite' ),
-                'popup'   => '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                'default'              => __( 'Your appointment id is #appointment_id', 'webba-booking-lite' ),
+                'not_translated_title' => 'Google calendar event / iCal description (for customer)',
+                'popup'                => '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
         );
@@ -2227,8 +2381,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Daily limit message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Daily booking limit is reached, please select another date.', 'webba-booking-lite' ),
-                'popup'   => __( 'Message shown when daily booking limit reached. Adjust the daily booking limits in the Settings -> Booking Rules.', 'webba-booking-lite' ),
+                'default'              => __( 'Daily booking limit is reached, please select another date.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Daily limit message',
+                'popup'                => __( 'Message shown when daily booking limit reached. Adjust the daily booking limits in the Settings -> Booking Rules.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2238,8 +2393,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'User limit message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'You have reached your booking limit.', 'webba-booking-lite' ),
-                'popup'   => __( 'Message shown when user limit is reached. Adjust the user booking limits in the Settings -> Booking Rules.', 'webba-booking-lite' ),
+                'default'              => __( 'You have reached your booking limit.', 'webba-booking-lite' ),
+                'not_translated_title' => 'User limit message',
+                'popup'                => __( 'Message shown when user limit is reached. Adjust the user booking limits in the Settings -> Booking Rules.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2250,9 +2406,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'PayPal mode', 'webba-booking-lite' ),
                 'wbk_paypal_settings_section',
                 [
-                    'default' => 'live',
-                    'popup'   => __( 'Select "Sandbox" to test the integration, and "Live" for actual payment processing.', 'webba-booking-lite' ),
-                    'extra'   => [
+                    'default'              => 'live',
+                    'not_translated_title' => 'PayPal mode',
+                    'popup'                => __( 'Select "Sandbox" to test the integration, and "Live" for actual payment processing.', 'webba-booking-lite' ),
+                    'extra'                => [
                         'sandbox' => __( 'Sandbox', 'webba-booking-lite' ),
                         'live'    => __( 'Live', 'webba-booking-lite' ),
                     ],
@@ -2264,7 +2421,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'PayPal Sandbox ClientID', 'webba-booking-lite' ),
                 'wbk_paypal_settings_section',
                 [
-                    'popup' => __( 'Enter the Client ID provided by PayPal for the Sandbox mode integration. <a href="https://www.paypal.com/us/cshelp/article/how-do-i-create-rest-api-credentials-ts1949" rel="noopener" target="_blank">Read more on how to set up PayPal integration.</a>', 'webba-booking-lite' ),
+                    'not_translated_title' => 'PayPal Sandbox ClientID',
+                    'popup'                => __( 'Enter the Client ID provided by PayPal for the Sandbox mode integration. <a href="https://www.paypal.com/us/cshelp/article/how-do-i-create-rest-api-credentials-ts1949" rel="noopener" target="_blank">Read more on how to set up PayPal integration.</a>', 'webba-booking-lite' ),
                 ]
             );
             wbk_opt()->add_option(
@@ -2273,7 +2431,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'PayPal Sandbox Secret', 'webba-booking-lite' ),
                 'wbk_paypal_settings_section',
                 [
-                    'popup' => 'Enter the Client ID provided by PayPal for the Sandbox mode integration. <a href="https://www.paypal.com/us/cshelp/article/how-do-i-create-rest-api-credentials-ts1949" rel="noopener" target="_blank">Read more on how to set up PayPal integration.</a>',
+                    'not_translated_title' => 'PayPal Sandbox Secret',
+                    'popup'                => 'Enter the Client ID provided by PayPal for the Sandbox mode integration. <a href="https://www.paypal.com/us/cshelp/article/how-do-i-create-rest-api-credentials-ts1949" rel="noopener" target="_blank">Read more on how to set up PayPal integration.</a>',
                 ]
             );
             wbk_opt()->add_option(
@@ -2282,7 +2441,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'PayPal Live ClientID', 'webba-booking-lite' ),
                 'wbk_paypal_settings_section',
                 [
-                    'popup' => 'Enter the Client ID provided by PayPal for the Sandbox mode integration. <a href="https://www.paypal.com/us/cshelp/article/how-do-i-create-rest-api-credentials-ts1949" rel="noopener" target="_blank">Read more on how to set up PayPal integration.</a>',
+                    'not_translated_title' => 'PayPal Live ClientID',
+                    'popup'                => 'Enter the Client ID provided by PayPal for the Sandbox mode integration. <a href="https://www.paypal.com/us/cshelp/article/how-do-i-create-rest-api-credentials-ts1949" rel="noopener" target="_blank">Read more on how to set up PayPal integration.</a>',
                 ]
             );
             wbk_opt()->add_option(
@@ -2291,7 +2451,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'PayPal Live Secret', 'webba-booking-lite' ),
                 'wbk_paypal_settings_section',
                 [
-                    'popup' => 'Enter the Client ID provided by PayPal for the Sandbox mode integration. <a href="https://www.paypal.com/us/cshelp/article/how-do-i-create-rest-api-credentials-ts1949" rel="noopener" target="_blank">Read more on how to set up PayPal integration.</a>',
+                    'not_translated_title' => 'PayPal Live Secret',
+                    'popup'                => 'Enter the Client ID provided by PayPal for the Sandbox mode integration. <a href="https://www.paypal.com/us/cshelp/article/how-do-i-create-rest-api-credentials-ts1949" rel="noopener" target="_blank">Read more on how to set up PayPal integration.</a>',
                 ]
             );
             wbk_opt()->add_option(
@@ -2300,9 +2461,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'PayPal currency', 'webba-booking-lite' ),
                 'wbk_paypal_settings_section',
                 [
-                    'popup'   => __( 'Select the currency to use for PayPal payments.', 'webba-booking-lite' ),
-                    'default' => 'USD',
-                    'extra'   => [
+                    'not_translated_title' => 'PayPal currency',
+                    'popup'                => __( 'Select the currency to use for PayPal payments.', 'webba-booking-lite' ),
+                    'default'              => 'USD',
+                    'extra'                => [
                         'AUD' => __( 'Australian Dollar', 'webba-booking-lite' ),
                         'BRL' => __( 'Brazilian Real', 'webba-booking-lite' ),
                         'CAD' => __( 'Canadian Dollar', 'webba-booking-lite' ),
@@ -2335,8 +2497,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Hide address', 'webba-booking-lite' ),
                 'wbk_paypal_settings_section',
                 [
-                    'popup'          => __( 'Turn on to hide address on PayPal checkout.', 'webba-booking-lite' ),
-                    'checkbox_value' => 'enabled',
+                    'not_translated_title' => 'Hide addres',
+                    'popup'                => __( 'Turn on to hide address on PayPal checkout.', 'webba-booking-lite' ),
+                    'checkbox_value'       => 'enabled',
                 ],
                 'advanced'
             );
@@ -2346,7 +2509,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Redirect to page when payment is successful', 'webba-booking-lite' ),
                 'wbk_paypal_settings_section',
                 [
-                    'popup' => __( 'Enter the URL where customers should be redirected after a successful payment. If left empty, customers will stay on the booking form page after completing the payment.', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Redirect to page when payment is successful',
+                    'popup'                => __( 'Enter the URL where customers should be redirected after a successful payment. If left empty, customers will stay on the booking form page after completing the payment.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2356,7 +2520,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Currency multiplier', 'webba-booking-lite' ),
                 'wbk_paypal_settings_section',
                 [
-                    'popup' => __( 'Add the currency multiplier to update the price before it is sent to PayPal. It is helpful when your service price is set in a currency not supported by PayPal, and you need to convert it to a PayPal-supported currency before checkout. If you do not require currency conversion, leave this field empty.', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Currency multiplier',
+                    'popup'                => __( 'Add the currency multiplier to update the price before it is sent to PayPal. It is helpful when your service price is set in a currency not supported by PayPal, and you need to convert it to a PayPal-supported currency before checkout. If you do not require currency conversion, leave this field empty.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2366,8 +2531,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Text of the Zoom meeting URL', 'webba-booking-lite' ),
                 'wbk_translation_settings_section',
                 [
-                    'default' => __( 'Click here to open your meeting in Zoom', 'webba-booking-lite' ),
-                    'popup'   => __( 'Text displayed as the link to the Zoom meeting.', 'webba-booking-lite' ),
+                    'default'              => __( 'Click here to open your meeting in Zoom', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Text of the Zoom meeting URL',
+                    'popup'                => __( 'Text displayed as the link to the Zoom meeting.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2379,7 +2545,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Publishable key', 'webba-booking-lite' ),
                 'wbk_stripe_settings_section',
                 [
-                    'popup' => __( 'Enter the publishable API key provided by Stripe for your integration. <a href="https://stripe.com/docs/keys" rel="noopener" target="_blank">Read more on how to set up Stripe integration.</a>', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Publishable key',
+                    'popup'                => __( 'Enter the publishable API key provided by Stripe for your integration. <a href="https://stripe.com/docs/keys" rel="noopener" target="_blank">Read more on how to set up Stripe integration.</a>', 'webba-booking-lite' ),
                 ]
             );
             wbk_opt()->add_option(
@@ -2388,7 +2555,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Secret key', 'webba-booking-lite' ),
                 'wbk_stripe_settings_section',
                 [
-                    'popup' => __( 'Enter the publishable API key provided by Stripe for your integration. <a href="https://stripe.com/docs/keys" rel="noopener" target="_blank">Read more on how to set up Stripe integration.</a>', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Secret key',
+                    'popup'                => __( 'Enter the publishable API key provided by Stripe for your integration. <a href="https://stripe.com/docs/keys" rel="noopener" target="_blank">Read more on how to set up Stripe integration.</a>', 'webba-booking-lite' ),
                 ]
             );
             wbk_opt()->add_option(
@@ -2397,9 +2565,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Stripe currency', 'webba-booking-lite' ),
                 'wbk_stripe_settings_section',
                 [
-                    'default' => 'USD',
-                    'popup'   => __( 'Select the currency to use for Stripe payments.', 'webba-booking-lite' ),
-                    'extra'   => array_combine( WBK_Stripe::getCurrencies(), WBK_Stripe::getCurrencies() ),
+                    'default'              => 'USD',
+                    'not_translated_title' => 'Stripe currency',
+                    'popup'                => __( 'Select the currency to use for Stripe payments.', 'webba-booking-lite' ),
+                    'extra'                => array_combine( WBK_Stripe::getCurrencies(), WBK_Stripe::getCurrencies() ),
                 ]
             );
             wbk_opt()->add_option(
@@ -2408,9 +2577,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Load Stripe javascript', 'webba-booking-lite' ),
                 'wbk_stripe_settings_section',
                 [
-                    'default' => 'yes',
-                    'popup'   => __( 'Select how the Stripe Javascript needs to be loaded', 'webba-booking-lite' ),
-                    'extra'   => [
+                    'default'              => 'yes',
+                    'not_translated_title' => 'Load Stripe javascript',
+                    'popup'                => __( 'Select how the Stripe Javascript needs to be loaded', 'webba-booking-lite' ),
+                    'extra'                => [
                         'yes'       => __( 'Yes', 'webba-booking-lite' ),
                         'no'        => __( 'No', 'webba-booking-lite' ),
                         'shortcode' => __( 'Only on the booking page (not recommended)', 'webba-booking-lite' ),
@@ -2424,13 +2594,14 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Load Stripe API', 'webba-booking-lite' ),
                 'wbk_stripe_settings_section',
                 [
-                    'default' => 'yes',
-                    'extra'   => [
+                    'default'              => 'yes',
+                    'extra'                => [
                         'yes' => __( 'Yes, load version 7.26.0', 'webba-booking-lite' ),
                         'old' => __( 'Yes, load version 6.21.1 (not recommended)', 'webba-booking-lite' ),
                         'no'  => __( 'No', 'webba-booking-lite' ),
                     ],
-                    'popup'   => __( 'Select how to load Stripe API. Set \'no\' or 6.21.1 only if there is a conflict with another plugin that uses Stripe.', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Load Stripe API',
+                    'popup'                => __( 'Select how to load Stripe API. Set \'no\' or 6.21.1 only if there is a conflict with another plugin that uses Stripe.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2440,8 +2611,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Hide the postal code field', 'webba-booking-lite' ),
                 'wbk_stripe_settings_section',
                 [
-                    'checkbox_value' => 'true',
-                    'popup'          => __( 'Turn on to hide the postal code field in the Stripe checkout.', 'webba-booking-lite' ),
+                    'checkbox_value'       => 'true',
+                    'not_translated_title' => 'Hide the postal code field',
+                    'popup'                => __( 'Turn on to hide the postal code field in the Stripe checkout.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2451,8 +2623,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Override Stripe card element error messages', 'webba-booking-lite' ),
                 'wbk_stripe_settings_section',
                 [
-                    'checkbox_value' => 'yes',
-                    'popup'          => __( 'Turn on to override the default error message displayed for Stripe card elements. To customize the error message, navigate to Wording/Translation -> Advanced Settings and modify the "Stripe card element error message" according to your preferences.', 'webba-booking-lite' ),
+                    'checkbox_value'       => 'yes',
+                    'not_translated_title' => 'Override Stripe card element error messages',
+                    'popup'                => __( 'Turn on to override the default error message displayed for Stripe card elements. To customize the error message, navigate to Wording/Translation -> Advanced Settings and modify the "Stripe card element error message" according to your preferences.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2462,9 +2635,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Additional payment information', 'webba-booking-lite' ),
                 'wbk_stripe_settings_section',
                 [
-                    'default' => '',
-                    'extra'   => WBK_Db_Utils::getPaymentFields(),
-                    'popup'   => __( 'Select the additional fields that you wish to include in the Stripe payment process.', 'webba-booking-lite' ),
+                    'default'              => '',
+                    'extra'                => WBK_Db_Utils::getPaymentFields(),
+                    'not_translated_title' => 'Additional payment information',
+                    'popup'                => __( 'Select the additional fields that you wish to include in the Stripe payment process.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2474,7 +2648,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Redirect to page when payment is successful', 'webba-booking-lite' ),
                 'wbk_stripe_settings_section',
                 [
-                    'popup' => __( 'Enter the URL where customers should be redirected after successful payment. If left empty, customers will stay on the booking form page after completing the payment.', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Redirect to page when payment is successful',
+                    'popup'                => __( 'Enter the URL where customers should be redirected after successful payment. If left empty, customers will stay on the booking form page after completing the payment.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2484,7 +2659,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Font size for card element on mobile devices', 'webba-booking-lite' ),
                 'wbk_stripe_settings_section',
                 [
-                    'popup' => __( 'Set the card element font size on mobile devices. Leave empty for the default input field font size.', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Font size for card element on mobile devices',
+                    'popup'                => __( 'Set the card element font size on mobile devices. Leave empty for the default input field font size.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2494,9 +2670,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Set status after booking is paid with Stripe to', 'webba-booking-lite' ),
                 'wbk_stripe_settings_section',
                 [
-                    'default' => 'based',
-                    'popup'   => __( 'Choose how to update the status after booking is paid with Stripe. To keep the current status unchanged, select "Based on status before payment". ', 'webba-booking-lite' ),
-                    'extra'   => [
+                    'default'              => 'based',
+                    'not_translated_title' => 'Set status after booking is paid with Stripe to',
+                    'popup'                => __( 'Choose how to update the status after booking is paid with Stripe. To keep the current status unchanged, select "Based on status before payment". ', 'webba-booking-lite' ),
+                    'extra'                => [
                         'based'         => __( 'Based on status before payment', 'webba-booking-lite' ),
                         'paid'          => __( 'Paid (awaiting approval)', 'webba-booking-lite' ),
                         'paid_approved' => __( 'Paid (approved)', 'webba-booking-lite' ),
@@ -2512,7 +2689,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Google API Client ID', 'webba-booking-lite' ),
                 'wbk_gg_calendar_settings_section',
                 [
-                    'popup' => __( 'Enter the Google API Client ID. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/google-calendar/">Read more on how to set up Google Calendar integration.</a>.', 'webba-booking-lite' ),
+                    'not_translated_title' => '',
+                    'popup'                => __( 'Enter the Google API Client ID. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/google-calendar/">Read more on how to set up Google Calendar integration.</a>.', 'webba-booking-lite' ),
                 ]
             );
             wbk_opt()->add_option(
@@ -2521,7 +2699,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Google API Client Secret', 'webba-booking-lite' ),
                 'wbk_gg_calendar_settings_section',
                 [
-                    'popup' => __( 'Enter the Google API Client Secret. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/google-calendar/">Read more on how to set up Google Calendar integration.</a>.', 'webba-booking-lite' ),
+                    'not_translated_title' => '',
+                    'popup'                => __( 'Enter the Google API Client Secret. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/google-calendar/">Read more on how to set up Google Calendar integration.</a>.', 'webba-booking-lite' ),
                 ]
             );
             wbk_opt()->add_option(
@@ -2530,8 +2709,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( '"Created by" property for the events', 'webba-booking-lite' ),
                 'wbk_gg_calendar_settings_section',
                 [
-                    'default' => 'webba_booking',
-                    'popup'   => __( 'Do not change this option if you do not plan to use the same Google calendars on different websites with Webba Booking.', 'webba-booking-lite' ),
+                    'default'              => 'webba_booking',
+                    'not_translated_title' => 'Created by property for the events',
+                    'popup'                => __( 'Do not change this option if you do not plan to use the same Google calendars on different websites with Webba Booking.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2541,9 +2721,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Customer\'s time zone', 'webba-booking-lite' ),
                 'wbk_gg_calendar_settings_section',
                 [
-                    'default' => 'webba',
-                    'popup'   => __( 'Choose the time zone to be used for events added to the customer\'s calendar.', 'webba-booking-lite' ),
-                    'extra'   => [
+                    'default'              => 'webba',
+                    'not_translated_title' => 'Customers time zone',
+                    'popup'                => __( 'Choose the time zone to be used for events added to the customer\'s calendar.', 'webba-booking-lite' ),
+                    'extra'                => [
                         'webba'    => __( 'Use Webba Booking time zone', 'webba-booking-lite' ),
                         'customer' => __( 'Use customer\'s calendar time zone', 'webba-booking-lite' ),
                     ],
@@ -2556,9 +2737,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Admin calendar event creation', 'webba-booking-lite' ),
                 'wbk_gg_calendar_settings_section',
                 [
-                    'default' => 'onbooking',
-                    'popup'   => __( 'Specify when the event should be added to the admin\'s calendar when creating bookings. ', 'webba-booking-lite' ),
-                    'extra'   => [
+                    'default'              => 'onbooking',
+                    'not_translated_title' => 'Admin calendar event creation',
+                    'popup'                => __( 'Specify when the event should be added to the admin\'s calendar when creating bookings. ', 'webba-booking-lite' ),
+                    'extra'                => [
                         'onbooking'           => __( 'On booking', 'webba-booking-lite' ),
                         'onpaymentorapproval' => __( 'On payment or approval', 'webba-booking-lite' ),
                     ],
@@ -2571,9 +2753,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Group services synchronization', 'webba-booking-lite' ),
                 'wbk_gg_calendar_settings_section',
                 [
-                    'default' => 'lock',
-                    'popup'   => __( 'Choose how group services are integrated with the events in Google calendar.', 'webba-booking-lite' ),
-                    'extra'   => [
+                    'default'              => 'lock',
+                    'not_translated_title' => 'Group services synchronization',
+                    'popup'                => __( 'Choose how group services are integrated with the events in Google calendar.', 'webba-booking-lite' ),
+                    'extra'                => [
                         'lock'   => __( 'Lock time slot', 'webba-booking-lite' ),
                         'reduce' => __( 'Reduce count of available places', 'webba-booking-lite' ),
                     ],
@@ -2586,8 +2769,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Ignore free events', 'webba-booking-lite' ),
                 'wbk_gg_calendar_settings_section',
                 [
-                    'checkbox_value' => 'yes',
-                    'popup'          => __( 'Turn on if free Google Calendar events should not be considered in 2-ways synchronization.', 'webba-booking-lite' ),
+                    'checkbox_value'       => 'yes',
+                    'not_translated_title' => 'Ignore free events',
+                    'popup'                => __( 'Turn on if free Google Calendar events should not be considered in 2-ways synchronization.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2597,8 +2781,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Ignore events added by Webba Booking', 'webba-booking-lite' ),
                 'wbk_gg_calendar_settings_section',
                 [
-                    'checkbox_value' => 'yes',
-                    'popup'          => __( 'Turn on if Webba Booking events should not be considered in 2-ways synchronization.', 'webba-booking-lite' ),
+                    'checkbox_value'       => 'yes',
+                    'not_translated_title' => 'Ignore events added by Webba Booking',
+                    'popup'                => __( 'Turn on if Webba Booking events should not be considered in 2-ways synchronization.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2608,9 +2793,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Export for group services', 'webba-booking-lite' ),
                 'wbk_gg_calendar_settings_section',
                 [
-                    'default' => 'event_foreach_appointment',
-                    'popup'   => __( 'Select the method of exporting group services.', 'webba-booking-lite' ),
-                    'extra'   => [
+                    'default'              => 'event_foreach_appointment',
+                    'not_translated_title' => 'Export for group service',
+                    'popup'                => __( 'Select the method of exporting group services.', 'webba-booking-lite' ),
+                    'extra'                => [
                         'one_event'                 => __( 'Add one event', 'webba-booking-lite' ),
                         'event_foreach_appointment' => __( 'Add event for each appointment', 'webba-booking-lite' ),
                     ],
@@ -2623,8 +2809,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Send an alert email to administrator if any issue occurred with the integration', 'webba-booking-lite' ),
                 'wbk_gg_calendar_settings_section',
                 [
-                    'checkbox_value' => 'yes',
-                    'popup'          => __( 'Turn on to alert admin about issues with integration. Notification is sent to the email set in the service settings.', 'webba-booking-lite' ),
+                    'checkbox_value'       => 'yes',
+                    'not_translated_title' => 'Send an alert email to administrator if any issue occurred with the integration',
+                    'popup'                => __( 'Turn on to alert admin about issues with integration. Notification is sent to the email set in the service settings.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2649,9 +2836,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Version of Google Client API', 'webba-booking-lite' ),
                 'wbk_gg_calendar_settings_section',
                 [
-                    'default' => '2.9.1',
-                    'extra'   => $version_list,
-                    'popup'   => __( 'Modify this setting only if you have other plugins in your WordPress that utilize a different version of the Google API and conflicts have arisen.', 'webba-booking-lite' ),
+                    'default'              => '2.9.1',
+                    'extra'                => $version_list,
+                    'not_translated_title' => 'Version of Google Client API',
+                    'popup'                => __( 'Modify this setting only if you have other plugins in your WordPress that utilize a different version of the Google API and conflicts have arisen.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2662,9 +2850,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Skip payment method selection for "Pay on arrival"', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default'        => 'true',
-                'checkbox_value' => 'true',
-                'popup'          => __( 'Skip payment method selection for "Pay on arrival" method if there is only one method available', 'webba-booking-lite' ),
+                'default'              => 'true',
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Skip payment method selection for Pay on arrival',
+                'popup'                => __( 'Skip payment method selection for "Pay on arrival" method if there is only one method available', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2675,7 +2864,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Validate WooCommerce coupons as Webba Coupons', 'webba-booking-lite' ),
                 'wbk_woo_settings_section',
                 [
-                    'popup' => __( 'Enable this option if you need to validate wooCommerce coupons as Webba coupons.', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Validate WooCommerce coupons as Webba Coupons',
+                    'popup'                => __( 'Enable this option if you need to validate wooCommerce coupons as Webba coupons.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2685,9 +2875,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Status of the booking paid with WooCommerce', 'webba-booking-lite' ),
                 'wbk_woo_settings_section',
                 [
-                    'popup'   => __( 'Choose the desired status update after a booking has been paid through WooCommerce.', 'webba-booking-lite' ),
-                    'default' => 'disabled',
-                    'extra'   => [
+                    'not_translated_title' => 'Status of the booking paid with WooCommerce',
+                    'popup'                => __( 'Choose the desired status update after a booking has been paid through WooCommerce.', 'webba-booking-lite' ),
+                    'default'              => 'disabled',
+                    'extra'                => [
                         'disabled'      => __( 'Disabled (do not update status)', 'webba-booking-lite' ),
                         'approved'      => __( 'Approved', 'webba-booking-lite' ),
                         'paid'          => __( 'Paid (awaiting approval)', 'webba-booking-lite' ),
@@ -2701,9 +2892,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Prefill fields in WooCommerce checkout with the data used in the booking form', 'webba-booking-lite' ),
                 'wbk_woo_settings_section',
                 [
-                    'default'        => 'true',
-                    'checkbox_value' => 'true',
-                    'popup'          => __( 'Turn on to prefill fields in the WooCommerce checkout with the data entered in the Webba booking form.', 'webba-booking-lite' ),
+                    'default'              => 'true',
+                    'checkbox_value'       => 'true',
+                    'not_translated_title' => 'Prefill fields in WooCommerce checkout with the data used in the booking form',
+                    'popup'                => __( 'Turn on to prefill fields in the WooCommerce checkout with the data entered in the Webba booking form.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2713,9 +2905,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Automatically add to cart', 'webba-booking-lite' ),
                 'wbk_woo_settings_section',
                 [
-                    'default'        => '',
-                    'checkbox_value' => 'true',
-                    'popup'          => __( 'If this option is enabled, the user will be redirected to the shopping cart page after submitting the booking form.', 'webba-booking-lite' ),
+                    'default'              => '',
+                    'checkbox_value'       => 'true',
+                    'not_translated_title' => 'Automatically add to cart',
+                    'popup'                => __( 'If this option is enabled, the user will be redirected to the shopping cart page after submitting the booking form.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2726,12 +2919,13 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Action for \'Paid\' booking status', 'webba-booking-lite' ),
                 'wbk_woo_settings_section',
                 [
-                    'extra' => array(
+                    'extra'                => array(
                         'complete_status'  => __( 'Complete status set', 'webba-booking-lite' ),
                         'thankyou_message' => __( 'Thank you message shown', 'webba-booking-lite' ),
                         'complete_payment' => __( 'Payment completed in WooCommerce', 'webba-booking-lite' ),
                     ),
-                    'popup' => __( 'Select which action will set the booking status as \'Paid\'', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Action for Paid booking status',
+                    'popup'                => __( 'Select which action will set the booking status as \'Paid\'', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2743,7 +2937,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Client ID', 'webba-booking-lite' ),
                 'wbk_zoom_settings_section',
                 [
-                    'popup' => 'Enter the Zoom Client ID. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/integrations/integration-with-zoom/">Read more on how to set up Zoom integration.</a>',
+                    'not_translated_title' => '',
+                    'popup'                => 'Enter the Zoom Client ID. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/integrations/integration-with-zoom/">Read more on how to set up Zoom integration.</a>',
                 ]
             );
             wbk_opt()->add_option(
@@ -2752,7 +2947,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Client secret', 'webba-booking-lite' ),
                 'wbk_zoom_settings_section',
                 [
-                    'popup' => 'Enter the Zoom Client secret. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/integrations/integration-with-zoom/">Read more on how to set up Zoom integration.</a>',
+                    'not_translated_title' => '',
+                    'popup'                => 'Enter the Zoom Client secret. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/integrations/integration-with-zoom/">Read more on how to set up Zoom integration.</a>',
                 ]
             );
             wbk_opt()->add_option(
@@ -2767,9 +2963,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Zoom meeting creation', 'webba-booking-lite' ),
                 'wbk_zoom_settings_section',
                 [
-                    'popup'   => __( 'Select when to create the meeting in Zoom - on booking or on payment or booking approval.', 'webba-booking-lite' ),
-                    'default' => 'onbooking',
-                    'extra'   => [
+                    'not_translated_title' => 'Zoom meeting creation',
+                    'popup'                => __( 'Select when to create the meeting in Zoom - on booking or on payment or booking approval.', 'webba-booking-lite' ),
+                    'default'              => 'onbooking',
+                    'extra'                => [
                         'onbooking'           => __( 'On booking', 'webba-booking-lite' ),
                         'onpaymentorapproval' => __( 'On payment or approval', 'webba-booking-lite' ),
                     ],
@@ -2783,8 +2980,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Customer name in the backend', 'webba-booking-lite' ),
             'wbk_interface_settings_section',
             [
-                'default' => '#name',
-                'popup'   => __( 'Use this option to display custom fields alongside the customer name in the appointments table and schedules. For instance, you can show the customer\'s name and last name by using the placeholder #name #field_lastname. In this example, the last name is stored in a custom field with the ID "lastname". Remember to include the #name placeholder in the value of this option for it to work correctly.', 'webba-booking-lite' ),
+                'default'              => '#name',
+                'not_translated_title' => 'Customer name in the backend',
+                'popup'                => __( 'Use this option to display custom fields alongside the customer name in the appointments table and schedules. For instance, you can show the customer\'s name and last name by using the placeholder #name #field_lastname. In this example, the last name is stored in a custom field with the ID "lastname". Remember to include the #name placeholder in the value of this option for it to work correctly.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2794,15 +2992,16 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Date format (backend)', 'webba-booking-lite' ),
             'wbk_interface_settings_section',
             [
-                'default' => 'M d, Y',
-                'extra'   => [
+                'default'              => 'M d, Y',
+                'extra'                => [
                     'm/d/y'  => __( 'm/d/y', 'webba-booking-lite' ),
                     'y/m/d'  => __( 'y/m/d', 'webba-booking-lite' ),
                     'y-m-d'  => __( 'y-m-d', 'webba-booking-lite' ),
                     'M d, Y' => __( 'M d, Y', 'webba-booking-lite' ),
                     'd/m/y'  => __( 'd/m/y', 'webba-booking-lite' ),
                 ],
-                'popup'   => __( 'Select how the date will be displayed on the Appointments page in the admin area.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Date format (backend)',
+                'popup'                => __( 'Select how the date will be displayed on the Appointments page in the admin area.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -2811,9 +3010,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Time slots format on the schedule page', 'webba-booking-lite' ),
             'wbk_interface_settings_section',
             [
-                'popup'   => __( 'Select how to display time slots on the Schedule page.', 'webba-booking-lite' ),
-                'default' => 'start',
-                'extra'   => [
+                'not_translated_title' => 'Time slots format on the schedule page',
+                'popup'                => __( 'Select how to display time slots on the Schedule page.', 'webba-booking-lite' ),
+                'default'              => 'start',
+                'extra'                => [
                     'start'     => __( 'Start', 'webba-booking-lite' ),
                     'start-end' => __( 'Start - End', 'webba-booking-lite' ),
                 ],
@@ -2826,7 +3026,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Custom field columns', 'webba-booking-lite' ),
             'wbk_interface_settings_section',
             [
-                'popup' => __( 'Enter a comma-separated list of custom field IDs. To set custom column headers, use square brackets with the desired titles. For example: custom-field1[Title 1],custom-field2[Title 2].', 'webba-booking-lite' ),
+                'not_translated_title' => 'Custom field columns',
+                'popup'                => __( 'Enter a comma-separated list of custom field IDs. To set custom column headers, use square brackets with the desired titles. For example: custom-field1[Title 1],custom-field2[Title 2].', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2836,8 +3037,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Backend calendar booking texts', 'webba-booking-lite' ),
             'wbk_interface_settings_section',
             [
-                'default' => '#customer_name [#service_name]',
-                'popup'   => __( __( 'Text shown in the backend calendar. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>', 'webba-booking-lite' ),
+                'default'              => '#customer_name [#service_name]',
+                'not_translated_title' => 'Backend calendar booking texts',
+                'popup'                => __( __( 'Text shown in the backend calendar. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2847,8 +3049,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Default number of days on Bookings page', 'webba-booking-lite' ),
             'wbk_interface_settings_section',
             [
-                'default' => '30',
-                'popup'   => __( 'Set the default number of days to be displayed on the appointment page. To improve performance, consider using a lower value.', 'webba-booking-lite' ),
+                'default'              => '30',
+                'not_translated_title' => 'Default number of days on Bookings page',
+                'popup'                => __( 'Set the default number of days to be displayed on the appointment page. To improve performance, consider using a lower value.', 'webba-booking-lite' ),
             ]
         );
         if ( wbk_fs()->is__premium_only() && wbk_fs()->can_use_premium_code() ) {
@@ -2858,7 +3061,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Twilio ACCOUNT SID', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'popup' => 'Enter the Twilio ACCOUNT SID. <a rel="noopener" target="_blank" href="https://support.twilio.com/hc/en-us/articles/14726256820123-What-is-a-Twilio-Account-SID-and-where-can-I-find-it-">Read more.</a>',
+                    'not_translated_title' => '',
+                    'popup'                => 'Enter the Twilio ACCOUNT SID. <a rel="noopener" target="_blank" href="https://support.twilio.com/hc/en-us/articles/14726256820123-What-is-a-Twilio-Account-SID-and-where-can-I-find-it-">Read more.</a>',
                 ]
             );
             wbk_opt()->add_option(
@@ -2867,7 +3071,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Twilio AUTH TOKEN', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'popup' => 'Enter the Twilio AUTH TOKEN. <a rel="noopener" target="_blank" href="https://support.twilio.com/hc/en-us/articles/223136027-Auth-Tokens-and-How-to-Change-Them">Read more.</a>',
+                    'not_translated_title' => '',
+                    'popup'                => 'Enter the Twilio AUTH TOKEN. <a rel="noopener" target="_blank" href="https://support.twilio.com/hc/en-us/articles/223136027-Auth-Tokens-and-How-to-Change-Them">Read more.</a>',
                 ]
             );
             wbk_opt()->add_option(
@@ -2876,7 +3081,8 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Twilio phone number or Messaging Service SID', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'popup' => __( 'The phone number must start with a + sign.', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Twilio phone number or Messaging Service SID',
+                    'popup'                => __( 'The phone number must start with a + sign.', 'webba-booking-lite' ),
                 ]
             );
             wbk_opt()->add_option(
@@ -2885,8 +3091,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Send SMS after customer makes a booking', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'checkbox_value' => 'true',
-                    'popup'          => __( 'Turn on to send booking SMS notifications to customers when they make a booking.', 'webba-booking-lite' ),
+                    'checkbox_value'       => 'true',
+                    'not_translated_title' => 'Send SMS after customer makes a booking',
+                    'popup'                => __( 'Turn on to send booking SMS notifications to customers when they make a booking.', 'webba-booking-lite' ),
                 ]
             );
             wbk_opt()->add_option(
@@ -2895,24 +3102,26 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Send SMS after admin adds a booking', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'checkbox_value' => 'true',
-                    'dependency'     => [
+                    'checkbox_value'       => 'true',
+                    'dependency'           => [
                         'wbk_sms_send_on_booking' => ':checked',
                     ],
-                    'popup'          => __( 'Turn on to send booking SMS notifications to customers when the booking was done by an admin.', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Send SMS after admin adds a booking',
+                    'popup'                => __( 'Turn on to send booking SMS notifications to customers when the booking was done by an admin.', 'webba-booking-lite' ),
                 ]
             );
             wbk_opt()->add_option(
                 'wbk_sms_message_on_booking',
                 'textarea',
-                __( 'Booking SMS:', 'webba-booking-lite' ),
+                __( 'Booking SMS', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'dependency' => [
+                    'dependency'           => [
                         'wbk_sms_send_on_booking' => ':checked',
                     ],
-                    'default'    => __( 'Dear #customer_name, You have successfully booked #service_name on #appointment_day at #appointment_time.', 'webba-booking-lite' ),
-                    'popup'      => __( 'Customize the booking SMS message. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                    'default'              => __( 'Dear #customer_name, You have successfully booked #service_name on #appointment_day at #appointment_time.', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Booking SMS',
+                    'popup'                => __( 'Customize the booking SMS message. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
                 ]
             );
             wbk_opt()->add_option(
@@ -2921,8 +3130,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Send booking reminder SMS', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'checkbox_value' => 'true',
-                    'popup'          => __( 'Turn on to send booking reminder SMS notifications to customers.', 'webba-booking-lite' ),
+                    'checkbox_value'       => 'true',
+                    'not_translated_title' => 'Send booking reminder SMS',
+                    'popup'                => __( 'Turn on to send booking reminder SMS notifications to customers.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2932,11 +3142,12 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Send reminder to customer X days before booking', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'dependency' => [
+                    'dependency'           => [
                         'wbk_sms_send_reminder' => ':checked',
                     ],
-                    'default'    => '1',
-                    'popup'      => __( 'Select the timing for the booking reminder SMS. For instance, set the value to 0 for the day of booking, 1 for one day before the booking, 2 for two days before, and so on.', 'webba-booking-lite' ),
+                    'default'              => '1',
+                    'not_translated_title' => 'Send reminder to customer X days before booking',
+                    'popup'                => __( 'Select the timing for the booking reminder SMS. For instance, set the value to 0 for the day of booking, 1 for one day before the booking, 2 for two days before, and so on.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
@@ -2946,11 +3157,12 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Reminder message', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'dependency' => [
+                    'dependency'           => [
                         'wbk_sms_send_reminder' => ':checked',
                     ],
-                    'default'    => __( 'Dea #customer_name, we would like to remind that you have booked the #service_name tomorrow at #appointment_time.', 'webba-booking-lite' ),
-                    'popup'      => 'Customize the booking reminder SMS message. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                    'default'              => __( 'Dea #customer_name, we would like to remind that you have booked the #service_name tomorrow at #appointment_time.', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Reminder message',
+                    'popup'                => 'Customize the booking reminder SMS message. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
                 ],
                 'advanced'
             );
@@ -2961,23 +3173,25 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Send payment received SMS', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'checkbox_value' => 'true',
-                    'default'        => 'true',
-                    'popup'          => __( 'Turn on to send payment received SMS notifications to customers once their booking has been paid.', 'webba-booking-lite' ),
+                    'checkbox_value'       => 'true',
+                    'default'              => 'true',
+                    'not_translated_title' => 'Send payment received SMS',
+                    'popup'                => __( 'Turn on to send payment received SMS notifications to customers once their booking has been paid.', 'webba-booking-lite' ),
                 ],
                 'advanced'
             );
             wbk_opt()->add_option(
                 'wbk_sms_message_on_payment',
                 'textarea',
-                __( 'Payment received SMS:', 'webba-booking-lite' ),
+                __( 'Payment received SMS', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'dependency' => [
+                    'dependency'           => [
                         'wbk_sms_send_on_payment' => ':checked',
                     ],
-                    'default'    => __( 'Dear #customer_name, your booking on #appointment_day at #appointment_time has been paid.', 'webba-booking-lite' ),
-                    'popup'      => __( 'Customize the booking payment SMS message. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                    'default'              => __( 'Dear #customer_name, your booking on #appointment_day at #appointment_time has been paid.', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Payment received SMS',
+                    'popup'                => __( 'Customize the booking payment SMS message. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
                 ],
                 'advanced'
             );
@@ -2988,21 +3202,23 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Send booking approval SMS', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'checkbox_value' => 'true',
-                    'popup'          => __( 'Turn on to send booking approval SMS notifications to customers once their booking has been approved.', 'webba-booking-lite' ),
+                    'checkbox_value'       => 'true',
+                    'not_translated_title' => 'Send booking approval SMS',
+                    'popup'                => __( 'Turn on to send booking approval SMS notifications to customers once their booking has been approved.', 'webba-booking-lite' ),
                 ]
             );
             wbk_opt()->add_option(
                 'wbk_sms_message_on_approval',
                 'textarea',
-                __( 'Booking approval SMS:', 'webba-booking-lite' ),
+                __( 'Booking approval SMS', 'webba-booking-lite' ),
                 'wbk_sms_settings_section',
                 [
-                    'dependency' => [
+                    'dependency'           => [
                         'wbk_sms_send_on_approval' => ':checked',
                     ],
-                    'default'    => __( 'Dear #customer_name, your booking on #appointment_day at #appointment_time has been approved.', 'webba-booking-lite' ),
-                    'popup'      => 'Customize the booking approval SMS message. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
+                    'default'              => __( 'Dear #customer_name, your booking on #appointment_day at #appointment_time has been approved.', 'webba-booking-lite' ),
+                    'not_translated_title' => 'Booking approval SMS',
+                    'popup'                => 'Customize the booking approval SMS message. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
                 ]
             );
         }
@@ -3012,8 +3228,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Services step title', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Services', 'webba-booking-lite' ),
-                'popup'   => __( 'Services title in the booking form sidebar.', 'webba-booking-lite' ),
+                'default'              => __( 'Services', 'webba-booking-lite' ),
+                'not_translated_title' => 'Services step title',
+                'popup'                => __( 'Services title in the booking form sidebar.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -3022,8 +3239,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Date and time step title', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Date and time', 'webba-booking-lite' ),
-                'popup'   => __( 'Date and time title in the booking form sidebar.', 'webba-booking-lite' ),
+                'default'              => __( 'Date and time', 'webba-booking-lite' ),
+                'not_translated_title' => 'Date and time step title',
+                'popup'                => __( 'Date and time title in the booking form sidebar.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -3032,8 +3250,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Details step title', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Details', 'webba-booking-lite' ),
-                'popup'   => __( 'User details title in the booking form sidebar.', 'webba-booking-lite' ),
+                'default'              => __( 'Details', 'webba-booking-lite' ),
+                'not_translated_title' => 'Details step title',
+                'popup'                => __( 'User details title in the booking form sidebar.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -3042,8 +3261,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Payment step title', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Payment', 'webba-booking-lite' ),
-                'popup'   => __( 'Payment title in the booking form sidebar.', 'webba-booking-lite' ),
+                'default'              => __( 'Payment', 'webba-booking-lite' ),
+                'not_translated_title' => 'Payment step title',
+                'popup'                => __( 'Payment title in the booking form sidebar.', 'webba-booking-lite' ),
             ]
         );
         // next and prev
@@ -3053,8 +3273,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Next button text', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Next' ),
-                'popup'   => __( 'Text on the Next button.', 'webba-booking-lite' ),
+                'default'              => __( 'Next' ),
+                'not_translated_title' => 'Next button text',
+                'popup'                => __( 'Text on the Next button.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -3063,8 +3284,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Back button text', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Back' ),
-                'popup'   => __( 'Text on the Back button.', 'webba-booking-lite' ),
+                'default'              => __( 'Back' ),
+                'not_translated_title' => 'Back button text',
+                'popup'                => __( 'Text on the Back button.', 'webba-booking-lite' ),
             ]
         );
         // next end prev end
@@ -3074,8 +3296,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Step separator on mobile', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'of', 'webba-booking-lite' ),
-                'popup'   => __( 'On mobile, you\'ll find a step separator. For instance, \'1 of 3\' (steps). Translate the seperator "of."', 'webba-booking-lite' ),
+                'default'              => __( 'of', 'webba-booking-lite' ),
+                'not_translated_title' => 'Step separator on mobile',
+                'popup'                => __( 'On mobile, you\'ll find a step separator. For instance, \'1 of 3\' (steps). Translate the seperator "of."', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3085,8 +3308,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Minutes label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'min', 'webba-booking-lite' ),
-                'popup'   => __( 'Minutes label in the services step.', 'webba-booking-lite' ),
+                'default'              => __( 'min', 'webba-booking-lite' ),
+                'not_translated_title' => 'Minutes label',
+                'popup'                => __( 'Minutes label in the services step.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3096,8 +3320,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Your local time checkbox', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Your local time', 'webba-booking-lite' ),
-                'popup'   => __( 'Text for the "Your local time" checkbox.', 'webba-booking-lite' ),
+                'default'              => __( 'Your local time', 'webba-booking-lite' ),
+                'not_translated_title' => 'Your local time checkbox',
+                'popup'                => __( 'Text for the "Your local time" checkbox.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3107,8 +3332,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Coupon label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Coupon', 'webba-booking-lite' ),
-                'popup'   => __( 'Coupon field label', 'webba-booking-lite' ),
+                'default'              => __( 'Coupon', 'webba-booking-lite' ),
+                'not_translated_title' => 'Coupon label',
+                'popup'                => __( 'Coupon field label', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3118,8 +3344,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Apply coupon button text', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Apply', 'webba-booking-lite' ),
-                'popup'   => __( 'Label for "Apply" coupon button', 'webba-booking-lite' ),
+                'default'              => __( 'Apply', 'webba-booking-lite' ),
+                'not_translated_title' => 'Apply coupon button text',
+                'popup'                => __( 'Label for "Apply" coupon button', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3129,8 +3356,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Payment methods title', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Please tell us how you would like to pay', 'webba-booking-lite' ),
-                'popup'   => __( 'Label shown above the payment methods', 'webba-booking-lite' ),
+                'default'              => __( 'Please tell us how you would like to pay', 'webba-booking-lite' ),
+                'not_translated_title' => 'Payment methods title',
+                'popup'                => __( 'Label shown above the payment methods', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3140,8 +3368,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'PayPal payment redirect notice', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'You will be redirected to PayPal to approve the payment', 'webba-booking-lite' ),
-                'popup'   => __( 'Text shown when user selects PayPal payment method and will be redirected to PayPal to approve the payment.', 'webba-booking-lite' ),
+                'default'              => __( 'You will be redirected to PayPal to approve the payment', 'webba-booking-lite' ),
+                'not_translated_title' => 'PayPal payment redirect notice',
+                'popup'                => __( 'Text shown when user selects PayPal payment method and will be redirected to PayPal to approve the payment.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3151,8 +3380,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Label for available spots', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Available', 'webba-booking-lite' ),
-                'popup'   => __( 'Text shown on the group service time slots. For example "Available: 10".', 'webba-booking-lite' ),
+                'default'              => __( 'Available', 'webba-booking-lite' ),
+                'not_translated_title' => 'Label for available spots',
+                'popup'                => __( 'Text shown on the group service time slots. For example "Available: 10".', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3162,8 +3392,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Approve payment button text', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'approve payment', 'webba-booking-lite' ),
-                'popup'   => __( 'Label for payment approval button.', 'webba-booking-lite' ),
+                'default'              => __( 'approve payment', 'webba-booking-lite' ),
+                'not_translated_title' => 'Approve payment button text',
+                'popup'                => __( 'Label for payment approval button.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3173,8 +3404,9 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Label for multiple booking limits', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default' => __( 'Default value: #service_name: select from #min to #max time slots. Selected: #selected_count.', 'webba-booking-lite' ),
-                'popup'   => __( 'Show this label if service has multiple booking limits. Available paceholders: #min, #max, #service_name, #selected_count', 'webba-booking-lite' ),
+                'default'              => __( 'Default value: #service_name: select from #min to #max time slots. Selected: #selected_count.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Label for multiple booking limits',
+                'popup'                => __( 'Show this label if service has multiple booking limits. Available paceholders: #min, #max, #service_name, #selected_count', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3184,9 +3416,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Multiple seat selection mode', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'popup'   => __( 'Choose how many places customer can select in the group service booking.', 'webba-booking-lite' ),
-                'default' => 'normal',
-                'extra'   => [
+                'not_translated_title' => 'Multiple seat selection mode',
+                'popup'                => __( 'Choose how many places customer can select in the group service booking.', 'webba-booking-lite' ),
+                'default'              => 'normal',
+                'extra'                => [
                     'normal'            => __( 'Let users select count', 'webba-booking-lite' ),
                     'normal_no_default' => __( 'Let users select count (no default value)', 'webba-booking-lite' ),
                     '1'                 => __( 'Allow select only one place', 'webba-booking-lite' ),
@@ -3201,9 +3434,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Show who booked the time slot', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default'        => '',
-                'checkbox_value' => 'true',
-                'popup'          => __( 'If enabled, each time slot will display the names of users who have already booked that time slot. Applicable for group services.', 'webba-booking-lite' ),
+                'default'              => '',
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Show who booked the time slot',
+                'popup'                => __( 'If enabled, each time slot will display the names of users who have already booked that time slot. Applicable for group services.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3213,9 +3447,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Disable vertical scrolling in details step', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default'        => '',
-                'checkbox_value' => 'true',
-                'popup'          => __( 'If enabled, the scroll bar in the details step will be removed, and the form height will dynamically adjust based on the selected fields.', 'webba-booking-lite' ),
+                'default'              => '',
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Disable vertical scrolling in details step',
+                'popup'                => __( 'If enabled, the scroll bar in the details step will be removed, and the form height will dynamically adjust based on the selected fields.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3225,9 +3460,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Show local time by default', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default'        => '',
-                'checkbox_value' => 'true',
-                'popup'          => __( 'If enabled, the booking form will automatically default to the local time of the customer.', 'webba-booking-lite' ),
+                'default'              => '',
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Show local time by default',
+                'popup'                => __( 'If enabled, the booking form will automatically default to the local time of the customer.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -3237,9 +3473,10 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             __( 'Auto select nearest date', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default'        => '',
-                'checkbox_value' => 'true',
-                'popup'          => __( 'If enabled, today or the next available date will be chosen automatically.', 'webba-booking-lite' ),
+                'default'              => '',
+                'checkbox_value'       => 'true',
+                'not_translated_title' => 'Auto select nearest date',
+                'popup'                => __( 'If enabled, today or the next available date will be chosen automatically.', 'webba-booking-lite' ),
             ],
             'advanced'
         );

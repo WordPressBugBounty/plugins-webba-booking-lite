@@ -98,6 +98,7 @@ final class WBK_Options_Processor
             $args
         );
         register_setting($group, $slug, [$this, $validation_callback]);
+
     }
     public function validate_text($input)
     {
