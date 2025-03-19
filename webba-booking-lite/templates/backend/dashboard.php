@@ -3,7 +3,7 @@
 if (!defined('ABSPATH'))
     exit;
 
-function plugion_get_dashboard_conditions($condition)
+function wbkdata_get_dashboard_conditions($condition)
 {
     $start = strtotime("-1 days");
     $end = strtotime("now");
@@ -11,16 +11,15 @@ function plugion_get_dashboard_conditions($condition)
     return $condition;
 }
 
-remove_action('plugion_before_table', 'wbk_plugion_before_table');
+remove_action('wbkdata_before_table', 'wbk_wbkdata_before_table');
 
-add_action('plugion_before_table', 'wbk_plugion_dashboard_before_table', 10, 1);
-function wbk_plugion_dashboard_before_table($table_name)
+add_action('wbkdata_before_table', 'wbk_wbkdata_dashboard_before_table', 10, 1);
+function wbk_wbkdata_dashboard_before_table($table_name)
 {
     if (!is_wbk_table($table_name)) {
         return;
     } ?>
-    <div class="wbk_dashboard_bookings_table custom-table-wrapper-wb <?php echo $table_name; ?>-custom-table-wb"
-        custom-table-wrapper>
+    <div class="custom-table-wrapper-wb <?php echo $table_name; ?>-custom-table-wb" custom-table-wrapper>
         <div class="table-area-wb">
             <div class="block-heading-wb">
                 <h2 class="block-title-wb">
@@ -30,7 +29,7 @@ function wbk_plugion_dashboard_before_table($table_name)
                     <a href="#" class="past-bookings-link-wb">
                         <?php echo esc_html__('Show past bookings', 'webba-booking-lite'); ?>
                     </a>
-                    <button class="button-wbkb"><span class="text-wb">
+                    <button class="button-wb"><span class="text-wb">
                             <?php echo esc_html__('New booking', 'webba-booking-lite'); ?>
                         </span> <span class="plus-icon-wb"></span></button>
                 </div>
@@ -70,7 +69,7 @@ function wbk_plugion_dashboard_before_table($table_name)
                                 <a id="wbk_csv_export" class="export-link-wb" data-delimiter="<?php echo $delimiter; ?>">Export to
                                     CSV files <img src="<?php echo WP_WEBBA_BOOKING__PLUGIN_URL; ?>/public/images/export-arrow.png"
                                         alt="export"></a>
-                                <div class="plugion_loader plugion_loader_quad plugion_hidden" style="float:left;"></div>
+                                <div class="wbkdata_loader wbkdata_loader_quad wbkdata_hidden" style="float:left;"></div>
                                 <button id="wbk_start_export" class="hidden" type="button">Start export</button>
                             </div>
                         </div>
@@ -147,8 +146,8 @@ $table = $db_prefix . 'wbk_appointments';
                     </div><!-- /.dashboard-header-wb -->
 
                     <?php
-                    add_filter('plugion_get_rows_conditions', 'plugion_get_dashboard_conditions');
-                    Plugion()->table($table);
+                    add_filter('wbkdata_get_rows_conditions', 'wbkdata_get_dashboard_conditions');
+                    WbkData()->table($table);
                     ?>
 
                     <div class="bookings-table-area-wb table-area-wb wbk_hidden" data-empty-table>
@@ -177,7 +176,7 @@ $table = $db_prefix . 'wbk_appointments';
                                     <input name="appointment_day" data-formated-date=<?php echo esc_attr($formatted_last_30_days); ?>
                                         value="<?php echo esc_attr($formatted_last_30_days); ?>"
                                         data-dateformat="<?php echo esc_attr($date_format_js); ?>"
-                                        class="plugion_input_date_range_start plugion_input_text plugion_filter_daterange plugion_filter_input"
+                                        class="wbkdata_input_date_range_start wbkdata_input_text wbkdata_filter_daterange wbkdata_filter_input"
                                         placeholder="Start date">
                                 </div>
 
@@ -185,7 +184,7 @@ $table = $db_prefix . 'wbk_appointments';
                                     <input name="appointment_day" data-formated-date=<?php echo esc_attr($formatted_last_30_days); ?>
                                         value="<?php echo esc_attr($formatted_yesterday); ?>"
                                         data-dateformat="<?php echo esc_attr($date_format_js); ?>"
-                                        class="plugion_input_date_range_end plugion_input_text plugion_filter_daterange plugion_filter_input"
+                                        class="wbkdata_input_date_range_end wbkdata_input_text wbkdata_filter_daterange wbkdata_filter_input"
                                         placeholder="End date">
                                 </div>
 

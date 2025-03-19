@@ -249,7 +249,7 @@ class WBK_Model_Utils {
      */
     static function get_services_in_category( $category_id, $pair = false ) {
         global $wpdb;
-        $list = $wpdb->get_var( $wpdb->prepare( 'SELECT category_list FROM ' . get_option( 'wbk_db_prefix', '' ) . 'wbk_service_categories WHERE id = %d', $category_id ) );
+        $list = $wpdb->get_var( $wpdb->prepare( 'SELECT list FROM ' . get_option( 'wbk_db_prefix', '' ) . 'wbk_service_categories WHERE id = %d', $category_id ) );
         if ( $list == '' ) {
             return false;
         }
@@ -864,7 +864,7 @@ class WBK_Model_Utils {
         $result = [];
         foreach ( $categories as $key => $value ) {
             $category = new WBK_Service_Category($key);
-            $services = json_decode( $category->get( 'category_list' ) );
+            $services = json_decode( $category->get( 'list' ) );
             if ( is_array( $services ) && in_array( $service_id, $services ) ) {
                 $result[] = $value;
             }
@@ -1013,7 +1013,7 @@ class WBK_Model_Utils {
             $services_ids[] = $booking->get_service();
         }
         $db_prefix = get_option( 'wbk_db_prefix', '' );
-        $payment_methods_all = Plugion()->tables->get_element_at( $db_prefix . 'wbk_services' )->fields->get_element_at( 'service_payment_methods' )->get_extra_data()['items'];
+        $payment_methods_all = WbkData()->tables->get_element_at( $db_prefix . 'wbk_services' )->fields->get_element_at( 'service_payment_methods' )->get_extra_data()['items'];
         $payment_methods_allowed = [];
         foreach ( $payment_methods_all as $payment_method => $payment_method_name ) {
             $allowed = true;
@@ -1228,6 +1228,31 @@ class WBK_Model_Utils {
         $count_bookings = $wpdb->get_var( $wpdb->prepare( ' SELECT COUNT(*) FROM ' . get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments ' ) );
         $count_bookings += $wpdb->get_var( $wpdb->prepare( ' SELECT COUNT(*) FROM ' . get_option( 'wbk_db_prefix', '' ) . 'wbk_cancelled_appointments ' ) );
         return $count_bookings;
+    }
+
+    public static function get_cf7_forms() : array {
+        $args = [
+            'post_type'      => 'wpcf7_contact_form',
+            'posts_per_page' => -1,
+        ];
+        $forms = [];
+        if ( $cf7_forms = get_posts( $args ) ) {
+            foreach ( $cf7_forms as $cf7_form ) {
+                $form = new stdClass();
+                $form->name = $cf7_form->post_title;
+                $form->id = $cf7_form->ID;
+                $forms[$cf7_form->ID] = $cf7_form->post_title;
+            }
+        }
+        return $forms;
+    }
+
+    static function extract_bh_availability_from_v4( $json_string ) {
+        $data = json_decode( $json_string, true );
+        if ( isset( $data['dow_availability'] ) ) {
+            return json_encode( $data['dow_availability'] );
+        }
+        return $json_string;
     }
 
 }

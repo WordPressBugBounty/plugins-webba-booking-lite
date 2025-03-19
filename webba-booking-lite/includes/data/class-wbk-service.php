@@ -81,10 +81,10 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_business_hours()
     {
-        if (!isset($this->fields['business_hours_v4'])) {
+        if (!isset($this->fields['business_hours'])) {
             return null;
         }
-        return $this->fields['business_hours_v4'];
+        return $this->fields['business_hours'];
     }
 
     /**

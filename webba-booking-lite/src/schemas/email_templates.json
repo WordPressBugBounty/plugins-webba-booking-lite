@@ -6,13 +6,29 @@
             "type": "string",
             "input_type": "text",
             "hidden": false,
-            "title": "Name"
+            "title": "Name",
+            "tab": "",
+            "misc": {
+                "tooltip": "Enter a name to identify the email template."
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         },
         "template": {
             "type": "string",
             "input_type": "editor",
             "hidden": true,
-            "title": "Template"
+            "title": "Template",
+            "tab": "",
+            "misc": {
+                "tooltip": "Use the text editor to prepare the email template. <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/placeholders/\">List of available placeholders</a>"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         }
     }
 }

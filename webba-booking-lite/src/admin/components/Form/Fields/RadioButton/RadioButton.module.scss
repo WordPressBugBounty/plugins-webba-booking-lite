@@ -1,0 +1,27 @@
+.buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+
+    .item {
+        display: block;
+        border: 1px solid #8a9393;
+        border-radius: 16px;
+        line-height: 1;
+        padding: 16px 10px 16px 10px;
+        cursor: pointer;
+        transition: 0.2s;
+        text-align: center;
+        transition: 0.2s all ease-in-out;
+        font-size: 16px;
+
+        &.checked {
+            background: #1f6763;
+            border-color: #1f6763;
+            color: #fff;
+        }
+    }
+}

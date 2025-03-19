@@ -1,0 +1,42 @@
+.message {
+    &.failed {
+        .title {
+            color: #fc2525;
+        }
+    }
+
+    &.success {
+        .title {
+            color: #7dc677;
+        }
+    }
+
+    .title {
+        font-size: 16px;
+        line-height: 1.1;
+        margin-bottom: 10px;
+        display: flex;
+        gap: 5px;
+    }
+
+    .subtitle {
+        font-size: 13px;
+        line-height: 1;
+        text-align: left;
+        margin-top: 10px;
+    }
+}
+
+.wrapper {
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.icon {
+    max-width: 16px;
+    width: 16px;
+    height: 16px;
+    max-height: 16px;
+    object-fit: contain;
+}

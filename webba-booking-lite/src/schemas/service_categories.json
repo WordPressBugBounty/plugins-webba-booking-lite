@@ -6,13 +6,31 @@
             "type": "string",
             "input_type": "text",
             "hidden": false,
-            "title": "Category name"
+            "title": "Category name",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Enter category name."
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         },
-        "category_list": {
+        "list": {
             "type": "string",
             "input_type": "select",
             "hidden": false,
-            "title": "Services"
+            "title": "Services",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Select the services to be included in this category.",
+                "options": "services",
+                "multiple": true
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
         }
     }
 }

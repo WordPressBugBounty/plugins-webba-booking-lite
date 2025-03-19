@@ -99,10 +99,11 @@ class WBK_Wizard
         $service->set('email', get_option('admin_email', ''));
         $service->set('priority', '0');
         $service->set('form', '0');
-        $dow_availability = '{"dow_availability":[ ' . implode(',', $dows_result) . ']}';
+        $dow_availability = '[ ' . implode(',', $dows_result) . ']';
 
 
-        $service->set('business_hours_v4', $dow_availability);
+
+        $service->set('business_hours', $dow_availability);
         $service->set('min_quantity', '1');
         $service->set('quantity', $quantity);
         $service->set('prepare_time', '0');

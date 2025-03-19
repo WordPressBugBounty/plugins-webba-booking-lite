@@ -1,0 +1,55 @@
+.selectField {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    gap: 3px;
+    z-index: 99999;
+
+    &:active,
+    &:focus,
+    &:focus-within,
+    &:focus-visible {
+        z-index: 9999999 !important;
+    }
+}
+
+.selectField.invalid {
+    color: red;
+}
+
+.selectField.invalid .selectInput {
+    border-color: red;
+}
+
+.errorContainer {
+    display: absolute;
+    color: red;
+    bottom: -18px;
+}
+
+.selectInput {
+    border-radius: 15px;
+    border: 1px solid #8a9393;
+    height: 50px;
+    font-family: poppins, arial;
+    font-size: 16px;
+    color: #333333;
+    width: 100%;
+    max-width: 100%;
+
+    &.preventOverlap {
+        height: auto;
+    }
+
+    :global(.css-1u9des2-indicatorSeparator) {
+        display: none;
+    }
+
+    :global(.css-tj5bde-Svg) {
+        fill: #333333;
+    }
+
+    :global(.css-1jqq78o-placeholder) {
+        color: #333333;
+    }
+}

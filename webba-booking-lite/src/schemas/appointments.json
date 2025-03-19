@@ -6,67 +6,173 @@
             "type": "string",
             "input_type": "text",
             "hidden": false,
-            "title": "Customer"
+            "title": "Customer",
+            "tab": "",
+            "misc": {
+                "tooltip": "Enter the name of the customer."
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         },
         "appointment_service_id": {
             "type": "string",
             "input_type": "select",
             "hidden": false,
-            "title": "Service"
+            "title": "Service",
+            "tab": "",
+            "misc": {
+                "tooltip": "Select the service for which the booking is being made.",
+                "options": "services",
+                "sub_type": "positive_integer"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
         },
         "appointment_day": {
             "type": "string",
             "input_type": "date",
             "hidden": true,
-            "title": "Date"
+            "title": "Date",
+            "tab": "",
+            "misc": {
+                "tooltip": "Select the booking date.",
+                "date_format": "M d, Y",
+                "time_zone": "America/Phoenix"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         },
         "appointment_time": {
             "type": "string",
-            "input_type": "time",
+            "input_type": "select",
             "hidden": true,
-            "title": "Time"
+            "title": "Time",
+            "tab": "",
+            "misc": {
+                "tooltip": "Select the booking time.",
+                "time_format": "H:i",
+                "options": "backend"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         },
         "appointment_quantity": {
             "type": "string",
             "input_type": "select",
             "hidden": true,
-            "title": "Places booked"
+            "title": "Places booked",
+            "tab": "",
+            "misc": {
+                "tooltip": "Specify the number of places being booked for this appointment.",
+                "sub_type": "positive_integer",
+                "options": "backend"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
         },
         "appointment_email": {
             "type": "string",
             "input_type": "text",
             "hidden": true,
-            "title": "Email"
+            "title": "Email",
+            "tab": "",
+            "misc": {
+                "tooltip": "Enter the customer's email address.",
+                "sub_type": "email"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         },
         "appointment_phone": {
             "type": "string",
             "input_type": "text",
             "hidden": false,
-            "title": "Phone"
+            "title": "Phone",
+            "tab": "",
+            "misc": {
+                "tooltip": "Enter the customer's phone number."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         },
         "appointment_description": {
             "type": "string",
             "input_type": "textarea",
             "hidden": true,
-            "title": "Comment"
+            "title": "Comment",
+            "tab": "",
+            "misc": {
+                "tooltip": "Add any additional comments related to the booking."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         },
         "appointment_extra": {
             "type": "string",
             "input_type": "webba_custom_data",
             "hidden": true,
-            "title": "Custom fields"
+            "title": "Custom fields",
+            "tab": "",
+            "misc": null,
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         },
         "appointment_moment_price": {
             "type": "string",
             "input_type": "text",
-            "hidden": false,
-            "title": "Payment"
+            "hidden": true,
+            "title": "Payment",
+            "tab": "",
+            "misc": {
+                "tooltip": "If the payment has already been made, enter the payment amount paid for 1 person.",
+                "sub_type": "none_negative_float"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         },
         "appointment_status": {
             "type": "string",
             "input_type": "select",
             "hidden": false,
-            "title": "Status"
+            "title": "Status",
+            "tab": "",
+            "misc": {
+                "tooltip": "Choose the appropriate booking status from the options available.",
+                "options": {
+                    "pending": "Awaiting approval",
+                    "approved": "Approved",
+                    "paid": "Paid (awaiting approval)",
+                    "paid_approved": "Paid (approved)",
+                    "arrived": "Arrived",
+                    "woocommerce": "Managed by WooCommerce",
+                    "added_by_admin_not_paid": "Added by the administrator (not paid)",
+                    "added_by_admin_paid": "Added by the administrator (paid)"
+                }
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "pending",
+            "editable": true
         }
     }
 }

@@ -18,7 +18,7 @@ $descriptions = array(
     'woocommerce' => '',
 );
 
-$payment_methods_all = Plugion()->tables->get_element_at(get_option('wbk_db_prefix', '') . 'wbk_services')->fields->get_element_at('service_payment_methods')->get_extra_data()['items'];
+$payment_methods_all = WbkData()->models->get_element_at(get_option('wbk_db_prefix', '') . 'wbk_services')->fields->get_element_at('service_payment_methods')->get_extra_data()['items'];
 $payment_methods_html = '';
 
 ?>

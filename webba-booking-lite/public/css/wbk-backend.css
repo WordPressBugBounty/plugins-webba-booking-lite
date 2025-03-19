@@ -1643,13 +1643,13 @@ min-height: 32px;
     margin-top: 15px;
 }
 
-.plugion_input_container .ui-slider-horizontal {
+.wbkdata_input_container .ui-slider-horizontal {
     box-shadow: none;
     border-radius: 0;
 
 }
 
-.plugion_input_container .ui-slider-handle{
+.wbkdata_input_container .ui-slider-handle{
     border-radius: 0;
     -webkit-box-shadow: none;
     box-shadow: none;
@@ -1659,14 +1659,14 @@ min-height: 32px;
     background-color: #ddd !important;
 }
 
-.plugion_input_container .ui-slider-range{
+.wbkdata_input_container .ui-slider-range{
     top: 0 !important;
     background: #002838 !important;
     border: none !important;
     box-shadow: none !important;
 }
 
-.plugion_input_container .ui-slider-handle:after{
+.wbkdata_input_container .ui-slider-handle:after{
     display: none;
 }
 

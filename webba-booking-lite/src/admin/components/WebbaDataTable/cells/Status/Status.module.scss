@@ -1,0 +1,112 @@
+$status-colors: (
+    'pending': #ff7e07,
+    'approved': #0eb500,
+    'paid': #ff7e07,
+    'paid_approved': #0eb500,
+    'woocommerce': #ff7e07,
+    'added_by_admin_not_paid': #ff7e07,
+    'added_by_admin_paid': #0eb500,
+    'arrived': #0eb500,
+    'cancelled': #fe0606,
+    'rejected': #fe0606,
+);
+
+.statusWrapper {
+    position: relative;
+
+    .status {
+        display: flex;
+        flex-flow: row;
+        padding: 4px 8px;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 5px;
+        cursor: pointer;
+        height: 34px;
+        width: 200px;
+        border-radius: 8px;
+        transition: 0.2s background-color ease-in-out;
+
+        .arrow {
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        .statusText {
+            margin: 0;
+            font-size: 16px;
+            max-width: 100%;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            text-align: left;
+        }
+
+        &:global(::after) {
+            content: '';
+            width: 5px;
+            height: 5px;
+            min-width: 5px;
+            min-height: 5px;
+            border-bottom: 1.5px solid #212121;
+            border-right: 1.5px solid #212121;
+            transform: rotate(45deg);
+            top: 12px;
+            right: 12px;
+            margin-left: auto;
+            margin-right: 0;
+        }
+    }
+
+    .optionsWrapper {
+        display: none;
+        flex-flow: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        position: absolute;
+        background-color: #fff;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 99;
+        box-shadow: 0 0 10px rgba(161, 164, 182, 0.3);
+        border-radius: 15px;
+        overflow: hidden;
+        max-height: 200px;
+        overflow: auto;
+        margin-top: 0;
+
+        &.open {
+            display: flex;
+        }
+
+        .optionItem {
+            padding: 5px 20px 5px 20px;
+            cursor: pointer;
+            color: #212121;
+            text-align: left;
+            line-height: 24px;
+            width: 100%;
+            transition: 0.2s all ease-in-out;
+
+            &:hover {
+                background-color: #cbe7e7;
+            }
+        }
+    }
+}
+
+@each $status, $color in $status-colors {
+    .status.#{$status} {
+        background-color: rgba($color, 20%);
+
+        &::after {
+            border-bottom: 1.5px solid $color;
+            border-right: 1.5px solid $color;
+        }
+
+        .statusText {
+            color: $color;
+        }
+    }
+}

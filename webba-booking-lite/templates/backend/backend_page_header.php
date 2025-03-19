@@ -30,17 +30,6 @@ if (isset($data[2])) {
         }
         ?>
     </div>
-    <nav class="main-menu-wb">
-        <a
-            href="<?php echo get_admin_url(); ?>admin.php?page=wbk-dashboard"><?php echo esc_html__('Dashboard', 'webba-booking-lite'); ?></a>
-        <a
-            href="<?php echo get_admin_url(); ?>admin.php?page=wbk-appointments"><?php echo esc_html__('Bookings', 'webba-booking-lite'); ?></a>
-        <a
-            href="<?php echo get_admin_url(); ?>admin.php?page=wbk-services"><?php echo esc_html__('Services', 'webba-booking-lite'); ?></a>
-        <a
-            href="<?php echo get_admin_url(); ?>admin.php?page=wbk-schedule"><?php echo esc_html__('Calendar', 'webba-booking-lite'); ?></a>
-        <a
-            href="<?php echo get_admin_url(); ?>admin.php?page=wbk-options"><?php echo esc_html__('Settings', 'webba-booking-lite'); ?></a>
-    </nav>
+
 
 </div>

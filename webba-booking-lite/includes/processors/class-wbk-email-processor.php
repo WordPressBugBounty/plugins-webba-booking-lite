@@ -156,7 +156,7 @@ class WBK_Email_Processor {
                         $notification['subject'],
                         $notification['message'],
                         $headers,
-                        $attachment
+                        $attachments
                     );
                 } else {
                     wp_mail(

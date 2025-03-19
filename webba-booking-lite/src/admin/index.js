@@ -1,18 +1,15 @@
 const { render } = wp.element
 import { StrictMode } from 'react'
-import App from './App'
-import { SidebarProvider } from './components/Sidebar/SidebarContext'
-import { Sidebar } from './components/Sidebar/Sidebar'
+import { App } from './App'
+import './App.scss'
+import '../assets/frontend.scss'
 
 const container = document.getElementById('wbk_spa_dashboard')
 
 if (container) {
     render(
         <StrictMode>
-            <SidebarProvider>
-                <App />
-                <Sidebar />
-            </SidebarProvider>
+            <App />
         </StrictMode>,
         container
     )

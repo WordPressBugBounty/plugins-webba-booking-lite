@@ -3,8 +3,8 @@ Contributors: Webba agency, freemius
 Donate link: https://webba-booking.com/
 Tags: appointment booking, appointment, booking, scheduling, booking system
 Requires at least: 5.6
-Tested up to: 6.7.1
-Stable tag: 5.0.58
+Tested up to: 6.7.2
+Stable tag: 5.1.8
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -169,35 +169,54 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  
 
 == Changelog ==
+ 
+5.1.8
+
+19/03/2025
+
+- Backend interface updated
+ 
+5.0.62
+
+30/01/2025
+
+- Maintenance update
+- Bug fix: bug with the users dashboard
+
+5.0.59
+
+27/01/2025
+
+- Bug fix: resolved an issue with the message displayed after PayPal payment
 
 5.0.58
 
 26/01/2025
 
-Bugfix: bug with email notifications for bookings scheduled far in advance
-Bugfix: bug with permissions for resending emails
+- Bug fix: bug with email notifications for bookings scheduled far in advance
+- Bug fix: bug with permissions for resending emails
 
 5.0.57
 
 15/01/2025
 
-Maintenance update
+- Maintenance update
 
 5.0.56
 
 28/12/2024
 
-Improvements: Users dashboard - allow users to manage, cancel, reschedule their bookings
-Improvements: iframes in the messages to embed videos
-Bugfix: bug with Schedule tools
+- Improvements: Users dashboard - allow users to manage, cancel, reschedule their bookings
+- Improvements: iframes in the messages to embed videos
+- Bug fix: bug with Schedule tools
 
 5.0.53
 
 20/11/2024
 
-- Bugfix: issue with the horizontal calendar when selecting multiple days.
-- Bugfix: bug with proper language detection in certain types of notifications..
-- Bugfix: consecutive bookings are not functioning on single-service forms.
+- Bug fix: issue with the horizontal calendar when selecting multiple days.
+- Bug fix: bug with proper language detection in certain types of notifications..
+- Bug fix: consecutive bookings are not functioning on single-service forms.
 - Improvements: Bookings page layout improved.
 - Improvements: option to (re)send email notifications manually.
 - Improvements: block WooCommerce order creation if the booking has been automatically cancelled..
@@ -206,23 +225,23 @@ Bugfix: bug with Schedule tools
 
 16/10/2024
 
-- Bugfix: minor bugfix.
+- Bug fix: minor Bug fix.
 - SDK update.
 
 5.0.51
 
 18/09/2024
 
-- Bugfix: minor bugfix.
+- Bug fix: minor Bug fix.
 
 5.0.50
 
 16/09/2024
 
 - Improvements: compatibility issue has been resolved.
-- Bugfix: resolved an issue with the message displayed when a user cancels a PayPal payment.
-- Bugfix: resolved issues where certain strings were not translatable.
-- Bugfix: resolved an issue with the title display in the mobile layout.
+- Bug fix: resolved an issue with the message displayed when a user cancels a PayPal payment.
+- Bug fix: resolved issues where certain strings were not translatable.
+- Bug fix: resolved an issue with the title display in the mobile layout.
 
 5.0.48
 
@@ -230,21 +249,21 @@ Bugfix: bug with Schedule tools
 
 - Improvements: added a customizable 'read more' label.
 - Improvements: improved message template sanitization to allow more flexible layout customizations.
-- Bugfix: fixed the start of the week in the weekly calendar.
-- Bugfix: addressed minor issues with translations.
-- Bugfix: bug with the local time when date is selected in the horizontal calendar.
+- Bug fix: fixed the start of the week in the weekly calendar.
+- Bug fix: addressed minor issues with translations.
+- Bug fix: bug with the local time when date is selected in the horizontal calendar.
 
 5.0.47
 
 17/07/2024
 
-* Bugfix: bug with updatting on certain configurations
+* Bug fix: bug with updatting on certain configurations
 
 5.0.46
 
 16/07/2024
 
-* Bugfix: bug with not availabile time slots on certain configurations
+* Bug fix: bug with not availabile time slots on certain configurations
 
 5.0.45
 
@@ -252,19 +271,19 @@ Bugfix: bug with Schedule tools
 
 * Improvements: improved integration with WooCommerce
 * Improvements: consecutive timeslots
-* Bugfix: adjustments for PHP 8.2 compatibility
+* Bug fix: adjustments for PHP 8.2 compatibility
  
 5.0.44
 
 13/06/2024
 
-* Bugfix: issue with the creation or editing of services on specific configurations
+* Bug fix: issue with the creation or editing of services on specific configurations
 
 5.0.43
 
 10/06/2024
 
-* Bugfix: bug with time slots selection on certain configurations
+* Bug fix: bug with time slots selection on certain configurations
 
 5.0.42
 
@@ -277,8 +296,8 @@ Bugfix: bug with Schedule tools
 * Improvements: horizontal calendar UI improved
 * Improvements: showing phone numbers on the Bookings page
 * Improvements: customizable message when booking is paid with coupon
-* Bugfix: bug with the email sent to team members
-* Bugfix: bug with apostrophe in the 'From: email' option
+* Bug fix: bug with the email sent to team members
+* Bug fix: bug with apostrophe in the 'From: email' option
 
 5.0.40
 
@@ -287,15 +306,15 @@ Bugfix: bug with Schedule tools
 * Improvements: Gutenberg block
 * Improvements: option to set booking status in the admin multiple booking interface
 * Improvements: option to show name of customer on the single service time slot
-* Bugfix: bug with the booking duplication
-* Bugfix: bug with the date format in the 'Date range' option of the service
-* Bugfix: bug with WooCommerce integration on creation configurations
+* Bug fix: bug with the booking duplication
+* Bug fix: bug with the date format in the 'Date range' option of the service
+* Bug fix: bug with WooCommerce integration on creation configurations
 
 5.0.38
 
 02/04/2024
 
-* Bugfix: bugs with the dashboard calendar translation
+* Bug fix: bugs with the dashboard calendar translation
 
 5.0.37
 
@@ -306,9 +325,9 @@ Bugfix: bug with Schedule tools
 * Improvements: option of service emails copies improved
 * Improvements: showing booking on the Schedule tools weekly calendar
 * Improvements: custom email template for arrival notifications
-* Bugfix: bug with subjects of certain notifications
-* Bugfix: error message when booking duplicated
-* Bugfix: bugs with dashboard calendar translation
+* Bug fix: bug with subjects of certain notifications
+* Bug fix: error message when booking duplicated
+* Bug fix: bugs with dashboard calendar translation
 
 5.0.35
 
@@ -324,13 +343,13 @@ Bugfix: bug with Schedule tools
 
 07/02/2024
 
-* Bugfix: bug with the user roles on certain configurations
+* Bug fix: bug with the user roles on certain configurations
 
 5.0.32
 
 03/02/2024
 
-* Bugfix: conflict with certain cache plugins
+* Bug fix: conflict with certain cache plugins
 
 5.0.31
 
@@ -341,23 +360,23 @@ Bugfix: bug with Schedule tools
 * Improvements: option to allow non-admin users edit service properties
 * Improvements: option to show local or server time by default 
 * Improvements: option to define booking details shown in the admin's Calendar
-* Bugfix: bug with validation of mandatory select field
-* Bugfix: bug with showing descriptions on certain configurations
-* Bugfix: bug with mobile layout of Schedule tools
-* Bugfix: bug with creation of pricing rules on certain configurations 
-* Bugfix: admin calendar did not use the general 'Week Starts On' WordPress option
+* Bug fix: bug with validation of mandatory select field
+* Bug fix: bug with showing descriptions on certain configurations
+* Bug fix: bug with mobile layout of Schedule tools
+* Bug fix: bug with creation of pricing rules on certain configurations 
+* Bug fix: admin calendar did not use the general 'Week Starts On' WordPress option
 
 5.0.30
 
 05/01/2024
 
-* Bugfix: bug with email notifications sent on payment
+* Bug fix: bug with email notifications sent on payment
 
 5.0.29
 
 02/01/2024
 
-* Bugfix: bug with searching time on PHP 8.2
+* Bug fix: bug with searching time on PHP 8.2
 
 5.0.28
 
@@ -366,8 +385,8 @@ Bugfix: bug with Schedule tools
 * Improvements: French translation improved
 * Improvements: option 'Automatically proceed to the next step' when time slot is selected
 * Improvements: local hours are shown by default
-* Bugfix: bug with validation of file field and minimal and maximum length 
-* Bugfix: bug with the option 'Actions to complete the payment'
+* Bug fix: bug with validation of file field and minimal and maximum length 
+* Bug fix: bug with the option 'Actions to complete the payment'
 
 5.0.26
 
@@ -383,9 +402,9 @@ Bugfix: bug with Schedule tools
 30/11/2023
 
 * Improvements: mobile layout improved
-* Bugfix: bug with service descriptions on certain configurations
-* Bugfix: bug with custom fields encoding
-* Bugfix: bug with the order of services inside category
+* Bug fix: bug with service descriptions on certain configurations
+* Bug fix: bug with custom fields encoding
+* Bug fix: bug with the order of services inside category
  
 
 5.0.23
@@ -396,7 +415,7 @@ Bugfix: bug with Schedule tools
 * Improvements: service descriptions in the booking form
 * Improvements: option to set up translation of the cancellation form title  
 * Improvements: #total_amount placeholder in the Booking form label option
-* Bugfix: wrong message when booking can't be canceled due to buffer
+* Bug fix: wrong message when booking can't be canceled due to buffer
    
 5.0.22
 
@@ -405,8 +424,8 @@ Bugfix: bug with Schedule tools
 * Improvements: conditional fields in custom forms
 * Improvements: choose payment method by default for 'Pay on arrival' payment method
 * Improvements: Back and Next buttons translatable in the Wording / Translation settings
-* Bugfix: issues with special characters in the CSV export
-* Bugfix: issues with email template styling (on saving)
+* Bug fix: issues with special characters in the CSV export
+* Bug fix: issues with email template styling (on saving)
 
 5.0.21
 
@@ -419,33 +438,33 @@ Bugfix: bug with Schedule tools
 
 21/10/2023
 
-* Bugfix: minor bugfix
+* Bug fix: minor Bug fix
 
 5.0.17
 
 20/10/2023
 
 * Improvements: translation improvements
-* Bugfix: minor bugfix
+* Bug fix: minor Bug fix
 
 5.0.16
 
 12/10/2023
 
-* Bugfix: minor bugfix
+* Bug fix: minor Bug fix
 
 5.0.15
 
 09/10/2023
 
 * Improvements: minor improvements
-* Bugfix: minor bugfix
+* Bug fix: minor Bug fix
 
 5.0.14
 
 05/10/2023
 
-* Bugfix: minor bugfix
+* Bug fix: minor Bug fix
 
 5.0.11
 
@@ -464,13 +483,13 @@ Bugfix: bug with Schedule tools
 21/09/2023
 
 * Improvement: minor style improvements
-* Bugfix: minor bugfix
+* Bug fix: minor Bug fix
 
 5.0.5
 
 19/09/2023
 
-* Bugfix: bugs with the multiple service selection
+* Bug fix: bugs with the multiple service selection
 
 5.0.4
 
@@ -480,27 +499,27 @@ Bugfix: bug with Schedule tools
 * Improvement: payment icon updated
 * Improvement: minor style improvements
 * Improvement: option to set British date format in the backend
-* Bugfix: with the option 'Week starts'
-* Bugfix: with todays bookings on the Bookings page
-* Bugfix: wrong time on invoices
-* Bugfix: bug with the comment field
-* Bugfix: bug with the import to CSV
-* Bugfix: bugs on the calendar page
+* Bug fix: with the option 'Week starts'
+* Bug fix: with todays bookings on the Bookings page
+* Bug fix: wrong time on invoices
+* Bug fix: bug with the comment field
+* Bug fix: bug with the import to CSV
+* Bug fix: bugs on the calendar page
 
 5.0.3
 
 16/09/2023
 
-* Bugfix: bugs on the calendar page
-* Bugfix: bugs with the checkbox fields
-* Bugfix: bugs with the checkbox fields
-* Bugfix: other minor bug fixes
+* Bug fix: bugs on the calendar page
+* Bug fix: bugs with the checkbox fields
+* Bug fix: bugs with the checkbox fields
+* Bug fix: other minor bug fixes
 
 5.0.2
 
 14/09/2023
 
-* Bugfix: minor bug fix 
+* Bug fix: minor bug fix 
 
 5.0
 
@@ -512,21 +531,21 @@ BIG UPDATE: IMPORTANT - changed everything
 
 01/09/2023
 
-* Bugfix: minor bug fixes
+* Bug fix: minor bug fixes
 * Maintenance update
 
 4.5.31
 
 05/07/2023
 
-* Bugfix: minor bug fixes
+* Bug fix: minor bug fixes
 
 4.5.28
 
 03/06/2023
 
-* Bugfix: bug with the cancellation link on certain configurations
-* Bugfix: bug with time extended mode in certain configurations
+* Bug fix: bug with the cancellation link on certain configurations
+* Bug fix: bug with time extended mode in certain configurations
 
 
 4.5.27
@@ -540,7 +559,7 @@ BIG UPDATE: IMPORTANT - changed everything
 
 09/06/2023
 
-* Bugfix: bug with payments on certain configuration
+* Bug fix: bug with payments on certain configuration
 
 
 4.5.25
@@ -550,29 +569,29 @@ BIG UPDATE: IMPORTANT - changed everything
 * Security: option to set security level for troubleshooting cache problems
 * Improvement: automatically show popup calendar
 * Improvement: availability to set pricing rules with zero amount
-* Bugfix: bug with export to CSV on certain configurations
-* Bugfix: bug with cancellation notifications
+* Bug fix: bug with export to CSV on certain configurations
+* Bug fix: bug with cancellation notifications
 
 
 4.5.24
 
 06/06/2023
 
-* Bugfix: bug in extended mode on certain configurations
+* Bug fix: bug in extended mode on certain configurations
 
 
 4.5.23
 
 01/06/2023
 
-* Bugfix: bug with locked dates on certain configurations
+* Bug fix: bug with locked dates on certain configurations
 
 
 4.5.22
 
 28/05/2023
 
-* Bugfix: bug with the option 'Allow to book the ongoing timeslot'
+* Bug fix: bug with the option 'Allow to book the ongoing timeslot'
 
 
 4.5.21
@@ -580,15 +599,15 @@ BIG UPDATE: IMPORTANT - changed everything
 24/05/2023
 
 * Security update
-* Bugfix: bug with end time of Gooogle calendar event 
-* Bugfix: bug approval notification on certain configurations
-* Bugfix: bug in extended mode on certain configurations
+* Bug fix: bug with end time of Gooogle calendar event 
+* Bug fix: bug approval notification on certain configurations
+* Bug fix: bug in extended mode on certain configurations
 
 4.5.19
 
 19/05/2023
 
-* Bugfix: bug with autlock on certain configurations
+* Bug fix: bug with autlock on certain configurations
 
 
 4.5.18
@@ -597,8 +616,8 @@ BIG UPDATE: IMPORTANT - changed everything
 
 * Improvement: separate message template for automatic cancellation
 * Improvement: custom templates for approval Notifications
-* Bugfix: bugs on the schedule page when time slots unlocked manually
-* Bugfix: narrow timeslots on certain configurations
+* Bug fix: bugs on the schedule page when time slots unlocked manually
+* Bug fix: narrow timeslots on certain configurations
 
 4.5.17
 
@@ -606,28 +625,28 @@ BIG UPDATE: IMPORTANT - changed everything
 
 * Improvement: adding multiple time slots from the backend
 * Improvement: #username placeholder for a single place services
-* Bugfix: bug with redirect after payment on certain configurations
-* Bugfix: bug with custom fields on the schedule page
-* Bugfix: doubled booked time slots
-* Bugfix: issue with iCal in the free version
-* Bugfix: bug with payment methods in the free version
-* Bugfix: bug with disabling dates in the calendar on certain configurations 
-* Bugfix: bug with the timezone after cancellation of booking on the Schedule page
+* Bug fix: bug with redirect after payment on certain configurations
+* Bug fix: bug with custom fields on the schedule page
+* Bug fix: doubled booked time slots
+* Bug fix: issue with iCal in the free version
+* Bug fix: bug with payment methods in the free version
+* Bug fix: bug with disabling dates in the calendar on certain configurations 
+* Bug fix: bug with the timezone after cancellation of booking on the Schedule page
 
 4.5.16
 
 13/04/2023
 
-* Bugfix: critical bug fix in the free version
+* Bug fix: critical bug fix in the free version
 
 4.5.15
 
 11/03/2023
 
-* Bugfix: bug with redirect when payment is made using coupon
-* Bugfix: bug with DST on certain configurations
-* Bugfix: bug with showing booked time slots on certain configurations
-* Bugfix: bug on the Schedule page 
+* Bug fix: bug with redirect when payment is made using coupon
+* Bug fix: bug with DST on certain configurations
+* Bug fix: bug with showing booked time slots on certain configurations
+* Bug fix: bug on the Schedule page 
 
 4.5.12
 
@@ -636,81 +655,81 @@ BIG UPDATE: IMPORTANT - changed everything
 * Improvements: performance improvements
 * Improvements: integration with WooCommerce improved
 * Improvements: option to set service dropdown placeholder
-* Bugfix: bug with booking form submition on certain configurations
-* Bugfix: bug with expiration time on certain configurations
+* Bug fix: bug with booking form submition on certain configurations
+* Bug fix: bug with expiration time on certain configurations
 
 4.5.11
 
 08/03/2023
 
-* Bugfix: bug with the locked dates
+* Bug fix: bug with the locked dates
 
 4.5.10
 
 18/02/2023
 
-* Bugfix: bug dashboard on certain configurations
+* Bug fix: bug dashboard on certain configurations
 
 4.5.9
 
 17/02/2023
 
-* Bugfix: bug with the option 'Show booked timeslots'
-* Bugfix: bug with the message when there is no time slots found
+* Bug fix: bug with the option 'Show booked timeslots'
+* Bug fix: bug with the message when there is no time slots found
 * Improvements: performance improvements
  
 4.5.8
 
 07/02/2023
 
-* Bugfix: bug with the option 'Set status after booking is paid with Stripe to'
-* Bugfix: bug with service description on certain configurations
+* Bug fix: bug with the option 'Set status after booking is paid with Stripe to'
+* Bug fix: bug with service description on certain configurations
 
 4.5.7
 
 02/02/23
 
-* Bugfix: Bug with the option 'Default number of days shown in extended mode' 
-* Bugfix: Bug with the phone formatting on the Schedule page
-* Bugfix: Bug with the option 'Prefill fields in WooCommerce checkout with the data used in the booking form'
-* Bugfix: Bug with adding events to Google calendar when bookings are added in the dashboard
+* Bug fix: Bug with the option 'Default number of days shown in extended mode' 
+* Bug fix: Bug with the phone formatting on the Schedule page
+* Bug fix: Bug with the option 'Prefill fields in WooCommerce checkout with the data used in the booking form'
+* Bug fix: Bug with adding events to Google calendar when bookings are added in the dashboard
 
 4.5.6
 
 28/01/2023
 
-* Bugfix: bug with availability calculation on certain configurations
+* Bug fix: bug with availability calculation on certain configurations
 
 4.5.5
 
 26/01/2023
 
-* Bugfix: bug with autolock on certain configurations
-* Bugfix: bug with the option 'Week starts on'
+* Bug fix: bug with autolock on certain configurations
+* Bug fix: bug with the option 'Week starts on'
 
 4.5.4
 
 15/01/2023
 
-* Bugfix: minor bugfix
+* Bug fix: minor Bug fix
 
 4.5.3
 
 10/01/2023
 
-* Bugfix: minor bugfix
+* Bug fix: minor Bug fix
 
 4.5.2
 
 09/01/2023
 
-* Bugfix: minor bugfix
+* Bug fix: minor Bug fix
 
 4.5.1
 
 09/01/2023
 
-* Bugfix: bug with the export to CSV
+* Bug fix: bug with the export to CSV
 
 4.5.0
 
@@ -722,27 +741,27 @@ BIG UPDATE: IMPORTANT - changed everything
 
 12/12/2022
 
-* Bugfix: rolling back to previous version due to certain amount of bugs
+* Bug fix: rolling back to previous version due to certain amount of bugs
 
 4.4.6
 
 12/12/2022
 
-* Bugfix: bug with multiple mode on certain configurations
-* Bugfix: bug on the Schedule page when non-admin user is logged
-* Bugfix: bug with updating bookings made in 'night hours mode'
+* Bug fix: bug with multiple mode on certain configurations
+* Bug fix: bug on the Schedule page when non-admin user is logged
+* Bug fix: bug with updating bookings made in 'night hours mode'
 
 4.4.5
 
 11/12/2022
 
-* Bugfix: bug with the night hours option
-* Bugfix: bug with category shortcode
-* Bugfix: bug with the placeholder in the thank you message
+* Bug fix: bug with the night hours option
+* Bug fix: bug with category shortcode
+* Bug fix: bug with the placeholder in the thank you message
 
 4.4.3
 
 10/12/2022
 
-* Bugfix: bug with the Stripe payments
+* Bug fix: bug with the Stripe payments
 

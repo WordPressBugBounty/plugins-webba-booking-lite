@@ -37,7 +37,7 @@ class WBK_Ical
                 $description = str_replace('{n}', "\n", $description);
             }
             $title = WBK_Placeholder_Processor::process_placeholders($title, $booking_id);
-            $description = WBK_Placeholder_Processor::process_placeholders($title, $booking_id);
+            $description = WBK_Placeholder_Processor::process_placeholders($description, $booking_id);
 
             $event = new Event();
 

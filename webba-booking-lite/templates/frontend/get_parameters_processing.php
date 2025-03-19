@@ -464,11 +464,11 @@ if (isset($_GET['pp_aprove']) && wbk_is5()) {
             $status = false;
             if ($init_result === false) {
                 $status = false;
-                $messsage = 'PayPal error 1';
+                $message = 'PayPal error 1';
             } else {
                 $execResult = $paypal->execute_payment($paymentId, $PayerID);
                 if ($execResult === false) {
-                    $messsage = 'PayPal error 2';
+                    $message = 'PayPal error 2';
                 } else {
                     $pp_redirect_url = trim(
                         get_option('wbk_paypal_redirect_url', '')
@@ -484,7 +484,7 @@ if (isset($_GET['pp_aprove']) && wbk_is5()) {
                             exit();
                         }
                     }
-                    $messsage = WBK_Renderer::load_template(
+                    $message = WBK_Renderer::load_template(
                         'frontend_v5/thank_you_message',
                         [$booking_ids],
                         false
@@ -492,7 +492,7 @@ if (isset($_GET['pp_aprove']) && wbk_is5()) {
                 }
             }
         } else {
-            $messsage = 'PayPal error 4';
+            $message = 'PayPal error 4';
         }
     } elseif ($_GET['pp_aprove'] == 'false') {
         $message = 'Payment cancelled';//, 'webba-booking-lite');

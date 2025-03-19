@@ -1,19 +1,22 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: webba-booking-lite\n"
+"Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-10 20:35+0200\n"
-"PO-Revision-Date: 2023-09-10 20:36+0200\n"
+"PO-Revision-Date: 2025-02-22 20:57+0100\n"
 "Last-Translator: \n"
 "Language-Team: Webba Booking <support@webba-booking.com>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.3\n"
-"X-Poedit-Basepath: ..\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.5\n"
+"X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;esc_html__\n"
+"X-Poedit-Mapping: tsx=gettext:JavaScript\n"
 "X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: node_modules\n"
 
 #: deprecated/class_wbk_appointment_deprecated.php:94
 msgid "incorrect service"
@@ -36,7 +39,6 @@ msgstr ""
 
 #: deprecated/class_wbk_appointment_deprecated.php:157
 #, fuzzy
-#| msgid "incorrect time"
 msgid "incorrect time offset"
 msgstr "fel tid"
 
@@ -63,7 +65,7 @@ msgstr "Fel Telefon"
 #: templates/backend/schedule_tools_content.php:143
 #: templates/backend/schedule_tools_content.php:230
 #: templates/frontend/suitable_hours.php:32
-#: templates/plugion/input_pe_business_hours.php:35
+#: templates/wbkdata/input_pe_business_hours.php:35
 msgid "Monday"
 msgstr "Måndag"
 
@@ -73,7 +75,7 @@ msgstr "Måndag"
 #: templates/backend/schedule_tools_content.php:144
 #: templates/backend/schedule_tools_content.php:231
 #: templates/frontend/suitable_hours.php:36
-#: templates/plugion/input_pe_business_hours.php:36
+#: templates/wbkdata/input_pe_business_hours.php:36
 msgid "Tuesday"
 msgstr "Tisdag"
 
@@ -83,7 +85,7 @@ msgstr "Tisdag"
 #: templates/backend/schedule_tools_content.php:145
 #: templates/backend/schedule_tools_content.php:232
 #: templates/frontend/suitable_hours.php:40
-#: templates/plugion/input_pe_business_hours.php:37
+#: templates/wbkdata/input_pe_business_hours.php:37
 msgid "Wednesday"
 msgstr "Onsdag"
 
@@ -93,7 +95,7 @@ msgstr "Onsdag"
 #: templates/backend/schedule_tools_content.php:146
 #: templates/backend/schedule_tools_content.php:233
 #: templates/frontend/suitable_hours.php:44
-#: templates/plugion/input_pe_business_hours.php:38
+#: templates/wbkdata/input_pe_business_hours.php:38
 msgid "Thursday"
 msgstr "Torsdag"
 
@@ -103,7 +105,7 @@ msgstr "Torsdag"
 #: templates/backend/schedule_tools_content.php:147
 #: templates/backend/schedule_tools_content.php:234
 #: templates/frontend/suitable_hours.php:48
-#: templates/plugion/input_pe_business_hours.php:39
+#: templates/wbkdata/input_pe_business_hours.php:39
 msgid "Friday"
 msgstr "Fredag"
 
@@ -113,7 +115,7 @@ msgstr "Fredag"
 #: templates/backend/schedule_tools_content.php:148
 #: templates/backend/schedule_tools_content.php:235
 #: templates/frontend/suitable_hours.php:52
-#: templates/plugion/input_pe_business_hours.php:40
+#: templates/wbkdata/input_pe_business_hours.php:40
 msgid "Saturday"
 msgstr "Lördag"
 
@@ -123,7 +125,7 @@ msgstr "Lördag"
 #: templates/backend/schedule_tools_content.php:149
 #: templates/backend/schedule_tools_content.php:236
 #: templates/frontend/suitable_hours.php:56
-#: templates/plugion/input_pe_business_hours.php:34
+#: templates/wbkdata/input_pe_business_hours.php:34
 msgid "Sunday"
 msgstr "Söndag"
 
@@ -264,7 +266,7 @@ msgstr ""
 #: includes/data/class-wbk-model.php:306
 #: includes/utilities/class_wbk_model_utils.php:187
 #: includes/utilities/class_wbk_model_utils.php:526
-#: plugion/utils/class-plugion-translator.php:96 webba-booking-lite.php:526
+#: wbkdata/utils/class-wbkdata-translator.php:96 webba-booking-lite.php:526
 msgid "Date"
 msgstr ""
 
@@ -273,7 +275,7 @@ msgstr ""
 #: includes/data/class-wbk-model.php:231 includes/data/class-wbk-model.php:301
 #: includes/utilities/class_wbk_model_utils.php:188
 #: includes/utilities/class_wbk_model_utils.php:527
-#: plugion/utils/class-plugion-translator.php:97
+#: wbkdata/utils/class-wbkdata-translator.php:97
 #: templates/backend/schedule_booking_dialog.php:8 webba-booking-lite.php:527
 msgid "Time"
 msgstr "Tid"
@@ -356,20 +358,17 @@ msgstr ""
 #: includes/utilities/class_wbk_model_utils.php:199
 #: includes/utilities/class_wbk_model_utils.php:538
 #, fuzzy
-#| msgid "Users"
 msgid "User IP"
 msgstr "Användare"
 
 #: deprecated/class_wbk_email_notifications.php:60
 #, fuzzy
-#| msgid "Appointment"
 msgid "Appointment canceled"
 msgstr "Utnämning"
 
 #: deprecated/class_wbk_email_notifications.php:63
 #: includes/backend/class_wbk_backend_options.php:608
 #, fuzzy
-#| msgid "Book appointment on"
 msgid "Your appointment canceled"
 msgstr "Boka tid på"
 
@@ -408,19 +407,16 @@ msgstr "Fel namn"
 
 #: deprecated/class_wbk_service_deprecated.php:94
 #, fuzzy
-#| msgid "incorrect time"
 msgid "incorrect multiple limit"
 msgstr "fel tid"
 
 #: deprecated/class_wbk_service_deprecated.php:108
 #, fuzzy
-#| msgid "incorrect time"
 msgid "incorrect multiple low limit"
 msgstr "fel tid"
 
 #: deprecated/class_wbk_service_deprecated.php:126
 #, fuzzy
-#| msgid "incorrect time"
 msgid "incorrect prepare_time"
 msgstr "fel tid"
 
@@ -430,13 +426,11 @@ msgstr "felaktig steg"
 
 #: deprecated/class_wbk_service_deprecated.php:204
 #, fuzzy
-#| msgid "incorrect email"
 msgid "incorrect min_quantity"
 msgstr "Fel e-post"
 
 #: deprecated/class_wbk_service_deprecated.php:219
 #, fuzzy
-#| msgid "incorrect id"
 msgid "incorrect priority"
 msgstr "Fel id"
 
@@ -446,7 +440,6 @@ msgstr ""
 
 #: deprecated/class_wbk_service_deprecated.php:254
 #, fuzzy
-#| msgid "incorrect email"
 msgid "incorrect interval"
 msgstr "Fel e-post"
 
@@ -458,7 +451,6 @@ msgstr "Ledig"
 
 #: deprecated/class_wbk_service_schedule.php:130
 #, fuzzy
-#| msgid "Search time slots"
 msgid "Select time slot"
 msgstr "Sök tidsluckor"
 
@@ -469,7 +461,6 @@ msgstr "Allmänt"
 
 #: includes/backend/class_wbk_backend_options.php:102
 #, fuzzy
-#| msgid "Booking items count"
 msgid "Booking rules"
 msgstr "Ny bokning"
 
@@ -530,7 +521,6 @@ msgstr ""
 #: includes/data/class-wbk-model.php:128 includes/data/class-wbk-model.php:132
 #: includes/data/class-wbk-model.php:136 includes/data/class-wbk-model.php:140
 #, fuzzy
-#| msgid "default form"
 msgid "Default"
 msgstr "Standardformulär"
 
@@ -539,14 +529,11 @@ msgid "For themes with narrow columns"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:219
-msgid ""
-"Choose between the default layout or the layout optimized for themes with "
-"narrow columns."
+msgid "Choose between the default layout or the layout optimized for themes with narrow columns."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:224
 #, fuzzy
-#| msgid "Suitable hours"
 msgid "Show suitable hours"
 msgstr "lämpliga timmar"
 
@@ -555,14 +542,11 @@ msgid "Multiple bookings in one session"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:234
-msgid ""
-"Turn on to activate the multiple booking mode that allows booking multiple "
-"time slots in the same booking."
+msgid "Turn on to activate the multiple booking mode that allows booking multiple time slots in the same booking."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:241
 #, fuzzy
-#| msgid "Phone number mask input"
 msgid "Phone number masked input"
 msgstr "Telefon"
 
@@ -584,10 +568,7 @@ msgid "Phone format"
 msgstr "Telefon"
 
 #: includes/backend/class_wbk_backend_options.php:255
-msgid ""
-"Customize the format for phone numbers using numeric symbols. You can use "
-"\"0\" to represent numeric placeholders. E.g.: (000) 000-0000. Leave this "
-"field blank if you do not wish to use a specific phone format."
+msgid "Customize the format for phone numbers using numeric symbols. You can use \"0\" to represent numeric placeholders. E.g.: (000) 000-0000. Leave this field blank if you do not wish to use a specific phone format."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:259
@@ -611,10 +592,7 @@ msgid "Autolock bookings"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:280
-msgid ""
-"Turn on to allow autolocking of services. When one service is booked, it "
-"will automatically lock another one, preventing overlapping or conflicting "
-"bookings."
+msgid "Turn on to allow autolocking of services. When one service is booked, it will automatically lock another one, preventing overlapping or conflicting bookings."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:283
@@ -622,9 +600,7 @@ msgid "Perform autolock on"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:285
-msgid ""
-"Choose whether the autolock feature applies to all services or only services "
-"within the same category."
+msgid "Choose whether the autolock feature applies to all services or only services within the same category."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:288
@@ -640,16 +616,13 @@ msgid "Autolock for group booking services"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:297
-msgid ""
-"Choose to either \"Lock time slot\" or \"Reduce count of available places\" "
-"when a group booking is turned on."
+msgid "Choose to either \"Lock time slot\" or \"Reduce count of available places\" when a group booking is turned on."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:299
 #: includes/backend/class_wbk_backend_options.php:1735
 #: includes/data/class-wbk-model.php:89
 #, fuzzy
-#| msgid "Search time slots"
 msgid "Lock time slot"
 msgstr "Sök tidsluckor"
 
@@ -681,10 +654,7 @@ msgid "Coupons"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:326
-msgid ""
-"Turn on to activate the coupon feature in the booking system. Read more "
-"about <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/"
-"documentation/set-up-frontend-booking-process/coupons/\">Coupns setup</a>."
+msgid "Turn on to activate the coupon feature in the booking system. Read more about <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/set-up-frontend-booking-process/coupons/\">Coupns setup</a>."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:329
@@ -693,7 +663,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:334
 #, fuzzy
-#| msgid "New appointment booking"
 msgid "Set expiration time on booking"
 msgstr "Ny bokning"
 
@@ -718,33 +687,25 @@ msgid "Delete bookings with started transaction"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:348
-msgid ""
-"Choose whether to automatically remove unpaid bookings that have already "
-"initiated the payment process."
+msgid "Choose whether to automatically remove unpaid bookings that have already initiated the payment process."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:353
 #, fuzzy
-#| msgid "Gap (in minutes)"
 msgid "Time to pay (in minutes)"
 msgstr "Mellanrum (I minuter)"
 
 #: includes/backend/class_wbk_backend_options.php:356
-msgid ""
-"Specify the time given to the customer (in minutes) for completing the "
-"payment before the booking is automatically deleted."
+msgid "Specify the time given to the customer (in minutes) for completing the payment before the booking is automatically deleted."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:361
 #, fuzzy
-#| msgid "Duration (in minutes)"
 msgid "Cancellation buffer (in minutes)"
 msgstr "Varaktighet (i minuter)"
 
 #: includes/backend/class_wbk_backend_options.php:363
-msgid ""
-"Set the cutoff time (in minutes) before the scheduled booking when customers "
-"cannot cancel or modify their bookings."
+msgid "Set the cutoff time (in minutes) before the scheduled booking when customers cannot cancel or modify their bookings."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:367
@@ -757,7 +718,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:372
 #, fuzzy
-#| msgid "Disabled"
 msgid "Disallow"
 msgstr "Avaktiverad"
 
@@ -770,9 +730,7 @@ msgid "Allow only one booking per time slot from an email"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:380
-msgid ""
-"Turn on to restrict customers from making multiple bookings for the same "
-"time slot using the same email address."
+msgid "Turn on to restrict customers from making multiple bookings for the same time slot using the same email address."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:384
@@ -780,9 +738,7 @@ msgid "Allow only one booking per day from an email"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:386
-msgid ""
-"Turn on to restrict customers from making multiple bookings for the same day "
-"using the same email address."
+msgid "Turn on to restrict customers from making multiple bookings for the same day using the same email address."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:390
@@ -790,21 +746,16 @@ msgid "Allow only one booking per service from an email"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:392
-msgid ""
-"Turn on to restrict customers from making multiple bookings for the same "
-"service using the same email address."
+msgid "Turn on to restrict customers from making multiple bookings for the same service using the same email address."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:396
 #, fuzzy
-#| msgid "Duration (in minutes)"
 msgid "Delete pending bookings (in minutes)"
 msgstr "Varaktighet (i minuter)"
 
 #: includes/backend/class_wbk_backend_options.php:399
-msgid ""
-"Specify the minutes (X) after which \"Awaiting Approval\" bookings will be "
-"automatically deleted. To disable automatic deletion, set the value to 0."
+msgid "Specify the minutes (X) after which \"Awaiting Approval\" bookings will be automatically deleted. To disable automatic deletion, set the value to 0."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:403
@@ -812,9 +763,7 @@ msgid "Maximum number of bookings at a specific time"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:405
-msgid ""
-"Set the system-wide maximum number of bookings allowed at any given time for "
-"all services. Leave it empty for no restrictions."
+msgid "Set the system-wide maximum number of bookings allowed at any given time for all services. Leave it empty for no restrictions."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:409
@@ -822,9 +771,7 @@ msgid "Maximum number of bookings on a specific day"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:411
-msgid ""
-"Set the limit for the maximum number of bookings across all services in a "
-"day. Leave it empty for no restrictions."
+msgid "Set the limit for the maximum number of bookings across all services in a day. Leave it empty for no restrictions."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:416
@@ -832,10 +779,7 @@ msgid "Lock time slot if at least one place is booked"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:419
-msgid ""
-"Select the services for which a time slot will be automatically locked once "
-"at least one place is booked. Note: With autolock turned on, connected "
-"service bookings are considered when locking time slots."
+msgid "Select the services for which a time slot will be automatically locked once at least one place is booked. Note: With autolock turned on, connected service bookings are considered when locking time slots."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:424
@@ -844,10 +788,8 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:427
 msgid ""
-"\"Select the services for which a whole day will be automatically locked "
-"once at least one time slot is booked. \n"
-"Note: With autolock turned on, connected service bookings are considered "
-"when locking a day.\""
+"\"Select the services for which a whole day will be automatically locked once at least one time slot is booked. \n"
+"Note: With autolock turned on, connected service bookings are considered when locking a day.\""
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:433
@@ -856,15 +798,12 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:436
 msgid ""
-"\"Select the services for which time slots before and after the booking will "
-"be automatically locked.\n"
-"Note: With autolock turned on, connected service bookings are considered "
-"when locking time slots.\""
+"\"Select the services for which time slots before and after the booking will be automatically locked.\n"
+"Note: With autolock turned on, connected service bookings are considered when locking time slots.\""
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:445
 #, fuzzy
-#| msgid "Business hours"
 msgid "Special business hours"
 msgstr "Öppettider "
 
@@ -877,9 +816,7 @@ msgid "Example 1: 1 01/15/2023 15:00-18:00"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:449
-msgid ""
-"This indicates that the service with the ID 1 will be available on "
-"01/15/2023 from 15:00 to 18:00."
+msgid "This indicates that the service with the ID 1 will be available on 01/15/2023 from 15:00 to 18:00."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:450
@@ -887,9 +824,7 @@ msgid "Example 2: 01/15/2023 15:00-18:00"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:451
-msgid ""
-"This means that all services will be available on 01/15/2023 from 15:00 to "
-"18:00."
+msgid "This means that all services will be available on 01/15/2023 from 15:00 to 18:00."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:455
@@ -897,9 +832,7 @@ msgid "Load CSS & JS only on the booking page"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:457
-msgid ""
-"Turn on to load CSS and JS files only when the booking form shortcode is "
-"detected on the page, optimizing performance for non-booking pages."
+msgid "Turn on to load CSS and JS files only when the booking form shortcode is detected on the page, optimizing performance for non-booking pages."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:462
@@ -910,7 +843,6 @@ msgstr ""
 #: includes/backend/class_wbk_backend_options.php:1619
 #: includes/backend/class_wbk_backend_options.php:1631
 #, fuzzy
-#| msgid "Nov"
 msgid "No"
 msgstr "Nov"
 
@@ -934,8 +866,7 @@ msgid "Holidays"
 msgstr "Lov"
 
 #: includes/backend/class_wbk_backend_options.php:477
-msgid ""
-"Set dates when your business is closed, and no new bookings will be accepted."
+msgid "Set dates when your business is closed, and no new bookings will be accepted."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:481
@@ -948,14 +879,11 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:490
 #, fuzzy
-#| msgid "Subject of an email to a customer"
 msgid "Send booking confirmation email (to customer)"
 msgstr "Ämne för ett e-postmeddelande till en kund"
 
 #: includes/backend/class_wbk_backend_options.php:494
-msgid ""
-"Turn on to automatically send a booking confirmation email to the customer "
-"after booking."
+msgid "Turn on to automatically send a booking confirmation email to the customer after booking."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:499
@@ -964,9 +892,7 @@ msgid "Attach iCal file to the email"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:503
-msgid ""
-"Turn on to attach iCal file to the booking confirmation email sent to "
-"customer."
+msgid "Turn on to attach iCal file to the booking confirmation email sent to customer."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:509
@@ -974,9 +900,7 @@ msgid "Booking confirmation email subject line (booking done by the customer)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:512
-msgid ""
-"Customize the subject line for the email sent to the customer after they "
-"make a booking"
+msgid "Customize the subject line for the email sent to the customer after they make a booking"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:512
@@ -1021,8 +945,7 @@ msgid "Booking confirmation email message (booking done by the customer)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:521
-msgid ""
-"Customize the email message sent to the customer after they make a booking. "
+msgid "Customize the email message sent to the customer after they make a booking. "
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:527
@@ -1035,14 +958,11 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:538
 #, fuzzy
-#| msgid "Send email to a customer"
 msgid "Send booking approval email (to customer)"
 msgstr "Отравлять письмо клинту"
 
 #: includes/backend/class_wbk_backend_options.php:541
-msgid ""
-"Turn on to automatically send a notification email to the customer once "
-"their booking request is approved. "
+msgid "Turn on to automatically send a notification email to the customer once their booking request is approved. "
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:545
@@ -1062,10 +982,7 @@ msgid "Send admin a copy of booking approval email"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:565
-msgid ""
-"Turn on if you want to send a copy of the booking approval email to the "
-"admin. Please note that the copy will be sent only if the booking is "
-"approved via the approval link."
+msgid "Turn on if you want to send a copy of the booking approval email to the admin. Please note that the copy will be sent only if the booking is approved via the approval link."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:571
@@ -1073,9 +990,7 @@ msgid "Send booking cancelation email (to admin)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:574
-msgid ""
-"Turn on to automatically send a booking cancelation email to the admin after "
-"a booking is canceled."
+msgid "Turn on to automatically send a booking cancelation email to the admin after a booking is canceled."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:578
@@ -1095,14 +1010,11 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:597
 #, fuzzy
-#| msgid "Subject of an email to a customer"
 msgid "Send booking cancelation email (to customer)"
 msgstr "Ämne för ett e-postmeddelande till en kund"
 
 #: includes/backend/class_wbk_backend_options.php:600
-msgid ""
-"Turn on to automatically send a booking cancelation email to the customer "
-"after a booking is canceled."
+msgid "Turn on to automatically send a booking cancelation email to the customer after a booking is canceled."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:614
@@ -1114,14 +1026,11 @@ msgid "Booking cancelation email message  (cancelation done by the customer)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:632
-msgid ""
-"Send booking cancelation email (to other customers in the group booking)"
+msgid "Send booking cancelation email (to other customers in the group booking)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:635
-msgid ""
-"Turn on to automatically send a booking cancelation email to all the "
-"customers added to the group booking."
+msgid "Turn on to automatically send a booking cancelation email to all the customers added to the group booking."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:655
@@ -1129,19 +1038,15 @@ msgid "Send booking confirmation email (to admin)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:659
-msgid ""
-"Turn on to automatically send a booking confirmation email to the admin."
+msgid "Turn on to automatically send a booking confirmation email to the admin."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:667
-msgid ""
-"Turn on to attach iCal file to the booking confirmation email sent to the "
-"admin."
+msgid "Turn on to attach iCal file to the booking confirmation email sent to the admin."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:671
 #, fuzzy
-#| msgid "Administrator email subject is wrong"
 msgid "Booking confirmation mail subject line"
 msgstr "Administratör e-post ämne är fel"
 
@@ -1158,15 +1063,12 @@ msgid "Send payment received email (to admin)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:692
-msgid ""
-"Turn on to automatically send an email notification to the administrator "
-"when a payment for a booking is received. "
+msgid "Turn on to automatically send an email notification to the administrator when a payment for a booking is received. "
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:697
 #: includes/backend/class_wbk_backend_options.php:722
 #, fuzzy
-#| msgid "Customer email subject is wrong"
 msgid "Payment received email subject line"
 msgstr "Kund e-post ämne är fel"
 
@@ -1177,31 +1079,24 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:714
 #, fuzzy
-#| msgid "Send email to a customer"
 msgid "Send payment received email (to customer)"
 msgstr "Отравлять письмо клинту"
 
 #: includes/backend/class_wbk_backend_options.php:718
-msgid ""
-"Turn on to automatically send an email notification to the customer when a "
-"payment for a booking is received. "
+msgid "Turn on to automatically send an email notification to the customer when a payment for a booking is received. "
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:741
 #, fuzzy
-#| msgid "Send email to a customer"
 msgid "Send status \"Arrived\" email (to customer)"
 msgstr "Отравлять письмо клинту"
 
 #: includes/backend/class_wbk_backend_options.php:744
-msgid ""
-"Turn on to automatically send an email notification to the customer when the "
-"status of their booking is changed to \"Arrived.\""
+msgid "Turn on to automatically send an email notification to the customer when the status of their booking is changed to \"Arrived.\""
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:748
 #, fuzzy
-#| msgid "Customer email subject is wrong"
 msgid "Status \"Arrived\" email subject line"
 msgstr "Kund e-post ämne är fel"
 
@@ -1211,7 +1106,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:763
 #, fuzzy
-#| msgid "Send email to an administrator"
 msgid "Send reminder email (to admin)"
 msgstr "Отправлять E-мейл администратору"
 
@@ -1221,7 +1115,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:771
 #, fuzzy
-#| msgid "Customer email subject is wrong"
 msgid "Reminder email subject line"
 msgstr "Kund e-post ämne är fel"
 
@@ -1232,32 +1125,24 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:785
 #, fuzzy
-#| msgid "Send email to a customer"
 msgid "Send reminder email (to customer)"
 msgstr "Отравлять письмо клинту"
 
 #: includes/backend/class_wbk_backend_options.php:788
-msgid ""
-"Turn on to send customers automatic email reminders for their upcoming "
-"bookings."
+msgid "Turn on to send customers automatic email reminders for their upcoming bookings."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:792
 #, fuzzy
-#| msgid "Send email to a customer"
 msgid "Send reminders to customers in X days"
 msgstr "Отравлять письмо клинту"
 
 #: includes/backend/class_wbk_backend_options.php:796
-msgid ""
-"Select the timing for the reminder notification. For instance, set the value "
-"to 0 for the day of booking, 1 for one day before the booking, 2 for two "
-"days before, and so on."
+msgid "Select the timing for the reminder notification. For instance, set the value to 0 for the day of booking, 1 for one day before the booking, 2 for two days before, and so on."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:800
 #, fuzzy
-#| msgid "Customer email subject is wrong"
 msgid "Reminder email subject line "
 msgstr "Kund e-post ämne är fel"
 
@@ -1266,9 +1151,7 @@ msgid "Reminder sending time"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:827
-msgid ""
-"Set the preferred hour for email reminders sent to customers and admins, "
-"based on your local timezone."
+msgid "Set the preferred hour for email reminders sent to customers and admins, based on your local timezone."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:831
@@ -1276,13 +1159,11 @@ msgid "Send reminders only for approved bookings."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:835
-msgid ""
-"Turn on to send reminder email notifications only for approved bookings."
+msgid "Turn on to send reminder email notifications only for approved bookings."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:839
 #, fuzzy
-#| msgid "Send email to a customer"
 msgid "Send invoice to a customer (HTML format) "
 msgstr "Отравлять письмо клинту"
 
@@ -1292,7 +1173,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:844
 #, fuzzy
-#| msgid "New appointment booking"
 msgid "Send invoice on booking"
 msgstr "Ny bokning"
 
@@ -1305,14 +1185,11 @@ msgid "Send invoice on payment complete"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:848
-msgid ""
-"Choose whether you would like to send an invoice to the customer and specify "
-"when the invoice email should be sent."
+msgid "Choose whether you would like to send an invoice to the customer and specify when the invoice email should be sent."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:852
 #, fuzzy
-#| msgid "Customer email subject is wrong"
 msgid "Invoice email subject line"
 msgstr "Kund e-post ämne är fel"
 
@@ -1321,15 +1198,11 @@ msgid "Current invoice number"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:864
-msgid ""
-"Set the starting number for your invoices. Use the placeholder "
-"#invoice_number in your notifications. Each time a customer makes a payment, "
-"the value of this option will be increased by one."
+msgid "Set the starting number for your invoices. Use the placeholder #invoice_number in your notifications. Each time a customer makes a payment, the value of this option will be increased by one."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:868
 #, fuzzy
-#| msgid "Send administrator an email"
 msgid "Send admin a copy of invoice email"
 msgstr "Skicka Admin en Epost"
 
@@ -1351,11 +1224,8 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:885
 msgid ""
-"When Enabled:Customer Notifications: The reply-to email address is set to "
-"the email specified in the service settings.\n"
-"Admin Notifications: The reply-to email address is set to the customer's "
-"email address. When Disabled: The 'From: email' value is used as the reply-"
-"to address for notifications."
+"When Enabled:Customer Notifications: The reply-to email address is set to the email specified in the service settings.\n"
+"Admin Notifications: The reply-to email address is set to the customer's email address. When Disabled: The 'From: email' value is used as the reply-to address for notifications."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:890
@@ -1363,9 +1233,7 @@ msgid "From: name"
 msgstr "Från: namn"
 
 #: includes/backend/class_wbk_backend_options.php:891
-msgid ""
-"Enter the name that will be displayed as the sender in the email "
-"notifications."
+msgid "Enter the name that will be displayed as the sender in the email notifications."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:894
@@ -1373,9 +1241,7 @@ msgid "From: email"
 msgstr "Från: e-post"
 
 #: includes/backend/class_wbk_backend_options.php:895
-msgid ""
-"Enter the email that will be displayed as the sender in the email "
-"notifications."
+msgid "Enter the email that will be displayed as the sender in the email notifications."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:897
@@ -1383,9 +1249,7 @@ msgid "Send copies of admin email notifications to addresses"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:898
-msgid ""
-"Enter the email addresses where you want to receive copies of admin "
-"notifications. Separate multiple email addresses with comma."
+msgid "Enter the email addresses where you want to receive copies of admin notifications. Separate multiple email addresses with comma."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:900
@@ -1393,9 +1257,7 @@ msgid "Notifications landing page"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:902
-msgid ""
-"Specify the landing page URL for payment or cancelation. This page should "
-"include the [webbabooking] shortcode."
+msgid "Specify the landing page URL for payment or cancelation. This page should include the [webbabooking] shortcode."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:907
@@ -1419,9 +1281,7 @@ msgid "Time slot format"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:924
-msgid ""
-"Choose between displaying only the start time or both the start and end "
-"times in the time slots."
+msgid "Choose between displaying only the start time or both the start and end times in the time slots."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:927
@@ -1440,14 +1300,11 @@ msgid "CSV delimiter"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:936
-msgid ""
-"If your date format includes a comma, use a semicolon. Otherwise, select the "
-"comma."
+msgid "If your date format includes a comma, use a semicolon. Otherwise, select the comma."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:938
 #, fuzzy
-#| msgid "Comment"
 msgid "Comma"
 msgstr "Kommentar"
 
@@ -1460,9 +1317,7 @@ msgid "Load Pickadate javascript"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:949
-msgid ""
-"Turn off if other plugins in your WordPress installation are using the "
-"pickadate date picker."
+msgid "Turn off if other plugins in your WordPress installation are using the pickadate date picker."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:954
@@ -1482,9 +1337,7 @@ msgid "Do not tax the deposit (service fee)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:965
-msgid ""
-"Turn on to avoid adding tax to the deposit. Important note: when this is "
-"turned on, do not use subtotal and tax placeholders."
+msgid "Turn on to avoid adding tax to the deposit. Important note: when this is turned on, do not use subtotal and tax placeholders."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:968
@@ -1492,9 +1345,7 @@ msgid "Fractional digits in price"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:971
-msgid ""
-"Write the number of decimal places to show for prices. E.g. Write 1 for "
-"prices to appear as 25.1 or 2 for prices to appear as 25.10."
+msgid "Write the number of decimal places to show for prices. E.g. Write 1 for prices to appear as 25.1 or 2 for prices to appear as 25.10."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:975
@@ -1502,9 +1353,7 @@ msgid "Fraction separator in prices"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:978
-msgid ""
-"Choose the symbol or character to separate decimals in prices. E.g. Use "
-"either a period (.) or a comma (,)."
+msgid "Choose the symbol or character to separate decimals in prices. E.g. Use either a period (.) or a comma (,)."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:982
@@ -1512,11 +1361,7 @@ msgid "List of dynamic placeholders"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:985
-msgid ""
-"Enter a comma-separated list of placeholders to remove from the string if "
-"they are not replaced with values. This is useful if you are using different "
-"custom fields for services and as a result some custom field placeholders "
-"are not replaced."
+msgid "Enter a comma-separated list of placeholders to remove from the string if they are not replaced with values. This is useful if you are using different custom fields for services and as a result some custom field placeholders are not replaced."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:988
@@ -1529,7 +1374,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:995
 #, fuzzy
-#| msgid "Select service label"
 msgid "Service label"
 msgstr "Välj tjänst etikett"
 
@@ -1549,9 +1393,8 @@ msgstr ""
 #: templates/backend/schedule_tools_content.php:114
 #: templates/backend/schedule_tools_content.php:195
 #: templates/frontend_v5/category_dropdown.php:8
-#: templates/plugion/category_list.php:10
+#: templates/wbkdata/category_list.php:10
 #, fuzzy
-#| msgid "Select form"
 msgid "Select category"
 msgstr "Formulärurval"
 
@@ -1577,7 +1420,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1016
 #, fuzzy
-#| msgid "date..."
 msgid "date"
 msgstr "Datum…"
 
@@ -1587,7 +1429,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1021
 #, fuzzy
-#| msgid "Webba Booking form"
 msgid "Booking form title"
 msgstr "Typ av boxningsformulär:"
 
@@ -1617,7 +1458,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1044
 #, fuzzy
-#| msgid "Email"
 msgid "Email label"
 msgstr "E-post"
 
@@ -1627,7 +1467,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1050
 #, fuzzy
-#| msgid "Phone"
 msgid "Phone label"
 msgstr "Telefon"
 
@@ -1637,7 +1476,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1057
 #, fuzzy
-#| msgid "Comment"
 msgid "Comment label"
 msgstr "Kommentar"
 
@@ -1660,9 +1498,7 @@ msgid "How many people per time slot?"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1067
-msgid ""
-"Quantity label on the booking form for group bookings. Available "
-"placeholders: #service"
+msgid "Quantity label on the booking form for group bookings. Available placeholders: #service"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1071
@@ -1670,9 +1506,7 @@ msgid "Thank you message"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1074
-msgid ""
-"Customize the thank you message displayed after a booking is made. Leave it "
-"empty to use the default formatted thank you message."
+msgid "Customize the thank you message displayed after a booking is made. Leave it empty to use the default formatted thank you message."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1078
@@ -1680,17 +1514,11 @@ msgid "Time slots not found message"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1080
-msgid ""
-"Unfortunately we were unable to meet your search criteria. Please change the "
-"criteria and try again."
-msgstr ""
-"Tyvärr kunde vi inte att uppfylla dina sökkriterier. Vänligen ändra "
-"kriterierna och försök igen."
+msgid "Unfortunately we were unable to meet your search criteria. Please change the criteria and try again."
+msgstr "Tyvärr kunde vi inte att uppfylla dina sökkriterier. Vänligen ändra kriterierna och försök igen."
 
 #: includes/backend/class_wbk_backend_options.php:1081
-msgid ""
-"Message displayed when no time slots are found for the selected service and "
-"date."
+msgid "Message displayed when no time slots are found for the selected service and date."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1085
@@ -1723,15 +1551,11 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1103
 #, fuzzy
-#| msgid "incorrect id"
 msgid "incorrect input"
 msgstr "Fel id"
 
 #: includes/backend/class_wbk_backend_options.php:1104
-msgid ""
-"Error message that appears if an issue occurs with the Stripe payment "
-"method. To show this message go to Stripe -> Advanced Settings and turn on "
-"\"override Stripe card element error messages\"."
+msgid "Error message that appears if an issue occurs with the Stripe payment method. To show this message go to Stripe -> Advanced Settings and turn on \"override Stripe card element error messages\"."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1108
@@ -1743,8 +1567,7 @@ msgid "Payment failed: #response"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1111
-msgid ""
-"Stripe API error message during payment processing. Placeholders: #response."
+msgid "Stripe API error message during payment processing. Placeholders: #response."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1115
@@ -1813,7 +1636,6 @@ msgstr ""
 #: includes/backend/class_wbk_backend_options.php:1172
 #: includes/data/class-wbk-model.php:214 includes/data/class-wbk-model.php:297
 #, fuzzy
-#| msgid "Book"
 msgid "Booking"
 msgstr "Boka"
 
@@ -1843,9 +1665,7 @@ msgid "Booking not added to card"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1187
-msgid ""
-"Error message that appears if an issue occurs with adding a booking to "
-"WooCommerce cart."
+msgid "Error message that appears if an issue occurs with adding a booking to WooCommerce cart."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1194
@@ -1869,9 +1689,7 @@ msgid "Price format"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1211
-msgid ""
-"Price format on the booking form. Required placeholder: #price. E.g.: "
-"$#price."
+msgid "Price format on the booking form. Required placeholder: #price. E.g.: $#price."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1214
@@ -1897,13 +1715,11 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1228
 #, fuzzy
-#| msgid "Service select label"
 msgid "Service fee label"
 msgstr "Метка для списка служб"
 
 #: includes/backend/class_wbk_backend_options.php:1229
 #, fuzzy
-#| msgid "Services"
 msgid "Service fee"
 msgstr "Tjänst"
 
@@ -1960,17 +1776,11 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1264
 #, fuzzy
-#| msgid "incorrect attachment"
 msgid "Allow attachments"
 msgstr "felaktig bifogad fil"
 
 #: includes/backend/class_wbk_backend_options.php:1267
-msgid ""
-"Turn on to allow users to attach files in the booking form. Please include "
-"the file input field in the custom form. For more information, see <a href="
-"\"https://webba-booking.com/documentation/set-up-frontend-booking-process/"
-"using-custom-fields-in-the-booking-form/\" target=\"_blank\" rel=\"noopener "
-"noreferrer\">Custom fields</a>."
+msgid "Turn on to allow users to attach files in the booking form. Please include the file input field in the custom form. For more information, see <a href=\"https://webba-booking.com/documentation/set-up-frontend-booking-process/using-custom-fields-in-the-booking-form/\" target=\"_blank\" rel=\"noopener noreferrer\">Custom fields</a>."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1271
@@ -1978,21 +1788,16 @@ msgid "Automatically delete attachments"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1275
-msgid ""
-"Highly Recommended: Turn this on to automatically delete the attachment as "
-"soon as the notification is sent."
+msgid "Highly Recommended: Turn this on to automatically delete the attachment as soon as the notification is sent."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1279
 #, fuzzy
-#| msgid "Add service"
 msgid "Order service by"
 msgstr "lägga tjänsten"
 
 #: includes/backend/class_wbk_backend_options.php:1281
-msgid ""
-"Choose between alphabetical order (A - Z) or order by priority for "
-"displaying services on the booking form."
+msgid "Choose between alphabetical order (A - Z) or order by priority for displaying services on the booking form."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1284
@@ -2012,9 +1817,7 @@ msgid "Show night hours time slots in previous day"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1293
-msgid ""
-"Specify the number of hours after midnight to display on the next day's "
-"calendar."
+msgid "Specify the number of hours after midnight to display on the next day's calendar."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1297
@@ -2031,7 +1834,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1307
 #, fuzzy
-#| msgid "Available time slots"
 msgid "Set 0 to not disable time slots"
 msgstr "Tillgängliga tidsluckor"
 
@@ -2040,9 +1842,7 @@ msgid "EU GDPR Compliance"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1313
-msgid ""
-"Turn on to align the booking system with GDPR guidelines, providing enhanced "
-"data protection and privacy for customer information."
+msgid "Turn on to align the booking system with GDPR guidelines, providing enhanced data protection and privacy for customer information."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1315
@@ -2050,8 +1850,7 @@ msgid "Disallow booking of the current time slot"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1319
-msgid ""
-"Turn on to prevent customers from making bookings for the current time slot."
+msgid "Turn on to prevent customers from making bookings for the current time slot."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1324
@@ -2059,10 +1858,7 @@ msgid "Consider the availability of overlapping time intervals"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1328
-msgid ""
-"Turn on this option to control the availability of time slots for the same "
-"service when they overlap. When turned on, the system will automatically "
-"adjust the availability to avoid double booking."
+msgid "Turn on this option to control the availability of time slots for the same service when they overlap. When turned on, the system will automatically adjust the availability to avoid double booking."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1332
@@ -2070,10 +1866,7 @@ msgid "Set the status to \"Arrived\" X minutes after the end of the booking"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1334
-msgid ""
-"Specify the number of minutes after the end of the booking when the status "
-"should be automatically changed to \"Arrived.\" Leave the field empty to "
-"keep the status unchanged."
+msgid "Specify the number of minutes after the end of the booking when the status should be automatically changed to \"Arrived.\" Leave the field empty to keep the status unchanged."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1340
@@ -2094,7 +1887,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1349
 #, fuzzy
-#| msgid "Cancel"
 msgid "Cancel booking"
 msgstr "Avbryt"
 
@@ -2108,18 +1900,13 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1357
 #, fuzzy
-#| msgid "Booking items count"
 msgid "Booking on #dt"
 msgstr "Ny bokning"
 
 #: includes/backend/class_wbk_backend_options.php:1358
 msgid ""
-"\"Message shown when customers pay for a booking or cancel their booking "
-"using the link sent in the email notification.\n"
-"Available placeholders: #name (customer name), #id (appointment id), "
-"#service (service name), #date (appointment date), #time (appointment time), "
-"#dt (appointment date and time), #start_end (appointment time in start-end "
-"format).\""
+"\"Message shown when customers pay for a booking or cancel their booking using the link sent in the email notification.\n"
+"Available placeholders: #name (customer name), #id (appointment id), #service (service name), #date (appointment date), #time (appointment time), #dt (appointment date and time), #start_end (appointment time in start-end format).\""
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1365
@@ -2151,21 +1938,15 @@ msgid "Warning message on cancel booking (buffer)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1381
-msgid ""
-"Sorry, you can not cancel because you have exceeded the time allowed to do "
-"so."
+msgid "Sorry, you can not cancel because you have exceeded the time allowed to do so."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1382
-msgid ""
-"Message shown when a customer tries to cancel a booking within a time frame "
-"that does not allow cancellations. Buffer time is set in Booking rules -> "
-"Cancellation buffer (in minutes)"
+msgid "Message shown when a customer tries to cancel a booking within a time frame that does not allow cancellations. Buffer time is set in Booking rules -> Cancellation buffer (in minutes)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1386
 #, fuzzy
-#| msgid "Subject of an email to a customer"
 msgid "Text of the payment link sent to a customer"
 msgstr "Ämne för ett e-postmeddelande till en kund"
 
@@ -2179,7 +1960,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1393
 #, fuzzy
-#| msgid "Subject of an email to a customer"
 msgid "Text of the cancelation link sent to a customer"
 msgstr "Ämne för ett e-postmeddelande till en kund"
 
@@ -2188,9 +1968,7 @@ msgid "Click here to cancel your booking."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1396
-msgid ""
-"Text of the booking cancelation link sent to a customer in the email "
-"notification."
+msgid "Text of the booking cancelation link sent to a customer in the email notification."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1400
@@ -2198,9 +1976,7 @@ msgid "Text of the cancellation link sent to an admin"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1403
-msgid ""
-"Text of the booking cancelation link sent to the admin in the email "
-"notification."
+msgid "Text of the booking cancelation link sent to the admin in the email notification."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1407
@@ -2208,9 +1984,7 @@ msgid "Text of the approval link sent to an admin)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1410
-msgid ""
-"Text of the booking approval link sent to the admin in the email "
-"notification."
+msgid "Text of the booking approval link sent to the admin in the email notification."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1414
@@ -2218,9 +1992,7 @@ msgid "Text of the link for adding event to customer's Google Calendar"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1417
-msgid ""
-"Text of the link to add a booking to Google Calendar. Sent to a customer in "
-"the email notification."
+msgid "Text of the link to add a booking to Google Calendar. Sent to a customer in the email notification."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1421
@@ -2258,9 +2030,7 @@ msgid "Appointment data not added to Google Calendar."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1438
-msgid ""
-"Message shown when there was an issue with adding a booking to the Google "
-"Calendar."
+msgid "Message shown when there was an issue with adding a booking to the Google Calendar."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1442
@@ -2272,9 +2042,7 @@ msgid "Booking doesn't exist."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1445
-msgid ""
-"Message shown when booking link (cancelation, approval, payment) is invalid "
-"in the email notification."
+msgid "Message shown when booking link (cancelation, approval, payment) is invalid in the email notification."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1449
@@ -2283,7 +2051,6 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1452
 #, fuzzy
-#| msgid "Available to users"
 msgid "Available placeholders:"
 msgstr "Tillgängliga för användarna"
 
@@ -2316,9 +2083,7 @@ msgid "Daily booking limit is reached, please select another date."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1484
-msgid ""
-"Message shown when daily booking limit reached. Adjust the daily booking "
-"limits in the Settings -> Booking Rules."
+msgid "Message shown when daily booking limit reached. Adjust the daily booking limits in the Settings -> Booking Rules."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1488
@@ -2331,9 +2096,7 @@ msgid "You have reached your booking limit."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1491
-msgid ""
-"Message shown when user limit is reached. Adjust the user booking limits in "
-"the Settings -> Booking Rules."
+msgid "Message shown when user limit is reached. Adjust the user booking limits in the Settings -> Booking Rules."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1499
@@ -2341,9 +2104,7 @@ msgid "PayPal mode"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1502
-msgid ""
-"Choose the mode for PayPal integration. Select \"Sandbox\" to test the "
-"integration, and \"Live\" for actual payment processing."
+msgid "Choose the mode for PayPal integration. Select \"Sandbox\" to test the integration, and \"Live\" for actual payment processing."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1504
@@ -2484,10 +2245,7 @@ msgid "Redirect to page when payment is successful"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1574
-msgid ""
-"Enter the URL where customers should be redirected after a successful "
-"payment. If left empty, customers will stay on the booking form page after "
-"completing the payment."
+msgid "Enter the URL where customers should be redirected after a successful payment. If left empty, customers will stay on the booking form page after completing the payment."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1578
@@ -2495,11 +2253,7 @@ msgid "Currency multiplier"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1580
-msgid ""
-"Add the currency multiplier to update the price before it is sent to PayPal. "
-"It is helpful when your service price is set in a currency not supported by "
-"PayPal, and you need to convert it to a PayPal-supported currency before "
-"checkout. If you do not require currency conversion, leave this field empty."
+msgid "Add the currency multiplier to update the price before it is sent to PayPal. It is helpful when your service price is set in a currency not supported by PayPal, and you need to convert it to a PayPal-supported currency before checkout. If you do not require currency conversion, leave this field empty."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1585
@@ -2555,9 +2309,7 @@ msgid "Yes, load version 6.21.1 (not recommended)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1633
-msgid ""
-"Select how to load Stripe API. Set 'no' or 6.21.1 only if there is a "
-"conflict with another plugin that uses Stripe."
+msgid "Select how to load Stripe API. Set 'no' or 6.21.1 only if there is a conflict with another plugin that uses Stripe."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1637
@@ -2573,11 +2325,7 @@ msgid "Override Stripe card element error messages"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1647
-msgid ""
-"Turn on to override the default error message displayed for Stripe card "
-"elements. To customize the error message, navigate to Wording/Translation -> "
-"Advanced Settings and modify the \"Stripe card element error message\" "
-"according to your preferences."
+msgid "Turn on to override the default error message displayed for Stripe card elements. To customize the error message, navigate to Wording/Translation -> Advanced Settings and modify the \"Stripe card element error message\" according to your preferences."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1652
@@ -2585,16 +2333,11 @@ msgid "Additional payment information"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1656
-msgid ""
-"Select the additional fields that you wish to include in the Stripe payment "
-"process."
+msgid "Select the additional fields that you wish to include in the Stripe payment process."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1662
-msgid ""
-"Enter the URL where customers should be redirected after successful payment. "
-"If left empty, customers will stay on the booking form page after completing "
-"the payment."
+msgid "Enter the URL where customers should be redirected after successful payment. If left empty, customers will stay on the booking form page after completing the payment."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1666
@@ -2602,9 +2345,7 @@ msgid "Font size for card element on mobile devices"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1668
-msgid ""
-"Set the card element font size on mobile devices. Leave empty for the "
-"default input field font size."
+msgid "Set the card element font size on mobile devices. Leave empty for the default input field font size."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1672
@@ -2612,9 +2353,7 @@ msgid "Set status after booking is paid with Stripe to"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1675
-msgid ""
-"Choose how to update the status after booking is paid with Stripe. To keep "
-"the current status unchanged, select \"Based on status before payment\". "
+msgid "Choose how to update the status after booking is paid with Stripe. To keep the current status unchanged, select \"Based on status before payment\". "
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1677
@@ -2626,10 +2365,7 @@ msgid "Google API Client ID"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1690
-msgid ""
-"Enter the Google API Client ID. <a rel=\"noopener\" target=\"_blank\" href="
-"\"https://webba-booking.com/documentation/google-calendar/google-api-setup/"
-"\">Read more on how to set up Google Calendar integration.</a>."
+msgid "Enter the Google API Client ID. <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/google-calendar/google-api-setup/\">Read more on how to set up Google Calendar integration.</a>."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1694
@@ -2637,10 +2373,7 @@ msgid "Google API Client Secret"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1696
-msgid ""
-"Enter the Google API Client Secret. <a rel=\"noopener\" target=\"_blank\" "
-"href=\"https://webba-booking.com/documentation/google-calendar/google-api-"
-"setup/\">Read more on how to set up Google Calendar integration.</a>."
+msgid "Enter the Google API Client Secret. <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/google-calendar/google-api-setup/\">Read more on how to set up Google Calendar integration.</a>."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1701
@@ -2648,9 +2381,7 @@ msgid "\"Created by\" property for the events"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1704
-msgid ""
-"Do not change this option if you do not plan to use the same Google "
-"calendars on different websites with Webba Booking."
+msgid "Do not change this option if you do not plan to use the same Google calendars on different websites with Webba Booking."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1708
@@ -2658,13 +2389,11 @@ msgid "Customer's time zone"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1711
-msgid ""
-"Choose the time zone to be used for events added to the customer's calendar."
+msgid "Choose the time zone to be used for events added to the customer's calendar."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1713
 #, fuzzy
-#| msgid "Webba Booking form"
 msgid "Use Webba Booking time zone"
 msgstr "Typ av boxningsformulär:"
 
@@ -2677,9 +2406,7 @@ msgid "Admin calendar event creation"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1722
-msgid ""
-"Specify when the event should be added to the admin's calendar when creating "
-"bookings. "
+msgid "Specify when the event should be added to the admin's calendar when creating bookings. "
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1724
@@ -2697,8 +2424,7 @@ msgid "Group services synchronization"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1733
-msgid ""
-"Choose how group services are integrated with the events in Google calendar."
+msgid "Choose how group services are integrated with the events in Google calendar."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1741
@@ -2706,9 +2432,7 @@ msgid "Ignore free events"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1744
-msgid ""
-"Turn on if free Google Calendar events should not be considered in 2-ways "
-"synchronization."
+msgid "Turn on if free Google Calendar events should not be considered in 2-ways synchronization."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1748
@@ -2716,9 +2440,7 @@ msgid "Ignore events added by Webba Booking"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1751
-msgid ""
-"Turn on if Webba Booking events should not be considered in 2-ways "
-"synchronization."
+msgid "Turn on if Webba Booking events should not be considered in 2-ways synchronization."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1755
@@ -2731,26 +2453,20 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1760
 #, fuzzy
-#| msgid "Add appointment"
 msgid "Add one event"
 msgstr "Lägg utnämning"
 
 #: includes/backend/class_wbk_backend_options.php:1761
 #, fuzzy
-#| msgid "Add appointment"
 msgid "Add event for each appointment"
 msgstr "Lägg utnämning"
 
 #: includes/backend/class_wbk_backend_options.php:1766
-msgid ""
-"Send an alert email to administrator if any issue occurred with the "
-"integration"
+msgid "Send an alert email to administrator if any issue occurred with the integration"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1769
-msgid ""
-"Turn on to alert admin about issues with integration. Notification is sent "
-"to the email set in the service settings."
+msgid "Turn on to alert admin about issues with integration. Notification is sent to the email set in the service settings."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1781
@@ -2758,9 +2474,7 @@ msgid "Version of Google Client API"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1785
-msgid ""
-"Modify this setting only if you have other plugins in your WordPress that "
-"utilize a different version of the Google API and conflicts have arisen."
+msgid "Modify this setting only if you have other plugins in your WordPress that utilize a different version of the Google API and conflicts have arisen."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1792
@@ -2769,10 +2483,7 @@ msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1794
 msgid ""
-"Enter the ID of the product used for WooCommerce integration. <a rel="
-"\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/"
-"documentation/payment/steps-to-setup-the-integration-of-woocommerce-with-"
-"webba/\">Read more on how to set up WooCommerce integration</a>\n"
+"Enter the ID of the product used for WooCommerce integration. <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/payment/steps-to-setup-the-integration-of-woocommerce-with-webba/\">Read more on how to set up WooCommerce integration</a>\n"
 " ."
 msgstr ""
 
@@ -2781,9 +2492,7 @@ msgid "Validate WooCommerce coupons as Webba Coupons"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1801
-msgid ""
-"Enable this option if you need to validate wooCommerce coupons as Webba "
-"coupons."
+msgid "Enable this option if you need to validate wooCommerce coupons as Webba coupons."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1804
@@ -2791,9 +2500,7 @@ msgid "Status of the booking paid with WooCommerce"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1806
-msgid ""
-"Choose the desired status update after a booking has been paid through "
-"WooCommerce."
+msgid "Choose the desired status update after a booking has been paid through WooCommerce."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1809
@@ -2801,14 +2508,11 @@ msgid "Disabled (do not update status)"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1816
-msgid ""
-"Prefill fields in WooCommerce checkout with the data used in the booking form"
+msgid "Prefill fields in WooCommerce checkout with the data used in the booking form"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1820
-msgid ""
-"Turn on to prefill fields in the WooCommerce checkout with the data entered "
-"in the Webba booking form."
+msgid "Turn on to prefill fields in the WooCommerce checkout with the data entered in the Webba booking form."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1829
@@ -2822,7 +2526,6 @@ msgstr ""
 #: includes/backend/class_wbk_backend_options.php:1839
 #: includes/data/class-wbk-model.php:362
 #, fuzzy
-#| msgid "Activation"
 msgid "Authorization"
 msgstr "Aktivering"
 
@@ -2831,9 +2534,7 @@ msgid "Zoom meeting creation"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1842
-msgid ""
-"Select when to create the meeting in Zoom - on booking or on payment or "
-"booking approval."
+msgid "Select when to create the meeting in Zoom - on booking or on payment or booking approval."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1853
@@ -2841,18 +2542,11 @@ msgid "Customer name in the backend"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1856
-msgid ""
-"Use this option to display custom fields alongside the customer name in the "
-"appointments table and schedules. For instance, you can show the customer's "
-"name and last name by using the placeholder #name #field_lastname. In this "
-"example, the last name is stored in a custom field with the ID \"lastname\". "
-"Remember to include the #name placeholder in the value of this option for it "
-"to work correctly."
+msgid "Use this option to display custom fields alongside the customer name in the appointments table and schedules. For instance, you can show the customer's name and last name by using the placeholder #name #field_lastname. In this example, the last name is stored in a custom field with the ID \"lastname\". Remember to include the #name placeholder in the value of this option for it to work correctly."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1861
 #, fuzzy
-#| msgid "Date format updated"
 msgid "Date format (backend)"
 msgstr "Datumformat uppdaterad "
 
@@ -2873,9 +2567,7 @@ msgid "M d, Y"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1870
-msgid ""
-"Select how the date will be displayed on the Appointments page in the admin "
-"area."
+msgid "Select how the date will be displayed on the Appointments page in the admin area."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1874
@@ -2895,10 +2587,7 @@ msgid "Custom field columns"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1887
-msgid ""
-"Enter a comma-separated list of custom field IDs. To set custom column "
-"headers, use square brackets with the desired titles. For example: custom-"
-"field1[Title 1],custom-field2[Title 2]."
+msgid "Enter a comma-separated list of custom field IDs. To set custom column headers, use square brackets with the desired titles. For example: custom-field1[Title 1],custom-field2[Title 2]."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1892
@@ -2906,9 +2595,7 @@ msgid "Default number of days on Bookings page"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1895
-msgid ""
-"Set the default number of days to be displayed on the appointment page. To "
-"improve performance, consider using a lower value."
+msgid "Set the default number of days to be displayed on the appointment page. To improve performance, consider using a lower value."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1900
@@ -2932,9 +2619,7 @@ msgid "Send SMS after customer makes a booking"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1918
-msgid ""
-"Turn on to send booking SMS notifications to customers when they make a "
-"booking."
+msgid "Turn on to send booking SMS notifications to customers when they make a booking."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1921
@@ -2942,9 +2627,7 @@ msgid "Send SMS after admin adds a booking"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1925
-msgid ""
-"Turn on to send booking SMS notifications to customers when the booking was "
-"done by an admin."
+msgid "Turn on to send booking SMS notifications to customers when the booking was done by an admin."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1928
@@ -2952,9 +2635,7 @@ msgid "Booking SMS:"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1931
-msgid ""
-"Dear #customer_name, You have successfully booked #service_name on "
-"#appointment_day at #appointment_time."
+msgid "Dear #customer_name, You have successfully booked #service_name on #appointment_day at #appointment_time."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1935
@@ -2970,10 +2651,7 @@ msgid "Send reminder to customer X days before booking"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1946
-msgid ""
-"Select the timing for the booking reminder SMS. For instance, set the value "
-"to 0 for the day of booking, 1 for one day before the booking, 2 for two "
-"days before, and so on."
+msgid "Select the timing for the booking reminder SMS. For instance, set the value to 0 for the day of booking, 1 for one day before the booking, 2 for two days before, and so on."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1950
@@ -2981,9 +2659,7 @@ msgid "Reminder message"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1953
-msgid ""
-"Dea #customer_name, we would like to remind that you have booked the "
-"#service_name tomorrow at #appointment_time."
+msgid "Dea #customer_name, we would like to remind that you have booked the #service_name tomorrow at #appointment_time."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1958
@@ -2991,9 +2667,7 @@ msgid "Send booking approval SMS"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1961
-msgid ""
-"Turn on to send booking approval SMS notifications to customers once their "
-"booking has been approved."
+msgid "Turn on to send booking approval SMS notifications to customers once their booking has been approved."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1965
@@ -3001,20 +2675,16 @@ msgid "Booking approval SMS:"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1968
-msgid ""
-"Dear #customer_name, your booking on #appointment_day at #appointment_time "
-"has been approved."
+msgid "Dear #customer_name, your booking on #appointment_day at #appointment_time has been approved."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_schedule.php:78
 #, fuzzy
-#| msgid "Webba Booking form"
 msgid "Overbooking error"
 msgstr "Typ av boxningsformulär:"
 
 #: includes/backend/class_wbk_backend_schedule.php:106
 #, fuzzy
-#| msgid "Appointment"
 msgid "Appointments added:"
 msgstr "Utnämning"
 
@@ -3031,9 +2701,7 @@ msgid "Please wait..."
 msgstr ""
 
 #: includes/class-wbk-assets-manager.php:54
-msgid ""
-"Duplication of bookings is highly discouraged because it can lead to errors "
-"in determining free timeslots."
+msgid "Duplication of bookings is highly discouraged because it can lead to errors in determining free timeslots."
 msgstr ""
 
 #: includes/class-wbk-assets-manager.php:66
@@ -3063,7 +2731,6 @@ msgstr "Visa nästa vecka"
 
 #: includes/class-wbk-assets-manager.php:74
 #, fuzzy
-#| msgid "Confirm action"
 msgid "Confirm"
 msgstr "bekräfta verkan"
 
@@ -3214,7 +2881,6 @@ msgstr ""
 
 #: includes/class-wbk-assets-manager.php:242
 #, fuzzy
-#| msgid "Find available times"
 msgid "No available dates message"
 msgstr "Найти свободное время"
 
@@ -3277,7 +2943,6 @@ msgstr ""
 
 #: includes/class-wbk-request-manager.php:1611
 #, fuzzy
-#| msgid "Unable to add the gap."
 msgid "Unable to create payment."
 msgstr "Det går inte att lägga till mellanrummet."
 
@@ -3304,7 +2969,6 @@ msgstr ""
 
 #: includes/class-wbk-request-manager.php:1748
 #, fuzzy
-#| msgid "incorrect name"
 msgid "incorrect amount"
 msgstr "Fel namn"
 
@@ -3318,7 +2982,6 @@ msgstr ""
 
 #: includes/class_wbk_backend.php:65
 #, fuzzy
-#| msgid "Webba Booking form"
 msgid "Webba Booking"
 msgstr "Typ av boxningsformulär:"
 
@@ -3338,7 +3001,6 @@ msgstr "Tjänst"
 #: includes/data/class-wbk-model.php:298 templates/backend/backend_page.php:30
 #: templates/backend/backend_page_header.php:21
 #, fuzzy
-#| msgid "Book"
 msgid "Bookings"
 msgstr "Boka"
 
@@ -3355,7 +3017,6 @@ msgstr "Utseende"
 #: includes/class_wbk_backend.php:74 includes/data/class-wbk-model.php:193
 #: templates/backend/backend_page.php:26
 #, fuzzy
-#| msgid "Email status updated"
 msgid "Email templates"
 msgstr "E-post statusuppdatering"
 
@@ -3376,7 +3037,6 @@ msgstr ""
 #: includes/class_wbk_frontend_booking.php:162
 #: includes/class_wbk_frontend_booking.php:170
 #, fuzzy
-#| msgid "Date format"
 msgid "Date and time"
 msgstr "Datumformat"
 
@@ -3403,7 +3063,6 @@ msgstr "Schema"
 
 #: includes/data/class-wbk-model.php:26 includes/data/class-wbk-model.php:423
 #, fuzzy
-#| msgid "Date format"
 msgid "Date range"
 msgstr "Datumformat"
 
@@ -3417,13 +3076,11 @@ msgstr ""
 
 #: includes/data/class-wbk-model.php:31
 #, fuzzy
-#| msgid "Services"
 msgid "Service name"
 msgstr "Tjänst"
 
 #: includes/data/class-wbk-model.php:31
 #, fuzzy
-#| msgid "Open services page"
 msgid "Enter service name."
 msgstr "Открыть страницу служб."
 
@@ -3433,14 +3090,11 @@ msgstr "Beskrivning."
 
 #: includes/data/class-wbk-model.php:32
 #, fuzzy
-#| msgid "Create at least one service. "
 msgid "Enter a description of the service."
 msgstr "Skapa minst en tjänst."
 
 #: includes/data/class-wbk-model.php:34
-msgid ""
-"Specify a date range if the service is only valid for a specific period of "
-"time."
+msgid "Specify a date range if the service is only valid for a specific period of time."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:35
@@ -3448,9 +3102,7 @@ msgid "Availability date range"
 msgstr ""
 
 #: includes/data/class-wbk-model.php:37
-msgid ""
-"Select the days and time intervals when this service is available for "
-"booking."
+msgid "Select the days and time intervals when this service is available for booking."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:50
@@ -3458,14 +3110,11 @@ msgid "Business hours"
 msgstr "Öppettider "
 
 #: includes/data/class-wbk-model.php:52
-msgid ""
-"Set the service price. If you're not using online payments, keep it zero."
+msgid "Set the service price. If you're not using online payments, keep it zero."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:56
-msgid ""
-"Enter the email addresses of administrators who will receive notifications "
-"for bookings related to this service."
+msgid "Enter the email addresses of administrators who will receive notifications for bookings related to this service."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:58 includes/data/class-wbk-model.php:405
@@ -3473,15 +3122,11 @@ msgid "Priority"
 msgstr ""
 
 #: includes/data/class-wbk-model.php:58
-msgid ""
-"If you have multiple services in one form, set the display priority by "
-"entering a priority number. A lower number indicates a higher priority."
+msgid "If you have multiple services in one form, set the display priority by entering a priority number. A lower number indicates a higher priority."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:60
-msgid ""
-"If you accept group reservations, you can specify the minimum number of "
-"bookings required per time slot."
+msgid "If you accept group reservations, you can specify the minimum number of bookings required per time slot."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:61
@@ -3489,9 +3134,7 @@ msgid "Minimum booking count per time slot"
 msgstr ""
 
 #: includes/data/class-wbk-model.php:63
-msgid ""
-"By default, one booking is allowed per time slot. If you accept group "
-"reservations, set the maximum number of bookings allowed per time slot."
+msgid "By default, one booking is allowed per time slot. If you accept group reservations, set the maximum number of bookings allowed per time slot."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:64
@@ -3500,13 +3143,11 @@ msgstr ""
 
 #: includes/data/class-wbk-model.php:78
 #, fuzzy
-#| msgid "Webba Booking form"
 msgid "Booking form"
 msgstr "Typ av boxningsformulär:"
 
 #: includes/data/class-wbk-model.php:79
 #, fuzzy
-#| msgid "default form"
 msgid "Default form"
 msgstr "Standardformulär"
 
@@ -3515,9 +3156,7 @@ msgid "Google calendar"
 msgstr ""
 
 #: includes/data/class-wbk-model.php:86
-msgid ""
-"If you have other calendars you'd like to integrate with, please provide the "
-"external iCal Calendar URLs."
+msgid "If you have other calendars you'd like to integrate with, please provide the external iCal Calendar URLs."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:87
@@ -3546,32 +3185,24 @@ msgstr ""
 
 #: includes/data/class-wbk-model.php:98
 #, fuzzy
-#| msgid "Duration (in minutes)"
 msgid "Duration (minutes)"
 msgstr "Varaktighet (i minuter)"
 
 #: includes/data/class-wbk-model.php:101
-msgid ""
-"Specify the buffer period for new reservations. E.g., if it's 9 AM and you "
-"want to offer time slots starting 24 hours later, enter 1440 (24 hours * 60 "
-"minutes)."
+msgid "Specify the buffer period for new reservations. E.g., if it's 9 AM and you want to offer time slots starting 24 hours later, enter 1440 (24 hours * 60 minutes)."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:102
 #, fuzzy
-#| msgid "Duration (in minutes)"
 msgid "Preparation time (minutes)"
 msgstr "Varaktighet (i minuter)"
 
 #: includes/data/class-wbk-model.php:104
-msgid ""
-"Enter the time needed between bookings. Default is zero for back-to-back "
-"scheduling."
+msgid "Enter the time needed between bookings. Default is zero for back-to-back scheduling."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:105
 #, fuzzy
-#| msgid "Gap (in minutes)"
 msgid "Gap (minutes)"
 msgstr "Mellanrum (I minuter)"
 
@@ -3581,7 +3212,6 @@ msgstr ""
 
 #: includes/data/class-wbk-model.php:108
 #, fuzzy
-#| msgid "Gap (in minutes)"
 msgid "Step (minutes)"
 msgstr "Mellanrum (I minuter)"
 
@@ -3599,13 +3229,11 @@ msgstr ""
 
 #: includes/data/class-wbk-model.php:131
 #, fuzzy
-#| msgid "Email notifications"
 msgid "Reminder notification template"
 msgstr "e-postmeddelanden"
 
 #: includes/data/class-wbk-model.php:134
 #, fuzzy
-#| msgid "Select a service"
 msgid "Select a template for invoices."
 msgstr "Välj tjänst"
 
@@ -3630,9 +3258,7 @@ msgid "Payment methods"
 msgstr ""
 
 #: includes/data/class-wbk-model.php:146
-msgid ""
-"Specify the necessary deposit amount for booking. Leave it 0 for full "
-"upfront payment."
+msgid "Specify the necessary deposit amount for booking. Leave it 0 for full upfront payment."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:148
@@ -3665,7 +3291,6 @@ msgstr ""
 
 #: includes/data/class-wbk-model.php:192
 #, fuzzy
-#| msgid "Email status updated"
 msgid "Email template"
 msgstr "E-post statusuppdatering"
 
@@ -3674,10 +3299,7 @@ msgid "Enter a name to identify the email template."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:198
-msgid ""
-"Use the text editor to prepare the email template. <a rel=\"noopener\" "
-"target=\"_blank\" href=\"https://webba-booking.com/documentation/"
-"placeholders/\">"
+msgid "Use the text editor to prepare the email template. <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/placeholders/\">"
 msgstr ""
 
 #: includes/data/class-wbk-model.php:199
@@ -3726,13 +3348,11 @@ msgstr ""
 
 #: includes/data/class-wbk-model.php:300
 #, fuzzy
-#| msgid "Add appointment"
 msgid "ID of cancelled appointment"
 msgstr "Lägg utnämning"
 
 #: includes/data/class-wbk-model.php:302
 #, fuzzy
-#| msgid "Cancel"
 msgid "Cancelled by"
 msgstr "Avbryt"
 
@@ -3742,14 +3362,12 @@ msgstr ""
 
 #: includes/data/class-wbk-model.php:352
 #, fuzzy
-#| msgid "Users"
 msgid "User"
 msgstr "Användare"
 
 #: includes/data/class-wbk-model.php:353
-#: plugion/utils/class-plugion-translator.php:103 webba-booking-lite.php:533
+#: wbkdata/utils/class-wbkdata-translator.php:103 webba-booking-lite.php:533
 #, fuzzy
-#| msgid "General options"
 msgid "select option"
 msgstr "Общие настройки"
 
@@ -3779,7 +3397,6 @@ msgstr ""
 
 #: includes/data/class-wbk-model.php:377
 #, fuzzy
-#| msgid "available"
 msgid "Available on"
 msgstr "Ledig"
 
@@ -3788,9 +3405,7 @@ msgid "Choose the service(-s) for which the coupon will be applicable."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:383
-msgid ""
-"Specify the Usage limit for the coupon - the maximum number of times it can "
-"be applied. Leaving it blank means unlimited use."
+msgid "Specify the Usage limit for the coupon - the maximum number of times it can be applied. Leaving it blank means unlimited use."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:384
@@ -3826,9 +3441,7 @@ msgid "Enter a name to identify the pricing rule."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:404
-msgid ""
-"Specify the order for applying pricing rules to a service. This matters when "
-"you apply multiple rules for the same service."
+msgid "Specify the order for applying pricing rules to a service. This matters when you apply multiple rules for the same service."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:406
@@ -3909,7 +3522,6 @@ msgstr ""
 
 #: includes/data/class-wbk-model.php:440
 #, fuzzy
-#| msgid "Search time slots"
 msgid "Number of timeslots"
 msgstr "Sök tidsluckor"
 
@@ -3923,7 +3535,6 @@ msgstr ""
 
 #: includes/data/class-wbk-model.php:449
 #, fuzzy
-#| msgid "Activation"
 msgid "Action"
 msgstr "Aktivering"
 
@@ -3940,8 +3551,7 @@ msgid "replace"
 msgstr ""
 
 #: includes/data/class-wbk-model.php:453
-msgid ""
-"Set the value by which the price will be increased, decreased, or replaced."
+msgid "Set the value by which the price will be increased, decreased, or replaced."
 msgstr ""
 
 #: includes/data/class-wbk-model.php:454
@@ -3968,11 +3578,11 @@ msgstr ""
 msgid "The field is related to the number of seats booked"
 msgstr ""
 
-#: includes/plugion_extensions/class-wbk-pe-business-hours.php:44
+#: includes/wbkdata_extensions/class-wbk-pe-business-hours.php:44
 msgid "Please, remove time range intersections."
 msgstr ""
 
-#: includes/plugion_extensions/class-wbk-pe-time.php:18
+#: includes/wbkdata_extensions/class-wbk-pe-time.php:18
 msgid "Ttime entered incorrectly"
 msgstr ""
 
@@ -4030,13 +3640,11 @@ msgstr ""
 
 #: includes/third-parties/class_wbk_woocommerce.php:357
 #, fuzzy
-#| msgid "Webba Booking form"
 msgid "Webba Booking services"
 msgstr "Typ av boxningsformulär:"
 
 #: includes/third-parties/class_wbk_woocommerce.php:366
 #, fuzzy
-#| msgid "Webba Booking form"
 msgid "Webba Booking pricing rules"
 msgstr "Typ av boxningsformulär:"
 
@@ -4046,216 +3654,179 @@ msgstr ""
 
 #: includes/utilities/class_wbk_model_utils.php:215
 #, fuzzy
-#| msgid "Send administrator an email"
 msgid "Added by the administrator (not paid)"
 msgstr "Skicka Admin en Epost"
 
 #: includes/utilities/class_wbk_model_utils.php:216
 #, fuzzy
-#| msgid "Send administrator an email"
 msgid "Added by the administrator (paid)"
 msgstr "Skicka Admin en Epost"
 
-#: plugion/templates/table.php:17 templates/plugion/table.php:17
+#: wbkdata/templates/table.php:17 templates/wbkdata/table.php:17
 #, fuzzy
-#| msgid "available"
 msgid "No data available."
 msgstr "Ledig"
 
-#: plugion/utils/class-plugion-translator.php:66 webba-booking-lite.php:496
+#: wbkdata/utils/class-wbkdata-translator.php:66 webba-booking-lite.php:496
 #, php-format
 msgid "%s is required"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:67 webba-booking-lite.php:497
+#: wbkdata/utils/class-wbkdata-translator.php:67 webba-booking-lite.php:497
 #, php-format
 msgid "%s must be a maximum of 256 characters"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:68 webba-booking-lite.php:498
+#: wbkdata/utils/class-wbkdata-translator.php:68 webba-booking-lite.php:498
 #, php-format
 msgid "Value of %s is not acceptable"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:69 webba-booking-lite.php:499
+#: wbkdata/utils/class-wbkdata-translator.php:69 webba-booking-lite.php:499
 #, php-format
 msgid "%s must be a maximum of 65535 characters"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:70 webba-booking-lite.php:500
+#: wbkdata/utils/class-wbkdata-translator.php:70 webba-booking-lite.php:500
 #, php-format
 msgid "Validation of %s failed"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:71 webba-booking-lite.php:501
+#: wbkdata/utils/class-wbkdata-translator.php:71 webba-booking-lite.php:501
 #, php-format
 msgid "Field %s is empty"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:73 webba-booking-lite.php:503
+#: wbkdata/utils/class-wbkdata-translator.php:73 webba-booking-lite.php:503
 msgid "Loading..."
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:74 webba-booking-lite.php:504
+#: wbkdata/utils/class-wbkdata-translator.php:74 webba-booking-lite.php:504
 msgid "Element not found"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:75 webba-booking-lite.php:505
+#: wbkdata/utils/class-wbkdata-translator.php:75 webba-booking-lite.php:505
 msgid "Bad request"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:76 webba-booking-lite.php:506
+#: wbkdata/utils/class-wbkdata-translator.php:76 webba-booking-lite.php:506
 msgid "Failed"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:77 webba-booking-lite.php:507
+#: wbkdata/utils/class-wbkdata-translator.php:77 webba-booking-lite.php:507
 msgid "Forbidden"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:78 webba-booking-lite.php:508
+#: wbkdata/utils/class-wbkdata-translator.php:78 webba-booking-lite.php:508
 #, fuzzy
-#| msgid "Create at least one service. "
 msgid "Please, set at least one filter"
 msgstr "Skapa minst en tjänst."
 
-#: plugion/utils/class-plugion-translator.php:79 webba-booking-lite.php:509
+#: wbkdata/utils/class-wbkdata-translator.php:79 webba-booking-lite.php:509
 #, fuzzy
-#| msgid "available"
 msgid "No data available"
 msgstr "Ledig"
 
-#: plugion/utils/class-plugion-translator.php:80 webba-booking-lite.php:510
+#: wbkdata/utils/class-wbkdata-translator.php:80 webba-booking-lite.php:510
 msgid "Here _START_ to _END_ of _TOTAL_ entries"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:81 webba-booking-lite.php:511
+#: wbkdata/utils/class-wbkdata-translator.php:81 webba-booking-lite.php:511
 msgid "Showing 0 to 0 of 0 entries"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:82 webba-booking-lite.php:512
+#: wbkdata/utils/class-wbkdata-translator.php:82 webba-booking-lite.php:512
 msgid "(filtered from _MAX_ total entries)"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:83 webba-booking-lite.php:513
+#: wbkdata/utils/class-wbkdata-translator.php:83 webba-booking-lite.php:513
 msgid "Show _MENU_ entries"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:84 webba-booking-lite.php:514
+#: wbkdata/utils/class-wbkdata-translator.php:84 webba-booking-lite.php:514
 msgid "Processing..."
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:85 webba-booking-lite.php:515
+#: wbkdata/utils/class-wbkdata-translator.php:85 webba-booking-lite.php:515
 #, fuzzy
-#| msgid "March"
 msgid "Search"
 msgstr "Mars"
 
-#: plugion/utils/class-plugion-translator.php:86 webba-booking-lite.php:516
+#: wbkdata/utils/class-wbkdata-translator.php:86 webba-booking-lite.php:516
 msgid "No matching records found"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:87 webba-booking-lite.php:517
+#: wbkdata/utils/class-wbkdata-translator.php:87 webba-booking-lite.php:517
 msgid "First"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:88 webba-booking-lite.php:518
+#: wbkdata/utils/class-wbkdata-translator.php:88 webba-booking-lite.php:518
 msgid "Last"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:89
+#: wbkdata/utils/class-wbkdata-translator.php:89
 #: templates/backend/wizard_page.php:282
 #: templates/frontend_v5/webba5_form_container.php:89
 #: webba-booking-lite.php:519
 msgid "Next"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:90
+#: wbkdata/utils/class-wbkdata-translator.php:90
 #: templates/backend/wizard_page.php:281 webba-booking-lite.php:520
 #, fuzzy
-#| msgid "Previous  month"
 msgid "Previous"
 msgstr "Förra månad"
 
-#: plugion/utils/class-plugion-translator.php:91 webba-booking-lite.php:521
+#: wbkdata/utils/class-wbkdata-translator.php:91 webba-booking-lite.php:521
 msgid ": activate to sort column ascending"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:92 webba-booking-lite.php:522
+#: wbkdata/utils/class-wbkdata-translator.php:92 webba-booking-lite.php:522
 msgid ": activate to sort column descending"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:93 webba-booking-lite.php:523
+#: wbkdata/utils/class-wbkdata-translator.php:93 webba-booking-lite.php:523
 msgid "Filters for"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:94
+#: wbkdata/utils/class-wbkdata-translator.php:94
 #: templates/frontend_v5/coupon_field.php:7 webba-booking-lite.php:524
 msgid "Apply"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:95 webba-booking-lite.php:525
+#: wbkdata/utils/class-wbkdata-translator.php:95 webba-booking-lite.php:525
 msgid "Apply and close"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:98 webba-booking-lite.php:528
+#: wbkdata/utils/class-wbkdata-translator.php:98 webba-booking-lite.php:528
 msgid "Filters"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:99 webba-booking-lite.php:529
+#: wbkdata/utils/class-wbkdata-translator.php:99 webba-booking-lite.php:529
 msgid "Save and close"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:100 webba-booking-lite.php:530
+#: wbkdata/utils/class-wbkdata-translator.php:100 webba-booking-lite.php:530
 msgid "New"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:101 webba-booking-lite.php:531
+#: wbkdata/utils/class-wbkdata-translator.php:101 webba-booking-lite.php:531
 msgid "Are you sure?"
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:102 webba-booking-lite.php:532
+#: wbkdata/utils/class-wbkdata-translator.php:102 webba-booking-lite.php:532
 msgid "Yes, delete it."
 msgstr ""
 
-#: plugion/utils/class-plugion-translator.php:104
+#: wbkdata/utils/class-wbkdata-translator.php:104
 #, fuzzy
-#| msgid "select..."
 msgid "select all"
 msgstr "Välj…"
 
-#: plugion/utils/class-plugion-translator.php:105
+#: wbkdata/utils/class-wbkdata-translator.php:105
 #, fuzzy
-#| msgid "Service select label"
 msgid "deselect all"
 msgstr "Метка для списка служб"
-
-#: plugion/vendor/DataTables/datatables.min.js:91
-msgid "<div/>"
-msgstr ""
-
-#: plugion/vendor/DataTables/datatables.min.js:91
-msgid "<button type=\"button\">&#215;</button>"
-msgstr ""
-
-#: plugion/vendor/DataTables/datatables.min.js:91
-msgid "<button type=\"button\"><span class=\""
-msgstr ""
-
-#: plugion/vendor/DataTables/datatables.min.js:91
-msgid "<button type=\"button\"></button>"
-msgstr ""
-
-#: plugion/vendor/DataTables/datatables.min.js:91
-msgid "<table><thead><tr><th>"
-msgstr ""
-
-#: plugion/vendor/DataTables/datatables.min.js:91
-msgid "<input/>"
-msgstr ""
-
-#: plugion/vendor/DataTables/datatables.min.js:91
-msgid "<button type = \"button\"/>"
-msgstr ""
 
 #: templates/backend/appearance_page_content.php:64
 msgid "Save"
@@ -4268,19 +3839,16 @@ msgstr ""
 
 #: templates/backend/backend_page.php:22
 #, fuzzy
-#| msgid "Services"
 msgid "Service categories"
 msgstr "Tjänst"
 
 #: templates/backend/backend_page.php:34
 #, fuzzy
-#| msgid "Add appointment"
 msgid "Active appointments"
 msgstr "Lägg utnämning"
 
 #: templates/backend/backend_page.php:37
 #, fuzzy
-#| msgid "Add appointment"
 msgid "Cancelled appointments"
 msgstr "Lägg utnämning"
 
@@ -4293,7 +3861,7 @@ msgid "Calendar not found"
 msgstr ""
 
 #: templates/backend/backend_page.php:79
-#: templates/plugion/cell_pe_google_access_token.php:26
+#: templates/wbkdata/cell_pe_google_access_token.php:26
 msgid "Manage authorization"
 msgstr ""
 
@@ -4303,7 +3871,6 @@ msgstr ""
 
 #: templates/backend/backend_page.php:99 templates/backend/schedule_page.php:16
 #, fuzzy
-#| msgid "Schedule"
 msgid "Schedule tools"
 msgstr "Schema"
 
@@ -4336,13 +3903,11 @@ msgstr ""
 
 #: templates/backend/dashboard_blocks.php:21
 #, fuzzy
-#| msgid "Book"
 msgid "Approved Bookings"
 msgstr "Boka"
 
 #: templates/backend/dashboard_blocks.php:22
 #, fuzzy
-#| msgid "Book"
 msgid "Pending Bookings"
 msgstr "Boka"
 
@@ -4352,7 +3917,6 @@ msgstr ""
 
 #: templates/backend/dashboard_blocks.php:115
 #, fuzzy
-#| msgid "Book"
 msgid "No. of bookings"
 msgstr "Boka"
 
@@ -4377,9 +3941,7 @@ msgid "authorization required"
 msgstr ""
 
 #: templates/backend/gg_auth_block.php:10
-msgid ""
-"IMPORTANT NOTICE: add the following URL in the Google Cloud Console or "
-"contact administrator before authorization:"
+msgid "IMPORTANT NOTICE: add the following URL in the Google Cloud Console or contact administrator before authorization:"
 msgstr ""
 
 #: templates/backend/gg_auth_block.php:13
@@ -4391,10 +3953,8 @@ msgid "authorization failed"
 msgstr ""
 
 #: templates/backend/gg_auth_block.php:17
-#: templates/plugion/cell_pe_google_access_token.php:41
-msgid ""
-"Check Google API credentials, calendar ID and try to re-authorize this "
-"calendar"
+#: templates/wbkdata/cell_pe_google_access_token.php:41
+msgid "Check Google API credentials, calendar ID and try to re-authorize this calendar"
 msgstr ""
 
 #: templates/backend/gg_auth_block.php:18
@@ -4402,12 +3962,12 @@ msgid "Re-authorize"
 msgstr ""
 
 #: templates/backend/gg_auth_block.php:22
-#: templates/plugion/cell_pe_google_access_token.php:29
+#: templates/wbkdata/cell_pe_google_access_token.php:29
 msgid "Authorized"
 msgstr ""
 
 #: templates/backend/gg_auth_block.php:23
-#: templates/plugion/cell_pe_google_access_token.php:30
+#: templates/wbkdata/cell_pe_google_access_token.php:30
 msgid "Calendar name on Google:"
 msgstr ""
 
@@ -4437,7 +3997,6 @@ msgstr "Öppna"
 
 #: templates/backend/schedule_page.php:15
 #, fuzzy
-#| msgid "Click to display the service schedule:"
 msgid "Click to open schedule tools:"
 msgstr "Klicka för att visa serviceschemat :"
 
@@ -4452,7 +4011,6 @@ msgstr "Klicka för att visa serviceschemat :"
 
 #: templates/backend/schedule_page.php:49
 #, fuzzy
-#| msgid "Schedule"
 msgid "Schedule Tools"
 msgstr "Schema"
 
@@ -4490,7 +4048,6 @@ msgstr "Välj tjänst:"
 #: templates/backend/schedule_tools_content.php:77
 #: templates/backend/schedule_tools_content.php:158
 #, fuzzy
-#| msgid "Confirm action"
 msgid "Choose an action"
 msgstr "bekräfta verkan"
 
@@ -4526,7 +4083,6 @@ msgstr ""
 
 #: templates/backend/schedule_tools_content.php:264
 #, fuzzy
-#| msgid "Select a service"
 msgid "Select date"
 msgstr "Välj tjänst"
 
@@ -4536,7 +4092,6 @@ msgstr ""
 
 #: templates/backend/wizard_page.php:165
 #, fuzzy
-#| msgid "Webba Booking form"
 msgid "Booking form settings"
 msgstr "Typ av boxningsformulär:"
 
@@ -4545,9 +4100,7 @@ msgid "Congrats! You are all set!"
 msgstr ""
 
 #: templates/backend/wizard_page.php:228
-msgid ""
-"This is a shortcode for the booking form, place it in the page you want it "
-"to appear:"
+msgid "This is a shortcode for the booking form, place it in the page you want it to appear:"
 msgstr ""
 
 #: templates/backend/wizard_page.php:248
@@ -4585,13 +4138,11 @@ msgstr ""
 
 #: templates/frontend/get_parameters_processing.php:148
 #, fuzzy
-#| msgid "Booking items count"
 msgid "Bookings not found."
 msgstr "Ny bokning"
 
 #: templates/frontend/get_parameters_processing.php:197
 #, fuzzy
-#| msgid "Cancel"
 msgid "Cancellation"
 msgstr "Avbryt"
 
@@ -4601,13 +4152,11 @@ msgstr ""
 
 #: templates/frontend/link_approval_result.php:14
 #, fuzzy
-#| msgid "Booking items count"
 msgid "Bookings approved: #count"
 msgstr "Ny bokning"
 
 #: templates/frontend/link_cancellation_result.php:14
 #, fuzzy
-#| msgid "Booking items count"
 msgid "Bookings canceled: #count"
 msgstr "Ny bokning"
 
@@ -4650,7 +4199,6 @@ msgstr ""
 
 #: templates/frontend_v5/group_timeslot.php:37
 #, fuzzy
-#| msgid "available"
 msgid "Available"
 msgstr "Ledig"
 
@@ -4665,7 +4213,6 @@ msgstr ""
 #: templates/frontend_v5/service_multiple.php:50
 #: templates/frontend_v5/service_single_radio.php:45
 #, fuzzy
-#| msgid "minutes"
 msgid "min"
 msgstr "Minuter"
 
@@ -4689,41 +4236,39 @@ msgstr ""
 msgid "Back"
 msgstr ""
 
-#: templates/plugion/category_list.php:22
+#: templates/wbkdata/category_list.php:22
 #, fuzzy
-#| msgid "Services"
 msgid "Service catetories"
 msgstr "Tjänst"
 
-#: templates/plugion/cell_pe_google_access_token.php:18
-#: templates/plugion/cell_pe_google_access_token.php:40
+#: templates/wbkdata/cell_pe_google_access_token.php:18
+#: templates/wbkdata/cell_pe_google_access_token.php:40
 msgid "Authorization failed"
 msgstr ""
 
-#: templates/plugion/cell_pe_google_access_token.php:19
+#: templates/wbkdata/cell_pe_google_access_token.php:19
 msgid "Google API credentials not set"
 msgstr ""
 
-#: templates/plugion/cell_pe_google_access_token.php:34
+#: templates/wbkdata/cell_pe_google_access_token.php:34
 msgid "Authorization required"
 msgstr ""
 
-#: templates/plugion/cell_pe_google_access_token.php:35
+#: templates/wbkdata/cell_pe_google_access_token.php:35
 msgid "Click on the link below to start the authorization process"
 msgstr ""
 
-#: templates/plugion/cell_pe_google_access_token.php:36
-#: templates/plugion/cell_pe_google_access_token.php:42
+#: templates/wbkdata/cell_pe_google_access_token.php:36
+#: templates/wbkdata/cell_pe_google_access_token.php:42
 msgid "Details: "
 msgstr ""
 
-#: templates/plugion/input_radio.php:10
+#: templates/wbkdata/input_radio.php:10
 msgid "Specify what action should be performed on the price."
 msgstr ""
 
-#: templates/plugion/input_radio.php:13
-msgid ""
-"Specify whether the amount is a fixed value or a percentage of the price."
+#: templates/wbkdata/input_radio.php:13
+msgid "Specify whether the amount is a fixed value or a percentage of the price."
 msgstr ""
 
 #~ msgid "Add Webba Booking form"
@@ -4768,12 +4313,8 @@ msgstr ""
 #~ msgid "Enabled"
 #~ msgstr "Enabled"
 
-#~ msgid ""
-#~ "a - Represents an alpha character (A-Z,a-z), 9 - Represents a numeric "
-#~ "character (0-9), * - Represents an alphanumeric character (A-Z,a-z,0-9)"
-#~ msgstr ""
-#~ "a - representerar en bokstav (A-Z, a-z), 9 - Representerar en siffra "
-#~ "(0-9), * - representerar ett alfanumeriskt tecken (A-Z, a-z, 0-9)"
+#~ msgid "a - Represents an alpha character (A-Z,a-z), 9 - Represents a numeric character (0-9), * - Represents an alphanumeric character (A-Z,a-z,0-9)"
+#~ msgstr "a - representerar en bokstav (A-Z, a-z), 9 - Representerar en siffra (0-9), * - representerar ett alfanumeriskt tecken (A-Z, a-z, 0-9)"
 
 #~ msgid "Check if you'd like to send customer an email"
 #~ msgstr "Kontrollera om du vill skicka kunden ett e-postmeddelande"
@@ -4802,12 +4343,8 @@ msgstr ""
 #~ msgid "Add the second gap"
 #~ msgstr "Lägga det andra mellanrummet"
 
-#~ msgid ""
-#~ "These services will be permanently deleted and cannot be recovered. "
-#~ "Continue?"
-#~ msgstr ""
-#~ "Dessa tjänster kommer att tas bort permanent och kan inte återställas . "
-#~ "Fortsätt?"
+#~ msgid "These services will be permanently deleted and cannot be recovered. Continue?"
+#~ msgstr "Dessa tjänster kommer att tas bort permanent och kan inte återställas . Fortsätt?"
 
 #~ msgid "Error"
 #~ msgstr "Fel"

@@ -1,0 +1,82 @@
+.slider {
+    width: 100%;
+    height: 4px;
+    background-color: #d9dfe7;
+}
+
+.slider:global(.disabled) {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.thumb {
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+    background-color: #212121;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.track:nth-child(2) {
+    height: 100%;
+    background-color: #212121;
+}
+
+.businessDay {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sliderWrapper {
+    width: 100%;
+}
+
+.sliderWrapper p {
+    margin: 0 0 10px 0;
+}
+
+.buttonGroup {
+    margin-top: 15px;
+}
+
+.buttonClose {
+    cursor: pointer;
+}
+
+.error {
+    color: red;
+}
+
+.daysWrapper {
+    display: flex;
+    flex-flow: column;
+    gap: 35px;
+}
+
+.select {
+    color: #212121;
+    padding: 0 40px 0 20px;
+    cursor: pointer;
+    height: 50px;
+    overflow: hidden;
+    display: block;
+    border-color: #212121;
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #8a9393;
+    border-radius: 15px;
+    line-height: 48px;
+    transition: 0.2s;
+    font-size: 16px;
+    font-family: poppins, arial;
+}
+
+.readableTime {
+    font-family: poppins, arial;
+    font-size: 16px;
+    color: #212121;
+}

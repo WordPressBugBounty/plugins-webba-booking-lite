@@ -129,19 +129,19 @@ class WBK_Booking_Factory {
                 $booking->set( 'payment_method', 'Pay on arrival' );
                 $booking->save();
             }
-            Plugion()->set_value(
+            WbkData()->set_value(
                 get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
                 'appointment_created_on',
                 $booking->get_id(),
                 time()
             );
-            Plugion()->set_value(
+            WbkData()->set_value(
                 get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
                 'appointment_duration',
                 $booking->get_id(),
                 $service->get_duration()
             );
-            Plugion()->set_value(
+            WbkData()->set_value(
                 get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
                 'appointment_prev_status',
                 $booking->get_id(),
@@ -150,7 +150,7 @@ class WBK_Booking_Factory {
             WBK_Model_Utils::set_booking_end( $booking->get_id() );
             if ( get_option( 'wbk_gdrp', 'disabled' ) == 'disabled' ) {
                 if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
-                    Plugion()->set_value(
+                    WbkData()->set_value(
                         get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
                         'appointment_user_ip',
                         $booking->get_id(),
@@ -161,24 +161,36 @@ class WBK_Booking_Factory {
             if ( $event != 'on_manual_booking' ) {
                 $amount = WBK_Price_Processor::calculate_single_booking_price( $booking_id, $booking_ids );
                 WBK_Model_Utils::set_amount_for_booking( $booking_id, $amount['price'], json_encode( $amount['price_details'] ) );
-                Plugion()->set_value(
+                WbkData()->set_value(
                     get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
                     'appointment_creted_by',
                     $booking->get_id(),
                     'customer'
                 );
             } else {
-                Plugion()->set_value(
+                WbkData()->set_value(
                     get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
                     'appointment_prev_status',
                     $booking->get_id(),
                     $booking->get( 'status' )
                 );
-                Plugion()->set_value(
+                WbkData()->set_value(
                     get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
                     'appointment_creted_by',
                     $booking->get_id(),
                     'admin'
+                );
+                WbkData()->set_value(
+                    get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
+                    'appointment_token',
+                    $booking->get_id(),
+                    uniqid()
+                );
+                WbkData()->set_value(
+                    get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
+                    'appointment_admin_token',
+                    $booking->get_id(),
+                    uniqid()
                 );
             }
             if ( get_option( 'wbk_appointments_delete_not_paid_mode', 'disabled' ) == 'on_booking' ) {
@@ -190,7 +202,7 @@ class WBK_Booking_Factory {
                         $expiration_value = time() + $expiration_time * 60;
                     }
                 }
-                Plugion()->set_value(
+                WbkData()->set_value(
                     get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
                     'appointment_expiration_time',
                     $booking->get_id(),
@@ -482,7 +494,7 @@ class WBK_Booking_Factory {
             WBK_Db_Utils::updateAppointmentDataAtGGCelendar( $booking_id );
             date_default_timezone_set( 'UTC' );
             WBK_Model_Utils::set_booking_end( $booking_id );
-            Plugion()->set_value(
+            WbkData()->set_value(
                 get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
                 'appointment_prev_status',
                 $booking_id,

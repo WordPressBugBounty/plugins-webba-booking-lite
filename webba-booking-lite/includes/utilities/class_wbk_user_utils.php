@@ -61,6 +61,9 @@ class WBK_User_Utils
     public static function check_access_to_service($allow_service_update = false)
     {
         $user_id = get_current_user_id();
+        if (current_user_can('manage_options')) {
+            return true;
+        }
         if ($user_id == 0) {
             return false;
         }
@@ -90,6 +93,47 @@ class WBK_User_Utils
         return false;
     }
 
+    /**
+     * check if current user has access to particular service
+     * @return bool true if has access
+     */
+    public static function check_access_to_particular_service($service_id, $allow_service_update = false)
+    {
+        $user_id = get_current_user_id();
+        if (current_user_can('manage_options')) {
+            return true;
+        }
+        if ($user_id == 0) {
+            return false;
+        }
+        if (!is_numeric($service_id)) {
+            return false;
+        }
+        global $wpdb;
+
+        if ($allow_service_update) {
+            $users = $wpdb->get_col('SELECT users FROM ' . get_option('wbk_db_prefix', '') . 'wbk_services WHERE users_allow_edit="yes" and id=' . $service_id);
+        } else {
+            $users = $wpdb->get_col('SELECT users FROM ' . get_option('wbk_db_prefix', '') . 'wbk_services WHERE id=' . $service_id);
+        }
+
+        foreach ($users as $user) {
+            if (is_null($user)) {
+                continue;
+            }
+            $user_arr = json_decode($user);
+            if ($user_arr == '') {
+                continue;
+            }
+            if (is_numeric($user_arr)) {
+                $user_arr = array($user_arr);
+            }
+            if (in_array($user_id, $user_arr)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 

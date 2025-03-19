@@ -1,9 +1,14 @@
 const defaultConfig = require('@wordpress/scripts/config/webpack.config.js')
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin')
-const { sync: glob } = require('fast-glob')
+const FastGlob = require('fast-glob')
+const PrefixSelectorPlugin = require('./src/webpack/PrefixSelectorPlugin.js')
 
 const getSrcJsEntries = () => {
-    const jsFilePaths = glob(['./src/**/index.js', '!./src/block/**/*'])
+    const jsFilePaths = FastGlob.sync([
+        './src/**/index.js',
+        '!./src/block/**/*',
+    ])
+
     const entries = {}
 
     jsFilePaths.forEach((filePath) => {
@@ -30,15 +35,20 @@ const defaultRules = defaultConfig.module.rules.filter(
 const config = {
     ...defaultConfig,
     plugins: [
-        ...defaultPlugins,
+        new PrefixSelectorPlugin({
+            includedScopes: ['admin/'],
+            prefix: `body[class*='webba-booking-wp-root']`,
+        }),
         new MiniCSSExtractPlugin({
             filename: (pathData) => {
                 if (!pathData.chunk.runtime.includes('block/')) {
                     return '[name]/index.css'
                 }
+
                 return '[name].css'
             },
         }),
+        ...defaultPlugins,
     ],
     entry: {
         ...defaultEntries,
@@ -63,6 +73,13 @@ const config = {
                 type: 'asset/inline',
             },
         ],
+    },
+    externals: {
+        react: 'React',
+        'react-dom': 'ReactDOM',
+    },
+    optimization: {
+        splitChunks: false,
     },
 }
 

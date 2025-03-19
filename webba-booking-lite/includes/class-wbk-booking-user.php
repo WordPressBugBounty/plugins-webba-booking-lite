@@ -41,7 +41,7 @@ class Wbk_Booking_User {
      * @param array $booking_data
      * @return void
      */
-    public function create_booking_user( array $booking_data ) : void {
+    public function create_booking_user( $booking_data ) : void {
         return;
         if ( !wbk_fs()->can_use_premium_code() ) {
             return;

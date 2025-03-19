@@ -561,7 +561,7 @@ function wbk_load_schedule_fullcalendar(start, service_id, initialView) {
         jQuery(appointment_days[0]).val(_first_day)
         jQuery(appointment_days[1]).val(_last_day)
 
-        jQuery(jQuery('.plugion_filter_daterange')[0]).trigger('change')
+        jQuery(jQuery('.wbkdata_filter_daterange')[0]).trigger('change')
 
         jQuery(calendarEl).removeClass('loading')
 
@@ -729,7 +729,7 @@ function editAppointment_fullcalendar(
     )
     if (booking.length > 0) {
         jQuery(booking)
-            .parent('.plugion_editable_row')
+            .parent('.wbkdata_editable_row')
             .find('.options-item-edit-wb')
             .click()
     } else {
@@ -1501,7 +1501,7 @@ function setEvents_fullcalendar(calendar) {
             'data-timeslot-edited-timestamp'
         )
 
-        plugion.add_appointment_fullcalendar(arr[3], arr[2])
+        wbkdata.add_appointment_fullcalendar(arr[3], arr[2])
     })
     // appointment click event
     jQuery('[id^=wbk_appointment_]').unbind('click')

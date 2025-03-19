@@ -19,30 +19,21 @@ WBK_Mixpanel::update_configuration(true);
     $db_prefix = get_option('wbk_db_prefix', '');
     switch ($plugin_page) {
         case 'wbk-services':
-            WBK_Renderer::load_template('backend/backend_page_header', array(__('Services', 'webba-booking-lite'), true));
-            Plugion()->table($db_prefix . 'wbk_services');
+            WBK_Renderer::load_template('backend/react_app', [], true);
             break;
         case 'wbk-service-categories':
-            WBK_Renderer::load_template('backend/backend_page_header', array(__('Service categories', 'webba-booking-lite'), true));
-            Plugion()->table($db_prefix . 'wbk_service_categories');
+            WBK_Renderer::load_template('backend/react_app', [], true);
             break;
         case 'wbk-email-templates':
-            WBK_Renderer::load_template('backend/backend_page_header', array(__('Email templates', 'webba-booking-lite'), true));
-            Plugion()->table($db_prefix . 'wbk_email_templates');
+            WBK_Renderer::load_template('backend/react_app', [], true);
             break;
         case 'wbk-appointments':
-            WBK_Renderer::load_template('backend/backend_page_header', array(__('Bookings', 'webba-booking-lite'), true));
-            $db_prefix = get_option('wbk_db_prefix', '');
-            if (isset($_GET['cancelled']) && $_GET['cancelled'] == 1) {
-                Plugion()->table($db_prefix . 'wbk_cancelled_appointments');
-                echo '<p style="display: block; clear: both;" ><a class="wbk_control_link" href="' . admin_url() . 'admin.php?page=wbk-appointments">' . __('Active appointments', 'webba-booking-lite') . '</a>';
-            } else {
-                Plugion()->table($db_prefix . 'wbk_appointments');
-                echo '<p style="display: block; clear: both;" ><a class="wbk_control_link" href="' . admin_url() . 'admin.php?page=wbk-appointments&cancelled=1">' . __('Cancelled appointments', 'webba-booking-lite') . '</a>';
-            }
+            WBK_Renderer::load_template('backend/react_app', [], true);
+            break;
+        case 'wbk-calendar':
+            WBK_Renderer::load_template('backend/react_app', [], true);
             break;
         case 'wbk-gg-calendars':
-            WBK_Renderer::load_template('backend/backend_page_header', array(__('Google calendars', 'webba-booking-lite'), true));
             if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
                 if (isset($_GET['clid']) && is_numeric($_GET['clid'])) {
                     if (WBK_User_Utils::check_access_to_gg_calendar($_GET['clid']) || current_user_can('manage_options')) {
@@ -69,7 +60,7 @@ WBK_Mixpanel::update_configuration(true);
                     echo $html;
                 } else {
                     if (current_user_can('manage_options')) {
-                        Plugion()->table($db_prefix . 'wbk_gg_calendars');
+                        WBK_Renderer::load_template('backend/react_app', [], true);
                     } else {
                         $user_id = get_current_user_id();
                         if ($user_id == 0) {
@@ -91,39 +82,36 @@ WBK_Mixpanel::update_configuration(true);
             }
             break;
         case 'wbk-coupons':
-            WBK_Renderer::load_template('backend/backend_page_header', array(__('Coupons', 'webba-booking-lite'), true));
-            Plugion()->table($db_prefix . 'wbk_coupons');
+            WBK_Renderer::load_template('backend/react_app', [], true);
             break;
         case 'wbk-pricing-rules':
-            WBK_Renderer::load_template('backend/backend_page_header', array(__('Pricing rules', 'webba-booking-lite'), true));
-            Plugion()->table($db_prefix . 'wbk_pricing_rules');
+            WBK_Renderer::load_template('backend/react_app', [], true);
             break;
-        case 'wbk-schedule':
-            if (isset($_GET['tools']) && $_GET['tools'] == 'true') {
-                WBK_Renderer::load_template('backend/backend_page_header', array(__('Schedule tools', 'webba-booking-lite'), true));
-                WBK_Renderer::load_template('backend/schedule_tools_content', array(), true);
-            } else {
-                WBK_Renderer::load_template('backend/backend_page_header', array(__('Calendar', 'webba-booking-lite'), true));
-                WBK_Renderer::load_template('backend/schedule_page', array(), true);
 
-            }
-
-            break;
         case 'wbk-options':
-            $services = WBK_Model_Utils::get_service_ids();
-            if (isset($_GET['wbk-activation'])) {
-                WBK_Renderer::load_template('backend/wizard_page', array());
+            if (isset($_GET['tools'])) {
+                WBK_Renderer::load_template('backend/backend_page_header', array(__('Schedule tools', 'webba-booking-lite'), true));
+                ?>
+                <div style="padding:25px">
+                    <?php
+                    WBK_Renderer::load_template('backend/schedule_tools_content', array(), true);
+                    ?>
+                </div>
+                <?php
             } else {
-                WBK_Renderer::load_template('backend/options_page', array());
+                $services = WBK_Model_Utils::get_service_ids();
+                if (isset($_GET['wbk-activation'])) {
+                    WBK_Renderer::load_template('backend/wizard_page', array());
+                } else {
+                    WBK_Renderer::load_template('backend/options_page', array());
+                }
             }
             break;
         case 'wbk-appearance':
             WBK_Renderer::load_template('backend/appearance_page_content', array(), true);
             break;
-
         case 'wbk-dashboard':
-            WBK_Renderer::load_template('backend/backend_page_header', array(__('Dashboard', 'webba-booking-lite'), true));
-            WBK_Renderer::load_template('backend/dashboard', array(), true);
+            WBK_Renderer::load_template('backend/react_app', [], true);
             break;
 
         default:

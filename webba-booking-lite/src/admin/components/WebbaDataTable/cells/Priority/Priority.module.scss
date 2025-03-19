@@ -1,0 +1,20 @@
+$priority-colors: (
+    'high': #fe0606,
+    'medium': #ff7e07,
+    'low': #0eb500,
+);
+
+.priority {
+    border-radius: 8px;
+    text-align: center;
+    line-height: 34px;
+    display: inline-block;
+    padding: 0 25px 0 25px;
+}
+
+@each $name, $color in $priority-colors {
+    .priority.#{$name} {
+        background-color: rgba($color, 20%);
+        color: $color;
+    }
+}

@@ -1,0 +1,49 @@
+.checkbox {
+    display: none;
+}
+
+.withLabel{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.track {
+    position: relative;
+    width: 46px;
+    min-width: 46px;
+    height: 26px;
+    border-radius: 50px;
+    background-color: #8a9393;
+    cursor: pointer;
+
+    &.on {
+        background-color: #1f6763;
+
+        .handle {
+            transform: translate(20px, -50%);
+        }
+    }
+
+    &.disabled {
+        opacity: 0.5;
+    }
+
+    &.disabled {
+        .handle {
+            opacity: 0.5;
+        }
+    }
+
+    .handle {
+        position: absolute;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+        transition: 0.2s;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}

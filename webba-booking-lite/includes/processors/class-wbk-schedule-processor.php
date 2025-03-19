@@ -689,10 +689,10 @@ class WBK_Schedule_Processor {
     public function is_working_day( $day, $service_id ) {
         $service = new WBK_Service($service_id);
         $busines_hours = json_decode( $service->get_business_hours() );
-        if ( !is_object( $busines_hours ) ) {
+        if ( !is_array( $busines_hours ) ) {
             return false;
         }
-        foreach ( $busines_hours->dow_availability as $item ) {
+        foreach ( $busines_hours as $item ) {
             if ( $day >= 1 && $day <= 7 ) {
                 if ( $day == $item->day_of_week && $item->status == 'active' ) {
                     return true;
@@ -741,12 +741,12 @@ class WBK_Schedule_Processor {
     public function get_business_hours_intervals_by_dow( $dow, $service_id ) {
         $service = new WBK_Service($service_id);
         $busines_hours = json_decode( $service->get_business_hours() );
-        if ( !is_object( $busines_hours ) ) {
+        if ( !is_array( $busines_hours ) ) {
             return [];
         }
         $slots = [];
         $sort_array = [];
-        foreach ( $busines_hours->dow_availability as $item ) {
+        foreach ( $busines_hours as $item ) {
             if ( $dow == $item->day_of_week ) {
                 $slots[] = $item;
             }

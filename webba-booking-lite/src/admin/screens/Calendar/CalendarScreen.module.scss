@@ -1,0 +1,77 @@
+@mixin event {
+    border-color: #d8eded;
+    margin: 0;
+    border-left: 3px solid #1f6763;
+    border-radius: 4px;
+    padding: 0 0 0 15px;
+    background: url('../../../../public/images/event-title-icon.png') no-repeat
+        left 3px top 4px;
+    background-color: rgb(230, 154, 176);
+    color: #212121;
+}
+
+.wrapper {
+    padding: 0 20px 0 0;
+
+    :global(.rbc-header) {
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    :global(.rbc-toolbar) {
+        margin: 20px;
+
+        label {
+            padding: 20px 0;
+        }
+
+        button {
+            transition: 0.2s all ease-in-out;
+
+            &.rbc-active {
+                background-color: #1f6763;
+                color: #ffffff;
+                border-color: #1f6763;
+            }
+
+            &:active,
+            &:focus {
+                @extend .rbc-active;
+            }
+
+            &:global(.rbc-active) {
+                @extend .rbc-active;
+            }
+
+            &:hover {
+                @extend .rbc-active;
+                background-color: lighten(#1f6763, 5%);
+            }
+        }
+    }
+
+    :global(.rbc-event) {
+        @include event;
+    }
+
+    .toolWrapper {
+        margin-top: 20px;
+    }
+
+    :global(.rbc-show-more){
+        color: #1f6763;
+    }
+}
+
+:global(.rbc-overlay) {
+    :global(.rbc-event) {
+        @include event;
+
+        &:not(:last-child){
+            margin-bottom: 1px;
+        }
+    }
+}

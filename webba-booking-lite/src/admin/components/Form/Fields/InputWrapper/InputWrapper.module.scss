@@ -1,0 +1,67 @@
+.wrapper {
+    position: relative;
+
+    &.noLabel {
+        z-index: 2;
+    }
+
+    &:active,
+    &:focus,
+    &:focus-visible,
+    &:focus-within {
+        z-index: 3!important;
+    }
+}
+
+.proLabel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 1;
+}
+
+.upgradeLink {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    border-radius: 8px;
+    background-color: #00000024;
+    padding: 5px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: #1f6763;
+    transition: 0.3s all ease-in;
+    box-shadow: 0 0 3px #33333328;
+    border: 1px solid #33333328;
+
+    .locked,
+    .unlock {
+        width: auto;
+        height: 16px;
+        object-fit: contain;
+    }
+
+    .unlock {
+        display: none;
+    }
+
+    &:hover {
+        padding: 8px 12px;
+
+        .unlock {
+            display: flex;
+        }
+
+        .locked {
+            display: none;
+        }
+    }
+}

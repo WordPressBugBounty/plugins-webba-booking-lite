@@ -1,0 +1,37 @@
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    position: relative;
+}
+
+.inputContainer {
+    display: flex;
+}
+
+.field.invalid .input {
+    border-color: red;
+}
+
+.labelContainer {
+    display: flex;
+}
+
+.errorContainer {
+    color: red;
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+}
+
+.input {
+    border: 1px solid #8a9393;
+    border-radius: 15px;
+    height: 50px;
+    margin: 0;
+    padding: 0 20px 0 20px;
+    font-family: poppins, arial;
+    font-size: 16px;
+    color: #212121;
+    width: 100%;
+}

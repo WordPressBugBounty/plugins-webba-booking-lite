@@ -91,7 +91,7 @@ class WBK_Db_Utils {
     // get service category list
     static function getServicesInCategory( $category_id ) {
         global $wpdb;
-        $list = $wpdb->get_var( $wpdb->prepare( " SELECT category_list FROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_service_categories WHERE id = %d", $category_id ) );
+        $list = $wpdb->get_var( $wpdb->prepare( " SELECT list FROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_service_categories WHERE id = %d", $category_id ) );
         if ( $list == '' ) {
             return FALSE;
         }

@@ -28,23 +28,37 @@ class WBK_Backend {
             10,
             2
         );
-        add_action( 'admin_enqueue_scripts', [$this, 'register_and_enqueue_react_admin'] );
+        add_filter( 'admin_body_class', [$this, 'push_css_top_level_class'] );
         $backend_schedule = new WBK_Backend_Schedule();
         $backend_options = new WBK_Backend_Options();
     }
 
+    public function push_css_top_level_class( $classes ) {
+        global $pagenow;
+        $pages = [
+            'wbk-schedule',
+            'wbk-options',
+            'wbk-gg-calendars',
+            'wbk-appearance',
+            'wbk-services',
+            'wbk-pricing-rules',
+            'wbk-appointments',
+            'wbk-calendar',
+            'wbk-coupons',
+            'wbk-service-categories',
+            'wbk-email-templates',
+            'wbk-dashboard',
+            'wbk-spa'
+        ];
+        $current_page = ( isset( $_GET['page'] ) ? $_GET['page'] : '' );
+        if ( in_array( $current_page, $pages ) ) {
+            $classes .= ' webba-booking-wp-root';
+        }
+        return $classes;
+    }
+
     public function register_and_enqueue_react_admin() {
-        /*
-        $script_name = 'wbk-react-admin';
-        wp_register_script(
-            $script_name,
-            WP_WEBBA_BOOKING__PLUGIN_URL . '/build/admin/index.js',
-            ['wp-element'],
-            '1.0.0',
-            true
-        );
-        wp_enqueue_script($script_name);
-        */
+        wp_enqueue_style( 'editor-buttons' );
     }
 
     public function prefix_plugin_update_message( $data, $response ) {
@@ -122,7 +136,7 @@ class WBK_Backend {
                 __( 'Calendar', 'webba-booking-lite' ),
                 __( 'Calendar', 'webba-booking-lite' ),
                 'read',
-                'wbk-schedule',
+                'wbk-calendar',
                 ['WBK_Renderer', 'render_backend_page']
             );
             add_submenu_page(

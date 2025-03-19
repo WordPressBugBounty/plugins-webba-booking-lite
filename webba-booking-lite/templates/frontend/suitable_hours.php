@@ -18,7 +18,7 @@ if ($show_hours == 'yes') {
     <?php
     if ($show_hours == 'yes') {
         ?>
-        <label class="input-label-wbk"><? echo WBK_Validator::kses($select_hours_label); ?></label>
+        <label class="wbk-input-label"><? echo WBK_Validator::kses($select_hours_label); ?></label>
         <hr class="wbk-hours-separator">
         <?php
     }

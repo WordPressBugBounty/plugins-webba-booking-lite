@@ -1,0 +1,47 @@
+.app {
+    margin-bottom: 20px;
+    padding-right: 20px;
+}
+
+.bookingsTable tr {
+    display: grid;
+    grid-template-areas:
+        'select menu menu'
+        'customer service date'
+        'payment phone phone'
+        'status status status';
+}
+
+.bookingsTable td[data-column-name='id'] {
+    display: none;
+}
+
+.bookingsTable td[data-column-name='select'] {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.bookingsTable td[data-column-name='menu'] {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.bookingsTable td[data-column-name='status'] select {
+    width: 100%;
+}
+
+@media screen and (min-width: 1200px) {
+    .bookingsTable tr {
+        display: table-row;
+    }
+
+    .bookingsTable td {
+        display: table-cell !important;
+    }
+}
+
+.exportButton {
+    color: #a1a3b6;
+    padding: 0;
+    gap: 10px;
+}

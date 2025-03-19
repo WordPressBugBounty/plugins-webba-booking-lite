@@ -1,12 +1,16 @@
 import classNames from 'classnames'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import styles from './Sidebar.module.css'
+import styles from './Sidebar.module.scss'
 import { useSidebar } from './SidebarContext'
 
 export const Sidebar = () => {
-    const { element, shown, close: hide } = useSidebar()
+    const { element, shown } = useSidebar()
     const sectionRef = useRef<HTMLElement | null>(null)
+
+    useEffect(() => {
+        document.body.style.overflow = shown ? 'hidden' : 'unset'
+    }, [shown])
 
     return createPortal(
         <div
@@ -14,9 +18,6 @@ export const Sidebar = () => {
             className={classNames(styles.sidebarContainer, {
                 [styles.shown]: shown,
             })}
-            onClick={() => {
-                hide()
-            }}
             ref={(ref) => {
                 if (!ref) return
 
@@ -31,13 +32,13 @@ export const Sidebar = () => {
                 }
             }}
         >
-            <section
+            <div
                 className={styles.sidebar}
-                ref={sectionRef}
+                ref={sectionRef as any}
                 onClick={(e) => e.stopPropagation()}
             >
                 {element}
-            </section>
+            </div>
         </div>,
         document.getElementById('wpwrap')!
     )

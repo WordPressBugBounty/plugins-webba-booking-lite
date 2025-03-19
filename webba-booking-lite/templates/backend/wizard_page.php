@@ -314,7 +314,7 @@ WBK_Mixpanel::track_event("setup wizard launched", []);
 
                                 <p class="text-center-wb mb-40-wb">
                                     <label for="shortcode-booking-form-wb">
-                                        <?php echo '<a style="color: #000;" target="_blank" rel="noopener" href="https://webba-booking.com/documentation/how-to-add-booking-form/">' . __('How to add the booking from to my website?', 'webba-booking-lite') . '</a>' ?>
+                                        <?php echo '<a style="color: #000;" target="_blank" rel="noopener" href="https://webba-booking.com/documentation/how-to-add-booking-form/">' . __('How to add the booking form to my website?', 'webba-booking-lite') . '</a>' ?>
                                     </label>
                                 </p>
                             </div>

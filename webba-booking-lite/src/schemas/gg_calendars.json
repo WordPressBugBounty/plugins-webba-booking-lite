@@ -6,25 +6,78 @@
             "type": "string",
             "input_type": "text",
             "hidden": false,
-            "title": "Name"
+            "title": "Name",
+            "tab": "",
+            "misc": {
+                "tooltip": "Enter a name to identify the calendar."
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         },
         "calendar_user_id": {
             "type": "string",
             "input_type": "select",
             "hidden": false,
-            "title": "User"
+            "title": "User",
+            "tab": "",
+            "misc": {
+                "tooltip": "",
+                "null_value": [
+                    "select option"
+                ],
+                "options": "backend"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": 0,
+            "editable": true
         },
-        "calendar_id": {
+        "calendar_ggid": {
             "type": "string",
             "input_type": "text",
             "hidden": false,
-            "title": "Calendar ID"
+            "title": "Calendar ID",
+            "tab": "",
+            "misc": {
+                "tooltip": "Enter your Calendar ID."
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
         },
         "calendar_mode": {
             "type": "string",
             "input_type": "select",
             "hidden": false,
-            "title": "Mode"
+            "title": "Mode",
+            "tab": "",
+            "misc": {
+                "tooltip": "Choose the calendar connection mode",
+                "options": {
+                    "One-way": "One-way (export)",
+                    "One-way-import": "One-way (import)",
+                    "Two-ways": "Two-ways"
+                }
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "calendar_access_token": {
+            "type": "string",
+            "input_type": "webba_google_access_token",
+            "hidden": false,
+            "title": "Authorization",
+            "tab": null,
+            "misc": [],
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": false
         }
     }
 }

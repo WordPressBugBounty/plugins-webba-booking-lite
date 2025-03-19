@@ -1,5 +1,5 @@
 import { Cell } from '@tanstack/react-table'
-import styles from './Table.module.css'
+import styles from './Table.module.scss'
 
 interface Props {
     cell: Cell<any, any>

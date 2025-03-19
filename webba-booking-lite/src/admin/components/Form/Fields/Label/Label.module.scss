@@ -1,0 +1,44 @@
+.tooltipIcon {
+    width: 12px;
+    height: 12px;
+    cursor: pointer;
+}
+
+.labelWrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+    width: 100%;
+    position: relative;
+}
+
+.tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: #212121;
+    padding: 5px;
+    border-radius: 10px 10px 10px 0;
+    font-size: 12px;
+    min-width: 110px;
+    margin: 0 0 6px 0;
+    text-align: center;
+    color: #fff;
+    width: 137px;
+    z-index: 999;
+
+    &::after {
+        content: '';
+        width: 0;
+        height: 0;
+        top: 100%;
+        left: 0;
+        position: absolute;
+        border-top: 10px solid #212121;
+        border-right: 5px solid transparent;
+        border-bottom: 0;
+        border-left: 5px solid transparent;
+        margin: 0 -5px 0 0;
+    }
+}

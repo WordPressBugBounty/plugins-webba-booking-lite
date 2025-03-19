@@ -164,10 +164,10 @@ class WBK_Price_Processor
                     case 'day_of_week_and_time':
                         $day_time = json_decode($rule->get_day_time());
 
-                        if (is_object($day_time)) {
+                        if (is_array($day_time)) {
                             $slots = [];
                             $sort_array = [];
-                            foreach ($day_time->dow_availability as $item) {
+                            foreach ($day_time as $item) {
                                 $dow = date('N', $booking->get_day());
                                 if ($dow == $item->day_of_week) {
                                     if (

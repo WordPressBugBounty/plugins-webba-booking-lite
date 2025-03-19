@@ -11,10 +11,11 @@ class WBK_Assets_Manager {
 
     protected $js;
 
-    public function __construct( $css, $js ) {
+    public function __construct( $css, $js, $directory = '' ) {
         $this->css = $css;
         $this->js = $js;
         add_action( 'admin_enqueue_scripts', [$this, 'admin_enqueue_scripts'], 20 );
+        add_action( 'admin_enqueue_scripts', [$this, 'admin_enqueue_scripts_textdomain'], 200 );
         add_action( 'wp_enqueue_scripts', [$this, 'wp_enqueue_scripts'], 20 );
     }
 
@@ -30,8 +31,8 @@ class WBK_Assets_Manager {
             'wbk-dashboard',
             'wbk-spa'
         ];
-        if ( isset( $_GET['page'] ) && in_array( $_GET['page'], $admin_pages ) ) {
-            Plugion()->initialize_assets( false, false );
+        if ( in_array( $_GET['page'], $admin_pages ) ) {
+            wp_enqueue_style( 'editor-buttons' );
         }
         foreach ( $this->css as $item ) {
             if ( $item[0] == 'backend' ) {
@@ -55,7 +56,8 @@ class WBK_Assets_Manager {
                             $item[2],
                             $item[3],
                             $item[4],
-                            $item[5]
+                            $item[5],
+                            true
                         );
                     }
                 }
@@ -118,7 +120,7 @@ class WBK_Assets_Manager {
         wp_localize_script( 'wbk5-backend-script', 'wbk_dashboardl10n', $translation_array );
         wp_localize_script( 'wbk-backend-script', 'wbk_dashboardl10n_old', $translation_array );
         // remove in V5
-        if ( isset( $_GET['page'] ) && $_GET['page'] == 'wbk-schedule' ) {
+        if ( isset( $_GET['page'] ) && $_GET['page'] == 'wbk-options' ) {
             wp_deregister_script( 'chosen' );
             $translation_array = [
                 'addappointment' => __( 'Add appointment', 'webba-booking-lite' ),
@@ -135,9 +137,26 @@ class WBK_Assets_Manager {
                 'ajaxurl'        => admin_url( 'admin-ajax.php' ),
                 'week_start'     => get_option( 'start_of_week', '1' ),
             ];
-            wp_localize_script( 'wbk-schedule', 'wbkl10n', $translation_array );
+            wp_localize_script( 'wbk-options', 'wbkl10n', $translation_array );
         }
-        plugion_localize_script( 'wbk5-backend-script' );
+        wbkdata_localize_script( 'wbk5-backend-script' );
+    }
+
+    public function admin_enqueue_scripts_textdomain() {
+        $admin_pages = [
+            'wbk-services',
+            'wbk-email-templates',
+            'wbk-service-categories',
+            'wbk-appointments',
+            'wbk-coupons',
+            'wbk-gg-calendars',
+            'wbk-pricing-rules',
+            'wbk-dashboard',
+            'wbk-spa'
+        ];
+        if ( in_array( $_GET['page'], $admin_pages ) ) {
+            $res = wp_set_script_translations( 'wbk-react-admin', 'webba-booking-lite', WP_WEBBA_BOOKING__PLUGIN_DIR . '/' . 'languages/' );
+        }
     }
 
     public function wp_enqueue_scripts() {

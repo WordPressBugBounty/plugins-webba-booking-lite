@@ -6,7 +6,7 @@ import {
 } from '@wordpress/components'
 import { useBlockProps, InspectorControls } from '@wordpress/block-editor'
 import { useState, useEffect } from '@wordpress/element'
-
+import '../assets/frontend.scss'
 import { __ } from '@wordpress/i18n'
 import apiFetch from '@wordpress/api-fetch'
 import StatusBar from './components/statusbar.js'
