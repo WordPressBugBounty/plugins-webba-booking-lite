@@ -266,40 +266,6 @@ class WBK_Model {
             false,
             false
         );
-        $tooltip = __( 'If you have other calendars you\'d like to integrate with, please provide the external iCal Calendar URLs.', 'webba-booking-lite' );
-        $table->add_field(
-            'service_extcalendar',
-            'extcalendar',
-            __( 'Take into account the external calendar (ics)', 'webba-booking-lite' ),
-            'textarea',
-            'general',
-            [
-                'tooltip'     => $tooltip,
-                'pro_version' => true,
-            ],
-            '',
-            true,
-            false,
-            false
-        );
-        $table->add_field(
-            'service_extcalendar_group_mode',
-            'extcalendar_group_mode',
-            __( 'External calendar for group services', 'webba-booking-lite' ),
-            'select',
-            'general',
-            [
-                'items'       => [
-                    'reduce' => __( 'Reduce availability', 'webba-booking-lite' ),
-                    'lock'   => __( 'Lock time slot', 'webba-booking-lite' ),
-                ],
-                'pro_version' => true,
-            ],
-            '',
-            true,
-            false,
-            true
-        );
         $tooltip = __( 'Add users who need access to this service\'s schedule.', 'webba-booking-lite' );
         $table->add_field(
             'service_users',
@@ -395,15 +361,6 @@ class WBK_Model {
             'arrival' => 'On arrival',
             'bank'    => 'Bank transfer',
         ];
-        $payment_methods = [
-            'paypal'  => 'PayPal',
-            'stripe'  => 'Stripe',
-            'arrival' => 'On arrival',
-            'bank'    => 'Bank transfer',
-        ];
-        if ( class_exists( 'WooCommerce' ) ) {
-            $payment_methods['woocommerce'] = 'WooCommerce';
-        }
         $tooltip = __( 'Select a template for booking confirmation notifications.', 'webba-booking-lite' );
         $table->add_field(
             'service_notification_template',
@@ -583,9 +540,8 @@ class WBK_Model {
             'checkbox',
             'general',
             [
-                'yes'         => __( 'Yes', 'webba-booking-lite' ),
-                'tooltip'     => $tooltip,
-                'pro_version' => true,
+                'yes'     => __( 'Yes', 'webba-booking-lite' ),
+                'tooltip' => $tooltip,
             ],
             '',
             true,

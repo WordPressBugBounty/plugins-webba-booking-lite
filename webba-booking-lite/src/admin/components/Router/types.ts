@@ -1,6 +1,7 @@
 export const ROUTES = [
     'dashboard',
     'bookings',
+    'cancelled-bookings',
     'calendar',
     'calendars',
     'services',
@@ -16,6 +17,7 @@ export const PAGES = [
     'wbk-service-categories',
     'wbk-email-templates',
     'wbk-appointments',
+    'wbk-canecelled-appointments',
     'wbk-coupons',
     'wbk-gg-calendars',
     'wbk-calendar',

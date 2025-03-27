@@ -45,3 +45,31 @@
     padding: 0;
     gap: 10px;
 }
+
+.buttonNavigation {
+    display: flex;
+    gap: 10px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: 0.3s all ease;
+
+    &.red {
+        color: rgb(255, 70, 70);
+    }
+
+    &.green {
+        color: #1f6763;
+    }
+
+    &.left {
+        &:hover {
+            transform: translateX(-5px);
+        }
+    }
+
+    &.right{
+        &:hover {
+            transform: translateX(5px);
+        }
+    }
+}

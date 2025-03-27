@@ -5,6 +5,7 @@ import { addQueryArgs } from '@wordpress/url'
 const DEFAULT_STATE = {
     appointments: null,
     services: null,
+    cancelled_appointments: null,
     service_categories: null,
     email_templates: null,
     coupons: null,

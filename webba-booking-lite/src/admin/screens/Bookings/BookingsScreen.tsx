@@ -35,15 +35,17 @@ import { FailedMessage } from '../../components/FailedMessage/FailedMessage'
 import { Button } from '../../components/Button/Button'
 import iconExport from '../../../../public/images/export-arrow.png'
 import apiFetch from '@wordpress/api-fetch'
+import { useRoute } from '../../components/Router/useRoute'
+import classNames from 'classnames'
 
 export const bookingsModel = removePrefixesFromModelFields(
     BookingsModel,
     'appointment_'
 )
 
-const form = createFormFromModel(bookingsModel)
+export const form = createFormFromModel(bookingsModel)
 
-const menuSections = createFormMenuSectionsFromModel({
+export const menuSections = createFormMenuSectionsFromModel({
     model: bookingsModel,
     form,
     modelName: 'appointments',
@@ -57,6 +59,7 @@ export const BookingsScreen = () => {
         (select) => select(store_name).getPreset(),
         []
     )
+    const { setRoute, route } = useRoute()
     const [downloadPending, setDownloadPending] = useState(false)
 
     // @ts-ignore
@@ -243,8 +246,20 @@ export const BookingsScreen = () => {
                 search={searchField}
                 isItemsForbidden={isForbidden(bookings)}
                 exportButton={is_pro && exportButton}
+                forcePermission={true}
             />
             <FailedMessage />
+            <div
+                className={classNames(
+                    styles.buttonNavigation,
+                    styles.red,
+                    styles.right
+                )}
+                onClick={() => setRoute('cancelled-bookings')}
+            >
+                {__('Cancelled Bookings', 'webba-booking-lite')}
+                &nbsp;&#8594;
+            </div>
         </TableProvider>
     )
 }

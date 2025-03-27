@@ -1,6 +1,8 @@
 <?php
 namespace WbkData;
 
+use WBK_User_Utils;
+
 if (!defined('ABSPATH'))
     exit;
 /*
@@ -602,6 +604,10 @@ class Model
         }
         do_action('wbkdata_on_before_item_deleted', $model_name, $this->model_name, $item);
         $result = $wpdb->delete($model_name, ['id' => $id], '%d');
+        
+        if($result){
+            do_action('wbkdata_on_after_item_deleted', $model_name, $this->model_name, $item);
+        }
 
         return $result;
     }
@@ -870,7 +876,14 @@ class Model
             // check if current user can add the field
             if (is_user_logged_in()) {
                 $user = wp_get_current_user();
-                if (!current_user_can('manage_options') && !current_user_can('manage_sites')) {
+                
+                $have_permission = current_user_can('manage_options') && current_user_can('manage_sites');
+
+                if(isset($_REQUEST['model']) && $_REQUEST['model'] == 'appointments' && isset($_REQUEST['service_id'])) {
+                    $have_permission = WBK_User_Utils::check_access_to_particular_service(get_current_user_id(), $_REQUEST['service_id']);
+                }
+
+                if ($have_permission) {
                     $role_found = false;
                     foreach ($user->roles as $role) {
                         switch ($action) {

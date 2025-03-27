@@ -15,6 +15,7 @@ import { Dashboard } from './screens/Dashboard/Dashboard'
 import { SettingsProvider } from './providers/SettingsProvider'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../store/backend'
+import { CanecelledBookingsScreen } from './screens/Bookings/CanecelledBookingsScreen'
 
 const tabToScreenMap: RouterConfig = {
     services: <ServicesScreen />,
@@ -23,6 +24,7 @@ const tabToScreenMap: RouterConfig = {
     'email-templates': <EmailTemplateScreen />,
     coupons: <CouponsScreen />,
     bookings: <BookingsScreen />,
+    'cancelled-bookings': <CanecelledBookingsScreen />,
     calendar: <CalendarScreen />,
     dashboard: <Dashboard />,
     calendars: <GGCalendarsScreen />,
@@ -56,6 +58,10 @@ const pageToRoutesMap: Record<Page, RouterConfig> = {
     },
     'wbk-appointments': {
         bookings: <BookingsScreen />,
+        ...tabToScreenMap,
+    },
+    'wbk-canecelled-appointments': {
+        'cancelled-bookings': <CanecelledBookingsScreen />,
         ...tabToScreenMap,
     },
     'wbk-calendar': {

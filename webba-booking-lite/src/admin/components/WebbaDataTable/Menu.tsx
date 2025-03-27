@@ -45,7 +45,7 @@ export const Menu = ({ onDelete, onDuplicate, onEdit }: Props) => {
                     <img src={DuplicateIcon} />
                 </button>
             )}
-            {settings?.is_admin && (
+            {(cell.row.original.can_delete || settings?.is_admin) && (
                 <ConfirmationButton
                     action={onDelete}
                     confirmationMessage={__(

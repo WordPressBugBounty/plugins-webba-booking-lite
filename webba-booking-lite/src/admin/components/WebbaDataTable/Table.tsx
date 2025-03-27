@@ -20,13 +20,14 @@ interface Props {
     addButtonTitle?: string
     className?: string
     loading?: boolean
-    onDeleteSelected: () => void
+    onDeleteSelected?: () => void
     onAdd?: () => void
     filter?: JSX.Element
     search?: JSX.Element
     exportButton?: JSX.Element
     noItemsImageUrl: string
     isItemsForbidden?: boolean
+    forcePermission?: boolean
 }
 
 export const Table = ({
@@ -42,9 +43,10 @@ export const Table = ({
     noItemsImageUrl,
     isItemsForbidden,
     exportButton,
+    forcePermission,
 }: Props) => {
     const isEmpty = !table.getRowCount()
-    const { settings } = useSelect(
+    const { settings, services_, services } = useSelect(
         // @ts-ignore
         (select) => select(store_name).getPreset(),
         []
@@ -58,15 +60,17 @@ export const Table = ({
                     <div className={styles.toolPanel}>
                         {exportButton && settings?.is_admin && exportButton}
                         {search && search}
-                        {settings?.is_admin && addButtonTitle && (
-                            <Button
-                                onClick={onAdd}
-                                className="button-wb"
-                                actionType="button"
-                            >
-                                {addButtonTitle} +
-                            </Button>
-                        )}
+                        {(forcePermission || settings?.is_admin) &&
+                            addButtonTitle &&
+                            onAdd && (
+                                <Button
+                                    onClick={onAdd}
+                                    className="button-wb"
+                                    actionType="button"
+                                >
+                                    {addButtonTitle} +
+                                </Button>
+                            )}
                     </div>
                 </div>
                 {filter && filter}
@@ -109,7 +113,8 @@ export const Table = ({
                                 />
                             )}
                             {settings?.is_admin &&
-                                !!table.getSelectedRowModel().rows.length && (
+                                !!table.getSelectedRowModel().rows.length &&
+                                onDeleteSelected && (
                                     <ConfirmationButton
                                         title={__(
                                             'Delete selected',

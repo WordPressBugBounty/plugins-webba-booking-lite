@@ -135,7 +135,46 @@ class WBK_User_Utils
         return false;
     }
 
+    /**
+     * Check if user is associated with service
+     *
+     * @param string|number|null $user_id
+     * @param string|number|null $service_id
+     * @return boolean
+     */
+    public static function is_user_associated_with_service($user_id, $service_id): bool
+    {
+        if (!is_numeric($service_id)) {
+            return false;
+        }
 
+        if (user_can($user_id, 'manage_options')) {
+            return true;
+        }
 
+        global $wpdb;
+        $users = $wpdb->get_col('SELECT users FROM ' . get_option('wbk_db_prefix', '') . 'wbk_services WHERE id=' . $service_id);
+        
+        foreach ($users as $user) {
+            if (is_null($user)) {
+                continue;
+            }
+
+            $user_arr = json_decode($user);
+            if ($user_arr == '') {
+                continue;
+            }
+
+            if (is_numeric($user_arr)) {
+                $user_arr = array($user_arr);
+            }
+
+            if (in_array($user_id, $user_arr)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 ?>

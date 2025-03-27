@@ -15,6 +15,7 @@ class WEBBA5_Form {
             get_this().initiaize_payments()
         }
         jQuery('.wbk_read_more').click(function (e) {
+            get_this().track_event('service_description_toggled',{})
             e.preventDefault()
             jQuery(this)
                 .siblings('.wbk_service_description_switcher')
@@ -127,6 +128,7 @@ class WEBBA5_Form {
 
         if (jQuery('.appointment-content-payment-optional').length > 0) {
             container.find('.wbk_services').change(function () {
+                get_this().track_event('service_selected',{})
                 var payable = false
 
                 if (!get_this().is_multi_service()) {
@@ -222,7 +224,11 @@ class WEBBA5_Form {
         this.container.find('.wbk-loading').remove()
         this.container.find('.wbk_date_picked_row').removeClass('wbk_hidden')
     }
-
+    track_event(event, param = {}){
+        if (typeof gtag === 'function' && wbkl10n.is_pro == 'true') {
+            gtag('event', 'webba_' + event, param);
+        }
+    }
     is_multi_service() {
         return this.container.find('.wbk_service_checkbox').length > 0
     }
@@ -614,7 +620,7 @@ class WEBBA5_Form {
                             .find('.wbk_chk_proxy')
                             .trigger('change')
                     })
-
+                    get_this().track_event('form_rendered',{})
                     jQuery(document).trigger('wbk_form_rendered')
 
                     this.set_input_events()
@@ -867,6 +873,7 @@ class WEBBA5_Form {
         }
 
         this.set_input_events()
+        get_this().track_event('payment_methods_shown',{})
         jQuery(document).trigger('wbk_payment_initialized')
         get_this().validate_form()
     }
@@ -1079,10 +1086,11 @@ class WEBBA5_Form {
         Scrollbar.initAll({ alwaysShowTracks: true, damping: 0.5 })
     }
 
-    async search_time_slots() {
+    async search_time_slots() {      
         const get_this = () => {
             return this
         }
+        get_this().track_event('search_time_slots',{})
         if (wbkl10n.multi_booking != 'enabled') {
             this.deselect_all_slots()
         }
@@ -1259,6 +1267,7 @@ class WEBBA5_Form {
         const get_this = () => {
             return this
         }
+        get_this().track_event('time_slot_selected',{})
         var exit = false
         this.container.find('.wbk_times option').each(function () {
             if (
@@ -1897,7 +1906,7 @@ class WEBBA5_Form {
                 } else {
                     if (
                         get_this()
-                            .container.find('[name="date_formated"]')
+                            .container.find('[name="date_formated"]')   
                             .val() == ''
                     ) {
                         get_this().hide_horizontal_calendar()
@@ -2397,6 +2406,7 @@ class WEBBA5_Form {
         const get_this = () => {
             return this
         }
+        get_this().track_event('booking_completed',{})
         this.container.find('.appointment-status-wrapper-w').fadeOut('fast')
         this.container
             .find('.appointment-content-wbk')
@@ -2408,6 +2418,7 @@ class WEBBA5_Form {
             })
 
         jQuery(document).trigger('webba_booking_finalize', [response, this])
+
     }
 
     prev_step() {

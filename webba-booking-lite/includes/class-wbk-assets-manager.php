@@ -170,6 +170,7 @@ class WBK_Assets_Manager {
             $has_shortcode = true;
         }
         $has_ud_shortcode = $this->has_shortcode( 'webba_user_dashboard' );
+        $is_pro = 'false';
         if ( isset( $_GET['ct_builder'] ) ) {
             return;
         }
@@ -364,6 +365,7 @@ class WBK_Assets_Manager {
             'local_time_by_default'          => esc_html( get_option( 'wbk_show_local_time_by_default', '' ) ),
             'multi_limit_service_label'      => esc_html( get_option( 'wbk_multi_limits_label', '#service_name: select from #min to #max timeslots. Selected: #selected_count.' ) ),
             'wbk_automatically_select_today' => esc_html( get_option( 'wbk_automatically_select_today', '' ) ),
+            'is_pro'                         => $is_pro,
         ];
         $sanitized_array = [];
         foreach ( $translation_array as $key => $value ) {

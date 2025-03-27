@@ -1,20 +1,20 @@
-=== Appointment Booking and Scheduling Calendar Plugin – Webba Booking ===
+=== Appointment Booking & Scheduling System — Webba Appointments Booking Calendar ===
 Contributors: Webba agency, freemius
 Donate link: https://webba-booking.com/
-Tags: appointment booking, appointment, booking, scheduling, booking system
+Tags:  appointments, appointment booking, booking, scheduling, booking system
 Requires at least: 5.6
 Tested up to: 6.7.2
-Stable tag: 5.1.8
+Stable tag: 5.1.9
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Powerful Appointment Booking Plugin 🗓️ Unlimited appointments, calendar sync, advanced features. Automate your scheduling with our booking system.
+Best Appointment Booking Plugin 🗓️ Easy scheduling unlimited appointments, calendar sync, notifications and 5* support = powerful booking system!
 
 == DESCRIPTION ==
-= Simple and Modern Booking, Reservation & Scheduling Calendar Plugin 🗓️ =
+= Simple and Modern Appointment Booking, Reservation & Scheduling Calendar Plugin 🗓️ =
 
-**[Webba Booking](https://webba-booking.com/) is powerful, modern and easy to use booking system and scheduling plugin.**
+**[Webba Appointments Booking](https://webba-booking.com/) is powerful, modern and easy to use appointment booking system and scheduling plugin.**
 
 Using Webba you can accept appointment bookings, reservations, hourly bookings for variety of services, rentals, spaces.
 
@@ -169,7 +169,16 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  
 
 == Changelog ==
- 
+
+5.1.9
+
+27/03/2025
+
+- Improvements: integration with the Google Tag
+- Bug fix: non-admin permissions updated
+- Bug fix: wrong translation of certain languages
+- Bug fix: bug with the cancelled bookings
+
 5.1.8
 
 19/03/2025

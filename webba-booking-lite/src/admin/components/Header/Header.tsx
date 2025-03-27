@@ -34,6 +34,10 @@ export const Header = () => {
                 label: __('Bookings', 'webba-booking-lite'),
             },
             {
+                route: 'cancelled-bookings',
+                label: __('Cancelled Bookings', 'webba-booking-lite'),
+            },
+            {
                 route: 'services',
                 label: __('Services', 'webba-booking-lite'),
             },
@@ -72,20 +76,20 @@ export const Header = () => {
         [admin_url]
     )
 
-    const pageToTabMap: Record<Page, TabConfig[]> = useMemo(() => {
-        return {
-            'wbk-services': dataAssetsTabs,
-            'wbk-pricing-rules': dataAssetsTabs,
-            'wbk-email-templates': dataAssetsTabs,
-            'wbk-coupons': dataAssetsTabs,
-            'wbk-gg-calendars': dataAssetsTabs,
-            'wbk-service-categories': dataAssetsTabs,
-            'wbk-calendar': dataAssetsTabs,
-            'wbk-appointments': dataAssetsTabs,
-            'wbk-dashboard': dataAssetsTabs,
-            'wbk-settings': dataAssetsTabs,
-        }
-    }, [dataAssetsTabs])
+    // const pageToTabMap: Record<Page, TabConfig[]> = useMemo(() => {
+    //     return {
+    //         'wbk-services': dataAssetsTabs,
+    //         'wbk-pricing-rules': dataAssetsTabs,
+    //         'wbk-email-templates': dataAssetsTabs,
+    //         'wbk-coupons': dataAssetsTabs,
+    //         'wbk-gg-calendars': dataAssetsTabs,
+    //         'wbk-service-categories': dataAssetsTabs,
+    //         'wbk-calendar': dataAssetsTabs,
+    //         'wbk-appointments': dataAssetsTabs,
+    //         'wbk-dashboard': dataAssetsTabs,
+    //         'wbk-settings': dataAssetsTabs,
+    //     }
+    // }, [dataAssetsTabs])
 
     const pageTitle = useMemo(
         () => dataAssetsTabs.find((tab) => tab.route === route)?.label,

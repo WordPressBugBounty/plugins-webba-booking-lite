@@ -14,9 +14,10 @@ import {
 } from '../GenericSelectField/utils'
 import { getFormState } from '../../lib/utils'
 import { useForm } from '../../lib/FormProvider'
-import { fromZonedTime, toZonedTime } from 'date-fns-tz'
+import { toZonedTime } from 'date-fns-tz'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
+import classNames from 'classnames'
 
 export const createDateField: FormComponentConstructor<any> = ({
     field,
@@ -61,7 +62,11 @@ export const createDateField: FormComponentConstructor<any> = ({
         }, [date])
 
         return (
-            <div className={styles.inputWrapper}>
+            <div
+                className={classNames(styles.inputWrapper, {
+                    [styles.open]: open,
+                })}
+            >
                 <Label title={label} id={name} tooltip={misc?.tooltip} />
                 <DatePicker
                     className={styles.dateInput}

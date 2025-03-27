@@ -237,8 +237,7 @@
             "title": "Take into account the external calendar (ics)",
             "tab": "general",
             "misc": {
-                "tooltip": "If you have other calendars you'd like to integrate with, please provide the external iCal Calendar URLs.",
-                "pro_version": true
+                "tooltip": "If you have other calendars you'd like to integrate with, please provide the external iCal Calendar URLs."
             },
             "required": false,
             "dependency": [],
@@ -251,9 +250,7 @@
             "hidden": true,
             "title": "External calendar for group services",
             "tab": "general",
-            "misc": {
-                "pro_version": true
-            },
+            "misc": [],
             "required": true,
             "dependency": [
                 [
@@ -522,8 +519,7 @@
             "tab": "general",
             "misc": {
                 "yes": "Yes",
-                "tooltip": "Check this to automatically create <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/integrations/integration-with-zoom/\">Zoom events</a> for each booking of this service.",
-                "pro_version": true
+                "tooltip": "Check this to automatically create <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/integrations/integration-with-zoom/\">Zoom events</a> for each booking of this service."
             },
             "required": false,
             "dependency": [],

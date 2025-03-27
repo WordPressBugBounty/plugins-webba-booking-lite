@@ -2,6 +2,7 @@
 namespace WbkData;
 
 use WBK_Placeholder_Processor;
+use WBK_User_Utils;
 
 if (!defined('ABSPATH')) {
     exit();
@@ -79,15 +80,20 @@ class Controller
                 ->add_item($fields);
             if ($action_result[0] == true) {
                 unset($action_result[0]);
-
-                if (trim(sanitize_text_field($request['model'])) === 'appointments') {
+                $model = trim(sanitize_text_field($request['model']));
+                if ($model === 'appointments') {
                     $action_result['extra_data']['dynamic_title'] = WBK_Placeholder_Processor::process_placeholders(get_option('wbk_backend_calendar_booking_text', '#customer_name [#service_name]'), $action_result['id']);
                 }
 
-                if (trim(sanitize_text_field($request['model'])) === 'services') {
+                if ($model === 'services') {
                     $action_result['can_edit'] = \WBK_User_Utils::check_access_to_particular_service($action_result['id'], true);
+                    $action_result['can_delete'] = \WBK_User_Utils::check_access_to_particular_service($action_result['id'], false);
+                } elseif($model === 'appointments') {
+                    $action_result['can_edit'] = \WBK_User_Utils::check_access_to_particular_service($fields['service_id'], false);
+                    $action_result['can_delete'] = \WBK_User_Utils::check_access_to_particular_service($fields['service_id'], false);
                 } else {
                     $action_result['can_edit'] = true;
+                    $action_result['can_delete'] = true;
                 }
 
                 return new \WP_REST_Response(['status' => 'succces', 'details' => $action_result], 200);
@@ -148,9 +154,15 @@ class Controller
         foreach ($result as $item) {
             if (trim(sanitize_text_field($params['model'])) === 'services') {
                 $item->can_edit = \WBK_User_Utils::check_access_to_particular_service($item->id, true);
+                $item->can_delete = current_user_can('manage_options');
+            } elseif (trim(sanitize_text_field($params['model'])) === 'appointments'){
+                $item->can_edit = true;
+                $item->can_delete = WBK_User_Utils::is_user_associated_with_service(get_current_user_id(), $item->service_id);
             } else {
+                $item->can_delete = true;
                 $item->can_edit = true;
             }
+            
             if (trim(sanitize_text_field($params['model'])) === 'appointments') {
                 $item->extra_data = [
                     'dynamic_title' => WBK_Placeholder_Processor::process_placeholders(get_option('wbk_backend_calendar_booking_text', '#customer_name [#service_name]'), $item->id)
@@ -212,12 +224,14 @@ class Controller
         }
 
         if ($request['model'] == 'appointments') {
-            if (is_numeric($row_id)) {
+            if (is_numeric($row_id) && $row_id !== 0) {
                 $booking = new \WBK_Booking($row_id);
                 if (!$booking->is_loaded()) {
                     return false;
                 }
                 return \WBK_User_Utils::check_access_to_particular_service($booking->get_service(), false);
+            } elseif (isset($request['data']['service_id'])) {
+                return \WBK_User_Utils::check_access_to_particular_service((int)@$request['data']['service_id'], false);
             }
         }
 
@@ -256,8 +270,24 @@ class Controller
         if (current_user_can('manage_options') || current_user_can('manage_sites')) {
             return true;
         }
-        return false;
 
+        if(trim(sanitize_text_field($request['model'])) === 'appointments' && is_array($request['ids']) && count($request['ids']) > 0){
+            foreach ($request['ids'] as $id) {
+                if (is_numeric($id)) {
+                    $booking = new \WBK_Booking($id);
+                    if (!$booking->is_loaded()) {
+                        return false;
+                    }
+                    
+                    if (WBK_User_Utils::check_access_to_particular_service($booking->service_id)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        return false;
     }
 
     /**

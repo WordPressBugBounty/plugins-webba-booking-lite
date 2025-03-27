@@ -85,7 +85,7 @@ if (isset($appearance_data['wbk_appearance_field_4'])) {
                 </div><!-- /.left-part-wb -->
                 <div class="right-part-wb">
                     <label for="shortcode-booking-form-wb">
-                        <?php echo '<a style="display: block;color: #000; margin: 0px auto; text-align: center; margin-bottom: 30px;" target="_blank" rel="noopener" href="https://webba-booking.com/documentation/how-to-add-booking-form/">' . __('How to add the booking form to my website?', 'webba-booking-lite') . '</a>' ?>
+                        <?php echo '<a style="display: block;color: #000; margin: 0px auto; text-align: center; margin-bottom: 30px;" target="_blank" rel="noopener" href="https://webba-booking.com/documentation/how-to-add-booking-form/">' . __('How to add the booking from to my website?', 'webba-booking-lite') . '</a>' ?>
                     </label>
                     <div class="appearance-result-block-wb">
                         <div class="appointment-box-wbkrapper-wb" data-appearance-font=""
