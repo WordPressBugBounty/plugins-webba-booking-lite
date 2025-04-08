@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: webba-booking-lite\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-02-22 20:51+0100\n"
-"PO-Revision-Date: 2025-02-22 20:51+0100\n"
+"PO-Revision-Date: 2025-03-20 21:58+0100\n"
 "Last-Translator: \n"
 "Language-Team: Webba Booking <support@webba-booking.com>\n"
 "Language: hu\n"
@@ -39,24 +39,20 @@ msgid "Customer Name"
 msgstr ""
 
 #: src/admin/components/Form/Fields/EditorField/EditorField.tsx:32
-#, fuzzy
 msgid "Booking date"
-msgstr "Форма WEBBA Booking"
+msgstr "Foglalás dátuma"
 
 #: src/admin/components/Form/Fields/EditorField/EditorField.tsx:37
-#, fuzzy
 msgid "Booking time"
-msgstr "Форма WEBBA Booking"
+msgstr "Foglalási idő"
 
 #: src/admin/components/Form/Fields/EditorField/EditorField.tsx:42
-#, fuzzy
 msgid "Booking local date"
-msgstr "Форма WEBBA Booking"
+msgstr "Helyi időpont foglalása"
 
 #: src/admin/components/Form/Fields/EditorField/EditorField.tsx:47
-#, fuzzy
 msgid "Booking local time"
-msgstr "Форма WEBBA Booking"
+msgstr "Helyi idő foglalása"
 
 #: src/admin/components/Form/Fields/EditorField/EditorField.tsx:52
 msgid "Appointment ID"
@@ -123,9 +119,8 @@ msgid "Customer Google Calendar link"
 msgstr ""
 
 #: src/admin/components/Form/Fields/EditorField/EditorField.tsx:122
-#, fuzzy
 msgid "Booking time range"
-msgstr "Форма WEBBA Booking"
+msgstr "Foglalási időtartomány"
 
 #: src/admin/components/Form/Fields/EditorField/EditorField.tsx:127
 msgid "Create loop"
@@ -406,20 +401,16 @@ msgid "Date/Time"
 msgstr ""
 
 #: src/admin/screens/Bookings/BookingsScreen.tsx:180
-#, fuzzy
-#| msgid "Add WEBBA Booking form"
 msgid "Add booking"
-msgstr "Добавить форму Webba Booking"
+msgstr "Foglalás hozzáadása"
 
 #: src/admin/screens/Bookings/BookingsScreen.tsx:188
-#, fuzzy
-#| msgid "Add WEBBA Booking form"
 msgid "Add Booking"
-msgstr "Добавить форму Webba Booking"
+msgstr "Foglalás hozzáadása"
 
 #: src/admin/screens/Coupons/CouponsScreen.tsx:56
 msgid "Edit Coupon"
-msgstr ""
+msgstr "Kupon szerkesztése"
 
 #: src/admin/screens/Coupons/CouponsScreen.tsx:104
 #: src/admin/screens/Coupons/CouponsScreen.tsx:111
@@ -2078,9 +2069,8 @@ msgid "Text of the 'Read more' link."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:2042
-#, fuzzy
 msgid "Booking form title"
-msgstr "Форма WEBBA Booking"
+msgstr "Foglalási űrlap címe"
 
 #: includes/backend/class_wbk_backend_options.php:2047
 msgid "Text above the booking form. List of available placeholders."
@@ -2570,9 +2560,8 @@ msgid "Text of the cancelation form label"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:2717
-#, fuzzy
 msgid "Cancellation form title"
-msgstr "Форма WEBBA Booking"
+msgstr "Törlési űrlap címe"
 
 #: includes/backend/class_wbk_backend_options.php:2720
 #: templates/frontend/get_parameters_processing.php:325
@@ -4109,9 +4098,8 @@ msgid "Time slot(s) already booked."
 msgstr ""
 
 #: includes/class-wbk-assets-manager.php:519
-#, fuzzy
 msgid "No available dates message"
-msgstr "Найти свободное время"
+msgstr "Nincsenek elérhető dátumok üzenet"
 
 #: includes/class-wbk-assets-manager.php:528
 msgid "Book"
@@ -4373,9 +4361,8 @@ msgid ""
 msgstr ""
 
 #: includes/data/class-wbk-model.php:262
-#, fuzzy
 msgid "Booking form"
-msgstr "Форма WEBBA Booking"
+msgstr "Foglalási űrlap"
 
 #: includes/data/class-wbk-model.php:269
 msgid "Default form"
@@ -4419,10 +4406,10 @@ msgid "Users"
 msgstr ""
 
 #: includes/data/class-wbk-model.php:365
-#, fuzzy
-#| msgid "Allow customers to choose a service"
 msgid "Allow users edit service parameters"
-msgstr "Разрешить пользователям выбирать службу"
+msgstr ""
+"A felhasználók számára a szolgáltatás paramétereinek szerkesztésének "
+"engedélyezése"
 
 #: includes/data/class-wbk-model.php:376
 msgid "Enter the duration of each booking."
@@ -4692,9 +4679,8 @@ msgstr ""
 #: includes/data/class-wbk-model.php:1759
 #: includes/wbkdata/utils/class-wbkdata-translator.php:110
 #: webba-booking-lite.php:1040
-#, fuzzy
 msgid "select option"
-msgstr "Общие настройки"
+msgstr "válassza ki a lehetőséget"
 
 #: includes/data/class-wbk-model.php:1768
 msgid "Enter your Calendar ID."
@@ -4837,9 +4823,8 @@ msgid "Day of week and time range"
 msgstr ""
 
 #: includes/data/class-wbk-model.php:2189
-#, fuzzy
 msgid "Action"
-msgstr "Настройки"
+msgstr "Művelet"
 
 #: includes/data/class-wbk-model.php:2194
 msgid "increase"
@@ -4963,9 +4948,8 @@ msgid "No data available."
 msgstr ""
 
 #: includes/wbkdata/utils/class-wbkdata-translator.php:63
-#, fuzzy
 msgid "Select option"
-msgstr "Общие настройки"
+msgstr "Válasszon egy opciót"
 
 #: includes/wbkdata/utils/class-wbkdata-translator.php:64
 msgid "No Time Slots available"
@@ -5493,9 +5477,8 @@ msgid ""
 msgstr ""
 
 #: templates/backend/wizard_page.php:207
-#, fuzzy
 msgid "Booking form settings"
-msgstr "Форма WEBBA Booking"
+msgstr "Foglalási űrlap beállításai"
 
 #: templates/backend/wizard_page.php:211
 msgid "Do you need to allow users book multiple time slotsin one checkout?"
@@ -5666,24 +5649,4 @@ msgstr ""
 #: templates/options/zoom_auth.php:26
 msgid "Please, set up Client ID and Client secret"
 msgstr ""
-
-#~ msgid "Select date to start search with"
-#~ msgstr "Укажите дату, с которой начать поиск"
-
-#~ msgid "Submit"
-#~ msgstr "Отправить"
-
-#~ msgid "Step 1 of 4"
-#~ msgstr "Шаг 1 из 4"
-
-#~ msgid "Step 1 of 3"
-#~ msgstr "Шаг 1 из 3"
-
-#~ msgid "Fill in a form:"
-#~ msgstr "Заполните форму:"
-
-#~ msgid "Fill in a form to book an appointment on "
-#~ msgstr "Заполните форму, чтобы забронировать встречу на"
-
-#~ msgid "leave empty to use Wordpress default value. "
-#~ msgstr "Отавьте пустым, чтобы использовать значение "
+ 

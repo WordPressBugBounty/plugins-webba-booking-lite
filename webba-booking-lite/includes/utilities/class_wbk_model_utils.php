@@ -1255,4 +1255,23 @@ class WBK_Model_Utils {
         return $json_string;
     }
 
+    static function get_email_template_type_usage( $template_field ) {
+        $service_ids = [];
+        $email_template_ids = [];
+        foreach ( self::get_service_ids() as $service_id ) {
+            $service = new WBK_Service($service_id);
+            if ( !$service->is_loaded() ) {
+                continue;
+            }
+            if ( $service->get( $template_field ) != false && is_numeric( $service->get( $template_field ) ) && $service->get( $template_field ) != 0 ) {
+                $service_ids[] = $service_id;
+                $email_template_ids[] = $service->get( $template_field );
+            }
+        }
+        return [
+            'service_ids'        => array_unique( $service_ids ),
+            'email_template_ids' => array_unique( $email_template_ids ),
+        ];
+    }
+
 }

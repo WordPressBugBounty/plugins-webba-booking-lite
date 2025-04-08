@@ -362,7 +362,7 @@
             "type": "string",
             "input_type": "select",
             "hidden": true,
-            "title": "'On Booking' notification template",
+            "title": "'On Booking' notification template (customer)",
             "tab": "email",
             "misc": {
                 "tooltip": "Select a template for booking confirmation notifications.",

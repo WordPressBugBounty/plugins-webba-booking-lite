@@ -40,6 +40,7 @@ class WBK_Model_Updater {
         self::update_5_1_2();
         self::update_5_1_3();
         self::update_5_1_5();
+        // self::update_5_1_11();
     }
 
     public static function run_previous_update() {
@@ -1164,6 +1165,57 @@ class WBK_Model_Updater {
             }
         }
         self::set_update_as_complete( 'update_5_1_5' );
+    }
+
+    static function update_5_1_11() {
+        global $wpdb;
+        if ( 1 == 1 ) {
+            $template_data = WBK_Model_Utils::get_email_template_type_usage( 'notification_template' );
+            foreach ( $template_data['email_template_ids'] as $email_template_id ) {
+                self::supplement_template_from_options( $email_template_id, get_option( 'wbk_email_customer_book_subject', '' ) );
+            }
+        }
+        // self::set_update_as_complete('wbk_email_customer_book_status');
+        if ( 1 == 1 ) {
+            $template_data = WBK_Model_Utils::get_email_template_type_usage( 'arrived_template' );
+            foreach ( $template_data['email_template_ids'] as $email_template_id ) {
+                self::supplement_template_from_options( $email_template_id, get_option( 'wbk_email_customer_arrived_subject', '' ) );
+            }
+        }
+        // self::set_update_as_complete('wbk_email_customer_daily_status');
+        if ( 1 == 1 ) {
+            $template_data = WBK_Model_Utils::get_email_template_type_usage( 'reminder_template' );
+            foreach ( $template_data['email_template_ids'] as $email_template_id ) {
+                self::supplement_template_from_options( $email_template_id, get_option( 'wbk_email_customer_daily_subject', '' ) );
+            }
+        }
+        // self::set_update_as_complete('wbk_email_customer_daily_status');
+        if ( 1 == 1 ) {
+            $template_data = WBK_Model_Utils::get_email_template_type_usage( 'invoice_template' );
+            foreach ( $template_data['email_template_ids'] as $email_template_id ) {
+                self::supplement_template_from_options( $email_template_id, get_option( 'wbk_email_customer_invoice_subject', '' ) );
+            }
+        }
+        // self::set_update_as_complete('wbk_email_customer_send_invoice');
+        if ( 1 == 1 ) {
+            $template_data = WBK_Model_Utils::get_email_template_type_usage( 'booking_changed_template' );
+            foreach ( $template_data['email_template_ids'] as $email_template_id ) {
+                self::supplement_template_from_options( $email_template_id, get_option( 'wbk_email_on_update_booking_subject', '' ) );
+            }
+        }
+        // self::set_update_as_complete('wbk_email_on_update_booking_subject');
+    }
+
+    static function supplement_template_from_options( $template_id, $subject ) {
+        $template = new WBK_Email_Template($template_id);
+        if ( !$template->is_loaded() ) {
+            return false;
+        }
+        $template->set( 'subject', $subject );
+        return $template->save();
+    }
+
+    static function generate_template_from_options() {
     }
 
 }

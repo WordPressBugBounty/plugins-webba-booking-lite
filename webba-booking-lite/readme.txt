@@ -1,15 +1,15 @@
-=== Appointment Booking & Scheduling System — Webba Appointments Booking Calendar ===
+=== Appointment Booking & Scheduling Plugin — Webba Booking Calendar ===
 Contributors: Webba agency, freemius
 Donate link: https://webba-booking.com/
-Tags:  appointments, appointment booking, booking, scheduling, booking system
+Tags:  appointments, appointment booking, booking calendar, scheduling, booking system
 Requires at least: 5.6
 Tested up to: 6.7.2
-Stable tag: 5.1.9
+Stable tag: 5.1.11
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Best Appointment Booking Plugin 🗓️ Easy scheduling unlimited appointments, calendar sync, notifications and 5* support = powerful booking system!
+Free Appointment Booking Plugin 🗓️ unlimited appointments, booking management, calendar sync, notifications, 5* support = powerful booking system!
 
 == DESCRIPTION ==
 = Simple and Modern Appointment Booking, Reservation & Scheduling Calendar Plugin 🗓️ =
@@ -18,7 +18,7 @@ Best Appointment Booking Plugin 🗓️ Easy scheduling unlimited appointments, 
 
 Using Webba you can accept appointment bookings, reservations, hourly bookings for variety of services, rentals, spaces.
 
-It offers a variety of important features that will make **accepting and managing online bookings** and reservations on your website a breeze.
+It offers a variety of important features that will make **accepting and managing online bookings** and reservations on your website super easy.
 
 Whether you run a wellness business, salon, any sport or rental business, events, consulting, medical clinic, or any business that relies on appointments, events and service booking, Webba Booking is your one-stop solution.
 
@@ -45,6 +45,8 @@ Whether you run a wellness business, salon, any sport or rental business, events
 
 == MAIN PREMIUM FEATURES INCLUDED IN WEBBA PRO: ==
 * **Two-way Calendar sync:** sync Webba with your calendar and manage your appointments without any double-bookings.
+* **Conversion Tracking with Google Analytics:** automatically track bookings and conversion events with GA4 integration.
+* **User Dashboard:** let your customers easily manage their bookings by rescheduling or canceling them.
 * **Zoom Integration:** create automatic zoom video conferencing events and attach them to the booking confirmation.
 * **Accept deposits and payments:** secure online payment integrations with Paypal, Stripe, or Woocommerce (with 100+ payment gateways).
 * **Track performance through statistics:** track and visualize how many bookings you get over time.
@@ -75,7 +77,7 @@ Webba Booking is perfect for spas, salons, rental businesses, event businesses a
 
 * **Specialists**: personal trainer booking, consultant booking, lawyer booking, wedding coordinators, contractor booking, therapist booking, tutor booking, photographer booking, dance instructors booking, coach booking, any other specialist who needs appointment booking
 * **Wellness and beauty professionals**: beauty salon booking, nail salon booking, hair salon booking, cosmetologist booking, hairdresser booking, barbershop booking, manicurist booking, SPA booking, swimming pool booking, massage booking
-* **Activity providers **: event booking, ticket booking, tour scheduling, golf booking, games booking, quest rooms booking, escape room booking, gym booking, fitness booking
+* **Activity providers **: tour booking, ticket booking, tour scheduling, golf booking, games booking, quest rooms booking, escape room booking, gym booking, fitness booking
 * **Medical services professionals**: doctor booking, dentist booking, therapist booking, clinic booking system and other areas related to medicine
 * **Restaurants and event venues**: table reservation, dining booking, private room reservation
 * **Equipment and transport rental**: car rental system, bike rental, boat rental, yacht booking, technics booking, any other kind of hourly rental
@@ -170,15 +172,21 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+5.1.11
+
+08/04/2025
+
+- Bug fix: wrong translation of certain languages 
+- Bug fix: warnings on certain configurations
+
 5.1.9
 
 27/03/2025
 
-- Improvements: integration with the Google Tag
+- Improvements: integration with the Google Tag (easier conversion tracking)
 - Bug fix: non-admin permissions updated
-- Bug fix: wrong translation of certain languages
 - Bug fix: bug with the cancelled bookings
-
+ 
 5.1.8
 
 19/03/2025

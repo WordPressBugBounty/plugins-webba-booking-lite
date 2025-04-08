@@ -374,7 +374,7 @@ class Model
                 }
             }
         }
-        if (!$model_updated || 1 == 1) {
+        if (!$model_updated) {
             $this->generate_frontend_model();
         }
 
@@ -604,8 +604,8 @@ class Model
         }
         do_action('wbkdata_on_before_item_deleted', $model_name, $this->model_name, $item);
         $result = $wpdb->delete($model_name, ['id' => $id], '%d');
-        
-        if($result){
+
+        if ($result) {
             do_action('wbkdata_on_after_item_deleted', $model_name, $this->model_name, $item);
         }
 
@@ -876,10 +876,10 @@ class Model
             // check if current user can add the field
             if (is_user_logged_in()) {
                 $user = wp_get_current_user();
-                
+
                 $have_permission = current_user_can('manage_options') && current_user_can('manage_sites');
 
-                if(isset($_REQUEST['model']) && $_REQUEST['model'] == 'appointments' && isset($_REQUEST['service_id'])) {
+                if (isset($_REQUEST['model']) && $_REQUEST['model'] == 'appointments' && isset($_REQUEST['service_id'])) {
                     $have_permission = WBK_User_Utils::check_access_to_particular_service(get_current_user_id(), $_REQUEST['service_id']);
                 }
 

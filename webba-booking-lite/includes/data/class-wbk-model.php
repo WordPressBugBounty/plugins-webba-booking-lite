@@ -365,7 +365,7 @@ class WBK_Model {
         $table->add_field(
             'service_notification_template',
             'notification_template',
-            __( '\'On Booking\' notification template', 'webba-booking-lite' ),
+            __( '\'On Booking\' notification template (customer)', 'webba-booking-lite' ),
             'select',
             'email',
             [
@@ -652,21 +652,65 @@ class WBK_Model {
                 'tooltip' => $tooltip,
             ]
         );
-        $tooltip = __( __( 'Use the text editor to prepare the email template. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>', 'webba-booking-lite' );
+        /*
+        $tooltip = __('Subject of the email', 'webba-booking-lite');
+        $table->add_field(
+            'subject',
+            'subject',
+            __('Email subject line', 'webba-booking-lite'),
+            'text',
+            '',
+            ['tooltip' => $tooltip]
+        );
+        */
+        $tooltip = __( __( 'Use the text editor to prepare the email template.', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>', 'webba-booking-lite' );
         $table->add_field(
             'template',
             'template',
-            __( 'Template', 'webba-booking-lite' ),
+            __( 'Email Body', 'webba-booking-lite' ),
+            'editor',
+            '',
+            [
+                'tooltip'      => $tooltip,
+                'placeholders' => true,
+            ],
+            '',
+            true,
+            false,
+            true
+        );
+        /*
+        $tooltip = __('A PDF attachment will be generated based on input text', 'webba-booking-lite');
+        $table->add_field(
+            'pdf_attachment',
+            'pdf_attachment',
+            __('PDF Attachment', 'webba-booking-lite'),
             'editor',
             '',
             [
                 'tooltip' => $tooltip,
+                'placeholders' => true
             ],
+            '',
+            true,
+            true,
+            false
+        );
+        
+        $tooltip = __('Calendar Event from iCal', 'webba-booking-lite');
+        $table->add_field(
+            'calendar_event',
+            'calendar_event',
+            __('Calendar Event (iCal)', 'webba-booking-lite'),
+            'textarea',
+            '',
+            ['tooltip' => $tooltip],
             '',
             true,
             false,
             false
         );
+        */
         $table->sync_structure();
         WbkData()->models->add( $table, $db_prefix . 'wbk_email_templates' );
         // Bookings (ex Appointments)

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: webba-booking-lite\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-05 19:24+0200\n"
-"PO-Revision-Date: 2025-02-22 20:26+0100\n"
+"PO-Revision-Date: 2025-03-20 21:53+0100\n"
 "Last-Translator: admin <admin@webba.io>\n"
 "Language-Team: Webba Booking <support@webba-booking.com>\n"
 "Language: fr_CA\n"
@@ -4802,7 +4802,6 @@ msgid "Specify whether the amount is a fixed value or a percentage of the price.
 msgstr "Spécifier si le montant est une valeur fixe ou un pourcentage du prix."
 
 #~ msgid ""
-
 #~ msgstr "ID de produit. <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/payment/steps-to-setup-the-integration-of-woocommerce-with-webba/\">En savoir plus</a>"
 
 #~ msgid "Product ID not specified correctly"

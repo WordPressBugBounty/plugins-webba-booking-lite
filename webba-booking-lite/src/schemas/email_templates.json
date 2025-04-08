@@ -20,12 +20,13 @@
             "type": "string",
             "input_type": "editor",
             "hidden": true,
-            "title": "Template",
+            "title": "Email Body",
             "tab": "",
             "misc": {
-                "tooltip": "Use the text editor to prepare the email template. <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/placeholders/\">List of available placeholders</a>"
+                "tooltip": "Use the text editor to prepare the email template.List of available placeholders</a>",
+                "placeholders": true
             },
-            "required": false,
+            "required": true,
             "dependency": [],
             "default_value": "",
             "editable": true

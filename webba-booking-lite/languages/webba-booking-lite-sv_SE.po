@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: webba-booking-lite\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-10 20:35+0200\n"
-"PO-Revision-Date: 2025-02-22 20:57+0100\n"
+"PO-Revision-Date: 2025-03-20 14:40+0100\n"
 "Last-Translator: \n"
 "Language-Team: Webba Booking <support@webba-booking.com>\n"
 "Language: sv\n"
@@ -1078,45 +1078,40 @@ msgid "Payment received email message"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:714
-#, fuzzy
 msgid "Send payment received email (to customer)"
-msgstr "Отравлять письмо клинту"
+msgstr "Skicka e-postmeddelande om mottagen betalning (till kunden)"
 
 #: includes/backend/class_wbk_backend_options.php:718
 msgid "Turn on to automatically send an email notification to the customer when a payment for a booking is received. "
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:741
-#, fuzzy
 msgid "Send status \"Arrived\" email (to customer)"
-msgstr "Отравлять письмо клинту"
+msgstr "Skicka e-postmeddelande med status \"Anlänt\" (till kunden)"
 
 #: includes/backend/class_wbk_backend_options.php:744
 msgid "Turn on to automatically send an email notification to the customer when the status of their booking is changed to \"Arrived.\""
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:748
-#, fuzzy
 msgid "Status \"Arrived\" email subject line"
-msgstr "Kund e-post ämne är fel"
+msgstr "Status \"Anlänt\" ämnesrad för e-post"
 
 #: includes/backend/class_wbk_backend_options.php:755
 msgid "Status \"Arrived\" email message"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:763
-#, fuzzy
 msgid "Send reminder email (to admin)"
-msgstr "Отправлять E-мейл администратору"
+msgstr "Skicka påminnelse via e-post (till administratör)"
 
 #: includes/backend/class_wbk_backend_options.php:766
 msgid "Turn on to send admin automatic email reminders for upcoming bookings."
-msgstr ""
+msgstr "Slå på för att skicka automatiska e-postpåminnelser till administratörer om kommande bokningar."
 
 #: includes/backend/class_wbk_backend_options.php:771
-#, fuzzy
 msgid "Reminder email subject line"
-msgstr "Kund e-post ämne är fel"
+msgstr "Ämnesrad för påminnelsemail"
 
 #: includes/backend/class_wbk_backend_options.php:778
 #: includes/backend/class_wbk_backend_options.php:807
@@ -1124,18 +1119,16 @@ msgid "Reminder email message"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:785
-#, fuzzy
 msgid "Send reminder email (to customer)"
-msgstr "Отравлять письмо клинту"
+msgstr "Skicka påminnelse via e-post (till kunden)"
 
 #: includes/backend/class_wbk_backend_options.php:788
 msgid "Turn on to send customers automatic email reminders for their upcoming bookings."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:792
-#, fuzzy
 msgid "Send reminders to customers in X days"
-msgstr "Отравлять письмо клинту"
+msgstr "Skicka påminnelser till kunder inom X dagar"
 
 #: includes/backend/class_wbk_backend_options.php:796
 msgid "Select the timing for the reminder notification. For instance, set the value to 0 for the day of booking, 1 for one day before the booking, 2 for two days before, and so on."
@@ -1163,9 +1156,8 @@ msgid "Turn on to send reminder email notifications only for approved bookings."
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:839
-#, fuzzy
 msgid "Send invoice to a customer (HTML format) "
-msgstr "Отравлять письмо клинту"
+msgstr "Skicka faktura till en kund (HTML-format)"
 
 #: includes/backend/class_wbk_backend_options.php:843
 msgid "Do not send invoice"
@@ -1714,9 +1706,8 @@ msgid "Label for the tax in payment details"
 msgstr ""
 
 #: includes/backend/class_wbk_backend_options.php:1228
-#, fuzzy
 msgid "Service fee label"
-msgstr "Метка для списка служб"
+msgstr "Etikett för serviceavgift"
 
 #: includes/backend/class_wbk_backend_options.php:1229
 #, fuzzy
@@ -2880,9 +2871,8 @@ msgid "Time slot(s) already booked."
 msgstr ""
 
 #: includes/class-wbk-assets-manager.php:242
-#, fuzzy
 msgid "No available dates message"
-msgstr "Найти свободное время"
+msgstr "Inga tillgängliga datum meddelande"
 
 #: includes/class-wbk-assets-manager.php:244
 msgid "Book"
@@ -3080,9 +3070,8 @@ msgid "Service name"
 msgstr "Tjänst"
 
 #: includes/data/class-wbk-model.php:31
-#, fuzzy
 msgid "Enter service name."
-msgstr "Открыть страницу служб."
+msgstr "Ange tjänstens namn."
 
 #: includes/data/class-wbk-model.php:32
 msgid "Description"
@@ -3367,9 +3356,8 @@ msgstr "Användare"
 
 #: includes/data/class-wbk-model.php:353
 #: wbkdata/utils/class-wbkdata-translator.php:103 webba-booking-lite.php:533
-#, fuzzy
 msgid "select option"
-msgstr "Общие настройки"
+msgstr "välj alternativ"
 
 #: includes/data/class-wbk-model.php:355
 msgid "Enter your Calendar ID."
@@ -3824,9 +3812,8 @@ msgid "select all"
 msgstr "Välj…"
 
 #: wbkdata/utils/class-wbkdata-translator.php:105
-#, fuzzy
 msgid "deselect all"
-msgstr "Метка для списка служб"
+msgstr "avmarkera alla"
 
 #: templates/backend/appearance_page_content.php:64
 msgid "Save"
@@ -4391,47 +4378,3 @@ msgstr ""
 #~ msgid "Gap between appointments"
 #~ msgstr "Tid mellan möten"
 
-#~ msgid "Select date to start search with"
-#~ msgstr "Укажите дату, с которой начать поиск"
-
-#~ msgid "Submit"
-#~ msgstr "Отправить"
-
-#~ msgid "of"
-#~ msgstr "из"
-
-#~ msgid "Step 1 of 4"
-#~ msgstr "Шаг 1 из 4"
-
-#~ msgid "Step 1 of 3"
-#~ msgstr "Шаг 1 из 3"
-
-#~ msgid "Fill in a form:"
-#~ msgstr "Заполните форму:"
-
-#~ msgid "Fill in a form to book an appointment on"
-#~ msgstr "Заполните форму, чтобы забронировать встречу"
-
-#~ msgid "Fill in a form to book an appointment on "
-#~ msgstr "Заполните форму, чтобы забронировать встречу на"
-
-#~ msgid "Add WEBBA Booking form"
-#~ msgstr "Добавить форму Webba Booking"
-
-#~ msgid "Allow customers to choose a service"
-#~ msgstr "Разрешить пользователям выбирать службу"
-
-#~ msgid "WEBBA Booking form"
-#~ msgstr "Форма WEBBA Booking"
-
-#~ msgid "Subject of email to a customer"
-#~ msgstr "Тема письма клиенту"
-
-#~ msgid "Subject of email to an administrator"
-#~ msgstr "Тема письма администратору"
-
-#~ msgid "Options"
-#~ msgstr "Настройки"
-
-#~ msgid "leave empty to use Wordpress default value. "
-#~ msgstr "Отавьте пустым, чтобы использовать значение "
