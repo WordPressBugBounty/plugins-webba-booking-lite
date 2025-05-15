@@ -2,6 +2,7 @@ import { useField } from '../../lib/hooks/useField'
 import { FormComponentConstructor } from '../../lib/types'
 import { Validators } from '../../utils/validation'
 import { GenericFormField } from '../GenericFormField/GenericFormField'
+import { __ } from '@wordpress/i18n'
 
 export const createEmailField: FormComponentConstructor<string> = ({
     field,
@@ -17,8 +18,8 @@ export const createEmailField: FormComponentConstructor<string> = ({
                 onChange={setValue}
                 errors={errors}
                 id={name}
-                type="email"
-                label="Email"
+                type="text"
+                label={field.label || __('Email', 'webba-booking-lite')}
                 misc={misc}
             />
         )

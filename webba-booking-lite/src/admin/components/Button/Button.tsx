@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import styles from './Button.module.scss'
-import { useCallback, useTransition } from '@wordpress/element'
+import { useCallback, useState, useTransition } from '@wordpress/element'
 
 interface ButtonProps {
     onClick?: () => void
@@ -8,11 +8,12 @@ interface ButtonProps {
     className?: string
     id?: string
     name?: string
-    type?: 'primary' | 'secondary' | 'no-border'
+    type?: 'primary' | 'secondary' | 'custom' | 'no-border'
     actionType?: 'button' | 'submit' | 'reset'
     isLoading?: boolean
     form?: string
     children?: React.ReactNode
+    tooltip?: string
 }
 
 export const Button = ({
@@ -26,12 +27,18 @@ export const Button = ({
     form,
     isLoading,
     children,
+    tooltip,
 }: ButtonProps) => {
-    const [maybeLoading, startAction] = useTransition()
+    const [maybeLoading, setMaybeLoading] = useState(false)
 
-    const handleClick = useCallback((e: any) => {
-        onClick && startAction(onClick)
-    }, [onClick, startAction])
+    const handleClick = useCallback(
+        async (e: any) => {
+            setMaybeLoading(true)
+            onClick && (await onClick())
+            setMaybeLoading(false)
+        },
+        [onClick]
+    )
 
     return (
         <button
@@ -48,9 +55,11 @@ export const Button = ({
             name={name}
             id={id}
             form={form}
+            data-title={tooltip}
         >
-            {maybeLoading ||
-                (isLoading && <div className={styles.loader}></div>)}
+            {(maybeLoading || isLoading) && (
+                <div className={styles.loader}></div>
+            )}
             {children}
         </button>
     )

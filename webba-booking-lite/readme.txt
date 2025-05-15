@@ -3,8 +3,8 @@ Contributors: Webba agency, freemius
 Donate link: https://webba-booking.com/
 Tags:  appointments, appointment booking, booking calendar, scheduling, booking system
 Requires at least: 5.6
-Tested up to: 6.7.2
-Stable tag: 5.1.11
+Tested up to: 6.8
+Stable tag: 5.1.18
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -172,7 +172,39 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-5.1.11
+5.1.18
+
+15/05/2025
+
+- Improvements: minor UI improvements
+- Bug fix: bugs with automatic template creations
+- Bug fix: bug with attachment in the customer's booking form
+- Bug fix: a series of minor fixes
+- Maintenance update
+
+5.1.17
+
+07/05/2025
+
+- Improvements: minor UI improvements
+- Bug fix: migration issues fixed
+- Bug fix: bug with automatic calculation on certain configurations
+
+5.1.16
+
+03/05/2025
+
+- Bug fix: migration issues fixed
+
+5.1.15
+
+30/04/2025
+
+- Improvements: New email notification system added.
+- Improvements: Administrator interface improved.
+- Bug fix: Minor bug fixes.
+
+5.1.12
 
 08/04/2025
 

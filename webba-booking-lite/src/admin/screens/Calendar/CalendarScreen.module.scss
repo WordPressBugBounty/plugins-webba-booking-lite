@@ -1,13 +1,23 @@
 @mixin event {
     border-color: #d8eded;
     margin: 0;
-    border-left: 3px solid #1f6763;
+    border-left: 10px solid transparent;
     border-radius: 4px;
-    padding: 0 0 0 15px;
-    background: url('../../../../public/images/event-title-icon.png') no-repeat
-        left 3px top 4px;
-    background-color: rgb(230, 154, 176);
+    padding: 0 0 0 2px;
+    background-color: transparent;
     color: #212121;
+}
+
+.eventWrapper {
+    border-radius: 4px;
+
+    @each $status, $color in colors.$status-colors {
+        &.#{$status} {
+            :global(.rbc-event) {
+                border-left-color: $color;
+            }
+        }
+    }
 }
 
 .wrapper {
@@ -59,10 +69,30 @@
 
     .toolWrapper {
         margin-top: 20px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 20px;
+
+        @media (max-width: 768px) {
+            flex-flow: column-reverse;
+
+            .addButton {
+                margin-left: 0;
+            }
+        }
     }
 
-    :global(.rbc-show-more){
+    :global(.rbc-show-more) {
         color: #1f6763;
+    }
+
+    .addButton {
+        margin-left: auto;
+    }
+
+    :global(.rbc-event[role='button']) {
+        background-color: inherit;
     }
 }
 
@@ -70,7 +100,7 @@
     :global(.rbc-event) {
         @include event;
 
-        &:not(:last-child){
+        &:not(:last-child) {
             margin-bottom: 1px;
         }
     }

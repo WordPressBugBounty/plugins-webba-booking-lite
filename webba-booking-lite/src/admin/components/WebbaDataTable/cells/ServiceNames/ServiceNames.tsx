@@ -20,11 +20,12 @@ export const ServiceNames = ({ getValue }: CellContext<any, any>) => {
         const names = services
             .filter(
                 (service: any) =>
-                    selectedServices && selectedServices.includes(service.id)
+                    selectedServices &&
+                    selectedServices.includes(service.id.toString())
             )
             .map((service: any) => service.name)
         return names.join(', ')
-    }, [services])
+    }, [services, getValue])
 
-    return <strong>{names}</strong>
+    return <div>{names}</div>
 }

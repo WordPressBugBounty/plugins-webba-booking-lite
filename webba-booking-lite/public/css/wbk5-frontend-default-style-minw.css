@@ -30,7 +30,7 @@ body {
 
 .main-block-w {
     height: 100vh;
-    font-family: poppins, arial;
+    font-family: 'Ubuntu', sans-serif;
     font-size: 16px;
     line-height: normal;
     margin: 0;
@@ -55,7 +55,8 @@ body {
     opacity: 0.7;
 }
 .main-block-w b {
-    font-family: poppins-semibold, arial;
+    font-family: 'Ubuntu', sans-serif;
+font-weight: 400;
 }
 .main-block-w img {
     max-width: 100%;
@@ -66,7 +67,7 @@ body {
     border-radius: 15px;
     height: 50px;
     padding: 0 20px 0 20px;
-    font-family: poppins, arial;
+    font-family: 'Ubuntu', sans-serif;
     font-size: 16px;
     color: #212121;
     outline: none;
@@ -96,7 +97,8 @@ body {
     background: #212121;
     padding: 8px 15px 8px 15px;
     color: #fff;
-    font-family: poppins-medium, arial;
+    font-family: 'Ubuntu', sans-serif;
+font-weight: 500;
     margin: 0 0 70px 0;
 }
 .header-main-w .header-container-w {
@@ -185,7 +187,8 @@ body {
     margin: 0 0 40px 0;
 }
 .page-title-wrapper-w .page-title-w {
-    font-family: poppins-medium, arial;
+    font-family: 'Ubuntu', sans-serif;
+font-weight: 500;
     font-size: 48px;
     margin: 0;
 }
@@ -294,7 +297,8 @@ body {
 }
 .field-row-w label {
     display: flex;
-    font-family: poppins-semibold, arial;
+    font-family: 'Ubuntu', sans-serif;
+font-weight: 400;
     margin: 0 0 10px 0;
 }
 .field-row-w.two-fields-w {
@@ -396,7 +400,7 @@ body {
 }
 
 .checkbox-row-w .checkbox-text-w {
-    font-family: poppins, arial;
+    font-family: 'Ubuntu', sans-serif;
     font-size: 16px;
 }
 .checkbox-row-w .checkbox-text-w .checkbox-title-w {
@@ -426,7 +430,8 @@ body {
 
 .button-wbk,
 .button-wbk:focus {
-    font-family: poppins-semibold, arial;
+    font-family: 'Ubuntu', sans-serif;
+font-weight: 400;
     display: inline-block;
     background: #1f6763;
     border-radius: 15px;
@@ -575,7 +580,8 @@ body {
 }
 .appointment-status-text-mobile-wbk .current-step-wbk {
     font-size: 20px;
-    font-family: poppins-medium, arial;
+    font-family: 'Ubuntu', sans-serif;
+font-weight: 500;
 }
 
 .service-cards-list-w {
@@ -591,7 +597,7 @@ body {
 }
 .service-cards-list-w .service-card-w {
     display: block;
-    font-family: poppins, arial;
+    font-family: 'Ubuntu', sans-serif;
     max-width: 215px;
     position: relative;
     margin: 0;
@@ -771,7 +777,7 @@ body {
     border-radius: 20px;
     width: 100%;
     padding: 0 40px 0 20px;
-    font-family: poppins, arial;
+    font-family: 'Ubuntu', sans-serif;
     font-size: 16px;
     color: #212121;
     background: #fff url(../images/select-arrow.png) no-repeat right 20px center;
@@ -787,7 +793,7 @@ body {
     box-shadow: 0 0 10px rgba(161, 164, 182, 0.16);
     border-radius: 20px;
     padding: 25px 10px 25px 10px;
-    font-family: poppins, arial;
+    font-family: 'Ubuntu', sans-serif;
     font-size: 16px;
     background: #fff;
     width: 445px;
@@ -844,7 +850,8 @@ body {
 }
 .ui-datepicker .ui-datepicker-header .ui-datepicker-title {
     text-align: center;
-    font-family: poppins-semibold, arial;
+    font-family: 'Ubuntu', sans-serif;
+font-weight: 400;
     color: #212121;
     line-height: 18px;
 }
@@ -884,7 +891,7 @@ body {
     border: none;
     cursor: pointer;
     font-size: 16px;
-    font-family: poppins, arial;
+    font-family: 'Ubuntu', sans-serif;
     transition: 0.2s;
     padding: 0;
 }
@@ -1061,12 +1068,14 @@ body {
     }
     .thank-you-block-w .thank-you-mobile-w .thank-you-title-mobile-w {
         font-size: 24px;
-        font-family: poppins-semibold, arial;
+        font-family: 'Ubuntu', sans-serif;
+font-weight: 400;
         line-height: 1.2;
         margin: 0 0 20px 0;
     }
     .thank-you-block-w .thank-you-mobile-w .thank-you-subtitle-mobile-w {
-        font-family: poppins-semibold, arial;
+        font-family: 'Ubuntu', sans-serif;
+font-weight: 400;
     }
     .thank-you-block-w .thank-you-list-w {
         margin: 0 0 50px 0;
@@ -2472,7 +2481,8 @@ body {
 }
 .payment-details-wrapper-w table tfoot tr:last-child td {
     padding-top: 10px;
-    font-family: poppins-semibold, arial;
+    font-family: 'Ubuntu', sans-serif;
+font-weight: 400;
 }
 
 .first-text-w.custom-w {
@@ -2728,7 +2738,8 @@ body {
     .radio-time-block-w
     .radio-time-inner-w
     .time-w {
-    font-family: poppins-semibold, arial;
+    font-family: 'Ubuntu', sans-serif;
+font-weight: 400;
 }
 .appontment-time-list-w.group-list-w .radio-time-block-w .group-active-icon-w {
     display: none;
@@ -2737,7 +2748,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: poppins-light, arial;
+    font-family: 'Ubuntu', sans-serif;
+font-weight: 300;;
     font-size: 14px;
 }
 .appontment-time-list-w.group-list-w .available-w img {
@@ -3346,12 +3358,14 @@ select.wbk-select {
 }
 .thank-you-block-w .thank-you-mobile-w .thank-you-title-mobile-w {
     font-size: 24px;
-    font-family: poppins-semibold, arial;
+    font-family: 'Ubuntu', sans-serif;
+font-weight: 400;
     line-height: 1.2;
     margin: 0 0 20px 0;
 }
 .thank-you-block-w .thank-you-mobile-w .thank-you-subtitle-mobile-w {
-    font-family: poppins-semibold, arial;
+    font-family: 'Ubuntu', sans-serif;
+font-weight: 400;
 }
 .thank-you-block-w .thank-you-list-w {
     margin: 0 0 50px 0;

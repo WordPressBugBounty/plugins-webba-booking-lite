@@ -130,7 +130,7 @@ class WBK_Date_Time_Utils {
 
     // render service disabilities
     public static function renderBHDisabilities() {
-        $arrIds = WBK_Db_Utils::getServices();
+        $arrIds = WBK_Model_Utils::get_service_ids();
         $html = '<script type=\'text/javascript\'>';
         $html .= 'var wbk_disabled_days = {';
         foreach ( $arrIds as $id ) {
@@ -205,7 +205,7 @@ class WBK_Date_Time_Utils {
 
     // render service abilities
     public static function renderBHAbilities() {
-        $arrIds = WBK_Db_Utils::getServices();
+        $arrIds = WBK_Model_Utils::get_service_ids();
         $date_format = self::get_date_format();
         $html = '<script type=\'text/javascript\'>';
         $html .= 'var wbk_available_days = {';
@@ -371,7 +371,7 @@ class WBK_Date_Time_Utils {
 
     // render service disabilities
     public static function renderBHDisabilitiesFull() {
-        $arrIds = WBK_Db_Utils::getServices();
+        $arrIds = WBK_Model_Utils::get_service_ids();
         $html = '<script type=\'text/javascript\'>';
         $html .= 'var wbk_disabled_days = {';
         foreach ( $arrIds as $id ) {
@@ -562,7 +562,7 @@ class WBK_Date_Time_Utils {
 
     // render service limits
     public static function renderServiceLimits() {
-        $arrIds = WBK_Db_Utils::getServices();
+        $arrIds = WBK_Model_Utils::get_service_ids();
         $html = '<script type=\'text/javascript\'>';
         $html .= 'var wbk_service_limits = {';
         foreach ( $arrIds as $id ) {

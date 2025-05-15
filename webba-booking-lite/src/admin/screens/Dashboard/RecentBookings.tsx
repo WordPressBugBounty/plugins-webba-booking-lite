@@ -24,6 +24,9 @@ import { wbkFormat } from '../../components/Form/utils/dateTime'
 import { getUnixTime } from 'date-fns'
 import styles from './Dashboard.module.scss'
 import helloIcon from '../../../../public/images/hello-dashboard.png'
+import { CustomerName } from '../../components/WebbaDataTable/cells/CustomerName/CustomerName'
+import { BookingTime } from '../../components/WebbaDataTable/cells/BookingTime/BookingTime'
+import { DurationCell } from '../../components/WebbaDataTable/cells/DurationCell/DurationCell'
 
 export const bookingsModel = removePrefixesFromModelFields(
     BookingsModel,
@@ -74,12 +77,13 @@ export const RecentBookings = () => {
         return generateColumnDefsFromModel(
             bookingsModel,
             {
+                name: {
+                    cell: CustomerName,
+                },
                 status: {
-                    header: __('Status', 'webba-booking-lite'),
                     cell: StatusCell,
                 },
                 service_id: {
-                    header: __('Service', 'webba-booking-lite'),
                     cell: ServiceName,
                 },
             },
@@ -88,20 +92,30 @@ export const RecentBookings = () => {
                     index: 0,
                     header: __('ID', 'webba-booking-lite'),
                     cell: ({ cell }) => cell.row.original.id,
-                    accessorKey: 'id',
                 },
-                date_time: {
+                time: {
                     index: 1,
                     header: __('Date/Time', 'webba-booking-lite'),
-                    cell: ({ cell }) =>
-                        wbkFormat(
-                            cell.row.original.time,
-                            `${
-                                settings ? settings.date_format : 'dd/mm/yyyy'
-                            } ${settings ? settings.time_format : 'HH:mm'}`,
-                            settings ? settings.timezone : 'UTC'
-                        ),
-                    accessorKey: 'time',
+                    cell: BookingTime,
+                },
+                duration: {
+                    index: 2,
+                    header: __('Duration', 'webba-booking-lite'),
+                    cell: DurationCell,
+                },
+                amount_paid: {
+                    index: 5,
+                    cell: ({ row }) => {
+                        const { amount_paid, moment_price } = row.original
+
+                        return (amount_paid && amount_paid > 0) ||
+                            moment_price > 0
+                            ? settings?.price_format.replace(
+                                  '#price',
+                                  amount_paid || 0
+                              )
+                            : __('Free', 'webba-booking-lite')
+                    },
                 },
             }
         )
@@ -113,13 +127,16 @@ export const RecentBookings = () => {
         selectable: true,
         isAdmin: settings?.is_admin,
         renderMenu: ({ cell }) => {
-            const { onDelete, onDuplicate, onSubmit } = getCellActions({
-                cell,
-                collectionName: 'appointments',
-            })
+            const { onDelete, onDuplicate, onSubmit, onCancel } =
+                getCellActions({
+                    cell,
+                    collectionName: 'appointments',
+                })
 
             return (
                 <Menu
+                    collectionName="appointments"
+                    onCancel={onCancel}
                     onDelete={onDelete}
                     onDuplicate={onDuplicate}
                     onEdit={() => {

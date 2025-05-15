@@ -68,8 +68,8 @@ class WBK_Frontend_Booking {
         }
         if ( isset( $_GET['ggeventadd'] ) ) {
             $ggeventadd = $_GET['ggeventadd'];
-            $ggeventadd = WBK_Db_Utils::wbk_sanitize( $ggeventadd );
-            $appointment_ids = WBK_Db_Utils::getAppointmentIdsByGroupToken( $ggeventadd );
+            $ggeventadd = WBK_Validator::wbk_sanitize( $ggeventadd );
+            $appointment_ids = WBK_Model_Utils::get_booking_ids_by_group_token( $ggeventadd );
             if ( count( $appointment_ids ) > 0 ) {
                 if ( !session_id() ) {
                     session_start();
@@ -124,7 +124,7 @@ class WBK_Frontend_Booking {
                     $cancel_token = str_replace( '>', '', $cancel_token );
                     $cancel_token = str_replace( '/', '', $cancel_token );
                     $cancel_token = str_replace( '\\', '', $cancel_token );
-                    WBK_Db_Utils::clearPaymentIdByToken( $cancel_token );
+                    WBK_Model_Utils::clear_payment_id_by_token( $cancel_token );
                 }
                 wp_redirect( get_permalink() . '?paypal_status=5' );
                 exit;

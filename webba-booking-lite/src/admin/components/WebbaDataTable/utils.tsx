@@ -28,7 +28,8 @@ const createColumnByField = (name: string, schema: any): ColumnDef<any> => {
 
 type TExtraColumn<T extends 'id' | 'date' | 'time' | 'date_time'> = T
 
-type TExtraColumnDef<TData> = ColumnDef<TData> & {
+type TExtraColumnDef<TData> = Omit<ColumnDef<TData>, 'accessorKey'> & {
+    accessorKey?: string
     index?: number
 }
 
@@ -52,6 +53,9 @@ export const generateColumnDefsFromModel = function <
                 return {
                     id: property,
                     accessorKey: property,
+                    header:
+                        model.properties[property]?.title ||
+                        model.properties[property]?.name,
                     ...customDef,
                 }
             }
@@ -61,12 +65,24 @@ export const generateColumnDefsFromModel = function <
 
     for (let key in extraCols) {
         const colPosition = extraCols[key]?.index
+        const mergedData = model.properties[key] || {}
 
         delete extraCols[key].index
+
+        if (colDefs.find((colDef: any) => colDef.id == key)) {
+            const existingColIndex = colDefs.findIndex(
+                (colDef: any) => colDef.id == key
+            )
+            if (existingColIndex !== -1) {
+                colDefs.splice(existingColIndex, 1)
+            }
+        }
 
         if (colPosition !== undefined) {
             colDefs.splice(colPosition, 0, {
                 id: key,
+                accessorKey: key,
+                header: mergedData?.title || mergedData?.name,
                 ...extraCols[key],
             })
             continue
@@ -74,6 +90,8 @@ export const generateColumnDefsFromModel = function <
 
         colDefs.push({
             id: key,
+            accessorKey: key,
+            header: mergedData?.title || mergedData?.name,
             ...extraCols[key],
         })
     }
@@ -132,4 +150,24 @@ export const removePrefixesFromModelFields = function <
             >]: T['properties'][K]
         }
     }
+}
+
+export const mapServiceCategories = (service: number, categories: []) =>
+    categories.filter((category: any) => category.services.includes(service))
+
+export const minutesToText = (minutes: number) => {
+    const hours = Math.floor(minutes / 60)
+    const minutesLeft = minutes % 60
+
+    if (hours === 0) {
+        return `${minutesLeft}min`
+    }
+
+    return `${hours}h ${minutesLeft > 0 ? minutesLeft + 'min' : ''}`
+}
+
+export const decodeHtmlEntities = (encoded: string): string => {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(encoded, 'text/html')
+    return doc.documentElement.textContent || ''
 }

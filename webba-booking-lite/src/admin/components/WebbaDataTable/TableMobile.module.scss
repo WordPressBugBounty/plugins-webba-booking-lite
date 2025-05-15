@@ -1,0 +1,83 @@
+.wrapper {
+    @include grid(1, 16);
+
+    @media (min-width: 850px) {
+        @include grid(2, 16);
+    }
+}
+
+.card {
+    background-color: colors.$background-white;
+    border-radius: 12px;
+    border: 1px solid colors.$input-border;
+    padding: 16px;
+}
+
+.toolPanel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 16px;
+
+    &.expandable {
+        justify-content: space-between;
+    }
+}
+
+.firstStage {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.mappedItems {
+    @include grid(2, 12);
+}
+
+.rowItem {
+    .rowItemTitle {
+        color: colors.$light-grey;
+        font-family: typography.$font-primary;
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 14px;
+        letter-spacing: 0%;
+        margin-bottom: 3px;
+    }
+
+    .rowItemValue {
+        font-family: typography.$font-primary;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 14px;
+        letter-spacing: 0%;
+        color: colors.$input-text;
+    }
+}
+
+.expandButton {
+    color: colors.$green;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+
+    &::after {
+        content: '';
+        background-image: url('data:image/svg+xml,<svg width="9" height="12" viewBox="0 0 9 12" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(%23clip0_224_143)"><g clip-path="url(%23clip1_224_143)"><path d="M7.87349 5.47036C8.16646 5.76333 8.16646 6.23911 7.87349 6.53208L3.37349 11.0321C3.08052 11.325 2.60474 11.325 2.31177 11.0321C2.0188 10.7391 2.0188 10.2633 2.31177 9.97036L6.28208 6.00005L2.31411 2.02974C2.02114 1.73677 2.02114 1.26099 2.31411 0.968018C2.60708 0.675049 3.08286 0.675049 3.37583 0.968018L7.87583 5.46802L7.87349 5.47036Z" fill="%230F766E"/></g></g><defs><clipPath id="clip0_224_143"><rect width="7.5" height="12" fill="white" transform="translate(0.59375)"/></clipPath><clipPath id="clip1_224_143"><path d="M0.59375 0H8.09375V12H0.59375V0Z" fill="white"/></clipPath></defs></svg>');
+        background-size: cover;
+        height: 12px;
+        width: 7.5px;
+        display: flex;
+        background-repeat: no-repeat;
+        background-position: center center;
+        transition: $transition;
+    }
+
+    &.expanded {
+        &::after {
+            transform: rotate(-90deg);
+        }
+    }
+}

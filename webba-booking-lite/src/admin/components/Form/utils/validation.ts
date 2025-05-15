@@ -14,13 +14,15 @@ export const validate = function <T>(value: T, validators: ValidatorFn<T>[]) {
 export const Validators = {
     email: (value: string) => {
         if (!value) return null
-
-        const isValid = emailRegex.test(value)
-
-        if (!isValid) {
-            return __(`The entered email is invalid`, 'webba-booking-lite')
+    
+        const emails = value.split(',').map(email => email.trim()).filter(Boolean)
+    
+        const invalidEmail = emails.find(email => !emailRegex.test(email))
+    
+        if (invalidEmail) {
+            return __(`The entered email "${invalidEmail}" is invalid`, 'webba-booking-lite')
         }
-
+    
         return null
     },
     required: (value: any) => {
@@ -147,8 +149,8 @@ export const Validators = {
             return __('Value must be an integer number', 'webba-booking-lite')
         }
 
-        if (parseInt(value) < 0) {
-            return __('Value must be a positive number or zero', 'webba-booking-lite')
+        if (parseInt(value) <= 0) {
+            return __('Value must be a positive number', 'webba-booking-lite')
         }
 
         if (value.replace(/[0-9]/g, '').length) {

@@ -19,6 +19,9 @@ export interface FormFieldMisc {
     multiple?: boolean
     pro_version?: boolean
     disabled?: boolean
+    disable_condition?: Record<string, string>
+    generate_random?: boolean,
+    generate_key?: string
 }
 
 export interface ResolvedFormField {

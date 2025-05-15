@@ -6,10 +6,16 @@ import styles from './DateRangeField.module.scss'
 import { IFilterFieldProps } from '../../types'
 import { useFilterField } from '../../hooks/useFilterField'
 import { formatWbkDate } from '../../utils'
+import { Label } from '../../../Form/Fields/Label/Label'
 
 type DateRange = Date[] | null[]
 
-export const DateRangeField = ({ name, label, misc }: IFilterFieldProps) => {
+export const DateRangeField = ({
+    name,
+    label,
+    placeholder,
+    misc,
+}: IFilterFieldProps) => {
     const { value, setFilter } = useFilterField(name)
     const isInitiated = useRef(false)
     const [open, setOpen] = useState(false)
@@ -60,6 +66,7 @@ export const DateRangeField = ({ name, label, misc }: IFilterFieldProps) => {
 
     return (
         <div className={styles.inputWrapper}>
+            {label && <Label title={label} id={name} />}
             <DatePicker
                 className={styles.dateInput}
                 calendarClassName={styles.calendar}
@@ -67,7 +74,6 @@ export const DateRangeField = ({ name, label, misc }: IFilterFieldProps) => {
                 startDate={range[0]}
                 endDate={range[1]}
                 selectsRange={true}
-                isClearable={true}
                 dateFormat={'MMM d, yyyy'}
                 onChange={(range: any, e) => {
                     if (range[0] && range[1]) {
@@ -82,6 +88,7 @@ export const DateRangeField = ({ name, label, misc }: IFilterFieldProps) => {
                 open={open}
                 onClickOutside={() => setOpen(false)}
                 onInputClick={() => setOpen(true)}
+                placeholderText={placeholder}
             />
         </div>
     )

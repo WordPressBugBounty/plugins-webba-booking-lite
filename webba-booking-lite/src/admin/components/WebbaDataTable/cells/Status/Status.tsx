@@ -3,85 +3,27 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import styles from './Status.module.scss'
 import classNames from 'classnames'
 import { __ } from '@wordpress/i18n'
-import pendingIcon from '../../../../../../public/images/status-pending-icon.png'
-import approvedIcon from '../../../../../../public/images/status-approved-icon.png'
-import rejectedIcon from '../../../../../../public/images/status-rejected-icon.png'
-import cancelledIcon from '../../../../../../public/images/status-canceled-icon.png'
 import { dispatch } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
+import metadata from '../../../../../schemas/appointments.json'
+import { formatStatusOptions } from './utils'
+import { IOption, Status } from './types'
 
-type Status =
-    | 'pending'
-    | 'cancelled'
-    | 'paid'
-    | 'approved'
-    | 'paid_approved'
-    | 'arrived'
-    | 'woocommerce'
-    | 'added_by_admin_not_paid'
-    | 'added_by_admin_paid'
-
-interface IOption {
-    value: Status
-    label: string
-    icon: string
-}
-
-const options: IOption[] = [
-    {
-        value: 'pending',
-        label: __('Awaiting approval', 'webba-booking-lite'),
-        icon: pendingIcon,
-    },
-    {
-        value: 'approved',
-        label: __('Approved', 'webba-booking-lite'),
-        icon: approvedIcon,
-    },
-    {
-        value: 'paid',
-        label: __('Paid (awaiting approval)', 'webba-booking-lite'),
-        icon: pendingIcon,
-    },
-    {
-        value: 'paid_approved',
-        label: __('Paid (approved)', 'webba-booking-lite'),
-        icon: approvedIcon,
-    },
-    {
-        value: 'arrived',
-        label: __('Arrived', 'webba-booking-lite'),
-        icon: approvedIcon,
-    },
-    {
-        value: 'woocommerce',
-        label: __('Managed by WooCommerce', 'webba-booking-lite'),
-        icon: pendingIcon,
-    },
-    {
-        value: 'added_by_admin_not_paid',
-        label: __(
-            'Added by the administrator (not paid)',
-            'webba-booking-lite'
-        ),
-        icon: pendingIcon,
-    },
-    {
-        value: 'added_by_admin_paid',
-        label: __('Added by the administrator (paid)', 'webba-booking-lite'),
-        icon: approvedIcon,
-    },
-]
-
-export const StatusCell = ({ getValue, row }: CellContext<any, any>) => {
+export const StatusCell = ({ getValue, row, table }: CellContext<any, any>) => {
+    const options: IOption[] = formatStatusOptions(
+        metadata.properties.appointment_status.misc.options
+    )
     const value = getValue() as Status
     const [open, setOpen] = useState(false)
     const [current, setCurrent] = useState(
         options.filter((o) => o.value === value)[0]
     )
-    const { icon, label } = useMemo(() => current, [current])
+    const { label } = useMemo(() => current, [current, value])
+    const totalRows = table.getRowModel().rows.length
+    const isLastTwo = row.index >= totalRows - 2
 
     const handleClick = useCallback((option: IOption) => {
+        // @ts-ignore
         dispatch(store_name).setItem(
             'appointments',
             { ...row.original, status: option.value },
@@ -107,13 +49,20 @@ export const StatusCell = ({ getValue, row }: CellContext<any, any>) => {
         }
     }, [open])
 
+    useEffect(()=> {
+        setCurrent(options.filter((o) => o.value === getValue())[0])
+    }, [getValue])
+
     return (
-        <div className={styles.statusWrapper}>
+        <div
+            className={classNames(styles.statusWrapper, {
+                [styles.isLastTwo]: isLastTwo,
+            })}
+        >
             <div
                 className={classNames(styles.status, styles[current.value])}
                 onClick={() => setOpen(!open)}
             >
-                <img src={icon} alt="Status icon" />
                 <p className={styles.statusText}>{label}</p>
             </div>
             <div

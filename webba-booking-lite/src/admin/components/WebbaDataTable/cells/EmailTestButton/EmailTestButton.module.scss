@@ -1,0 +1,127 @@
+.pop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0000006a;
+    z-index: 99999999;
+
+    .innerWrapper {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 30px 40px;
+        border-radius: 12px;
+        background-color: #fff;
+        max-width: 500px;
+        width: 100%;
+        max-height: 400px;
+        // height: 300px;
+    }
+
+    .header {
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+
+        h3,
+        p {
+            margin: 0;
+        }
+    }
+
+    .buttonWrapper {
+        height: 64px;
+        padding: 0 20px;
+
+        &:not(.noCutRadius) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+
+    .closeIcon {
+        display: flex;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        cursor: pointer;
+        transition: $transition;
+
+        &:hover {
+            transform: scale(0.9);
+        }
+    }
+}
+.header {
+    display: none;
+}
+.buttonWrapper {
+    display: flex;
+    gap: 10px;
+    padding: 4px;
+    cursor: pointer;
+    align-items: center;
+    border: 1px solid #e2e2e2;
+    border-radius: 4px;
+
+    img {
+        max-width: 15px;
+        height: auto;
+        object-fit: contain;
+    }
+}
+
+.inputEmail {
+    border: 1px solid #e2e2e2;
+    padding: 4px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    height: 64px;
+    width: 100%;
+}
+
+.wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.ready {
+        .buttonWrapper {
+            border-left: none;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            height: 38px;
+        }
+    }
+}
+
+.selectBox {
+    width: 100%;
+}
+
+.selectControl {
+    border-right: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.closeIcon {
+    display: none;
+}
+
+.error {
+    color: red;
+}
+
+.hidden {
+    display: none;
+}

@@ -41,7 +41,7 @@
             "misc": {
                 "tooltip": "Select the booking date.",
                 "date_format": "M d, Y",
-                "time_zone": "America/Phoenix"
+                "time_zone": "Europe/Warsaw"
             },
             "required": true,
             "dependency": [],
@@ -80,6 +80,20 @@
             "default_value": null,
             "editable": true
         },
+        "appointment_duration": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Duration",
+            "tab": "",
+            "misc": {
+                "sub_type": "positive_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": false
+        },
         "appointment_email": {
             "type": "string",
             "input_type": "text",
@@ -98,7 +112,7 @@
         "appointment_phone": {
             "type": "string",
             "input_type": "text",
-            "hidden": false,
+            "hidden": true,
             "title": "Phone",
             "tab": "",
             "misc": {
@@ -139,7 +153,7 @@
             "type": "string",
             "input_type": "text",
             "hidden": true,
-            "title": "Payment",
+            "title": "Price",
             "tab": "",
             "misc": {
                 "tooltip": "If the payment has already been made, enter the payment amount paid for 1 person.",
@@ -148,6 +162,21 @@
             "required": false,
             "dependency": [],
             "default_value": "",
+            "editable": true
+        },
+        "appointment_amount_paid": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Amount paid",
+            "tab": "",
+            "misc": {
+                "tooltip": "Enter the exact amount of money that was actually paid",
+                "sub_type": "none_negative_float"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "0",
             "editable": true
         },
         "appointment_status": {
@@ -159,14 +188,12 @@
             "misc": {
                 "tooltip": "Choose the appropriate booking status from the options available.",
                 "options": {
-                    "pending": "Awaiting approval",
+                    "pending": "Pending",
                     "approved": "Approved",
-                    "paid": "Paid (awaiting approval)",
-                    "paid_approved": "Paid (approved)",
+                    "rejected": "Rejected",
+                    "cancelled": "Cancelled",
                     "arrived": "Arrived",
-                    "woocommerce": "Managed by WooCommerce",
-                    "added_by_admin_not_paid": "Added by the administrator (not paid)",
-                    "added_by_admin_paid": "Added by the administrator (paid)"
+                    "noshow": "No-Show"
                 }
             },
             "required": true,

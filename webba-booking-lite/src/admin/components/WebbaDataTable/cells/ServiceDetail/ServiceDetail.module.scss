@@ -1,7 +1,35 @@
 .table {
+    border-collapse: collapse;
     :global(td) {
         text-align: left;
         padding: 15px;
         vertical-align: top;
+        background-color: colors.$background-offwhite;
+    }
+
+    @media (max-width: 768px) {
+        width: 100%;
+
+        tr {
+            @include grid(1, 10);
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid colors.$input-border;
+            width: 100%;
+        }
+
+        td {
+            background-color: transparent;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 12px;
+
+            &:nth-child(1) {
+                display: none;
+            }
+        }
     }
 }

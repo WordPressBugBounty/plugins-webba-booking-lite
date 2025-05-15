@@ -18,7 +18,7 @@ $approve_btn = esc_html(get_option('wbk_payment_approve_text', ''));
 <div id="card-errors"></div>
 
 <?php
-if (WBK_Stripe::isCurrencyZeroDecimal(get_option('wbk_stripe_currency', ''))) {
+if (WBK_Stripe::is_currency_zero_decimal(get_option('wbk_stripe_currency', ''))) {
     $safe_value = $payment_details['total'];
 } else {
     $safe_value = $payment_details['total'] * 100;
@@ -311,7 +311,7 @@ if (!wbk_is5()) {
         data-app-id="<?php echo esc_attr(implode(',', $booking_ids)); ?>"
         class="wbk-button wbk-width-100 wbk-mt-10-mb-10 wbk-stripe-approval-button"
         value="<?php echo esc_attr($approve_btn); ?>">
-<?php
+    <?php
 } else {
     ?>
     <input type="hidden" class="wbk-input wbk_stripe_payment_method_id" name="payment_method_id">

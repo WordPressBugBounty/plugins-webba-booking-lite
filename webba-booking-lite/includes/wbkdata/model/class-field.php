@@ -566,25 +566,29 @@ class Field
 
                             break;
                         case 'email':
-                            $arr_sql_parts = ['VARCHAR', 256, '', '%s'];
+                            $arr_sql_parts = ['text', '', '', '%s'];
 
                             break;
                         default:
-                            $arr_sql_parts = ['VARCHAR', 256, '', '%s'];
+                            $arr_sql_parts = ['text', '', '', '%s'];
 
                             break;
                     }
                 } else {
-                    $arr_sql_parts = ['VARCHAR', 256, '', '%s'];
+                    $arr_sql_parts = ['text', '', '', '%s'];
                 }
 
                 break;
             case 'radio':
-                $arr_sql_parts = ['VARCHAR', 256, '', '%s'];
+                $arr_sql_parts = ['text', '', '', '%s'];
 
                 break;
             case 'checkbox':
-                $arr_sql_parts = ['VARCHAR', 256, '', '%s'];
+                $arr_sql_parts = ['text', '', '', '%s'];
+
+                break;
+            case 'multicheckbox':
+                $arr_sql_parts = ['text', '', '', '%s'];
 
                 break;
             case 'select':
@@ -592,7 +596,7 @@ class Field
                 if (isset($ed['type']) && 'positive_integer' === $ed['type']) {
                     $arr_sql_parts = ['int', 'unsigned NULL', '', '%d'];
                 } else {
-                    $arr_sql_parts = ['VARCHAR', 1024, '', '%s'];
+                    $arr_sql_parts = ['mediumtext', '', '', '%s'];
                 }
 
                 break;
@@ -613,7 +617,7 @@ class Field
 
                 break;
             case 'date_range':
-                $arr_sql_parts = ['varchar', 128, '', '%s'];
+                $arr_sql_parts = ['text', 128, '', '%s'];
                 break;
             case 'wbk_date':
                 $arr_sql_parts =
@@ -635,7 +639,9 @@ class Field
                 $arr_sql_parts =
                     ['TEXT', 65535, '', '%s'];
                 break;
-
+            case 'color':
+                $arr_sql_parts = ['text', '', '', '%s'];
+                break;
             default:
                 break;
         }

@@ -1,11 +1,137 @@
+.wrapper {
+    tr {
+        background-color: colors.$background-offwhite !important;
+    }
+}
+
 .table {
+    width: 100%;
+    border-collapse: collapse;
+
     :global(td) {
         text-align: left;
         padding: 15px;
         vertical-align: top;
+
+        @media (max-width: 768px) {
+            padding: 0;
+        }
+    }
+
+    :global(tr) {
+        @media (max-width: 768px) {
+            display: grid;
+            gap: 16px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid colors.$input-border;
+            background-color: transparent !important;
+        }
     }
 }
-.description{
+
+.description {
     text-align: left;
     padding: 15px;
+}
+
+.column {
+    display: flex;
+    flex-flow: column;
+    gap: 16px;
+}
+
+.columnItem {
+    display: flex;
+    flex-flow: column;
+    gap: 6px;
+
+    > span {
+        font-family: typography.$font-primary;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 14px;
+        letter-spacing: 0%;
+        color: colors.$light-grey;
+    }
+
+    p {
+        font-family: typography.$font-primary;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 16px;
+        letter-spacing: 0%;
+        margin: 0;
+        color: colors.$off-black;
+    }
+
+    &.wrapMobile {
+        @media (max-width: 768px) {
+            flex-flow: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+}
+
+.customDetailItems {
+    @media (max-width: 768px) {
+        display: flex;
+        flex-flow: column;
+        gap: 6px;
+        padding: 12px;
+        background-color: colors.$background-offwhite;
+        border-radius: 8px;
+
+        p {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+}
+
+.emailSelect {
+    padding: 8px 12px;
+    padding-left: 40px;
+    background-image: url('../../../../../../public/images/icon-send.svg');
+    background-position: 12px center;
+    border: 1px solid colors.$input-border;
+    border-radius: dimensions.$input-radius;
+    color: colors.$primary;
+    @include typography.use-font($font: typography.$font-primary, $size: 16px);
+    -webkit-appearance: listbox;
+    appearance: listbox;
+}
+
+.inputNote {
+    border: 1px solid colors.$input-border;
+    border-radius: dimensions.$input-radius;
+    height: 140px;
+    padding: 8px;
+}
+
+.emailSelectWrapper {
+    display: flex;
+    flex-flow: column;
+    gap: 6px;
+}
+
+.customDetailWrapper {
+    max-width: 250px;
+
+    @media (max-width: 768px) {
+        max-width: 100%;
+    }
+}
+
+.mobileDivider {
+    display: none;
+
+    @media (max-width: 768px) {
+        display: flex;
+        width: 100%;
+        margin-bottom: 16px;
+        border-top: 1px solid colors.$input-border;
+    }
 }

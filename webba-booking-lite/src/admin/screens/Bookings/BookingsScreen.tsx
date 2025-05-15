@@ -14,6 +14,7 @@ import { Menu } from '../../components/WebbaDataTable/Menu'
 import { Table } from '../../components/WebbaDataTable/Table'
 import {
     generateColumnDefsFromModel,
+    minutesToText,
     removePrefixesFromModelFields,
 } from '../../components/WebbaDataTable/utils'
 import styles from './Bookings.module.scss'
@@ -33,10 +34,13 @@ import { FormValueFromModel } from '../../components/Form/lib/types'
 import { isForbidden } from '../../utils/errors'
 import { FailedMessage } from '../../components/FailedMessage/FailedMessage'
 import { Button } from '../../components/Button/Button'
-import iconExport from '../../../../public/images/export-arrow.png'
+import iconExport from '../../../../public/images/icon-export.svg'
 import apiFetch from '@wordpress/api-fetch'
 import { useRoute } from '../../components/Router/useRoute'
 import classNames from 'classnames'
+import { BookingTime } from '../../components/WebbaDataTable/cells/BookingTime/BookingTime'
+import { CustomerName } from '../../components/WebbaDataTable/cells/CustomerName/CustomerName'
+import { DurationCell } from '../../components/WebbaDataTable/cells/DurationCell/DurationCell'
 
 export const bookingsModel = removePrefixesFromModelFields(
     BookingsModel,
@@ -70,17 +74,33 @@ export const BookingsScreen = () => {
         []
     )
     const [search, setSearch] = useState('')
+    const customGlobalFilterFn = (
+        row: any,
+        columnId: any,
+        filterValue: any
+    ) => {
+        if (!filterValue) return true
+        return Object.values(row.original).some((value) => {
+            if (typeof value === 'string' || typeof value === 'number') {
+                return String(value)
+                    .toLowerCase()
+                    .includes(String(filterValue).toLowerCase())
+            }
+            return false
+        })
+    }
 
     const columns = useMemo(() => {
         return generateColumnDefsFromModel(
             bookingsModel,
             {
+                name: {
+                    cell: CustomerName,
+                },
                 status: {
-                    header: __('Status', 'webba-booking-lite'),
                     cell: StatusCell,
                 },
                 service_id: {
-                    header: __('Service', 'webba-booking-lite'),
                     cell: ServiceName,
                 },
             },
@@ -89,20 +109,30 @@ export const BookingsScreen = () => {
                     index: 0,
                     header: __('ID', 'webba-booking-lite'),
                     cell: ({ cell }) => cell.row.original.id,
-                    accessorKey: 'id',
                 },
-                date_time: {
+                time: {
                     index: 1,
                     header: __('Date/Time', 'webba-booking-lite'),
-                    cell: ({ cell }) =>
-                        wbkFormat(
-                            cell.row.original.time,
-                            `${
-                                settings ? settings.date_format : 'dd/mm/yyyy'
-                            } ${settings ? settings.time_format : 'HH:mm'}`,
-                            settings ? settings.timezone : 'UTC'
-                        ),
-                    accessorKey: 'time',
+                    cell: BookingTime,
+                },
+                duration: {
+                    index: 2,
+                    header: __('Duration', 'webba-booking-lite'),
+                    cell: DurationCell,
+                },
+                amount_paid: {
+                    index: 5,
+                    cell: ({ row }) => {
+                        const { amount_paid, moment_price } = row.original
+
+                        return (amount_paid && amount_paid > 0) ||
+                            moment_price > 0
+                            ? settings?.price_format.replace(
+                                  '#price',
+                                  amount_paid || 0
+                              )
+                            : __('Free', 'webba-booking-lite')
+                    },
                 },
             }
         )
@@ -114,15 +144,18 @@ export const BookingsScreen = () => {
         selectable: true,
         isAdmin: settings?.is_admin,
         renderMenu: ({ cell }) => {
-            const { onDelete, onDuplicate, onSubmit } = getCellActions({
-                cell,
-                collectionName: 'appointments',
-            })
+            const { onDelete, onDuplicate, onSubmit, onCancel } =
+                getCellActions({
+                    cell,
+                    collectionName: 'appointments',
+                })
 
             return (
                 <Menu
+                    collectionName="appointments"
                     onDelete={onDelete}
                     onDuplicate={onDuplicate}
+                    onCancel={onCancel}
                     onEdit={() => {
                         sidebar.open(
                             <Form
@@ -152,7 +185,7 @@ export const BookingsScreen = () => {
             globalFilter: search,
         },
         onGlobalFilterChange: setSearch,
-        globalFilterFn: 'includesString',
+        globalFilterFn: customGlobalFilterFn,
         filterFromLeafRows: true,
         maxLeafRowFilterDepth: 2,
     })
@@ -218,6 +251,7 @@ export const BookingsScreen = () => {
         <TableProvider table={dynamicTable}>
             <Table
                 title={__('Bookings', 'webba-booking-lite')}
+                collectionName="appointments"
                 addButtonTitle={__('Add booking', 'webba-booking-lite')}
                 table={dynamicTable}
                 loading={loading}
@@ -257,7 +291,7 @@ export const BookingsScreen = () => {
                 )}
                 onClick={() => setRoute('cancelled-bookings')}
             >
-                {__('Cancelled Bookings', 'webba-booking-lite')}
+                {__('Cancelled Bookings (legacy)', 'webba-booking-lite')}
                 &nbsp;&#8594;
             </div>
         </TableProvider>

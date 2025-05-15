@@ -23,6 +23,7 @@ export const useOptions = ({ options, nullValue = [] }: IOptionRequest) => {
         options === 'service_categories'
     ) {
         const { services, categories } = useSelect(
+            // @ts-ignore
             (select) => select(store_name).getPreset(),
             []
         )
@@ -38,6 +39,7 @@ export const useOptions = ({ options, nullValue = [] }: IOptionRequest) => {
         options !== 'backend'
     ) {
         const modelObject = useSelect(
+            // @ts-ignore
             (select) => select(store_name).getItems(options),
             []
         )
@@ -69,7 +71,7 @@ export const formatOptionsWithId = (options: Record<string, string>[]) => {
 
     return options.map((option) => {
         return {
-            value: option['id']?.toString(),
+            value: option['value']?.toString(),
             label: option['label'],
         }
     })

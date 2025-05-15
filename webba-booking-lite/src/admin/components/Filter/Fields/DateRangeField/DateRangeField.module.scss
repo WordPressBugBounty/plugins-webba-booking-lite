@@ -1,15 +1,21 @@
 .dateInput {
-    border: 1px solid #8a9393;
-    border-radius: 15px;
-    height: 50px;
+    border: 1px solid colors.$input-border;
+    border-radius: dimensions.$input-radius;
+    height: dimensions.$input-height;
     margin: 0;
-    padding: 0 20px 0 20px;
-    font-family: poppins, arial;
-    font-size: 16px;
-    color: #212121;
+    padding: 0 40px 0 16px;
+    color: colors.$input-text;
+    @include typography.use-font(
+        $font: typography.$font-primary,
+        $size: 16px,
+        $weight: 300
+    );
     width: 100%;
-    z-index: 99999;
+    z-index: 1;
     position: relative;
+    background-image: url('../../../../../../public/images/icon-calendar-filled.png');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
 
     &:active,
     &:focus,

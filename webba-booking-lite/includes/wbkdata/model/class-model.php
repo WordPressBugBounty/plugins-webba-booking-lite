@@ -199,10 +199,10 @@ class Model
 
                 $filter_name = $filter['name'];
 
-                if (is_array($filter['value'])) {
+                if (isset($filter['value']) && is_array($filter['value'])) {
                     $filter_value = $filter['value'];
                 } else {
-                    $filter_value = array($filter['value']);
+                    $filter_value = isset($filter['value']) ? array($filter['value']) : [];
                 }
 
                 if ('appointment_service_categories' == $filter_name) {
@@ -211,7 +211,11 @@ class Model
                     $service_categories = $wpdb->get_var($wpdb->prepare("SELECT list FROM " . get_option('wbk_db_prefix', '') . "wbk_service_categories WHERE id = %d", $filter_value));
                     $service_categories_ids = json_decode($service_categories);
 
-                    $filter_value = $service_categories_ids;
+                    if (is_array($service_categories_ids) && count($service_categories_ids) == 0) {
+                        $filter_value = [-1];
+                    } elseif (is_array($service_categories_ids) && count($service_categories_ids) > 0) {
+                        $filter_value = $service_categories_ids;
+                    }
                 }
 
                 $filter_value = apply_filters('wbkdata_filter_value', $filter_value, $filter_name);
@@ -374,6 +378,7 @@ class Model
                 }
             }
         }
+
         if (!$model_updated) {
             $this->generate_frontend_model();
         }
@@ -423,6 +428,10 @@ class Model
                     $type = 'string';
                     $input_type = 'checkbox';
                     break;
+                case 'multicheckbox':
+                    $type = 'string';
+                    $input_type = 'multicheckbox';
+                    break;
                 case 'wbk_date':
                     $type = 'string';
                     $input_type = 'date';
@@ -443,7 +452,10 @@ class Model
                     $type = 'string';
                     $input_type = 'radio';
                     break;
-
+                case 'color':
+                    $type = 'string';
+                    $input_type = 'color';
+                    break;
                 default:
                     $type = 'not_defined';
                     $input_type = 'not_defined';
@@ -846,7 +858,7 @@ class Model
                         if (false === $format) {
                             continue;
                         }
-                        $valid_fields[$field->get_name()] = $this->clean_up_value($validation_result[1]);
+                        $valid_fields[$field->get_name()] = $field->get_type() !== 'wbk_app_custom_data' ? $this->clean_up_value($validation_result[1]) : $validation_result[1];
                         $field_formats[] = $format;
                     } else {
                         $invalid_fields[] = [$slug, $validation_result[1]];
@@ -877,7 +889,7 @@ class Model
             if (is_user_logged_in()) {
                 $user = wp_get_current_user();
 
-                $have_permission = current_user_can('manage_options') && current_user_can('manage_sites');
+                $have_permission = current_user_can('manage_options') && current_user_can('manage_sites') && !is_multisite();
 
                 if (isset($_REQUEST['model']) && $_REQUEST['model'] == 'appointments' && isset($_REQUEST['service_id'])) {
                     $have_permission = WBK_User_Utils::check_access_to_particular_service(get_current_user_id(), $_REQUEST['service_id']);

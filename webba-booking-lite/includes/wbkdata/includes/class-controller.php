@@ -158,6 +158,9 @@ class Controller
             } elseif (trim(sanitize_text_field($params['model'])) === 'appointments'){
                 $item->can_edit = true;
                 $item->can_delete = WBK_User_Utils::is_user_associated_with_service(get_current_user_id(), $item->service_id);
+            } else if (trim(sanitize_text_field($params['model'])) === 'email_templates'){
+                $item->can_edit = true;
+                $item->can_delete = $item->is_default === 'yes' ? false : true;
             } else {
                 $item->can_delete = true;
                 $item->can_edit = true;

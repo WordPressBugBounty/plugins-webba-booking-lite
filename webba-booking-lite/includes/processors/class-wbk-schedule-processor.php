@@ -646,7 +646,7 @@ class WBK_Schedule_Processor {
 
     public function load_appointments_by_day( $day, $service_id ) {
         global $wpdb;
-        $db_arr = $wpdb->get_results( $wpdb->prepare( "                                       SELECT *\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments\r\n\t\t\t\t\t\t\t\t\t\t\t\t\twhere service_id = %d AND day = %d\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t", $service_id, $day ) );
+        $db_arr = $wpdb->get_results( $wpdb->prepare( "                                       SELECT *\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments where service_id = %d AND day = %d AND " . WBK_Model_Utils::get_not_canclled_sql(), $service_id, $day ) );
         $this->appointments = [];
         if ( count( $db_arr ) == 0 ) {
             return 0;

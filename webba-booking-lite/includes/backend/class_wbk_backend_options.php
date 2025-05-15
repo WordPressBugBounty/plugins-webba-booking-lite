@@ -403,7 +403,7 @@ class WBK_Backend_Options {
                 'default'              => 'approved',
                 'extra'                => [
                     'approved' => __( 'Approved', 'webba-booking-lite' ),
-                    'pending'  => __( 'Awaiting approval', 'webba-booking-lite' ),
+                    'pending'  => __( 'Pending', 'webba-booking-lite' ),
                 ],
             ]
         );
@@ -548,7 +548,7 @@ class WBK_Backend_Options {
             [
                 'default'              => '0',
                 'not_translated_title' => 'Delete pending bookings (in minutes)',
-                'popup'                => __( 'Specify the minutes (X) after which "Awaiting Approval" bookings will be automatically deleted. To disable automatic deletion, set the value to 0.', 'webba-booking-lite' ),
+                'popup'                => __( 'Specify the minutes (X) after which "Pending" bookings will be automatically deleted. To disable automatic deletion, set the value to 0.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -673,544 +673,14 @@ Note: With autolock turned on, connected service bookings are considered when lo
             ]
         );
         wbk_opt()->add_option(
-            'wbk_email_customer_book_status',
-            'checkbox',
-            __( 'Send booking confirmation email (to customer)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'default'              => 'true',
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Send booking confirmation email (to customer)',
-                'popup'                => __( 'Turn on to automatically send a booking confirmation email to the customer after booking.', 'webba-booking-lite' ),
-            ]
-        );
-        if ( wbk_fs()->is__premium_only() && wbk_fs()->can_use_premium_code() ) {
-            wbk_opt()->add_option(
-                'wbk_email_customer_book_status_generate_ical',
-                'checkbox',
-                __( 'Attach iCal file to the email', 'webba-booking-lite' ),
-                'wbk_email_settings_section',
-                [
-                    'default'              => '',
-                    'checkbox_value'       => 'true',
-                    'not_translated_title' => 'Attach iCal file to the email',
-                    'popup'                => __( 'Turn on to attach iCal file to the booking confirmation email sent to customer.', 'webba-booking-lite' ),
-                    'dependency'           => [
-                        'wbk_email_customer_book_status' => ':checked',
-                    ],
-                ]
-            );
-        }
-        wbk_opt()->add_option(
-            'wbk_email_customer_book_subject',
-            'text',
-            __( 'Booking confirmation email subject line (booking done by the customer)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'default'              => 'Time reserved',
-                'not_translated_title' => 'Booking confirmation email subject line (booking done by the customer)',
-                'popup'                => __( 'Customize the subject line for the email sent to the customer after they make a booking', 'webba-booking-lite' ) . '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'           => [
-                    'wbk_email_customer_book_status' => ':checked',
-                ],
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_book_message',
-            'editor',
-            __( 'Booking confirmation email message (booking done by the customer)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'not_translated_title' => 'Booking confirmation email message (booking done by the customer)',
-                'popup'                => __( 'Customize the email message sent to the customer after they make a booking. ', 'webba-booking-lite' ) . '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'default'              => '<p>Dear #customer_name,</p><p>You have successfully booked #service_name on #appointment_day at #appointment_time.</p>',
-                'dependency'           => [
-                    'wbk_email_customer_book_status' => ':checked',
-                ],
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_manual_book_subject',
-            'text',
-            __( 'Booking confirmation email subject line (booking done by the admin)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'dependency'           => [
-                    'wbk_email_customer_book_status' => ':checked',
-                ],
-                'not_translated_title' => 'Booking confirmation email subject line (booking done by the admin)',
-                'popup'                => __( 'Customize the subject line for the email sent to the customer after a booking is made by an admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_manual_book_message',
-            'editor',
-            __( 'Booking confirmation email message (booking done by the admin)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'not_translated_title' => 'Booking confirmation email message (booking done by the admin)',
-                'popup'                => __( 'Customize the email message sent to the customer after a booking is made by an admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'           => [
-                    'wbk_email_customer_book_status' => ':checked',
-                ],
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_approve_status',
-            'checkbox',
-            __( 'Send booking approval email (to customer)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Send booking approval email (to customer)',
-                'popup'                => __( 'Turn on to automatically send a notification email to the customer once their booking request is approved. ', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_approve_subject',
-            'text',
-            __( 'Booking approval email subject line', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'default'              => __( 'Your booking has been approved', 'webba-booking-lite' ),
-                'not_translated_title' => 'Booking approval email subject line',
-                'popup'                => __( 'Customize the subject line for the booking approval email. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/#subjectplaceholders">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'           => [
-                    'wbk_email_customer_approve_status' => ':checked',
-                ],
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_approve_message',
-            'editor',
-            __( 'Booking approval email message', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'default'              => '<p>Your booking on #appointment_day at #appointment_time has been approved.</p>',
-                'not_translated_title' => 'Booking approval email message',
-                'popup'                => 'Customize the email message for the booking approval email. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/#subjectplaceholders">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'           => [
-                    'wbk_email_customer_approve_status' => ':checked',
-                ],
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_approve_copy_status',
-            'checkbox',
-            __( 'Send admin a copy of booking approval email', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Send admin a copy of booking approval email',
-                'popup'                => __( 'Turn on if you want to send a copy of the booking approval email to the admin. Please note that the copy will be sent only if the booking is approved via the approval link.', 'webba-booking-lite' ),
-                'dependency'           => [
-                    'wbk_email_customer_approve_status' => ':checked',
-                ],
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_adimn_appointment_cancel_status',
-            'checkbox',
-            __( 'Send booking cancelation email (to admin)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Send booking cancelation email (to admin)',
-                'popup'                => __( 'Turn on to automatically send a booking cancelation email to the admin after a booking is canceled.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_adimn_appointment_cancel_subject',
-            'text',
-            __( 'Booking cancelation email subject line', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'default'              => __( 'Booking canceled', 'webba-booking-lite' ),
-                'not_translated_title' => 'Booking cancelation email subject line',
-                'popup'                => __( 'Customize the subject line for the booking cancelation email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'           => [
-                    'wbk_email_adimn_appointment_cancel_status' => ':checked',
-                ],
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_adimn_appointment_cancel_message',
-            'editor',
-            __( 'Booking cancelation email message', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'default'              => '<p>#customer_name canceled the appointment with #service_name on #appointment_day at #appointment_time</p>',
-                'dependency'           => [
-                    'wbk_email_adimn_appointment_cancel_status' => ':checked',
-                ],
-                'not_translated_title' => 'Booking cancelation email message',
-                'popup'                => __( 'Customize the email message for the booking cancelation email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_appointment_cancel_status',
-            'checkbox',
-            __( 'Send booking cancelation email (to customer)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Send booking cancelation email (to customer)',
-                'popup'                => __( 'Turn on to automatically send a booking cancelation email to the customer after a booking is canceled.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_appointment_cancel_subject',
-            'text',
-            __( 'Booking cancelation email subject line', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'dependency'           => [
-                    'wbk_email_customer_appointment_cancel_status' => ':checked',
-                ],
-                'default'              => __( 'Your appointment canceled', 'webba-booking-lite' ),
-                'not_translated_title' => 'Booking cancelation email subject line',
-                'popup'                => __( 'Customize the subject line for the booking cancelation email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_appointment_cancel_message',
-            'editor',
-            __( 'Booking cancelation email message (cancelation done by the admin)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'dependency'           => [
-                    'wbk_email_customer_appointment_cancel_status' => ':checked',
-                ],
-                'default'              => '<p>Your appointment with #service_name on #appointment_day at #appointment_time has been canceled</p>',
-                'not_translated_title' => 'Booking cancelation email message (cancelation done by the admin)',
-                'popup'                => __( 'Customize the email message for the booking cancelation email sent to the customer when the cancellation is initiated by the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_bycustomer_appointment_cancel_message',
-            'editor',
-            __( 'Booking cancelation email message  (cancelation done by the customer)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'dependency'           => [
-                    'wbk_email_customer_appointment_cancel_status' => ':checked',
-                ],
-                'default'              => '<p>Your appointment with #service_name on #appointment_day at #appointment_time has been canceled</p>',
-                'not_translated_title' => 'Booking cancelation email message  (cancelation done by the customer)',
-                'popup'                => 'Customize the email message for the booking cancelation email sent to the customer when the cancellation is initiated by the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_secondary_book_status',
-            'checkbox',
-            __( 'Send booking confirmation email (to other customers in the group booking)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Send booking confirmation email (to other customers in the group booking)',
-                'popup'                => __( 'Turn on to automatically send a booking confirmation email to all the customers added to the group booking.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_secondary_book_subject',
-            'text',
-            __( 'Booking confirmation email subject line', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Booking confirmation email subject line',
-                'popup'                => 'Customize the email message for the booking confirmation email sent to the customers in the group booking. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'           => [
-                    'wbk_email_secondary_book_status' => ':checked',
-                ],
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_secondary_book_message',
-            'editor',
-            __( 'Booking confirmation email message', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Booking confirmation email message',
-                'popup'                => 'Customize the email message for the booking confirmation email sent to the customers in the group booking. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'           => [
-                    'wbk_email_secondary_book_status' => ':checked',
-                ],
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_admin_book_status',
-            'checkbox',
-            __( 'Send booking confirmation email (to admin)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'default'              => 'true',
-                'not_translated_title' => 'Send booking confirmation email (to admin)',
-                'popup'                => __( 'Turn on to automatically send a booking confirmation email to the admin.', 'webba-booking-lite' ),
-            ]
-        );
-        if ( wbk_fs()->is__premium_only() && wbk_fs()->can_use_premium_code() ) {
-            wbk_opt()->add_option(
-                'wbk_email_admin_book_status_generate_ical',
-                'checkbox',
-                __( 'Attach iCal file to the email', 'webba-booking-lite' ),
-                'wbk_email_settings_section',
-                [
-                    'dependency'           => [
-                        'wbk_email_admin_book_status' => ':checked',
-                    ],
-                    'checkbox_value'       => 'true',
-                    'not_translated_title' => 'Attach iCal file to the email',
-                    'popup'                => __( 'Turn on to attach iCal file to the booking confirmation email sent to the admin.', 'webba-booking-lite' ),
-                ]
-            );
-        }
-        wbk_opt()->add_option(
-            'wbk_email_admin_book_subject',
-            'text',
-            __( 'Booking confirmation mail subject line', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'default'              => __( 'New booking of #service_name', 'webba-booking-lite' ),
-                'dependency'           => [
-                    'wbk_email_admin_book_status' => ':checked',
-                ],
-                'not_translated_title' => 'Booking confirmation mail subject line',
-                'popup'                => __( 'Customize the subject line for the email sent to the admin after a booking has been made. List of available placeholders. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_email_admin_book_message',
-            'editor',
-            __( 'Booking confirmation email message', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'default'              => '<p>Details of booking:</p><p>Date: #appointment_day<br/>Time: #appointment_time<br/>Customer name: #customer_name<br/>Customer phone: #customer_phone<br/>Customer email: #customer_email<br/>Customer comment: #customer_comment</p><p></p>',
-                'dependency'           => [
-                    'wbk_email_admin_book_status' => ':checked',
-                ],
-                'not_translated_title' => 'Booking confirmation email message',
-                'popup'                => __( 'Customize the email message sent to the admin after a booking has been made. List of available placeholders. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_email_admin_paymentrcvd_status',
-            'checkbox',
-            __( 'Send payment received email (to admin)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Send payment received email (to admin)',
-                'popup'                => __( 'Turn on to automatically send an email notification to the administrator when a payment for a booking is received. ', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_admin_paymentrcvd_subject',
-            'text',
-            __( 'Payment received email subject line', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'dependency'           => [
-                    'wbk_email_admin_paymentrcvd_status' => ':checked',
-                ],
-                'defaul'               => 'Payment from #customer_name received',
-                'not_translated_title' => 'Payment received email subject line',
-                'popup'                => 'Customize the subject line for the payment received email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_admin_paymentrcvd_message',
-            'editor',
-            __( 'Payment received email message', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'not_translated_title' => 'Payment received email message',
-                'popup'                => 'Customize the email message for the payment received email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'           => [
-                    'wbk_email_admin_paymentrcvd_status' => ':checked',
-                ],
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_paymentrcvd_status',
-            'checkbox',
-            __( 'Send payment received email (to customer)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'default'              => '',
-                'not_translated_title' => 'Send payment received email (to customer)',
-                'popup'                => __( 'Turn on to automatically send an email notification to the customer when a payment for a booking is received. ', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_paymentrcvd_subject',
-            'text',
-            __( 'Payment received email subject line', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'dependency'           => [
-                    'wbk_email_customer_paymentrcvd_status' => ':checked',
-                ],
-                'default'              => 'Your payment received',
-                'not_translated_title' => 'Payment received email subject line',
-                'popup'                => 'Customize the subject line for the payment received email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_paymentrcvd_message',
-            'editor',
-            __( 'Payment received email message', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'default'              => 'Payment from #customer_name for booking of #service_name on #appointment_day at #appointment_time received. <br>Total amount: #total_amount',
-                'dependency'           => [
-                    'wbk_email_customer_paymentrcvd_status' => ':checked',
-                ],
-                'not_translated_title' => 'Payment received email message',
-                'popup'                => 'Customize the email message for the payment received email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ],
-            'advanced'
-        );
-        // option to send payment notificiations for arrival method
-        wbk_opt()->add_option(
-            'wbk_email_customer_paymentrcvd_payonarrival_status',
-            'checkbox',
-            __( 'Send payment received email for \'Pay on arrival\' method', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'default'              => '',
-                'not_translated_title' => 'Send payment received email for Pay on arrival method',
-                'popup'                => __( 'Turn on to automatically send an email notification to the customer after they choose the \'Pay on Arrival\' payment method.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_arrived_status',
-            'checkbox',
-            __( 'Send status "Arrived" email (to customer)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Send status Arrived email (to customer)',
-                'popup'                => __( 'Turn on to automatically send an email notification to the customer when the status of their booking is changed to "Arrived."', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_arrived_subject',
-            'text',
-            __( 'Status "Arrived" email subject line', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'dependency'           => [
-                    'wbk_email_customer_arrived_status' => ':checked',
-                ],
-                'not_translated_title' => 'Status Arrived email subject line',
-                'popup'                => 'Customize the subject line for the status "Arrived" email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_arrived_message',
-            'editor',
-            __( 'Status "Arrived" email message', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'not_translated_title' => 'Status Arrived email message',
-                'popup'                => 'Customize the email message for the status "Arrived" email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'           => [
-                    'wbk_email_customer_arrived_status' => ':checked',
-                ],
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
             'wbk_email_customer_arrived_delay',
             'text',
             __( 'Set delay for "Arrived" email', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency'           => [
-                    'wbk_email_customer_arrived_status' => ':checked',
-                ],
                 'default'              => '',
                 'not_translated_title' => 'Set delay for Arrived email',
                 'popup'                => __( 'Specify the delay (in hours) for the "Arrived" email notification. Alternatively, leave this field empty to send the notification immediately after the status is changed', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_admin_daily_status',
-            'checkbox',
-            __( 'Send reminder email (to admin)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Send reminder email (to admin)',
-                'popup'                => __( 'Turn on to send admin automatic email reminders for upcoming bookings.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_admin_daily_subject',
-            'text',
-            __( 'Reminder email subject line', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'not_translated_title' => 'Reminder email subject line',
-                'popup'                => 'Customize the subject line for reminder email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'           => [
-                    'wbk_email_admin_daily_status' => ':checked',
-                ],
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_admin_daily_message',
-            'editor',
-            __( 'Reminder email message', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'not_translated_title' => 'Reminder email message',
-                'popup'                => 'Customize the email message for reminder email sent to the admin. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'           => [
-                    'wbk_email_admin_daily_status' => ':checked',
-                ],
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_daily_status',
-            'checkbox',
-            __( 'Send reminder email (to customer)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Send reminder email (to customer)',
-                'popup'                => __( 'Turn on to send customers automatic email reminders for their upcoming bookings.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1220,40 +690,9 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Send reminders to customers in X days', 'webba-booking-lite' ),
             'wbk_email_settings_section',
             [
-                'dependency'           => [
-                    'wbk_email_customer_daily_status' => ':checked',
-                ],
                 'default'              => '1',
                 'not_translated_title' => 'Send reminders to customers in X days',
                 'popup'                => __( 'Select the timing for the reminder notification. For instance, set the value to 0 for the day of booking, 1 for one day before the booking, 2 for two days before, and so on.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_daily_subject',
-            'text',
-            __( 'Reminder email subject line', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'dependency'           => [
-                    'wbk_email_customer_daily_status' => ':checked',
-                ],
-                'not_translated_title' => 'Reminder email subject line',
-                'popup'                => 'Customize the subject line for reminder email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_daily_message',
-            'editor',
-            __( 'Reminder email message', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'not_translated_title' => 'Reminder email message',
-                'popup'                => 'Customize the email message for reminder email sent to the customer. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-                'dependency'           => [
-                    'wbk_email_customer_daily_status' => ':checked',
-                ],
             ],
             'advanced'
         );
@@ -1276,95 +715,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
                 'extra'                => $data_time,
                 'not_translated_title' => 'Reminder sending time',
                 'popup'                => __( 'Set the preferred hour for email reminders sent to customers and admins, based on your local timezone.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_reminders_only_for_approved',
-            'checkbox',
-            __( 'Send reminders only for approved bookings', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'dependency'           => [
-                    'wbk_email_customer_daily_status' => ':checked',
-                ],
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Send reminders only for approved bookings',
-                'popup'                => __( 'Turn on to send reminder email notifications only for approved bookings.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_send_invoice',
-            'select',
-            __( 'Send invoice to a customer (HTML format)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'default'              => 'disabled',
-                'extra'                => [
-                    'disabled'   => __( 'Do not send invoice', 'webba-booking-lite' ),
-                    'onbooking'  => __( 'Send invoice on booking', 'webba-booking-lite' ),
-                    'onapproval' => __( 'Send invoice on approval', 'webba-booking-lite' ),
-                    'onpayment'  => __( 'Send invoice on payment complete', 'webba-booking-lite' ),
-                ],
-                'not_translated_title' => 'Send invoice to a customer (HTML format)',
-                'popup'                => __( 'Choose whether you would like to send an invoice to the customer and specify when the invoice email should be sent.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_customer_invoice_subject',
-            'text',
-            __( 'Invoice email subject line', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'dependency'           => [
-                    'wbk_email_customer_send_invoice' => 'onbooking|onapproval|onpayment',
-                ],
-                'default'              => __( 'Invoice', 'webba-booking-lite' ),
-                'not_translated_title' => 'Invoice email subject line',
-                'popup'                => 'Customize the subject line for invoice email. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_current_invoice_number',
-            'text',
-            __( 'Current invoice number', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'dependency'           => [
-                    'wbk_email_customer_send_invoice' => 'onbooking|onapproval|onpayment',
-                ],
-                'default'              => '1',
-                'not_translated_title' => 'Current invoice number',
-                'popup'                => __( 'Set the starting number for your invoices. Use the placeholder #invoice_number in your notifications. Each time a customer makes a payment, the value of this option will be increased by one.' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_send_invoice_copy',
-            'checkbox',
-            __( 'Send admin a copy of invoice email', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'dependency'           => [
-                    'wbk_email_customer_send_invoice' => 'onbooking|onapproval|onpayment',
-                ],
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Send admin a copy of invoice email',
-                'popup'                => __( 'Turn on if you want to send a copy of the invoice email to the admin.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_on_update_booking_subject',
-            'text',
-            __( 'Notification subject (when booking changes)', 'webba-booking-lite' ),
-            'wbk_email_settings_section',
-            [
-                'not_translated_title' => 'Notification subject (when booking changes)',
-                'popup'                => __( 'Customize the subject line for booking changes notification email.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1408,8 +758,7 @@ Note: With autolock turned on, connected service bookings are considered when lo
             [
                 'not_translated_title' => 'Send copies of admin email notifications to addresses',
                 'popup'                => __( 'Enter the email addresses where you want to receive copies of admin notifications. Separate multiple email addresses with comma.', 'webba-booking-lite' ),
-            ],
-            'advanced'
+            ]
         );
         wbk_opt()->add_option(
             'wbk_email_landing',
@@ -1419,8 +768,7 @@ Note: With autolock turned on, connected service bookings are considered when lo
             [
                 'not_translated_title' => 'Notifications landing page',
                 'popup'                => __( 'Specify the landing page URL for payment or cancelation. This page should include the [webbabooking] shortcode.', 'webba-booking-lite' ),
-            ],
-            'advanced'
+            ]
         );
         wbk_opt()->add_option(
             'wbk_date_input_dropdown_count',
@@ -1501,6 +849,17 @@ Note: With autolock turned on, connected service bookings are considered when lo
                 'not_translated_title' => 'Tax',
                 'popup'                => __( 'Tax used for online payments.', 'webba-booking-lite' ),
                 'default'              => '0',
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_payment_price_format',
+            'text',
+            __( 'Price format', 'webba-booking-lite' ),
+            'wbk_general_settings_section',
+            [
+                'default'              => '$#price',
+                'not_translated_title' => 'Price format',
+                'popup'                => __( 'Price format on the booking form. Required placeholder: #price. E.g.: $#price.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -1876,17 +1235,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
                 'popup'                => '<a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
             ],
             'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_payment_price_format',
-            'text',
-            __( 'Price format', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => '$#price',
-                'not_translated_title' => 'Price format',
-                'popup'                => __( 'Price format on the booking form. Required placeholder: #price. E.g.: $#price.', 'webba-booking-lite' ),
-            ]
         );
         wbk_opt()->add_option(
             'wbk_payment_subtotal_title',
@@ -2568,7 +1916,7 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                     'default'              => 'USD',
                     'not_translated_title' => 'Stripe currency',
                     'popup'                => __( 'Select the currency to use for Stripe payments.', 'webba-booking-lite' ),
-                    'extra'                => array_combine( WBK_Stripe::getCurrencies(), WBK_Stripe::getCurrencies() ),
+                    'extra'                => array_combine( WBK_Stripe::get_currencies(), WBK_Stripe::get_currencies() ),
                 ]
             );
             wbk_opt()->add_option(
@@ -2636,7 +1984,7 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 'wbk_stripe_settings_section',
                 [
                     'default'              => '',
-                    'extra'                => WBK_Db_Utils::getPaymentFields(),
+                    'extra'                => WBK_Model_Utils::get_payment_fields(),
                     'not_translated_title' => 'Additional payment information',
                     'popup'                => __( 'Select the additional fields that you wish to include in the Stripe payment process.', 'webba-booking-lite' ),
                 ],
@@ -2661,23 +2009,6 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 [
                     'not_translated_title' => 'Font size for card element on mobile devices',
                     'popup'                => __( 'Set the card element font size on mobile devices. Leave empty for the default input field font size.', 'webba-booking-lite' ),
-                ],
-                'advanced'
-            );
-            wbk_opt()->add_option(
-                'wbk_stripe_status_after_payment',
-                'select',
-                __( 'Set status after booking is paid with Stripe to', 'webba-booking-lite' ),
-                'wbk_stripe_settings_section',
-                [
-                    'default'              => 'based',
-                    'not_translated_title' => 'Set status after booking is paid with Stripe to',
-                    'popup'                => __( 'Choose how to update the status after booking is paid with Stripe. To keep the current status unchanged, select "Based on status before payment". ', 'webba-booking-lite' ),
-                    'extra'                => [
-                        'based'         => __( 'Based on status before payment', 'webba-booking-lite' ),
-                        'paid'          => __( 'Paid (awaiting approval)', 'webba-booking-lite' ),
-                        'paid_approved' => __( 'Paid (approved)', 'webba-booking-lite' ),
-                    ],
                 ],
                 'advanced'
             );
@@ -2881,7 +2212,7 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                     'extra'                => [
                         'disabled'      => __( 'Disabled (do not update status)', 'webba-booking-lite' ),
                         'approved'      => __( 'Approved', 'webba-booking-lite' ),
-                        'paid'          => __( 'Paid (awaiting approval)', 'webba-booking-lite' ),
+                        'paid'          => __( 'Paid (pending)', 'webba-booking-lite' ),
                         'paid_approved' => __( 'Paid (approved)', 'webba-booking-lite' ),
                     ],
                 ]

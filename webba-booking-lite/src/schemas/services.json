@@ -39,7 +39,7 @@
             "misc": {
                 "tooltip": "Specify a date range if the service is only valid for a specific period of time.",
                 "date_format": "M d, Y",
-                "time_zone": "America/Phoenix"
+                "time_zone": "Europe/Warsaw"
             },
             "required": false,
             "dependency": [],
@@ -140,13 +140,32 @@
             "type": "string",
             "input_type": "text",
             "hidden": false,
-            "title": "Email",
+            "title": "Notification email(s)",
             "tab": "email",
             "misc": {
-                "tooltip": "Enter the email address of administrators who will receive notifications for bookings related to this service.",
+                "tooltip": "Enter the email address of administrators who will receive notifications for bookings related to this service (use comma to add multiple).",
                 "sub_type": "email"
             },
             "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "service_color": {
+            "type": "string",
+            "input_type": "color",
+            "hidden": true,
+            "title": "Color",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Select a color for this service.",
+                "generate_random": true,
+                "generate_key": [
+                    "services",
+                    "color"
+                ]
+            },
+            "required": false,
             "dependency": [],
             "default_value": "",
             "editable": true
@@ -302,11 +321,11 @@
             "type": "string",
             "input_type": "text",
             "hidden": false,
-            "title": "Duration (minutes)",
+            "title": "Duration",
             "tab": "hours",
             "misc": {
                 "sub_type": "positive_integer",
-                "tooltip": "Enter the duration of each booking."
+                "tooltip": "Enter the duration of each booking in minutes."
             },
             "required": true,
             "dependency": [],
@@ -350,102 +369,12 @@
             "title": "Step (minutes)",
             "tab": "hours",
             "misc": {
-                "tooltip": "  ",
+                "tooltip": "Enter the default time interval for time slots, which helps organize business hours and appointment durations.",
                 "sub_type": "positive_integer"
             },
             "required": true,
             "dependency": [],
             "default_value": "30",
-            "editable": true
-        },
-        "service_notification_template": {
-            "type": "string",
-            "input_type": "select",
-            "hidden": true,
-            "title": "'On Booking' notification template (customer)",
-            "tab": "email",
-            "misc": {
-                "tooltip": "Select a template for booking confirmation notifications.",
-                "options": "email_templates",
-                "null_value": [
-                    "Default"
-                ]
-            },
-            "required": false,
-            "dependency": [],
-            "default_value": "0",
-            "editable": true
-        },
-        "service_reminder_template": {
-            "type": "string",
-            "input_type": "select",
-            "hidden": true,
-            "title": "Reminder notification template",
-            "tab": "email",
-            "misc": {
-                "tooltip": "Select a template for booking reminders.",
-                "null_value": [
-                    "Default"
-                ],
-                "options": "email_templates"
-            },
-            "required": false,
-            "dependency": [],
-            "default_value": "0",
-            "editable": true
-        },
-        "service_invoice_template": {
-            "type": "string",
-            "input_type": "select",
-            "hidden": true,
-            "title": "Invoice notification template",
-            "tab": "email",
-            "misc": {
-                "tooltip": "Select a template for invoices.",
-                "null_value": [
-                    "Default"
-                ],
-                "options": "email_templates"
-            },
-            "required": false,
-            "dependency": [],
-            "default_value": "0",
-            "editable": true
-        },
-        "service_booking_changed_template": {
-            "type": "string",
-            "input_type": "select",
-            "hidden": true,
-            "title": "Booking changes template",
-            "tab": "email",
-            "misc": {
-                "tooltip": "Select a template for booking changes notifications.",
-                "null_value": [
-                    "Default"
-                ],
-                "options": "email_templates"
-            },
-            "required": false,
-            "dependency": [],
-            "default_value": "0",
-            "editable": true
-        },
-        "service_arrived_template": {
-            "type": "string",
-            "input_type": "select",
-            "hidden": true,
-            "title": "Status \"arrived\" template",
-            "tab": "email",
-            "misc": {
-                "tooltip": "Select a template for status \"Arrived\" notification. ",
-                "null_value": [
-                    "Default"
-                ],
-                "options": "email_templates"
-            },
-            "required": false,
-            "dependency": [],
-            "default_value": "0",
             "editable": true
         },
         "service_payment_methods": {

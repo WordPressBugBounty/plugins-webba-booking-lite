@@ -13,6 +13,17 @@ function wbk_wbkdata_on_after_item_added(
         $bf = new WBK_Booking_Factory();
         $bf->post_production([$item->id], 'on_manual_booking');
     }
+
+    if ($model_name == get_option('wbk_db_prefix', '') . 'wbk_services') {
+        $default_templates = WbkData()->models->get_element_at(get_option('wbk_db_prefix') . 'wbk_email_templates')->get_items([['name' => 'is_default', 'value' => 'yes']]);
+
+        foreach ($default_templates as $template) {
+            $assigned_services = isset($template->services) && !empty($template->services) && !is_null($template->services) ? json_decode($template->services) : [];
+            $assigned_services[] = $item->id;
+
+            WbkData()->models->get_element_at(get_option('wbk_db_prefix') . 'wbk_email_templates')->update_item(['services' => $assigned_services], $template->id);
+        }
+    }
 }
 
 add_action(
@@ -29,7 +40,7 @@ function wbk_wbkdata_on_before_item_deleted(
     global $wpdb;
     if ($model_name == get_option('wbk_db_prefix', '') . 'wbk_appointments') {
         $bf = new WBK_Booking_Factory();
-        $bf->destroy($row->id, __('Service administrator (dashboard)', 'webba-booking-lite'));
+        $bf->destroy($row->id, 'administrator', true);
     }
     if ($model_name == get_option('wbk_db_prefix', '') . 'wbk_services') {
         $wpdb->query(
@@ -57,6 +68,7 @@ function wbk_wbkdata_on_after_item_updated(
     if ($model_name == get_option('wbk_db_prefix', '') . 'wbk_appointments') {
         $bf = new WBK_Booking_Factory();
         $bf->update($item);
+
     }
 }
 

@@ -12,10 +12,12 @@ export interface IConfirmationProps {
     confirmationMessage: string
     action: () => void
     classes?: string
+    wrapperClass?: string
     title?: string
     icon?: string
-    buttonType?: 'primary' | 'secondary'
+    buttonType?: 'primary' | 'secondary' | 'custom' | 'no-border'
     position?: 'top' | 'right' | 'bottom' | 'left'
+    tooltip?: string
 }
 
 export type TItemsRawData<T extends Record<string, any>> = T[] | T

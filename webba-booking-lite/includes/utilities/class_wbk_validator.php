@@ -547,5 +547,20 @@ class WBK_Validator
         }
         return false;
     }
+
+    public static function wbk_sanitize($value)
+    {
+        $value = str_replace('"', '', $value);
+        $value = str_replace('<', '', $value);
+        $value = str_replace('\'', '', $value);
+        $value = str_replace('>', '', $value);
+        $value = str_replace('/', '', $value);
+        $value = str_replace('\\', '', $value);
+        $value = str_replace('and', '', $value);
+        $value = str_replace('union', '', $value);
+        $value = str_replace('delete', '', $value);
+        $value = str_replace('select', '', $value);
+        return $value;
+    }
 }
 ?>

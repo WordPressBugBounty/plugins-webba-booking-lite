@@ -149,8 +149,8 @@ class WBK_Backend {
             );
             add_submenu_page(
                 'wbk-main',
-                __( 'Email templates', 'webba-booking-lite' ),
-                __( 'Email templates', 'webba-booking-lite' ),
+                __( 'Email notifications', 'webba-booking-lite' ),
+                __( 'Email notifications', 'webba-booking-lite' ),
                 'manage_options',
                 'wbk-email-templates',
                 ['WBK_Renderer', 'render_backend_page']

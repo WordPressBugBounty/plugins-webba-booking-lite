@@ -31,7 +31,7 @@ class WBK_Assets_Manager {
             'wbk-dashboard',
             'wbk-spa'
         ];
-        if ( in_array( $_GET['page'], $admin_pages ) ) {
+        if ( isset( $_GET['page'] ) && in_array( $_GET['page'], $admin_pages ) ) {
             wp_enqueue_style( 'editor-buttons' );
         }
         foreach ( $this->css as $item ) {
@@ -154,7 +154,7 @@ class WBK_Assets_Manager {
             'wbk-dashboard',
             'wbk-spa'
         ];
-        if ( in_array( $_GET['page'], $admin_pages ) ) {
+        if ( isset( $_GET['page'] ) && in_array( $_GET['page'], $admin_pages ) ) {
             $res = wp_set_script_translations( 'wbk-react-admin', 'webba-booking-lite', WP_WEBBA_BOOKING__PLUGIN_DIR . '/' . 'languages/' );
         }
     }
@@ -344,7 +344,7 @@ class WBK_Assets_Manager {
             'stripe_mob_size'                => get_option( 'wbk_stripe_mob_font_size', '' ),
             'auto_add_to_cart'               => get_option( 'wbk_woo_auto_add_to_cart', 'disabled' ),
             'range_selection'                => get_option( 'wbk_range_selection', 'disabled' ),
-            'picker_format'                  => WBK_Db_Utils::convertDateFormatForPicker(),
+            'picker_format'                  => WBK_Model_Utils::convert_date_format_for_picker(),
             'scroll_value'                   => get_option( 'wbk_scroll_value', '120' ),
             'field_required'                 => get_option( 'wbk_validation_error_message', '' ),
             'error_status_scroll_value'      => '0',

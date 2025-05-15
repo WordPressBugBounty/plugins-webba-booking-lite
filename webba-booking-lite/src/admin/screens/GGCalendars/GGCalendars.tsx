@@ -13,10 +13,10 @@ import { ggcalendarsModel } from './model'
 import { createFormFromModel } from '../../components/Form/lib/createForm'
 import { GoogleAuthCell } from '../../components/WebbaDataTable/cells/GoogleAuth/GoogleAuth'
 import { __ } from '@wordpress/i18n'
+import styles from './GGCalendars.module.scss'
 
 const columns = generateColumnDefsFromModel(ggcalendarsModel, {
     access_token: {
-        header: __('Authoriztion', 'webba-booking-lite'),
         cell: GoogleAuthCell,
     },
 })
@@ -133,6 +133,7 @@ export const GGCalendarsScreen = () => {
                 )
             }
             noItemsImageUrl={plugin_url + '/public/images/bookings-empty.png'}
+            className={styles.table}
         />
     )
 }

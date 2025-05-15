@@ -17,7 +17,7 @@ class WBK_Stripe {
         return false;
     }
 
-    public static function getCurrencies() {
+    public static function get_currencies() {
         return [
             'USD',
             'AED',
@@ -158,7 +158,7 @@ class WBK_Stripe {
         ];
     }
 
-    public static function isCurrencyZeroDecimal( $currency ) {
+    public static function is_currency_zero_decimal( $currency ) {
         $arr_list = [
             'MGA',
             'BIF',

@@ -103,6 +103,20 @@
             "dependency": [],
             "default_value": "",
             "editable": false
+        },
+        "appointment_duration": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Duration",
+            "tab": "",
+            "misc": {
+                "sub_type": "positive_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": false
         }
     }
 }

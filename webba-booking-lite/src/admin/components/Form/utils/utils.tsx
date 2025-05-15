@@ -23,6 +23,8 @@ import { createDateField } from '../Fields/DateField/DateField'
 import { createCheckboxField } from '../Fields/CheckboxField/CheckboxField'
 import { CreateCustomFields } from '../Fields/CustomField/CustomField'
 import { InputWrapper } from '../Fields/InputWrapper/InputWrapper'
+import { createMultiCheckbox } from '../Fields/MultiCheckbox/MultiCheckbox'
+import { createColorField } from '../Fields/ColorField/ColorField'
 
 interface CustomFieldConfig {
     title?: string
@@ -55,10 +57,6 @@ export const getFieldComponentFromType = ({
     if (name === 'email') {
         return createEmailField(constructorConfig)
     }
-
-    // if (inputType === 'select' && name === 'payment_methods') {
-    // return createPaymentSelectField(constructorConfig)
-    // }
 
     if (inputType === 'select') {
         return createGenericSelectField(constructorConfig)
@@ -104,8 +102,16 @@ export const getFieldComponentFromType = ({
         return createCheckboxField(constructorConfig)
     }
 
+    if (inputType === 'multicheckbox') {
+        return createMultiCheckbox(constructorConfig)
+    }
+
     if (inputType === 'webba_custom_data') {
         return CreateCustomFields(constructorConfig)
+    }
+
+    if (inputType === 'color') {
+        return createColorField(constructorConfig)
     }
 
     return ({ name, label }) => {
@@ -244,4 +250,19 @@ export const safeParse = function <T = any>(
             error: e as Error,
         }
     }
+}
+
+export const checkForConditionalDisable = (
+    form: FormFromModel<any>,
+    conditions: Record<string, string>
+): boolean => {
+    if (!form || !form.defaultValue) return false
+
+    return Object.keys(conditions).every((fieldName) => {
+        const formValue = form.defaultValue[fieldName]
+
+        if (formValue === undefined) return false
+
+        return formValue === conditions[fieldName]
+    })
 }

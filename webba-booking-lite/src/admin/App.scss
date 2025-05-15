@@ -1,4 +1,58 @@
-#wbk_spa_dashboard {
-    font-family: poppins, arial;
+@font-face {
+    font-family: Ubuntu;
+    src: url(./../fonts/ubuntu/Ubuntu-Light.ttf);
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url(./../fonts/ubuntu/Ubuntu-LightItalic.ttf);
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url(./../fonts/ubuntu/Ubuntu-Regular.ttf);
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url(./../fonts/ubuntu/Ubuntu-Italic.ttf);
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url(./../fonts/ubuntu/Ubuntu-Medium.ttf);
     font-weight: 500;
+    position: relative;
+    z-index: 0;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url(./../fonts/ubuntu/Ubuntu-MediumItalic.ttf);
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url(./../fonts/ubuntu/Ubuntu-Bold.ttf);
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: Ubuntu;
+    src: url(./../fonts/ubuntu/Ubuntu-BoldItalic.ttf);
+    font-weight: 700;
+    font-style: italic;
+}
+
+#wbk_spa_dashboard {
+    font-family: typography.$font-primary;
+    font-weight: 300;
 }

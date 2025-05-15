@@ -99,11 +99,12 @@ class WBK_Backend_Schedule
                 die();
                 return;
             }
+            // to test
             $count = $wpdb->get_var(
                 $wpdb->prepare(
                     'SELECT COUNT(*) FROM ' .
                     get_option('wbk_db_prefix', '') .
-                    'wbk_appointments where service_id = %d and time = %d',
+                    'wbk_appointments where service_id = %d and time = %d and ' . WBK_Model_Utils::get_not_canclled_sql(),
                     $service_id,
                     $time
                 )
@@ -201,7 +202,7 @@ class WBK_Backend_Schedule
         }
 
         $bf = new WBK_Booking_Factory();
-        $bf->destroy($booking_id, 'administrator', true);
+        $bf->destroy($booking_id, 'administrator', false);
 
         date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
         $sp = new WBK_Schedule_Processor();
@@ -269,7 +270,7 @@ class WBK_Backend_Schedule
         }
 
         $bf = new WBK_Booking_Factory();
-        $bf->destroy($booking_id, 'administrator', true);
+        $bf->destroy($booking_id, 'administrator', false);
 
         date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
         $sp = new WBK_Schedule_Processor();
@@ -331,7 +332,7 @@ class WBK_Backend_Schedule
         }
 
         $name = esc_html(
-            WBK_Db_Utils::backend_customer_name_processing(
+            WBK_Model_Utils::backend_customer_name_processing(
                 $booking_id,
                 $booking->get_name()
             )
@@ -403,7 +404,7 @@ class WBK_Backend_Schedule
         }
 
         $name = esc_html(
-            WBK_Db_Utils::backend_customer_name_processing(
+            WBK_Model_Utils::backend_customer_name_processing(
                 $booking_id,
                 $booking->get_name()
             )

@@ -12,6 +12,7 @@ export type TFilterSelectOptions = Record<string, string> | string
 export interface IFilterField {
     name: string
     label?: string
+    placeholder?: string
     type: TFilterFieldType
     options?: TFilterSelectOptions
     misc?: TFilterFieldMisc
@@ -19,11 +20,13 @@ export interface IFilterField {
     null_value?: string[]
     value?: TAllowedFilterValue<any>
     triggerDateRange?: boolean
+    initialValue?: TAllowedFilterValue<any>
 }
 
 export interface IFilterFieldProps {
     name: string
     label: string
+    placeholder?: string
     misc: TFilterFieldMisc
     value?: TAllowedFilterValue<any>
 }
@@ -43,9 +46,16 @@ export interface IFilterContext {
 export interface IFilterFormProps {
     fields: IFilterField[]
     model: TAllowedFilterModel
+    columnCount?: number
+    customQuery?: TAllowedFilterValue<any>[]
+    setCustomQuery?: (value: any) => void
 }
 
-export type TAllowedFilterModel = 'appointments' | 'services' | 'coupons'
+export type TAllowedFilterModel =
+    | 'appointments'
+    | 'services'
+    | 'coupons'
+    | 'dashboard'
 
 export type TAllowedFilterValue<T extends string | Date | number> = T | T[]
 
@@ -60,4 +70,5 @@ export interface IFilterContextValue {
     setFilter: (value: any, isFromDateRange?: boolean) => void
     filters: any
     model: TAllowedFilterModel
+    setInitialValue: (value: any) => void
 }

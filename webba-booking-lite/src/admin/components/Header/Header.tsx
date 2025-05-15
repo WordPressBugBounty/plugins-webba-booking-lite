@@ -35,7 +35,7 @@ export const Header = () => {
             },
             {
                 route: 'cancelled-bookings',
-                label: __('Cancelled Bookings', 'webba-booking-lite'),
+                label: __('Cancelled Bookings (legacy)', 'webba-booking-lite'),
             },
             {
                 route: 'services',
@@ -65,7 +65,7 @@ export const Header = () => {
             {
                 route: 'email-templates',
                 slug: 'wbk-email-templates',
-                label: __('Email templates', 'webba-booking-lite'),
+                label: __('Email notifications', 'webba-booking-lite'),
             },
             {
                 route: 'calendars',

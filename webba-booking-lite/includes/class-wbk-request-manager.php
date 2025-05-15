@@ -102,6 +102,11 @@ class WBK_Request_Manager {
                 'callback'            => [$this, 'get_cell_detail'],
                 'permission_callback' => [$this, 'get_cell_detail_permission'],
             ] );
+            register_rest_route( 'wbk/v2', '/send-test-email/', [
+                'methods'             => 'POST',
+                'callback'            => [$this, 'send_test_email'],
+                'permission_callback' => [$this, 'send_test_email_permission'],
+            ] );
         } );
         add_action( 'wp_ajax_wbk_calculate_amounts', [$this, 'calculate_amounts'] );
         add_action( 'wp_ajax_nopriv_wbk_calculate_amounts', [$this, 'calculate_amounts'] );
@@ -422,7 +427,7 @@ class WBK_Request_Manager {
                         wp_die();
                         return;
                     }
-                    if ( WBK_Stripe::isCurrencyZeroDecimal( get_option( 'wbk_stripe_currency', '' ) ) ) {
+                    if ( WBK_Stripe::is_currency_zero_decimal( get_option( 'wbk_stripe_currency', '' ) ) ) {
                         $safe_value = $payment_details['total'];
                     } else {
                         $safe_value = $payment_details['total'] * 100;
@@ -573,10 +578,10 @@ class WBK_Request_Manager {
         }
         $action = sanitize_text_field( $request['notification_type'] );
         $actions = [
-            'confirmation',
-            'payment',
-            'approval',
-            'arrival'
+            'booking_created_by_customer',
+            'booking_paid',
+            'booking_approved',
+            'booking_finished'
         ];
         if ( !in_array( $action, $actions ) ) {
             $error_status = true;
@@ -1158,9 +1163,9 @@ class WBK_Request_Manager {
         } else {
             $html .= WBK_Renderer::load_template( 'frontend/form_fields', [$service_ids, $time, $category_id] );
         }
-        echo $html;
+        echo apply_filters( 'wbk_post_render_booking_form', $html );
         date_default_timezone_set( 'UTC' );
-        die;
+        wp_die();
         return;
     }
 
@@ -1193,7 +1198,6 @@ class WBK_Request_Manager {
             echo -1;
             date_default_timezone_set( 'UTC' );
             die;
-            return;
         }
         date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
         if ( isset( $_POST['category'] ) && $_POST['category'] != 'undefined' ) {
@@ -1690,74 +1694,12 @@ class WBK_Request_Manager {
             $booking->set( 'canceled_by', __( 'customer', 'webba-booking-lite' ) );
             $booking->save();
         }
-        // usage of deprecate method
-        $appointment_ids = $booking_ids;
+        foreach ( $booking_ids as $booking_id ) {
+            $bf = new WBK_Booking_Factory();
+            $bf->destroy( $booking_id, 'customer', false );
+            $i++;
+        }
         if ( $multi_booking_valid && count( $booking_ids ) > 0 ) {
-            $customer_notification_mode = get_option( 'wbk_email_customer_cancel_multiple_mode', 'foreach' );
-            $admin_notification_mode = get_option( 'wbk_email_admin_cancel_multiple_mode', 'foreach' );
-            $multiple = false;
-            if ( get_option( 'wbk_multi_booking' ) == 'enabled' || get_option( 'wbk_multi_booking' ) == 'enabled_slot' ) {
-                $multiple = true;
-            }
-            if ( $multiple && $customer_notification_mode == 'one' && get_option( 'wbk_email_customer_appointment_cancel_status', '' ) == 'true' ) {
-                if ( count( $appointment_ids ) > 0 ) {
-                    $appointment = new WBK_Appointment_deprecated();
-                    if ( $appointment->setId( $appointment_ids[0] ) ) {
-                        if ( $appointment->load() ) {
-                            $recipient = $appointment->getEmail();
-                            $notifications = new WBK_Email_Notifications(null, null);
-                            $subject = get_option( 'wbk_email_customer_appointment_cancel_subject', '' );
-                            $message = get_option( 'wbk_email_customer_bycustomer_appointment_cancel_message', '' );
-                            $notifications->sendMultipleNotification(
-                                $appointment_ids,
-                                $message,
-                                $subject,
-                                $recipient
-                            );
-                        }
-                    }
-                }
-            }
-            $multiple = false;
-            if ( get_option( 'wbk_multi_booking' ) == 'enabled' || get_option( 'wbk_multi_booking' ) == 'enabled_slot' ) {
-                $multiple = true;
-            }
-            if ( $multiple && $admin_notification_mode == 'one' && get_option( 'wbk_email_adimn_appointment_cancel_status', '' ) == 'true' ) {
-                if ( count( $appointment_ids ) > 0 ) {
-                    $appointment = new WBK_Appointment_deprecated();
-                    if ( $appointment->setId( $appointment_ids[0] ) ) {
-                        if ( $appointment->load() ) {
-                            $service = WBK_Db_Utils::initServiceById( $appointment->getService() );
-                            if ( $service != false ) {
-                                $recipient = $service->getEmail();
-                                $subject = get_option( 'wbk_email_adimn_appointment_cancel_subject', '' );
-                                $message = get_option( 'wbk_email_adimn_appointment_cancel_message', '' );
-                                $notifications = new WBK_Email_Notifications(null, null);
-                                $notifications->sendMultipleNotification(
-                                    $appointment_ids,
-                                    $message,
-                                    $subject,
-                                    $recipient
-                                );
-                                $super_admin_email = get_option( 'wbk_super_admin_email', '' );
-                                if ( $super_admin_email != '' ) {
-                                    $notifications->sendMultipleNotification(
-                                        $appointment_ids,
-                                        $message,
-                                        $subject,
-                                        $super_admin_email
-                                    );
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            foreach ( $booking_ids as $booking_id ) {
-                $bf = new WBK_Booking_Factory();
-                $bf->destroy( $booking_id, 'customer', true );
-                $i++;
-            }
             $message = '<div class="thank-you-block-w"><div class="thank-you-content-w">' . esc_html( get_option( 'wbk_booking_canceled_message', 'Your booking has been cancelled.' ) ) . '</div></div>';
             echo json_encode( [
                 'status'         => 'success',
@@ -2317,10 +2259,12 @@ class WBK_Request_Manager {
         }
         $booking = new WBK_Booking($request['booking']);
         if ( $booking->is_loaded() ) {
+            date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
             $booking->set( 'time', $time );
+            $booking->set( 'day', strtotime( 'midnight', $time ) );
+            date_default_timezone_set( 'UTC' );
             $booking->save();
-            //  $bf = new WBK_Booking_Factory();
-            //$bf->update([$request['booking']]);
+            WBK_Email_Processor::send( [$request['booking']], 'booking_updated_by_customer' );
             $data = [
                 'booking' => WBK_Model_Utils::get_booking_data( $request['booking'] ),
             ];
@@ -2346,7 +2290,7 @@ class WBK_Request_Manager {
             return $this->response_error( 'Wrong booking passed.' );
         }
         $bf = new WBK_Booking_Factory();
-        if ( $bf->destroy( $request['booking'], 'customer', true ) == false ) {
+        if ( $bf->destroy( $request['booking'], 'customer' ) == false ) {
             return $this->response_error( 'Something went wrong.' );
         }
         return new \WP_REST_Response([
@@ -2418,14 +2362,15 @@ class WBK_Request_Manager {
         if ( is_user_logged_in() ) {
             $current_user = wp_get_current_user();
             $user = $current_user->user_login;
+            $current_user_email = ( current_user_can( 'manage_options' ) ? $current_user->user_email : '' );
         }
         $data = [
-            'services'   => $services_arr,
-            'categories' => $categories_arr,
-            'plugin_url' => WP_WEBBA_BOOKING__PLUGIN_URL,
-            'admin_url'  => admin_url(),
-            'is_pro'     => wbk_fs()->is__premium_only() && wbk_fs()->can_use_premium_code(),
-            'settings'   => [
+            'services'           => $services_arr,
+            'categories'         => $categories_arr,
+            'plugin_url'         => WP_WEBBA_BOOKING__PLUGIN_URL,
+            'admin_url'          => admin_url(),
+            'is_pro'             => wbk_fs()->is__premium_only() && wbk_fs()->can_use_premium_code(),
+            'settings'           => [
                 'narrow_form'   => get_option( 'wbk_form_layout' ) == 'narrow',
                 'week_start'    => get_option( 'start_of_week', '1' ),
                 'time_format'   => get_option( 'time_format' ),
@@ -2434,8 +2379,9 @@ class WBK_Request_Manager {
                 'locale'        => get_locale(),
                 'custom_fields' => WBK_Model_Utils::get_custom_fields_list(),
                 'is_admin'      => current_user_can( 'manage_options' ),
+                'price_format'  => get_option( 'wbk_payment_price_format', '$#price' ),
             ],
-            'wording'    => [
+            'wording'            => [
                 'service_label'        => get_option( 'wbk_service_label', __( 'Select a service', 'webba-booking-lite' ) ),
                 'category_label'       => get_option( 'wbk_category_label', __( 'Select category', 'webba-booking-lite' ) ),
                 'date_label'           => get_option( 'wbk_date_basic_label', __( 'Book an appointment on', 'webba-booking-lite' ) ),
@@ -2452,8 +2398,9 @@ class WBK_Request_Manager {
                 'no_booking'           => get_option( 'wbk_user_dashboard_no_bookings_available', __( 'No bookings available', 'webba-booking-lite' ) ),
                 'label_login_title'    => get_option( 'wbk_user_dashboard_login_title', __( 'Login to your booking manager', 'webba-booking-lite' ) ),
             ],
-            'appearance' => WBK_Model_Utils::get_appearance_data(),
-            'user'       => $user,
+            'appearance'         => WBK_Model_Utils::get_appearance_data(),
+            'user'               => $user,
+            'current_user_email' => $current_user_email,
         ];
         $response = new \WP_REST_Response($data);
         $response->set_status( 200 );
@@ -2762,6 +2709,29 @@ class WBK_Request_Manager {
                 break;
         }
         $response = new \WP_REST_Response($data);
+        $response->set_status( 200 );
+        return $response;
+    }
+
+    public function send_test_email_permission( $request ) : bool {
+        return current_user_can( 'manage_options' );
+    }
+
+    public function send_test_email( $request ) : WP_REST_Response {
+        $id = ( isset( $request['id'] ) ? sanitize_text_field( $request['id'] ) : '' );
+        $bookings = ( isset( $request['bookings'] ) ? $request['bookings'] : [] );
+        $email = ( isset( $request['email'] ) ? sanitize_text_field( $request['email'] ) : '' );
+        if ( !is_array( $bookings ) ) {
+            return new \WP_REST_Response([
+                'status'  => 'error',
+                'message' => __( 'Bookings should be an array', 'webba-booking-lite' ),
+            ], 400);
+        }
+        WBK_Email_Processor::send_test( $bookings, $id, $email );
+        $response = new \WP_REST_Response([
+            'status'  => 'success',
+            'message' => __( 'Test email sent successfully!', 'webba-booking-lite' ),
+        ]);
         $response->set_status( 200 );
         return $response;
     }

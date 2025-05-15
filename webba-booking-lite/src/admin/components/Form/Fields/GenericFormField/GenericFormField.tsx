@@ -1,10 +1,12 @@
 import classNames from 'classnames'
-import { InputHTMLAttributes, useState } from 'react'
-import styles from './GenericFormField.module.css'
+import { InputHTMLAttributes, useEffect, useState } from 'react'
+import styles from './GenericFormField.module.scss'
 import { Label } from '../Label/Label'
 import { FormFieldMisc } from '../../types'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
+import { useForm } from '../../lib/FormProvider'
+import { checkForConditionalDisable } from '../../utils/utils'
 
 interface GenericFieldProps {
     value: any
@@ -35,6 +37,26 @@ export const GenericFormField = ({
         []
     )
 
+    const form = useForm()
+    const [conditionallyDisabled, setConditionallyDisabled] = useState(false)
+    const [hasEvaluated, setHasEvaluated] = useState(false)
+
+    useEffect(() => {
+        if (!misc?.disable_condition || !form.defaultValue) return
+
+        setHasEvaluated(false)
+        setConditionallyDisabled(false)
+    }, [form.defaultValue])
+
+    useEffect(() => {
+        if (hasEvaluated || !misc?.disable_condition || !form.defaultValue)
+            return
+
+        const result = checkForConditionalDisable(form, misc.disable_condition)
+        setConditionallyDisabled(result)
+        setHasEvaluated(true)
+    }, [form.defaultValue, misc?.disable_condition, hasEvaluated])
+
     return (
         <div
             className={classNames(styles.field, {
@@ -54,7 +76,11 @@ export const GenericFormField = ({
                     onBlur={() => setTouched(true)}
                     min={misc?.min}
                     max={misc?.max}
-                    disabled={misc?.disabled || (misc?.pro_version && !is_pro)}
+                    disabled={
+                        misc?.disabled ||
+                        (misc?.pro_version && !is_pro) ||
+                        conditionallyDisabled
+                    }
                 />
             </div>
             {showErrors && (

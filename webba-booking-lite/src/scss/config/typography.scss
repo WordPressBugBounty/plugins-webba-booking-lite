@@ -1,0 +1,15 @@
+$font-primary: 'Ubuntu', sans-serif;
+
+@mixin use-font(
+    $font: $font-primary,
+    $size: 12px,
+    $line-height: $size + 10px,
+    $weight: normal,
+    $style: normal
+) {
+    font-family: $font;
+    font-size: $size;
+    line-height: $line-height;
+    font-weight: $weight;
+    font-style: $style;
+}

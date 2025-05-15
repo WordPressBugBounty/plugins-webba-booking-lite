@@ -13,7 +13,7 @@ export const GoogleAuthCell = ({ cell }: CellContext<any, any>) => {
     const authData = useSelect(
         // @ts-ignore
         (select) => select(store_name).getGgAuthData(calendarId),
-        []
+        [cell.row.original]
     )
     const { isAuthenticated, connectionStatus } = authData[calendarId] || {}
 

@@ -17,11 +17,9 @@ import { PricingRuleType } from '../../components/WebbaDataTable/cells/PricingRu
 
 const columns = generateColumnDefsFromModel(pricingRulesModel, {
     priority: {
-        header: __('Priority', 'webba-booking-lite'),
         cell: PriorityCell,
     },
     type: {
-        header: __('Type', 'webba-booking-lite'),
         cell: PricingRuleType,
     },
 })

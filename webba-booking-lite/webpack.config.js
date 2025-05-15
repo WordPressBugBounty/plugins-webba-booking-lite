@@ -72,6 +72,21 @@ const config = {
                 test: imageAssetsRegex,
                 type: 'asset/inline',
             },
+            {
+                test: /\.scss$/,
+                use: [
+                    'postcss-loader',
+                    'sass-loader',
+                    {
+                        loader: 'sass-resources-loader',
+                        options: {
+                            resources: [
+                                './src/scss/config/config.scss'
+                            ],
+                        },
+                    },
+                ],
+            },
         ],
     },
     externals: {

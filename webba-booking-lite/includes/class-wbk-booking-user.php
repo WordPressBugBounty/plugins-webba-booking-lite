@@ -65,7 +65,7 @@ class Wbk_Booking_User {
             return;
         }
         set_query_var( 'wbk_user_data', $userdata );
-        WBK_Email_Processor::send( [$booking_data['id']], 'user_created' );
+        WBK_Email_Processor::send( [$booking_data['id']], 'user_registered' );
     }
 
     /**

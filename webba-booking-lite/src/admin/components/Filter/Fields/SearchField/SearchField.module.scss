@@ -1,4 +1,21 @@
-.input{
+.input {
+    padding: dimensions.$input-padding;
     padding-right: 40px;
-    background: url('../../../../../../public/images/search-icon.png') no-repeat calc(100% - 10px) center;
+    background: url('../../../../../../public/images/search-icon.png') no-repeat
+        calc(100% - 10px) center;
+    background-size: 16px 16px;
+    background-color: colors.$background-white;
+    border: 1px solid colors.$input-border;
+    border-radius: dimensions.$input-radius;
+    color: colors.$input-text;
+    height: dimensions.$input-height;
+    @include typography.use-font($font: typography.$font-primary, $size: 16px);
+}
+
+@media (max-width: 768px) {
+    .input,
+    .inputContainer {
+        width: 100%;
+        order: 3;
+    }
 }

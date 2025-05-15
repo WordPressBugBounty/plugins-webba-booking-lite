@@ -1,4 +1,4 @@
-import { getCoreRowModel, getSortedRowModel } from '@tanstack/react-table'
+import { getFilteredRowModel } from '@tanstack/react-table'
 import { useDispatch, useSelect } from '@wordpress/data'
 import { store, store_name } from '../../../store/backend'
 import { Form } from '../../components/Form/Form'
@@ -12,8 +12,35 @@ import { generateColumnDefsFromModel } from '../../components/WebbaDataTable/uti
 import { emailTemplatesModel } from './model'
 import { createFormFromModel } from '../../components/Form/lib/createForm'
 import { __ } from '@wordpress/i18n'
+import { EmailTestButton } from '../../components/WebbaDataTable/cells/EmailTestButton/EmailTestButton'
+import { EmailType } from '../../components/WebbaDataTable/cells/EmailType/EmailType'
+import { EmailReceivers } from '../../components/WebbaDataTable/cells/EmailReceivers/EmailReceivers'
+import { EmailStatus } from '../../components/WebbaDataTable/cells/EmailStatus/EmailStatus'
+import { SearchField } from '../../components/Filter/Fields/SearchField/SearchField'
+import { useState } from 'react'
+import metadata from '../../../schemas/email_templates.json'
 
-const columns = generateColumnDefsFromModel(emailTemplatesModel)
+const columns = generateColumnDefsFromModel(
+    emailTemplatesModel,
+    {
+        recipients: {
+            cell: EmailReceivers,
+        },
+        type: {
+            cell: EmailType,
+        },
+        enabled: {
+            cell: EmailStatus,
+        },
+    },
+    {
+        test: {
+            header: '',
+            cell: EmailTestButton,
+            enableSorting: false,
+        },
+    }
+)
 
 const form = createFormFromModel(emailTemplatesModel)
 
@@ -39,6 +66,44 @@ export const EmailTemplateScreen = () => {
         []
     )
 
+    const customGlobalFilterFn = (
+        row: any,
+        columnId: any,
+        filterValue: any
+    ) => {
+        if (!filterValue) return true
+        return Object.values(row.original).some((value) => {
+            if (typeof value === 'string' || typeof value === 'number') {
+                const fields: Record<string, any> = metadata?.properties
+
+                if (
+                    fields[columnId]?.input_type === 'select' ||
+                    fields[columnId]?.input_type === 'multicheckbox'
+                ) {
+                    const options: Record<string, string> =
+                        fields[columnId]?.misc?.options
+
+                    for (let key in options) {
+                        if (key === value) {
+                            return String(options[key])
+                                .toLowerCase()
+                                .includes(String(filterValue).toLowerCase())
+                        }
+                    }
+                }
+
+                return String(value)
+                    .toLowerCase()
+                    .includes(String(filterValue).toLowerCase())
+            }
+            return false
+        })
+    }
+    const [search, setSearch] = useState('')
+    const searchField = (
+        <SearchField name="search" onChange={setSearch} label="Search" />
+    )
+
     const table = useWbkTable({
         columns,
         data: emailTemplates,
@@ -52,6 +117,7 @@ export const EmailTemplateScreen = () => {
 
             return (
                 <Menu
+                    collectionName="email_templates"
                     onDelete={onDelete}
                     onDuplicate={onDuplicate}
                     onEdit={() => {
@@ -83,12 +149,19 @@ export const EmailTemplateScreen = () => {
                 />
             )
         },
+        getFilteredRowModel: getFilteredRowModel(),
+        onGlobalFilterChange: setSearch,
+        globalFilterFn: customGlobalFilterFn,
+        state: {
+            globalFilter: search,
+        },
     })
 
     const onDeleteSelected = async () => {
         const selectedRowsIds = table
             .getSelectedRowModel()
-            .rows.map((row) => row.original.id)
+            .rows.filter((row) => row.original?.is_default != 'yes')
+            .map((row) => row.original.id)
 
         if (!selectedRowsIds.length) {
             return
@@ -107,11 +180,13 @@ export const EmailTemplateScreen = () => {
 
     return (
         <Table
-            title={__('Email templates', 'webba-booking-lite')}
+            title={__('Email notifications', 'webba-booking-lite')}
             addButtonTitle={__('Add Email Template', 'webba-booking-lite')}
             table={table}
             loading={isLoading}
             onDeleteSelected={onDeleteSelected}
+            horizontalOverflow={true}
+            search={searchField}
             onAdd={() =>
                 sidebar.open(
                     <Form

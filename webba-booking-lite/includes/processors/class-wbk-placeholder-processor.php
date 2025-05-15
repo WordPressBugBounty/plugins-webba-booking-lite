@@ -72,7 +72,19 @@ class WBK_Placeholder_Processor
                     );
                 }
             } else {
-                return $message;
+                if (is_array($bookings) && count($bookings) > 0) {
+                    $booking = new WBK_Booking($bookings[0]);
+                    if (!$booking->is_loaded()) {
+                        return $message;
+                    }
+                    return self::message_placeholder_processing_old(
+                        $message,
+                        $bookings[0],
+                        $booking->get_service()
+                    );
+                } else {
+                    return $message;
+                }
             }
 
             $search_tag =
@@ -961,7 +973,7 @@ class WBK_Placeholder_Processor
         $userdata = get_query_var('wbk_user_data', false);
 
         if ($userdata && is_array($userdata) && !empty($userdata)) {
-            foreach($userdata as $placeholder => $value){
+            foreach ($userdata as $placeholder => $value) {
                 $message = str_replace('#' . $placeholder, $value, $message);
             }
         }
@@ -982,6 +994,9 @@ class WBK_Placeholder_Processor
     {
         $current_time_zone = date_default_timezone_get();
         date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
+
+        $message = str_replace('#booking_order', self::process_order_placeholder($bookings), $message);
+
         if (get_option('wbk_multi_booking', '') == 'enabled') {
             $message = WBK_Placeholder_Processor::process_placeholders($message, $bookings);
         } else {
@@ -989,5 +1004,131 @@ class WBK_Placeholder_Processor
         }
         date_default_timezone_set($current_time_zone);
         return $message;
+    }
+    public static function process_order_placeholder($bookings)
+    {
+        $prev_timezone = date_default_timezone_get();
+        date_default_timezone_set(
+            get_option('wbk_timezone', 'UTC')
+        );
+        $rows = [];
+        foreach ($bookings as $booking_id) {
+            $booking = new WBK_Booking($booking_id);
+            if (!$booking->is_loaded()) {
+                continue;
+            }
+            $rows[] = self::message_placeholder_processing_old('#service_name #appointment_day #appointment_time', $booking_id, $booking->get_service());
+
+        }
+        date_default_timezone_set($prev_timezone);
+        return implode("<br/>", $rows);
+    }
+
+    public static function process_agenda_placehoder($message, $bookings)
+    {
+        $agenda = '<table style="text-align:left;">';
+        $agenda .=
+            '<tr>
+									  <th style="margin:0;background:#ccc;border:1px solid #fff;padding:5px;">' .
+            __('Service', 'webba-booking-lite') .
+            '</th>
+									  <th style="margin:0;background:#ccc;border:1px solid #fff;padding:5px;">' .
+            __('Time', 'webba-booking-lite') .
+            '</th>
+									  <th style="margin:0;background:#ccc;border:1px solid #fff;padding:5px;">' .
+            __('Name', 'webba-booking-lite') .
+            '</th>
+									  <th style="margin:0;background:#ccc;border:1px solid #fff;padding:5px;">' .
+            __('Email', 'webba-booking-lite') .
+            '</th>
+									  <th style="margin:0;background:#ccc;border:1px solid #fff;padding:5px;">' .
+            __('Phone', 'webba-booking-lite') .
+            '</th>
+   								  	  <th style="margin:0;background:#ccc;border:1px solid #fff;padding:5px;">' .
+            __('Places booked', 'webba-booking-lite') .
+            '</th>
+									  <th style="margin:0;background:#ccc;border:1px solid #fff;padding:5px;">' .
+            __('Status', 'webba-booking-lite') .
+            '</th>
+									  <th style="margin:0;background:#ccc;border:1px solid #fff;padding:5px;">' .
+            __('Additional information', 'webba-booking-lite') .
+            '</th>
+        </tr>';
+
+        foreach ($bookings as $booking_id) {
+
+            $booking = new WBK_Booking($booking_id);
+            if (!$booking->is_loaded()) {
+                continue;
+            }
+
+            $skip_status = ['pending', 'arrived'];
+            if (in_array($status, $skip_status)) {
+                continue;
+            }
+
+            $service = new WBK_Service($booking->get_service());
+            if (!$service->is_loaded()) {
+                continue;
+            }
+
+            $time_format = WBK_Date_Time_Utils::get_time_format();
+
+            date_default_timezone_set(
+                get_option('wbk_timezone', 'UTC')
+            );
+            $time_string = wp_date(
+                $time_format,
+                $booking->get_start(),
+                new DateTimeZone(date_default_timezone_get())
+            );
+            date_default_timezone_set('UTC');
+
+            $extra_data = trim($booking->get('extra'));
+            $extra_content = '';
+            if ($extra_data != '') {
+                $extra = json_decode($extra_data);
+                foreach ($extra as $item) {
+                    if (count($item) != 3) {
+                        continue;
+                    }
+                    $extra_content .=
+                        $item[1] . ': ' . $item[2] . '. ';
+                }
+            }
+
+            $status = $booking->get_status();
+
+            $status_list = WBK_Model_Utils::get_booking_status_list();
+            if (isset($status_list[$status])) {
+                $status = $status_list[$status][0];
+            } else {
+                $status = '';
+            }
+
+            $agenda .=
+                '<tr><td style="margin:0;border:1px solid #ccc;padding:5px;">' .
+                $service->get_name() .
+                '</td><td style="margin:0;border:1px solid #ccc;padding:5px;">' .
+                $time_string .
+                '</td><td style="margin:0;border:1px solid #ccc;padding:5px;">' .
+                stripslashes($booking->get_name()) .
+                '</td><td style="margin:0;border:1px solid #ccc;padding:5px;">' .
+                $booking->get('email') .
+                '</td><td style="margin:0;border:1px solid #ccc;padding:5px;">' .
+                $booking->get('phone') .
+                '</td><td style="margin:0;border:1px solid #ccc;padding:5px;">' .
+                $booking->get_quantity() .
+                '</td><td style="margin:0;border:1px solid #ccc;padding:5px;">' .
+                $status .
+                '</td><td style="margin:0;border:1px solid #ccc;padding:5px;">' .
+                $extra_content .
+                '</td></tr>';
+
+        }
+
+        $agenda .= '</table>';
+
+        return str_replace('#tomorrow_agenda', $agenda, $message);
     }
 }

@@ -72,11 +72,11 @@
     line-height: 48px;
     transition: 0.2s;
     font-size: 16px;
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
 }
 
 .readableTime {
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
     font-size: 16px;
     color: #212121;
 }

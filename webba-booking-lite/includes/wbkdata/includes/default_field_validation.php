@@ -87,6 +87,46 @@ function wbkdata_property_field_checkbox_validator($input, $value, $slug, $field
     return [false, sprintf(wbkdata_translate_string('Value of %s is not acceptable'), $field->get_title())];
 }
 
+// multicheckbox field
+add_filter('wbkdata_property_field_validation_multicheckbox', 'wbkdata_property_field_multicheckbox_validator', 10, 4);
+function wbkdata_property_field_multicheckbox_validator($input, $value, $slug, $field)
+{
+    $valid = true;
+    $options = isset($field->get_extra_data()['options']) ? $field->get_extra_data()['options'] : [];
+    $value = !empty($value) ? $value : [];
+    
+    if(!$field->get_required() && is_array($value)) {
+        return [true, json_encode($value)];
+    }else if (!$field->get_required() && !is_array($value) && !empty($value)) {
+        return [true, stripslashes($value)];
+    }
+
+    try{
+        if(!is_array($value) && !empty($value)){
+            $value = json_decode($value);
+        }
+    } catch (Exception $e) {
+    
+    }
+
+    if(!is_array($value)) {
+        return [false, sprintf(wbkdata_translate_string('Value of %s is not acceptable'), $field->get_title())];
+    }
+
+    foreach ($value as $key) {
+        if(!in_array($key, array_keys($options))) {
+            $valid = false;
+            break;
+        }
+    }
+
+    if (!$valid) {
+        return [false, sprintf(wbkdata_translate_string('Value of %s is not acceptable'), $field->get_title())];
+    }
+
+    return [true, json_encode($value)];
+}
+
 // select field
 add_filter('wbkdata_property_field_validation_select', 'wbkdata_property_field_select_validator', 10, 4);
 function wbkdata_property_field_select_validator($input, $value, $slug, $field)
@@ -210,5 +250,22 @@ function validate_wbk_business_hours($input, $value, $slug, $field)
 {
     // to do: make additional validation here
     return [true, json_encode($value)];
+}
+
+// color
+add_filter('wbkdata_property_field_validation_color', 'validate_wbk_color', 10, 4);
+function validate_wbk_color($input, $value, $slug, $field)
+{
+    $value = trim(sanitize_text_field($value));
+
+    if (!WbkData\Validator::check_hex_color($value)) {
+        return [false, __('Color entered incorrectly', 'webba-booking-lite'), $field->get_title()];
+    }
+
+    if($field->get_required() && $value == '') {
+        return [false, sprintf(wbkdata_translate_string('%s is required'), $field->get_title())];
+    }
+
+    return [true, $value];
 }
 ?>

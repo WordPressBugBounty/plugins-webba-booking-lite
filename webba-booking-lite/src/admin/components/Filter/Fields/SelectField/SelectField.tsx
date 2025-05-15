@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import styles from './SelectField.module.scss'
-import Select from 'react-select'
+import Select, { components, MultiValueProps } from 'react-select'
 import classNames from 'classnames'
 import { IOption } from '../../../Form/types'
 import { isModelOptions, useOptions } from './utils'
@@ -8,9 +8,49 @@ import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
 import { useFilterField } from '../../hooks/useFilterField'
 import { IFilterFieldProps, TFilterSelectOptions } from '../../types'
+import { Label } from '../../../Form/Fields/Label/Label'
 
-export const SelectField = ({ name, label, misc }: IFilterFieldProps) => {
-    const { value, setFilter, model, field } = useFilterField(name)
+const MAX_DISPLAYED_OPTIONS = 4
+
+const CustomMultiValue = (props: MultiValueProps<IOption>) => {
+    const { index, getValue } = props
+    const selectedValues = getValue()
+
+    if (index < MAX_DISPLAYED_OPTIONS) {
+        return <components.MultiValue {...props} />
+    }
+
+    if (index === MAX_DISPLAYED_OPTIONS) {
+        const remaining = selectedValues.length - MAX_DISPLAYED_OPTIONS
+        return <div className={styles.multiValueMore}>+{remaining}</div>
+    }
+
+    return null
+}
+
+const customStyles = {
+    valueContainer: (base: any) => ({
+        ...base,
+        flexWrap: 'nowrap',
+        overflow: 'hidden',
+    }),
+    multiValue: (base: any) => ({
+        ...base,
+        maxWidth: '100px',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+    }),
+}
+
+export const SelectField = ({
+    name,
+    label,
+    placeholder,
+    misc,
+}: IFilterFieldProps) => {
+    const { value, setFilter, model, field, setInitialValue } =
+        useFilterField(name)
     const multiple = misc?.multiple
     const [isInitiated, setIsInitiated] = useState(false)
 
@@ -30,8 +70,26 @@ export const SelectField = ({ name, label, misc }: IFilterFieldProps) => {
             }) as IOption[]
         }
 
+        if (
+            !isInitiated &&
+            multiple &&
+            model === 'appointments' &&
+            name === 'appointment_status'
+        ) {
+            return options.filter((status) => status.value === 'approved')
+        }
+
         return options as IOption[]
     }, [value, options])
+
+    useEffect(() => {
+        if (field?.initialValue) {
+            return
+        }
+
+        valueObject &&
+            setInitialValue(valueObject.map((option) => option.value))
+    }, [valueObject])
 
     const handleChange = (selectedOptions: any) => {
         setIsInitiated(true)
@@ -57,6 +115,7 @@ export const SelectField = ({ name, label, misc }: IFilterFieldProps) => {
 
     return (
         <div className={classNames(styles.selectField)}>
+            {label && <Label title={label} id={name} />}
             <div>
                 <Select
                     value={valueObject}
@@ -75,7 +134,12 @@ export const SelectField = ({ name, label, misc }: IFilterFieldProps) => {
                     isSearchable={false}
                     isDisabled={isLoading}
                     isLoading={isLoading}
-                    placeholder={label}
+                    placeholder={placeholder}
+                    hideSelectedOptions={false}
+                    components={
+                        multiple ? { MultiValue: CustomMultiValue } : undefined
+                    }
+                    styles={multiple ? customStyles : undefined}
                 />
             </div>
         </div>

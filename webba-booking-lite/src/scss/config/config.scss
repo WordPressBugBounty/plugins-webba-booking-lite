@@ -1,0 +1,11 @@
+@use './colors' as colors;
+@use './normalize' as *;
+@use './responsive' as *;
+@use './common' as *;
+@use './buttons' as buttons;
+@use './typography' as typography;
+@use './animations' as animations;
+@use './dimensions.scss' as dimensions;
+
+// Declear variables
+$transition: 0.3s all linear;

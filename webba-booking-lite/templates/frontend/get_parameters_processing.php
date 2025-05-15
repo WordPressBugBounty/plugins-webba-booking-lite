@@ -137,83 +137,9 @@ if (get_option('wbk_allow_manage_by_link', 'no') == 'yes') {
         $valid = false;
         $i = 0;
 
-        $customer_notification_mode = get_option(
-            'wbk_email_customer_cancel_multiple_mode',
-            'foreach'
-        );
-        $multiple = false;
-        if (
-            get_option('wbk_multi_booking') == 'enabled' ||
-            get_option('wbk_multi_booking') == 'enabled_slot'
-        ) {
-            $multiple = true;
-        }
-        if (
-            $multiple &&
-            $customer_notification_mode == 'one' &&
-            get_option('wbk_email_customer_appointment_cancel_status', '') ==
-            'true'
-        ) {
-            if (count($booking_ids) > 0) {
-                $appointment = new WBK_Appointment_deprecated();
-                if ($appointment->setId($booking_ids[0])) {
-                    if ($appointment->load()) {
-                        $recipient = $appointment->getEmail();
-                        $noifications = new WBK_Email_Notifications(null, null);
-                        $subject = get_option(
-                            'wbk_email_customer_appointment_cancel_subject',
-                            ''
-                        );
-                        $message = get_option(
-                            'wbk_email_customer_appointment_cancel_message',
-                            ''
-                        );
-                        $noifications->sendMultipleNotification(
-                            $booking_ids,
-                            $message,
-                            $subject,
-                            $recipient
-                        );
-                        // send to administrator
-                        $service_id = $appointment->getService();
-                        $service = WBK_Db_Utils::initServiceById($service_id);
-                        if ($service != false) {
-                            $subject = get_option(
-                                'wbk_email_adimn_appointment_cancel_subject',
-                                ''
-                            );
-                            $message = get_option(
-                                'wbk_email_adimn_appointment_cancel_message',
-                                ''
-                            );
-                            $noifications->sendMultipleNotification(
-                                $booking_ids,
-                                $message,
-                                $subject,
-                                $service->getEmail()
-                            );
-                            $super_admin_email = get_option(
-                                'wbk_super_admin_email',
-                                ''
-                            );
-                            if ($super_admin_email != '') {
-                                $noifications->sendMultipleNotification(
-                                    $booking_ids,
-                                    $message,
-                                    $subject,
-                                    $super_admin_email
-                                );
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         $bf = new WBK_Booking_Factory();
-
         foreach ($booking_ids as $booking_id) {
-            $bf->destroy($booking_id, 'administrator', true);
+            $bf->destroy($booking_id, 'administrator', false);
             $i++;
         }
         if ($i > 0) {
@@ -504,7 +430,7 @@ if (isset($_GET['pp_aprove']) && wbk_is5()) {
             $cancel_token = str_replace('>', '', $cancel_token);
             $cancel_token = str_replace('/', '', $cancel_token);
             $cancel_token = str_replace('\\', '', $cancel_token);
-            WBK_Db_Utils::clearPaymentIdByToken($cancel_token);
+            WBK_Model_Utils::clear_payment_id_by_token($cancel_token);
         }
 
 

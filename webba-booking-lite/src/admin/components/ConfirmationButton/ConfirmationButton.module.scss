@@ -7,6 +7,10 @@
 
     &.active {
         z-index: 9999;
+
+        &[data-title]::after {
+            display: none;
+        }
     }
 }
 
@@ -30,6 +34,7 @@
         z-index: inherit;
 
         &.top {
+            top: unset;
             bottom: calc(100% + 5px);
             left: 50%;
             transform: translateX(-50%);
@@ -46,8 +51,8 @@
         }
 
         &.left {
-            left: calc(-100% - 5px);
-            transform: translate(-50%, -50%) scale(1);
+            left: calc(50% - 15px);
+            transform: translate(-100%, -50%) scale(1);
         }
     }
 }

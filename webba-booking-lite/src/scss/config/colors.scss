@@ -1,0 +1,31 @@
+$primary: #1f6763;
+$text-black: #333;
+$text-white: #fff;
+$background-white: #fff;
+$background-offwhite: #f9fafb;
+$border: rgba(0, 0, 0, 0.1);
+$shadow: rgba(0, 0, 0, 0.1);
+$input-border: #e5e7eb;
+$input-text: #1f2937;
+$text-grey: #4b5563;
+$row-border: #f3f4f6;
+$light-grey: #6b7280;
+$off-black: #111827;
+$red: #ef4444;
+$green: #0f766e;
+$border-dark: #8a9393;
+
+
+$status-colors: (
+    'pending': #ff7e07,
+    'approved': #0eb500,
+    'paid': #ff7e07,
+    'paid_approved': #0eb500,
+    'woocommerce': #ff7e07,
+    'added_by_admin_not_paid': #ff7e07,
+    'added_by_admin_paid': #0eb500,
+    'arrived': #0eb500,
+    'cancelled': #fe0606,
+    'rejected': #fe0606,
+    'noshow': #fe0606,
+);

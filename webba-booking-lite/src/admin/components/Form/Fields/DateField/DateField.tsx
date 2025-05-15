@@ -45,6 +45,19 @@ export const createDateField: FormComponentConstructor<any> = ({
                         Intl.DateTimeFormat().resolvedOptions().timeZone
                     )
                 )
+            } else if (
+                value &&
+                isNaN(value) &&
+                typeof value === 'string' &&
+                !initialized
+            ) {
+                setInitialized(true)
+                setDate(
+                    toZonedTime(
+                        new Date(value),
+                        Intl.DateTimeFormat().resolvedOptions().timeZone
+                    )
+                )
             }
         }, [value])
 

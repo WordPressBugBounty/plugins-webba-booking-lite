@@ -1,30 +1,17 @@
-$status-colors: (
-    'pending': #ff7e07,
-    'approved': #0eb500,
-    'paid': #ff7e07,
-    'paid_approved': #0eb500,
-    'woocommerce': #ff7e07,
-    'added_by_admin_not_paid': #ff7e07,
-    'added_by_admin_paid': #0eb500,
-    'arrived': #0eb500,
-    'cancelled': #fe0606,
-    'rejected': #fe0606,
-);
-
 .statusWrapper {
     position: relative;
+    display: inline-flex;
 
     .status {
         display: flex;
         flex-flow: row;
-        padding: 4px 8px;
+        padding: 5px 12px;
         align-items: center;
         justify-content: flex-start;
         gap: 5px;
         cursor: pointer;
-        height: 34px;
-        width: 200px;
-        border-radius: 8px;
+        width: 100px;
+        border-radius: 9999px;
         transition: 0.2s background-color ease-in-out;
 
         .arrow {
@@ -34,12 +21,16 @@ $status-colors: (
 
         .statusText {
             margin: 0;
-            font-size: 16px;
             max-width: 100%;
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
             text-align: left;
+            @include typography.use-font(
+                $font: typography.$font-primary,
+                $size: 14px,
+                $weight: 400
+            );
         }
 
         &:global(::after) {
@@ -66,15 +57,17 @@ $status-colors: (
         position: absolute;
         background-color: #fff;
         top: 100%;
-        left: 0;
         right: 0;
         z-index: 99;
         box-shadow: 0 0 10px rgba(161, 164, 182, 0.3);
         border-radius: 15px;
         overflow: hidden;
-        max-height: 200px;
+        max-height: 175px;
         overflow: auto;
         margin-top: 0;
+        width: calc(100% + 80px);
+        max-width: 200px;
+        min-width: 100px;
 
         &.open {
             display: flex;
@@ -94,9 +87,17 @@ $status-colors: (
             }
         }
     }
+
+    &.isLastTwo {
+        .optionsWrapper {
+            bottom: 0;
+            top: unset;
+            z-index: 999999;
+        }
+    }
 }
 
-@each $status, $color in $status-colors {
+@each $status, $color in colors.$status-colors {
     .status.#{$status} {
         background-color: rgba($color, 20%);
 

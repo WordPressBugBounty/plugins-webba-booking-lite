@@ -8,64 +8,76 @@ import { format } from 'date-fns'
 export const createFilterFields = (fields: any) => {
     const fieldsComponents: JSX.Element[] = []
 
-    fields.forEach(({ name, label, type, misc, value }: IFilterField) => {
-        switch (type) {
-            case 'text':
-                fieldsComponents.push(
-                    <TextField
-                        name={name}
-                        label={label as string}
-                        misc={misc as TFilterFieldMisc}
-                        value={value}
-                    />
-                )
-                break
-            case 'select':
-                fieldsComponents.push(
-                    <SelectField
-                        name={name}
-                        label={label as string}
-                        misc={misc as TFilterFieldMisc}
-                        value={value}
-                    />
-                )
-                break
-            case 'date':
-                fieldsComponents.push(
-                    <DateField
-                        name={name}
-                        label={label as string}
-                        misc={misc as TFilterFieldMisc}
-                        value={value}
-                    />
-                )
-                break
-            case 'date_range':
-                fieldsComponents.push(
-                    <DateRangeField
-                        name={name}
-                        label={label as string}
-                        misc={misc as TFilterFieldMisc}
-                        value={value}
-                    />
-                )
-                break
-            default:
-                console.error('Unknown filter field type: ' + type)
-                break
+    fields.forEach(
+        ({ name, label, placeholder, type, misc, value }: IFilterField) => {
+            switch (type) {
+                case 'text':
+                    fieldsComponents.push(
+                        <TextField
+                            name={name}
+                            label={label as string}
+                            placeholder={placeholder}
+                            misc={misc as TFilterFieldMisc}
+                            value={value}
+                        />
+                    )
+                    break
+                case 'select':
+                    fieldsComponents.push(
+                        <SelectField
+                            name={name}
+                            label={label as string}
+                            placeholder={placeholder}
+                            misc={misc as TFilterFieldMisc}
+                            value={value}
+                        />
+                    )
+                    break
+                case 'date':
+                    fieldsComponents.push(
+                        <DateField
+                            name={name}
+                            label={label as string}
+                            placeholder={placeholder}
+                            misc={misc as TFilterFieldMisc}
+                            value={value}
+                        />
+                    )
+                    break
+                case 'date_range':
+                    fieldsComponents.push(
+                        <DateRangeField
+                            name={name}
+                            label={label as string}
+                            placeholder={placeholder}
+                            misc={misc as TFilterFieldMisc}
+                            value={value}
+                        />
+                    )
+                    break
+                default:
+                    console.error('Unknown filter field type: ' + type)
+                    break
+            }
         }
-    })
+    )
 
     return fieldsComponents
 }
 
-export const createFilterStructure = (fields: IFilterField[]) => {
+export const createFilterStructure = (
+    fields: IFilterField[],
+    customQuery?: TAllowedFilterValue<any>[]
+) => {
     let filters: TAllowedFilterValue<any>[] = []
 
     filters = fields.map((field: IFilterField) => {
         return {
             name: field.name,
-            value: field.value !== 0 ? field.value : '',
+            value:
+                (field?.value && field.value !== 0 && field.value) ||
+                field?.initialValue ||
+                '',
         }
     })
 
@@ -88,6 +100,16 @@ export const createFilterStructure = (fields: IFilterField[]) => {
         (filter) =>
             filter.value !== '' && filter.value !== '' && filter.value !== '0'
     )
+
+    filters = [
+        ...filters.filter((filter: TAllowedFilterValue<any>) =>
+            fields.find((field) => field.name === filter.name)
+        ),
+        ...(customQuery?.filter(
+            (filter: TAllowedFilterValue<any>) =>
+                !fields.find((field) => field.name === filter.name)
+        ) as TAllowedFilterValue<any>[]),
+    ]
 
     return filters as TAllowedFilterValue<any>[]
 }

@@ -13,29 +13,13 @@ import { Table } from '../../components/WebbaDataTable/Table'
 import { generateColumnDefsFromModel } from '../../components/WebbaDataTable/utils'
 import { serviceCategoriesModel, servicesModel } from './model'
 import { ServiceDetail } from '../../components/WebbaDataTable/cells/ServiceDetail/ServiceDetail'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { SearchField } from '../../components/Filter/Fields/SearchField/SearchField'
 import { getFilteredRowModel } from '@tanstack/react-table'
 import { isForbidden } from '../../utils/errors'
 import { FailedMessage } from '../../components/FailedMessage/FailedMessage'
 import { useSettings } from '../../providers/SettingsProvider'
-
-const columnsService = generateColumnDefsFromModel(
-    servicesModel,
-    {
-        email: {
-            cell: ({ getValue }) => <span>{getValue()}</span>,
-            header: __('Email', 'webba-booking-lite'),
-        },
-    },
-    {
-        id: {
-            cell: ({ cell }) => <span>{cell.row.original.id}</span>,
-            header: __('ID', 'webba-booking-lite'),
-            index: 0,
-        },
-    }
-)
+import { DurationCell } from '../../components/WebbaDataTable/cells/DurationCell/DurationCell'
 
 const formService = createFormFromModel(servicesModel)
 
@@ -49,7 +33,6 @@ const columnsServiceCategory = generateColumnDefsFromModel(
     serviceCategoriesModel,
     {
         list: {
-            header: __('Services', 'webba-booking-lite'),
             cell: ServiceNames,
         },
     },
@@ -89,6 +72,39 @@ export const ServicesScreen = () => {
         []
     )
     const settings = useSettings()
+
+    const columnsService = useMemo(
+        () =>
+            generateColumnDefsFromModel(
+                servicesModel,
+                {
+                    email: {
+                        cell: ({ getValue }) => <span>{getValue()}</span>,
+                    },
+                    price: {
+                        cell: ({ cell }) =>
+                            cell.row.original.price &&
+                            cell.row.original.price != 0
+                                ? settings?.price_format.replace(
+                                      '#price',
+                                      cell.row.original.price
+                                  )
+                                : __('Free', 'webba-booking-lite'),
+                    },
+                    duration: {
+                        cell: DurationCell,
+                    },
+                },
+                {
+                    id: {
+                        cell: ({ cell }) => <span>{cell.row.original.id}</span>,
+                        header: __('ID', 'webba-booking-lite'),
+                        index: 0,
+                    },
+                }
+            ),
+        [settings]
+    )
 
     const tableService = useWbkTable({
         columns: columnsService,

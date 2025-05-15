@@ -4,7 +4,7 @@ import { FormFieldProps } from '../../types'
 import { __ } from '@wordpress/i18n'
 import { Label } from '../Label/Label'
 import { useState } from 'react'
-import styles from './../GenericFormField/GenericFormField.module.css'
+import styles from './../GenericFormField/GenericFormField.module.scss'
 import { FormComponentConstructor } from '../../lib/types'
 import { useField } from '../../lib/hooks/useField'
 
@@ -26,6 +26,11 @@ const placeHolders: Record<
         name: 'wbk_customer_name_button',
         text: __('Customer Name', 'webba-booking-lite'),
         content: '#customer_name',
+    },
+    {
+        name: 'wbk_booking_order_button',
+        text: __('Booking order', 'webba-booking-lite'),
+        content: '#booking_order',
     },
     {
         name: 'wbk_appointment_day_button',
@@ -121,6 +126,16 @@ const placeHolders: Record<
         name: 'wbk_time_range',
         text: __('Booking time range', 'webba-booking-lite'),
         content: '#time_range',
+    },
+    {
+        name: 'wbk_user_email_button',
+        text: __('User email (account)', 'webba-booking-lite'),
+        content: '#user_email',
+    },
+    {
+        name: 'wbk_user_pass_button',
+        text: __('User password (account)', 'webba-booking-lite'),
+        content: '##user_pass',
     },
     {
         name: 'wbk_multiple_loop',

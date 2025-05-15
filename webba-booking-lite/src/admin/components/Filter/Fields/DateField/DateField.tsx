@@ -5,8 +5,14 @@ import styles from './DateField.module.scss'
 import { IFilterFieldProps } from '../../types'
 import { useFilterField } from '../../hooks/useFilterField'
 import { formatWbkDate } from '../../utils'
+import { Label } from '../../../Form/Fields/Label/Label'
 
-export const DateField = ({ name, label, misc }: IFilterFieldProps) => {
+export const DateField = ({
+    name,
+    label,
+    placeholder,
+    misc,
+}: IFilterFieldProps) => {
     const { setFilter } = useFilterField(name)
     const [date, setDate] = useState<Date>(new Date())
     const [open, setOpen] = useState(false)
@@ -15,6 +21,7 @@ export const DateField = ({ name, label, misc }: IFilterFieldProps) => {
 
     return (
         <div className={styles.inputWrapper}>
+            {label && <Label title={label} id={name} />}
             <DatePicker
                 className={styles.dateInput}
                 calendarClassName={styles.calendar}
@@ -30,6 +37,7 @@ export const DateField = ({ name, label, misc }: IFilterFieldProps) => {
                 open={open}
                 onClickOutside={() => setOpen(false)}
                 onInputClick={() => setOpen(true)}
+                placeholderText={placeholder}
             />
         </div>
     )

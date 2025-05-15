@@ -3,7 +3,7 @@
     flex-direction: column;
     position: relative;
     gap: 3px;
-    z-index: 99999;
+    z-index: 1;
 
     &:active,
     &:focus,
@@ -28,14 +28,21 @@
 }
 
 .selectInput {
-    border-radius: 15px;
-    border: 1px solid #8a9393;
-    height: 50px;
-    font-family: poppins, arial;
-    font-size: 16px;
-    color: #333333;
+    border-radius: dimensions.$input-radius;
+    border: 1px solid colors.$input-border;
+    height: dimensions.$input-height;
     width: 100%;
     max-width: 100%;
+    color: colors.$input-text;
+    @include typography.use-font(
+        $font: typography.$font-primary,
+        $size: 16px,
+        $weight: 300
+    );
+
+    :global(.css-hlgwow) {
+        padding-left: 12px;
+    }
 
     &.preventOverlap {
         height: auto;
@@ -46,10 +53,27 @@
     }
 
     :global(.css-tj5bde-Svg) {
-        fill: #333333;
+        fill: #9ca3af;
     }
 
     :global(.css-1jqq78o-placeholder) {
         color: #333333;
     }
+}
+
+.multiValueMore {
+    display: flex;
+    min-width: 0;
+    background-color: hsl(0, 0%, 90%);
+    border-radius: 2px;
+    margin: 2px;
+    box-sizing: border-box;
+    max-width: 100px;
+    white-space: nowrap;
+    border-radius: 2px;
+    color: hsl(0, 0%, 20%);
+    font-size: 85%;
+    padding: 3px;
+    padding-left: 6px;
+    min-width: 30px;
 }

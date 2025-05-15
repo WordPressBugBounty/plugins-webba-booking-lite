@@ -8,13 +8,22 @@ class WBK_Model {
         add_action( 'init', [$this, 'initalize_model'], 20 );
     }
 
+    static function create_tables() {
+        global $wpdb;
+        $prefix = $wpdb->prefix;
+        update_option( 'wbk_db_prefix', $prefix );
+        // custom on/off days
+        $wpdb->query( "CREATE TABLE IF NOT EXISTS " . get_option( 'wbk_db_prefix', '' ) . "wbk_days_on_off (\r\n\t            id int unsigned NOT NULL auto_increment PRIMARY KEY,\r\n\t            service_id int unsigned NOT NULL,\r\n\t            day int unsigned NOT NULL,\r\n\t            status int unsigned NOT NULL,\r\n\t            UNIQUE KEY id (id)\r\n\t        )\r\n\t        DEFAULT CHARACTER SET = utf8\r\n\t        COLLATE = utf8_general_ci" );
+        // custom locked timeslots
+        $wpdb->query( "CREATE TABLE IF NOT EXISTS " . get_option( 'wbk_db_prefix', '' ) . "wbk_locked_time_slots (\r\n\t            id int unsigned NOT NULL auto_increment PRIMARY KEY,\r\n\t            service_id int unsigned NOT NULL,\r\n\t            time int unsigned NOT NULL,\r\n\t            connected_id int unsigned NOT NULL default 0,\r\n\t            UNIQUE KEY id (id)\r\n\t        )\r\n\t        DEFAULT CHARACTER SET = utf8\r\n\t        COLLATE = utf8_general_ci" );
+    }
+
     public function initalize_model() {
         global $wpdb;
         $db_prefix = $wpdb->prefix;
         update_option( 'wbk_db_prefix', $db_prefix );
-        WBK_Model_Updater::update_table_names();
         // create tables if not created
-        WBK_Db_Utils::createTables();
+        self::create_tables();
         $date_format = get_option( 'wbk_date_format_backend', 'M d, Y' );
         $db_prefix = get_option( 'wbk_db_prefix', '' );
         $table = new WbkData\Model($db_prefix . 'wbk_services');
@@ -160,11 +169,11 @@ class WBK_Model {
             true,
             false
         );
-        $tooltip = __( 'Enter the email address of administrators who will receive notifications for bookings related to this service.', 'webba-booking-lite' );
+        $tooltip = __( 'Enter the email address of administrators who will receive notifications for bookings related to this service (use comma to add multiple).', 'webba-booking-lite' );
         $table->add_field(
             'service_email',
             'email',
-            __( 'Email', 'webba-booking-lite' ),
+            __( 'Notification email(s)', 'webba-booking-lite' ),
             'text',
             'email',
             [
@@ -172,6 +181,22 @@ class WBK_Model {
                 'sub_type' => 'email',
             ],
             ''
+        );
+        $table->add_field(
+            'service_color',
+            'color',
+            __( 'Color', 'webba-booking-lite' ),
+            'color',
+            'general',
+            [
+                'tooltip'         => __( 'Select a color for this service.', 'webba-booking-lite' ),
+                'generate_random' => true,
+                'generate_key'    => ['services', 'color'],
+            ],
+            '',
+            true,
+            false,
+            false
         );
         $table->add_field(
             'service_priority',
@@ -299,11 +324,11 @@ class WBK_Model {
             false,
             false
         );
-        $tooltip = __( 'Enter the duration of each booking.', 'webba-booking-lite' );
+        $tooltip = __( 'Enter the duration of each booking in minutes.', 'webba-booking-lite' );
         $table->add_field(
             'service_duration',
             'duration',
-            __( 'Duration (minutes)', 'webba-booking-lite' ),
+            __( 'Duration', 'webba-booking-lite' ),
             'text',
             'hours',
             [
@@ -342,7 +367,7 @@ class WBK_Model {
             true,
             false
         );
-        $tooltip = __( '  ', 'webba-booking-lite' );
+        $tooltip = __( 'Enter the default time interval for time slots, which helps organize business hours and appointment durations.', 'webba-booking-lite' );
         $table->add_field(
             'service_step',
             'step',
@@ -376,7 +401,7 @@ class WBK_Model {
                 ],
             ],
             '0',
-            true,
+            false,
             false,
             false
         );
@@ -396,7 +421,7 @@ class WBK_Model {
                 'options'    => 'email_templates',
             ],
             '0',
-            true,
+            false,
             false,
             false
         );
@@ -416,7 +441,7 @@ class WBK_Model {
                 'options'    => 'email_templates',
             ],
             '0',
-            true,
+            false,
             false,
             false
         );
@@ -436,7 +461,7 @@ class WBK_Model {
                 'options'    => 'email_templates',
             ],
             '0',
-            true,
+            false,
             false,
             false
         );
@@ -456,7 +481,7 @@ class WBK_Model {
                 'options'    => 'email_templates',
             ],
             '0',
-            true,
+            false,
             false,
             false
         );
@@ -639,30 +664,123 @@ class WBK_Model {
         WbkData()->models->add( $table, $db_prefix . 'wbk_service_categories' );
         // Email templates
         $table = new WbkData\Model($db_prefix . 'wbk_email_templates');
-        $table->set_single_item_name( __( 'Email template', 'webba-booking-lite' ) );
-        $table->set_multiple_item_name( __( 'Email templates', 'webba-booking-lite' ) );
+        $table->set_single_item_name( __( 'Email notification', 'webba-booking-lite' ) );
+        $table->set_multiple_item_name( __( 'Email notifications', 'webba-booking-lite' ) );
         $tooltip = __( 'Enter a name to identify the email template.', 'webba-booking-lite' );
         $table->add_field(
             'name',
             'name',
-            __( 'Name', 'webba-booking-lite' ),
+            __( 'Name (internal use)', 'webba-booking-lite' ),
+            'text',
+            '',
+            [
+                'tooltip'           => $tooltip,
+                'disable_condition' => [
+                    'is_default' => 'yes',
+                ],
+            ]
+        );
+        $table->add_field(
+            'enabled',
+            'enabled',
+            __( 'Enabled', 'webba-booking-lite' ),
+            'checkbox',
+            '',
+            [
+                'yes'     => __( 'Yes', 'webba-booking-lite' ),
+                'tooltip' => $tooltip,
+            ],
+            'yes',
+            true,
+            true,
+            false
+        );
+        $table->add_field(
+            'is_default',
+            'is_default',
+            __( 'Default', 'webba-booking-lite' ),
+            'checkbox',
+            '',
+            [
+                'yes'     => __( 'Yes', 'webba-booking-lite' ),
+                'tooltip' => $tooltip,
+            ],
+            '',
+            false,
+            false,
+            false
+        );
+        $notification_types = [
+            'booking_created_by_admin'      => __( 'Booking is made by admin', 'webba-booking-lite' ),
+            'booking_created_by_customer'   => __( 'Booking is made by customer', 'webba-booking-lite' ),
+            'booking_approved'              => __( 'Booking status changed to "Approved"', 'webba-booking-lite' ),
+            'booking_cancelled_by_admin'    => __( 'Booking cancelled by admin', 'webba-booking-lite' ),
+            'booking_cancelled_by_customer' => __( 'Booking cancelled by customer', 'webba-booking-lite' ),
+            'booking_cancelled_auto'        => __( 'Booking cancelled automatically', 'webba-booking-lite' ),
+            'booking_updated_by_admin'      => __( 'Booking updated by admin', 'webba-booking-lite' ),
+            'booking_updated_by_customer'   => __( 'Booking updated by customer', 'webba-booking-lite' ),
+            'booking_paid'                  => __( 'Booking is paid', 'webba-booking-lite' ),
+            'admin_reminder'                => __( 'Booking reminder to admin', 'webba-booking-lite' ),
+            'customer_reminder'             => __( 'Booking reminder to customer', 'webba-booking-lite' ),
+            'user_registered'               => __( 'New user is created', 'webba-booking-lite' ),
+            'booking_finished'              => __( 'Booking is finished', 'webba-booking-lite' ),
+        ];
+        $tooltip = __( 'Choose a trigger when email template is sent.', 'webba-booking-lite' );
+        $table->add_field(
+            'type',
+            'type',
+            __( 'Trigger', 'webba-booking-lite' ),
+            'select',
+            '',
+            [
+                'tooltip'           => $tooltip,
+                'multiple'          => false,
+                'options'           => $notification_types,
+                'items'             => $notification_types,
+                'disable_condition' => [
+                    'is_default' => 'yes',
+                ],
+            ],
+            null,
+            true,
+            true,
+            true
+        );
+        $table->add_field(
+            'recipients',
+            'recipients',
+            __( 'Recipients', 'webba-booking-lite' ),
+            'multicheckbox',
+            '',
+            [
+                'yes'     => __( 'Yes', 'webba-booking-lite' ),
+                'tooltip' => __( 'Set who receive this email', 'webba-booking-lite' ),
+                'options' => [
+                    'admin'    => __( 'Administrator(s)', 'webba-booking-lite' ),
+                    'customer' => __( 'Customer', 'webba-booking-lite' ),
+                    'group'    => __( 'Group Users', 'webba-booking-lite' ),
+                ],
+            ],
+            '',
+            true,
+            true,
+            false
+        );
+        $tooltip = __( 'Subject of the email', 'webba-booking-lite' );
+        $table->add_field(
+            'subject',
+            'subject',
+            __( 'Email subject line', 'webba-booking-lite' ),
             'text',
             '',
             [
                 'tooltip' => $tooltip,
-            ]
-        );
-        /*
-        $tooltip = __('Subject of the email', 'webba-booking-lite');
-        $table->add_field(
-            'subject',
-            'subject',
-            __('Email subject line', 'webba-booking-lite'),
-            'text',
+            ],
             '',
-            ['tooltip' => $tooltip]
+            true,
+            false,
+            true
         );
-        */
         $tooltip = __( __( 'Use the text editor to prepare the email template.', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>', 'webba-booking-lite' );
         $table->add_field(
             'template',
@@ -677,41 +795,84 @@ class WBK_Model {
             '',
             true,
             false,
-            true
+            false
         );
-        /*
-        $tooltip = __('A PDF attachment will be generated based on input text', 'webba-booking-lite');
+        $tooltip = __( 'A PDF attachment will be generated based on input text', 'webba-booking-lite' );
         $table->add_field(
             'pdf_attachment',
             'pdf_attachment',
-            __('PDF Attachment', 'webba-booking-lite'),
+            __( 'PDF Attachment', 'webba-booking-lite' ),
             'editor',
             '',
             [
-                'tooltip' => $tooltip,
-                'placeholders' => true
+                'tooltip'      => $tooltip,
+                'placeholders' => true,
+                'pro_version'  => true,
             ],
-            '',
-            true,
-            true,
-            false
-        );
-        
-        $tooltip = __('Calendar Event from iCal', 'webba-booking-lite');
-        $table->add_field(
-            'calendar_event',
-            'calendar_event',
-            __('Calendar Event (iCal)', 'webba-booking-lite'),
-            'textarea',
-            '',
-            ['tooltip' => $tooltip],
             '',
             true,
             false,
             false
         );
-        */
+        $tooltip = __( 'Generate and attach the iCal file for each booking', 'webba-booking-lite' );
+        $table->add_field(
+            'calendar_event',
+            'calendar_event',
+            __( 'Attach iCal file', 'webba-booking-lite' ),
+            'checkbox',
+            '',
+            [
+                'yes'         => __( 'Yes', 'webba-booking-lite' ),
+                'tooltip'     => $tooltip,
+                'pro_version' => true,
+            ],
+            'yes',
+            true,
+            false,
+            false
+        );
+        $tooltip = __( 'Select the services for which this notification is used.', 'webba-booking-lite' );
+        $table->add_field(
+            'use_for_all_services',
+            'use_for_all_services',
+            __( 'Use this template for all services', 'webba-booking-lite' ),
+            'checkbox',
+            '',
+            [
+                'yes'     => __( 'Yes', 'webba-booking-lite' ),
+                'tooltip' => $tooltip,
+            ],
+            '',
+            true,
+            false,
+            false
+        );
+        $table->add_field(
+            'services',
+            'services',
+            __( 'Services', 'webba-booking-lite' ),
+            'select',
+            'general',
+            [
+                'tooltip'  => $tooltip,
+                'items'    => WBK_Model_Utils::get_services(),
+                'options'  => 'services',
+                'multiple' => true,
+            ],
+            null,
+            true,
+            false,
+            false
+        );
+        $table->fields->get_element_at( 'services' )->set_dependency( [['use_for_all_services', '!=', 'yes']] );
         $table->sync_structure();
+        $table->fields->get_element_at( 'is_default' )->set_filter_data(
+            'select',
+            ['IN'],
+            [],
+            '',
+            ['yes', 'no']
+        );
         WbkData()->models->add( $table, $db_prefix . 'wbk_email_templates' );
         // Bookings (ex Appointments)
         $time_format = get_option( 'wbk_time_format', '' );
@@ -850,7 +1011,7 @@ class WBK_Model {
             ],
             '',
             false,
-            false,
+            true,
             false
         );
         $table->add_field(
@@ -894,7 +1055,8 @@ class WBK_Model {
             ],
             '',
             true,
-            in_array( 'phone', $allowed_fields ),
+            false,
+            //in_array('phone', $allowed_fields),
             false
         );
         $tooltip = __( 'Add any additional comments related to the booking.', 'webba-booking-lite' );
@@ -954,7 +1116,7 @@ class WBK_Model {
         $table->add_field(
             'appointment_moment_price',
             'moment_price',
-            __( 'Payment', 'webba-booking-lite' ),
+            __( 'Price', 'webba-booking-lite' ),
             'text',
             '',
             [
@@ -964,7 +1126,21 @@ class WBK_Model {
             '',
             true,
             false,
-            //in_array('moment_price', $allowed_fields),
+            false
+        );
+        $table->add_field(
+            'appointment_amount_paid',
+            'amount_paid',
+            __( 'Amount paid', 'webba-booking-lite' ),
+            'text',
+            '',
+            [
+                'tooltip'  => __( 'Enter the exact amount of money that was actually paid', 'webba-booking-lite' ),
+                'sub_type' => 'none_negative_float',
+            ],
+            '0',
+            true,
+            true,
             false
         );
         $table->add_field(
@@ -1456,7 +1632,7 @@ class WBK_Model {
         $table->add_field(
             'appointment_moment_price',
             'moment_price',
-            'Price',
+            __( 'Price', 'webba-booking-lite' ),
             'text',
             '',
             null,
@@ -1526,7 +1702,7 @@ class WBK_Model {
             ],
             '',
             false,
-            false,
+            true,
             false
         );
         $table->add_field(

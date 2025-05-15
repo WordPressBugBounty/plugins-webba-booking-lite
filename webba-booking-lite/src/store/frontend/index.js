@@ -1,5 +1,9 @@
 import apiFetch from '@wordpress/api-fetch'
 import { createReduxStore, register } from '@wordpress/data'
+import { useLocale } from '../../frontend/hooks/useLocale'
+import { addQueryArgs } from '@wordpress/url';
+
+const { lang } = useLocale();
 
 const DEFAULT_STATE = {
     userFutureBookings: null,
@@ -58,53 +62,53 @@ const actions = {
     },
     fetchTimeSlots:
         () =>
-        async ({ select, dispatch }) => {
-            const queryString = new URLSearchParams(
-                select.getFormData()
-            ).toString()
-            const response = await apiFetch({
-                path: `/wbk/v2/get-time-slots/?${queryString}`,
-            })
+            async ({ select, dispatch }) => {
+                const queryString = new URLSearchParams(
+                    select.getFormData()
+                ).toString()
+                const response = await apiFetch({
+                    path: `/wbk/v2/get-time-slots/?${queryString}`,
+                })
 
-            dispatch.setDynamicAttribute('timeSlots', response.timeslots)
-        },
+                dispatch.setDynamicAttribute('timeSlots', response.timeslots)
+            },
     updateBooking:
         () =>
-        async ({ select, dispatch }) => {
-            const response = await apiFetch({
-                path: `/wbk/v2/update-booking`,
-                method: 'POST',
-                data: select.getFormData(),
-            })
-            let bookings = select.getUserFutureBookings()
-            const index = bookings.findIndex((booking) => {
-                if (!Number.isInteger(Number(booking.id))) {
-                    return false
+            async ({ select, dispatch }) => {
+                const response = await apiFetch({
+                    path: `/wbk/v2/update-booking`,
+                    method: 'POST',
+                    data: select.getFormData(),
+                })
+                let bookings = select.getUserFutureBookings()
+                const index = bookings.findIndex((booking) => {
+                    if (!Number.isInteger(Number(booking.id))) {
+                        return false
+                    }
+                    return booking.id === response.booking.id
+                })
+                if (index !== -1) {
+                    bookings[index] = {
+                        ...bookings[index],
+                        ...response.booking,
+                    }
                 }
-                return booking.id === response.booking.id
-            })
-            if (index !== -1) {
-                bookings[index] = {
-                    ...bookings[index],
-                    ...response.booking,
-                }
-            }
-            dispatch.setUserFutureBookings(bookings)
-        },
+                dispatch.setUserFutureBookings(bookings)
+            },
     deleteBooking:
         () =>
-        async ({ select, dispatch }) => {
-            const response = await apiFetch({
-                path: `/wbk/v2/delete-booking`,
-                method: 'POST',
-                data: select.getFormData(),
-            })
-            let bookings = select.getUserFutureBookings()
-            const updatedBookings = bookings.filter(
-                (booking) => booking.id !== select.getFormData().booking
-            )
-            dispatch.setUserFutureBookings(updatedBookings)
-        },
+            async ({ select, dispatch }) => {
+                const response = await apiFetch({
+                    path: `/wbk/v2/delete-booking`,
+                    method: 'POST',
+                    data: select.getFormData(),
+                })
+                let bookings = select.getUserFutureBookings()
+                const updatedBookings = bookings.filter(
+                    (booking) => booking.id !== select.getFormData().booking
+                )
+                dispatch.setUserFutureBookings(updatedBookings)
+            },
 }
 const store = createReduxStore('webba_booking/frontend_store', {
     reducer(state = DEFAULT_STATE, action) {
@@ -173,32 +177,35 @@ const store = createReduxStore('webba_booking/frontend_store', {
     resolvers: {
         getUserFutureBookings:
             () =>
-            async ({ dispatch }) => {
-                const result = await apiFetch({
-                    path: `/wbk/v2/get-user-bookings/`,
-                })
-                dispatch.setUserFutureBookings(result.bookings)
-            },
+                async ({ dispatch }) => {
+                    const result = await apiFetch({
+                        path: addQueryArgs(`/wbk/v2/get-user-bookings/`, {
+                            lang,
+                        }),
+                    })
+                    dispatch.setUserFutureBookings(result.bookings)
+                },
         getUserPastBookings:
             () =>
-            async ({ dispatch }) => {
-                const params = {
-                    pastBookings: true,
-                }
-                const queryString = new URLSearchParams(params).toString()
-                const result = await apiFetch({
-                    path: `/wbk/v2/get-user-bookings/?${queryString}`,
-                })
-                dispatch.setUserPastBookings(result.bookings)
-            },
+                async ({ dispatch }) => {
+                    const params = {
+                        pastBookings: true,
+                        lang
+                    }
+                    const queryString = new URLSearchParams(params).toString()
+                    const result = await apiFetch({
+                        path: `/wbk/v2/get-user-bookings/?${queryString}`,
+                    })
+                    dispatch.setUserPastBookings(result.bookings)
+                },
         getPreset:
             () =>
-            async ({ dispatch }) => {
-                const result = await apiFetch({
-                    path: `/wbk/v2/get-preset/`,
-                })
-                dispatch.setPreset(result)
-            },
+                async ({ dispatch }) => {
+                    const result = await apiFetch({
+                        path: `/wbk/v2/get-preset/`,
+                    })
+                    dispatch.setPreset(result)
+                },
     },
 })
 

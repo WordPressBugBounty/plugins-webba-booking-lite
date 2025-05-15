@@ -368,6 +368,9 @@ class WBK_Price_Processor
             } else {
                 $item_names[] = '';
             }
+            if ($booking->get('status') == 'cancelled') {
+                continue;
+            }
             $prices[] = $booking->get_price();
             $quantities[] = $booking->get_quantity();
             $services[] = $booking->get_service();

@@ -7,12 +7,13 @@ import { CellProvider } from './context/CellProvider'
 import { TableProvider } from './context/TableProvider'
 import { Button } from '../Button/Button'
 import { __ } from '@wordpress/i18n'
-import deleteIcon from '../../../../public/images/delete-icon.png'
-import { ConfirmationButton } from '../ConfirmationButton/ConfirmationButton'
 import { Pagination } from './Pagination'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../store/backend'
 import { ErrorMessage } from '../ErrorMessage/ErrorMessage'
+import { BulkActions } from './BulkActions'
+import { useMemo } from 'react'
+import { TableMobile } from './TableMobile'
 
 interface Props {
     table: TanstackTable<any>
@@ -28,6 +29,8 @@ interface Props {
     noItemsImageUrl: string
     isItemsForbidden?: boolean
     forcePermission?: boolean
+    horizontalOverflow?: boolean
+    collectionName?: string
 }
 
 export const Table = ({
@@ -44,13 +47,17 @@ export const Table = ({
     isItemsForbidden,
     exportButton,
     forcePermission,
+    horizontalOverflow,
+    collectionName,
 }: Props) => {
     const isEmpty = !table.getRowCount()
-    const { settings, services_, services } = useSelect(
+    const { settings } = useSelect(
         // @ts-ignore
         (select) => select(store_name).getPreset(),
         []
     )
+
+    const isMobile = useMemo(() => window.innerWidth < 768, [window.innerWidth])
 
     return (
         <TableProvider table={table}>
@@ -89,7 +96,10 @@ export const Table = ({
                             src={noItemsImageUrl}
                         />
                         <div>
-                            {__('The table is empty', 'webba-booking-lite')}
+                            {__(
+                                'There is nothing here...',
+                                'webba-booking-lite'
+                            )}
                         </div>
                     </div>
                 )}
@@ -104,156 +114,151 @@ export const Table = ({
                 )}
                 {!loading && !isEmpty && (
                     <>
-                        <div className={styles.selectAllCheckboxMobile}>
-                            {settings?.is_admin && (
-                                <input
-                                    type="checkbox"
-                                    onChange={table.getToggleAllRowsSelectedHandler()}
-                                    checked={table.getIsAllRowsSelected()}
-                                />
-                            )}
-                            {settings?.is_admin &&
-                                !!table.getSelectedRowModel().rows.length &&
-                                onDeleteSelected && (
-                                    <ConfirmationButton
-                                        title={__(
-                                            'Delete selected',
-                                            'webba-booking-lite'
-                                        )}
-                                        confirmationMessage={__(
-                                            'Yes, delete it',
-                                            'webba-booking-lite'
-                                        )}
-                                        icon={deleteIcon}
-                                        action={onDeleteSelected}
-                                        buttonType="primary"
-                                        position="right"
-                                    />
-                                )}
-                        </div>
                         {!isEmpty && !isItemsForbidden && (
-                            <div className={styles.tableWrapper}>
-                                <table
-                                    className={classNames(
-                                        styles.webbaDataTable,
-                                        className
-                                    )}
-                                >
-                                    <thead className={styles.tableHead}>
-                                        {table
-                                            .getHeaderGroups()
-                                            .map((headerGroup) => (
-                                                <tr key={headerGroup.id}>
-                                                    {headerGroup.headers.map(
-                                                        (header) => (
-                                                            <Header
-                                                                header={header}
-                                                            />
-                                                        )
-                                                    )}
-                                                </tr>
-                                            ))}
-                                    </thead>
-                                    <tbody>
-                                        {table.getRowModel().rows.map((row) => (
-                                            <>
-                                                <tr
-                                                    key={row.id}
-                                                    className={classNames(
-                                                        styles.tableRow,
-                                                        {
-                                                            [styles.tableRowExpanded]:
-                                                                row.getIsExpanded(),
-                                                        }
-                                                    )}
-                                                >
-                                                    {row
-                                                        .getVisibleCells()
-                                                        .map((cell) => (
-                                                            <CellProvider
-                                                                cell={cell}
+                            <div
+                                className={classNames(styles.tableWrapper, {
+                                    [styles.horizontalOverflow]:
+                                        horizontalOverflow,
+                                })}
+                            >
+                                {isMobile && <TableMobile table={table} />}
+                                {!isMobile && (
+                                    <table
+                                        className={classNames(
+                                            styles.webbaDataTable,
+                                            className
+                                        )}
+                                    >
+                                        <thead className={styles.tableHead}>
+                                            {table
+                                                .getHeaderGroups()
+                                                .map((headerGroup) => (
+                                                    <tr key={headerGroup.id}>
+                                                        {headerGroup.headers.map(
+                                                            (header) => (
+                                                                <Header
+                                                                    header={
+                                                                        header
+                                                                    }
+                                                                />
+                                                            )
+                                                        )}
+                                                    </tr>
+                                                ))}
+                                        </thead>
+                                        <tbody>
+                                            {table
+                                                .getRowModel()
+                                                .rows.map((row) => (
+                                                    <>
+                                                        <tr
+                                                            key={row.id}
+                                                            className={
+                                                                styles.tableRow
+                                                            }
+                                                        >
+                                                            {row
+                                                                .getVisibleCells()
+                                                                .map((cell) => (
+                                                                    <CellProvider
+                                                                        cell={
+                                                                            cell
+                                                                        }
+                                                                    >
+                                                                        <td
+                                                                            className={
+                                                                                styles.tableCell
+                                                                            }
+                                                                            data-column-name={
+                                                                                cell
+                                                                                    .column
+                                                                                    .id
+                                                                            }
+                                                                            style={{
+                                                                                gridArea:
+                                                                                    cell
+                                                                                        .column
+                                                                                        .id,
+                                                                            }}
+                                                                        >
+                                                                            {flexRender(
+                                                                                cell
+                                                                                    .column
+                                                                                    .columnDef
+                                                                                    .cell,
+                                                                                cell.getContext()
+                                                                            )}
+                                                                        </td>
+                                                                    </CellProvider>
+                                                                ))}
+                                                        </tr>
+                                                        {row.getIsExpanded() && (
+                                                            <tr
+                                                                className={
+                                                                    styles.tableRowExpanded
+                                                                }
                                                             >
                                                                 <td
                                                                     className={
-                                                                        styles.tableCell
+                                                                        styles.expandedData
                                                                     }
-                                                                    data-column-name={
-                                                                        cell
-                                                                            .column
-                                                                            .id
+                                                                    colSpan={
+                                                                        row.getVisibleCells()
+                                                                            .length
                                                                     }
-                                                                    style={{
-                                                                        gridArea:
-                                                                            cell
-                                                                                .column
-                                                                                .id,
-                                                                    }}
                                                                 >
-                                                                    {flexRender(
-                                                                        cell
-                                                                            .column
-                                                                            .columnDef
-                                                                            .cell,
-                                                                        cell.getContext()
-                                                                    )}
+                                                                    <ExpandedData
+                                                                        row={
+                                                                            row
+                                                                        }
+                                                                    />
                                                                 </td>
-                                                            </CellProvider>
-                                                        ))}
-                                                </tr>
-                                                {row.getIsExpanded() && (
-                                                    <tr
-                                                        className={
-                                                            styles.tableRowExpanded
-                                                        }
-                                                    >
-                                                        <td
-                                                            className={
-                                                                styles.expandedData
-                                                            }
-                                                            colSpan={
-                                                                row.getVisibleCells()
-                                                                    .length
-                                                            }
-                                                        >
-                                                            <ExpandedData
-                                                                row={row}
-                                                            />
-                                                        </td>
+                                                            </tr>
+                                                        )}
+                                                    </>
+                                                ))}
+                                        </tbody>
+                                        <tfoot>
+                                            {table
+                                                .getFooterGroups()
+                                                .map((footerGroup) => (
+                                                    <tr key={footerGroup.id}>
+                                                        {footerGroup.headers.map(
+                                                            (header) => (
+                                                                <th
+                                                                    key={
+                                                                        header.id
+                                                                    }
+                                                                >
+                                                                    {header.isPlaceholder
+                                                                        ? null
+                                                                        : flexRender(
+                                                                              header
+                                                                                  .column
+                                                                                  .columnDef
+                                                                                  .footer,
+                                                                              header.getContext()
+                                                                          )}
+                                                                </th>
+                                                            )
+                                                        )}
                                                     </tr>
-                                                )}
-                                            </>
-                                        ))}
-                                    </tbody>
-                                    <tfoot>
-                                        {table
-                                            .getFooterGroups()
-                                            .map((footerGroup) => (
-                                                <tr key={footerGroup.id}>
-                                                    {footerGroup.headers.map(
-                                                        (header) => (
-                                                            <th key={header.id}>
-                                                                {header.isPlaceholder
-                                                                    ? null
-                                                                    : flexRender(
-                                                                          header
-                                                                              .column
-                                                                              .columnDef
-                                                                              .footer,
-                                                                          header.getContext()
-                                                                      )}
-                                                            </th>
-                                                        )
-                                                    )}
-                                                </tr>
-                                            ))}
-                                    </tfoot>
-                                </table>
+                                                ))}
+                                        </tfoot>
+                                    </table>
+                                )}
                             </div>
                         )}
                     </>
                 )}
                 <Pagination table={table} />
             </div>
+            {!!table.getSelectedRowModel().rows.length && (
+                <BulkActions
+                    onDeleteSelected={onDeleteSelected}
+                    collectionName={collectionName}
+                />
+            )}
         </TableProvider>
     )
 }

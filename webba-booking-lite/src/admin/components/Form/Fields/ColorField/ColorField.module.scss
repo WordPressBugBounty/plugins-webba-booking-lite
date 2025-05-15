@@ -1,0 +1,37 @@
+.wrapper {
+    input {
+        padding: 0;
+        margin: 0;
+        border: none;
+        outline: none;
+        height: 50px;
+        width: 50px;
+        -webkit-appearance: none;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        cursor: pointer;
+
+        &::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        &::-webkit-color-swatch {
+            border: none;
+        }
+    }
+
+    .boxWrapper {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: flex-start;
+        border: 1px solid colors.$border-dark;
+        border-radius: 15px;
+        overflow: hidden;
+        cursor: pointer;
+
+        span {
+            cursor: text;
+        }
+    }
+}

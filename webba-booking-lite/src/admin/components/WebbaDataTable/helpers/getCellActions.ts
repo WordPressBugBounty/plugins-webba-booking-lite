@@ -29,9 +29,17 @@ export const getCellActions = ({ cell, collectionName }: CellActionsParams) => {
         })
     }
 
+    const onCancel = async () => {
+        setItem('appointments', {
+            ...cell.row.original,
+            status: 'cancelled',
+        })
+    }
+
     return {
         onDelete,
         onDuplicate,
         onSubmit,
+        onCancel,
     }
 }

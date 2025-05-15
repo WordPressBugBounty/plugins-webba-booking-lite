@@ -4,31 +4,7 @@ if (!defined('ABSPATH'))
     exit;
 date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
 global $wpdb;
-if (isset($_GET['timereset'])) {
-    $ids = $wpdb->get_col('select id from wp_wbk_appointments');
 
-    foreach ($ids as $id) {
-        $booking = new WBK_Booking($id);
-        $start = $booking->get_start();
-
-        $new_start = WBK_Time_Math_Utils::adjust_times(
-            $start,
-            -10800,
-            get_option('wbk_timezone', 'UTC')
-        );
-        $booking->set('time', $new_start);
-        $day = $booking->get('day');
-        $new_day = WBK_Time_Math_Utils::adjust_times(
-            $day,
-            10800,
-            get_option('wbk_timezone', 'UTC')
-        );
-        $day = $booking->set('day', $new_day);
-
-        $booking->save();
-
-    }
-}
 
 ?>
 <div class="wrap">

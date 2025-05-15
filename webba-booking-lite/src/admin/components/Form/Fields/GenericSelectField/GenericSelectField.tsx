@@ -1,6 +1,6 @@
-import { useLayoutEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import styles from './GenericSelectField.module.scss'
-import Select from 'react-select'
+import Select, { components, MultiValueProps } from 'react-select'
 import classNames from 'classnames'
 import { Label } from '../Label/Label'
 import { FormFieldMisc, FormFieldProps, IOption } from '../../types'
@@ -18,6 +18,40 @@ import { string } from 'zod'
 import { getFormState } from '../../lib/utils'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
+import { checkForConditionalDisable } from '../../utils/utils'
+
+const MAX_DISPLAYED_OPTIONS = 4
+
+const CustomMultiValue = (props: MultiValueProps<IOption>) => {
+    const { index, getValue } = props
+    const selectedValues = getValue()
+
+    if (index < MAX_DISPLAYED_OPTIONS) {
+        return <components.MultiValue {...props} />
+    }
+
+    if (index === MAX_DISPLAYED_OPTIONS) {
+        const remaining = selectedValues.length - MAX_DISPLAYED_OPTIONS
+        return <div className={styles.multiValueMore}>+{remaining}</div>
+    }
+
+    return null
+}
+
+const customStyles = {
+    valueContainer: (base: any) => ({
+        ...base,
+        flexWrap: 'nowrap',
+        overflow: 'hidden',
+    }),
+    multiValue: (base: any) => ({
+        ...base,
+        maxWidth: '100px',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+    }),
+}
 
 export const createGenericSelectField: FormComponentConstructor<any> = ({
     field,
@@ -112,6 +146,29 @@ export const createGenericSelectField: FormComponentConstructor<any> = ({
             }
         }, [options, form.fields[name].value])
 
+        const [conditionallyDisabled, setConditionallyDisabled] =
+            useState(false)
+        const [hasEvaluated, setHasEvaluated] = useState(false)
+
+        useEffect(() => {
+            if (!misc?.disable_condition || !form.defaultValue) return
+
+            setHasEvaluated(false)
+            setConditionallyDisabled(false)
+        }, [form.defaultValue])
+
+        useEffect(() => {
+            if (hasEvaluated || !misc?.disable_condition || !form.defaultValue)
+                return
+
+            const result = checkForConditionalDisable(
+                form,
+                misc.disable_condition
+            )
+            setConditionallyDisabled(result)
+            setHasEvaluated(true)
+        }, [form.defaultValue, misc?.disable_condition, hasEvaluated])
+
         return (
             <div
                 className={classNames(styles.selectField, {
@@ -127,14 +184,21 @@ export const createGenericSelectField: FormComponentConstructor<any> = ({
                             handleChange(selectedOptions as IOption[])
                         }
                         classNames={{
-                            control: (state) => styles.selectInput,
+                            control: () => styles.selectInput,
                         }}
                         id={name}
                         isMulti={multiple}
                         onBlur={() => setTouched(true)}
                         isSearchable={false}
-                        isDisabled={isLoading}
+                        isDisabled={isLoading || conditionallyDisabled}
                         isLoading={isLoading}
+                        hideSelectedOptions={false}
+                        components={
+                            multiple
+                                ? { MultiValue: CustomMultiValue }
+                                : undefined
+                        }
+                        styles={multiple ? customStyles : undefined}
                     />
                     {showErrors && firstError && (
                         <div className={styles.errorContainer}>

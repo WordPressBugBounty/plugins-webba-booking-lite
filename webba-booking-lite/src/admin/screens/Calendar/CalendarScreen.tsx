@@ -28,6 +28,11 @@ import { filterFields } from './FilterConfigs'
 import { __ } from '@wordpress/i18n'
 import { toZonedTime } from 'date-fns-tz'
 import { formatWbkDate } from '../../components/Filter/utils'
+import { Button } from '../../components/Button/Button'
+import metadata from '../../../schemas/appointments.json'
+import { TAllowedFilterValue } from '../../components/Filter/types'
+import { increaseOpacity } from '../../components/Form/Fields/ColorField/utils'
+import classNames from 'classnames'
 
 const localizer = dateFnsLocalizer({
     format,
@@ -53,6 +58,10 @@ const menuSections = createFormMenuSectionsFromModel({
 export const CalendarScreen = () => {
     const sidebar = useSidebar()
     const { filterItems } = useDispatch(store_name)
+    const allStatus: Record<string, string> = useMemo(
+        () => metadata.properties?.appointment_status.misc?.options,
+        []
+    )
     const bookings = useSelect(
         (select) =>
             // @ts-ignore
@@ -65,7 +74,18 @@ export const CalendarScreen = () => {
                     name: 'appointment_day',
                     value: formatWbkDate(endOfWeek(endOfMonth(new Date()))),
                 },
+                {
+                    name: 'appointment_status',
+                    value: Object.keys(allStatus).filter(
+                        (status) => status === 'approved'
+                    ),
+                },
             ]),
+        []
+    )
+    const services = useSelect(
+        // @ts-ignore
+        (select) => select(store_name).getItems('services'),
         []
     )
 
@@ -168,8 +188,9 @@ export const CalendarScreen = () => {
             if (!booking?.end) {
                 const duration = select(store_name)
                     .getItems('services', [])
-                    .find((service: any) => service.id === booking.service_id)
-                    ?.duration
+                    .find(
+                        (service: any) => service.id === booking.service_id
+                    )?.duration
 
                 calculatedEnd = getUnixTime(
                     addMinutes(fromUnixTime(booking.time), duration)
@@ -180,16 +201,35 @@ export const CalendarScreen = () => {
                 title: booking?.extra_data.dynamic_title || booking.name,
                 start: toZonedTime(
                     fromUnixTime(booking.time),
-                    Intl.DateTimeFormat().resolvedOptions().timeZone
+                    settings?.timezone ||
+                        Intl.DateTimeFormat().resolvedOptions().timeZone
                 ),
                 end: toZonedTime(
                     fromUnixTime(booking?.end ? booking?.end : calculatedEnd),
-                    Intl.DateTimeFormat().resolvedOptions().timeZone
+                    settings?.timezone ||
+                        Intl.DateTimeFormat().resolvedOptions().timeZone
                 ),
                 status: booking.status,
+                color:
+                    services.find(
+                        (service: any) => service.id == booking.service_id
+                    )?.color || 'transparent',
             }
         })
-    }, [bookings])
+    }, [bookings, services])
+
+    const [customFilter, setCustomFilter] = useState<
+        TAllowedFilterValue<any>[]
+    >([
+        {
+            name: 'appointment_day',
+            value: formatWbkDate(startOfWeek(startOfMonth(new Date()))),
+        },
+        {
+            name: 'appointment_day',
+            value: formatWbkDate(endOfWeek(endOfMonth(new Date()))),
+        },
+    ])
 
     const updateRange = useCallback(
         (fullRange: Date[] | Record<'start' | 'end', Date>) => {
@@ -197,7 +237,17 @@ export const CalendarScreen = () => {
                 ? [fullRange[0], fullRange[fullRange.length - 1]]
                 : [fullRange.start, fullRange.end]
 
-            filterItems('appointments', [
+            const query = generateFilterFromDateRange(formattedRange)
+            setCustomFilter(query)
+
+            filterItems('appointments', query)
+        },
+        [customFilter]
+    )
+
+    const generateFilterFromDateRange = useCallback(
+        (formattedRange: [Date, Date]) => {
+            return [
                 {
                     name: 'appointment_day',
                     value: formatWbkDate(formattedRange[0]),
@@ -206,8 +256,27 @@ export const CalendarScreen = () => {
                     name: 'appointment_day',
                     value: formatWbkDate(formattedRange[1]),
                 },
-            ])
+                ...customFilter.filter(
+                    (filter: TAllowedFilterValue<any>) =>
+                        filter.name !== 'appointment_day'
+                ),
+            ]
         },
+        [customFilter]
+    )
+
+    const EventWrapper = useCallback(
+        ({ event, children }: any) => (
+            <div
+                className={classNames(
+                    styles.eventWrapper,
+                    styles[event.status]
+                )}
+                style={{ backgroundColor: increaseOpacity(event.color, 0.5) }}
+            >
+                {children}
+            </div>
+        ),
         []
     )
 
@@ -218,13 +287,15 @@ export const CalendarScreen = () => {
                     fields={filterFields}
                     model="appointments"
                     columnCount={2}
+                    customQuery={customFilter}
+                    setCustomQuery={setCustomFilter}
                 />
-                <button
+                <Button
                     onClick={handleAddBookingClick}
-                    className="schedule-tools-button-wbk"
+                    className={styles.addButton}
                 >
                     {__('Add booking +', 'webba-booking-lite')}
-                </button>
+                </Button>
             </div>
             <Calendar
                 events={events}
@@ -244,6 +315,9 @@ export const CalendarScreen = () => {
                 step={15}
                 popup
                 onRangeChange={(fullRange) => updateRange(fullRange)}
+                components={{
+                    eventWrapper: EventWrapper,
+                }}
             />
             <a
                 href="/wp-admin/admin.php?page=wbk-options&tools=true"

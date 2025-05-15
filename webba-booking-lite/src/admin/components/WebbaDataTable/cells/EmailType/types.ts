@@ -1,0 +1,1 @@
+export type TEmailTypes = Record<string, string>

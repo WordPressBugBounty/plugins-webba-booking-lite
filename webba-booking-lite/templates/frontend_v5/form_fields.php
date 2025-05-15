@@ -80,7 +80,7 @@ if ($form == 0) {
     <textarea style="display:none" name="extra" class="wbk-input wbk-extra"></textarea>
     <?php
 } else {
-    // todo: replace with v5 form
+
     if (class_exists('Cf7_Polylang_Public')) {
         $cf7_polylang = new Cf7_Polylang_Public('1', '1');
         if (method_exists($cf7_polylang, 'translate_form_id')) {

@@ -26,20 +26,6 @@ class WBK_Admin_Notices {
         return '';
     }
 
-    public static function stripe_fields_update_norice() {
-        $value = get_option( 'wbk_stripe_additional_fields', '' );
-        if ( !is_array( $value ) ) {
-            return '';
-        }
-        $payment_fields = WBK_Db_Utils::getPaymentFields();
-        foreach ( $value as $item ) {
-            if ( !isset( $payment_fields[$item] ) ) {
-                return '<div class="notice notice-warning is-dismissible"><p>Webba Booking: please, update the option <strong>Additional payment information</strong> on the Stripe tab of the Settings page.
-						</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button></div>';
-            }
-        }
-    }
-
     public static function wbk_4_0_update() {
         return '';
     }

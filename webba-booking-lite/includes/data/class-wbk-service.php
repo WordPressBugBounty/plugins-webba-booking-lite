@@ -34,7 +34,7 @@ class WBK_Service extends WBK_Model_Object
     public function get_interval_between()
     {
         if (!isset($this->fields['interval_between'])) {
-            return null;
+            return 0;
         }
         return $this->fields['interval_between'];
     }

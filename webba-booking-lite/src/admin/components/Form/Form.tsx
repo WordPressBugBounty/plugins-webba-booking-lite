@@ -4,7 +4,7 @@ import { FormSections } from './types'
 import classNames from 'classnames'
 import { toast, ToastContainer, ToastContentProps } from 'react-toastify'
 import { Model } from '../../types'
-import styles from './Form.module.css'
+import styles from './Form.module.scss'
 import { FormProvider } from './lib/FormProvider'
 import { FormFromModel, FormValueFromModel } from './lib/types'
 import { getFormState } from './lib/utils'
@@ -67,12 +67,15 @@ export const Form = function <T extends Model>({
     const shouldShowSections = Object.keys(sections).length > 1
     const [activeSection, setActiveSection] = useState('general')
     const sidebar = useSidebar()
+    // @ts-ignore
     const busy = useSelect((select) => select(store_name).isBusy(), [])
 
     useEffect(() => {
         if (defaultValue) {
             form.patchValue(defaultValue)
             form.defaultValue = defaultValue
+        } else {
+            form.defaultValue = {} as FormValueFromModel<T>
         }
 
         return form.reset
@@ -150,7 +153,7 @@ export const Form = function <T extends Model>({
                 </form>
                 <div className={styles.buttons}>
                     <div className={styles.editButtons}>
-                        {onDelete && (
+                        {onDelete && defaultValue?.can_delete !== false && (
                             <ConfirmationButton
                                 icon={deleteIcon}
                                 classes={styles.closeBtn}

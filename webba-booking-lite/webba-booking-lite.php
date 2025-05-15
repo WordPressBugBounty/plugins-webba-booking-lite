@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 5.1.11
+ * Version: 5.1.18
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -64,7 +64,7 @@ if ( !defined( 'WP_WEBBA_BOOKING__PLUGIN_DIR' ) ) {
     define( 'WP_WEBBA_BOOKING__PLUGIN_URL', plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( 'WP_WEBBA_BOOKING__VERSION' ) ) {
-    define( 'WP_WEBBA_BOOKING__VERSION', '5.1.11' );
+    define( 'WP_WEBBA_BOOKING__VERSION', '5.1.17' );
 }
 if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_textdomain' ) ) {
     include 'vendor/autoload.php';
@@ -77,6 +77,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     include 'deprecated/class_wbk_db_utils.php';
     include 'deprecated/class_wbk_email_notifications.php';
     include 'includes/backend/class_wbk_admin_notices.php';
+    include 'includes/backend/class-wbk-admin-notices.php';
     require 'deprecated/wbk_wording.php';
     require 'deprecated/class_wbk_date_time_utils.php';
     if ( get_option( 'wbk_stripe_publishable_key', '' ) != '' ) {
@@ -129,6 +130,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     include 'includes/processors/class-wbk-placeholder-processor.php';
     include 'includes/processors/class-wbk-options-processor.php';
     include 'includes/processors/class-wbk-email-processor.php';
+    include 'includes/processors/class-wbk-pdf-processor.php';
     // user controller
     include 'includes/class-wbk-booking-user.php';
     // Assets manager
@@ -155,6 +157,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     $wbk_request_manager = new WBK_Request_Manager();
     $wbk_model = new WBK_Model();
     $wbk_model_relation_destroyer = new WBK_Model_Relation_Destroyer();
+    $wbk_admin_notices = new WBK_Admin_Notices2();
     // init frontend / backend
     if ( is_admin() ) {
         $backend = new WBK_Backend();
@@ -626,7 +629,7 @@ register_uninstall_hook( __FILE__, 'wbk_uninstall' );
 // localization
 if ( !function_exists( 'wbk_plugins_loaded' ) ) {
     function wbk_plugins_loaded() {
-        wbk_cleanup_attachements();
+        WBK_Model_Utils::cleanup_attachements();
         load_plugin_textdomain( 'webba-booking-lite', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
         $arr_ids = WBK_Model_Utils::get_service_ids();
         if ( function_exists( 'pll_register_string' ) ) {
@@ -678,6 +681,36 @@ if ( !function_exists( 'wbk_plugins_loaded' ) ) {
                 $category->get_name()
             );
         }
+        $arr_ids = WBK_Model_Utils::get_email_templates();
+        foreach ( $arr_ids as $id => $name ) {
+            $template = new WBK_Email_Template($id);
+            if ( !$template->is_loaded() ) {
+                continue;
+            }
+            do_action(
+                'wpml_register_single_string',
+                'webba-booking-lite',
+                'Email template subject ' . $id,
+                $template->get( 'subject' )
+            );
+            do_action(
+                'wpml_register_single_string',
+                'webba-booking-lite',
+                'Email template message body ' . $id,
+                $template->get( 'template' )
+            );
+            do_action(
+                'wpml_register_single_string',
+                'webba-booking-lite',
+                'Email template pdf attachment ' . $id,
+                $template->get( 'pdf_attachment' )
+            );
+            if ( function_exists( 'pll_register_string' ) ) {
+                pll_register_string( 'webba_email_template_subject_' . $id, $template->get( 'subject' ), 'webba-booking' );
+                pll_register_string( 'webba_email_template_message_' . $id, $template->get( 'template' ), 'webba-booking' );
+                pll_register_string( 'webba_email_template_pdf_' . $id, $template->get( 'pdf_attachment' ), 'webba-booking' );
+            }
+        }
     }
 
 }
@@ -701,7 +734,31 @@ if ( !function_exists( 'wbk_daily' ) ) {
     function wbk_daily() {
         $noifications = new WBK_Email_Notifications(0, 0);
         $noifications->send( 'daily' );
-        // send arrival notification
+        // email remidners
+        $days_before = intval( get_option( 'wbk_email_reminder_days', '1' ) );
+        $service_ids = WBK_Model_Utils::get_service_ids();
+        if ( is_array( $service_ids ) && count( $service_ids ) > 0 ) {
+            foreach ( $service_ids as $service_id ) {
+                $booking_ids = WBK_Model_Utils::get_future_bookings_for_service( $service_id, 1 );
+                WBK_Email_Processor::send( $booking_ids, 'admin_reminder' );
+                if ( $days_before == 1 ) {
+                    $booking_groups = WBK_Model_Utils::group_bookings_by_email( $booking_ids );
+                    foreach ( $booking_groups as $booking_group ) {
+                        WBK_Email_Processor::send( $booking_group, 'customer_reminder' );
+                    }
+                }
+            }
+        }
+        if ( $days_before > 1 ) {
+            $service_ids = WBK_Model_Utils::get_service_ids();
+            foreach ( $service_ids as $service_id ) {
+                $booking_ids = WBK_Model_Utils::get_future_bookings_for_service( $service_id, $days_before );
+                $booking_groups = WBK_Model_Utils::group_bookings_by_email( $booking_ids );
+                foreach ( $booking_groups as $booking_group ) {
+                    WBK_Email_Processor::send( $booking_group, 'customer_reminder' );
+                }
+            }
+        }
     }
 
 }
@@ -711,7 +768,6 @@ if ( !function_exists( 'wbk_init' ) ) {
     }
     function wbk_init() {
         WBK_Model_Updater::create_ht_file();
-        WBK_Model_Updater::run_previous_update();
         WBK_Model_Updater::run_update();
         register_block_type( __DIR__ . DIRECTORY_SEPARATOR . 'build' . DIRECTORY_SEPARATOR . 'block' );
         WBK_Email_Processor::send_late_notifications( 'arrival' );
@@ -727,8 +783,6 @@ if ( !function_exists( 'wbk_deactivate' ) ) {
 if ( !function_exists( 'wbk_uninstall' ) ) {
     function wbk_uninstall() {
         return;
-        // drop tables
-        // WBK_Db_Utils::dropTables();
     }
 
 }
@@ -736,44 +790,6 @@ if ( !function_exists( 'wbk_deactivation_alert' ) ) {
     function wbk_deactivation_alert() {
         echo '<div class="notice notice-error is-dismissible"><p>Webba Booking: Please deactivate the free version of Webba Booking in order to gain access to premium features. All data and settings are already saved.
         </p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button></div>';
-    }
-
-}
-if ( !function_exists( 'wbk_cleanup_attachements' ) ) {
-    function wbk_cleanup_attachements() {
-        if ( get_option( 'wbk_delete_attachemnt', 'no' ) == 'no' || get_option( 'wbk_delete_attachemnt', 'no' ) == '' ) {
-            return;
-        }
-        global $wpdb;
-        $prefix = $wpdb->prefix;
-        $query = $wpdb->prepare( 'SHOW TABLES LIKE %s', $prefix . $wpdb->esc_like( 'wbk_appointments' ) );
-        if ( $wpdb->get_var( $query ) != $prefix . 'wbk_appointments' ) {
-            return;
-        }
-        $result = $wpdb->get_results( 'Select * from ' . $prefix . "wbk_appointments where attachment  <> '' LIMIT 10 ", ARRAY_A );
-        foreach ( $result as $item ) {
-            $file = json_decode( $item['attachment'] );
-            if ( is_array( $file ) ) {
-                $file = $file[0];
-                try {
-                    if ( file_exists( $file ) ) {
-                        unlink( $file );
-                    }
-                } catch ( \Exception $e ) {
-                }
-                $wpdb->update(
-                    get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
-                    [
-                        'attachment' => '',
-                    ],
-                    [
-                        'id' => $item['id'],
-                    ],
-                    ['%s'],
-                    ['%d']
-                );
-            }
-        }
     }
 
 }
@@ -843,11 +859,8 @@ if ( !function_exists( 'wbk_is_multi_booking' ) ) {
 }
 if ( !function_exists( 'wbk_regular_routine' ) ) {
     function wbk_regular_routine() {
-        WBK_Db_Utils::deleteExpiredAppointments();
+        WBK_Model_Utils::auto_cancel_bookings();
         WBK_Model_Utils::auto_set_arrived_satus();
-        if ( isset( $_GET['test'] ) ) {
-            wbk_daily();
-        }
     }
 
 }

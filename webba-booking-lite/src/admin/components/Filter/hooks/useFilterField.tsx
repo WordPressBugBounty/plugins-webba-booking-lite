@@ -11,6 +11,21 @@ export const useFilterField = (name: string) => {
     const field = fields.find((field: IFilterField) => field.name === name)
     const value = field?.value
 
+    const setInitialValue = (initialValue: TAllowedFilterValue<any>) => {
+        setFields(
+            fields.map((field) => {
+                if (field.name === name) {
+                    return {
+                        ...field,
+                        initialValue,
+                    }
+                }
+
+                return field
+            })
+        )
+    }
+
     const setFilter = (
         value: TAllowedFilterValue<any>,
         isFromDateRange = false
@@ -56,5 +71,6 @@ export const useFilterField = (name: string) => {
         field,
         setFilter,
         model,
+        setInitialValue,
     } as IFilterContextValue
 }

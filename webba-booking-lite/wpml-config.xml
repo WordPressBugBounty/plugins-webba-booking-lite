@@ -94,6 +94,11 @@
             <key name="wbk_user_dashboard_link_text_reschedule"/>
             <key name="wbk_user_dashboard_section_past_bookings_label"/>
             <key name="wbk_user_dashboard_section_bookings_label"/>
-            <key name="wbk_user_dashboard_link_label"/>           
+            <key name="wbk_user_dashboard_link_label"/>   
+            
+            <key name="wbk_local_time_label"/>  
+            <key name="wbk_available_label"/>  
+                    
+
 	</admin-texts>
 </wpml-config>

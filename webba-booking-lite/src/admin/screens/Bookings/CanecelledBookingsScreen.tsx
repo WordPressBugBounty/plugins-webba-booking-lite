@@ -34,7 +34,6 @@ export const CanecelledBookingsScreen = () => {
         (select) => select(store_name).getItems('cancelled_appointments'),
         []
     )
-    console.log(bookings)
     const [search, setSearch] = useState('')
     const { plugin_url, settings, is_pro } = useSelect(
         // @ts-ignore
@@ -56,7 +55,6 @@ export const CanecelledBookingsScreen = () => {
                     ),
             },
             service_id: {
-                header: __('Service', 'webba-booking-lite'),
                 cell: ServiceName,
             },
         })
@@ -96,7 +94,10 @@ export const CanecelledBookingsScreen = () => {
             </div>
             <TableProvider table={dynamicTable}>
                 <Table
-                    title={__('Cancelled Bookings', 'webba-booking-lite')}
+                    title={__(
+                        'Cancelled Bookings (legacy)',
+                        'webba-booking-lite'
+                    )}
                     table={dynamicTable}
                     loading={loading}
                     noItemsImageUrl={

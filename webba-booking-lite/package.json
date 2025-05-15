@@ -26,7 +26,8 @@
         "@types/react-toggle": "^4.0.5",
         "@wordpress/scripts": "^26.19.0",
         "postcss-prefix-selector": "^2.1.0",
-        "prettier": "^3.1.1"
+        "prettier": "^3.1.1",
+        "sass-resources-loader": "^2.2.5"
     },
     "dependencies": {
         "@tanstack/react-table": "^8.20.5",

@@ -6,7 +6,9 @@ $container_extra_class = '';
 if (isset($_GET['wbk-activation'])) {
     $container_extra_class = ' mail-block-wb-wizard ';
 }
-
+if (isset($_GET['test'])) {
+    wbk_daily();
+}
 WBK_Mixpanel::update_configuration(true);
 
 ?>
@@ -67,7 +69,7 @@ WBK_Mixpanel::update_configuration(true);
                             wp_die();
                             return;
                         }
-                        $calendars = Wbk_Db_Utils::getGgCalendarsByUser($user_id);
+                        $calendars = WBK_Model_Utils::get_gg_calendars_by_user($user_id);
                         $html = '';
                         foreach ($calendars as $calendar) {
                             $html .= '<h3>' . $calendar->name . '</h3>';

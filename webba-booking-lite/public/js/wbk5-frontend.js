@@ -2143,7 +2143,14 @@ class WEBBA5_Form {
             if (locale == '') {
                 locale = 'en-US'
             }
+           
             form_data.append('locale', locale)
+            var lang = locale
+            if (lang.length > 2) {
+                lang = lang.slice(0, 2)
+            }
+            form_data.append('lang', lang)
+        
             const result = jQuery.ajax({
                 url: wbkl10n.ajaxurl,
                 type: 'POST',

@@ -28,7 +28,7 @@
     border-radius: 15px;
     border: 1px solid #8a9393;
     height: 50px;
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
     font-size: 16px;
     color: #333333;
     width: 100%;
@@ -45,4 +45,21 @@
     :global(.css-1jqq78o-placeholder) {
         color: #333333;
     }
+}
+
+.multiValueMore {
+    display: flex;
+    min-width: 0;
+    background-color: hsl(0, 0%, 90%);
+    border-radius: 2px;
+    margin: 2px;
+    box-sizing: border-box;
+    max-width: 100px;
+    white-space: nowrap;
+    border-radius: 2px;
+    color: hsl(0, 0%, 20%);
+    font-size: 85%;
+    padding: 3px;
+    padding-left: 6px;
+    min-width: 30px;
 }

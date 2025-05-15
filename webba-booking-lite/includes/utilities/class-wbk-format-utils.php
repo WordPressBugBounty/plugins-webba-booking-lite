@@ -84,4 +84,22 @@ class WBK_Format_Utils
         date_default_timezone_set($prev_time_zone);
         return $time;
     }
+
+    /**
+     * Generate random color
+     *
+     * @param array $ignore_list
+     * @return string
+     */
+    public static function generate_random_color(array $ignore_list = []): string
+    {
+        $color = '#';
+        $color .= str_pad(dechex(mt_rand(0, 255)), 2, '0', STR_PAD_LEFT);
+        $color .= str_pad(dechex(mt_rand(0, 255)), 2, '0', STR_PAD_LEFT);
+        $color .= str_pad(dechex(mt_rand(0, 255)), 2, '0', STR_PAD_LEFT);
+        if (in_array($color, $ignore_list)) {
+            return self::generate_random_color($ignore_list);
+        }
+        return $color;
+    }
 }

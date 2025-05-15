@@ -11,8 +11,10 @@ export const ConfirmationButton = ({
     icon,
     confirmationMessage,
     classes,
+    wrapperClass,
     buttonType,
     position,
+    tooltip,
 }: IConfirmationProps) => {
     const [visible, setVisible] = useState(false)
     const [isBusy, setIsBusy] = useState(false)
@@ -46,9 +48,10 @@ export const ConfirmationButton = ({
     return (
         <div
             ref={wrapperRef}
-            className={classNames(styles.wrapper, {
+            className={classNames(styles.wrapper, wrapperClass, {
                 [styles['active']]: visible,
             })}
+            data-title={tooltip}
         >
             <Button
                 onClick={() => setVisible(!visible)}
