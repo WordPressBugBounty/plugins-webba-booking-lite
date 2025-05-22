@@ -55,16 +55,17 @@ class WBK_Admin_Notices2
             }
 
             $props = [
-                'dismissible'        => true,
-                'id'                 => $id,
+                'dismissible' => true,
+                'id' => $id,
                 'additional_classes' => ['wbk-admin-notice']
             ];
 
             if (isset($notice['type'])) {
                 $props['type'] = $notice['type'];
             }
-
-            wp_admin_notice($notice['message'], $props);
+            if (function_exists('wp_admin_notice')) {
+                wp_admin_notice($notice['message'], $props);
+            }
         }
     }
 
@@ -89,7 +90,7 @@ class WBK_Admin_Notices2
         $notice_id = trim(sanitize_text_field($_POST['notice_id']));
 
         $this->ignored[] = $notice_id;
-        $this->ignored   = array_unique($this->ignored);
+        $this->ignored = array_unique($this->ignored);
 
         update_option($this->option_key, $this->ignored);
     }
@@ -103,8 +104,8 @@ class WBK_Admin_Notices2
     {
         $notices = [
             'inform_email_duplication_v_5118' => [
-                'message'   => sprintf(__('IMPORTANT: please double check your <a href="%s/">Email Notifications</a> page for any template duplication to avoid multiple emails. Also make sure that the templates have at least 1 or all services assigned. Read more in our <a href="%s" target="_blank">documentation</a>.', 'webba-booking-lite'), admin_url('admin.php?page=wbk-email-templates&tab=email-templates'), 'https://webba-booking.com/documentation/email-notifications/'),
-                'type'      => 'info',
+                'message' => sprintf(__('IMPORTANT: please double check your <a href="%s/">Email Notifications</a> page for any template duplication to avoid multiple emails. Also make sure that the templates have at least 1 or all services assigned. Read more in our <a href="%s" target="_blank">documentation</a>.', 'webba-booking-lite'), admin_url('admin.php?page=wbk-email-templates&tab=email-templates'), 'https://webba-booking.com/documentation/email-notifications/'),
+                'type' => 'info',
                 'condition' => function () {
                     return isset($_GET['page']) && 0 === strpos($_GET['page'], 'wbk-');
                 }

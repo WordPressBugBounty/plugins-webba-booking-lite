@@ -5,22 +5,21 @@
 .header {
     display: flex;
     align-items: center;
-    /* justify-content: space-between; */
-    /* gap: 20px; */
     border-bottom: 1px solid lightgray;
-    padding: 0 30px 30px 0;
+    padding: 20px;
     margin: 0 0 30px 0;
-    margin-top: 30px;
-    margin-right: 30px;
+    gap: 10px;
+    background-color: colors.$background-white;
+    max-height: 100px;
 }
 
 .title {
-    font-size: 32px;
+    font-size: 22px;
     line-height: 32px;
     white-space: nowrap;
+    margin: 0;
 
     @media (max-width: 768px) {
-        margin: 0;
         font-size: 18px;
         line-height: 28px;
     }
@@ -28,7 +27,6 @@
 
 .logoLinkContainer {
     display: flex;
-    /* width: 30%; */
 }
 
 .logoLink {
@@ -36,7 +34,6 @@
     cursor: pointer;
     display: block;
     position: relative;
-    width: 250px;
 
     @media (max-width: 768px) {
         width: 150px;        
@@ -46,7 +43,9 @@
 .logoImg {
     width: 100%;
     height: auto;
+    max-height: 80px;
     object-fit: contain;
+    min-height: 80px;
 
     @media (max-width: 768px) {
         max-width: 140px;
@@ -74,5 +73,4 @@
     width: 1px;
     height: 20px;
     background-color: lightgray;
-    margin-right: 13px;
 }

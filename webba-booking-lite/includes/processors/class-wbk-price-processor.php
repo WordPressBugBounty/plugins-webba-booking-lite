@@ -354,11 +354,13 @@ class WBK_Price_Processor
         $quantities = array();
         $services = array();
 
+        $bookings = [];
         foreach ($booking_ids as $booking_id) {
             $booking = new WBK_Booking($booking_id);
             if (!$booking->is_loaded()) {
                 return -4;
             }
+            $bookings[] = $booking;
             $service = new WBK_Service($booking->get_service());
             if (!$service->is_loaded()) {
                 return -4;
@@ -377,6 +379,7 @@ class WBK_Price_Processor
             $subtotal += floatval($booking->get_price()) * floatval($booking->get_quantity());
 
         }
+        $subtotal = apply_filters('webba_after_subtotal_calculated', $subtotal, $booking_ids);
 
         if ($coupon != FALSE && !is_null($coupon)) {
             if ($coupon[1] > 0) {

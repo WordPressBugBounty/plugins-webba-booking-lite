@@ -1,3 +1,4 @@
+@use './responsive.scss' as *;
 // Mixins
 @mixin flex-center {
     display: flex;
@@ -62,38 +63,38 @@
 }
 
 @mixin mobile-column {
-    @include breakpoint(mobile) {
+    @include mobile {
         grid-template-columns: repeat(1, 1fr);
         flex-flow: column;
     }
 }
 
 @mixin mobile-column-reverse {
-    @include breakpoint(mobile) {
+    @include mobile {
         flex-flow: column-reverse;
     }
 }
 
 @mixin mobile-heading {
-    @include breakpoint(mobile) {
+    @include mobile {
         flex-flow: column;
     }
 }
 
 @mixin mobile-button {
-    @include breakpoint(mobile) {
+    @include mobile {
         align-self: flex-start;
     }
 }
 
 @mixin hide-mobile {
-    @include breakpoint(mobile) {
+    @include mobile {
         display: none;
     }
 }
 
 @mixin hide-tablet {
-    @include breakpoint(tablet) {
+    @include tablet {
         display: none;
     }
 }
@@ -105,25 +106,25 @@
 }
 
 @mixin mobile-visible {
-    @include breakpoint(mobile) {
+    @include mobile {
         display: inline-block;
     }
 }
 
 @mixin tablet-visible {
-    @include breakpoint(tablet) {
+    @include tablet {
         display: inline-block;
     }
 }
 
 @mixin mobile-flex-center {
-    @include breakpoint(mobile) {
+    @include mobile {
         @include flex-center;
     }
 }
 
 @mixin tablet-flex-center {
-    @include breakpoint(tablet) {
+    @include tablet {
         @include flex-center;
     }
 }
@@ -150,13 +151,13 @@
 }
 
 @mixin mobile-grid($column: 1, $gap: 20) {
-    @include breakpoint(mobile) {
+    @include mobile {
         @include grid($column, $gap);
     }
 }
 
 @mixin tablet-grid($column: 2, $gap: 20) {
-    @include breakpoint(tablet) {
+    @include tablet {
         @include grid($column, $gap);
     }
 }

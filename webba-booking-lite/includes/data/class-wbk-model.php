@@ -603,7 +603,6 @@ class WBK_Model {
             false,
             false
         );
-        //
         $tooltip = __( 'When this option is enabled, the system allows customers to select only consecutive time slots.', 'webba-booking-lite' );
         $table->add_field(
             'service_consecutive_timeslots',
@@ -795,7 +794,7 @@ class WBK_Model {
             '',
             true,
             false,
-            false
+            true
         );
         $tooltip = __( 'A PDF attachment will be generated based on input text', 'webba-booking-lite' );
         $table->add_field(

@@ -3,7 +3,7 @@ import styles from './Table.module.scss'
 import classNames from 'classnames'
 import { usePagination } from './hooks/usePagination'
 import { __ } from '@wordpress/i18n'
-import { useLayoutEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import iconArrowLeft from '../../../../public/images/icon-arrow-left.svg'
 import iconArrowRight from '../../../../public/images/icon-arrow-right.svg'
 
@@ -64,6 +64,9 @@ export const Pagination = ({ table }: PaginationProps) => {
         onChange: (page) => table.setPageIndex(page - 1),
     })
 
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, [table.getPaginationRowModel()])
     return (
         <div className={styles.paginationContainer}>
             <div className={styles.itemCountWrapper}>

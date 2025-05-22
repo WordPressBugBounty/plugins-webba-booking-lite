@@ -179,7 +179,7 @@ class Model
         } else {
             $appointment_day = [];
             foreach ($filters as $key => $filter) {
-                if ('appointment_day' == $filter['name']) {
+                if (isset($filter['value']) && 'appointment_day' == $filter['name']) {
                     $prev_time_zone = date_default_timezone_get();
                     date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
                     $appointment_day[] = strtotime($filter['value']);

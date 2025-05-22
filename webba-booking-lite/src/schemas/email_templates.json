@@ -111,7 +111,7 @@
                 "tooltip": "Use the text editor to prepare the email template.List of available placeholders</a>",
                 "placeholders": true
             },
-            "required": false,
+            "required": true,
             "dependency": [],
             "default_value": "",
             "editable": true

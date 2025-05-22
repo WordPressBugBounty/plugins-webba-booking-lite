@@ -263,20 +263,32 @@ font-weight: 400;
 }
 
 .main-block-wb .main-part-wrapper-wb {
-    padding: 45px 50px 45px 50px;
     width: 100%;
+}
+
+.main-part-wrapper-wb .button-wbkb{
+    margin-left: 20px;
 }
 
 .header-main-wb {
     display: flex;
     align-items: center;
     border-bottom: 1px solid #c2c7c7;
-    padding: 0 0 30px 0;
+    padding: 20px;
     margin: 0 0 30px 0;
+    background-color: #fff;
+    gap: 10px;
+    max-height: 100px;
 }
 
-.header-main-wb .logo-main-wb {
-    margin: 0 13px 0 0;
+.header-main-wb > a > img {
+    width: 100%;
+    height: auto;
+    max-height: 80px;
+    -o-object-fit: contain;
+    object-fit: contain;
+    min-height: 80px;
+    max-width: 150px;
 }
 
 .header-main-wb .vertical-line-wb {
@@ -284,12 +296,12 @@ font-weight: 400;
     height: 30px;
     width: 1px;
     background: #c2c4d6;
-    margin: 0 13px 0 0;
 }
 
 .header-main-wb .page-title-wb {
-    font-size: 32px;
+    font-size: 22px;
     line-height: 32px;
+    font-weight: 300;
 }
 
 .header-main-wb .main-menu-wb {
@@ -387,6 +399,7 @@ font-weight: 500;
     column-gap: 25px;
     row-gap: 25px;
     grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
+    margin: 0px 20px 20px 20px;
 }
 
 .settings-list-wb li {
@@ -466,7 +479,7 @@ font-weight: 400;
 
 @media (max-width: 1500px) {
     .main-block-wb .main-part-wrapper-wb {
-        padding: 25px 30px 25px 30px;
+        /* padding: 25px 30px 25px 30px; */
     }
 }
 
@@ -505,8 +518,8 @@ font-weight: 400;
 
 @media (max-width: 1200px) {
     .header-main-wb {
-        padding-bottom: 15px;
-        margin-bottom: 20px;
+        padding-bottom: 20;
+        margin-bottom: 30px;
     }
 
     .header-main-wb .page-title-wb {
@@ -545,7 +558,7 @@ font-weight: 400;
 
 @media (max-width: 1100px) {
     .main-block-wb .main-part-wrapper-wb {
-        padding: 15px 15px 25px 15px;
+        /* padding: 15px 15px 25px 15px; */
     }
 }
 
@@ -2280,6 +2293,7 @@ font-weight: 400;
 
 .appearance-block-wb {
     display: flex;
+    margin: 0px 20px 0px 20px;
 }
 
 .appearance-menu-wrapper-wb {
@@ -11673,8 +11687,8 @@ font-weight: 400;
     margin-bottom: 20px;
     margin-right: 20px;
 }
-.webba-booking_page_wbk-options .main-block-wb {
-    left: -20px;
+.webba-booking_page_wbk-options .main-block-wb .wrap {
+    margin: 0;
 }
 .mail-block-wb-wizard {
     left: 0 !important;
@@ -11960,4 +11974,14 @@ span.wbk_email_resend_result {
     position: relative;
     background: #1f6763;
     color: #fff;
+}
+
+#wpcontent{
+    padding-left: 0;
+}
+
+@media screen and (max-width: 782px) {
+    .auto-fold #wpcontent {
+        padding-left: 0;
+    }
 }

@@ -41,6 +41,8 @@ export const createDateRangeField: FormComponentConstructor<any> = ({
                 setValue(
                     formatWbkDate(range[0]) + ' - ' + formatWbkDate(range[1])
                 )
+            } else {
+                setValue('')
             }
         }, [range])
 

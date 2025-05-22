@@ -269,7 +269,12 @@
             "hidden": true,
             "title": "External calendar for group services",
             "tab": "general",
-            "misc": [],
+            "misc": {
+                "options": {
+                    "reduce": "Reduce availability",
+                    "lock": "Lock time slot"
+                }
+            },
             "required": true,
             "dependency": [
                 [

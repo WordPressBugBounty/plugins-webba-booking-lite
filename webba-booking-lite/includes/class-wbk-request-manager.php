@@ -751,6 +751,7 @@ class WBK_Request_Manager {
             $price = WBK_Price_Processor::calculate_single_booking_price( $booking, $bookings );
             $sub_total += $price['price'] * $booking->get_quantity();
         }
+        $sub_total = apply_filters( 'webba_after_subtotal_calculated', $sub_total, $bookings );
         $service_fees = 0;
         $services = array_unique( $services );
         if ( count( $services ) > 50 ) {

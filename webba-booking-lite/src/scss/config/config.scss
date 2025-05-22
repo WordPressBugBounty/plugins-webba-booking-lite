@@ -1,9 +1,9 @@
 @use './colors' as colors;
 @use './normalize' as *;
 @use './responsive' as *;
-@use './common' as *;
 @use './buttons' as buttons;
 @use './typography' as typography;
+@use './common' as *;
 @use './animations' as animations;
 @use './dimensions.scss' as dimensions;
 
