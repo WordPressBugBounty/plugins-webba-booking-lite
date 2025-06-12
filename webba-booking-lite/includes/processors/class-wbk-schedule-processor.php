@@ -42,7 +42,7 @@ class WBK_Schedule_Processor {
         }
         $date = new DateTime();
         $date->setTimestamp( strtotime( 'yesterday midnight' ) );
-        $result = $wpdb->get_results( "\r\n\t\t\t\t\t\tSELECT day, service_id\r\n\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_days_on_off\r\n\t\t\t\t\t\twhere status = 0 and day >= " . $date->getTimestamp() );
+        $result = $wpdb->get_results( "\n\t\t\t\t\t\tSELECT day, service_id\n\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_days_on_off\n\t\t\t\t\t\twhere status = 0 and day >= " . $date->getTimestamp() );
         foreach ( $result as $item ) {
             $this->locked_days[$item->service_id][] = $item->day;
         }
@@ -52,7 +52,7 @@ class WBK_Schedule_Processor {
         global $wpdb;
         $date = new DateTime();
         $date->setTimestamp( strtotime( 'yesterday midnight' ) );
-        $result = $wpdb->get_results( "\r\n                        SELECT day, service_id\r\n                        FROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_days_on_off\r\n                        where status = 1 and day >= " . $date->getTimestamp() );
+        $result = $wpdb->get_results( "\n                        SELECT day, service_id\n                        FROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_days_on_off\n                        where status = 1 and day >= " . $date->getTimestamp() );
         foreach ( $result as $item ) {
             $this->unlocked_days[$item->service_id][] = $item->day;
         }
@@ -60,7 +60,7 @@ class WBK_Schedule_Processor {
 
     public function load_locked_timeslots() {
         global $wpdb;
-        $result = $wpdb->get_results( "\r\n\t\t\t\t\t\tSELECT time, service_id\r\n\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . 'wbk_locked_time_slots' );
+        $result = $wpdb->get_results( "\n\t\t\t\t\t\tSELECT time, service_id\n\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . 'wbk_locked_time_slots' );
         foreach ( $result as $item ) {
             $this->locked_time_slots[$item->service_id][] = $item->time;
         }
@@ -646,7 +646,7 @@ class WBK_Schedule_Processor {
 
     public function load_appointments_by_day( $day, $service_id ) {
         global $wpdb;
-        $db_arr = $wpdb->get_results( $wpdb->prepare( "                                       SELECT *\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments where service_id = %d AND day = %d AND " . WBK_Model_Utils::get_not_canclled_sql(), $service_id, $day ) );
+        $db_arr = $wpdb->get_results( $wpdb->prepare( "                                       SELECT *\n\t\t\t\t\t\t\t\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments where service_id = %d AND day = %d AND " . WBK_Model_Utils::get_not_canclled_sql(), $service_id, $day ) );
         $this->appointments = [];
         if ( count( $db_arr ) == 0 ) {
             return 0;

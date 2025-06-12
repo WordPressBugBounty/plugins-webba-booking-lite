@@ -38,19 +38,21 @@ if ($timeslot->get_free_places() > 0) {
                     <span class="time-w time-long-w" data-server-date="<?php echo esc_attr(
                         $date
                     ); ?>" data-local-date="<?php echo esc_attr(
-                         $local_date
-                     ); ?>" data-server-time="<?php echo esc_attr(
-                          $time
-                      ); ?>" data-local-time="<?php echo esc_attr(
-                           $local_time
-                       ); ?>" data-index="<?php echo esc_attr($index); ?>" data-start="<?php echo esc_attr(
-                               $timeslot->getStart()
-                           ); ?>" data-end="<?php echo esc_attr(
-                                $timeslot->get_end()
-                            ); ?>" data-service="<?php echo esc_html(
-                                 $service->get_id()
-                             ); ?>">
-                        <span class="wbk_time_slot_time_string"><?php echo esc_html($time); ?></span>
+    $local_date
+); ?>" data-server-time="<?php echo esc_attr(
+    $time
+); ?>" data-local-time="<?php echo esc_attr(
+    $local_time
+); ?>" data-index="<?php echo esc_attr(
+    $index
+); ?>" data-start="<?php echo esc_attr(
+    $timeslot->getStart()
+); ?>" data-end="<?php echo esc_attr(
+    $timeslot->get_end()
+); ?>" data-service="<?php echo esc_html($service->get_id()); ?>">
+                        <span class="wbk_time_slot_time_string"><?php echo esc_html(
+                            $time
+                        ); ?></span>
                     </span>
                 </span><!-- /.radio-time-inner-w -->
                 <span class="available-w">
@@ -90,12 +92,22 @@ if ($timeslot->get_free_places() > 0) {
                     </span>
 
                 <?php } ?>
-                <?php do_action('wbk_group_time_slot_custom_html', $service->get_id(), $timeslot); ?>
+                <?php do_action(
+                    'wbk_group_time_slot_custom_html',
+                    $service->get_id(),
+                    $timeslot
+                ); ?>
             </span>
         </label>
     </li>
     <?php
-} elseif (get_option('wbk_show_booked_slots', 'enabled') == 'enabled') { ?>
+} elseif (
+    (get_option('wbk_show_booked_slots', 'enabled') == 'enabled' &&
+        $timeslot->get_status() != -2) ||
+    (get_option('wbk_show_booked_slots', 'enabled') == 'enabled' &&
+        $timeslot->get_status() == -2 &&
+        get_option('wbk_show_locked_as_booked', '') == 'yes')
+) { ?>
     <li>
         <label>
             <input class="timeslot_radio-w" type="radio" name="day-<?php echo esc_attr(
@@ -107,19 +119,21 @@ if ($timeslot->get_free_places() > 0) {
                     <span class="time-w time-long-w" data-server-date="<?php echo esc_attr(
                         $date
                     ); ?>" data-local-date="<?php echo esc_attr(
-                         $local_date
-                     ); ?>" data-server-time="<?php echo esc_attr(
-                          $time
-                      ); ?>" data-local-time="<?php echo esc_attr(
-                           $local_time
-                       ); ?>" data-index="<?php echo esc_attr($index); ?>" data-start="<?php echo esc_attr(
-                               $timeslot->getStart()
-                           ); ?>" data-end="<?php echo esc_attr(
-                                $timeslot->get_end()
-                            ); ?>" data-service="<?php echo esc_html(
-                                 $service->get_id()
-                             ); ?>">
-                        <span class="wbk_time_slot_time_string"><?php echo esc_html($time); ?></span>
+    $local_date
+); ?>" data-server-time="<?php echo esc_attr(
+    $time
+); ?>" data-local-time="<?php echo esc_attr(
+    $local_time
+); ?>" data-index="<?php echo esc_attr(
+    $index
+); ?>" data-start="<?php echo esc_attr(
+    $timeslot->getStart()
+); ?>" data-end="<?php echo esc_attr(
+    $timeslot->get_end()
+); ?>" data-service="<?php echo esc_html($service->get_id()); ?>">
+                        <span class="wbk_time_slot_time_string"><?php echo esc_html(
+                            $time
+                        ); ?></span>
                     </span>
                 </span><!-- /.radio-time-inner-w -->
                 <span class="available-w">
@@ -159,7 +173,11 @@ if ($timeslot->get_free_places() > 0) {
                     </span>
 
                 <?php } ?>
-                <?php do_action('wbk_group_time_slot_custom_html', $service->get_id(), $timeslot); ?>
+                <?php do_action(
+                    'wbk_group_time_slot_custom_html',
+                    $service->get_id(),
+                    $timeslot
+                ); ?>
             </span>
         </label>
     </li>

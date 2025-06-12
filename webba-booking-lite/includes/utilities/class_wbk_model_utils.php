@@ -637,7 +637,7 @@ class WBK_Model_Utils {
 
     static function get_booking_ids_by_service_and_time( $service_id, $time ) {
         global $wpdb;
-        $booking_ids = $wpdb->get_col( $wpdb->prepare( "\r\n\t\t\tSELECT      id\r\n\t\t\tFROM        " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments\r\n \t\t\tWHERE       service_id = %d\r\n\t\t\tAND \t\ttime  = %d AND " . self::get_not_canclled_sql() . "            \r\n\t\t\t", $service_id, $time ) );
+        $booking_ids = $wpdb->get_col( $wpdb->prepare( "\n\t\t\tSELECT      id\n\t\t\tFROM        " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments\n \t\t\tWHERE       service_id = %d\n\t\t\tAND \t\ttime  = %d AND " . self::get_not_canclled_sql() . "            \n\t\t\t", $service_id, $time ) );
         return $booking_ids;
     }
 
@@ -1102,7 +1102,7 @@ class WBK_Model_Utils {
 
     public static function get_bookings_by_service_and_time( $service_id, $time ) {
         global $wpdb;
-        $booking_ids = $wpdb->get_col( $wpdb->prepare( "\r\n\t\t\tSELECT      id\r\n\t\t\tFROM        " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments\r\n \t\t\tWHERE       service_id = %d\r\n\t\t\tAND \t\ttime  = %d\r\n            AND " . self::get_not_canclled_sql() . "\r\n\t\t\t", $service_id, $time ) );
+        $booking_ids = $wpdb->get_col( $wpdb->prepare( "\n\t\t\tSELECT      id\n\t\t\tFROM        " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments\n \t\t\tWHERE       service_id = %d\n\t\t\tAND \t\ttime  = %d\n            AND " . self::get_not_canclled_sql() . "\n\t\t\t", $service_id, $time ) );
         return $booking_ids;
     }
 
@@ -1198,7 +1198,7 @@ class WBK_Model_Utils {
 
     public static function get_bookings_to_send_arrival_email() {
         global $wpdb;
-        $booking_ids = $wpdb->get_col( $wpdb->prepare( "\r\n\t\t\tSELECT id\r\n\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments WHERE arrival_email_time < %d", time() ) );
+        $booking_ids = $wpdb->get_col( $wpdb->prepare( "\n\t\t\tSELECT id\n\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments WHERE arrival_email_time < %d", time() ) );
         return $booking_ids;
     }
 
@@ -1560,7 +1560,7 @@ class WBK_Model_Utils {
             $domain = parse_url( home_url(), PHP_URL_HOST );
             $table_name = get_option( 'wbk_db_prefix', '' ) . "wbk_appointments";
             // Prepare the SQL
-            $sql = "UPDATE {$table_name}\r\n                    SET name = %s,\r\n                        email = %s,\r\n                        phone = %s\r\n                    WHERE end < %d";
+            $sql = "UPDATE {$table_name}\n                    SET name = %s,\n                        email = %s,\n                        phone = %s\n                    WHERE end < %d";
             // Prepare the values
             $name = 'n/a';
             $email = 'gdpr-compliant@' . $domain;

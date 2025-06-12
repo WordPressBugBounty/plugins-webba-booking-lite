@@ -1,1 +1,359 @@
-(()=>{"use strict";var e={1455:e=>{e.exports=window.wp.apiFetch},47143:e=>{e.exports=window.wp.data}},t={};function s(o){var r=t[o];if(void 0!==r)return r.exports;var a=t[o]={exports:{}};return e[o](a,a.exports,s),a.exports}s.n=e=>{var t=e&&e.__esModule?()=>e.default:()=>e;return s.d(t,{a:t}),t},s.d=(e,t)=>{for(var o in t)s.o(t,o)&&!s.o(e,o)&&Object.defineProperty(e,o,{enumerable:!0,get:t[o]})},s.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t);var o=s(1455),r=s.n(o),a=s(47143);const n=window.wp.url,{lang:i}=(()=>{const e=document.documentElement?.lang||"en-US",[t,s=""]=e.split("-");return{lang:t,locale:e,localeCode:s}})(),u={userFutureBookings:null,userPastBookings:null,preset:{},formData:{services:[],offset:null,date:null,booking:null,time:null},dynamicAttributes:{timeSlots:null}},g={setUserFutureBookings:e=>({type:"SET_USER_FUTURE_BOOKING",bookings:e}),setUserPastBookings:e=>({type:"SET_USER_PAST_BOOKING",bookings:e}),setPreset:e=>({type:"SET_PRESET",preset:e}),setUserName:e=>({type:"SET_USER_NAME",userName:e}),setFormData:(e,t)=>({type:"SET_FORM_DATA",key:e,value:t}),setDynamicAttribute:(e,t)=>({type:"SET_DYNAMIC_ATTRIBUTE",key:e,value:t}),fetchTimeSlots:()=>async({select:e,dispatch:t})=>{const s=new URLSearchParams(e.getFormData()).toString(),o=await r()({path:`/wbk/v2/get-time-slots/?${s}`});t.setDynamicAttribute("timeSlots",o.timeslots)},updateBooking:()=>async({select:e,dispatch:t})=>{const s=await r()({path:"/wbk/v2/update-booking",method:"POST",data:e.getFormData()});let o=e.getUserFutureBookings();const a=o.findIndex((e=>!!Number.isInteger(Number(e.id))&&e.id===s.booking.id));-1!==a&&(o[a]={...o[a],...s.booking}),t.setUserFutureBookings(o)},deleteBooking:()=>async({select:e,dispatch:t})=>{await r()({path:"/wbk/v2/delete-booking",method:"POST",data:e.getFormData()});const s=e.getUserFutureBookings().filter((t=>t.id!==e.getFormData().booking));t.setUserFutureBookings(s)}},c=(0,a.createReduxStore)("webba_booking/frontend_store",{reducer(e=u,t){switch(t.type){case"SET_USER_FUTURE_BOOKING":return{...e,userFutureBookings:t.bookings};case"SET_USER_PAST_BOOKING":return{...e,userPastBookings:t.bookings};case"SET_PRESET":return{...e,preset:t.preset};case"SET_USER_NAME":return{...e,preset:{...e.preset,user:t.userName}};case"SET_FORM_DATA":return{...e,formData:{...e.formData,[t.key]:t.value}};case"SET_DYNAMIC_ATTRIBUTE":return{...e,dynamicAttributes:{...e.dynamicAttributes,[t.key]:t.value}}}return e},actions:g,selectors:{getUserFutureBookings:e=>e.userFutureBookings,getUserPastBookings:e=>e.userPastBookings,getPreset:e=>e.preset,getFormData:e=>e.formData,getDynamicAttributes:e=>e.dynamicAttributes,getSelectedDate:e=>e.seletedDate},resolvers:{getUserFutureBookings:()=>async({dispatch:e})=>{const t=await r()({path:(0,n.addQueryArgs)("/wbk/v2/get-user-bookings/",{lang:i})});e.setUserFutureBookings(t.bookings)},getUserPastBookings:()=>async({dispatch:e})=>{const t=new URLSearchParams({pastBookings:!0,lang:i}).toString(),s=await r()({path:`/wbk/v2/get-user-bookings/?${t}`});e.setUserPastBookings(s.bookings)},getPreset:()=>async({dispatch:e})=>{const t=await r()({path:"/wbk/v2/get-preset/"});e.setPreset(t)}}});(0,a.register)(c)})();
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "./src/frontend/hooks/useLocale.jsx":
+/*!******************************************!*\
+  !*** ./src/frontend/hooks/useLocale.jsx ***!
+  \******************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   useLocale: () => (/* binding */ useLocale)
+/* harmony export */ });
+const useLocale = () => {
+  const locale = document.documentElement?.lang || 'en-US';
+  const [lang, localeCode = ''] = locale.split('-');
+  return {
+    lang,
+    locale,
+    localeCode
+  };
+};
+
+/***/ }),
+
+/***/ "@wordpress/api-fetch":
+/*!**********************************!*\
+  !*** external ["wp","apiFetch"] ***!
+  \**********************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["apiFetch"];
+
+/***/ }),
+
+/***/ "@wordpress/data":
+/*!******************************!*\
+  !*** external ["wp","data"] ***!
+  \******************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["data"];
+
+/***/ }),
+
+/***/ "@wordpress/url":
+/*!*****************************!*\
+  !*** external ["wp","url"] ***!
+  \*****************************/
+/***/ ((module) => {
+
+module.exports = window["wp"]["url"];
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
+(() => {
+/*!*************************************!*\
+  !*** ./src/store/frontend/index.js ***!
+  \*************************************/
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   default_state: () => (/* binding */ default_state),
+/* harmony export */   store_name: () => (/* binding */ store_name)
+/* harmony export */ });
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/api-fetch */ "@wordpress/api-fetch");
+/* harmony import */ var _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/data */ "@wordpress/data");
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _frontend_hooks_useLocale__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../frontend/hooks/useLocale */ "./src/frontend/hooks/useLocale.jsx");
+/* harmony import */ var _wordpress_url__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @wordpress/url */ "@wordpress/url");
+/* harmony import */ var _wordpress_url__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_wordpress_url__WEBPACK_IMPORTED_MODULE_3__);
+
+
+
+
+const {
+  lang
+} = (0,_frontend_hooks_useLocale__WEBPACK_IMPORTED_MODULE_2__.useLocale)();
+const DEFAULT_STATE = {
+  userFutureBookings: null,
+  userPastBookings: null,
+  preset: {},
+  formData: {
+    services: [],
+    offset: null,
+    date: null,
+    booking: null,
+    time: null
+  },
+  dynamicAttributes: {
+    timeSlots: null
+  }
+};
+const actions = {
+  setUserFutureBookings(bookings) {
+    return {
+      type: 'SET_USER_FUTURE_BOOKING',
+      bookings
+    };
+  },
+  setUserPastBookings(bookings) {
+    return {
+      type: 'SET_USER_PAST_BOOKING',
+      bookings
+    };
+  },
+  setPreset(preset) {
+    return {
+      type: 'SET_PRESET',
+      preset
+    };
+  },
+  setUserName(userName) {
+    return {
+      type: 'SET_USER_NAME',
+      userName
+    };
+  },
+  setFormData(key, value) {
+    return {
+      type: 'SET_FORM_DATA',
+      key,
+      value
+    };
+  },
+  setDynamicAttribute(key, value) {
+    return {
+      type: 'SET_DYNAMIC_ATTRIBUTE',
+      key,
+      value
+    };
+  },
+  fetchTimeSlots: () => async ({
+    select,
+    dispatch
+  }) => {
+    const queryString = new URLSearchParams(select.getFormData()).toString();
+    const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_0___default()({
+      path: `/wbk/v2/get-time-slots/?${queryString}`
+    });
+    dispatch.setDynamicAttribute('timeSlots', response.timeslots);
+  },
+  updateBooking: () => async ({
+    select,
+    dispatch
+  }) => {
+    const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_0___default()({
+      path: `/wbk/v2/update-booking`,
+      method: 'POST',
+      data: select.getFormData()
+    });
+    let bookings = select.getUserFutureBookings();
+    const index = bookings.findIndex(booking => {
+      if (!Number.isInteger(Number(booking.id))) {
+        return false;
+      }
+      return booking.id === response.booking.id;
+    });
+    if (index !== -1) {
+      bookings[index] = {
+        ...bookings[index],
+        ...response.booking
+      };
+    }
+    dispatch.setUserFutureBookings(bookings);
+  },
+  deleteBooking: () => async ({
+    select,
+    dispatch
+  }) => {
+    const response = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_0___default()({
+      path: `/wbk/v2/delete-booking`,
+      method: 'POST',
+      data: select.getFormData()
+    });
+    let bookings = select.getUserFutureBookings();
+    const updatedBookings = bookings.filter(booking => booking.id !== select.getFormData().booking);
+    dispatch.setUserFutureBookings(updatedBookings);
+  }
+};
+const store = (0,_wordpress_data__WEBPACK_IMPORTED_MODULE_1__.createReduxStore)('webba_booking/frontend_store', {
+  reducer(state = DEFAULT_STATE, action) {
+    switch (action.type) {
+      case 'SET_USER_FUTURE_BOOKING':
+        return {
+          ...state,
+          userFutureBookings: action.bookings
+        };
+      case 'SET_USER_PAST_BOOKING':
+        return {
+          ...state,
+          userPastBookings: action.bookings
+        };
+      case 'SET_PRESET':
+        return {
+          ...state,
+          preset: action.preset
+        };
+      case 'SET_USER_NAME':
+        return {
+          ...state,
+          preset: {
+            ...state.preset,
+            user: action.userName
+          }
+        };
+      case 'SET_FORM_DATA':
+        return {
+          ...state,
+          formData: {
+            ...state.formData,
+            [action.key]: action.value
+          }
+        };
+      case 'SET_DYNAMIC_ATTRIBUTE':
+        return {
+          ...state,
+          dynamicAttributes: {
+            ...state.dynamicAttributes,
+            [action.key]: action.value
+          }
+        };
+    }
+    return state;
+  },
+  actions,
+  selectors: {
+    getUserFutureBookings(state) {
+      return state.userFutureBookings;
+    },
+    getUserPastBookings(state) {
+      return state.userPastBookings;
+    },
+    getPreset(state) {
+      return state.preset;
+    },
+    getFormData(state) {
+      return state.formData;
+    },
+    getDynamicAttributes(state) {
+      return state.dynamicAttributes;
+    },
+    getSelectedDate(state) {
+      return state.seletedDate;
+    }
+  },
+  resolvers: {
+    getUserFutureBookings: () => async ({
+      dispatch
+    }) => {
+      const result = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_0___default()({
+        path: (0,_wordpress_url__WEBPACK_IMPORTED_MODULE_3__.addQueryArgs)(`/wbk/v2/get-user-bookings/`, {
+          lang
+        })
+      });
+      dispatch.setUserFutureBookings(result.bookings);
+    },
+    getUserPastBookings: () => async ({
+      dispatch
+    }) => {
+      const params = {
+        pastBookings: true,
+        lang
+      };
+      const queryString = new URLSearchParams(params).toString();
+      const result = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_0___default()({
+        path: `/wbk/v2/get-user-bookings/?${queryString}`
+      });
+      dispatch.setUserPastBookings(result.bookings);
+    },
+    getPreset: () => async ({
+      dispatch
+    }) => {
+      const result = await _wordpress_api_fetch__WEBPACK_IMPORTED_MODULE_0___default()({
+        path: `/wbk/v2/get-preset/`
+      });
+      dispatch.setPreset(result);
+    }
+  }
+});
+(0,_wordpress_data__WEBPACK_IMPORTED_MODULE_1__.register)(store);
+const store_name = 'webba_booking/frontend_store';
+const default_state = DEFAULT_STATE;
+})();
+
+/******/ })()
+;
+//# sourceMappingURL=index.js.map

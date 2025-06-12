@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 5.1.19
+ * Version: 5.1.20
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -64,7 +64,7 @@ if ( !defined( 'WP_WEBBA_BOOKING__PLUGIN_DIR' ) ) {
     define( 'WP_WEBBA_BOOKING__PLUGIN_URL', plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( 'WP_WEBBA_BOOKING__VERSION' ) ) {
-    define( 'WP_WEBBA_BOOKING__VERSION', '5.1.19' );
+    define( 'WP_WEBBA_BOOKING__VERSION', '5.1.20' );
 }
 if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_textdomain' ) ) {
     include 'vendor/autoload.php';
@@ -879,19 +879,19 @@ add_action( 'current_screen', 'wbk_admin_init' );
 if ( !function_exists( 'wbk_admin_init' ) ) {
     function wbk_admin_init() {
         if ( is_admin() && isset( $_GET['page'] ) && $_GET['page'] == 'wbk-main-pricing' ) {
-            WBK_Mixpanel::track_event( "pricing page opened", [] );
+            WBK_Mixpanel::track_event( 'pricing page opened', [] );
         }
     }
 
 }
 if ( !function_exists( 'add_wbk_custom_permission' ) ) {
     function add_wbk_custom_permission(  $permissions  ) {
-        $permissions['helpscout'] = array(
+        $permissions['helpscout'] = [
             'icon-class' => 'dashicons dashicons-admin-generic',
             'label'      => wbk_fs()->get_text_inline( 'Anonymous Usage Data', 'webba-config' ),
             'desc'       => wbk_fs()->get_text_inline( 'Anonymous data collected to enhance product functionality and experience', 'webba-config' ),
             'priority'   => 16,
-        );
+        ];
         return $permissions;
     }
 

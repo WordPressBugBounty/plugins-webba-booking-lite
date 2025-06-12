@@ -35,3 +35,28 @@
     color: #212121;
     width: 100%;
 }
+
+.rawEditor {
+    width: 100%;
+    min-height: 280px;
+    border-radius: 2px;
+    padding: 10px;
+}
+
+.editorToggle {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    .editorToggleButton {
+        padding: 5px 8px;
+        background-color: darker(#f6f7f7, 5);
+        color: #595959;
+        cursor: pointer;
+        border: 1px solid #dcdcde;
+
+        &.editorToggleButtonActive {
+            background-color: #f6f7f7;
+        }
+    }
+}

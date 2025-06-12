@@ -64,7 +64,7 @@
             "title": "Date range",
             "tab": "",
             "misc": {
-                "time_zone": "Europe/Warsaw"
+                "time_zone": "Europe/London"
             },
             "required": true,
             "dependency": [

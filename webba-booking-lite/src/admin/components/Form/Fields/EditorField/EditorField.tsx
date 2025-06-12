@@ -7,6 +7,7 @@ import { useState } from 'react'
 import styles from './../GenericFormField/GenericFormField.module.scss'
 import { FormComponentConstructor } from '../../lib/types'
 import { useField } from '../../lib/hooks/useField'
+import classNames from 'classnames'
 
 const placeHolders: Record<
     'name' | 'text' | 'content',
@@ -260,22 +261,56 @@ export const createEditorField: FormComponentConstructor<any> = ({ field }) => {
         const isValid = !errors.length
         const showErrors = !isValid && touched
         const [firstError] = errors
+        const [isVisual, setIsVisual] = useState(true)
 
         return (
             <div>
                 <div>
                     <Label id={name} title={label} tooltip={misc?.tooltip} />
                 </div>
+                <div className={styles.editorToggle}>
+                    <div
+                        className={classNames(styles.editorToggleButton, {
+                            [styles.editorToggleButtonActive]: isVisual,
+                        })}
+                        onClick={() => setIsVisual(true)}
+                    >
+                        {__('Visual', 'webba-booking-lite')}
+                    </div>
+                    <div
+                        className={classNames(styles.editorToggleButton, {
+                            [styles.editorToggleButtonActive]: !isVisual,
+                        })}
+                        onClick={() => setIsVisual(false)}
+                    >
+                        {__('Text', 'webba-booking-lite')}
+                    </div>
+                </div>
                 <div>
-                    <Editor
-                        id={name}
-                        onEditorChange={(content: string): void =>
-                            setValue(content)
-                        }
-                        value={value}
-                        init={editorConfigs}
-                        onClick={() => setTouched(true)}
-                    />
+                    {isVisual && (
+                        <Editor
+                            id={name}
+                            onEditorChange={(content: string): void =>
+                                setValue(content)
+                            }
+                            value={value}
+                            init={editorConfigs}
+                            onClick={() => setTouched(true)}
+                        />
+                    )}
+                    {!isVisual && (
+                        <textarea
+                            className={classNames(
+                                styles.rawEditor,
+                                styles.input
+                            )}
+                            name={name}
+                            id={name}
+                            onChange={(e) => setValue(e.target.value)}
+                        >
+                            {value}
+                        </textarea>
+                    )}
                 </div>
                 {showErrors && (
                     <div className={styles.errorContainer}>{firstError}</div>

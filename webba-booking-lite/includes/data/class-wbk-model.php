@@ -13,9 +13,9 @@ class WBK_Model {
         $prefix = $wpdb->prefix;
         update_option( 'wbk_db_prefix', $prefix );
         // custom on/off days
-        $wpdb->query( "CREATE TABLE IF NOT EXISTS " . get_option( 'wbk_db_prefix', '' ) . "wbk_days_on_off (\r\n\t            id int unsigned NOT NULL auto_increment PRIMARY KEY,\r\n\t            service_id int unsigned NOT NULL,\r\n\t            day int unsigned NOT NULL,\r\n\t            status int unsigned NOT NULL,\r\n\t            UNIQUE KEY id (id)\r\n\t        )\r\n\t        DEFAULT CHARACTER SET = utf8\r\n\t        COLLATE = utf8_general_ci" );
+        $wpdb->query( "CREATE TABLE IF NOT EXISTS " . get_option( 'wbk_db_prefix', '' ) . "wbk_days_on_off (\n\t            id int unsigned NOT NULL auto_increment PRIMARY KEY,\n\t            service_id int unsigned NOT NULL,\n\t            day int unsigned NOT NULL,\n\t            status int unsigned NOT NULL,\n\t            UNIQUE KEY id (id)\n\t        )\n\t        DEFAULT CHARACTER SET = utf8\n\t        COLLATE = utf8_general_ci" );
         // custom locked timeslots
-        $wpdb->query( "CREATE TABLE IF NOT EXISTS " . get_option( 'wbk_db_prefix', '' ) . "wbk_locked_time_slots (\r\n\t            id int unsigned NOT NULL auto_increment PRIMARY KEY,\r\n\t            service_id int unsigned NOT NULL,\r\n\t            time int unsigned NOT NULL,\r\n\t            connected_id int unsigned NOT NULL default 0,\r\n\t            UNIQUE KEY id (id)\r\n\t        )\r\n\t        DEFAULT CHARACTER SET = utf8\r\n\t        COLLATE = utf8_general_ci" );
+        $wpdb->query( "CREATE TABLE IF NOT EXISTS " . get_option( 'wbk_db_prefix', '' ) . "wbk_locked_time_slots (\n\t            id int unsigned NOT NULL auto_increment PRIMARY KEY,\n\t            service_id int unsigned NOT NULL,\n\t            time int unsigned NOT NULL,\n\t            connected_id int unsigned NOT NULL default 0,\n\t            UNIQUE KEY id (id)\n\t        )\n\t        DEFAULT CHARACTER SET = utf8\n\t        COLLATE = utf8_general_ci" );
     }
 
     public function initalize_model() {

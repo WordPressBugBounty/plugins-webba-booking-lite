@@ -1,6 +1,7 @@
 <?php
-if (!defined('ABSPATH'))
-    exit;
+if (!defined('ABSPATH')) {
+    exit();
+}
 
 $day_to_render = $data[0];
 $timeslot = $data[1];
@@ -20,6 +21,7 @@ $slot_html = '';
 
 // *** Free single time slot
 if ($timeslot->get_status() == 0 && $timeslot->get_free_places() > 0) {
+
     $sufix = '';
     if (get_option('wbk_multi_booking', '') == 'enabled') {
         $sufix = '_' . $timeslot->getStart() . '_' . $service->get_id();
@@ -27,38 +29,65 @@ if ($timeslot->get_status() == 0 && $timeslot->get_free_places() > 0) {
     ?>
     <li>
         <label>
-            <input class="timeslot_radio-w" type="radio" name="day-<?php echo esc_attr($day_to_render) . $sufix; ?>">
+            <input class="timeslot_radio-w" type="radio" name="day-<?php echo esc_attr(
+                $day_to_render
+            ) . $sufix; ?>">
             <span class="radio-time-block-w timeslot-animation-w wbk_flex">
                 <span class="radio-checkmark"></span>
-                <span class="time-w time-long-w" data-server-date="<?php echo esc_attr($date); ?>"
-                    data-local-date="<?php echo esc_attr($local_date); ?>" data-server-time="<?php echo esc_attr($time); ?>"
+                <span class="time-w time-long-w" data-server-date="<?php echo esc_attr(
+                    $date
+                ); ?>"
+                    data-local-date="<?php echo esc_attr(
+                        $local_date
+                    ); ?>" data-server-time="<?php echo esc_attr($time); ?>"
                     data-local-time="<?php echo esc_attr($local_time); ?>"
                     data-start="<?php echo esc_attr($timeslot->getStart()); ?>"
-                    data-end="<?php echo esc_attr($timeslot->get_end()); ?>" data-index="<?php echo esc_attr($index); ?>"
-                    data-service="<?php echo esc_html($service->get_id()); ?>"><span
-                        class="wbk_time_slot_time_string"><?php echo esc_html($time); ?></span>
+                    data-end="<?php echo esc_attr(
+                        $timeslot->get_end()
+                    ); ?>" data-index="<?php echo esc_attr($index); ?>"
+                    data-service="<?php echo esc_html(
+                        $service->get_id()
+                    ); ?>"><span
+                        class="wbk_time_slot_time_string"><?php echo esc_html(
+                            $time
+                        ); ?></span>
                 </span>
             </span>
         </label>
     </li>
     <?php
-} elseif (get_option('wbk_show_booked_slots', 'enabled') == 'enabled') {
-    ?>
+} elseif (
+    (get_option('wbk_show_booked_slots', 'enabled') == 'enabled' &&
+        $timeslot->get_status() != -2) ||
+    (get_option('wbk_show_booked_slots', 'enabled') == 'enabled' &&
+        $timeslot->get_status() == -2 &&
+        get_option('wbk_show_locked_as_booked', '') == 'yes')
+) { ?>
     <li>
         <label>
             <input class="timeslot_radio-w" type="radio" name="time-1" disabled="">
             <span class="radio-time-block-w timeslot-animation-w wbk_flex">
                 <span class="radio-checkmark"></span>
-                <span class="time-w time-long-w" data-server-date="<?php echo esc_attr($date); ?>"
-                    data-local-date="<?php echo esc_attr($local_date); ?>" data-server-time="<?php echo esc_attr($time); ?>"
+                <span class="time-w time-long-w" data-server-date="<?php echo esc_attr(
+                    $date
+                ); ?>"
+                    data-local-date="<?php echo esc_attr(
+                        $local_date
+                    ); ?>" data-server-time="<?php echo esc_attr($time); ?>"
                     data-local-time="<?php echo esc_attr($local_time); ?>"
                     data-start="<?php esc_attr($timeslot->getStart()); ?>"
-                    data-end="<?php echo esc_attr($timeslot->get_end()); ?>" data-index="<?php echo esc_attr($index); ?>"
+                    data-end="<?php echo esc_attr(
+                        $timeslot->get_end()
+                    ); ?>" data-index="<?php echo esc_attr($index); ?>"
                     data-service="<?php esc_html($service->get_id()); ?>"><span
-                        class="wbk_time_slot_time_string"><?php echo esc_html($time); ?></span>
+                        class="wbk_time_slot_time_string"><?php echo esc_html(
+                            $time
+                        ); ?></span>
                     <?php if (
-                        get_option('wbk_show_details_of_previous_bookings', '') ==
-                        'true'
+                        get_option(
+                            'wbk_show_details_of_previous_bookings',
+                            ''
+                        ) == 'true'
                     ) { ?><span
                             style="width:100%;display:block;clear:both;text-decoration:underline!important;font-size:12px;">
                             <?php
@@ -73,7 +102,9 @@ if ($timeslot->get_status() == 0 && $timeslot->get_free_places() > 0) {
                                 }
                                 echo $booking->get_name() .
                                     ' ' .
-                                    $booking->get_custom_field_value('last_name') .
+                                    $booking->get_custom_field_value(
+                                        'last_name'
+                                    ) .
                                     '</br>';
                             }
                             ?>
@@ -86,7 +117,4 @@ if ($timeslot->get_status() == 0 && $timeslot->get_free_places() > 0) {
             </span><!-- /.radio-time-block-w -->
         </label>
     </li>
-    <?php
-}
-
-
+    <?php }

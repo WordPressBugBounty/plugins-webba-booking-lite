@@ -346,6 +346,22 @@ class WBK_Backend_Options {
             ],
             'advanced'
         );
+        // continue here
+        wbk_opt()->add_option(
+            'wbk_show_locked_as_booked',
+            'checkbox',
+            __( 'Show locked time slots as booked', 'webba-booking-lite' ),
+            'wbk_mode_settings_section',
+            [
+                'not_translated_title' => 'Show locked time slots as booked',
+                'popup'                => __( 'Turn on to show locked time slots as "Booked".', 'webba-booking-lite' ),
+                'checkbox_value'       => 'yes',
+                'dependency'           => [
+                    'wbk_show_booked_slots' => ':checked',
+                ],
+            ],
+            'advanced'
+        );
         wbk_opt()->add_option(
             'wbk_appointments_auto_lock',
             'checkbox',
@@ -1308,19 +1324,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
             ],
             'advanced'
         );
-        // continue here
-        wbk_opt()->add_option(
-            'wbk_show_locked_as_booked',
-            'checkbox',
-            __( 'Show locked time slots as booked', 'webba-booking-lite' ),
-            'wbk_mode_settings_section',
-            [
-                'not_translated_title' => 'Show locked time slots as booked',
-                'popup'                => __( 'Turn on to show locked time slots as "Booked".', 'webba-booking-lite' ),
-                'checkbox_value'       => 'yes',
-            ],
-            'advanced'
-        );
         wbk_opt()->add_option(
             'wbk_allow_attachemnt',
             'checkbox',
@@ -2250,11 +2253,11 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 __( 'Action for \'Paid\' booking status', 'webba-booking-lite' ),
                 'wbk_woo_settings_section',
                 [
-                    'extra'                => array(
+                    'extra'                => [
                         'complete_status'  => __( 'Complete status set', 'webba-booking-lite' ),
                         'thankyou_message' => __( 'Thank you message shown', 'webba-booking-lite' ),
                         'complete_payment' => __( 'Payment completed in WooCommerce', 'webba-booking-lite' ),
-                    ),
+                    ],
                     'not_translated_title' => 'Action for Paid booking status',
                     'popup'                => __( 'Select which action will set the booking status as \'Paid\'', 'webba-booking-lite' ),
                 ],
