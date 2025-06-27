@@ -1769,6 +1769,7 @@
                 data: {
                     action: 'wbk_save_options',
                     form_data: jQuery(this).serialize(),
+                    nonce: wbkl10n.wbkb_nonce,
                 },
                 success: function (result) {
                     wbk_change_button_status_options(buttonSubmit, 'regular')

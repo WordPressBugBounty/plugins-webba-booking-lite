@@ -64,7 +64,7 @@
             "title": "Date range",
             "tab": "",
             "misc": {
-                "time_zone": "Europe/London"
+                "time_zone": "Africa/Abidjan"
             },
             "required": true,
             "dependency": [

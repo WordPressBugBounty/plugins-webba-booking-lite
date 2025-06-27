@@ -363,6 +363,12 @@ class WBK_Booking_Factory {
             if ( !$booking->is_loaded() ) {
                 return;
             }
+            $start_time = $booking->get_start();
+            $prev_time_zone = date_default_timezone_get();
+            date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
+            $booking->set( 'day', strtotime( 'midnight', $start_time ) );
+            date_default_timezone_set( $prev_time_zone );
+            $booking->save();
             $current_status = $booking->get( 'status' );
             $prev_status = $booking->get( 'prev_status' );
             $service_id = $booking->get( 'service_id' );

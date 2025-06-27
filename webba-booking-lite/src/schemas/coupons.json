@@ -24,7 +24,7 @@
             "tab": "",
             "misc": {
                 "tooltip": "Define the time period during which the coupon will be valid.",
-                "time_zone": "Europe/London"
+                "time_zone": "Africa/Abidjan"
             },
             "required": false,
             "dependency": [],

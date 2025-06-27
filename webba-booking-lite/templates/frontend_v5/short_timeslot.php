@@ -104,7 +104,9 @@ if ($timeslot->get_status() == 0 && $timeslot->get_free_places() > 0) {
                         ?>
                     </span>
 
-                <?php } ?>
+                <?php } else {echo '<span class="wbk_time_slot_time_string">' .
+                        esc_html(get_option('wbk_booked_text', 'Booked')) .
+                        '</span>';} ?>
             </span>
         </label>
     </li>

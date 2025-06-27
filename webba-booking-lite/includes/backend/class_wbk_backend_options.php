@@ -22,7 +22,7 @@ class WBK_Backend_Options {
     }
 
     public function save_options() {
-        if ( !current_user_can( 'manage_options' ) ) {
+        if ( !current_user_can( 'manage_options' ) || !wp_verify_nonce( $_POST['nonce'], 'wbkb_nonce' ) ) {
             wp_send_json_error( 'No permissions' );
         }
         global $wp_settings_fields;

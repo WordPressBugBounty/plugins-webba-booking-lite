@@ -3,7 +3,7 @@ import styles from './Table.module.scss'
 import classNames from 'classnames'
 import { usePagination } from './hooks/usePagination'
 import { __ } from '@wordpress/i18n'
-import { useEffect, useLayoutEffect } from 'react'
+import { useCallback, useEffect, useLayoutEffect } from 'react'
 import iconArrowLeft from '../../../../public/images/icon-arrow-left.svg'
 import iconArrowRight from '../../../../public/images/icon-arrow-right.svg'
 
@@ -63,10 +63,15 @@ export const Pagination = ({ table }: PaginationProps) => {
         page: currentPageIndex + 1,
         onChange: (page) => table.setPageIndex(page - 1),
     })
+    const scrollTop = useCallback(
+        () => window.scrollTo({ top: 0, behavior: 'smooth' }),
+        []
+    )
 
-    useEffect(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-    }, [table.getPaginationRowModel()])
+    // useEffect(() => {
+    //     window.scrollTo({ top: 0, behavior: 'smooth' })
+    // }, [table.getPaginationRowModel()])
+
     return (
         <div className={styles.paginationContainer}>
             <div className={styles.itemCountWrapper}>
@@ -88,7 +93,10 @@ export const Pagination = ({ table }: PaginationProps) => {
             {pageCount >= 2 && (
                 <div className={styles.paginationTools}>
                     <button
-                        onClick={() => table.previousPage()}
+                        onClick={() => {
+                            table.previousPage()
+                            scrollTop()
+                        }}
                         disabled={!table.getCanPreviousPage()}
                     >
                         <span>{__('Previous', 'webba-booking-lite')}</span>
@@ -120,6 +128,7 @@ export const Pagination = ({ table }: PaginationProps) => {
                                     )}
                                     onClick={() => {
                                         table.setPageIndex(index)
+                                        scrollTop()
                                     }}
                                 >
                                     {page}
@@ -128,7 +137,10 @@ export const Pagination = ({ table }: PaginationProps) => {
                         })}
                     </div>
                     <button
-                        onClick={() => table.nextPage()}
+                        onClick={() => {
+                            table.nextPage()
+                            scrollTop()
+                        }}
                         disabled={!table.getCanNextPage()}
                     >
                         <span>{__('Next', 'webba-booking-lite')}</span>

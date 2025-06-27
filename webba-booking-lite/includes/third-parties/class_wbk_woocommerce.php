@@ -51,7 +51,7 @@ function wbK_woocommerce_coupon_is_valid(  $value, $coupon, $discounts  ) {
                 if ( !$booking->is_loaded() ) {
                     continue;
                 }
-                if ( !WBK_Validator::check_Coupon( $coupon->get_code(), array($booking->get_service()) ) ) {
+                if ( !WBK_Validator::check_Coupon( $coupon->get_code(), [$booking->get_service()] ) ) {
                     $value = false;
                 }
             }
@@ -94,7 +94,7 @@ function wbk_delete_order_item(  $item_id  ) {
 
 function wbk_order_cancelled_refunded(  $order_id  ) {
     $order = new WC_Order($order_id);
-    $booking_ids = array();
+    $booking_ids = [];
     foreach ( $order->get_items() as $item_id => $item ) {
         if ( in_array( $item->get_product_id(), wbk_woocommerce_get_product_ids() ) ) {
             $booking_ids_this = explode( ',', wc_get_order_item_meta( $item_id, 'IDs', true ) );
@@ -143,23 +143,68 @@ function wbk_display_booking_data_text_cart(  $item_data, $cart_item  ) {
         $order_text = implode( ',', $payment_details['item_names'] );
     }
     $meta_key = wbk_get_translation_string( 'wbk_product_meta_key', 'wbk_product_meta_key', 'Appointments' );
-    $item_data[] = array(
+    $item_data[] = [
         'key'     => $meta_key,
         'value'   => $order_text,
         'display' => '',
-    );
+    ];
     date_default_timezone_set( 'UTC' );
     return $item_data;
 }
 
+/*
+function wbk_calculate_booking_product_price($cart_object)
+{
+    if (!WC()->session->__isset("reload_checkout")) {
+        foreach ($cart_object->cart_contents as $key => $value) {
+            if (!isset($value['wbk_appointment_ids'])) {
+                continue;
+            }
+            $prod_id = $value['data']->get_id();
+            if (
+                $value['wbk_appointment_ids'] === NULL &&
+                in_array($value['product_id'], wbk_woocommerce_get_product_ids())
+            ) {
+                $cart_object->remove_cart_item($key);
+
+            }
+            $booking_ids = explode(',', $value['wbk_appointment_ids']);
+
+            foreach ($booking_ids as $booking_id) {
+                $booking = new WBK_Booking($booking_id);
+                if (!$booking->is_loaded()) {
+                    continue;
+                }
+
+                if ($prod_id == $booking->get_woo_product()) {
+                    $payment_details = WBK_Price_Processor::get_payment_items($booking_ids, 0);
+                    $price = $payment_details['total'];
+                    if ($price == 0) {
+                        $cart_object->remove_cart_item($key);
+                    }
+                    $value['data']->set_price($price);
+                }
+            }
+        }
+    }
+}
+*/
 function wbk_calculate_booking_product_price(  $cart_object  ) {
-    if ( !WC()->session->__isset( "reload_checkout" ) ) {
+    if ( !WC()->session->__isset( 'reload_checkout' ) ) {
         foreach ( $cart_object->cart_contents as $key => $value ) {
             if ( !isset( $value['wbk_appointment_ids'] ) ) {
                 continue;
             }
             $prod_id = $value['data']->get_id();
-            if ( $value['wbk_appointment_ids'] === NULL && in_array( $value['product_id'], wbk_woocommerce_get_product_ids() ) ) {
+            $default_lang = apply_filters( 'wpml_default_language', null );
+            $prod_id = apply_filters(
+                'wpml_object_id',
+                $prod_id,
+                'product',
+                false,
+                $default_lang
+            );
+            if ( $value['wbk_appointment_ids'] === null && in_array( $value['product_id'], wbk_woocommerce_get_product_ids() ) ) {
                 $cart_object->remove_cart_item( $key );
             }
             $booking_ids = explode( ',', $value['wbk_appointment_ids'] );
@@ -212,7 +257,7 @@ function wbk_add_booking_text_to_order_items(
 }
 
 function wbk_woocommerce_payment_complete(  $order_id  ) {
-    $default_value = array('complete_status', 'thankyou_message', 'complete_payment');
+    $default_value = ['complete_status', 'thankyou_message', 'complete_payment'];
     $complete_action = get_option( 'wbk_woo_complete_action', $default_value );
     if ( !in_array( 'complete_payment', $complete_action ) ) {
         return;
@@ -221,7 +266,7 @@ function wbk_woocommerce_payment_complete(  $order_id  ) {
 }
 
 function wbk_woocommerce_status_complete(  $order_id  ) {
-    $default_value = array('complete_status', 'thankyou_message', 'complete_payment');
+    $default_value = ['complete_status', 'thankyou_message', 'complete_payment'];
     $complete_action = get_option( 'wbk_woo_complete_action', $default_value );
     if ( !in_array( 'complete_status', $complete_action ) ) {
         return;
@@ -230,7 +275,7 @@ function wbk_woocommerce_status_complete(  $order_id  ) {
 }
 
 function wbk_woocommerce_thankyou(  $order_id  ) {
-    $default_value = array('complete_status', 'thankyou_message', 'complete_payment');
+    $default_value = ['complete_status', 'thankyou_message', 'complete_payment'];
     $complete_action = get_option( 'wbk_woo_complete_action', $default_value );
     if ( !in_array( 'thankyou_message', $complete_action ) ) {
         return;
@@ -240,10 +285,10 @@ function wbk_woocommerce_thankyou(  $order_id  ) {
 
 class WBK_WooCommerce {
     static function add_to_cart( $booking_ids ) {
-        return json_encode( array(
+        return json_encode( [
             'status'  => 0,
             'details' => __( 'Payment method not supported', 'webba-booking-lite' ),
-        ) );
+        ] );
     }
 
     public static function render_initial_form(
@@ -253,7 +298,7 @@ class WBK_WooCommerce {
         $button_class
     ) {
         if ( $payment_method == 'woocommerce' ) {
-            return $input .= WBK_Renderer::load_template( 'frontend/woocommerce_init', array($booking_ids, $button_class), false );
+            return $input .= WBK_Renderer::load_template( 'frontend/woocommerce_init', [$booking_ids, $button_class], false );
         }
         return $input;
     }
@@ -261,33 +306,33 @@ class WBK_WooCommerce {
 }
 
 function wbk_woocommerce_coupon_options_usage_restriction(  $coupon_id, $coupon  ) {
-    if ( !$coupon->is_type( array('percent') ) ) {
+    if ( !$coupon->is_type( ['percent'] ) ) {
         return;
     }
     $options = WBK_Model_Utils::get_services( true );
-    wbk_woocommerce_wp_multi_select( array(
+    wbk_woocommerce_wp_multi_select( [
         'id'      => 'webba_services',
         'name'    => 'webba_services[]',
         'label'   => __( 'Webba Booking services', 'webba-booking-lite' ),
         'options' => $options,
-    ) );
+    ] );
     $options = WBK_Model_Utils::get_pricing_rules( true );
-    wbk_woocommerce_wp_multi_select( array(
+    wbk_woocommerce_wp_multi_select( [
         'id'      => 'webba_pricing_rules',
         'name'    => 'webba_pricing_rules[]',
         'label'   => __( 'Webba Booking pricing rules', 'webba-booking-lite' ),
         'options' => $options,
-    ) );
+    ] );
 }
 
 function wbk_woocommerce_coupon_options_save(  $post_id  ) {
     $coupon = new WC_Coupon($post_id);
-    if ( !$coupon->is_type( array('percent') ) ) {
+    if ( !$coupon->is_type( ['percent'] ) ) {
         return;
     }
     $ids = $_POST['webba_services'];
     $options = WBK_Model_Utils::get_services( true );
-    $validated = array();
+    $validated = [];
     foreach ( $ids as $id ) {
         if ( array_key_exists( $id, $options ) ) {
             $validated[] = $id;
@@ -296,7 +341,7 @@ function wbk_woocommerce_coupon_options_save(  $post_id  ) {
     update_post_meta( $post_id, 'webba_services', $validated );
     $ids = $_POST['webba_pricing_rules'];
     $options = WBK_Model_Utils::get_pricing_rules( true );
-    $validated = array();
+    $validated = [];
     foreach ( $ids as $id ) {
         if ( array_key_exists( $id, $options ) ) {
             $validated[] = $id;
@@ -316,7 +361,7 @@ function wbk_woocommerce_wp_multi_select(  $field, $variation_id = 0  ) {
     $field['wrapper_class'] = ( isset( $field['wrapper_class'] ) ? $field['wrapper_class'] : '' );
     $field['name'] = ( isset( $field['name'] ) ? $field['name'] : $field['id'] );
     $meta_data = maybe_unserialize( get_post_meta( $the_id, $field['id'], true ) );
-    $meta_data = ( $meta_data ? $meta_data : array() );
+    $meta_data = ( $meta_data ? $meta_data : [] );
     $field['value'] = ( isset( $field['value'] ) ? $field['value'] : $meta_data );
     echo '<p class="form-field ' . esc_attr( $field['id'] ) . '_field ' . esc_attr( $field['wrapper_class'] ) . '"><label for="' . esc_attr( $field['id'] ) . '">' . wp_kses_post( $field['label'] ) . '</label><select id="' . esc_attr( $field['id'] ) . '" name="' . esc_attr( $field['name'] ) . '" class="' . esc_attr( $field['class'] ) . '" multiple="multiple">';
     foreach ( $field['options'] as $key => $value ) {
@@ -353,8 +398,8 @@ function wbk_woocommerce_coupon_get_discount_amount(
     if ( empty( $cart_item['wbk_appointment_ids'] ) ) {
         return $discount_amount;
     }
-    $allowed_services = array();
-    $allowed_pricing_rules = array();
+    $allowed_services = [];
+    $allowed_pricing_rules = [];
     if ( is_array( $coupon->get_meta( 'webba_services' ) ) ) {
         $allowed_services = $coupon->get_meta( 'webba_services' );
     }
@@ -400,7 +445,7 @@ function wbk_woocommerce_coupon_get_discount_amount(
 
 function wbk_complete_payment(  $order_id  ) {
     $order = wc_get_order( $order_id );
-    $booking_ids = array();
+    $booking_ids = [];
     foreach ( $order->get_items() as $item_id => $item ) {
         if ( !is_object( $item ) ) {
             continue;

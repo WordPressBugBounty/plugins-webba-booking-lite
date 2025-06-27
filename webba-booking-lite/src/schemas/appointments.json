@@ -41,7 +41,7 @@
             "misc": {
                 "tooltip": "Select the booking date.",
                 "date_format": "M d, Y",
-                "time_zone": "Europe/London"
+                "time_zone": "Africa/Abidjan"
             },
             "required": true,
             "dependency": [],

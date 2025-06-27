@@ -189,7 +189,7 @@ export const createGenericSelectField: FormComponentConstructor<any> = ({
                         id={name}
                         isMulti={multiple}
                         onBlur={() => setTouched(true)}
-                        isSearchable={false}
+                        isSearchable={multiple}
                         isDisabled={isLoading || conditionallyDisabled}
                         isLoading={isLoading}
                         hideSelectedOptions={false}
