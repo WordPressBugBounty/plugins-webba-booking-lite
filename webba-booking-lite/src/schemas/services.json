@@ -39,7 +39,7 @@
             "misc": {
                 "tooltip": "Specify a date range if the service is only valid for a specific period of time.",
                 "date_format": "M d, Y",
-                "time_zone": "Africa/Abidjan"
+                "time_zone": "Europe/Warsaw"
             },
             "required": false,
             "dependency": [],

@@ -268,6 +268,7 @@ class WBK_Schedule_Processor {
                     }
                 }
                 $status = $this->get_time_slot_status( $time, $total_duration, $service );
+                error_log( print_r( $status, true ) );
                 $booked = 0;
                 if ( is_array( $status ) ) {
                     $booked = $status[1];
@@ -646,7 +647,7 @@ class WBK_Schedule_Processor {
 
     public function load_appointments_by_day( $day, $service_id ) {
         global $wpdb;
-        $db_arr = $wpdb->get_results( $wpdb->prepare( "                                       SELECT *\n\t\t\t\t\t\t\t\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_appointments where service_id = %d AND day = %d AND " . WBK_Model_Utils::get_not_canclled_sql(), $service_id, $day ) );
+        $db_arr = $wpdb->get_results( $wpdb->prepare( "                                       SELECT *\n\t\t\t\t\t\t\t\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments where service_id = %d AND day = %d AND ' . WBK_Model_Utils::get_not_canclled_sql(), $service_id, $day ) );
         $this->appointments = [];
         if ( count( $db_arr ) == 0 ) {
             return 0;
@@ -767,12 +768,14 @@ class WBK_Schedule_Processor {
         $start = $time;
         $end = $time + $duration;
         // check breakers
-        foreach ( $this->breakers as $breaker ) {
-            if ( $start > $breaker->getStart() && $start < $breaker->getEnd() ) {
-                return -1;
-            }
-            if ( $end > $breaker->getStart() && $end < $breaker->getEnd() ) {
-                return -1;
+        if ( get_option( 'wbk_mode_overlapping_availabiliy', 'true' ) == 'true' ) {
+            foreach ( $this->breakers as $breaker ) {
+                if ( $start > $breaker->getStart() && $start < $breaker->getEnd() ) {
+                    return -1;
+                }
+                if ( $end > $breaker->getStart() && $end < $breaker->getEnd() ) {
+                    return -1;
+                }
             }
         }
         // check locked timeslots

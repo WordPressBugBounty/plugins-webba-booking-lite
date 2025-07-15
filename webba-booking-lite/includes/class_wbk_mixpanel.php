@@ -1,29 +1,35 @@
 <?php
-if (!defined('ABSPATH'))
-    exit;
+if (!defined('ABSPATH')) {
+    exit();
+}
 
 class WBK_Mixpanel
 {
-    const PROJECT_TOKEN = "253966a60c813a3ea17ea0a6bcaa4479";
+    const PROJECT_TOKEN = '253966a60c813a3ea17ea0a6bcaa4479';
 
     public static function update_configuration($initial = true)
     {
         global $wp_settings_sections, $wp_settings_fields;
         $initial_tracking_version = 'wbk_tracking_v5058';
 
-        if (self::is_localhost() || ($initial && get_option($initial_tracking_version) == 'true')) {
+        if (
+            self::is_localhost() ||
+            ($initial && get_option($initial_tracking_version) == 'true')
+        ) {
             return;
         }
 
         $host = self::get_host();
         $data = ['name' => self::get_host()];
-        if (empty($wp_settings_sections['wbk-options']) || empty($wp_settings_fields['wbk-options'])) {
+        if (
+            empty($wp_settings_sections['wbk-options']) ||
+            empty($wp_settings_fields['wbk-options'])
+        ) {
             return;
         }
         $settings_fields = $wp_settings_fields['wbk-options'];
         $fields_to_remove = [];
         foreach ($settings_fields as $section => $fields) {
-
             foreach ($fields as $field) {
                 if (
                     $field['id'] == 'wbk_gg_clientid' ||
@@ -54,7 +60,11 @@ class WBK_Mixpanel
                     $value = '[empty]';
                 }
 
-                if (isset($field['args']) && isset($field['args']['not_translated_title']) && $field['args']['not_translated_title'] != '') {
+                if (
+                    isset($field['args']) &&
+                    isset($field['args']['not_translated_title']) &&
+                    $field['args']['not_translated_title'] != ''
+                ) {
                     $title = $field['args']['not_translated_title'];
                     $data[$title] = $value;
                 }
@@ -64,7 +74,9 @@ class WBK_Mixpanel
         try {
             $mp = Mixpanel::getInstance(self::PROJECT_TOKEN);
             if (!is_array($data) || empty($data)) {
-                throw new InvalidArgumentException('Invalid data provided. Expected a non-empty array.');
+                throw new InvalidArgumentException(
+                    'Invalid data provided. Expected a non-empty array.'
+                );
             }
             if ($initial) {
                 $mp->people->remove(self::get_host(), $fields_to_remove, 0);
@@ -83,8 +95,7 @@ class WBK_Mixpanel
         if ($host == '') {
             return false;
         }
-        return
-            stripos($host, 'localhost') !== false ||
+        return stripos($host, 'localhost') !== false ||
             substr($host, -4) === '.dev' ||
             substr($host, -5) === '.test';
     }
@@ -101,6 +112,10 @@ class WBK_Mixpanel
             return;
         }
         try {
+            if(!class_exists('Mixpanel') && file_exists(WP_WEBBA_BOOKING__PLUGIN_DIR . '/vendor/mixpanel/mixpanel-php/lib/Mixpanel.php')){
+                require_once WP_WEBBA_BOOKING__PLUGIN_DIR . '/vendor/mixpanel/mixpanel-php/lib/Mixpanel.php';
+            }
+            
             $mp = Mixpanel::getInstance(self::PROJECT_TOKEN);
             $mp->identify(self::get_host());
             $mp->track($event, $details);
@@ -108,5 +123,4 @@ class WBK_Mixpanel
             error_log('Error in tracking: ' . $e->getMessage());
         }
     }
-
 }

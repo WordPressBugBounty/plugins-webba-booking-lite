@@ -1350,19 +1350,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
             'advanced'
         );
         wbk_opt()->add_option(
-            'wbk_disable_security',
-            'checkbox',
-            __( 'Disable advanced security checks', 'webba-booking-lite' ),
-            'wbk_general_settings_section',
-            [
-                'checkbox_value'       => 'true',
-                'default'              => 'true',
-                'not_translated_title' => 'Disable advanced security checks',
-                'popup'                => __( 'IMPORTANT: if you disable this option, make sure to not cache pages with the booking form.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
             'wbk_order_service_by',
             'select',
             __( 'Order service by', 'webba-booking-lite' ),

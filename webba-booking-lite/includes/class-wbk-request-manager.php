@@ -182,7 +182,7 @@ class WBK_Request_Manager {
     }
 
     public function wbk_apply_coupon() {
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -256,7 +256,7 @@ class WBK_Request_Manager {
     }
 
     public function wbk_approve_payment() {
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -673,7 +673,7 @@ class WBK_Request_Manager {
     }
 
     public function calculate_amounts() {
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -806,7 +806,7 @@ class WBK_Request_Manager {
     }
 
     public function search_time() {
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -975,7 +975,7 @@ class WBK_Request_Manager {
     }
 
     public function render_days() {
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -997,7 +997,7 @@ class WBK_Request_Manager {
 
     public function prepare_service_data() {
         try {
-            if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+            if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
                 wp_die();
                 return;
             }
@@ -1106,7 +1106,7 @@ class WBK_Request_Manager {
     }
 
     public function render_booking_form() {
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -1171,7 +1171,7 @@ class WBK_Request_Manager {
     }
 
     public function book() {
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -1417,7 +1417,7 @@ class WBK_Request_Manager {
             $_SESSION['wbk_last_name'] = $last_name;
         }
         $boking_factory->post_production( $booking_ids, 'on_booking' );
-        WBK_Mixpanel::track_event( "booking created", [
+        WBK_Mixpanel::track_event( 'booking created', [
             'booking_type' => 'frontend',
         ] );
         $payment_methods = WBK_Model_Utils::get_payment_methods_for_bookings_intersected( $booking_ids );
@@ -1476,7 +1476,7 @@ class WBK_Request_Manager {
     }
 
     public function prepare_payment() {
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -1606,7 +1606,7 @@ class WBK_Request_Manager {
     }
 
     public function charge_stripe() {
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -1651,7 +1651,7 @@ class WBK_Request_Manager {
     }
 
     public function cancel_booking() {
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -1723,7 +1723,7 @@ class WBK_Request_Manager {
         if ( $notice == 'wbk_show_go_preimum_1' ) {
             update_option( 'wbk_show_go_preimum_1', 'false' );
         }
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -1740,7 +1740,7 @@ class WBK_Request_Manager {
         global $wpdb;
         global $current_user;
         date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -1987,7 +1987,7 @@ class WBK_Request_Manager {
     }
 
     public function save_appearance() {
-        if ( get_option( 'wbk_disable_security', '' ) != 'true' && !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
+        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkf_nonce' ) ) {
             wp_die();
             return;
         }
@@ -2082,7 +2082,7 @@ class WBK_Request_Manager {
         }
         file_put_contents( $dir . DIRECTORY_SEPARATOR . 'index.html', '' );
         file_put_contents( $dir . DIRECTORY_SEPARATOR . 'wbk5-frontend-custom-style.css', $css_content );
-        WBK_Mixpanel::track_event( "appearance saved", [] );
+        WBK_Mixpanel::track_event( 'appearance saved', [] );
     }
 
     public function wbk_report_error() {
@@ -2300,7 +2300,7 @@ class WBK_Request_Manager {
     }
 
     public function get_preset( $request ) {
-        WBK_Mixpanel::track_event( "v51 react app: get preset", [] );
+        WBK_Mixpanel::track_event( 'v51 react app: get preset', [] );
         $services = WBK_Model_Utils::get_services();
         $services_arr = [];
         foreach ( $services as $id => $name ) {
@@ -2416,7 +2416,7 @@ class WBK_Request_Manager {
     }
 
     public function get_field_options( WP_REST_Request $request ) {
-        WBK_Mixpanel::track_event( "v51 react app: get field options", [] );
+        WBK_Mixpanel::track_event( 'v51 react app: get field options', [] );
         $data = [];
         $params = $request->get_params();
         $model = ( isset( $params['model'] ) ? sanitize_text_field( $params['model'] ) : '' );
@@ -2438,34 +2438,32 @@ class WBK_Request_Manager {
                     $data[$model][$field] = $payment_methods;
                     break;
             }
-        } else {
-            if ( $model === 'appointments' && ($field === 'service_id' || $field === 'day' || $field === 'time') && $form['service_id'] && $form['day'] ) {
-                $sp = new WBK_Schedule_Processor();
-                date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
-                $day = strtotime( $form['day'] );
-                $timeslots = $sp->get_time_slots_by_day(
-                    $day,
-                    $form['service_id'] ?? 0,
-                    [
-                        'skip_gg_calendar'       => false,
-                        'ignore_preparation'     => true,
-                        'calculate_availability' => true,
-                        'calculate_night_hours'  => false,
-                        'filter_availability'    => false,
-                    ],
-                    $form['id'] ?? null
-                );
-                foreach ( $timeslots as $slot ) {
-                    $data[$model]['time'][$slot->start] = sprintf( '%s (%d available)', $slot->formated_time, $slot->free_places );
-                    for ($place = 1; $place <= $slot->free_places && $form['time'] == $slot->start; $place++) {
-                        $data[$model]['quantity'][$place] = sprintf( '%d', $place );
-                    }
+        } elseif ( $model === 'appointments' && ($field === 'service_id' || $field === 'day' || $field === 'time') && $form['service_id'] && $form['day'] ) {
+            $sp = new WBK_Schedule_Processor();
+            date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
+            $day = strtotime( $form['day'] );
+            $timeslots = $sp->get_time_slots_by_day(
+                $day,
+                $form['service_id'] ?? 0,
+                [
+                    'skip_gg_calendar'       => false,
+                    'ignore_preparation'     => true,
+                    'calculate_availability' => true,
+                    'calculate_night_hours'  => false,
+                    'filter_availability'    => false,
+                ],
+                $form['id'] ?? null
+            );
+            foreach ( $timeslots as $slot ) {
+                $data[$model]['time'][$slot->start] = sprintf( '%s (%d available)', $slot->formated_time, $slot->free_places );
+                for ($place = 1; $place <= $slot->free_places && $form['time'] == $slot->start; $place++) {
+                    $data[$model]['quantity'][$place] = sprintf( '%d', $place );
                 }
-                if ( empty( $data[$model]['time'] ) ) {
-                    $data[$model]['time'] = [
-                        'plugion_null' => __( 'No time slots available', 'webba-booking-lite' ),
-                    ];
-                }
+            }
+            if ( empty( $data[$model]['time'] ) ) {
+                $data[$model]['time'] = [
+                    'plugion_null' => __( 'No time slots available', 'webba-booking-lite' ),
+                ];
             }
         }
         $response = new WP_REST_Response($data);
@@ -2493,7 +2491,7 @@ class WBK_Request_Manager {
         $data = [];
         $params = $request->get_params();
         $calendar_id = ( isset( $params['calendar_id'] ) ? sanitize_text_field( $params['calendar_id'] ) : null );
-        $credentials = array(get_option( 'wbk_gg_clientid', '' ), get_option( 'wbk_gg_secret', '' ));
+        $credentials = [get_option( 'wbk_gg_clientid', '' ), get_option( 'wbk_gg_secret', '' )];
         $credentials = apply_filters( 'wbk_gg_credentials', $credentials );
         $data['isAuthenticated'] = $credentials[0] && $credentials[1];
         if ( $calendar_id !== null ) {
@@ -2565,10 +2563,10 @@ class WBK_Request_Manager {
         $date_format_js = str_replace( 'Y', 'yyyy', $date_format_js );
         $date_format_js = str_replace( 'S', '', $date_format_js );
         $date_format_js = str_replace( 's', '', $date_format_js );
-        $yesterday = date( 'F d, Y', strtotime( "-1 days" ) );
-        $last_30_days = date( 'F d, Y', strtotime( "-31 days" ) );
-        $formatted_yesterday = date( $date_format, strtotime( "-1 days" ) );
-        $formatted_last_30_days = date( $date_format, strtotime( "-31 days" ) );
+        $yesterday = date( 'F d, Y', strtotime( '-1 days' ) );
+        $last_30_days = date( 'F d, Y', strtotime( '-31 days' ) );
+        $formatted_yesterday = date( $date_format, strtotime( '-1 days' ) );
+        $formatted_last_30_days = date( $date_format, strtotime( '-31 days' ) );
         $db_prefix = get_option( 'wbk_db_prefix', '' );
         $table = $db_prefix . 'wbk_appointments';
         $pro_version = false;
