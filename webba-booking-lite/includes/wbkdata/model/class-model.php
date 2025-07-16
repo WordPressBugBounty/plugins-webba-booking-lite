@@ -3,15 +3,15 @@ namespace WbkData;
 
 use WBK_User_Utils;
 
-if (!defined('ABSPATH'))
-    exit;
+if (!defined('ABSPATH')) {
+    exit();
+}
 /*
  * This file is part of Webba Booking plugin
  */
 
-
 if (!defined('ABSPATH')) {
-    exit;
+    exit();
 }
 /**
  * Database table class
@@ -91,7 +91,6 @@ class Model
      * @param string $model_name name of table in the database
      */
 
-
     public function __construct($model_name)
     {
         $this->fields = new Collection('Field');
@@ -122,9 +121,29 @@ class Model
      * @param mixed $in_row
      * @param mixed $required
      */
-    public function add_field($slug, $name, $title, $type, $section = '', $extra_data = null, $default_value = '', $editable = true, $in_row = true, $required = true)
-    {
-        $field = new Field($name, $title, $type, $section, $extra_data, $default_value, $editable, $in_row, $required);
+    public function add_field(
+        $slug,
+        $name,
+        $title,
+        $type,
+        $section = '',
+        $extra_data = null,
+        $default_value = '',
+        $editable = true,
+        $in_row = true,
+        $required = true
+    ) {
+        $field = new Field(
+            $name,
+            $title,
+            $type,
+            $section,
+            $extra_data,
+            $default_value,
+            $editable,
+            $in_row,
+            $required
+        );
         $field->set_model_name($this->model_name);
         $this->fields->add($field, $slug);
     }
@@ -134,19 +153,22 @@ class Model
         $this->storage['fields_to_view_db']['id'] = 'id';
 
         // get fields and filter by role
-        $fields = $this->filter_fields_by_role('view', $this->fields->get_elements());
+        $fields = $this->filter_fields_by_role(
+            'view',
+            $this->fields->get_elements()
+        );
 
         foreach ($fields as $slug => $field) {
             $this->storage['fields_to_view'][$slug] = $field;
-            $this->storage['fields_to_view_db'][$slug] = \WbkData_Model_Utils::clean_up_string($field->get_name());
+            $this->storage['fields_to_view_db'][
+                $slug
+            ] = \WbkData_Model_Utils::clean_up_string($field->get_name());
         }
         if (1 === count($this->storage['fields_to_view_db'])) {
             $this->storage['fields_to_view_db'] = [];
             $this->storage['fields_to_view'] = [];
         }
     }
-
-
 
     public function get_items($filters = [])
     {
@@ -159,7 +181,10 @@ class Model
         // check for filters with default values
         if (count($filters) == 0) {
             foreach ($this->storage['fields_to_view'] as $slug => $field) {
-                if (is_array($field->get_filter_value()) && count($field->get_filter_value()) > 0) {
+                if (
+                    is_array($field->get_filter_value()) &&
+                    count($field->get_filter_value()) > 0
+                ) {
                     $filter['name'] = $slug;
                     $filter['value'] = $field->get_filter_value();
                     $filters[] = $filter;
@@ -179,59 +204,82 @@ class Model
         } else {
             $appointment_day = [];
             foreach ($filters as $key => $filter) {
-                if (isset($filter['value']) && 'appointment_day' == $filter['name']) {
+                if (
+                    isset($filter['value']) &&
+                    'appointment_day' == $filter['name']
+                ) {
                     $prev_time_zone = date_default_timezone_get();
-                    date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
+                    date_default_timezone_set(
+                        get_option('wbk_timezone', 'UTC')
+                    );
                     $appointment_day[] = strtotime($filter['value']);
                     date_default_timezone_set($prev_time_zone);
                     unset($filters[$key]);
                 }
             }
             if ($appointment_day) {
-                $filters[] = array(
+                $filters[] = [
                     'name' => 'appointment_day',
-                    'value' => $appointment_day
-                );
+                    'value' => $appointment_day,
+                ];
             }
         }
         if (count($filters) > 0) {
             foreach ($filters as $filter) {
-
                 $filter_name = $filter['name'];
 
                 if (isset($filter['value']) && is_array($filter['value'])) {
                     $filter_value = $filter['value'];
                 } else {
-                    $filter_value = isset($filter['value']) ? array($filter['value']) : [];
+                    $filter_value = isset($filter['value'])
+                        ? [$filter['value']]
+                        : [];
                 }
 
                 if ('appointment_service_categories' == $filter_name) {
                     $filter_name = 'appointment_service_id';
 
-                    $service_categories = $wpdb->get_var($wpdb->prepare("SELECT list FROM " . get_option('wbk_db_prefix', '') . "wbk_service_categories WHERE id = %d", $filter_value));
+                    $service_categories = $wpdb->get_var(
+                        $wpdb->prepare(
+                            'SELECT list FROM ' .
+                                get_option('wbk_db_prefix', '') .
+                                'wbk_service_categories WHERE id = %d',
+                            $filter_value
+                        )
+                    );
                     $service_categories_ids = json_decode($service_categories);
 
-                    if (is_array($service_categories_ids) && count($service_categories_ids) == 0) {
+                    if (
+                        is_array($service_categories_ids) &&
+                        count($service_categories_ids) == 0
+                    ) {
                         $filter_value = [-1];
-                    } elseif (is_array($service_categories_ids) && count($service_categories_ids) > 0) {
+                    } elseif (
+                        is_array($service_categories_ids) &&
+                        count($service_categories_ids) > 0
+                    ) {
                         $filter_value = $service_categories_ids;
                     }
                 }
 
-                $filter_value = apply_filters('wbkdata_filter_value', $filter_value, $filter_name);
+                $filter_value = apply_filters(
+                    'wbkdata_filter_value',
+                    $filter_value,
+                    $filter_name
+                );
 
                 if (!empty($filter_value)) {
-                    $this->fields->get_element_at($filter_name)->set_filter_value($filter_value);
+                    $this->fields
+                        ->get_element_at($filter_name)
+                        ->set_filter_value($filter_value);
                 }
             }
         }
         $conditions_by_fields = [];
         foreach ($this->fields->get_elements() as $slug => $field) {
-
             $filter_sql = $field->filter_to_sql();
 
             if ('' !== $filter_sql) {
-
                 $conditions_by_fields[] = '(' . $filter_sql . ')';
             }
         }
@@ -243,7 +291,8 @@ class Model
         // update conditions
         $user = wp_get_current_user();
         if (
-            $this->model_name == get_option('wbk_db_prefix', '') . 'wbk_appointments'
+            $this->model_name ==
+            get_option('wbk_db_prefix', '') . 'wbk_appointments'
         ) {
             if (
                 in_array('administrator', $user->roles, true) ||
@@ -251,14 +300,15 @@ class Model
             ) {
             } else {
                 $services = \WBK_Model_Utils::get_service_ids(true);
-                $condition_this = ' AND service_id in (' . implode(',', $services) . ')';
+                $condition_this =
+                    ' AND service_id in (' . implode(',', $services) . ')';
                 $conditions .= $condition_this;
             }
         }
         if (
-            $this->model_name == get_option('wbk_db_prefix', '') . 'wbk_services'
+            $this->model_name ==
+            get_option('wbk_db_prefix', '') . 'wbk_services'
         ) {
-
             if (
                 in_array('administrator', $user->roles, true) ||
                 (is_multisite() && !is_super_admin())
@@ -273,9 +323,18 @@ class Model
         if ('' !== $conditions) {
             $conditions = ' WHERE ' . $conditions;
         }
-        $sql = 'SELECT ' . implode(', ', $this->storage['fields_to_view_db']) . ' from ' . \WbkData_Model_Utils::clean_up_string($this->get_model_name()) . $conditions;
+        $sql =
+            'SELECT ' .
+            implode(', ', $this->storage['fields_to_view_db']) .
+            ' from ' .
+            \WbkData_Model_Utils::clean_up_string($this->get_model_name()) .
+            $conditions;
 
-        $result = apply_filters('wbkdata_rows_value', $wpdb->get_results($sql), $this->model_name);
+        $result = apply_filters(
+            'wbkdata_rows_value',
+            $wpdb->get_results($sql),
+            $this->model_name
+        );
         //  $result = $this->remove_slashes_from_properties($result);
 
         $this->storage['rows'] = $result;
@@ -325,7 +384,9 @@ class Model
     public function prepare_properties_form($action)
     {
         // filter fields by ediable flag
-        $fields = $this->filter_fields_by_ediable($this->fields->get_elements());
+        $fields = $this->filter_fields_by_ediable(
+            $this->fields->get_elements()
+        );
 
         // filter fields list by role
         $fields = $this->filter_fields_by_role($action, $fields);
@@ -334,7 +395,9 @@ class Model
         $this->storage['property_fields_' . $action] = [];
 
         foreach ($fields as $slug => $field) {
-            $this->storage['property_sections_' . $action][] = $field->get_section();
+            $this->storage[
+                'property_sections_' . $action
+            ][] = $field->get_section();
             $this->storage['property_fields_' . $action][$slug] = $field;
         }
     }
@@ -359,22 +422,45 @@ class Model
     public function sync_structure()
     {
         global $wpdb;
-        $model_name = \WbkData_Model_Utils::clean_up_string($this->get_model_name());
+        $model_name = \WbkData_Model_Utils::clean_up_string(
+            $this->get_model_name()
+        );
         // check if table exitsts and create if does not
-        $wpdb->query("CREATE TABLE IF NOT EXISTS " . $model_name . " ( id int unsigned NOT NULL auto_increment PRIMARY KEY )");
+        $wpdb->query(
+            'CREATE TABLE IF NOT EXISTS ' .
+                $model_name .
+                ' ( id int unsigned NOT NULL auto_increment PRIMARY KEY )'
+        );
         // iterate over fields
         $fields = $this->fields->get_elements();
         $model_updated = false;
 
         foreach ($fields as $slug => $field) {
             // check if field exists
-            $field_name = \WbkData_Model_Utils::clean_up_string($field->get_name());
+            $field_name = \WbkData_Model_Utils::clean_up_string(
+                $field->get_name()
+            );
             $args = [$field_name];
-            if (0 === $wpdb->query($wpdb->prepare('SHOW COLUMNS FROM ' . $model_name . ' LIKE %s ', $args))) {
+            if (
+                0 ===
+                $wpdb->query(
+                    $wpdb->prepare(
+                        'SHOW COLUMNS FROM ' . $model_name . ' LIKE %s ',
+                        $args
+                    )
+                )
+            ) {
                 $model_updated = true;
                 $sql_type = $field->field_type_to_sql_type();
                 if (false !== $sql_type) {
-                    $wpdb->query('ALTER TABLE `' . $model_name . '`  ADD `' . $field_name . '`' . $sql_type);
+                    $wpdb->query(
+                        'ALTER TABLE `' .
+                            $model_name .
+                            '`  ADD `' .
+                            $field_name .
+                            '`' .
+                            $sql_type
+                    );
                 }
             }
         }
@@ -382,7 +468,6 @@ class Model
         if (!$model_updated) {
             $this->generate_frontend_model();
         }
-
     }
     /**
      * Generate json schema for using in react app
@@ -390,9 +475,11 @@ class Model
      */
     public function generate_frontend_model()
     {
-
         global $wpdb;
-        $data = ['$schema' => 'http://json-schema.org/draft-07/schema#', 'type' => 'object'];
+        $data = [
+            '$schema' => 'http://json-schema.org/draft-07/schema#',
+            'type' => 'object',
+        ];
         $fields = $this->fields->get_elements();
         $properties = [];
         foreach ($fields as $slug => $field) {
@@ -475,19 +562,30 @@ class Model
                 'required' => $field->get_required(),
                 'dependency' => $field->get_dependency(),
                 'default_value' => $field->get_default_value(),
-                'editable' => $field->get_editable()
+                'editable' => $field->get_editable(),
             ];
         }
         $data['properties'] = $properties;
-        $json_output = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        $model_name = str_replace([$wpdb->prefix, 'wbk_'], [''], $this->model_name);
-
-        $path = WP_WEBBA_BOOKING__PLUGIN_DIR . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'schemas' . DIRECTORY_SEPARATOR . $model_name . '.json';
-        file_put_contents(
-            $path,
-            $json_output
+        $json_output = json_encode(
+            $data,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        );
+        $model_name = str_replace(
+            [$wpdb->prefix, 'wbk_'],
+            [''],
+            $this->model_name
         );
 
+        $path =
+            WP_WEBBA_BOOKING__PLUGIN_DIR .
+            DIRECTORY_SEPARATOR .
+            'src' .
+            DIRECTORY_SEPARATOR .
+            'schemas' .
+            DIRECTORY_SEPARATOR .
+            $model_name .
+            '.json';
+        file_put_contents($path, $json_output);
     }
     /**
      * @return string
@@ -523,7 +621,10 @@ class Model
         }
 
         // filter fields list by role
-        $fields = $this->filter_fields_by_role('add', $this->fields->get_elements());
+        $fields = $this->filter_fields_by_role(
+            'add',
+            $this->fields->get_elements()
+        );
         // filter fields by dependency
         $fields = $this->filter_fields_by_dependency($fields, $sanitized_data);
         $fields_before_editable_check = $fields;
@@ -537,17 +638,35 @@ class Model
             return [false, $invalid_fields];
         }
 
-        $values_and_format = [$validation['valid_fields'], $validation['field_formats']];
+        $values_and_format = [
+            $validation['valid_fields'],
+            $validation['field_formats'],
+        ];
 
         // filter by 3dparty (add values)
-        $values_and_format = apply_filters('wbkdata_add_item_values', $values_and_format, $this->get_model_name());
-        $model_name = \WbkData_Model_Utils::clean_up_string($this->get_model_name());
-        $wpdb->insert($model_name, $values_and_format[0], $values_and_format[1]);
+        $values_and_format = apply_filters(
+            'wbkdata_add_item_values',
+            $values_and_format,
+            $this->get_model_name()
+        );
+        $model_name = \WbkData_Model_Utils::clean_up_string(
+            $this->get_model_name()
+        );
+        $wpdb->insert(
+            $model_name,
+            $values_and_format[0],
+            $values_and_format[1]
+        );
         $id = $wpdb->insert_id;
         $item = $this->get_item($id);
         $item = json_decode(json_encode($item), true);
         $row_for_action = (object) $item;
-        do_action('wbkdata_on_after_item_added', $model_name, $this->model_name, $row_for_action);
+        do_action(
+            'wbkdata_on_after_item_added',
+            $model_name,
+            $this->model_name,
+            $row_for_action
+        );
         return [true, 'id' => $id];
     }
 
@@ -561,7 +680,10 @@ class Model
         }
 
         // filter fields list by role
-        $fields = $this->filter_fields_by_role('update', $this->fields->get_elements());
+        $fields = $this->filter_fields_by_role(
+            'update',
+            $this->fields->get_elements()
+        );
         // filter fields by dependency
         $fields = $this->filter_fields_by_dependency($fields, $sanitized_data);
         $fields_before_editable_check = $fields;
@@ -575,50 +697,93 @@ class Model
         }
         // filter by 3dparty
         $conditions = [['id' => $id], ['%d']];
-        $conditions = apply_filters('wbkdata_update_item_conditions', $conditions, $this->get_model_name());
+        $conditions = apply_filters(
+            'wbkdata_update_item_conditions',
+            $conditions,
+            $this->get_model_name()
+        );
 
-        $model_name = \WbkData_Model_Utils::clean_up_string($this->get_model_name());
+        $model_name = \WbkData_Model_Utils::clean_up_string(
+            $this->get_model_name()
+        );
 
-        if (false === $wpdb->update($model_name, $validation['valid_fields'], $conditions[0], $validation['field_formats'], $conditions[1])) {
+        if (
+            false ===
+            $wpdb->update(
+                $model_name,
+                $validation['valid_fields'],
+                $conditions[0],
+                $validation['field_formats'],
+                $conditions[1]
+            )
+        ) {
             return [false, null];
         }
-        do_action('wbkdata_on_after_item_updated', $model_name, $this->model_name, $id);
+        do_action(
+            'wbkdata_on_after_item_updated',
+            $model_name,
+            $this->model_name,
+            $id
+        );
         return [true, null];
     }
     public function get_item($id, $output = OBJECT)
     {
         global $wpdb;
         $args = [$id];
-        $model_name = \WbkData_Model_Utils::clean_up_string($this->get_model_name());
+        $model_name = \WbkData_Model_Utils::clean_up_string(
+            $this->get_model_name()
+        );
         $this->prepare_fields_to_view();
         if (0 === count($this->storage['fields_to_view_db'])) {
             return null;
         }
         $fields = implode(',', $this->storage['fields_to_view_db']);
         $conditions = ' where id = %d ';
-        $conditions = apply_filters('wbkdata_get_item_conditions', $conditions, $this->get_model_name());
+        $conditions = apply_filters(
+            'wbkdata_get_item_conditions',
+            $conditions,
+            $this->get_model_name()
+        );
 
-        $value = $wpdb->get_row($wpdb->prepare('SELECT ' . $fields . ' FROM ' . $model_name . $conditions, $args), $output);
-        $value = array($value);
+        $value = $wpdb->get_row(
+            $wpdb->prepare(
+                'SELECT ' . $fields . ' FROM ' . $model_name . $conditions,
+                $args
+            ),
+            $output
+        );
+        $value = [$value];
         apply_filters('wbkdata_rows_value', $value, $this->model_name);
         return $value[0];
-
     }
     public function delete_item($id)
     {
         global $wpdb;
         $args = [$id];
-        $model_name = \WbkData_Model_Utils::clean_up_string($this->get_model_name());
+        $model_name = \WbkData_Model_Utils::clean_up_string(
+            $this->get_model_name()
+        );
         $item = $this->get_item($id);
 
         if (!$this->current_user_can_delete($item)) {
             return false;
         }
-        do_action('wbkdata_on_before_item_deleted', $model_name, $this->model_name, $item);
+        do_action(
+            'wbkdata_on_before_item_deleted',
+            $model_name,
+            $this->model_name,
+            $item
+        );
         $result = $wpdb->delete($model_name, ['id' => $id], '%d');
 
         if ($result) {
-            do_action('wbkdata_on_after_item_deleted', $model_name, $this->model_name, $item);
+            do_action(
+                'wbkdata_on_after_item_deleted',
+                $model_name,
+                $this->model_name,
+                $item
+            );
         }
 
         return $result;
@@ -626,7 +791,10 @@ class Model
     public function сurrent_user_can_view()
     {
         $user = wp_get_current_user();
-        if (current_user_can('manage_options') || current_user_can('manage_sites')) {
+        if (
+            current_user_can('manage_options') ||
+            current_user_can('manage_sites')
+        ) {
             return true;
         }
         $this->prepare_fields_to_view();
@@ -639,22 +807,42 @@ class Model
     public function current_user_can_delete($row = null)
     {
         $user = wp_get_current_user();
-        if (current_user_can('manage_options') || current_user_can('manage_sites')) {
-            return apply_filters('wbkdata_row_can_delete', true, $row, $this->get_model_name());
+        if (
+            current_user_can('manage_options') ||
+            current_user_can('manage_sites')
+        ) {
+            return apply_filters(
+                'wbkdata_row_can_delete',
+                true,
+                $row,
+                $this->get_model_name()
+            );
         }
 
         foreach ($user->roles as $role) {
             if (in_array($role, $this->can_delete, true)) {
-                return apply_filters('wbkdata_row_can_delete', true, $row, $this->get_model_name());
+                return apply_filters(
+                    'wbkdata_row_can_delete',
+                    true,
+                    $row,
+                    $this->get_model_name()
+                );
             }
         }
 
-        return apply_filters('wbkdata_row_can_delete', false, $row, $this->get_model_name());
+        return apply_filters(
+            'wbkdata_row_can_delete',
+            false,
+            $row,
+            $this->get_model_name()
+        );
     }
     public function current_user_can_add()
     {
         // filter fields list by editable
-        $fields = $this->filter_fields_by_ediable($this->fields->get_elements());
+        $fields = $this->filter_fields_by_ediable(
+            $this->fields->get_elements()
+        );
 
         // filter fields list by role
         $fields = $this->filter_fields_by_role('add', $fields);
@@ -668,7 +856,9 @@ class Model
     public function current_user_can_update()
     {
         // filter fields list by editable
-        $fields = $this->filter_fields_by_ediable($this->fields->get_elements());
+        $fields = $this->filter_fields_by_ediable(
+            $this->fields->get_elements()
+        );
 
         // filter fields list by role
         $fields = $this->filter_fields_by_role('update', $fields);
@@ -686,7 +876,9 @@ class Model
     public function current_user_can_duplicate()
     {
         // filter fields list by editable
-        $fields = $this->filter_fields_by_ediable($this->fields->get_elements());
+        $fields = $this->filter_fields_by_ediable(
+            $this->fields->get_elements()
+        );
 
         // filter fields list by role
         $fields = $this->filter_fields_by_role('add', $fields);
@@ -750,7 +942,10 @@ class Model
                     switch ($dependency_rule[1]) {
                         case '=':
                             if (isset($post_data[$dependency_rule[0]])) {
-                                if ($post_data[$dependency_rule[0]] != $dependency_rule[2]) {
+                                if (
+                                    $post_data[$dependency_rule[0]] !=
+                                    $dependency_rule[2]
+                                ) {
                                     $rules_passed = false;
                                 }
                             }
@@ -758,7 +953,10 @@ class Model
                             break;
                         case '<':
                             if (isset($post_data[$dependency_rule[0]])) {
-                                if ($post_data[$dependency_rule[0]] >= $dependency_rule[2]) {
+                                if (
+                                    $post_data[$dependency_rule[0]] >=
+                                    $dependency_rule[2]
+                                ) {
                                     $rules_passed = false;
                                 }
                             }
@@ -766,7 +964,10 @@ class Model
                             break;
                         case '>':
                             if (isset($post_data[$dependency_rule[0]])) {
-                                if ($post_data[$dependency_rule[0]] <= $dependency_rule[2]) {
+                                if (
+                                    $post_data[$dependency_rule[0]] <=
+                                    $dependency_rule[2]
+                                ) {
                                     $rules_passed = false;
                                 }
                             }
@@ -774,14 +975,16 @@ class Model
                             break;
                         case '!=':
                             if (isset($post_data[$dependency_rule[0]])) {
-                                if ($post_data[$dependency_rule[0]] == $dependency_rule[2]) {
+                                if (
+                                    $post_data[$dependency_rule[0]] ==
+                                    $dependency_rule[2]
+                                ) {
                                     $rules_passed = false;
                                 }
                             }
 
                             break;
                         default:
-
                             break;
                     }
                 }
@@ -812,7 +1015,7 @@ class Model
     }
 
     /**
-     * Get the value of roles of wp users that can delete  
+     * Get the value of roles of wp users that can delete
      *
      * @return array
      */
@@ -849,30 +1052,54 @@ class Model
 
         foreach ($fields as $slug => $field) {
             if (isset($data[$field->get_name()])) {
-                $validation_result = apply_filters('wbkdata_property_field_validation_' . $field->get_type(), [false, ''], $data[$field->get_name()], $slug, $field);
-                if (!array($validation_result)) {
-                    $invalid_fields[] = [$slug, sprintf(wbkdata_translate_string('Validation of %s failed'), $field->get_title())];
+                $validation_result = apply_filters(
+                    'wbkdata_property_field_validation_' . $field->get_type(),
+                    [false, ''],
+                    $data[$field->get_name()],
+                    $slug,
+                    $field
+                );
+                if (![$validation_result]) {
+                    $invalid_fields[] = [
+                        $slug,
+                        sprintf(
+                            wbkdata_translate_string('Validation of %s failed'),
+                            $field->get_title()
+                        ),
+                    ];
                 } else {
                     if (true === $validation_result[0]) {
                         $format = $field->field_type_to_sql_type(true);
                         if (false === $format) {
                             continue;
                         }
-                        $valid_fields[$field->get_name()] = $field->get_type() !== 'wbk_app_custom_data' ? $this->clean_up_value($validation_result[1]) : $validation_result[1];
+                        $valid_fields[$field->get_name()] =
+                            $field->get_type() !== 'wbk_app_custom_data'
+                                ? $this->clean_up_value($validation_result[1])
+                                : $validation_result[1];
                         $field_formats[] = $format;
                     } else {
                         $invalid_fields[] = [$slug, $validation_result[1]];
                     }
                 }
-
             } else {
                 if ($field->get_required()) {
-                    $invalid_fields[] = [$slug, sprintf(wbkdata_translate_string('Field %s is empty'), $field->get_title())];
+                    $invalid_fields[] = [
+                        $slug,
+                        sprintf(
+                            wbkdata_translate_string('Field %s is empty'),
+                            $field->get_title()
+                        ),
+                    ];
                 }
             }
         }
 
-        return ['invalid_fields' => $invalid_fields, 'valid_fields' => $valid_fields, 'field_formats' => $field_formats];
+        return [
+            'invalid_fields' => $invalid_fields,
+            'valid_fields' => $valid_fields,
+            'field_formats' => $field_formats,
+        ];
     }
 
     /**
@@ -889,10 +1116,20 @@ class Model
             if (is_user_logged_in()) {
                 $user = wp_get_current_user();
 
-                $have_permission = current_user_can('manage_options') && current_user_can('manage_sites') && !is_multisite();
+                $have_permission =
+                    current_user_can('manage_options') &&
+                    current_user_can('manage_sites') &&
+                    !is_multisite();
 
-                if (isset($_REQUEST['model']) && $_REQUEST['model'] == 'appointments' && isset($_REQUEST['service_id'])) {
-                    $have_permission = WBK_User_Utils::check_access_to_particular_service(get_current_user_id(), $_REQUEST['service_id']);
+                if (
+                    isset($_REQUEST['model']) &&
+                    $_REQUEST['model'] == 'appointments' &&
+                    isset($_REQUEST['service_id'])
+                ) {
+                    $have_permission = WBK_User_Utils::check_access_to_particular_service(
+                        get_current_user_id(),
+                        $_REQUEST['service_id']
+                    );
                 }
 
                 if ($have_permission) {
@@ -917,7 +1154,12 @@ class Model
                         continue;
                     }
                 } else {
-                    $admin_passed = apply_filters('wbkdata_admin_filter_by_role', true, $action, $field);
+                    $admin_passed = apply_filters(
+                        'wbkdata_admin_filter_by_role',
+                        true,
+                        $action,
+                        $field
+                    );
                     if (!$admin_passed) {
                         continue;
                     }
@@ -1045,5 +1287,4 @@ class Model
 
         return '';
     }
-
 }

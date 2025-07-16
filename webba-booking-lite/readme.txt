@@ -1,18 +1,18 @@
-=== Appointment Booking & Scheduling Plugin â€” Webba Booking Calendar ===
+=== Appointment Booking & Scheduling Plugin — Webba Booking Calendar ===
 Contributors: Webba agency, freemius
 Donate link: https://webba-booking.com/
 Tags:  appointments, appointment booking, booking calendar, scheduling, booking system
 Requires at least: 5.6
 Tested up to: 6.8
-Stable tag: 5.1.22
+Stable tag: 5.1.23
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Free Appointment Booking Plugin ðŸ—“ï¸ unlimited appointments, booking management, calendar sync, notifications, 5* support = powerful booking system!
+Free Appointment Booking Plugin 🗓️ unlimited appointments, booking management, calendar sync, notifications, 5* support = powerful booking system!
 
 == DESCRIPTION ==
-= Simple and Modern Appointment Booking, Reservation & Scheduling Calendar Plugin ðŸ—“ï¸ =
+= Simple and Modern Appointment Booking, Reservation & Scheduling Calendar Plugin =
 
 **[Webba Appointments Booking](https://webba-booking.com/) is powerful, modern and easy to use appointment booking system and scheduling plugin.**
 
@@ -171,6 +171,12 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  
 
 == Changelog ==
+
+16/07/2025
+
+5.1.23
+
+- Bug fix: bug with custom forms
 
 15/07/2025
 
