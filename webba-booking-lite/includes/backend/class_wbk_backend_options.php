@@ -124,10 +124,10 @@ class WBK_Backend_Options {
                 'icon' => 'bookins-rules-icon',
             ]
         );
-        // User interface (ex. mode) section
+        // Booking form (ex. mode) section
         add_settings_section(
             'wbk_mode_settings_section',
-            __( 'User interface', 'webba-booking-lite' ),
+            __( 'Booking form', 'webba-booking-lite' ),
             [$this, 'wbk_mode_settings_section_callback'],
             'wbk-options',
             [
@@ -239,17 +239,14 @@ class WBK_Backend_Options {
         );
         wbk_opt()->add_option(
             'wbk_form_layout',
-            'select',
-            __( 'Form layout', 'webba-booking-lite' ),
+            'checkbox',
+            __( 'Show summary sidebar by default?', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
-                'default'              => 'default',
-                'extra'                => [
-                    'default' => __( 'Default', 'webba-booking-lite' ),
-                    'narrow'  => __( 'For themes with narrow columns', 'webba-booking-lite' ),
-                ],
-                'not_translated_title' => 'Form layout',
-                'popup'                => __( 'Choose between the default layout or the layout optimized for themes with narrow columns.', 'webba-booking-lite' ),
+                'default'              => 'yes',
+                'checkbox_value'       => 'yes',
+                'not_translated_title' => 'Show summary sidebar by default?',
+                'popup'                => __( 'Turn on to show the summary sidebar by default.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(
@@ -266,101 +263,81 @@ class WBK_Backend_Options {
             ]
         );
         wbk_opt()->add_option(
-            'wbk_multi_booking',
-            'checkbox',
-            __( 'Multiple bookings in one session', 'webba-booking-lite' ),
-            'wbk_mode_settings_section',
-            [
-                'not_translated_title' => 'Multiple bookings in one session',
-                'popup'                => __( 'Turn on to activate the multiple booking mode that allows booking multiple time slots in the same booking.', 'webba-booking-lite' ),
-                'default'              => '',
-                'checkbox_value'       => 'enabled',
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_auto_next_on_timeslot_selection',
-            'checkbox',
-            __( 'Auto-advance to the next step in the booking form', 'webba-booking-lite' ),
-            'wbk_mode_settings_section',
-            [
-                'not_translated_title' => 'Auto-advance to the next step in the booking form',
-                'popup'                => __( 'Turn on to automatically go to the next step after selecting a time interval in the booking form\'s Date and time step.', 'webba-booking-lite' ),
-                'default'              => '',
-                'checkbox_value'       => 'enabled',
-                'dependency'           => [
-                    'wbk_multi_booking' => 'not_checked',
-                ],
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_phone_mask',
-            'select',
-            __( 'Phone number masked input', 'webba-booking-lite' ),
-            'wbk_mode_settings_section',
-            [
-                'default'              => 'enabled',
-                'not_translated_title' => 'Phone number masked input',
-                'extra'                => [
-                    'enabled'             => __( 'jQuery Masked Input Plugin', 'webba-booking-lite' ),
-                    'enabled_mask_plugin' => __( 'jQuery Mask Plugin', 'webba-booking-lite' ),
-                    'disabled'            => __( 'Disabled', 'webba-booking-lite' ),
-                ],
-                'dependency'           => [
-                    'wbk_mode' => 'extended|simple',
-                ],
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_phone_format',
-            'text',
-            __( 'Phone format', 'webba-booking-lite' ),
-            'wbk_mode_settings_section',
-            [
-                'default'              => '(000)000-0000',
-                'not_translated_title' => 'Phone format',
-                'popup'                => __( 'Customize phone number formats using "0" for mandatory digits and "9" for optional ones. E.g , (000) 000 00 00 requires 10 digits, while (000) 000 000 9 requires 9 digits with the 10th optional. Leave blank to disable formatting.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_phone_required',
-            'checkbox',
-            __( 'Phone field is mandatory', 'webba-booking-lite' ),
-            'wbk_mode_settings_section',
-            [
-                'not_translated_title' => 'Phone field is mandatory',
-                'popup'                => __( 'Turn on to make the phone field mandatory.', 'webba-booking-lite' ),
-                'checkbox_value'       => '3',
-                'default'              => '',
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
             'wbk_show_booked_slots',
             'checkbox',
             __( 'Show booked time slots', 'webba-booking-lite' ),
             'wbk_mode_settings_section',
             [
                 'not_translated_title' => 'Show booked time slots',
-                'popup'                => __( 'Turn on to show booked time slots as "Booked".', 'webba-booking-lite' ),
+                'popup'                => __( 'Turn on to show booked time slots, if not enabled unavailable timeslots will be shown as disabled.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
-        // continue here
+        wbk_opt()->add_option(
+            'wbk_allow_multiple_services',
+            'checkbox',
+            __( 'Allow multiple service selection', 'webba-booking-lite' ),
+            'wbk_mode_settings_section',
+            [
+                'not_translated_title' => 'Allow multiple service selection',
+                'popup'                => __( 'Turn on to allow customers to select multiple services.', 'webba-booking-lite' ),
+                'default'              => 'yes',
+                'checkbox_value'       => 'yes',
+            ],
+            'advanced'
+        );
+        /* 
         wbk_opt()->add_option(
             'wbk_show_locked_as_booked',
             'checkbox',
-            __( 'Show locked time slots as booked', 'webba-booking-lite' ),
+            __('Show locked time slots as booked', 'webba-booking-lite'),
             'wbk_mode_settings_section',
             [
                 'not_translated_title' => 'Show locked time slots as booked',
-                'popup'                => __( 'Turn on to show locked time slots as "Booked".', 'webba-booking-lite' ),
-                'checkbox_value'       => 'yes',
-                'dependency'           => [
-                    'wbk_show_booked_slots' => ':checked',
-                ],
+                'popup' => __(
+                    'Turn on to show locked time slots as "Booked".',
+                    'webba-booking-lite'
+                ),
+                'checkbox_value' => 'yes',
+                'dependency' => ['wbk_show_booked_slots' => ':checked'],
             ],
             'advanced'
+        );
+        */
+        // sidebar support options
+        wbk_opt()->add_option(
+            'wbk_sidebar_help_title',
+            'text',
+            __( 'Support Title', 'webba-booking-lite' ),
+            'wbk_mode_settings_section',
+            [
+                'not_translated_title' => 'Sidebar support title',
+                'popup'                => __( 'Type the title to be displayed above the support links.', 'webba-booking-lite' ),
+                'default'              => __( 'Need help?', 'webba-booking-lite' ),
+            ],
+            'sidebar_support'
+        );
+        wbk_opt()->add_option(
+            'wbk_sidebar_help_phone',
+            'text',
+            __( 'Support phone number', 'webba-booking-lite' ),
+            'wbk_mode_settings_section',
+            [
+                'not_translated_title' => 'Support phone number',
+                'popup'                => __( 'Type the phone number to be displayed below the support title.', 'webba-booking-lite' ),
+            ],
+            'sidebar_support'
+        );
+        wbk_opt()->add_option(
+            'wbk_sidebar_help_email',
+            'text',
+            __( 'Support email', 'webba-booking-lite' ),
+            'wbk_mode_settings_section',
+            [
+                'not_translated_title' => 'Support email',
+                'popup'                => __( 'Type the email address to be displayed below the phone number.', 'webba-booking-lite' ),
+            ],
+            'sidebar_support'
         );
         wbk_opt()->add_option(
             'wbk_appointments_auto_lock',
@@ -650,22 +627,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
             'advanced'
         );
         wbk_opt()->add_option(
-            'wbk_disable_day_on_all_booked',
-            'select',
-            __( 'Disable booked dates in calendar', 'webba-booking-lite' ),
-            'wbk_mode_settings_section',
-            [
-                'default'              => 'foreach',
-                'extra'                => [
-                    'disabled'     => __( 'No', 'webba-booking-lite' ),
-                    'enabled'      => __( 'Yes', 'webba-booking-lite' ),
-                    'enabled_plus' => __( 'Yes (including bookings from neighboring services.)', 'webba-booking-lite' ),
-                ],
-                'not_translated_title' => 'Disable booked dates in calendar',
-                'popup'                => __( 'Disable date in the calendar if no free time slots found.', 'webba-booking-lite' ),
-            ]
-        );
-        wbk_opt()->add_option(
             'wbk_holydays',
             'text',
             __( 'Holidays', 'webba-booking-lite' ),
@@ -787,47 +748,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
             ]
         );
         wbk_opt()->add_option(
-            'wbk_date_input_dropdown_count',
-            'text',
-            __( 'Number of dates in the dropdown input', 'webba-booking-lite' ),
-            'wbk_mode_settings_section',
-            [
-                'default'              => '30',
-                'not_translated_title' => 'Number of dates in the dropdown input',
-                'popup'                => __( 'Used only for dropdown date select', 'webba-booking-lite' ),
-                'dependency'           => [
-                    'wbk_date_input' => 'dropdown',
-                ],
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_avaiability_popup_calendar',
-            'text',
-            __( 'Number of dates in the calendar', 'webba-booking-lite' ),
-            'wbk_mode_settings_section',
-            [
-                'default'              => '360',
-                'not_translated_title' => 'Number of dates in the calendar',
-                'popup'                => __( 'Specify the number of dates displayed in the calendar.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_timeslot_time_string',
-            'select',
-            __( 'Time slot format', 'webba-booking-lite' ),
-            'wbk_mode_settings_section',
-            [
-                'not_translated_title' => 'Time slot format',
-                'popup'                => __( 'Choose between displaying only the start time or both the start and end times in the time slots.', 'webba-booking-lite' ),
-                'default'              => 'start',
-                'extra'                => [
-                    'start'     => __( 'Start', 'webba-booking-lite' ),
-                    'start_end' => __( 'Start', 'webba-booking-lite' ) . ' - ' . __( 'end', 'webba-booking-lite' ),
-                ],
-            ]
-        );
-        wbk_opt()->add_option(
             'wbk_csv_delimiter',
             'select',
             __( 'CSV delimiter', 'webba-booking-lite' ),
@@ -938,17 +858,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
             'advanced'
         );
         wbk_opt()->add_option(
-            'service-label-wbk',
-            'text',
-            __( 'Service label', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Select a service', 'webba-booking-lite' ),
-                'not_translated_title' => 'Service label',
-                'popup'                => __( 'Service label on the booking form.', 'webba-booking-lite' ),
-            ]
-        );
-        wbk_opt()->add_option(
             'wbk_category_label',
             'text',
             __( 'Category label', 'webba-booking-lite' ),
@@ -982,53 +891,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
             ]
         );
         wbk_opt()->add_option(
-            'wbk_readmore_text',
-            'text',
-            __( 'Service \'Read more\' label', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Read more' ),
-                'not_translated_title' => 'Service Read more label',
-                'popup'                => __( 'Text of the \'Read more\' link.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_form_label',
-            'text',
-            __( 'Booking form title', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => '',
-                'not_translated_title' => 'Booking form title',
-                'popup'                => __( 'Text above the booking form. List of available placeholders.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_booked_text',
-            'text',
-            __( 'Booked time slot text', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Booked', 'webba-booking-lite' ),
-                'not_translated_title' => 'Booked time slot text',
-                'popup'                => __( 'Text on a booked time slot.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_name_label',
-            'text',
-            __( 'Name label', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Name', 'webba-booking-lite' ),
-                'not_translated_title' => 'Name label',
-                'popup'                => __( 'Name label on the booking form.', 'webba-booking-lite' ),
-            ]
-        );
-        wbk_opt()->add_option(
             'wbk_email_label',
             'text',
             __( 'Email label', 'webba-booking-lite' ),
@@ -1051,52 +913,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
             ]
         );
         wbk_opt()->add_option(
-            'wbk_comment_label',
-            'text',
-            __( 'Comment label', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Comment', 'webba-booking-lite' ),
-                'not_translated_title' => 'Comment label',
-                'popup'                => __( 'Comment label on the booking form.', 'webba-booking-lite' ),
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_book_items_quantity_label',
-            'text',
-            __( 'Quantity label', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'How many people per time slot?', 'webba-booking-lite' ),
-                'not_translated_title' => 'Quantity label',
-                'popup'                => __( 'Quantity label on the booking form for group bookings. Available placeholders: #service', 'webba-booking-lite' ),
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_book_thanks_message',
-            'editor',
-            __( 'Thank you message', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => '',
-                'not_translated_title' => 'Thank you message',
-                'popup'                => __( 'Customize the thank you message displayed after a booking is made. Leave it empty to use the default formatted thank you message.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_book_not_found_message',
-            'text',
-            __( 'Time slots not found message', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Unfortunately we were unable to meet your search criteria. Please change the criteria and try again.', 'webba-booking-lite' ),
-                'not_translated_title' => 'Time slots not found message',
-                'popup'                => __( 'Message displayed when no time slots are found for the selected service and date.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
             'wbk_payment_pay_with_paypal_btn_text',
             'text_alfa_numeric',
             __( 'PayPal option label', 'webba-booking-lite' ),
@@ -1109,6 +925,18 @@ Note: With autolock turned on, connected service bookings are considered when lo
             'advanced'
         );
         wbk_opt()->add_option(
+            'wbk_paypal_message',
+            'text',
+            __( 'PayPal message', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'You will be redirected to PayPal in the next screen.', 'webba-booking-lite' ),
+                'not_translated_title' => 'PayPal message',
+                'popup'                => __( 'Message that appears when the user selects PayPal as the payment method.', 'webba-booking-lite' ),
+            ],
+            'advanced'
+        );
+        wbk_opt()->add_option(
             'wbk_stripe_button_text',
             'text_alfa_numeric',
             __( 'Credit card option label', 'webba-booking-lite' ),
@@ -1117,18 +945,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
                 'default'              => __( 'Pay with credit card', 'webba-booking-lite' ),
                 'not_translated_title' => 'Credit card option label',
                 'popup'                => __( 'Label for Stripe payment method', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_stripe_card_element_error_message',
-            'text',
-            __( 'Stripe card element error message', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'incorrect input', 'webba-booking-lite' ),
-                'not_translated_title' => 'Stripe card element error message',
-                'popup'                => __( 'Error message that appears if an issue occurs with the Stripe payment method. To show this message go to Stripe -> Advanced Settings and turn on "override Stripe card element error messages".', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1162,7 +978,7 @@ Note: With autolock turned on, connected service bookings are considered when lo
             __( 'Message for Pay on arrival payment method', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default'              => __( 'Pay on arrival', 'webba-booking-lite' ),
+                'default'              => __( 'You will be able to pay by cash or credit card once you arrive.', 'webba-booking-lite' ),
                 'not_translated_title' => 'Message for Pay on arrival payment method',
                 'popup'                => __( 'Message for Pay on arrival payment method.', 'webba-booking-lite' ),
             ],
@@ -1217,26 +1033,14 @@ Note: With autolock turned on, connected service bookings are considered when lo
             'advanced'
         );
         wbk_opt()->add_option(
-            'wbk_woo_error_add_to_cart',
+            'wbk_woo_message',
             'text',
-            __( 'Add to cart error message', 'webba-booking-lite' ),
+            __( 'WooCommerce message', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default'              => __( 'Booking not added to cart', 'webba-booking-lite' ),
-                'not_translated_title' => 'Add to cart error message',
-                'popup'                => __( 'Error message that appears if an issue occurs with adding a booking to WooCommerce cart.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_payment_details_title',
-            'text_alfa_numeric',
-            __( 'Payment details title', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Payment details', 'webba-booking-lite' ),
-                'not_translated_title' => 'Payment details title',
-                'popup'                => __( 'Message above the payment details.', 'webba-booking-lite' ),
+                'default'              => __( 'You will be able to checkout in the next screen.', 'webba-booking-lite' ),
+                'not_translated_title' => 'WooCommerce message',
+                'popup'                => __( 'Message that appears when the user selects WooCommerce as the payment method.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1253,18 +1057,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
             'advanced'
         );
         wbk_opt()->add_option(
-            'wbk_payment_subtotal_title',
-            'text',
-            __( 'Subtotal title', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Subtotal', 'webba-booking-lite' ),
-                'not_translated_title' => 'Subtotal title',
-                'popup'                => __( 'Label for the subtotal amount in payment details', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
             'wbk_tax_label',
             'text',
             __( 'Tax label', 'webba-booking-lite' ),
@@ -1277,24 +1069,12 @@ Note: With autolock turned on, connected service bookings are considered when lo
             'advanced'
         );
         wbk_opt()->add_option(
-            'wbk_service_fee_description',
-            'text',
-            __( 'Service fee label', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Service fee', 'webba-booking-lite' ),
-                'not_translated_title' => 'Service fee label',
-                'popup'                => __( 'Label for the service fee in payment details', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
             'wbk_payment_discount_item',
             'text',
             __( 'Discount label', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default'              => __( 'Discount', 'webba-booking-lite' ),
+                'default'              => __( 'Discount (-)', 'webba-booking-lite' ),
                 'not_translated_title' => 'Discount label',
                 'popup'                => __( 'Label for the discount', 'webba-booking-lite' ),
             ],
@@ -1363,6 +1143,17 @@ Note: With autolock turned on, connected service bookings are considered when lo
                     'priority'   => __( 'Priority (descending)', 'webba-booking-lite' ),
                     'priority_a' => __( 'Priority (ascending)', 'webba-booking-lite' ),
                 ],
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_after_booking_instructions',
+            'editor',
+            __( 'Instructions to show after place booking', 'webba-booking-lite' ),
+            'wbk_mode_settings_section',
+            [
+                'not_translated_title' => 'Instructions to show after place booking',
+                'popup'                => __( 'A message to show on thank you screen after booking is places', 'webba-booking-lite' ),
+                'default'              => '<h4>Important Information</h4><ul><li>Please arrive 10 minutes before your scheduled appointment time</li><li>Cancellations must be made at least 24 hours in advance</li><li>Bring valid ID for verification at check-in</li></ul>',
             ]
         );
         wbk_opt()->add_option(
@@ -1448,42 +1239,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
             'advanced'
         );
         wbk_opt()->add_option(
-            'wbk_payment_cancel_message',
-            'text',
-            __( 'PayPal payment cancelation message', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Payment canceled.', 'webba-booking-lite' ),
-                'not_translated_title' => 'PayPal payment cancelation message',
-                'popup'                => __( 'Message shown when payment with PayPal is canceled', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_booking_cancel_email_label',
-            'text_alfa_numeric',
-            __( 'Cancellation form label', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Please, enter your email to confirm cancelation', 'webba-booking-lite' ),
-                'not_translated_title' => 'Cancellation form label',
-                'popup'                => __( 'Text of the cancelation form label', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_booking_cancel_form_title',
-            'text_alfa_numeric',
-            __( 'Cancellation form title', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Cancellation', 'webba-booking-lite' ),
-                'not_translated_title' => 'Cancellation form title',
-                'popup'                => __( 'Cancellation form title. Appears on the sidebar (on desktop) and top bar (on mobile)', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
             'wbk_cancel_button_text',
             'text_alfa_numeric',
             __( 'Cancellation button text', 'webba-booking-lite' ),
@@ -1496,19 +1251,6 @@ Note: With autolock turned on, connected service bookings are considered when lo
             'advanced'
         );
         wbk_opt()->add_option(
-            'wbk_appointment_information',
-            'text',
-            __( 'Booking details', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Booking', 'webba-booking-lite' ),
-                'not_translated_title' => 'Booking details',
-                'popup'                => __( '"Message shown when customers pay for a booking or cancel their booking using the link sent in the email notification.
-Available placeholders: #name (customer name), #id (appointment id), #service (service name), #date (appointment date), #time (appointment time), #dt (appointment date and time), #start_end (appointment time in start-end format)."', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
             'wbk_booking_cancel_error_message',
             'text',
             __( 'Cancellation error message', 'webba-booking-lite' ),
@@ -1517,30 +1259,6 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 'default'              => __( 'Unable to cancel booking, please check the email you\'ve entered.', 'webba-booking-lite' ),
                 'not_translated_title' => 'Cancellation error message',
                 'popup'                => __( 'Message shown when an error occurs on cancelation', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_booking_couldnt_be_canceled',
-            'text',
-            __( 'Warning message on cancel booking (reason: paid booking)', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Paid booking can\'t be canceled.', 'webba-booking-lite' ),
-                'not_translated_title' => 'Warning message on cancel booking (reason: paid booking)',
-                'popup'                => __( 'Displayed when customer tries to cancel paid booking.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_booking_couldnt_be_canceled2',
-            'text',
-            __( 'Warning message on cancel booking (buffer)', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Sorry, you can not cancel because you have exceeded the time allowed to do so.', 'webba-booking-lite' ),
-                'not_translated_title' => 'Warning message on cancel booking (buffer)',
-                'popup'                => __( 'Message shown when a customer tries to cancel a booking within a time frame that does not allow cancellations. Buffer time is set in Booking rules -> Cancellation buffer (in minutes)', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -1617,54 +1335,6 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
             'advanced'
         );
         wbk_opt()->add_option(
-            'wbk_add_gg_button_text',
-            'text',
-            __( 'Add to customer\'s Google Calendar button text', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Add to my Google Calendar', 'webba-booking-lite' ),
-                'not_translated_title' => 'Add to customer Google Calendar button text',
-                'popup'                => __( 'Text of the link included in the email notification', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_gg_calendar_add_event_success',
-            'text',
-            __( 'Google calendar event adding success message', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Booking data added to Google Calendar.', 'webba-booking-lite' ),
-                'not_translated_title' => 'Google calendar event adding success message',
-                'popup'                => __( 'Message shown when booking is added to the Google Calendar.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_gg_calendar_add_event_canceled',
-            'text',
-            __( 'Google calendar event adding error message', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Appointment data not added to Google Calendar.', 'webba-booking-lite' ),
-                'not_translated_title' => 'Google calendar event adding error message',
-                'popup'                => __( 'Message shown when there was an issue with adding a booking to the Google Calendar.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_email_landing_text_invalid_token',
-            'text',
-            __( 'Booking token error message', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Booking token error message', 'webba-booking-lite' ),
-                'not_translated_title' => 'Booking token error message',
-                'popup'                => __( 'Message shown when booking link (cancelation, approval, payment) is invalid in the email notification.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
             'wbk_gg_calendar_event_title',
             'text',
             __( 'Google calendar event / iCal summary (for admin)', 'webba-booking-lite' ),
@@ -1722,18 +1392,6 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 'default'              => __( 'Daily booking limit is reached, please select another date.', 'webba-booking-lite' ),
                 'not_translated_title' => 'Daily limit message',
                 'popup'                => __( 'Message shown when daily booking limit reached. Adjust the daily booking limits in the Settings -> Booking Rules.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_limit_by_email_reached_message',
-            'text',
-            __( 'User limit message', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'You have reached your booking limit.', 'webba-booking-lite' ),
-                'not_translated_title' => 'User limit message',
-                'popup'                => __( 'Message shown when user limit is reached. Adjust the user booking limits in the Settings -> Booking Rules.', 'webba-booking-lite' ),
             ],
             'advanced'
         );
@@ -2165,19 +1823,28 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 'advanced'
             );
         }
+        /*
         wbk_opt()->add_option(
             'wbk_skip_on_arrival_payment_method',
             'checkbox',
-            __( 'Skip payment method selection for "Pay on arrival"', 'webba-booking-lite' ),
+            __(
+                'Skip payment method selection for "Pay on arrival"',
+                'webba-booking-lite'
+            ),
             'wbk_mode_settings_section',
             [
-                'default'              => 'true',
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Skip payment method selection for Pay on arrival',
-                'popup'                => __( 'Skip payment method selection for "Pay on arrival" method if there is only one method available', 'webba-booking-lite' ),
+                'default' => 'true',
+                'checkbox_value' => 'true',
+                'not_translated_title' =>
+                    'Skip payment method selection for Pay on arrival',
+                'popup' => __(
+                    'Skip payment method selection for "Pay on arrival" method if there is only one method available',
+                    'webba-booking-lite'
+                ),
             ],
             'advanced'
         );
+        */
         if ( wbk_fs()->is__premium_only() && wbk_fs()->can_use_premium_code() ) {
             wbk_opt()->add_option(
                 'wbk_woo_check_coupons_inwebba',
@@ -2510,7 +2177,7 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                     'dependency'           => [
                         'wbk_sms_send_on_payment' => ':checked',
                     ],
-                    'default'              => __( 'Dear #customer_name, your booking on #appointment_day at #appointment_time has been paid.', 'webba-booking-lite' ),
+                    'default'              => __( 'Dear #customer_name, your booking on #appointment_day at #appointment_time has been paid.', 'webba-booking-lite' ),
                     'not_translated_title' => 'Payment received SMS',
                     'popup'                => __( 'Customize the booking payment SMS message. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">', 'webba-booking-lite' ) . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
                 ],
@@ -2537,45 +2204,12 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                     'dependency'           => [
                         'wbk_sms_send_on_approval' => ':checked',
                     ],
-                    'default'              => __( 'Dear #customer_name, your booking on #appointment_day at #appointment_time has been approved.', 'webba-booking-lite' ),
+                    'default'              => __( 'Dear #customer_name, your booking on #appointment_day at #appointment_time has been approved.', 'webba-booking-lite' ),
                     'not_translated_title' => 'Booking approval SMS',
                     'popup'                => 'Customize the booking approval SMS message. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">' . __( 'List of available placeholders', 'webba-booking-lite' ) . '</a>',
                 ]
             );
         }
-        wbk_opt()->add_option(
-            'wbk_service_step_title',
-            'text',
-            __( 'Services step title', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Services', 'webba-booking-lite' ),
-                'not_translated_title' => 'Services step title',
-                'popup'                => __( 'Services title in the booking form sidebar.', 'webba-booking-lite' ),
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_date_time_step_title',
-            'text',
-            __( 'Date and time step title', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Date and time', 'webba-booking-lite' ),
-                'not_translated_title' => 'Date and time step title',
-                'popup'                => __( 'Date and time title in the booking form sidebar.', 'webba-booking-lite' ),
-            ]
-        );
-        wbk_opt()->add_option(
-            'wbk_details_step_title',
-            'text',
-            __( 'Details step title', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Details', 'webba-booking-lite' ),
-                'not_translated_title' => 'Details step title',
-                'popup'                => __( 'User details title in the booking form sidebar.', 'webba-booking-lite' ),
-            ]
-        );
         wbk_opt()->add_option(
             'wbk_payment_step_title',
             'text',
@@ -2610,200 +2244,873 @@ Available placeholders: #name (customer name), #id (appointment id), #service (s
                 'popup'                => __( 'Text on the Back button.', 'webba-booking-lite' ),
             ]
         );
-        // next end prev end
-        wbk_opt()->add_option(
-            'wbk_step_separator',
-            'text',
-            __( 'Step separator on mobile', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'of', 'webba-booking-lite' ),
-                'not_translated_title' => 'Step separator on mobile',
-                'popup'                => __( 'On mobile, you\'ll find a step separator. For instance, \'1 of 3\' (steps). Translate the seperator "of."', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_minutes_label',
-            'text',
-            __( 'Minutes label', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'min', 'webba-booking-lite' ),
-                'not_translated_title' => 'Minutes label',
-                'popup'                => __( 'Minutes label in the services step.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_local_time_label',
-            'text',
-            __( 'Your local time checkbox', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Your local time', 'webba-booking-lite' ),
-                'not_translated_title' => 'Your local time checkbox',
-                'popup'                => __( 'Text for the "Your local time" checkbox.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_coupon_label',
-            'text',
-            __( 'Coupon label', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Coupon', 'webba-booking-lite' ),
-                'not_translated_title' => 'Coupon label',
-                'popup'                => __( 'Coupon field label', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_coupon_apply_text',
-            'text',
-            __( 'Apply coupon button text', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Apply', 'webba-booking-lite' ),
-                'not_translated_title' => 'Apply coupon button text',
-                'popup'                => __( 'Label for "Apply" coupon button', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
         wbk_opt()->add_option(
             'wbk_payment_methods_title',
             'text',
             __( 'Payment methods title', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default'              => __( 'Please tell us how you would like to pay', 'webba-booking-lite' ),
+                'default'              => __( 'Payment method', 'webba-booking-lite' ),
                 'not_translated_title' => 'Payment methods title',
                 'popup'                => __( 'Label shown above the payment methods', 'webba-booking-lite' ),
             ],
             'advanced'
         );
         wbk_opt()->add_option(
-            'wbk_paypal_prompt',
+            'wbk_wording_enter_coupon_code',
             'text',
-            __( 'PayPal payment redirect notice', 'webba-booking-lite' ),
+            __( 'Enter coupon code', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default'              => __( 'You will be redirected to PayPal to approve the payment', 'webba-booking-lite' ),
-                'not_translated_title' => 'PayPal payment redirect notice',
-                'popup'                => __( 'Text shown when user selects PayPal payment method and will be redirected to PayPal to approve the payment.', 'webba-booking-lite' ),
+                'default'              => __( 'Enter coupon code', 'webba-booking-lite' ),
+                'not_translated_title' => 'Enter coupon code',
+                'popup'                => __( 'Placeholder Enter coupon code', 'webba-booking-lite' ),
             ],
             'advanced'
         );
         wbk_opt()->add_option(
-            'wbk_available_label',
+            'wbk_wording_apply',
             'text',
-            __( 'Label for available spots', 'webba-booking-lite' ),
+            __( 'Apply', 'webba-booking-lite' ),
             'wbk_translation_settings_section',
             [
-                'default'              => __( 'Available', 'webba-booking-lite' ),
-                'not_translated_title' => 'Label for available spots',
-                'popup'                => __( 'Text shown on the group service time slots. For example "Available: 10".', 'webba-booking-lite' ),
+                'default'              => __( 'Apply', 'webba-booking-lite' ),
+                'not_translated_title' => 'Apply',
+                'popup'                => __( 'Apply button text', 'webba-booking-lite' ),
             ],
             'advanced'
         );
-        wbk_opt()->add_option(
-            'wbk_approve_button_text',
-            'text',
-            __( 'Approve payment button text', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'approve payment', 'webba-booking-lite' ),
-                'not_translated_title' => 'Approve payment button text',
-                'popup'                => __( 'Label for payment approval button.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
-        wbk_opt()->add_option(
-            'wbk_multi_limits_label',
-            'text',
-            __( 'Label for multiple booking limits', 'webba-booking-lite' ),
-            'wbk_translation_settings_section',
-            [
-                'default'              => __( 'Default value: #service_name: select from #min to #max time slots. Selected: #selected_count.', 'webba-booking-lite' ),
-                'not_translated_title' => 'Label for multiple booking limits',
-                'popup'                => __( 'Show this label if service has multiple booking limits. Available paceholders: #min, #max, #service_name, #selected_count', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
+        /*
         wbk_opt()->add_option(
             'wbk_places_selection_mode',
             'select',
-            __( 'Multiple seat selection mode', 'webba-booking-lite' ),
+            __('Multiple seat selection mode', 'webba-booking-lite'),
             'wbk_mode_settings_section',
             [
                 'not_translated_title' => 'Multiple seat selection mode',
-                'popup'                => __( 'Choose how many places customer can select in the group service booking.', 'webba-booking-lite' ),
-                'default'              => 'normal',
-                'extra'                => [
-                    'normal'            => __( 'Let users select count', 'webba-booking-lite' ),
-                    'normal_no_default' => __( 'Let users select count (no default value)', 'webba-booking-lite' ),
-                    '1'                 => __( 'Allow select only one place', 'webba-booking-lite' ),
-                    'max'               => __( 'Allow select only maximum places', 'webba-booking-lite' ),
+                'popup' => __(
+                    'Choose how many places customer can select in the group service booking.',
+                    'webba-booking-lite'
+                ),
+                'default' => 'normal',
+                'extra' => [
+                    'normal' => __(
+                        'Let users select count',
+                        'webba-booking-lite'
+                    ),
+                    'normal_no_default' => __(
+                        'Let users select count (no default value)',
+                        'webba-booking-lite'
+                    ),
+                    '1' => __(
+                        'Allow select only one place',
+                        'webba-booking-lite'
+                    ),
+                    'max' => __(
+                        'Allow select only maximum places',
+                        'webba-booking-lite'
+                    ),
                 ],
             ],
             'advanced'
         );
+        */
+        /*
         wbk_opt()->add_option(
             'wbk_show_details_of_previous_bookings',
             'checkbox',
-            __( 'Show who booked the time slot', 'webba-booking-lite' ),
+            __('Show who booked the time slot', 'webba-booking-lite'),
             'wbk_mode_settings_section',
             [
-                'default'              => '',
-                'checkbox_value'       => 'true',
+                'default' => '',
+                'checkbox_value' => 'true',
                 'not_translated_title' => 'Show who booked the time slot',
-                'popup'                => __( 'If enabled, each time slot will display the names of users who have already booked that time slot. Applicable for group services.', 'webba-booking-lite' ),
+                'popup' => __(
+                    'If enabled, each time slot will display the names of users who have already booked that time slot. Applicable for group services.',
+                    'webba-booking-lite'
+                ),
             ],
             'advanced'
         );
-        wbk_opt()->add_option(
-            'wbk_disable_scroll_on_details_step',
-            'checkbox',
-            __( 'Disable vertical scrolling in details step', 'webba-booking-lite' ),
-            'wbk_mode_settings_section',
-            [
-                'default'              => '',
-                'checkbox_value'       => 'true',
-                'not_translated_title' => 'Disable vertical scrolling in details step',
-                'popup'                => __( 'If enabled, the scroll bar in the details step will be removed, and the form height will dynamically adjust based on the selected fields.', 'webba-booking-lite' ),
-            ],
-            'advanced'
-        );
+        */
+        /*
         wbk_opt()->add_option(
             'wbk_show_local_time_by_default',
             'checkbox',
-            __( 'Show local time by default', 'webba-booking-lite' ),
+            __('Show local time by default', 'webba-booking-lite'),
             'wbk_mode_settings_section',
             [
-                'default'              => '',
-                'checkbox_value'       => 'true',
+                'default' => '',
+                'checkbox_value' => 'true',
                 'not_translated_title' => 'Show local time by default',
-                'popup'                => __( 'If enabled, the booking form will automatically default to the local time of the customer.', 'webba-booking-lite' ),
+                'popup' => __(
+                    'If enabled, the booking form will automatically default to the local time of the customer.',
+                    'webba-booking-lite'
+                ),
             ],
             'advanced'
         );
+        */
+        /*  
         wbk_opt()->add_option(
             'wbk_automatically_select_today',
             'checkbox',
-            __( 'Auto select nearest date', 'webba-booking-lite' ),
+            __('Auto select nearest date', 'webba-booking-lite'),
             'wbk_mode_settings_section',
             [
-                'default'              => '',
-                'checkbox_value'       => 'true',
+                'default' => '',
+                'checkbox_value' => 'true',
                 'not_translated_title' => 'Auto select nearest date',
-                'popup'                => __( 'If enabled, today or the next available date will be chosen automatically.', 'webba-booking-lite' ),
+                'popup' => __(
+                    'If enabled, today or the next available date will be chosen automatically.',
+                    'webba-booking-lite'
+                ),
             ],
             'advanced'
         );
+        */
         if ( get_option( 'wbk_price_separator' ) === false ) {
             wbk_opt()->reset_defaults();
         }
+        // --- BEGIN: Added for frontend wording translations ---
+        wbk_opt()->add_option(
+            'wbk_wording_label_login_user',
+            'text',
+            __( 'Username or Email Address', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Username or Email Address', 'webba-booking-lite' ),
+                'not_translated_title' => 'Login form username/email label',
+                'popup'                => __( 'Label for the username/email field in the login form.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_label_login_password',
+            'text',
+            __( 'Password', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Password', 'webba-booking-lite' ),
+                'not_translated_title' => 'Login form password label',
+                'popup'                => __( 'Label for the password field in the login form.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_label_login_button',
+            'text',
+            __( 'Login', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Login', 'webba-booking-lite' ),
+                'not_translated_title' => 'Login form button label',
+                'popup'                => __( 'Label for the login button in the login form.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_summary',
+            'text',
+            __( 'Summary', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Summary', 'webba-booking-lite' ),
+                'not_translated_title' => 'Summary label',
+                'popup'                => __( 'Label for the summary section.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_select_services',
+            'text',
+            __( 'Select service(s)', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Select service(s)', 'webba-booking-lite' ),
+                'not_translated_title' => 'Select services label',
+                'popup'                => __( 'Label for selecting services.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_choose_service_proceed',
+            'text',
+            __( 'Choose a service to proceed', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Choose a service to proceed', 'webba-booking-lite' ),
+                'not_translated_title' => 'Choose service to proceed label',
+                'popup'                => __( 'Label for prompting to choose a service to proceed.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_select_date_time_services',
+            'text',
+            __( 'Select date & time for services', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Select date & time for services', 'webba-booking-lite' ),
+                'not_translated_title' => 'Select date & time for services label',
+                'popup'                => __( 'Label for selecting date and time for services.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_choose_preferred_appointment_slot',
+            'text',
+            __( 'Choose your preferred appointment slot', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Choose your preferred appointment slot', 'webba-booking-lite' ),
+                'not_translated_title' => 'Choose preferred appointment slot label',
+                'popup'                => __( 'Label for choosing preferred appointment slot.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_personal_details',
+            'text',
+            __( 'Personal details', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Personal details', 'webba-booking-lite' ),
+                'not_translated_title' => 'Personal details label',
+                'popup'                => __( 'Label for personal details section.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_fill_contact_information',
+            'text',
+            __( 'Please fill in your contact information', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Please fill in your contact information', 'webba-booking-lite' ),
+                'not_translated_title' => 'Fill contact information label',
+                'popup'                => __( 'Prompt to fill in contact information.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_select_preferred_payment_method',
+            'text',
+            __( 'Select your preferred payment method', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Select your preferred payment method', 'webba-booking-lite' ),
+                'not_translated_title' => 'Select preferred payment method label',
+                'popup'                => __( 'Prompt to select preferred payment method.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_select_date_time',
+            'text',
+            __( 'Select date & time', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Select date & time', 'webba-booking-lite' ),
+                'not_translated_title' => 'Select date & time',
+                'popup'                => __( 'Label above calendar when date and time isn\'t selected.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_choosing_timeslot_for',
+            'text',
+            __( 'Choosing time slot for', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Choosing time slot for', 'webba-booking-lite' ),
+                'not_translated_title' => 'Choosing time slot for',
+                'popup'                => __( 'Label in Choosing time slot for.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_no_available_timeslots',
+            'text',
+            __( 'No available time slots', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'No available time slots', 'webba-booking-lite' ),
+                'not_translated_title' => 'No available time slots',
+                'popup'                => __( 'Label in No available time slots.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_available',
+            'text',
+            __( 'Available', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Available', 'webba-booking-lite' ),
+                'not_translated_title' => 'Available',
+                'popup'                => __( 'Label in Calendar - Available', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_booked',
+            'text',
+            __( 'Booked', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Booked', 'webba-booking-lite' ),
+                'not_translated_title' => 'Booked',
+                'popup'                => __( 'Label in Calendar - Booked', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_today',
+            'text',
+            __( 'Today', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Today', 'webba-booking-lite' ),
+                'not_translated_title' => 'Today',
+                'popup'                => __( 'Label in Calendar - Today', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_slots',
+            'text',
+            __( 'Slots', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'slots', 'webba-booking-lite' ),
+                'not_translated_title' => 'Slots',
+                'popup'                => __( 'Label in timeslots', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_submit',
+            'text',
+            __( 'Submit', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Submit', 'webba-booking-lite' ),
+                'not_translated_title' => 'Submit button label',
+                'popup'                => __( 'Label for the submit button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_appointment_confirmed',
+            'text',
+            __( 'Appointment Confirmed', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Appointment Confirmed', 'webba-booking-lite' ),
+                'not_translated_title' => 'Appointment confirmed label',
+                'popup'                => __( 'Label for appointment confirmed message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_look_forward_seeing_you',
+            'text',
+            __( 'We look forward to seeing you.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'We look forward to seeing you.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Look forward to seeing you label',
+                'popup'                => __( 'Label for look forward to seeing you message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_payment_information',
+            'text',
+            __( 'Payment Information', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Payment Information', 'webba-booking-lite' ),
+                'not_translated_title' => 'Payment information label',
+                'popup'                => __( 'Label for payment information section.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_add_to_calendar',
+            'text',
+            __( '+ Add to Calendar', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( '+ Add to Calendar', 'webba-booking-lite' ),
+                'not_translated_title' => 'Add to calendar label',
+                'popup'                => __( 'Label for add to calendar button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_cost_breakdown',
+            'text',
+            __( 'Cost Breakdown', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Cost Breakdown', 'webba-booking-lite' ),
+                'not_translated_title' => 'Cost breakdown label',
+                'popup'                => __( 'Label for cost breakdown section.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_total_amount_paid',
+            'text',
+            __( 'Total amount paid', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Total amount paid', 'webba-booking-lite' ),
+                'not_translated_title' => 'Total amount paid label',
+                'popup'                => __( 'Label for total amount paid.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_booking_success',
+            'text',
+            __( 'Booking success', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Booking success', 'webba-booking-lite' ),
+                'not_translated_title' => 'Booking success label',
+                'popup'                => __( 'Label for booking success message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_loading_payment_form',
+            'text',
+            __( 'Loading payment form...', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Loading payment form...', 'webba-booking-lite' ),
+                'not_translated_title' => 'Loading payment form label',
+                'popup'                => __( 'Label for loading payment form message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_processing',
+            'text',
+            __( 'Processing...', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Processing...', 'webba-booking-lite' ),
+                'not_translated_title' => 'Processing label',
+                'popup'                => __( 'Label for processing message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_pay',
+            'text',
+            __( 'Pay', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Pay', 'webba-booking-lite' ),
+                'not_translated_title' => 'Pay button label',
+                'popup'                => __( 'Label for pay button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_pay_with',
+            'text',
+            __( 'Pay with', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Pay with', 'webba-booking-lite' ),
+                'not_translated_title' => 'Pay with label',
+                'popup'                => __( 'Label for pay with message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_please_complete_payment_confirm_booking',
+            'text',
+            __( 'Please complete your payment to confirm your booking.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Please complete your payment to confirm your booking.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Please complete payment to confirm booking label',
+                'popup'                => __( 'Label for please complete payment to confirm booking message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_payment_successful',
+            'text',
+            __( 'Payment successful', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Payment successful', 'webba-booking-lite' ),
+                'not_translated_title' => 'Payment successful label',
+                'popup'                => __( 'Label for payment successful message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_thank_you_payment',
+            'text',
+            __( 'Thank you for your payment.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Thank you for your payment.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Thank you for your payment label',
+                'popup'                => __( 'Label for thank you for your payment message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_total_amount_due',
+            'text',
+            __( 'Total amount due', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Total amount due', 'webba-booking-lite' ),
+                'not_translated_title' => 'Total amount due label',
+                'popup'                => __( 'Label for total amount due.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_loading_booking_details',
+            'text',
+            __( 'Loading booking details...', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Loading booking details...', 'webba-booking-lite' ),
+                'not_translated_title' => 'Loading booking details label',
+                'popup'                => __( 'Label for loading booking details message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_complete_your_payment',
+            'text',
+            __( 'Complete Your Payment', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Complete Your Payment', 'webba-booking-lite' ),
+                'not_translated_title' => 'Complete your payment label',
+                'popup'                => __( 'Label for complete your payment message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_select_payment_method_complete_payment',
+            'text',
+            __( 'Please select a payment method and complete your payment to confirm your booking.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Please select a payment method and complete your payment to confirm your booking.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Select payment method and complete payment label',
+                'popup'                => __( 'Label for select payment method and complete payment message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_appointment_approved',
+            'text',
+            __( 'Appointment Approved', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Appointment Approved', 'webba-booking-lite' ),
+                'not_translated_title' => 'Appointment approved label',
+                'popup'                => __( 'Label for appointment approved message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_appointment_approved_message',
+            'text',
+            __( 'You have approved this appointment. The customer has been notified.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'You have approved this appointment. The customer has been notified.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Appointment approved message label',
+                'popup'                => __( 'Label for appointment approved message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_appointment_cancelled',
+            'text',
+            __( 'Appointment Cancelled', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Appointment Cancelled', 'webba-booking-lite' ),
+                'not_translated_title' => 'Appointment cancelled label',
+                'popup'                => __( 'Label for appointment cancelled message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_appointment_cancelled_admin_message',
+            'text',
+            __( 'You have cancelled this appointment. The customer has been notified of the cancellation.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'You have cancelled this appointment. The customer has been notified of the cancellation.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Appointment cancelled admin message label',
+                'popup'                => __( 'Label for appointment cancelled admin message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_appointment_cancelled_customer_message',
+            'text',
+            __( 'You have cancelled your appointment. We hope to see you again soon.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'You have cancelled your appointment. We hope to see you again soon.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Appointment cancelled customer message label',
+                'popup'                => __( 'Label for appointment cancelled customer message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_booking_approved',
+            'text',
+            __( 'Booking approved', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Booking approved', 'webba-booking-lite' ),
+                'not_translated_title' => 'Booking approved label',
+                'popup'                => __( 'Label for booking approved message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_booking_cancelled',
+            'text',
+            __( 'Booking cancelled', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Booking cancelled', 'webba-booking-lite' ),
+                'not_translated_title' => 'Booking cancelled label',
+                'popup'                => __( 'Label for booking cancelled message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_approve_appointment',
+            'text',
+            __( 'Approve Appointment', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Approve Appointment', 'webba-booking-lite' ),
+                'not_translated_title' => 'Approve appointment label',
+                'popup'                => __( 'Label for approve appointment button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_show_more',
+            'text',
+            __( 'Show more', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Show more', 'webba-booking-lite' ),
+                'not_translated_title' => 'Show more label',
+                'popup'                => __( 'Label for show more button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_show_less',
+            'text',
+            __( 'Show less', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Show less', 'webba-booking-lite' ),
+                'not_translated_title' => 'Show less label',
+                'popup'                => __( 'Label for show less button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_toggle_description',
+            'text',
+            __( 'Toggle description', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Toggle description', 'webba-booking-lite' ),
+                'not_translated_title' => 'Toggle description label',
+                'popup'                => __( 'Label for toggle description button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_for_group_bookings_only',
+            'text',
+            __( 'For group bookings only:', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'For group bookings only:', 'webba-booking-lite' ),
+                'not_translated_title' => 'For group bookings only label',
+                'popup'                => __( 'Label for for group bookings only message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_select',
+            'text',
+            __( '+ Select', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( '+ Select', 'webba-booking-lite' ),
+                'not_translated_title' => '+ Select',
+                'popup'                => __( 'Label for + Select button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_selected',
+            'text',
+            __( 'Selected', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Selected', 'webba-booking-lite' ),
+                'not_translated_title' => 'Selected',
+                'popup'                => __( 'Label for Selected.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_number_of_people',
+            'text',
+            __( 'Number of people:', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Number of people:', 'webba-booking-lite' ),
+                'not_translated_title' => 'Number of people label',
+                'popup'                => __( 'Label for number of people message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_reduce_item',
+            'text',
+            __( 'Reduce item', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Reduce item', 'webba-booking-lite' ),
+                'not_translated_title' => 'Reduce item label',
+                'popup'                => __( 'Label for reduce item button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_increase_item',
+            'text',
+            __( 'Increase item', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Increase item', 'webba-booking-lite' ),
+                'not_translated_title' => 'Increase item label',
+                'popup'                => __( 'Label for increase item button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_no_time_selected',
+            'text',
+            __( 'No time selected', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'No time selected', 'webba-booking-lite' ),
+                'not_translated_title' => 'No time selected label',
+                'popup'                => __( 'Label for no time selected message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_remove_item',
+            'text',
+            __( 'Remove item', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Remove item', 'webba-booking-lite' ),
+                'not_translated_title' => 'Remove item label',
+                'popup'                => __( 'Label for remove item button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_empty_summary',
+            'text',
+            __( 'Please select a service and slot to see a summary here.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Please select a service and slot to see a summary here.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Empty summary label',
+                'popup'                => __( 'Label for empty summary message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_add_more',
+            'text',
+            __( '+ Add more label', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( '+ Add more', 'webba-booking-lite' ),
+                'not_translated_title' => '+ Add more label',
+                'popup'                => __( 'Label + Add more button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_no_services_found',
+            'text',
+            __( 'No services found!', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'No services found!', 'webba-booking-lite' ),
+                'not_translated_title' => 'No services found label',
+                'popup'                => __( 'Label for no services found message.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_tax_included',
+            'text',
+            __( 'Tax incl.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Tax incl.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Tax incl.',
+                'popup'                => __( 'Label for Tax incl. in sidebar.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_show_summary',
+            'text',
+            __( 'Show summary', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Show summary', 'webba-booking-lite' ),
+                'not_translated_title' => 'Show summary label',
+                'popup'                => __( 'Label for show summary button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_duration',
+            'text',
+            __( 'Duration', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Duration', 'webba-booking-lite' ),
+                'not_translated_title' => 'Duration',
+                'popup'                => __( 'Label for Duration.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_please_select_service',
+            'text',
+            __( 'Please select at least one service.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Please select at least one service.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Please select at least one service.',
+                'popup'                => __( 'Label for "Please select at least one service" tooltip in the navigation button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_please_select_timeslot',
+            'text',
+            __( 'Please select a time slot for each selected service.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Please select a time slot for each selected service.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Please select a time slot for each selected service.',
+                'popup'                => __( 'Label for "please select a time slot for each selected service" tooltip in the navigation button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_please_fill_out_all_fields',
+            'text',
+            __( 'Please fill out all required fields.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Please fill out all required fields.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Please fill out all required fields.',
+                'popup'                => __( 'Label for "Please fill out all required fields" tooltip in the navigation button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_please_select_payment_method',
+            'text',
+            __( 'Please select a payment method.', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Please select a payment method.', 'webba-booking-lite' ),
+                'not_translated_title' => 'Please select a payment method.',
+                'popup'                => __( 'Label for "Please select a payment method" tooltip in the navigation button.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_total_amount_label',
+            'text',
+            __( 'Total amount label', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Total amount', 'webba-booking-lite' ),
+                'not_translated_title' => 'Total amount label',
+                'popup'                => __( 'Label for the total amount in payment details', 'webba-booking-lite' ),
+            ],
+            'advanced'
+        );
         do_action( 'wbk_options_after' );
     }
 

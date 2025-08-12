@@ -146,7 +146,7 @@ class WBK_Date_Time_Utils {
             if ( !$business_hours->setFromArray( $arr_bh ) ) {
                 continue;
             }
-            $arr_disabled = array();
+            $arr_disabled = [];
             if ( !$business_hours->isWorkday( 'monday' ) ) {
                 if ( WBK_Date_Time_Utils::getStartOfWeek() == 'monday' ) {
                     array_push( $arr_disabled, 1 );
@@ -201,330 +201,6 @@ class WBK_Date_Time_Utils {
         $html .= '"blank":"blank"';
         $html .= '};</script>';
         return $html;
-    }
-
-    // render service abilities
-    public static function renderBHAbilities() {
-        $arrIds = WBK_Model_Utils::get_service_ids();
-        $date_format = self::get_date_format();
-        $html = '<script type=\'text/javascript\'>';
-        $html .= 'var wbk_available_days = {';
-        foreach ( $arrIds as $id ) {
-            $service = new WBK_Service_deprecated();
-            if ( !$service->setId( $id ) ) {
-                continue;
-            }
-            if ( !$service->load() ) {
-                continue;
-            }
-            // init service schedulle
-            $service_schedule = new WBK_Service_Schedule();
-            $service_schedule->setServiceId( $id );
-            $service_schedule->load();
-            $prepare_time = round( $service->getPrepareTime() / 1440 );
-            $limited = false;
-            if ( $service->getDateRange() == '' ) {
-                $day_to_render = strtotime( 'today midnight' );
-            } else {
-                $day_to_render = $service->getDateRangeStart();
-                $limited = true;
-            }
-            $endofrange = false;
-            $i = 1;
-            $i_prepare = 1;
-            $i_count_of_dates = get_option( 'wbk_date_input_dropdown_count', '30' );
-            if ( !is_numeric( $i_count_of_dates ) ) {
-                $i_count_of_dates = 30;
-            } else {
-                if ( $i_count_of_dates < 1 || $i_count_of_dates > 360 ) {
-                    $i_count_of_dates = 30;
-                }
-            }
-            $arr_days = array();
-            while ( !$endofrange ) {
-                if ( !$limited ) {
-                    if ( $i_prepare < $prepare_time ) {
-                        $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                        $i_prepare++;
-                        continue;
-                    }
-                }
-                if ( $service_schedule->getDayStatus( $day_to_render ) == 0 ) {
-                    $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                    continue;
-                }
-                if ( get_option( 'wbk_disable_day_on_all_booked', 'disabled' ) == 'enabled' || get_option( 'wbk_disable_day_on_all_booked', 'disabled' ) == 'enabled_plus' ) {
-                    $service_schedule->buildSchedule( $day_to_render, false, true );
-                    if ( $service_schedule->hasFreeTimeSlots() === false ) {
-                        $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                        continue;
-                    }
-                }
-                $arr_days[] = $day_to_render . '-HM-' . wp_date( $date_format, $day_to_render, new DateTimeZone(date_default_timezone_get()) );
-                $i++;
-                $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                if ( $limited ) {
-                    if ( $day_to_render >= $service->getDateRangeEnd() ) {
-                        $endofrange = true;
-                    }
-                } else {
-                    if ( $i > $i_count_of_dates ) {
-                        $endofrange = true;
-                    }
-                }
-            }
-            $day_to_render = strtotime( 'tomorrow', $day_to_render );
-            $html .= '"' . $id . '":"' . implode( ';', $arr_days ) . '",';
-        }
-        $html .= '"blank":"blank"';
-        $html .= '};</script>';
-        return $html;
-    }
-
-    // get  service abilities
-    public static function getBHAbilities( $service_id ) {
-        $date_format = self::get_date_format();
-        $id = $service_id;
-        $result = '';
-        $service = new WBK_Service_deprecated();
-        if ( !$service->setId( $id ) ) {
-            return '';
-        }
-        if ( !$service->load() ) {
-            return '';
-        }
-        // init service schedulle
-        $service_schedule = new WBK_Service_Schedule();
-        $service_schedule->setServiceId( $id );
-        $service_schedule->load();
-        $prepare_time = round( $service->getPrepareTime() / 1440 );
-        $limited = false;
-        if ( $service->getDateRange() == '' ) {
-            $day_to_render = strtotime( 'today midnight' );
-        } else {
-            $day_to_render = $service->getDateRangeStart();
-            $limited = true;
-        }
-        $endofrange = false;
-        $i = 1;
-        $i_prepare = 1;
-        $i_count_of_dates = get_option( 'wbk_date_input_dropdown_count', '30' );
-        $google_events = array();
-        if ( !is_numeric( $i_count_of_dates ) ) {
-            $i_count_of_dates = 30;
-        } else {
-            if ( $i_count_of_dates < 2 || $i_count_of_dates > 360 ) {
-                $i_count_of_dates = 30;
-            }
-        }
-        $arr_days = array();
-        while ( !$endofrange ) {
-            if ( !$limited ) {
-                if ( $i_prepare < $prepare_time ) {
-                    $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                    $i_prepare++;
-                    continue;
-                }
-            } else {
-                if ( $day_to_render > $service->getDateRangeEnd() ) {
-                    $endofrange = true;
-                    continue;
-                }
-            }
-            if ( $day_to_render < strtotime( 'today midnight' ) ) {
-                $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                continue;
-            }
-            $day_status = $service_schedule->getDayStatus( $day_to_render );
-            if ( $day_status == 0 ) {
-                $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                continue;
-            }
-            if ( get_option( 'wbk_disable_day_on_all_booked', 'disabled' ) == 'enabled' || get_option( 'wbk_disable_day_on_all_booked', 'disabled' ) == 'enabled_plus' ) {
-                $service_schedule->buildSchedule( $day_to_render, false, true );
-                if ( $service_schedule->hasFreeTimeSlots() === false ) {
-                    $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                    continue;
-                }
-            }
-            if ( $day_status == 2 ) {
-                $arr_days[] = $day_to_render . '-HM-' . wp_date( $date_format, $day_to_render, new DateTimeZone(date_default_timezone_get()) ) . ' ' . get_option( 'wbk_daily_limit_reached_message', __( 'Daily booking limit is reached, please select another date', 'webba-booking-lite' ) ) . '-HM-wbk_dropdown_limit_reached';
-            } else {
-                $arr_days[] = $day_to_render . '-HM-' . wp_date( $date_format, $day_to_render, new DateTimeZone(date_default_timezone_get()) ) . '-HM-wbk_dropdown_regular_item';
-            }
-            $i++;
-            $day_to_render = strtotime( 'tomorrow', $day_to_render );
-            if ( $limited ) {
-                if ( $day_to_render > $service->getDateRangeEnd() ) {
-                    $endofrange = true;
-                }
-            } else {
-                if ( $i > $i_count_of_dates ) {
-                    $endofrange = true;
-                }
-            }
-        }
-        $day_to_render = strtotime( 'tomorrow', $day_to_render );
-        $result .= implode( ';', $arr_days );
-        return $result;
-    }
-
-    // render service disabilities
-    public static function renderBHDisabilitiesFull() {
-        $arrIds = WBK_Model_Utils::get_service_ids();
-        $html = '<script type=\'text/javascript\'>';
-        $html .= 'var wbk_disabled_days = {';
-        foreach ( $arrIds as $id ) {
-            $service = new WBK_Service_deprecated();
-            if ( !$service->setId( $id ) ) {
-                continue;
-            }
-            if ( !$service->load() ) {
-                continue;
-            }
-            // init service schedulle
-            $service_schedule = new WBK_Service_Schedule();
-            $service_schedule->setServiceId( $id );
-            $service_schedule->load();
-            $prepare_time = round( $service->getPrepareTime() / 1440 );
-            $arr_disabled = array();
-            $day_to_render = strtotime( 'today midnight' );
-            for ($i = 1; $i <= 360; $i++) {
-                if ( $i <= $prepare_time ) {
-                    array_push( $arr_disabled, date( 'Y', $day_to_render ) . ',' . intval( date( 'n', $day_to_render ) - 1 ) . ',' . date( 'j', $day_to_render ) );
-                    $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                    continue;
-                }
-                if ( $service_schedule->getDayStatus( $day_to_render ) == 0 ) {
-                    array_push( $arr_disabled, date( 'Y', $day_to_render ) . ',' . intval( date( 'n', $day_to_render ) - 1 ) . ',' . date( 'j', $day_to_render ) );
-                } else {
-                    if ( get_option( 'wbk_disable_day_on_all_booked', 'disabled' ) == 'enabled' || get_option( 'wbk_disable_day_on_all_booked', 'disabled' ) == 'enabled_plus' ) {
-                        $service_schedule->buildSchedule( $day_to_render, false, true );
-                        if ( $service_schedule->hasFreeTimeSlots() === false ) {
-                            continue;
-                        }
-                    }
-                }
-                $day_to_render = strtotime( 'tomorrow', $day_to_render );
-            }
-            $html .= '"' . $id . '":"' . implode( ';', $arr_disabled ) . '",';
-        }
-        $html .= '"blank":"blank"';
-        $html .= '};</script>';
-        return $html;
-    }
-
-    // get single service abilities
-    public static function getServiceAbiliy( $service_id ) {
-        $id = $service_id;
-        $service = new WBK_Service_deprecated();
-        if ( !$service->setId( $id ) ) {
-            return;
-        }
-        if ( !$service->load() ) {
-            return;
-        }
-        // init service schedulle
-        $service_schedule = new WBK_Service_Schedule();
-        $service_schedule->setServiceId( $id );
-        $service_schedule->load();
-        $prepare_time = round( $service->getPrepareTime() / 1440 );
-        $arr_disabled = array();
-        $day_to_render = strtotime( 'today midnight' );
-        $result = '';
-        $check_availability_days = get_option( 'wbk_avaiability_popup_calendar', '360' );
-        for ($i = 1; $i <= $check_availability_days; $i++) {
-            if ( $service->getDateRange() != '' ) {
-                $limit_start = $service->getDateRangeStart();
-                $limit_end = $service->getDateRangeEnd();
-                if ( $day_to_render < $limit_start || $day_to_render > $limit_end ) {
-                    $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                    continue;
-                }
-            }
-            $disallow_after = get_option( 'wbk_disallow_after', '0' );
-            if ( trim( $disallow_after ) == '' ) {
-                $disallow_after = '0';
-            }
-            if ( $disallow_after != '0' ) {
-                $limit2 = time() + $disallow_after * 60 * 60;
-                if ( $day_to_render > $limit2 ) {
-                    $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                    continue;
-                }
-            }
-            if ( $i <= $prepare_time ) {
-                $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                continue;
-            }
-            $day_status = $service_schedule->getDayStatus( $day_to_render );
-            if ( $day_status == 0 || $day_status == 2 ) {
-                $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                continue;
-            } else {
-                if ( get_option( 'wbk_disable_day_on_all_booked', 'disabled' ) == 'enabled' || get_option( 'wbk_disable_day_on_all_booked', 'disabled' ) == 'enabled_plus' ) {
-                    $service_schedule->buildSchedule( $day_to_render, false, true );
-                    if ( $service_schedule->hasFreeTimeSlots() === false ) {
-                        $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                        continue;
-                    }
-                }
-            }
-            $valid = apply_filters(
-                'wbk_check_date_availability',
-                true,
-                $day_to_render,
-                $service_id
-            );
-            if ( !$valid ) {
-                continue;
-            }
-            array_push( $arr_disabled, date( 'Y', $day_to_render ) . ',' . intval( date( 'n', $day_to_render ) - 1 ) . ',' . date( 'j', $day_to_render ) );
-            $day_to_render = strtotime( 'tomorrow', $day_to_render );
-        }
-        $result .= implode( ';', $arr_disabled );
-        return $result;
-    }
-
-    // get single service disabilities
-    public static function getServiceDisabiliy( $service_id ) {
-        $id = $service_id;
-        $service = new WBK_Service_deprecated();
-        if ( !$service->setId( $id ) ) {
-            return;
-        }
-        if ( !$service->load() ) {
-            return;
-        }
-        // init service schedulle
-        $service_schedule = new WBK_Service_Schedule();
-        $service_schedule->setServiceId( $id );
-        $service_schedule->load();
-        $prepare_time = round( $service->getPrepareTime() / 1440 );
-        $arr_disabled = array();
-        $day_to_render = strtotime( 'today midnight' );
-        $result = '';
-        $check_availability_days = get_option( 'wbk_avaiability_popup_calendar', '360' );
-        for ($i = 1; $i <= $check_availability_days; $i++) {
-            if ( $i <= $prepare_time ) {
-                array_push( $arr_disabled, date( 'Y', $day_to_render ) . ',' . intval( date( 'n', $day_to_render ) - 1 ) . ',' . date( 'j', $day_to_render ) );
-                $day_to_render = strtotime( 'tomorrow', $day_to_render );
-                continue;
-            }
-            if ( $service_schedule->getDayStatus( $day_to_render ) == 0 ) {
-                array_push( $arr_disabled, date( 'Y', $day_to_render ) . ',' . intval( date( 'n', $day_to_render ) - 1 ) . ',' . date( 'j', $day_to_render ) );
-            } else {
-                if ( get_option( 'wbk_disable_day_on_all_booked', 'disabled' ) == 'enabled' || get_option( 'wbk_disable_day_on_all_booked', 'disabled' ) == 'enabled_plus' ) {
-                    $service_schedule->buildSchedule( $day_to_render, false, true );
-                    if ( $service_schedule->hasFreeTimeSlots() === false ) {
-                        array_push( $arr_disabled, date( 'Y', $day_to_render ) . ',' . intval( date( 'n', $day_to_render ) - 1 ) . ',' . date( 'j', $day_to_render ) );
-                    }
-                }
-            }
-            $day_to_render = strtotime( 'tomorrow', $day_to_render );
-        }
-        $result .= implode( ';', $arr_disabled );
-        return $result;
     }
 
     public static function getServicWeekDisabiliy( $service_id ) {
@@ -596,27 +272,27 @@ class WBK_Date_Time_Utils {
         $start_compare,
         $end_compare
     ) {
-        $intersect = FALSE;
+        $intersect = false;
         if ( $start_compare == $start ) {
-            $intersect = TRUE;
+            $intersect = true;
         }
         if ( $start_compare > $start && $start_compare < $end ) {
-            $intersect = TRUE;
+            $intersect = true;
         }
         if ( $end_compare > $start && $end_compare <= $end ) {
-            $intersect = TRUE;
+            $intersect = true;
         }
         if ( $start >= $start_compare && $end <= $end_compare ) {
-            $intersect = TRUE;
+            $intersect = true;
         }
         if ( $start <= $start_compare && $end >= $end_compare ) {
-            $intersect = TRUE;
+            $intersect = true;
         }
         return $intersect;
     }
 
     public static function loadEventsInRange( $day, $number_of_days, $service ) {
-        $event_data_arr = array();
+        $event_data_arr = [];
         return $event_data_arr;
     }
 

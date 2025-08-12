@@ -465,7 +465,7 @@ class Model
             }
         }
 
-        if (!$model_updated) {
+        if ($model_updated) {
             $this->generate_frontend_model();
         }
     }
@@ -542,6 +542,14 @@ class Model
                 case 'color':
                     $type = 'string';
                     $input_type = 'color';
+                    break;
+                case 'wbk_form_builder':
+                    $type = 'json';
+                    $input_type = 'form_fields';
+                    break;
+                case 'file':
+                    $type = 'string';
+                    $input_type = 'file';
                     break;
                 default:
                     $type = 'not_defined';
@@ -667,7 +675,7 @@ class Model
             $this->model_name,
             $row_for_action
         );
-        return [true, 'id' => $id];
+        return [true, 'id' => $id, 'data' => $validation['valid_fields']];
     }
 
     public function update_item($data, $id)
@@ -725,7 +733,7 @@ class Model
             $this->model_name,
             $id
         );
-        return [true, null];
+        return [true, 'data' => $validation['valid_fields']];
     }
     public function get_item($id, $output = OBJECT)
     {

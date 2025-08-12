@@ -109,6 +109,9 @@ WBK_Mixpanel::update_configuration(true);
                 }
             }
             break;
+        case 'wbk-form-builder':
+            WBK_Renderer::load_template('backend/react_app', [], true);
+            break;
         case 'wbk-appearance':
             WBK_Renderer::load_template('backend/appearance_page_content', array(), true);
             break;

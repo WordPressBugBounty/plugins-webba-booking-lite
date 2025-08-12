@@ -28,22 +28,8 @@ class WBK_Email_Processor {
             }
             $message = $et->get( 'template' );
             $subject = $et->get( 'subject' );
-            if ( function_exists( 'pll__' ) ) {
-                $subject = pll__( $subject );
-                $message = pll__( $message );
-            }
-            $subject = apply_filters(
-                'wpml_translate_single_string',
-                $subject,
-                'webba-booking-lite',
-                'Email template subject ' . $id
-            );
-            $message = apply_filters(
-                'wpml_translate_single_string',
-                $message,
-                'webba-booking-lite',
-                'Email template message body ' . $id
-            );
+            $message = WBK_Translation_Processor::translate_string( 'webba_email_template_message_' . $id, $message );
+            $subject = WBK_Translation_Processor::translate_string( 'webba_email_template_subject_' . $id, $subject );
             $message = WBK_Placeholder_Processor::process( $message, $bookings );
             $subject = WBK_Placeholder_Processor::process( $subject, $bookings );
             if ( $trigger == 'admin_reminder' ) {
@@ -86,15 +72,7 @@ class WBK_Email_Processor {
                 }
                 $pdf_attachement = strip_tags( $et->get( 'pdf_attachment' ) );
                 if ( $pdf_attachement != '' ) {
-                    if ( function_exists( 'pll__' ) ) {
-                        $pdf_attachement = pll__( $pdf_attachement );
-                    }
-                    $pdf_attachement = apply_filters(
-                        'wpml_translate_single_string',
-                        $pdf_attachement,
-                        'webba-booking-lite',
-                        'Email template pdf attachment ' . $id
-                    );
+                    $pdf_attachement = WBK_Translation_Processor::translate_string( 'webba_email_template_pdf_' . $id, $pdf_attachement );
                     $pdf_file = WBK_Pdf_Processor::process( $pdf_attachement, $bookings );
                     if ( $pdf_file != false ) {
                         $attachments[] = $pdf_file;
@@ -197,13 +175,13 @@ class WBK_Email_Processor {
             'wpml_translate_single_string',
             $subject,
             'webba-booking-lite',
-            'Email template subject ' . $template->get_id()
+            'webba_email_template_subject_' . $template->get_id()
         );
         $message = apply_filters(
             'wpml_translate_single_string',
             $message,
             'webba-booking-lite',
-            'Email template message body ' . $template->get_id()
+            'webba_email_template_message_' . $template->get_id()
         );
         $message = WBK_Placeholder_Processor::process( $message, $bookings );
         $subject = WBK_Placeholder_Processor::process( $subject, $bookings );
@@ -225,7 +203,7 @@ class WBK_Email_Processor {
                     'wpml_translate_single_string',
                     $pdf_attachement,
                     'webba-booking-lite',
-                    'Email template pdf attachment ' . $template->get_id()
+                    'webba_email_template_pdf_' . $template->get_id()
                 );
                 $pdf_file = WBK_Pdf_Processor::process( $pdf_attachement, $bookings );
                 if ( $pdf_file != false ) {

@@ -91,6 +91,28 @@ global $wpdb;
                                             } ?>
                                         </div>
                                     </div>
+                                    <?php $hasSidebarSupportFields = false; ?>
+                                    <?php foreach ($fields as $field) {
+                                        if ('sidebar_support' == $field['args']['subsection']) {
+                                            $hasSidebarSupportFields = true;
+                                            break;
+                                        }
+                                    } ?>
+                                    <?php if ($hasSidebarSupportFields) { ?>
+                                    <hr class="fullwidth-wb">
+                                    <div class="toggle-container-wb" data-js="toggle-container-wb">
+                                        <div class="toggle-title-wb" data-js="toggle-title-wb">
+                                            <?php echo esc_html__('Sidebar Support Details', 'webba-booking-lite') ?>
+                                        </div>
+                                        <div class="toggle-content-wb" data-js="toggle-content-wb">
+                                            <?php foreach ($fields as $field) {
+                                                if ('sidebar_support' == $field['args']['subsection']) {
+                                                    call_user_func($field['callback'], $field);
+                                                }
+                                            } ?>
+                                        </div>
+                                    </div>
+                                    <?php } ?>
                                 </div>
                             </div>
                         </div>

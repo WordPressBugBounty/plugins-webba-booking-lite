@@ -521,7 +521,6 @@ class WBK_Placeholder_Processor
         $multi_token = null,
         $multi_token_admin = null
     ) {
-
         $booking = new WBK_Booking($booking_id);
         if (!$booking->is_loaded()) {
             return;
@@ -573,7 +572,11 @@ class WBK_Placeholder_Processor
         $message = str_replace('#zoom_pass', $zoom_pass, $message);
         $message = str_replace('#zoom_meeting_id', $zoom_meeting_id, $message);
 
-        $message = str_replace('#admin_token', $booking->get('admin_token'), $message);
+        $message = str_replace(
+            '#admin_token',
+            $booking->get('admin_token'),
+            $message
+        );
         $message = str_replace('#token', $booking->get('token'), $message);
 
         // processing links for payment, cancelation and google event addings
@@ -922,8 +925,8 @@ class WBK_Placeholder_Processor
             wp_date(
                 $time_format,
                 $booking->get_start() +
-                $correction +
-                $service->get_duration() * 60,
+                    $correction +
+                    $service->get_duration() * 60,
                 $timezone_to_use
             );
 
@@ -968,7 +971,11 @@ class WBK_Placeholder_Processor
             esc_url(get_option('wbk_user_dashboard_page_link', '')),
             esc_html(get_option('wbk_user_dashboard_link_label', ''))
         );
-        $message = str_replace('#dashboard_page', $user_dashboard_page_link, $message);
+        $message = str_replace(
+            '#dashboard_page',
+            $user_dashboard_page_link,
+            $message
+        );
 
         $userdata = get_query_var('wbk_user_data', false);
 
@@ -995,33 +1002,38 @@ class WBK_Placeholder_Processor
         $current_time_zone = date_default_timezone_get();
         date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
 
-        $message = str_replace('#booking_order', self::process_order_placeholder($bookings), $message);
+        $message = str_replace(
+            '#booking_order',
+            self::process_order_placeholder($bookings),
+            $message
+        );
 
-        if (get_option('wbk_multi_booking', '') == 'enabled') {
-            $message = WBK_Placeholder_Processor::process_placeholders($message, $bookings);
-        } else {
-            $message = WBK_Placeholder_Processor::process_placeholders($message, $bookings[0]);
-        }
+        $message = WBK_Placeholder_Processor::process_placeholders(
+            $message,
+            $bookings
+        );
+
         date_default_timezone_set($current_time_zone);
         return $message;
     }
     public static function process_order_placeholder($bookings)
     {
         $prev_timezone = date_default_timezone_get();
-        date_default_timezone_set(
-            get_option('wbk_timezone', 'UTC')
-        );
+        date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
         $rows = [];
         foreach ($bookings as $booking_id) {
             $booking = new WBK_Booking($booking_id);
             if (!$booking->is_loaded()) {
                 continue;
             }
-            $rows[] = self::message_placeholder_processing_old('#service_name #appointment_day #appointment_time', $booking_id, $booking->get_service());
-
+            $rows[] = self::message_placeholder_processing_old(
+                '#service_name #appointment_day #appointment_time',
+                $booking_id,
+                $booking->get_service()
+            );
         }
         date_default_timezone_set($prev_timezone);
-        return implode("<br/>", $rows);
+        return implode('<br/>', $rows);
     }
 
     public static function process_agenda_placehoder($message, $bookings)
@@ -1056,7 +1068,6 @@ class WBK_Placeholder_Processor
         </tr>';
 
         foreach ($bookings as $booking_id) {
-
             $booking = new WBK_Booking($booking_id);
             if (!$booking->is_loaded()) {
                 continue;
@@ -1074,9 +1085,7 @@ class WBK_Placeholder_Processor
 
             $time_format = WBK_Date_Time_Utils::get_time_format();
 
-            date_default_timezone_set(
-                get_option('wbk_timezone', 'UTC')
-            );
+            date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
             $time_string = wp_date(
                 $time_format,
                 $booking->get_start(),
@@ -1092,8 +1101,7 @@ class WBK_Placeholder_Processor
                     if (count($item) != 3) {
                         continue;
                     }
-                    $extra_content .=
-                        $item[1] . ': ' . $item[2] . '. ';
+                    $extra_content .= $item[1] . ': ' . $item[2] . '. ';
                 }
             }
 
@@ -1124,7 +1132,6 @@ class WBK_Placeholder_Processor
                 '</td><td style="margin:0;border:1px solid #ccc;padding:5px;">' .
                 $extra_content .
                 '</td></tr>';
-
         }
 
         $agenda .= '</table>';

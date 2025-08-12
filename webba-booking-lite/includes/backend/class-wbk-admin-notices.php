@@ -112,6 +112,16 @@ class WBK_Admin_Notices2
             ]
         ];
 
+        if (wbk_fs()->is_free_plan()) {
+            $notices['new_changes_v_606'] = [
+                'message' => sprintf(__('IMPORTANT! Webba Booking v6 is here and it may affect your current configuration. <a href="%s" target="_blank">Please read more about it here</a>', 'webba-booking-lite') , 'https://webba-booking.com/blog/webba-6-0/'),
+                'type' => 'info',
+                'condition' => function () {
+                    return isset($_GET['page']) && 0 === strpos($_GET['page'], 'wbk-');
+                }
+            ];
+        }
+
         return array_filter($notices, function ($props, $id) {
             return $this->should_show($id);
         }, ARRAY_FILTER_USE_BOTH);

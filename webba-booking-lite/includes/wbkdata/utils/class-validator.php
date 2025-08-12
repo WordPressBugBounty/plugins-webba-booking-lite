@@ -1,7 +1,8 @@
 <?php
 namespace WbkData;
-if (!defined('ABSPATH'))
-    exit;
+if (!defined('ABSPATH')) {
+    exit();
+}
 /*
  * This file is part of Webba Booking plugin
 
@@ -9,9 +10,8 @@ if (!defined('ABSPATH'))
 
  */
 
-
 if (!defined('ABSPATH')) {
-    exit;
+    exit();
 }
 class Validator
 {
@@ -20,7 +20,6 @@ class Validator
     {
         if (strlen($str) > $max || strlen($str) < $min) {
             return false;
-
         } else {
             return true;
         }
@@ -31,7 +30,7 @@ class Validator
         if (!is_numeric($int)) {
             return false;
         }
-        if (intval($int) <> $int) {
+        if (intval($int) != $int) {
             return false;
         }
         if ($int > $max || $int < $min) {
@@ -53,7 +52,12 @@ class Validator
     // check if email
     public static function check_email($eml)
     {
-        if (!preg_match('/^([a-z0-9_\.-]+)@([a-z0-9_\.-]+)\.([a-z\.]{2,20})$/', $eml)) {
+        if (
+            !preg_match(
+                '/^([a-z0-9_\.-]+)@([a-z0-9_\.-]+)\.([a-z\.]{2,20})$/',
+                $eml
+            )
+        ) {
             return false;
         } else {
             return true;
@@ -62,9 +66,13 @@ class Validator
     // check if color
     public static function check_color($clr)
     {
-        if (!preg_match('/#([a-f]|[A-F]|[0-9]){3}(([a-f]|[A-F]|[0-9]){3})?\b/', $clr)) {
+        if (
+            !preg_match(
+                '/#([a-f]|[A-F]|[0-9]){3}(([a-f]|[A-F]|[0-9]){3})?\b/',
+                $clr
+            )
+        ) {
             return false;
-
         } else {
             return true;
         }
@@ -72,12 +80,19 @@ class Validator
     // check if day of week
     public static function check_day_of_week($str)
     {
-        if ($str != 'monday' && $str != 'tuesday' && $str != 'wednesday' && $str != 'thursday' && $str != 'friday' && $str != 'saturday' && $str != 'sunday') {
+        if (
+            $str != 'monday' &&
+            $str != 'tuesday' &&
+            $str != 'wednesday' &&
+            $str != 'thursday' &&
+            $str != 'friday' &&
+            $str != 'saturday' &&
+            $str != 'sunday'
+        ) {
             return false;
         } else {
             return true;
         }
-
     }
 
     /**
@@ -88,7 +103,10 @@ class Validator
      */
     public static function check_hex_color(string $color): bool
     {
-        return preg_match('/#([a-f]|[A-F]|[0-9]){3}(([a-f]|[A-F]|[0-9]){3})?\b/', $color);
+        return preg_match(
+            '/#([a-f]|[A-F]|[0-9]){3}(([a-f]|[A-F]|[0-9]){3})?\b/',
+            $color
+        );
     }
 }
 

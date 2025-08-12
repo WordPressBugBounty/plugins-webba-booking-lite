@@ -39,6 +39,7 @@ class WBK_Backend {
             'wbk-schedule',
             'wbk-options',
             'wbk-gg-calendars',
+            'wbk-form-builder',
             'wbk-appearance',
             'wbk-services',
             'wbk-pricing-rules',

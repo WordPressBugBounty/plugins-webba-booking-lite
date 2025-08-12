@@ -98,6 +98,18 @@ class WBK_Schedule_Processor {
         } else {
             $filter_availability = true;
         }
+        if ( isset( $options['offset'] ) ) {
+            $offset = $options['offset'];
+        } else {
+            if ( isset( $_POST['offset'] ) ) {
+                $offset = $_POST['offset'];
+                if ( !is_numeric( $offset ) ) {
+                    $offset = 0;
+                }
+            } else {
+                $offset = 0;
+            }
+        }
         $night_houts_addon = get_option( 'wbk_night_hours', '0' );
         if ( trim( $night_houts_addon ) == '' ) {
             $night_houts_addon = 0;
@@ -116,25 +128,7 @@ class WBK_Schedule_Processor {
         $service = new WBK_Service($service_id);
         $time_format = WBK_Date_Time_Utils::get_time_format();
         $date_format = WBK_Format_Utils::get_date_format();
-        if ( isset( $_POST['offset'] ) ) {
-            $offset = $_POST['offset'];
-        } else {
-            $offset = '';
-        }
-        if ( !is_numeric( $offset ) ) {
-            $offset = 0;
-        }
-        $time_zone_client = '';
-        if ( isset( $_POST['time_zone_client'] ) ) {
-            $time_zone_client = $_POST['time_zone_client'];
-        }
         $date = new DateTime();
-        if ( $time_zone_client != '' ) {
-            $this_tz = new DateTimeZone($time_zone_client);
-            $date = ( new DateTime('@' . $day) )->setTimezone( new DateTimeZone($time_zone_client) );
-            $offset = $this_tz->getOffset( $date );
-            $offset = $offset * -1 / 60;
-        }
         $this->day = $day;
         $this->breakers = [];
         if ( !isset( $this->gg_breakers ) ) {
@@ -268,7 +262,6 @@ class WBK_Schedule_Processor {
                     }
                 }
                 $status = $this->get_time_slot_status( $time, $total_duration, $service );
-                error_log( print_r( $status, true ) );
                 $booked = 0;
                 if ( is_array( $status ) ) {
                     $booked = $status[1];
@@ -768,14 +761,12 @@ class WBK_Schedule_Processor {
         $start = $time;
         $end = $time + $duration;
         // check breakers
-        if ( get_option( 'wbk_mode_overlapping_availabiliy', 'true' ) == 'true' ) {
-            foreach ( $this->breakers as $breaker ) {
-                if ( $start > $breaker->getStart() && $start < $breaker->getEnd() ) {
-                    return -1;
-                }
-                if ( $end > $breaker->getStart() && $end < $breaker->getEnd() ) {
-                    return -1;
-                }
+        foreach ( $this->breakers as $breaker ) {
+            if ( $start > $breaker->getStart() && $start < $breaker->getEnd() ) {
+                return -1;
+            }
+            if ( $end > $breaker->getStart() && $end < $breaker->getEnd() ) {
+                return -1;
             }
         }
         // check locked timeslots

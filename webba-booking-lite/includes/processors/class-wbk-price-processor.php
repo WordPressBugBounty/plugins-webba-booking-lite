@@ -388,7 +388,7 @@ class WBK_Price_Processor
                 $amount_of_discount = ($subtotal / 100) * $coupon[2];
             }
             $subtotal -= $amount_of_discount;
-            $item_names[] = get_option('wbk_payment_discount_item', __('Discount', 'webba-booking-lite'));
+            $item_names[] = get_option('wbk_payment_discount_item', __('Discount (-)', 'webba-booking-lite'));
             $prices[] = $amount_of_discount * (-1);
             $quantities[] = 1;
             $services[] = 0;

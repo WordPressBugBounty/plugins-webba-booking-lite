@@ -1,8 +1,9 @@
 <?php
 //WBK validator class
 // check if accessed directly
-if (!defined('ABSPATH'))
-    exit;
+if (!defined('ABSPATH')) {
+    exit();
+}
 
 use voku\helper\AntiXSS;
 
@@ -23,7 +24,7 @@ class WBK_Validator
         if (!is_numeric($int)) {
             return false;
         }
-        if (intval($int) <> $int) {
+        if (intval($int) != $int) {
             return false;
         }
         if ($int > $max || $int < $min) {
@@ -34,7 +35,12 @@ class WBK_Validator
     // check if email
     public static function check_email($eml)
     {
-        if (!preg_match('/^([a-z0-9_+\.-]+)@([a-z0-9_\.-]+)\.([a-z\.]{2,20})$/', $eml)) {
+        if (
+            !preg_match(
+                '/^([a-z0-9_+\.-]+)@([a-z0-9_\.-]+)\.([a-z\.]{2,20})$/',
+                $eml
+            )
+        ) {
             return false;
         } else {
             return true;
@@ -48,7 +54,15 @@ class WBK_Validator
     // check if day of week
     public static function check_day_of_week($str)
     {
-        if ($str != 'monday' && $str != 'tuesday' && $str != 'wednesday' && $str != 'thursday' && $str != 'friday' && $str != 'saturday' && $str != 'sunday') {
+        if (
+            $str != 'monday' &&
+            $str != 'tuesday' &&
+            $str != 'wednesday' &&
+            $str != 'thursday' &&
+            $str != 'friday' &&
+            $str != 'saturday' &&
+            $str != 'sunday'
+        ) {
             return false;
         } else {
             return true;
@@ -73,7 +87,11 @@ class WBK_Validator
             return false;
         }
         global $wpdb;
-        $users = $wpdb->get_col('SELECT users FROM ' . get_option('wbk_db_prefix', '') . 'wbk_services');
+        $users = $wpdb->get_col(
+            'SELECT users FROM ' .
+                get_option('wbk_db_prefix', '') .
+                'wbk_services'
+        );
         foreach ($users as $user) {
             if (is_null($user)) {
                 continue;
@@ -93,7 +111,14 @@ class WBK_Validator
         if ($user_id == 0) {
             return false;
         }
-        $user_count = $wpdb->get_var($wpdb->prepare('SELECT count(*) as cnt FROM ' . get_option('wbk_db_prefix', '') . 'wbk_gg_calendars where user_id = %d', $user_id));
+        $user_count = $wpdb->get_var(
+            $wpdb->prepare(
+                'SELECT count(*) as cnt FROM ' .
+                    get_option('wbk_db_prefix', '') .
+                    'wbk_gg_calendars where user_id = %d',
+                $user_id
+            )
+        );
         if ($user_count > 0) {
             return true;
         }
@@ -108,7 +133,15 @@ class WBK_Validator
             return false;
         }
 
-        $user_count = $wpdb->get_var($wpdb->prepare('SELECT count(*) as cnt FROM ' . get_option('wbk_db_prefix', '') . 'wbk_gg_calendars where user_id = %d AND id = %d', $user_id, $calendar_id));
+        $user_count = $wpdb->get_var(
+            $wpdb->prepare(
+                'SELECT count(*) as cnt FROM ' .
+                    get_option('wbk_db_prefix', '') .
+                    'wbk_gg_calendars where user_id = %d AND id = %d',
+                $user_id,
+                $calendar_id
+            )
+        );
 
         if ($user_count > 0) {
             return true;
@@ -124,7 +157,14 @@ class WBK_Validator
             return false;
         }
         global $wpdb;
-        $user = $wpdb->get_var($wpdb->prepare('SELECT users FROM ' . get_option('wbk_db_prefix', '') . 'wbk_services WHERE id = %d', $service_id));
+        $user = $wpdb->get_var(
+            $wpdb->prepare(
+                'SELECT users FROM ' .
+                    get_option('wbk_db_prefix', '') .
+                    'wbk_services WHERE id = %d',
+                $service_id
+            )
+        );
         if ($user == '' || is_null($user)) {
             return false;
         }
@@ -151,8 +191,14 @@ class WBK_Validator
     // check email loop for multiple emails
     public static function check_email_loop($value)
     {
-        if (substr_count($value, '[appointment_loop_start]') == 1 && substr_count($value, '[appointment_loop_end]') == 1) {
-            if (strpos($value, '[appointment_loop_start]') < strpos($value, '[appointment_loop_end]')) {
+        if (
+            substr_count($value, '[appointment_loop_start]') == 1 &&
+            substr_count($value, '[appointment_loop_end]') == 1
+        ) {
+            if (
+                strpos($value, '[appointment_loop_start]') <
+                strpos($value, '[appointment_loop_end]')
+            ) {
                 return true;
             }
         }
@@ -162,28 +208,31 @@ class WBK_Validator
     public static function check_coupon($coupon, $service_ids)
     {
         global $wpdb;
-        $data[0] = " SELECT * FROM " . get_option('wbk_db_prefix', '') . "wbk_coupons WHERE name = %s";
+        $data[0] =
+            ' SELECT * FROM ' .
+            get_option('wbk_db_prefix', '') .
+            'wbk_coupons WHERE name = %s';
         $data[1] = [$coupon];
 
         $data = apply_filters('wbk_check_coupon', $data);
         $result = $wpdb->get_row($wpdb->prepare($data[0], $data[1]), ARRAY_A);
 
-        if ($result == NULL) {
-            return FALSE;
+        if ($result == null) {
+            return false;
         }
         // check service
         if ($result['services'] != '') {
             $services = json_decode($result['services']);
             foreach ($service_ids as $service_id) {
                 if (is_array($services) && !in_array($service_id, $services)) {
-                    return FALSE;
+                    return false;
                 }
             }
         }
         // check used
         if ($result['maximum'] != 0 && $result['maximum'] != '') {
             if (intval($result['used']) >= $result['maximum']) {
-                return FALSE;
+                return false;
             }
         }
         // check date range
@@ -193,27 +242,43 @@ class WBK_Validator
             $end = strtotime(trim($range[1]));
             if (time() >= $start && time() <= $end) {
             } else {
-                return FALSE;
+                return false;
             }
         }
-        return array($result['id'], $result['amount_fixed'], $result['amount_percentage']);
+        return [
+            $result['id'],
+            $result['amount_fixed'],
+            $result['amount_percentage'],
+        ];
     }
     public function getCouponData($coupon_id)
     {
         global $wpdb;
-        $result = $wpdb->get_row($wpdb->prepare(" SELECT * FROM " . get_option('wbk_db_prefix', '') . "wbk_coupons WHERE id = %d", $coupon_id), ARRAY_A);
-        if ($result == NULL) {
-            return FALSE;
+        $result = $wpdb->get_row(
+            $wpdb->prepare(
+                ' SELECT * FROM ' .
+                    get_option('wbk_db_prefix', '') .
+                    'wbk_coupons WHERE id = %d',
+                $coupon_id
+            ),
+            ARRAY_A
+        );
+        if ($result == null) {
+            return false;
         }
-        return array($result['id'], $result['amount_fixed'], $result['amount_percentage']);
+        return [
+            $result['id'],
+            $result['amount_fixed'],
+            $result['amount_percentage'],
+        ];
     }
     public static function validateId($id, $table)
     {
-        $result = TRUE;
+        $result = true;
         if (!is_numeric($id)) {
-            $result = FALSE;
+            $result = false;
         } else {
-            $result = apply_filters('wbk_validate_id', $result, array($id, $table));
+            $result = apply_filters('wbk_validate_id', $result, [$id, $table]);
         }
 
         return $result;
@@ -229,7 +294,6 @@ class WBK_Validator
             return false;
         }
         if (!in_array($service_id, WBK_Model_Utils::get_service_ids(), true)) {
-
             return false;
         }
         return true;
@@ -273,7 +337,6 @@ class WBK_Validator
         if (class_exists('voku\helper\AntiXSS')) {
             $antiXss = new AntiXSS();
             $input = $antiXss->xss_clean($input);
-
         }
         $input = strip_tags($input);
         return $input;
@@ -281,11 +344,10 @@ class WBK_Validator
     public static function no_html($input)
     {
         $input = strip_tags($input);
-
     }
     public static function kses($input)
     {
-        $style_attr = array(
+        $style_attr = [
             'background',
             'background-color',
             'background-image',
@@ -418,33 +480,32 @@ class WBK_Validator
             'cellpadding',
             'align',
 
-            '--*'
-        );
-        $default_attribs = array(
-            'id' => array(),
-            'class' => array(),
-            'title' => array(),
+            '--*',
+        ];
+        $default_attribs = [
+            'id' => [],
+            'class' => [],
+            'title' => [],
             'style' => $style_attr,
-            'data' => array(),
-            'data-mce-id' => array(),
-            'data-mce-style' => array(),
-            'data-mce-bogus' => array(),
-            'type' => array(),
-            'colspan' => array(),
-            'src' => array(),
-            'width' => array(),
-            'cellspacing' => array(),
-            'cellpadding' => array(),
-            'border' => array(),
-            'align' => array(),
-            'height' => array(),
-            'frameborder' => array(),
-            'allow' => array(),
-            'referrerpolicy' => array(),
-            'allowfullscreen' => array(),
-
-        );
-        $allowed_tags = array(
+            'data' => [],
+            'data-mce-id' => [],
+            'data-mce-style' => [],
+            'data-mce-bogus' => [],
+            'type' => [],
+            'colspan' => [],
+            'src' => [],
+            'width' => [],
+            'cellspacing' => [],
+            'cellpadding' => [],
+            'border' => [],
+            'align' => [],
+            'height' => [],
+            'frameborder' => [],
+            'allow' => [],
+            'referrerpolicy' => [],
+            'allowfullscreen' => [],
+        ];
+        $allowed_tags = [
             'h1' => $default_attribs,
             'h2' => $default_attribs,
             'h3' => $default_attribs,
@@ -454,13 +515,10 @@ class WBK_Validator
             'div' => $default_attribs,
             'span' => $default_attribs,
             'p' => $default_attribs,
-            'a' => array_merge(
-                $default_attribs,
-                array(
-                    'href' => array(),
-                    'target' => array('_blank', '_top'),
-                )
-            ),
+            'a' => array_merge($default_attribs, [
+                'href' => [],
+                'target' => ['_blank', '_top'],
+            ]),
             'u' => $default_attribs,
             'i' => $default_attribs,
             'q' => $default_attribs,
@@ -483,8 +541,8 @@ class WBK_Validator
             'th' => $default_attribs,
             'style' => $default_attribs,
             'img' => $default_attribs,
-            'iframe' => $default_attribs
-        );
+            'iframe' => $default_attribs,
+        ];
         $input = wp_kses($input, $allowed_tags);
         return $input;
     }
@@ -507,8 +565,7 @@ class WBK_Validator
 
     public static function remove_emoji($text)
     {
-
-        $clean_text = "";
+        $clean_text = '';
 
         // Match Emoticons
         $regexEmoticons = '/[\x{1F600}-\x{1F64F}]/u';
@@ -539,7 +596,9 @@ class WBK_Validator
             $allowed = false;
             $booking = new WBK_Booking($booking_id);
             if ($booking->is_loaded()) {
-                if ($booking->get('email') == wp_get_current_user()->user_email) {
+                if (
+                    $booking->get('email') == wp_get_current_user()->user_email
+                ) {
                     $allowed = true;
                 }
             }
@@ -561,6 +620,161 @@ class WBK_Validator
         $value = str_replace('delete', '', $value);
         $value = str_replace('select', '', $value);
         return $value;
+    }
+    public static function wbk_kses($input)
+    {
+        $allowed_tags = [
+            'a' => [
+                'href' => [],
+                'title' => [],
+                'target' => [],
+                'rel' => [],
+                'class' => [],
+                'style' => [],
+            ],
+            'abbr' => [
+                'title' => [],
+                'class' => [],
+                'style' => [],
+            ],
+            'b' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'blockquote' => [
+                'cite' => [],
+                'class' => [],
+                'style' => [],
+            ],
+            'br' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'code' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'del' => [
+                'datetime' => [],
+                'class' => [],
+                'style' => [],
+            ],
+            'div' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'em' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'h1' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'h2' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'h3' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'h4' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'h5' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'h6' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'hr' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'i' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'img' => [
+                'src' => [],
+                'alt' => [],
+                'title' => [],
+                'width' => [],
+                'height' => [],
+                'class' => [],
+                'style' => [],
+            ],
+            'li' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'ol' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'p' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'pre' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'span' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'strong' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'table' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'thead' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'tbody' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'tfoot' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'tr' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'td' => [
+                'colspan' => [],
+                'rowspan' => [],
+                'class' => [],
+                'style' => [],
+            ],
+            'th' => [
+                'colspan' => [],
+                'rowspan' => [],
+                'scope' => [],
+                'class' => [],
+                'style' => [],
+            ],
+            'u' => [
+                'class' => [],
+                'style' => [],
+            ],
+            'ul' => [
+                'class' => [],
+                'style' => [],
+            ],
+        ];
+        return wp_kses($input, $allowed_tags);
     }
 }
 ?>

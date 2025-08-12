@@ -133,10 +133,6 @@ class WBK_Frontend_Booking {
     }
 
     public function wbk_shc_webbabooking( $attr ) {
-        $get_processing = WBK_Renderer::load_template( 'frontend/get_parameters_processing', [], false );
-        if ( $get_processing != '' ) {
-            return $get_processing;
-        }
         extract( shortcode_atts( [
             'service' => '0',
         ], $attr ) );
@@ -145,9 +141,6 @@ class WBK_Frontend_Booking {
         ], $attr ) );
         extract( shortcode_atts( [
             'category_list' => 'no',
-        ], $attr ) );
-        extract( shortcode_atts( [
-            'multiservice' => 'no',
         ], $attr ) );
         extract( shortcode_atts( [
             'compatibility' => 'no',
@@ -162,118 +155,8 @@ class WBK_Frontend_Booking {
         if ( isset( $_GET['service'] ) && is_numeric( $_GET['service'] ) ) {
             $service = $_GET['service'];
         }
-        $this->scenario = [];
-        if ( $service == 0 ) {
-            if ( $multiservice != 'yes' ) {
-                if ( $category_list == 'yes' ) {
-                    $templates = [
-                        'frontend_v5/category_dropdown'    => [$category_ids],
-                        'frontend_v5/service_single_radio' => [$service_ids, false, true],
-                    ];
-                } else {
-                    $templates = [
-                        'frontend_v5/service_single_radio' => [$service_ids, false, false],
-                    ];
-                }
-            } else {
-                if ( $category_list == 'yes' ) {
-                    $templates = [
-                        'frontend_v5/category_dropdown' => [$category_ids],
-                        'frontend_v5/service_multiple'  => [$service_ids, false, true],
-                    ];
-                } else {
-                    $templates = [
-                        'frontend_v5/service_multiple' => [$service_ids, false, false],
-                    ];
-                }
-            }
-            $this->scenario[] = [
-                'title'     => esc_html( get_option( 'wbk_service_step_title', __( 'Service', 'webba-booking-lite' ) ) ),
-                'slug'      => 'services',
-                'templates' => $templates,
-                'request'   => '',
-            ];
-            $this->scenario[] = [
-                'title'     => esc_html( get_option( 'wbk_date_time_step_title', __( 'Date and time', 'webba-booking-lite' ) ) ),
-                'slug'      => 'date_time',
-                'templates' => [
-                    'frontend_v5/date_time' => [false],
-                ],
-                'request'   => 'wbk_prepare_service_data',
-            ];
-        } else {
-            $service_ids = [$service];
-            $this->scenario[] = [
-                'title'     => esc_html( get_option( 'wbk_date_time_step_title', __( 'Date and time', 'webba-booking-lite' ) ) ),
-                'slug'      => 'date_time',
-                'templates' => [
-                    'frontend_v5/service_dropdown' => [$service_ids, true],
-                    'frontend_v5/date_time'        => [true],
-                ],
-                'request'   => 'wbk_prepare_service_data',
-            ];
-        }
-        // detect if there are free services
-        $free_services = 0;
-        $paid_services = 0;
-        foreach ( $service_ids as $service_id ) {
-            $service = new WBK_Service($service_id);
-            if ( !$service->is_loaded() ) {
-                continue;
-            }
-            if ( $service->get_payment_methods() == '' ) {
-                $free_services++;
-            } else {
-                if ( $service->has_only_arrival_payment_method() ) {
-                    $free_services++;
-                } else {
-                    $paid_services++;
-                }
-            }
-        }
-        $this->scenario[] = [
-            'title'   => esc_html( get_option( 'wbk_details_step_title', __( 'Details', 'webba-booking-lite' ) ) ),
-            'slug'    => 'form',
-            'request' => 'wbk_render_booking_form',
-        ];
-        if ( $paid_services > 0 ) {
-            $payment_slug = 'payment';
-            if ( $free_services > 0 ) {
-                $payment_slug = 'payment_optional';
-            }
-            // only paid services
-            $this->scenario[] = [
-                'title'   => esc_html( get_option( 'wbk_payment_step_title', __( 'Payment', 'webba-booking-lite' ) ) ),
-                'slug'    => $payment_slug,
-                'request' => 'wbk_book',
-            ];
-            $this->scenario[] = [
-                'slug'    => 'final_screen',
-                'request' => 'wbk_approve_payment',
-            ];
-        } else {
-            $this->scenario[] = [
-                'slug'    => 'final_screen',
-                'request' => 'wbk_book',
-            ];
-        }
-        $compatibility_html = '';
-        if ( $compatibility == 'yes' ) {
-            $compatibility_html = '<span class="wbk_compatibility"></span>';
-        }
-        if ( get_option( 'wbk_initial_shortcode_render_tracked', '' ) != 'true' ) {
-            if ( WBK_Model_Utils::get_total_count_of_bookings() == 0 ) {
-                $data['service'] = $tracking_service;
-                $data['category'] = $category;
-                $data['category_list'] = $category_list;
-                $data['multiservice'] = $multiservice;
-                WBK_Mixpanel::track_event( "1st shortcode rendering", $data );
-                update_option( 'wbk_initial_shortcode_render_tracked', 'true' );
-            } else {
-                update_option( 'wbk_initial_shortcode_render_tracked', 'true' );
-            }
-        }
-        return $compatibility_html . WBK_Renderer::load_template( 'frontend_v5/webba5_form_container', [$this->scenario], false );
+        $cnt = WBK_Renderer::load_template( 'frontend_v6/booking_form', [$service, $category_list, $category], false );
+        return $cnt;
     }
 
     public function wp_enqueue_scripts() {
@@ -282,7 +165,6 @@ class WBK_Frontend_Booking {
         $select_slots_label = get_option( 'wbk_slots_label', '' );
         $thanks_message = get_option( 'wbk_book_thanks_message', '' );
         $select_date_placeholder = WBK_Validator::alfa_numeric( get_option( 'wbk_date_input_placeholder', '' ) );
-        $booked_text = get_option( 'wbk_booked_text', '' );
         // Localize the script with new data
         $checkout_label = get_option( 'wbk_checkout_button_text', '' );
         $checkout_label = str_replace( '#selected_count', '<span class="wbk_multi_selected_count"></span>', $checkout_label );

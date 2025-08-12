@@ -1,5 +1,6 @@
 <?php
 
+use WbkData\Model;
 if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -13,9 +14,9 @@ class WBK_Model {
         $prefix = $wpdb->prefix;
         update_option( 'wbk_db_prefix', $prefix );
         // custom on/off days
-        $wpdb->query( "CREATE TABLE IF NOT EXISTS " . get_option( 'wbk_db_prefix', '' ) . "wbk_days_on_off (\n\t            id int unsigned NOT NULL auto_increment PRIMARY KEY,\n\t            service_id int unsigned NOT NULL,\n\t            day int unsigned NOT NULL,\n\t            status int unsigned NOT NULL,\n\t            UNIQUE KEY id (id)\n\t        )\n\t        DEFAULT CHARACTER SET = utf8\n\t        COLLATE = utf8_general_ci" );
+        $wpdb->query( 'CREATE TABLE IF NOT EXISTS ' . get_option( 'wbk_db_prefix', '' ) . "wbk_days_on_off (\n\t            id int unsigned NOT NULL auto_increment PRIMARY KEY,\n\t            service_id int unsigned NOT NULL,\n\t            day int unsigned NOT NULL,\n\t            status int unsigned NOT NULL,\n\t            UNIQUE KEY id (id)\n\t        )\n\t        DEFAULT CHARACTER SET = utf8\n\t        COLLATE = utf8_general_ci" );
         // custom locked timeslots
-        $wpdb->query( "CREATE TABLE IF NOT EXISTS " . get_option( 'wbk_db_prefix', '' ) . "wbk_locked_time_slots (\n\t            id int unsigned NOT NULL auto_increment PRIMARY KEY,\n\t            service_id int unsigned NOT NULL,\n\t            time int unsigned NOT NULL,\n\t            connected_id int unsigned NOT NULL default 0,\n\t            UNIQUE KEY id (id)\n\t        )\n\t        DEFAULT CHARACTER SET = utf8\n\t        COLLATE = utf8_general_ci" );
+        $wpdb->query( 'CREATE TABLE IF NOT EXISTS ' . get_option( 'wbk_db_prefix', '' ) . "wbk_locked_time_slots (\n\t            id int unsigned NOT NULL auto_increment PRIMARY KEY,\n\t            service_id int unsigned NOT NULL,\n\t            time int unsigned NOT NULL,\n\t            connected_id int unsigned NOT NULL default 0,\n\t            UNIQUE KEY id (id)\n\t        )\n\t        DEFAULT CHARACTER SET = utf8\n\t        COLLATE = utf8_general_ci" );
     }
 
     public function initalize_model() {
@@ -25,7 +26,38 @@ class WBK_Model {
         // create tables if not created
         self::create_tables();
         $date_format = get_option( 'wbk_date_format_backend', 'M d, Y' );
-        $db_prefix = get_option( 'wbk_db_prefix', '' );
+        // form table definition
+        $table = new WbkData\Model($db_prefix . 'wbk_forms');
+        $table->set_single_item_name( __( 'Form', 'webba-booking-lite' ) );
+        $table->set_multiple_item_name( __( 'Forms', 'webba-booking-lite' ) );
+        $table->sections['general'] = __( 'General', 'webba-booking-lite' );
+        $table->add_field(
+            'form_name',
+            'name',
+            __( 'Form name', 'webba-booking-lite' ),
+            'text',
+            'general',
+            [
+                'tooltip' => __( 'Enter form name.', 'webba-booking-lite' ),
+            ]
+        );
+        $table->add_field(
+            'form_fields',
+            'fields',
+            __( 'Fields', 'webba-booking-lite' ),
+            'wbk_form_fields',
+            'general',
+            [
+                'tooltip' => __( '', '' ),
+            ],
+            [],
+            true,
+            false,
+            false
+        );
+        $table->sync_structure();
+        WbkData()->models->add( $table, $db_prefix . 'wbk_forms' );
+        // end form table definition
         $table = new WbkData\Model($db_prefix . 'wbk_services');
         $table->set_single_item_name( __( 'Service', 'webba-booking-lite' ) );
         $table->set_multiple_item_name( __( 'Services', 'webba-booking-lite' ) );
@@ -59,6 +91,20 @@ class WBK_Model {
             false,
             false
         );
+        $table->add_field(
+            'service_image',
+            'image',
+            __( 'Image', 'webba-booking-lite' ),
+            'file',
+            'general',
+            [
+                'tooltip' => __( 'Image to show in service preview', 'webba-booking-lite' ),
+            ],
+            '',
+            true,
+            true,
+            false
+        );
         $tooltip = __( 'Specify a date range if the service is only valid for a specific period of time.', 'webba-booking-lite' );
         $table->add_field(
             'service_date_range',
@@ -79,64 +125,64 @@ class WBK_Model {
         $tooltip = __( 'Select the days and time intervals when this service is available for booking.', 'webba-booking-lite' );
         $business_hours_default = [
             [
-                "start"       => 32400,
-                "end"         => 46800,
-                "day_of_week" => '1',
-                "status"      => "active",
+                'start'       => 32400,
+                'end'         => 46800,
+                'day_of_week' => '1',
+                'status'      => 'active',
             ],
             [
-                "start"       => 50400,
-                "end"         => 64800,
-                "day_of_week" => '1',
-                "status"      => "active",
+                'start'       => 50400,
+                'end'         => 64800,
+                'day_of_week' => '1',
+                'status'      => 'active',
             ],
             [
-                "start"       => 32400,
-                "end"         => 46800,
-                "day_of_week" => '2',
-                "status"      => "active",
+                'start'       => 32400,
+                'end'         => 46800,
+                'day_of_week' => '2',
+                'status'      => 'active',
             ],
             [
-                "start"       => 50400,
-                "end"         => 64800,
-                "day_of_week" => '2',
-                "status"      => "active",
+                'start'       => 50400,
+                'end'         => 64800,
+                'day_of_week' => '2',
+                'status'      => 'active',
             ],
             [
-                "start"       => 32400,
-                "end"         => 46800,
-                "day_of_week" => '3',
-                "status"      => "active",
+                'start'       => 32400,
+                'end'         => 46800,
+                'day_of_week' => '3',
+                'status'      => 'active',
             ],
             [
-                "start"       => 50400,
-                "end"         => 64800,
-                "day_of_week" => '3',
-                "status"      => "active",
+                'start'       => 50400,
+                'end'         => 64800,
+                'day_of_week' => '3',
+                'status'      => 'active',
             ],
             [
-                "start"       => 32400,
-                "end"         => 46800,
-                "day_of_week" => '4',
-                "status"      => "active",
+                'start'       => 32400,
+                'end'         => 46800,
+                'day_of_week' => '4',
+                'status'      => 'active',
             ],
             [
-                "start"       => 50400,
-                "end"         => 64800,
-                "day_of_week" => '4',
-                "status"      => "active",
+                'start'       => 50400,
+                'end'         => 64800,
+                'day_of_week' => '4',
+                'status'      => 'active',
             ],
             [
-                "start"       => 32400,
-                "end"         => 46800,
-                "day_of_week" => '5',
-                "status"      => "active",
+                'start'       => 32400,
+                'end'         => 46800,
+                'day_of_week' => '5',
+                'status'      => 'active',
             ],
             [
-                "start"       => 50400,
-                "end"         => 64800,
-                "day_of_week" => '5',
-                "status"      => "active",
+                'start'       => 50400,
+                'end'         => 64800,
+                'day_of_week' => '5',
+                'status'      => 'active',
             ]
         ];
         $table->add_field(
@@ -255,25 +301,6 @@ class WBK_Model {
                 $forms[$cf7_form->ID] = $cf7_form->post_title;
             }
         }
-        $tooltip = __( 'Choose your preferred booking form: either keep the default value or select a <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/set-up-frontend-booking-process/using-custom-fields-in-the-booking-form/">CF7 form.</a>', 'webba-booking-lite' );
-        $table->add_field(
-            'service_form',
-            'form',
-            __( 'Booking form', 'webba-booking-lite' ),
-            'select',
-            'general',
-            [
-                'tooltip'    => $tooltip,
-                'options'    => 'backend',
-                'null_value' => [
-                    '0' => __( 'Default form', 'webba-booking-lite' ),
-                ],
-            ],
-            '0',
-            true,
-            false,
-            false
-        );
         $tooltip = __( 'If you\'ve integrated <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/google-calendar/">Google Calendar</a>, choose the specific Google Calendar to synchronize with the service.', 'webba-booking-lite' );
         $table->add_field(
             'service_gg_calendars',
@@ -290,6 +317,40 @@ class WBK_Model {
             true,
             false,
             false
+        );
+        $tooltip = __( 'If you have other calendars you\'d like to integrate with, please provide the external iCal Calendar URLs.', 'webba-booking-lite' );
+        $table->add_field(
+            'service_extcalendar',
+            'extcalendar',
+            __( 'Take into account the external calendar (ics)', 'webba-booking-lite' ),
+            'textarea',
+            'general',
+            [
+                'tooltip'     => $tooltip,
+                'pro_version' => true,
+            ],
+            '',
+            true,
+            false,
+            false
+        );
+        $table->add_field(
+            'service_extcalendar_group_mode',
+            'extcalendar_group_mode',
+            __( 'External calendar for group services', 'webba-booking-lite' ),
+            'select',
+            'general',
+            [
+                'items'       => [
+                    'reduce' => __( 'Reduce availability', 'webba-booking-lite' ),
+                    'lock'   => __( 'Lock time slot', 'webba-booking-lite' ),
+                ],
+                'pro_version' => true,
+            ],
+            '',
+            true,
+            false,
+            true
         );
         $tooltip = __( 'Add users who need access to this service\'s schedule.', 'webba-booking-lite' );
         $table->add_field(
@@ -386,6 +447,15 @@ class WBK_Model {
             'arrival' => 'On arrival',
             'bank'    => 'Bank transfer',
         ];
+        $payment_methods = [
+            'paypal'  => 'PayPal',
+            'stripe'  => 'Stripe',
+            'arrival' => 'On arrival',
+            'bank'    => 'Bank transfer',
+        ];
+        if ( class_exists( 'WooCommerce' ) ) {
+            $payment_methods['woocommerce'] = 'WooCommerce';
+        }
         $tooltip = __( 'Select a template for booking confirmation notifications.', 'webba-booking-lite' );
         $table->add_field(
             'service_notification_template',
@@ -565,8 +635,9 @@ class WBK_Model {
             'checkbox',
             'general',
             [
-                'yes'     => __( 'Yes', 'webba-booking-lite' ),
-                'tooltip' => $tooltip,
+                'yes'         => __( 'Yes', 'webba-booking-lite' ),
+                'tooltip'     => $tooltip,
+                'pro_version' => true,
             ],
             '',
             true,
@@ -579,10 +650,10 @@ class WBK_Model {
             __( 'Minimum time slots per booking', 'webba-booking-lite' ),
             'text',
             'general',
-            array(
+            [
                 'sub_type' => 'none_negative_integer',
                 'tooltip'  => __( 'Minimum number of time slots required to make a booking. Applicable only if "Settings -> User Interface -> Multiple Bookings in One Session" is enabled.', 'webba-booking-lite' ),
-            ),
+            ],
             '',
             true,
             false,
@@ -594,10 +665,10 @@ class WBK_Model {
             __( 'Maximum time slots per booking', 'webba-booking-lite' ),
             'text',
             'general',
-            array(
+            [
                 'sub_type' => 'none_negative_integer',
                 'tooltip'  => __( 'Maximum number of time slots allowed to make a booking. Applicable only if "Settings -> User Interface -> Multiple Bookings in One Session" is enabled.', 'webba-booking-lite' ),
-            ),
+            ],
             '',
             true,
             false,
@@ -613,6 +684,21 @@ class WBK_Model {
             [
                 'yes'     => __( 'Yes', 'webba-booking-lite' ),
                 'tooltip' => $tooltip,
+            ],
+            '',
+            true,
+            false,
+            false
+        );
+        $table->add_field(
+            'service_form_builder',
+            'form_builder',
+            __( 'Form', 'webba-booking-lite' ),
+            'select',
+            'general',
+            [
+                'tooltip' => __( 'Select form to populate fields in booking form', 'webba-booking-lite' ),
+                'options' => 'forms',
             ],
             '',
             true,
@@ -2310,6 +2396,36 @@ class WBK_Model {
         $table->fields->get_element_at( 'pricing_rule_day_time' )->set_dependency( [['type', '=', 'day_of_week_and_time']] );
         $table->fields->get_element_at( 'pricing_rule_fixed_percent' )->set_dependency( [['action', '!=', 'replace'], ['action', '!=', 'multiply']] );
         $table->sync_structure();
+        // Forms
+        $table = new Model($db_prefix . 'wbk_forms');
+        $table->set_single_item_name( __( 'Form', 'webba-booking-lite' ) );
+        $table->set_multiple_item_name( __( 'Forms', 'webba-booking-lite' ) );
+        $table->add_field(
+            'name',
+            'name',
+            __( 'Name', 'webba-booking-lite' ),
+            'text',
+            '',
+            [],
+            '',
+            true,
+            true,
+            false
+        );
+        $table->add_field(
+            'fields',
+            'fields',
+            __( 'Fields', 'webba-booking-lite' ),
+            'text',
+            '',
+            [],
+            '',
+            true,
+            false,
+            false
+        );
+        $table->sync_structure();
+        $table = WbkData()->models->add( $table, $db_prefix . 'wbk_forms' );
     }
 
 }

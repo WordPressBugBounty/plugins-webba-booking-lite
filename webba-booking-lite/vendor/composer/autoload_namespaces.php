@@ -6,6 +6,9 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'cli' => array($vendorDir . '/wp-cli/php-cli-tools/lib'),
+    'WP_CLI\\' => array($vendorDir . '/wp-cli/wp-cli/php'),
     'PayPal' => array($vendorDir . '/paypal/rest-api-sdk-php/lib'),
+    'Mustache' => array($vendorDir . '/wp-cli/mustache/src'),
     'ICal' => array($vendorDir . '/johngrogg/ics-parser/src'),
 );

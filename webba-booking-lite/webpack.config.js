@@ -53,6 +53,7 @@ const config = {
     entry: {
         ...defaultEntries,
         ...srcJsEntries,
+        'wizard_page': './src/scss/wizard_page.scss',
     },
     output: {
         ...defaultConfig.output,

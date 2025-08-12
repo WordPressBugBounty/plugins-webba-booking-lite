@@ -12,11 +12,6 @@ class WBK_Booking_Factory {
         if ( !WBK_Validator::check_email( $data['email'] ) ) {
             return [false, 'Incorrect email'];
         }
-        if ( get_option( 'wbk_phone_required', '3' ) != '' ) {
-            if ( !WBK_Validator::check_string_size( $data['phone'], 3, 128 ) ) {
-                return [false, 'Incorrect phone'];
-            }
-        }
         if ( !WBK_Validator::check_integer( $data['time'], 1438426800, 4901674778 ) ) {
             return [false, 'Incorrect time'];
         }
@@ -121,6 +116,7 @@ class WBK_Booking_Factory {
     public function post_production( $booking_ids, $event = 'on_booking' ) {
         $prev_time_zone = date_default_timezone_get();
         date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
+        $result = [];
         foreach ( $booking_ids as $booking_id ) {
             $booking = new WBK_Booking($booking_id);
             $service_id = $booking->get_service();

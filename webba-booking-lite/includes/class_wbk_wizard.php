@@ -32,25 +32,37 @@ class WBK_Wizard
             return;
         }
 
-        if (
-            !isset($_POST['service_name']) ||
-            !isset($_POST['duration']) ||
-            !isset($_POST['range_start']) ||
-            !isset($_POST['range_end']) ||
-            !isset($_POST['allow_multiple_slots']) ||
-            !isset($_POST['allow_multiple_services']) ||
-            !isset($_POST['quantity']) ||
-            !isset($_POST['dow'])
-        ) {
-            echo json_encode(['status' => 'fail', 'reason' => 'wrong input']);
-            wp_die();
-            return;
-        }
-        $more_services = false;
-        if (isset($_POST['more_services'])) {
-            $more_services = true;
+        // Check required fields
+        $required_fields = [
+            'email',
+            'timezone',
+            'currency',
+            'service_name',
+            'service_description',
+            'service_price',
+            'service_duration',
+            'service_interval',
+            'service_buffer',
+            'service_advance',
+            'service_min_people',
+            'service_max_people',
+            'range_start',
+            'range_end',
+            'dow',
+        ];
+
+        foreach ($required_fields as $field) {
+            if (!isset($_POST[$field])) {
+                echo json_encode([
+                    'status' => 'fail',
+                    'reason' => 'missing field: ' . $field,
+                ]);
+                wp_die();
+                return;
+            }
         }
 
+        // Validate and sanitize input
         $service_name = esc_html(
             sanitize_text_field(trim($_POST['service_name']))
         );
@@ -62,16 +74,16 @@ class WBK_Wizard
             wp_die();
             return;
         }
-        $duration = esc_html(sanitize_text_field(trim($_POST['duration'])));
+
+        $duration = intval($_POST['service_duration']);
         if (!WBK_Validator::check_integer($duration, 5, 1440)) {
             echo json_encode(['status' => 'fail', 'reason' => 'duration']);
             wp_die();
             return;
         }
-        $range_start = esc_html(
-            sanitize_text_field(trim($_POST['range_start'] * 60))
-        );
-        if (!WBK_Validator::check_integer($duration, 0, 86100)) {
+
+        $range_start = intval($_POST['range_start']) * 60;
+        if (!WBK_Validator::check_integer($range_start, 0, 86100)) {
             echo json_encode([
                 'status' => 'fail',
                 'reason' => 'wrong start time',
@@ -79,9 +91,8 @@ class WBK_Wizard
             wp_die();
             return;
         }
-        $range_end = esc_html(
-            sanitize_text_field(trim($_POST['range_end'] * 60))
-        );
+
+        $range_end = intval($_POST['range_end']) * 60;
         if (!WBK_Validator::check_integer($range_end, 0, 86400)) {
             echo json_encode([
                 'status' => 'fail',
@@ -90,33 +101,13 @@ class WBK_Wizard
             wp_die();
             return;
         }
-        $allow_multiple_slots = esc_html(
-            sanitize_text_field(trim($_POST['allow_multiple_slots']))
-        );
-        if ($allow_multiple_slots != 'yes' && $allow_multiple_slots != 'no') {
-            echo json_encode([
-                'status' => 'fail',
-                'reason' => 'wrong multiple slots',
-            ]);
-            wp_die();
-            return;
-        }
-        $allow_multiple_services = esc_html(
-            sanitize_text_field(trim($_POST['allow_multiple_services']))
-        );
+
+        $min_people = intval($_POST['service_min_people']);
+        $max_people = intval($_POST['service_max_people']);
         if (
-            $allow_multiple_services != 'yes' &&
-            $allow_multiple_services != 'no'
+            !WBK_Validator::check_integer($min_people, 1, 10000) ||
+            !WBK_Validator::check_integer($max_people, 1, 10000)
         ) {
-            echo json_encode([
-                'status' => 'fail',
-                'reason' => 'wrong multiple services',
-            ]);
-            wp_die();
-            return;
-        }
-        $quantity = esc_html(sanitize_text_field(trim($_POST['quantity'])));
-        if (!WBK_Validator::check_integer($quantity, 1, 10000)) {
             echo json_encode([
                 'status' => 'fail',
                 'reason' => 'wrong quantity',
@@ -125,7 +116,7 @@ class WBK_Wizard
             return;
         }
 
-        // $dows = esc_html( sanitize_text_field(  $_POST['dow'] ) );
+        // Process business hours
         $dows_result = [];
         foreach ($_POST['dow'] as $dow) {
             if (!WBK_Validator::check_integer($dow, 1, 7)) {
@@ -147,48 +138,83 @@ class WBK_Wizard
             }
         }
 
+        // Create service
         $service = new WBK_Service();
 
+        // Basic info
         $service->set('name', $service_name);
-        $service->set('email', get_option('admin_email', ''));
+        $service->set(
+            'description',
+            sanitize_text_field($_POST['service_description'])
+        );
+        $service->set('email', sanitize_email($_POST['email']));
         $service->set('priority', '0');
         $service->set('form', '0');
-        $dow_availability = '[ ' . implode(',', $dows_result) . ']';
 
+        // Business hours
+        $dow_availability = '[ ' . implode(',', $dows_result) . ']';
         $service->set('business_hours', $dow_availability);
-        $service->set('min_quantity', '1');
-        $service->set('quantity', $quantity);
-        $service->set('prepare_time', '0');
+
+        // Service settings
+        $service->set('min_quantity', $min_people);
+        $service->set('quantity', $max_people);
+
         $service->set('duration', $duration);
-        $service->set('interval_between', '0');
-        $service->set('step', $duration);
+        $service->set('step', intval($_POST['service_interval']));
+        $service->set('interval_between', intval($_POST['service_buffer']));
+
+        $service->set('price', floatval($_POST['service_price']));
+        $service->set('service_fee', '0');
+
+        // Templates
         $service->set('notification_template', '0');
         $service->set('reminder_template', '0');
         $service->set('invoice_template', '0');
         $service->set('booking_changed_template', '0');
         $service->set('approval_template', '0');
+        $service->set('prepare_time', intval($_POST['service_advance']));
 
-        $service->set('price', '0');
-        $service->set('service_fee', '0');
-
+        // Save service
         $service_id = $service->save();
 
-        if ($allow_multiple_slots == 'yes') {
-            update_option('wbk_multi_booking', 'enabled');
+        // Save global settings
+        update_option('wbk_timezone', sanitize_text_field($_POST['timezone']));
+        update_option(
+            'wbk_payment_price_format',
+            sanitize_text_field($_POST['currency_symbol'] . '#price')
+        );
+
+        // Process closed dates
+        if (isset($_POST['closed_dates'])) {
+            $closed_dates = json_decode(
+                stripslashes($_POST['closed_dates']),
+                true
+            );
+            $holiday_dates = [];
+
+            foreach ($closed_dates as $range) {
+                $start = DateTime::createFromFormat('m/d/Y', $range['start']);
+                $end = DateTime::createFromFormat('m/d/Y', $range['end']);
+                $interval = new DateInterval('P1D');
+                $date_range = new DatePeriod(
+                    $start,
+                    $interval,
+                    $end->modify('+1 day')
+                );
+
+                foreach ($date_range as $date) {
+                    $holiday_dates[] = $date->format('Y-m-d');
+                }
+            }
+
+            update_option('wbk_holydays', implode(',', $holiday_dates));
         }
 
-        $shortcode = '';
-        if ($allow_multiple_services == 'yes') {
-            $shortcode = '[webbabooking multiservice=yes]';
-            update_option('wbk_multi_booking', 'enabled');
-        } else {
-            if ($more_services) {
-                $shortcode = '[webbabooking]';
-            } else {
-                $shortcode = '[webbabooking service=' . $service_id . ']';
-            }
-        }
-        echo json_encode(['status' => 'success', 'shortcode' => $shortcode]);
+        // Return shortcode
+        echo json_encode([
+            'status' => 'success',
+            'shortcode' => '[webbabooking]',
+        ]);
         WBK_Mixpanel::track_event('service created', []);
         WBK_Mixpanel::track_event('setup wizard basic setup complete', []);
         wp_die();

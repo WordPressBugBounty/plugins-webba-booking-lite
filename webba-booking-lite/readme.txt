@@ -4,37 +4,54 @@ Donate link: https://webba-booking.com/
 Tags:  appointments, appointment booking, booking calendar, scheduling, booking system
 Requires at least: 5.6
 Tested up to: 6.8
-Stable tag: 5.1.23
+Stable tag: 6.0.6
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Free Appointment Booking Plugin 🗓️ unlimited appointments, booking management, calendar sync, notifications, 5* support = powerful booking system!
+Free Appointment Booking Plugin 🗓️ Unlimited appointments, booking management, calendar sync, notifications, 5* support = powerful booking system!
 
 == DESCRIPTION ==
-= Simple and Modern Appointment Booking, Reservation & Scheduling Calendar Plugin =
+= Ultimate Appointment Booking, Reservation & Scheduling Calendar Plugin =
 
-**[Webba Appointments Booking](https://webba-booking.com/) is powerful, modern and easy to use appointment booking system and scheduling plugin.**
+**[Webba Appointments Booking](https://webba-booking.com/) is a powerful appointment booking system and scheduling plugin.**
 
-Using Webba you can accept appointment bookings, reservations, hourly bookings for variety of services, rentals, spaces.
+Webba allows businesses to accept and manage appointment bookings, reservations, hourly bookings for variety of services, rentals, spaces.
 
-It offers a variety of important features that will make **accepting and managing online bookings** and reservations on your website super easy.
+It offers all of the most important features that will make **accepting and managing online bookings** and reservations on your website super easy.
 
-Whether you run a wellness business, salon, any sport or rental business, events, consulting, medical clinic, or any business that relies on appointments, events and service booking, Webba Booking is your one-stop solution.
+Setup in 5 minutes and start accepting bookings and reservations without any coding or design skills!
 
 **Join thousands of businesses** that use Webba to accept and manage bookings through their Wordpress website. Our **world-class support** is ready to help you have the best experience with Webba.
 
 [TRY PRO VERSION](https://webba-booking.com/pricing/ "Pricing of Webba Booking") | [USE CASES & DEMOS](https://webba-booking.com/demos-use-cases/ "Demo of Webba Booking") | [FEATURES](https://webba-booking.com/features/ "Features Overview of Webba Booking") | [DOCUMENTATION](https://webba-booking.com/documentation/ "Documentation of Webba Booking")
 
-[youtube https://www.youtube.com/watch?v=IX1TfPnZFus]
+[youtube https://www.youtube.com/watch?v=TGGBEMmXHl8]
+
+== WHO IS THE WEBBA BOOKING PLUGIN FOR? ==
+
+Webba Booking is a powerful WordPress booking plugin built for businesses and professionals who need a reliable appointment booking, scheduling, and reservation system. Whether you provide services online or in person, Webba helps you accept bookings 24/7, avoid double-bookings, and manage your schedule with ease.
+
+* **Salons and Beauty Professionals:** Hair salons, nail salons, yoga studios, pilates studios, barbershops, spas, massage therapists, tattoo and piercing studios, tanning salons, cosmetologists. Webba provides automated reminders so clients never miss appointments, secure online payments to confirm bookings, and calendar synchronization to avoid double-bookings.
+* **Consultants and Business Professionals:** Coaches, lawyers, psychologists, bookkeepers, financial advisors, wedding planners. Consultants love features like recurring appointments for regular clients, group bookings to handle sessions efficiently, and Zoom integration for virtual meetings.
+* **Healthcare and Medical Providers:** Doctors, dentists, therapists, nutritionists, clinics, physiotherapists, homeopaths. Healthcare professionals use custom booking forms and secure data management to handle appointments while staying GDPR compliant.
+* **Education and Training:** Tutors, language schools, play rooms, private teachers, driving schools, music instructors. Education providers benefit from availability calendars, group class bookings, and automated reminders to manage lessons and keep students informed.
+* **Fitness, Sports and Gyms:** Yoga instructors, personal trainers, dance studios, fitness classes, golf lessons, sports coaches. With Webba, fitness professionals can accept bookings around the clock, offer discount coupons, and send reminders to maximize attendance.
+* **Coaching and Online Services:** Life coaches, online consultants, therapists, digital service providers. Coaches appreciate Webba’s virtual session booking, secure payment integrations, and easy-to-use scheduler that lets clients book from anywhere.
+* **Personal and Professional Services:** Photographers, cleaning services, catering, automotive repairs, event planners, musicians. Webba’s straightforward booking system, calendar view, and automated notifications handle scheduling so providers can focus on delivering quality service.
 
 
-== MAIN FREE FEATURES INCLUDED IN WEBBA LITE: ==
+Unlock PRO features with [Webba Booking Premium](https://webba-booking.com/pricing/).
 
-* **Unlimited Services and Bookings:** add as many bookable services/events as you want and categorize them for your and/or your customersâ€™ convenience.
+
+== MAIN FREE FEATURES INCLUDED IN WEBBA BOOKING LITE: ==
+
+* **Unlimited Services and Bookings:** add as many bookable services/events as you want and categorize them for your and/or your customers' convenience.
 * **Multiple appointment bookings, group bookings, service categories:** categorize your services into different categories, allow to book multiple services in one session, instead of repeating the booking process for each service.
 * **Modern booking calendar form:** clean and modern booking form design that looks great on all devices.
-* **Easy bookings management:** approve, add, edit, cancel any bookings with a few clicks. 
+* **Cart Feature:** Simplify scheduling by allowing customers to book multiple services or appointments at once and complete them in a single, hassle-free checkout.
+* **Easy bookings management:** approve, add, edit, cancel any bookings with a few clicks. Change booking statuses based on the current status, including no-shows.
+* **Export booking to CSV:** export your bookings to CSV file for external management.
 * **Advanced booking rules:** add buffer zones, block times, allow group bookings and other 20+ custom settings available for your convenience
 * **Adjustable business hours & holidays:** have complete control on your own availability with our powerful schedule tools.
 * **Powerful pricing settings:** offer pricing based on time, day, number of time slots already booked and many more options.
@@ -45,12 +62,13 @@ Whether you run a wellness business, salon, any sport or rental business, events
 
 == MAIN PREMIUM FEATURES INCLUDED IN WEBBA PRO: ==
 * **Two-way Calendar sync:** sync Webba with your calendar and manage your appointments without any double-bookings.
+* **Accept payments:** secure online payment integrations with Paypal, Stripe, or Woocommerce (with 100+ payment gateways).
 * **Conversion Tracking with Google Analytics:** automatically track bookings and conversion events with GA4 integration.
+* **Custom Form Fields:** enhance your booking form with variety of different form fields (comments, drop downs, checkmarks, file upload etc.) using our Custom Form Builder.
 * **User Dashboard:** let your customers easily manage their bookings by rescheduling or canceling them.
 * **Zoom Integration:** create automatic zoom video conferencing events and attach them to the booking confirmation.
-* **Accept deposits and payments:** secure online payment integrations with Paypal, Stripe, or Woocommerce (with 100+ payment gateways).
 * **Track performance through statistics:** track and visualize how many bookings you get over time.
-* **Offer Coupons:** whether itâ€™s Black Friday or your Birthday sale - offer promotional coupons through Webba!
+* **Offer Coupons:** whether it's Black Friday or your Birthday sale - offer promotional coupons through Webba!
 * **Send SMS reminders:** send appointment confirmations and reminders using SMS provider Twilio.
 * **WooCommerce Integration:** integrate with WooCommerce directly and offer your own checkout experience.
 * **Manage Taxes and Invoices:** enable tax calculation, generate and send professional invoices to your customers automatically.
@@ -63,28 +81,14 @@ Explore the full list of [Webba Booking features](https://webba-booking.com/feat
 
 We are proud to have near perfect 5/5 score on both [Wordpress](https://wordpress.org/plugins/webba-booking-lite/#reviews "reviews of Webba Booking"): and [Trustpilot](https://www.trustpilot.com/review/webba-booking.com "reviews of Webba Booking"):
 
-*â€œThe customer service for this **plugin is phenomenal!**
-The customer service for this plugin is absolutely second-to-none. I'm blown away by how good they are!â€* - R.Tyrrell
+* "The customer service for this **plugin is phenomenal!**
+The customer service for this plugin is absolutely second-to-none. I'm blown away by how good they are!" - R.Tyrrell
 
-*â€œWebba support is nothing like what you have experienced in your earlier life and everything you are hoping to have with a product. The response times, the professionalism, the friendliness... you name it, they have it. **Easiest seven star review I have given!**â€* - Webba Customer
+* "I’ve been using the plugin quite some time now and I’d say it’s **the most user-friendly booking-plugin on the market.** Easy to setup and a nice clean, modern layout! Support is also great. I had an issue with locking dates and it was solved within a few hours. Good job guys!" - losboeros
 
-*â€œThis plugin is awesome and it can accomplish anything your business needs! OMG the support is NUMBER 1!!!! I will refer this plugin to everyone and let them know **the support is just awesome**. I am very pleased with everything!â€* - jbiento
+* "Webba support is nothing like what you have experienced in your earlier life and everything you are hoping to have with a product. The response times, the professionalism, the friendliness... you name it, they have it. **Easiest seven star review I have given!"** - Webba Customer
 
-
-== WHO IS WEBBA PERFECT FOR ==
-
-Webba Booking is perfect for spas, salons, rental businesses, event businesses and more. If you need to take any kind of appointments or bookings, this plugin is for you. Here are some of the areas where Webba Booking can be used:
-
-* **Specialists**: personal trainer booking, consultant booking, lawyer booking, wedding coordinators, contractor booking, therapist booking, tutor booking, photographer booking, dance instructors booking, coach booking, any other specialist who needs appointment booking
-* **Wellness and beauty professionals**: beauty salon booking, nail salon booking, hair salon booking, cosmetologist booking, hairdresser booking, barbershop booking, manicurist booking, SPA booking, swimming pool booking, massage booking
-* **Activity providers **: tour booking, ticket booking, tour scheduling, golf booking, games booking, quest rooms booking, escape room booking, gym booking, fitness booking
-* **Medical services professionals**: doctor booking, dentist booking, therapist booking, clinic booking system and other areas related to medicine
-* **Restaurants and event venues**: table reservation, dining booking, private room reservation
-* **Equipment and transport rental**: car rental system, bike rental, boat rental, yacht booking, technics booking, any other kind of hourly rental
-* **Education providers**: language school booking system, facility booking, language lessons booking, private tutor booking, driving school lessons booking, private teachers booking, school booking, classroom booking, seminar booking
-* **Professional Service providers**: car service booking, cleaning booking, repair services booking
-
-Unlock PRO features with [Webba Booking Premium](https://webba-booking.com/pricing/).
+* "This plugin is awesome and it can accomplish anything your business needs! OMG the support is NUMBER 1!!!! I will refer this plugin to everyone and let them know **the support is just awesome**. I am very pleased with everything!" - jbiento
 
 
 == Installation ==
@@ -121,16 +125,16 @@ Unlock PRO features with [Webba Booking Premium](https://webba-booking.com/prici
 
 == Screenshots == 
 
-1. Set up booking form easily with shortcodes
-2. Offer unlimited services and group them into categories
-3. Allow to book multiple services or time slots in one booking
-4. Connect to PayPal, Stripe or WooCommerce for online payments
-5. Customize the booking form's appearance
-6. Manage your bookings without any coding skills
-7. Gain an overview of all the bookings in one place 
-8. Tracking your businessâ€™ KPIs in the Dashboard
+1. Easy Setup using Setup Wizard
+2. Modern looking booking form
+3. Allow to book multiple services or time slots in one booking session
+4. Connect to PayPal, Stripe or WooCommerce for online payments [PRO VERSION ONLY]
+5. Customers able to add bookings to the Calendar
+6. Manage your bookings easily
+7. Add Custom Form Fields [PRO VERSION ONLY] 
+8. Translate your form in any language you want
 9. Set up pricing rules based on day, early booking and more
-10. Customize the plugin with a powerful settings dashboard
+10. Customize your email notifications and trigger points
 11. Access comprehensive documentation for a seamless setup
 
 
@@ -140,7 +144,7 @@ Unlock PRO features with [Webba Booking Premium](https://webba-booking.com/prici
 Yes! Check out our [online demos](https://webba-booking.com/demos-use-cases) to see how the frontend and backend of Webba Booking works.
 
 **How do I add booking form to my website?**
-It's simple! Use our Gutenberg block or if you are using any of the pagebuilders - add a [shortcode](https://webba-booking.com/documentation/how-to-add-booking-form/#shortcode).
+You can add Webba Booking form by using our Gutenberg block or if you are using any of the pagebuilders like Elementor or Divi- add a [shortcode](https://webba-booking.com/documentation/how-to-add-booking-form/#shortcode).
 
 Here we have prepared [detailed instructions](https://webba-booking.com/documentation/how-to-add-booking-form/) on how to add the booking form.
 
@@ -151,14 +155,14 @@ Yes, [Webba Booking PRO](https://webba-booking.com/pricing/) offers integrations
 Two-way calendar integrations are available when using [Webba Booking PRO](https://webba-booking.com/pricing/). This allows you to sync directly with your Google Calendar or other calendar using iCal attachements.
 
 **Can I translate Webba to other languages?**
-Yes, Webba Booking has in-built wording/translation feature for the booking form and it is also compatible with translation plugins like Loco Translate, Polyland and WPML.
+Yes, Webba Booking has in-built wording/translation feature for the booking form and it is also compatible with translation plugins like Loco Translate, Polyland and WPML if you want to offer more than 1 language on your website.
 
 **How to upgrade to Webba PRO version?**
-If you have a Webba Booking Lite version, just go to your WP dashboard, click on Webba and in the left menu youâ€™ll see â€œPricingâ€ menu item. Click on it and choose the plan you want.
+If you have a Webba Booking Lite version, just go to your WP dashboard, click on Webba and in the left menu youâ€™ll see â€œPricingâ€  menu item. Click on it and choose the plan you want.
 Alternatively, you can go to [our website](https://webba-booking.com/pricing/) and upgrade right there.
 
 **Can email notifications be customized?**
-Yes, Webba Booking offers great email customization features including different placeholders for variable elements.
+Yes, Webba Booking offers great email customization features including different placeholders for variable elements. We also offer different email notification trigger scenarios, so you have full control on when and which email who receives.
 
 **Is Webba Booking compatible with my theme and/or page builder?**
 Yes, Webba Booking is compatible with most themes and page builders (Elementor, Divi, Gutenberg). In case of any conflicts, our support team will be happy to help you out.
@@ -171,6 +175,76 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  
 
 == Changelog ==
+
+10/08/2025
+
+6.0.6
+
+- Improvements: visual improvements in booking form layout and checkout fields
+- Improvement: jump to time section on pick date in booking calendar
+- Improvement: added support for time format 'G\hi'
+- Bug fix: render links in checkbox fields label
+- Bug fix: #customer_comment placeholder not working
+- Bug fix: limit services selection access in calendar page based on user permission
+- Bug fix: date and time format correction in Stripe checkout screen
+- Bug fix: dropdown fields value not stored
+- Bug fix: email not sent after user creation
+- Bug fix: issue with payment where there are free and pro versions selected
+- Bug fix: page keeps loading when there is multiple forms
+- Security: vulnerability fixed
+
+02/08/2025
+
+6.0.5
+
+- Improvements: visual improvements in booking form and better user experience in wizard page
+- Bug fix: can't submit booking form without last name though it's not required
+- Improvement: option to hide/show unavailable or locked timeslots
+- Improvement: option to allow user to select single or multiple services in booking form
+- Improvement: allow image file upload for attachment fields in booking form
+- Improvement: made Last name and Phone deletable, and allows to make these fields required
+- Bug fix: schedule tools not working
+- Improvement: mark first available date as selected in booking calendar if today is not available
+- Improvement: more wording options for '+ Select', 'Selected' and 'No available time slots'
+
+28/07/2025
+
+6.0.4
+
+- Bug fix: typing in checkout fields input wrong values
+- Bug fix: block user from submission if no methods selected in payment screen
+
+26/07/2025
+
+6.0.3
+
+- Improvements: more wording options for error messages and sidebar
+- Improvements: visual improvements in booking form
+- Bug fix: can't set placeholder text for phone number field
+- Bug fix: other minor bug fixes 
+
+22/07/2025
+
+6.0.2
+
+- Improvements: dynamic translation feature
+
+21/07/2025
+
+6.0.1
+
+- Improvements: dynamic text color to match with background contrast
+- Bug fix: fixed translation issues
+- Improvements: text wrap management in form elements
+- Bug fix: tax calculation and item pricing
+- Bug fix: email links
+- Improvements: other minor improvements related with booking form
+
+19/07/2025
+
+6.0.0
+
+- Improvements: major update - booking form design completely reworked and modernized
 
 16/07/2025
 

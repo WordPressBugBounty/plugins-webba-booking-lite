@@ -30,6 +30,20 @@
             "default_value": "",
             "editable": true
         },
+        "service_image": {
+            "type": "string",
+            "input_type": "file",
+            "hidden": false,
+            "title": "Image",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Image to show in service preview"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
         "service_date_range": {
             "type": "string",
             "input_type": "date_range",
@@ -215,24 +229,6 @@
             "default_value": "1",
             "editable": true
         },
-        "service_form": {
-            "type": "string",
-            "input_type": "select",
-            "hidden": true,
-            "title": "Booking form",
-            "tab": "general",
-            "misc": {
-                "tooltip": "Choose your preferred booking form: either keep the default value or select a <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/set-up-frontend-booking-process/using-custom-fields-in-the-booking-form/\">CF7 form.</a>",
-                "options": "backend",
-                "null_value": [
-                    "Default form"
-                ]
-            },
-            "required": false,
-            "dependency": [],
-            "default_value": "0",
-            "editable": true
-        },
         "service_gg_calendars": {
             "type": "string",
             "input_type": "select",
@@ -256,7 +252,8 @@
             "title": "Take into account the external calendar (ics)",
             "tab": "general",
             "misc": {
-                "tooltip": "If you have other calendars you'd like to integrate with, please provide the external iCal Calendar URLs."
+                "tooltip": "If you have other calendars you'd like to integrate with, please provide the external iCal Calendar URLs.",
+                "pro_version": true
             },
             "required": false,
             "dependency": [],
@@ -270,10 +267,7 @@
             "title": "External calendar for group services",
             "tab": "general",
             "misc": {
-                "options": {
-                    "reduce": "Reduce availability",
-                    "lock": "Lock time slot"
-                }
+                "pro_version": true
             },
             "required": true,
             "dependency": [
@@ -453,7 +447,8 @@
             "tab": "general",
             "misc": {
                 "yes": "Yes",
-                "tooltip": "Check this to automatically create <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/integrations/integration-with-zoom/\">Zoom events</a> for each booking of this service."
+                "tooltip": "Check this to automatically create <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/integrations/integration-with-zoom/\">Zoom events</a> for each booking of this service.",
+                "pro_version": true
             },
             "required": false,
             "dependency": [],
@@ -499,6 +494,21 @@
             "misc": {
                 "yes": "Yes",
                 "tooltip": "When this option is enabled, the system allows customers to select only consecutive time slots."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "service_form_builder": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Form",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Select form to populate fields in booking form",
+                "options": "forms"
             },
             "required": false,
             "dependency": [],

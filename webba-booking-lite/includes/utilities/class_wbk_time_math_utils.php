@@ -1,11 +1,16 @@
 <?php
 // check if accessed directly
-if (!defined('ABSPATH'))
-    exit;
+if (!defined('ABSPATH')) {
+    exit();
+}
 class WBK_Time_Math_Utils
 {
-    public static function check_range_intersect($start, $end, $start_compare, $end_compare)
-    {
+    public static function check_range_intersect(
+        $start,
+        $end,
+        $start_compare,
+        $end_compare
+    ) {
         if ($start_compare == $start) {
             return true;
         }
@@ -23,8 +28,12 @@ class WBK_Time_Math_Utils
         }
         return false;
     }
-    public static function adjust_times($time_1, $time_2, $time_zone, $ignore_rule = false)
-    {
+    public static function adjust_times(
+        $time_1,
+        $time_2,
+        $time_zone,
+        $ignore_rule = false
+    ) {
         $dst_mode = date('I', strtotime('today midnight', $time_1));
 
         if ($dst_mode == '1') {
@@ -33,26 +42,21 @@ class WBK_Time_Math_Utils
             $difference = $offset_1 - $offset_2;
 
             $result = $time_1 + $time_2 + $difference;
-
         } else {
-
             $result = $time_1 + $time_2;
             $offset_1 = date('Z', $time_1);
             $offset_2 = date('Z', $time_1 + $time_2);
             $difference = $offset_1 - $offset_2;
 
             if ($ignore_rule == true && $difference < 0) {
-
                 $difference = 0;
             }
 
             $result = $time_1 + $time_2 + $difference;
         }
 
-
         return $result;
     }
-
 
     public static function get_offset_difference_with_midnight($time)
     {
@@ -73,12 +77,18 @@ class WBK_Time_Math_Utils
     public static function get_offset_local($time)
     {
         $offset = 0;
-        $time_zone_client = $_POST['time_zone_client'];
+        $time_zone_client = isset($_POST['time_zone_client'])
+            ? $_POST['time_zone_client']
+            : (isset($_GET['time_zone_client'])
+                ? $_GET['time_zone_client']
+                : '');
         if ($time_zone_client != '') {
             $this_tz = new DateTimeZone($time_zone_client);
-            $date_this = (new DateTime('@' . $time))->setTimezone(new DateTimeZone($time_zone_client));
+            $date_this = (new DateTime('@' . $time))->setTimezone(
+                new DateTimeZone($time_zone_client)
+            );
             $offset = $this_tz->getOffset($date_this);
-            $offset = $offset * -1 / 60;
+            $offset = ($offset * -1) / 60;
         }
         return $offset;
     }
@@ -88,9 +98,11 @@ class WBK_Time_Math_Utils
         $time_zone = get_option('wbk_timezone', 'UTC');
         if ($time_zone != '') {
             $this_tz = new DateTimeZone($time_zone);
-            $date_this = (new DateTime('@' . $time))->setTimezone(new DateTimeZone($time_zone));
+            $date_this = (new DateTime('@' . $time))->setTimezone(
+                new DateTimeZone($time_zone)
+            );
             $offset = $this_tz->getOffset($date_this);
-            $offset = $offset * -1 / 60;
+            $offset = ($offset * -1) / 60;
         }
         return $offset - self::get_offset_local($time);
     }
@@ -140,7 +152,9 @@ class WBK_Time_Math_Utils
         $time_zone = get_option('wbk_timezone', 'UTC');
         $timezone_to_use = new DateTimeZone($time_zone);
         $this_tz = new DateTimeZone($time_zone);
-        $date = (new DateTime('@' . $date))->setTimezone(new DateTimeZone($time_zone));
+        $date = (new DateTime('@' . $date))->setTimezone(
+            new DateTimeZone($time_zone)
+        );
         $now = new DateTime('now', $this_tz);
         $offset_sign = $this_tz->getOffset($date);
         if ($offset_sign > 0) {
@@ -150,7 +164,7 @@ class WBK_Time_Math_Utils
         }
         $offset_rounded = abs($offset_sign / 3600);
         $offset_int = floor($offset_rounded);
-        if (($offset_rounded - $offset_int) == 0.5) {
+        if ($offset_rounded - $offset_int == 0.5) {
             $offset_fractional = ':30';
         } else {
             $offset_fractional = '';
@@ -158,8 +172,5 @@ class WBK_Time_Math_Utils
         $timezone_utc_string = $sign . $offset_int . $offset_fractional;
         return new DateTimeZone($timezone_utc_string);
     }
-
-
-
 }
 ?>

@@ -54,6 +54,7 @@ class WBK_Model_Updater
         self::update_service_colors_v_5_1_18();
         self::merge_existing_service_to_en_v_5_1_18();
         self::update_default_templates_v_5_1_18();
+        self::create_appearance_config_css_v6_0_3();
     }
 
     static function update_4_3_0_1()
@@ -76,24 +77,7 @@ class WBK_Model_Updater
             self::set_update_as_complete('update_4_3_0_1');
         }
     }
-    static function update_4_5_1()
-    {
-        global $wpdb;
-        if (self::is_update_required('update_4_5_1')) {
-            update_option(
-                'wbk_payment_item_name',
-                __(
-                    '#service_name on #appointment_day at #appointment_time',
-                    'webba-booking-lite'
-                )
-            );
-            update_option(
-                'wbk_appointment_information',
-                'Appointment on #appointment_day #appointment_time'
-            );
-            self::set_update_as_complete('update_4_5_1');
-        }
-    }
+    static function update_4_5_1() {}
 
     static function update_5_0_0_static()
     {
@@ -913,7 +897,7 @@ class WBK_Model_Updater
                     'webba-booking-lite'
                 ),
                 'template' => __(
-                    'Hello #customer_name,<br><br>You can now manage your bookings and profile anytime by going here: #dashboard_page<br><br>#account_details<br><br>If you have any questions, please contact us.<br><br>Thank you!',
+                    'Hello #customer_name,<br><br>You can now manage your bookings and profile anytime by going here: #dashboard_page<br><br>#user_login / #user_pass<br><br>If you have any questions, please contact us.<br><br>Thank you!',
                     'webba-booking-lite'
                 ),
             ],
@@ -1492,6 +1476,41 @@ class WBK_Model_Updater
         }
 
         self::set_update_as_complete('update_default_templates_v_5_1_18');
+    }
+
+    public static function update_appearance_configs(): void
+    {
+        $dir = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'webba_booking_style';
+        if (!is_dir($dir)) {
+            mkdir($dir);
+        }
+
+        $data = get_option('wbk_apperance_data', []);
+
+        $colors_shades_css = WBK_Color_Utils::generateCssVariables([
+            'primary' => WBK_Color_Utils::generateColorShades(
+                $data['wbk_appearance_field_1'] ?? '#14B8A9'
+            ),
+            'secondary' => WBK_Color_Utils::generateColorShades(
+                $data['wbk_appearance_field_2'] ?? '#F9FAFB'
+            ),
+        ]);
+
+        file_put_contents(
+            $dir . DIRECTORY_SEPARATOR . 'wbk6-frontend-config.css',
+            $colors_shades_css
+        );
+    }
+
+    public static function create_appearance_config_css_v6_0_3(): void
+    {
+        if (!self::is_update_required('create_appearance_config_css_v6_0_3')) {
+            return;
+        }
+
+        self::update_appearance_configs();
+
+        self::set_update_as_complete('create_appearance_config_css_v6_0_3');
     }
 }
 ?>

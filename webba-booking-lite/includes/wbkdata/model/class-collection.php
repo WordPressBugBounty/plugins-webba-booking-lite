@@ -44,7 +44,7 @@ class Collection
     /**
      * add new element in collection.
      *
-     * @param var $object object to add in collection
+     * @param  \WBK_Model $object object to add in collection
      * @param string $slug   the key in array
      */
     public function add($object, $slug)

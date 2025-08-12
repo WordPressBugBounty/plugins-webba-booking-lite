@@ -183,6 +183,13 @@ class WBK_Stripe {
         }
     }
 
+    public function create_payment_intent( $booking_ids, $payment_details, $payment_method_id = null ) {
+        return [
+            'success' => false,
+            'error'   => __( 'Payment method not supported', 'webba-booking-lite' ),
+        ];
+    }
+
     public function charge(
         $booking_ids,
         $payment_details,
