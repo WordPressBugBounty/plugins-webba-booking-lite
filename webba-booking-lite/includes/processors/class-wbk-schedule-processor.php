@@ -496,7 +496,7 @@ class WBK_Schedule_Processor {
                 $timezone_to_use_end = $timezone_to_use;
             }
             $timezone = $timezone_to_use;
-            $timeslot_time_string = get_option( 'wbk_timeslot_time_string', 'start' );
+            $timeslot_time_string = 'start';
             $current_offset = $offset * -60 - $timezone->getOffset( $date );
             if ( $timeslot_time_string == 'start' ) {
                 $time = wp_date( $time_format, $timeslots[$i]->getStart(), $timezone_to_use );

@@ -111,6 +111,11 @@ class WBK_Mixpanel
         if (self::is_localhost()) {
             return;
         }
+
+        if(isset($_SERVER['SERVER_SOFTWARE']) && $_SERVER['SERVER_SOFTWARE'] == 'PHP.wasm'){
+            return;
+        }
+
         try {
             if(!class_exists('Mixpanel') && file_exists(WP_WEBBA_BOOKING__PLUGIN_DIR . '/vendor/mixpanel/mixpanel-php/lib/Mixpanel.php')){
                 require_once WP_WEBBA_BOOKING__PLUGIN_DIR . '/vendor/mixpanel/mixpanel-php/lib/Mixpanel.php';

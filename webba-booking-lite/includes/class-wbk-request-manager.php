@@ -520,7 +520,7 @@ class WBK_Request_Manager {
                 }
                 if ( $result[0] == 1 && count( $booking_ids ) > 0 ) {
                     $booking_factory = new WBK_Booking_Factory();
-                    $booking_factory->set_as_paid( $booking_ids, 'Stripe' );
+                    $booking_factory->set_as_paid( $booking_ids, 'Stripe', $payment_details['total'] );
                 }
                 if ( $result[0] == 1 || $result[0] == 2 ) {
                     if ( get_option( 'wbk_stripe_redirect_url', '' ) == '' ) {
@@ -1701,7 +1701,7 @@ class WBK_Request_Manager {
 
     public function wbk_set_appointment_as_paid_with_coupon( $booking_ids, $method ) {
         $bf = new WBK_Booking_Factory();
-        $bf->set_as_paid( $booking_ids, 'coupon' );
+        $bf->set_as_paid( $booking_ids, 'coupon', 1 );
         if ( $method == 'coupon' ) {
             $thanks_message = WBK_Renderer::load_template( 'frontend_v5/thank_you_message', [$booking_ids], false );
             $thanks_message = str_replace( 'wbk_hide_if_paid', 'wbk_hidden', $thanks_message );
@@ -2463,6 +2463,7 @@ class WBK_Request_Manager {
                 'stripe_publishable_key'             => get_option( 'wbk_stripe_publishable_key', '' ),
                 'show_booked_slots'                  => get_option( 'wbk_show_booked_slots', '' ) === 'enabled',
                 'allowed_multiple_service_selection' => get_option( 'wbk_allow_multiple_services', 'yes' ) === 'yes',
+                'coupons_enabled'                    => get_option( 'wbk_allow_coupons', 'yes' ) === 'enabled',
             ],
             'wording'            => [
                 'service_label'                           => get_option( 'wbk_service_label', __( 'Select a service', 'webba-booking-lite' ) ),
@@ -2546,6 +2547,7 @@ class WBK_Request_Manager {
                 'no_services_found'                       => get_option( 'wbk_wording_no_services_found', __( 'No services found!', 'webba-booking-lite' ) ),
                 'show_summary'                            => get_option( 'wbk_wording_show_summary', __( 'Show summary', 'webba-booking-lite' ) ),
                 'total'                                   => get_option( 'wbk_payment_total_title', __( 'Total', 'webba-booking-lite' ) ),
+                'free'                                    => get_option( 'wbk_wording_free', __( 'Free', 'webba-booking-lite' ) ),
                 'select_date_time'                        => get_option( 'wbk_wording_select_date_time', __( 'Select date & time', 'webba-booking-lite' ) ),
                 'choosing_timeslot_for'                   => get_option( 'wbk_wording_choosing_timeslot_for', __( 'Choosing time slot for', 'webbab-booking-lite' ) ),
                 'available'                               => get_option( 'wbk_wording_available', __( 'Available', 'webba-booking-lite' ) ),
@@ -2564,6 +2566,8 @@ class WBK_Request_Manager {
                 'select'                                  => get_option( 'wbk_wording_select', __( '+ Select', 'webba-booking-lite' ) ),
                 'selected'                                => get_option( 'wbk_wording_selected', __( 'Selected', 'webba-booking-lite' ) ),
                 'no_available_timeslots'                  => get_option( 'wbk_wording_no_available_timeslots', __( 'No available time slots', 'webba-booking-lite' ) ),
+                'hour'                                    => get_option( 'wbk_wording_hour', __( 'h', 'webba-booking-lite' ) ),
+                'minute'                                  => get_option( 'wbk_wording_minute', __( 'min', 'webba-booking-lite' ) ),
             ],
             'appearance'         => WBK_Model_Utils::get_appearance_data(),
             'user'               => $user,
@@ -3096,6 +3100,7 @@ class WBK_Request_Manager {
      * @apiParam {number} [category] Service category ID
      * @apiParam {string} [attachment] File attachment URL or ID
      * @apiParam {number[]} [quantities] Array of quantities for each booking (defaults to 1)
+     * @apiParam {string} [coupon] Coupon code to apply
      *
      * @apiSuccess {boolean} success Whether the booking was successful
      * @apiSuccess {number[]} booking_ids Array of created booking IDs
@@ -3103,6 +3108,7 @@ class WBK_Request_Manager {
      * @apiSuccess {boolean} payment_required Whether payment is required
      * @apiSuccess {string[]} payment_methods Available payment methods
      * @apiSuccess {Object} [payment_details] Payment details if payment is required
+     * @apiSuccess {string} [coupon_status] Status of coupon application (if coupon provided)
      *
      * @apiError {boolean} success false
      * @apiError {string} message Error message
@@ -3175,6 +3181,17 @@ class WBK_Request_Manager {
                 ], 400);
             }
         }
+        $coupon_result = false;
+        $coupon_status = 'not_provided';
+        if ( isset( $params['coupon'] ) && !empty( trim( $params['coupon'] ) ) ) {
+            $coupon = esc_html( sanitize_text_field( trim( $params['coupon'] ) ) );
+            $coupon_result = WBK_Validator::check_coupon( $coupon, $params['services'] );
+            if ( $coupon_result === false ) {
+                $coupon_status = 'invalid';
+            } else {
+                $coupon_status = 'valid';
+            }
+        }
         // Prepare base booking data
         $base_booking_data = [
             'name'             => sanitize_text_field( $params['first_name'] . ' ' . $params['last_name'] ),
@@ -3183,6 +3200,7 @@ class WBK_Request_Manager {
             'description'      => ( isset( $params['description'] ) ? sanitize_text_field( $params['description'] ) : '' ),
             'extra'            => ( isset( $params['extra'] ) ? $params['extra'] : '' ),
             'service_category' => ( isset( $params['category'] ) ? intval( $params['category'] ) : 0 ),
+            'coupon'           => ( $coupon_result !== false && is_array( $coupon_result ) ? $coupon_result[0] : '' ),
         ];
         $booking_ids = [];
         $skipped_count = 0;
@@ -3282,6 +3300,23 @@ class WBK_Request_Manager {
         }
         // Run post-production tasks
         $booking_factory->post_production( $booking_ids, 'on_booking' );
+        if ( $coupon_result !== false && is_array( $coupon_result ) ) {
+            $tax = get_option( 'wbk_general_tax', '0' );
+            if ( trim( $tax ) == '' ) {
+                $tax = '0';
+            }
+            $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );
+            if ( $coupon_result[2] == 100 || $payment_details['subtotal'] <= 0 ) {
+                foreach ( $booking_ids as $booking_id ) {
+                    $booking = new WBK_Booking($booking_id);
+                    if ( $booking->is_loaded() ) {
+                        // $booking->set_status('paid_approved');
+                        $booking->save();
+                        do_action( 'wbk_booking_paid', $booking_id, 'coupon' );
+                    }
+                }
+            }
+        }
         // Get payment methods
         $payment_methods = WBK_Model_Utils::get_payment_methods_for_bookings_intersected( $booking_ids );
         $response_data = [
@@ -3289,6 +3324,9 @@ class WBK_Request_Manager {
             'booking_ids'   => $booking_ids,
             'skipped_count' => $skipped_count,
         ];
+        if ( $coupon_status !== 'not_provided' ) {
+            $response_data['coupon_status'] = $coupon_status;
+        }
         // Check if payment method is valid
         if ( isset( $params['payment_method'] ) && !empty( $payment_methods ) ) {
             if ( !in_array( $params['payment_method'], $payment_methods ) ) {
@@ -3301,7 +3339,7 @@ class WBK_Request_Manager {
             if ( trim( $tax ) == '' ) {
                 $tax = '0';
             }
-            $payment_details = WBK_Price_Processor::get_payment_items( $booking_ids, $tax );
+            $payment_details = WBK_Price_Processor::get_payment_items( $booking_ids, $tax, $coupon_result );
             $payable = true;
             // Use the reusable payment method processor
             $payment_response = $this->process_payment_method(
@@ -3387,7 +3425,7 @@ class WBK_Request_Manager {
                 'message' => 'Token and token type are required',
             ], 400);
         }
-        if ( !in_array( $token_type, ['customer_token', 'admin_token'] ) ) {
+        if ( !in_array( $token_type, ['customer_token', 'admin_token', 'payment_id'] ) ) {
             return new WP_REST_Response([
                 'status'  => 'error',
                 'message' => 'Invalid token type',
@@ -3396,8 +3434,10 @@ class WBK_Request_Manager {
         $booking_ids = [];
         if ( $token_type === 'customer_token' ) {
             $booking_ids = WBK_Model_Utils::get_booking_ids_by_group_token( $token );
-        } else {
+        } elseif ( $token_type === 'admin_token' ) {
             $booking_ids = WBK_Model_Utils::get_booking_ids_by_group_admin_token( $token );
+        } elseif ( $token_type === 'payment_id' ) {
+            $booking_ids = WBK_Model_Utils::get_booking_ids_by_payment_id( $token );
         }
         if ( empty( $booking_ids ) ) {
             return new WP_REST_Response([

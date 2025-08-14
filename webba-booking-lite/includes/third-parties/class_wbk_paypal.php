@@ -131,7 +131,7 @@ class WBK_PayPal {
             if ( $result ) {
                 // Mark bookings as paid
                 $booking_factory = new WBK_Booking_Factory();
-                $booking_factory->set_as_paid( $booking_ids, 'PayPal' );
+                $booking_factory->set_as_paid( $booking_ids, 'PayPal', $payment_details['total'] );
                 return true;
             }
             return false;

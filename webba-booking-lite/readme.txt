@@ -4,7 +4,7 @@ Donate link: https://webba-booking.com/
 Tags:  appointments, appointment booking, booking calendar, scheduling, booking system
 Requires at least: 5.6
 Tested up to: 6.8
-Stable tag: 6.0.6
+Stable tag: 6.0.7
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -175,6 +175,20 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  
 
 == Changelog ==
+
+14/08/2025
+
+6.0.7
+
+- Improvement: translation improved
+- Improvements: other minor visual improvements and polished user experience
+- Bug fix: PayPal success message fixed
+- Bug fix: 'amount paid' output fixed
+- Bug fix: timeslot format fixed on certain configurations
+- Bug fix: coupons fail on certain configurations
+- Bug fix: enable/disable coupon field from settings
+- Bug fix: pricing rules doesn't work on dropdown field changed
+- Bug fix: faded text in booking form with dark themes
 
 10/08/2025
 

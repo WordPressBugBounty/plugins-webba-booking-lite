@@ -2638,6 +2638,17 @@ Note: With autolock turned on, connected service bookings are considered when lo
             ]
         );
         wbk_opt()->add_option(
+            'wbk_wording_free',
+            'text',
+            __( 'Free', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Free', 'webba-booking-lite' ),
+                'not_translated_title' => 'Free',
+                'popup'                => __( 'Label for Free in pricing.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
             'wbk_wording_total_amount_paid',
             'text',
             __( 'Total amount paid', 'webba-booking-lite' ),
@@ -3053,6 +3064,39 @@ Note: With autolock turned on, connected service bookings are considered when lo
                 'default'              => __( 'Duration', 'webba-booking-lite' ),
                 'not_translated_title' => 'Duration',
                 'popup'                => __( 'Label for Duration.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_minute',
+            'text',
+            __( 'Minute', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'min', 'webba-booking-lite' ),
+                'not_translated_title' => 'Duration',
+                'popup'                => __( 'Label for Minute.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_hour',
+            'text',
+            __( 'Hour', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'h', 'webba-booking-lite' ),
+                'not_translated_title' => 'Hour',
+                'popup'                => __( 'Label for Hour.', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_minute',
+            'text',
+            __( 'Minute', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'min', 'webba-booking-lite' ),
+                'not_translated_title' => 'Duration',
+                'popup'                => __( 'Label for Minute.', 'webba-booking-lite' ),
             ]
         );
         wbk_opt()->add_option(

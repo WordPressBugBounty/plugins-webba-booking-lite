@@ -83,7 +83,7 @@ class WBK_Frontend_Booking {
             }
         }
         // check if called as payment result
-        if ( isset( $_GET['pp_aprove'] ) && !wbk_is5() ) {
+        if ( isset( $_GET['pp_aprove'] ) ) {
             if ( $_GET['pp_aprove'] == 'true' ) {
                 if ( isset( $_GET['paymentId'] ) && isset( $_GET['PayerID'] ) ) {
                     $paymentId = $_GET['paymentId'];
@@ -103,12 +103,8 @@ class WBK_Frontend_Booking {
                             $pp_redirect_url = trim( get_option( 'wbk_paypal_redirect_url', '' ) );
                             if ( $pp_redirect_url != '' ) {
                                 if ( filter_var( $pp_redirect_url, FILTER_VALIDATE_URL ) !== false ) {
-                                    wp_redirect( $pp_redirect_url );
-                                    exit;
                                 }
                             }
-                            wp_redirect( get_permalink() . '?paypal_status=1' );
-                            exit;
                         }
                     }
                 } else {

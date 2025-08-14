@@ -295,7 +295,7 @@ class WBK_Booking_Factory {
         return $i;
     }
 
-    public function set_as_paid( $booking_ids, $method ) {
+    public function set_as_paid( $booking_ids, $method, $total_amount ) {
         date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
         $coupon_id = null;
         $booking_ids_t = $booking_ids;
@@ -315,6 +315,12 @@ class WBK_Booking_Factory {
         }
         if ( count( $booking_ids ) > 0 ) {
         }
+        $price_per_booking = number_format(
+            $total_amount / count( $booking_ids ),
+            get_option( 'wbk_price_fractional', '2' ),
+            get_option( 'wbk_price_separator', '.' ),
+            ''
+        );
         if ( count( $booking_ids ) > 0 ) {
             foreach ( $booking_ids as $booking_id ) {
                 $booking = new WBK_Booking($booking_id);
@@ -322,7 +328,7 @@ class WBK_Booking_Factory {
                     continue;
                 }
                 $booking->set( 'payment_method', $method );
-                $booking->set( 'amount_paid', $booking->get( 'moment_price' ) );
+                $booking->set( 'amount_paid', $price_per_booking );
                 $booking->save();
                 $coupon_id = $booking->get( 'coupon' );
                 if ( get_option( 'wbk_gg_when_add', 'onbooking' ) == 'onpaymentorapproval' ) {

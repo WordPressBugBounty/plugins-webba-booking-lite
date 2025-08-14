@@ -1512,5 +1512,13 @@ class WBK_Model_Updater
 
         self::set_update_as_complete('create_appearance_config_css_v6_0_3');
     }
+    static function update_6_0_6()
+    {
+        global $wpdb;
+        if (self::is_update_required('update_6_0_6')) {
+            update_option('wbk_mode', 'webba6');
+        }
+        self::set_update_as_complete('update_6_0_6');
+    }
 }
 ?>

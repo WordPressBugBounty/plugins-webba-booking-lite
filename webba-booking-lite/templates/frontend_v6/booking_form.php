@@ -13,7 +13,8 @@ $allowed_params = [
     'cancelation',
     'order_payment',
     'PayerID',
-    'paymentId'
+    'paymentId',
+    'paypal_status',
 ];
 
 $extra_data_attrs = '';

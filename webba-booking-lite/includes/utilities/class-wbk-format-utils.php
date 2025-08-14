@@ -1,7 +1,8 @@
 <?php
 // check if accessed directly
-if (!defined('ABSPATH'))
-    exit;
+if (!defined('ABSPATH')) {
+    exit();
+}
 class WBK_Format_Utils
 {
     public static function get_date_format()
@@ -31,7 +32,7 @@ class WBK_Format_Utils
     static function price_to_float($s)
     {
         $s = str_replace(',', '.', $s);
-        $s = preg_replace("/[^0-9\.]/", "", $s);
+        $s = preg_replace('/[^0-9\.]/', '', $s);
         $s = str_replace('.', '', substr($s, 0, -3)) . substr($s, -3);
         return (float) $s;
     }
@@ -39,7 +40,16 @@ class WBK_Format_Utils
     static function format_price($value)
     {
         $price_format = get_option('wbk_payment_price_format', '$#price');
-        $value = str_replace('#price', number_format($value, get_option('wbk_price_fractional', '2'), get_option('wbk_price_separator', '.'), ''), $price_format);
+        $value = str_replace(
+            '#price',
+            number_format(
+                $value,
+                get_option('wbk_price_fractional', '2'),
+                get_option('wbk_price_separator', '.'),
+                ''
+            ),
+            $price_format
+        );
         return esc_html($value);
     }
 
@@ -53,34 +63,10 @@ class WBK_Format_Utils
 
         $prev_time_zone = date_default_timezone_get();
         date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
-        $timezone_to_use = new DateTimeZone(
-            date_default_timezone_get()
-        );
+        $timezone_to_use = new DateTimeZone(date_default_timezone_get());
 
-        if (
-            get_option(
-                'wbk_timeslot_time_string',
-                'start'
-            ) == 'start' || $format_type != 'time'
-        ) {
-            $time = wp_date(
-                $format,
-                $booking->get_start(),
-                $timezone_to_use
-            );
-        }
-        if ($format_type == 'time') {
-            $time =
-                $time = wp_date(
-                    $format,
-                    $booking->get_start(),
-                    $timezone_to_use
-                ) . ' - ' . $time = wp_date(
-                    $format,
-                    $booking->get_end(),
-                    $timezone_to_use
-                );
-        }
+        $time = wp_date($format, $booking->get_start(), $timezone_to_use);
+
         date_default_timezone_set($prev_time_zone);
         return $time;
     }
@@ -91,8 +77,9 @@ class WBK_Format_Utils
      * @param array $ignore_list
      * @return string
      */
-    public static function generate_random_color(array $ignore_list = []): string
-    {
+    public static function generate_random_color(
+        array $ignore_list = []
+    ): string {
         $color = '#';
         $color .= str_pad(dechex(mt_rand(0, 255)), 2, '0', STR_PAD_LEFT);
         $color .= str_pad(dechex(mt_rand(0, 255)), 2, '0', STR_PAD_LEFT);

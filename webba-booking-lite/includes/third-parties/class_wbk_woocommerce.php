@@ -467,8 +467,9 @@ function wbk_complete_payment(  $order_id  ) {
         $update_status = 'woocommerce';
     }
     if ( count( $booking_ids ) > 0 ) {
+        $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );
         $bf = new WBK_Booking_Factory();
-        $bf->set_as_paid( $booking_ids, 'woocommerce' );
+        $bf->set_as_paid( $booking_ids, 'woocommerce', $payment_details['total'] );
         do_action( 'wbk_woocommerce_order_placed', $booking_ids, $order_id );
     }
 }
