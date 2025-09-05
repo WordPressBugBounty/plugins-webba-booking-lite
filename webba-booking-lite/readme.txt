@@ -4,7 +4,7 @@ Donate link: https://webba-booking.com/
 Tags:  appointments, appointment booking, booking calendar, scheduling, booking system
 Requires at least: 5.6
 Tested up to: 6.8
-Stable tag: 6.0.7
+Stable tag: 6.0.10
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -175,6 +175,41 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  
 
 == Changelog ==
+
+05/09/2025
+
+6.0.10
+
+- Improvement: improved textarea field in form builder
+- Improvement: static CSS class names in booking form
+- Improvement: calendar in booking form
+- Bug fix: wrong time values in confirmation Screenshots
+- Bug fix: other minor bug fixes and improvements
+
+27/08/2025
+
+6.0.9
+
+- Improvement: day view in admin calendar
+- Improvement: improved translations
+- Improvement: enhanced user journey in booking form
+- Improvement: simplified group reservation and timeslot selection in serviecs settings
+- Improvement: default form for services
+- Bug fix: can't disable business hours in service settings
+- Bug fix: checkbox title isn't visible in email and dashboard
+- Bug fix: problems with user dashboard login
+- Bug fix: other minor bug fixes and improvements
+
+20/08/2025
+
+6.0.8
+
+- Bug fix: issues with time and date selection in booking form
+- Bug fix: available dates missing in booking calendar
+- Bug fix: tax isn't being added initially in footer summary part
+- Improvement: unavailable time slots message while 'Show booked time slots' settings is turned off
+- Improvement: improved number input field in form builder
+- Improvement: visual improvments for better user experience and responsive
 
 14/08/2025
 

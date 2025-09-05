@@ -55,6 +55,7 @@ class WBK_Model_Updater
         self::merge_existing_service_to_en_v_5_1_18();
         self::update_default_templates_v_5_1_18();
         self::create_appearance_config_css_v6_0_3();
+        self::update_services_6_0_9();
     }
 
     static function update_4_3_0_1()
@@ -1519,6 +1520,39 @@ class WBK_Model_Updater
             update_option('wbk_mode', 'webba6');
         }
         self::set_update_as_complete('update_6_0_6');
+    }
+
+    static function update_services_6_0_9(): void
+    {
+        if(!self::is_update_required('update_services_6_0_9')) {
+            return;
+        }
+
+        $services = WBK_Model_Utils::get_services();
+
+        foreach ($services as $id => $title) {
+            $service = new WBK_Service($id);
+
+            if (!$service->is_loaded()) {
+                continue;
+            }
+
+            if($service->get('min_quantity') > 1 || $service->get('quantity') > 1) {
+                $service->set('group_booking', 'yes');
+            }
+
+            if($service->get('multi_mode_low_limit') > 1 || $service->get('multi_mode_limit') > 0) {
+                $service->set('limited_timeslot', 'yes');
+            }
+
+            if(!$service->get('form_builder') || empty($service->get('form_builder'))){
+                $service->set('form_builder', '0');
+            }
+            
+            $service->save();
+        }
+        
+        self::set_update_as_complete('update_services_6_0_9');
     }
 }
 ?>

@@ -2402,6 +2402,12 @@ class WBK_Request_Manager {
             }
             $name = WBK_Translation_Processor::translate_string( 'webba_service_' . $id, $name );
             $description = WBK_Translation_Processor::translate_string( 'webba_service_description_' . $id, $service->get_description() );
+            $first_available_date = null;
+            $days_diff = ceil( (strtotime( '+1 year', time() ) - time()) / 86400 ) + 1;
+            $available_dates = WBK_Model_Utils::get_service_availability_in_range( $id, date( 'Y-m-d', time() ), $days_diff );
+            if ( count( $available_dates ) > 0 ) {
+                $first_available_date = $available_dates[0];
+            }
             $service_data = [
                 'id'                    => $id,
                 'value'                 => $id,
@@ -2418,6 +2424,9 @@ class WBK_Request_Manager {
                 'min_slots'             => $service->get( 'multi_mode_low_limit' ),
                 'max_slots'             => $service->get( 'multi_mode_limit' ),
                 'consecutive_timeslots' => $service->get( 'consecutive_timeslots' ) === 'yes',
+                'group_booking'         => $service->get( 'group_booking' ) === 'yes',
+                'limited_timeslot'      => $service->get( 'limited_timeslot' ) === 'yes',
+                'first_available'       => $first_available_date,
             ];
             $services_arr[] = $service_data;
         }
@@ -2464,6 +2473,7 @@ class WBK_Request_Manager {
                 'show_booked_slots'                  => get_option( 'wbk_show_booked_slots', '' ) === 'enabled',
                 'allowed_multiple_service_selection' => get_option( 'wbk_allow_multiple_services', 'yes' ) === 'yes',
                 'coupons_enabled'                    => get_option( 'wbk_allow_coupons', 'yes' ) === 'enabled',
+                'tax'                                => get_option( 'wbk_general_tax', 0 ),
             ],
             'wording'            => [
                 'service_label'                           => get_option( 'wbk_service_label', __( 'Select a service', 'webba-booking-lite' ) ),
@@ -2769,7 +2779,7 @@ class WBK_Request_Manager {
                     'error' => 'Start date must be before end date',
                 ], 400);
             }
-            $days_difference = ceil( ($end_timestamp - $start_timestamp) / 86400 );
+            $days_difference = ceil( ($end_timestamp - $start_timestamp) / 86400 ) + 1;
             $available_dates = WBK_Model_Utils::get_service_availability_in_range( $service_id, $start_date, $days_difference );
             // Filter dates based on the date parts in the format YYYY,M,D
             $filtered_dates = array_filter( $available_dates, function ( $date ) use($start_timestamp, $end_timestamp) {
@@ -2918,7 +2928,7 @@ class WBK_Request_Manager {
                 }
                 // Get the form ID from the service
                 $form_id = $service->get( 'form_builder' );
-                if ( !$form_id ) {
+                if ( !$form_id || $form_id == '0' ) {
                     $fields = json_decode( '[{
                             "type": "text",
                             "slug": "first_name",
@@ -3203,6 +3213,7 @@ class WBK_Request_Manager {
             'coupon'           => ( $coupon_result !== false && is_array( $coupon_result ) ? $coupon_result[0] : '' ),
         ];
         $booking_ids = [];
+        $booking_times = [];
         $skipped_count = 0;
         $not_booked_due_limit = false;
         $sp = new WBK_Schedule_Processor();
@@ -3280,6 +3291,7 @@ class WBK_Request_Manager {
             if ( $status[0] ) {
                 $booking_id = $status[1];
                 $booking_ids[] = $booking_id;
+                $booking_times[] = $time;
                 do_action( 'wbk_table_after_add', [$booking_id, get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments'] );
                 $booking_data['id'] = $booking_id;
                 do_action( 'wbk_booking_added', $booking_data );
@@ -3323,6 +3335,7 @@ class WBK_Request_Manager {
             'success'       => true,
             'booking_ids'   => $booking_ids,
             'skipped_count' => $skipped_count,
+            'times'         => $booking_times,
         ];
         if ( $coupon_status !== 'not_provided' ) {
             $response_data['coupon_status'] = $coupon_status;

@@ -258,6 +258,22 @@ class WBK_Model {
             true,
             false
         );
+        $table->add_field(
+            'service_group_booking',
+            'group_booking',
+            __( 'Enable group booking', 'webba-booking-lite' ),
+            'checkbox',
+            'general',
+            [
+                'yes'         => __( 'Yes', 'webba-booking-lite' ),
+                'tooltip'     => __( 'If you accept group reservations, you can specify the minimum number of bookings required per time slot.', 'webba-booking-lite' ),
+                'description' => __( 'If you accept group reservations, you can specify the minimum number of bookings required per time slot and set the maximum number of bookings allowed per time slot by enable the option above.' ),
+            ],
+            '',
+            true,
+            false,
+            false
+        );
         $tooltip = __( 'If you accept group reservations, you can specify the minimum number of bookings required per time slot.', 'webba-booking-lite' );
         $table->add_field(
             'service_min_quantity',
@@ -645,6 +661,22 @@ class WBK_Model {
             false
         );
         $table->add_field(
+            'service_limited_timeslot',
+            'limited_timeslot',
+            __( 'Limit timeslot selection', 'webba-booking-lite' ),
+            'checkbox',
+            'general',
+            [
+                'yes'         => __( 'Yes', 'webba-booking-lite' ),
+                'tooltip'     => __( 'Check this to limit the number of time slots per booking. Applicable only if "Settings -> User Interface -> Multiple Bookings in One Session" is enabled.', 'webba-booking-lite' ),
+                'description' => __( 'You can limit the number of time slots selection per booking by enable the option above. If the number of selected time slots is less than the minimum or greater than the maximum, the user will not be able to continue with the booking.', 'webba-booking-lite' ),
+            ],
+            '',
+            true,
+            false,
+            false
+        );
+        $table->add_field(
             'service_multi_mode_low_limit',
             'multi_mode_low_limit',
             __( 'Minimum time slots per booking', 'webba-booking-lite' ),
@@ -697,10 +729,13 @@ class WBK_Model {
             'select',
             'general',
             [
-                'tooltip' => __( 'Select form to populate fields in booking form', 'webba-booking-lite' ),
-                'options' => 'forms',
+                'tooltip'    => __( 'Select form to populate fields in booking form', 'webba-booking-lite' ),
+                'options'    => 'forms',
+                'null_value' => [
+                    '0' => __( 'Default form', 'webba-booking-lite' ),
+                ],
             ],
-            '',
+            '0',
             true,
             false,
             false
@@ -708,6 +743,12 @@ class WBK_Model {
         if ( $table->fields->get_element_at( 'service_extcalendar_group_mode' ) != false ) {
             $table->fields->get_element_at( 'service_extcalendar_group_mode' )->set_dependency( [['quantity', '>', '1'], ['extcalendar', '!=', '']] );
         }
+        // group booking toggle dependency
+        $table->fields->get_element_at( 'service_min_quantity' )->set_dependency( [['group_booking', '=', 'yes']] );
+        $table->fields->get_element_at( 'service_quantity' )->set_dependency( [['group_booking', '=', 'yes']] );
+        // timeslot selection limitation toggle dependency
+        $table->fields->get_element_at( 'service_multi_mode_low_limit' )->set_dependency( [['limited_timeslot', '=', 'yes']] );
+        $table->fields->get_element_at( 'service_multi_mode_limit' )->set_dependency( [['limited_timeslot', '=', 'yes']] );
         $table->sync_structure();
         WbkData()->models->add( $table, $db_prefix . 'wbk_services' );
         // Service categories
