@@ -56,7 +56,9 @@ date_default_timezone_set('UTC');
             <div class="single-tab-wb active-wb" data-js="single-tab-wb" data-name="service_schedule">
                 <div class="wrap">
                     <?php
-                    date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
+                    date_default_timezone_set(
+                        get_option('wbk_timezone', 'UTC')
+                    );
                     WBK_Renderer::load_template(
                         'backend/schedule_booking_dialog',
                         [],
@@ -84,10 +86,12 @@ date_default_timezone_set('UTC');
                             <option value="0">' .
                             __('Select service', 'webba-booking-lite') .
                             '</option>';
-                        $services = WBK_Model_Utils::get_services();
+                        $services = WBK_Model_Utils::get_services(true);
                         foreach ($services as $id => $name) {
                             if (!current_user_can('manage_options')) {
-                                if (!WBK_Validator::check_access_to_service($id)) {
+                                if (
+                                    !WBK_Validator::check_access_to_service($id)
+                                ) {
                                     continue;
                                 }
                             }
@@ -124,7 +128,9 @@ date_default_timezone_set('UTC');
                                 data-name="lock">
                             <span class="checkmark-wb"></span>
                             <span
-                                class="radio-title-wb"><?php echo esc_html(__('Lock dates', 'webba-booking-lite')); ?></span>
+                                class="radio-title-wb"><?php echo esc_html(
+                                    __('Lock dates', 'webba-booking-lite')
+                                ); ?></span>
                         </label>
                     </div>
                     <div class="radio-row-wb">
@@ -133,7 +139,9 @@ date_default_timezone_set('UTC');
                                 data-js="radio-schedule-tools-action-wb" data-name="unlock">
                             <span class="checkmark-wb"></span>
                             <span
-                                class="radio-title-wb"><?php echo esc_html(__('Unlock dates', 'webba-booking-lite')); ?></span>
+                                class="radio-title-wb"><?php echo esc_html(
+                                    __('Unlock dates', 'webba-booking-lite')
+                                ); ?></span>
                         </label>
                     </div>
                 </div><!-- /.field-wrapper -->
@@ -149,7 +157,7 @@ date_default_timezone_set('UTC');
                                 'webba-booking-lite'
                             ); ?></option>
                             <?php
-                            $services = WBK_Model_Utils::get_services();
+                            $services = WBK_Model_Utils::get_services(true);
                             foreach ($services as $id => $name) { ?>
                                 <option value="<?php echo $id; ?>"><?php echo $name; ?></option>
                             <?php }
@@ -276,7 +284,7 @@ date_default_timezone_set('UTC');
                                 'webba-booking-lite'
                             ); ?></option>
                             <?php
-                            $services = WBK_Model_Utils::get_services();
+                            $services = WBK_Model_Utils::get_services(true);
                             foreach ($services as $id => $name) { ?>
                                 <option value="<?php echo $id; ?>"><?php echo $name; ?></option>
                             <?php }
@@ -391,7 +399,7 @@ date_default_timezone_set('UTC');
                                 'webba-booking-lite'
                             ); ?></option>
                             <?php
-                            $services = WBK_Model_Utils::get_services();
+                            $services = WBK_Model_Utils::get_services(true);
                             foreach ($services as $id => $name) { ?>
                                 <option value="<?php echo $id; ?>"><?php echo $name; ?></option>
                             <?php }
@@ -424,11 +432,11 @@ date_default_timezone_set('UTC');
             <button data-url=<?php echo esc_url_raw(
                 parse_url(rest_url(), PHP_URL_PATH)
             ); ?> data-nonce="<?php echo wp_create_nonce(
-                  'wp_rest'
-              ); ?>" class="button-wbkb schedule_tools_start_btn wbk_hidden"><?php echo __(
-                   'Start',
-                   'webba-booking-lite'
-               ); ?><span class="btn-ring-wbk"></span></button>
+     'wp_rest'
+ ); ?>" class="button-wbkb schedule_tools_start_btn wbk_hidden"><?php echo __(
+    'Start',
+    'webba-booking-lite'
+); ?><span class="btn-ring-wbk"></span></button>
 
         </div><!-- /.buttons-block-wb -->
 

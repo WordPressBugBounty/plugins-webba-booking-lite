@@ -122,7 +122,7 @@ class WBK_Assets_Manager {
         wp_localize_script( 'wbk5-backend-script', 'wbk_dashboardl10n', $translation_array );
         wp_localize_script( 'wbk-backend-script', 'wbk_dashboardl10n_old', $translation_array );
         // remove in V5
-        if ( isset( $_GET['page'] ) && $_GET['page'] == 'wbk-options' ) {
+        if ( isset( $_GET['page'] ) && $_GET['page'] == 'wbk-calendar' || $_GET['page'] == 'wbk-options' ) {
             wp_deregister_script( 'chosen' );
             $translation_array = [
                 'addappointment' => __( 'Add appointment', 'webba-booking-lite' ),
@@ -138,7 +138,8 @@ class WBK_Assets_Manager {
                 'ajaxurl'        => admin_url( 'admin-ajax.php' ),
                 'week_start'     => get_option( 'start_of_week', '1' ),
             ];
-            wp_localize_script( 'wbk-options', 'wbkl10n', $translation_array );
+            //  wp_localize_script('wbk-options', 'wbkl10n', $translation_array);
+            wp_localize_script( 'wbk-schedule', 'wbkl10n', $translation_array );
         }
         wbkdata_localize_script( 'wbk5-backend-script' );
     }

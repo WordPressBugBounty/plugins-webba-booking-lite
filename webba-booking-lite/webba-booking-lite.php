@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.0.10
+ * Version: 6.0.11
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -64,7 +64,7 @@ if ( !defined( 'WP_WEBBA_BOOKING__PLUGIN_DIR' ) ) {
     define( 'WP_WEBBA_BOOKING__PLUGIN_URL', plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( 'WP_WEBBA_BOOKING__VERSION' ) ) {
-    define( 'WP_WEBBA_BOOKING__VERSION', '6.0.10' );
+    define( 'WP_WEBBA_BOOKING__VERSION', '6.0.9' );
 }
 if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_textdomain' ) ) {
     include 'vendor/autoload.php';
@@ -243,7 +243,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
         ];
         $js_array[] = [
             'backend',
-            ['wbk-schedule', 'wbk-options'],
+            ['wbk-schedule', 'wbk-options', 'wbk-calendar'],
             'jquery-maskedinput',
             WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/jquery.maskedinput.min.js',
             ['jquery', 'jquery-ui-core', 'jquery-effects-core'],
@@ -444,7 +444,12 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     ];
     $css_array[] = [
         'backend',
-        ['wbk-schedule', 'wbk-options', 'wbk-gg-calendars'],
+        [
+            'wbk-schedule',
+            'wbk-options',
+            'wbk-gg-calendars',
+            'wbk-calendar'
+        ],
         'multidate-picker-style',
         WP_WEBBA_BOOKING__PLUGIN_URL . '/public/css/jquery.datepick.css',
         [],
@@ -453,7 +458,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     if ( isset( $_GET['wbk-activation'] ) ) {
         $css_array[] = [
             'backend',
-            ['wbk-options'],
+            ['wbk-options', 'wbk-calendar'],
             'wbk-wizard-style',
             WP_WEBBA_BOOKING__PLUGIN_URL . '/build/wizard_page/index.css',
             [],
@@ -463,7 +468,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     if ( isset( $_GET['tools'] ) ) {
         $css_array[] = [
             'backend',
-            ['wbk-options'],
+            ['wbk-options', 'wbk-calendar'],
             'wbk-backend-style-old',
             WP_WEBBA_BOOKING__PLUGIN_URL . '/public/css/wbk-backend.css',
             [],
@@ -515,7 +520,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     ];
     $js_array[] = [
         'backend',
-        ['wbk-schedule', 'wbk-options'],
+        ['wbk-schedule', 'wbk-options', 'wbk-calendar'],
         'jquery-plugin-wbk',
         WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/jquery.plugin.js',
         ['jquery', 'jquery-ui-core', 'jquery-effects-core'],
@@ -523,7 +528,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     ];
     $js_array[] = [
         'backend',
-        ['wbk-schedule', 'wbk-options'],
+        ['wbk-schedule', 'wbk-options', 'wbk-calendar'],
         'wbk-schedule',
         WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/wbk-schedule.js',
         ['jquery', 'jquery-ui-core', 'jquery-ui-dialog'],
@@ -531,7 +536,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     ];
     $js_array[] = [
         'backend',
-        ['wbk-schedule', 'wbk-options'],
+        ['wbk-schedule', 'wbk-options', 'wbk-calendar'],
         'wbk-validator',
         WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/wbk-validator.js',
         ['jquery'],
@@ -539,7 +544,12 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     ];
     $js_array[] = [
         'backend',
-        ['wbk-schedule', 'wbk-options', 'wbk-appearance'],
+        [
+            'wbk-schedule',
+            'wbk-options',
+            'wbk-appearance',
+            'wbk-calendar'
+        ],
         'wbk5-backend-plugins',
         WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/wbk5-backend-plugins.js',
         ['jquery'],
@@ -547,7 +557,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     ];
     $js_array[] = [
         'backend',
-        ['wbk-options'],
+        ['wbk-options', 'wbk-calendar'],
         'wbk-options',
         WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/wbk-options.js',
         ['jquery', 'wbk5-backend-plugins'],
@@ -568,7 +578,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     ];
     $js_array[] = [
         'backend',
-        ['wbk-schedule', 'wbk-options'],
+        ['wbk-schedule', 'wbk-options', 'wbk-calendar'],
         'wbk-chosen',
         WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/chosen.jquery.min.js',
         ['jquery', 'jquery-ui-core', 'jquery-ui-tabs'],
@@ -576,7 +586,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     ];
     $js_array[] = [
         'backend',
-        ['wbk-schedule', 'wbk-options'],
+        ['wbk-schedule', 'wbk-options', 'wbk-calendar'],
         'multidate-picker',
         WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/jquery.datepick.min.js',
         ['jquery'],
@@ -584,7 +594,12 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     ];
     $js_array[] = [
         'backend',
-        ['wbk-appearance', 'wbk-schedule', 'wbk-options'],
+        [
+            'wbk-appearance',
+            'wbk-schedule',
+            'wbk-options',
+            'wbk-calendar'
+        ],
         'wbk-backend-script',
         WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/wbk-backend.js',
         ['jquery'],

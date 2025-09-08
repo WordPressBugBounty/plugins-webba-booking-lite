@@ -193,5 +193,10 @@
 			<key name="wbk_wording_apply"/>
 			<key name="wbk_total_amount_label"/>
 			<key name="wbk_stripe_api_error_message"/>
+			<key name="wbk_wording_please_select_timeslot"/>
+			<key name="wbk_wording_this_field_is_required"/>
+			<key name="the_entered_email_is_invalid"/>
+			<key name="please_enter_a_valid_phone_number"/>
+			<key name="the_entered_number_is_invalid"/>
 	</admin-texts>
 </wpml-config>

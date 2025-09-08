@@ -2484,6 +2484,50 @@ Note: With autolock turned on, connected service bookings are considered when lo
             ]
         );
         wbk_opt()->add_option(
+            'wbk_wording_this_field_is_required',
+            'text',
+            __( 'This field is required', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'This field is required', 'webba-booking-lite' ),
+                'not_translated_title' => 'This field is required label',
+                'popup'                => __( 'This field is required in error message', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_the_entered_email_is_invalid',
+            'text',
+            __( 'The entered email is invalid', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'The entered email is invalid', 'webba-booking-lite' ),
+                'not_translated_title' => 'The entered email is invalid',
+                'popup'                => __( 'The entered email is invalid in error message', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_please_enter_a_valid_phone_number',
+            'text',
+            __( 'Please enter a valid phone number', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'Please enter a valid phone number', 'webba-booking-lite' ),
+                'not_translated_title' => 'Please enter a valid phone number',
+                'popup'                => __( 'Please enter a valid phone number in error message', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
+            'wbk_wording_the_entered_number_is_invalid',
+            'text',
+            __( 'The entered number is invalid', 'webba-booking-lite' ),
+            'wbk_translation_settings_section',
+            [
+                'default'              => __( 'The entered number is invalid', 'webba-booking-lite' ),
+                'not_translated_title' => 'The entered number is invalid',
+                'popup'                => __( 'The entered number is invalid in error message', 'webba-booking-lite' ),
+            ]
+        );
+        wbk_opt()->add_option(
             'wbk_wording_select_preferred_payment_method',
             'text',
             __( 'Select your preferred payment method', 'webba-booking-lite' ),

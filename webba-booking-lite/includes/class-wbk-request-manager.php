@@ -2402,12 +2402,16 @@ class WBK_Request_Manager {
             }
             $name = WBK_Translation_Processor::translate_string( 'webba_service_' . $id, $name );
             $description = WBK_Translation_Processor::translate_string( 'webba_service_description_' . $id, $service->get_description() );
-            $first_available_date = null;
-            $days_diff = ceil( (strtotime( '+1 year', time() ) - time()) / 86400 ) + 1;
-            $available_dates = WBK_Model_Utils::get_service_availability_in_range( $id, date( 'Y-m-d', time() ), $days_diff );
-            if ( count( $available_dates ) > 0 ) {
-                $first_available_date = $available_dates[0];
-            }
+            // $first_available_date = null;
+            // $days_diff = ceil((strtotime('+1 year', time()) - time()) / 86400) + 1;
+            // $available_dates = WBK_Model_Utils::get_service_availability_in_range(
+            //     $id,
+            //     date('Y-m-d', time()),
+            //     $days_diff
+            // );
+            // if (count($available_dates) > 0) {
+            //     $first_available_date = $available_dates[0];
+            // }
             $service_data = [
                 'id'                    => $id,
                 'value'                 => $id,
@@ -2426,7 +2430,6 @@ class WBK_Request_Manager {
                 'consecutive_timeslots' => $service->get( 'consecutive_timeslots' ) === 'yes',
                 'group_booking'         => $service->get( 'group_booking' ) === 'yes',
                 'limited_timeslot'      => $service->get( 'limited_timeslot' ) === 'yes',
-                'first_available'       => $first_available_date,
             ];
             $services_arr[] = $service_data;
         }
@@ -2578,6 +2581,10 @@ class WBK_Request_Manager {
                 'no_available_timeslots'                  => get_option( 'wbk_wording_no_available_timeslots', __( 'No available time slots', 'webba-booking-lite' ) ),
                 'hour'                                    => get_option( 'wbk_wording_hour', __( 'h', 'webba-booking-lite' ) ),
                 'minute'                                  => get_option( 'wbk_wording_minute', __( 'min', 'webba-booking-lite' ) ),
+                'this_field_is_required'                  => get_option( 'wbk_wording_this_field_is_required', __( 'This field is required', 'webba-booking-lite' ) ),
+                'the_entered_email_is_invalid'            => get_option( 'wbk_wording_the_entered_email_is_invalid', __( 'The entered email is invalid', 'webba-booking-lite' ) ),
+                'please_enter_a_valid_phone_number'       => get_option( 'wbk_wording_please_enter_a_valid_phone_number', __( 'Please enter a valid phone number', 'webba-booking-lite' ) ),
+                'the_entered_number_is_invalid'           => get_option( 'wbk_wording_the_entered_number_is_invalid', __( 'The entered number is invalid', 'webba-booking-lite' ) ),
             ],
             'appearance'         => WBK_Model_Utils::get_appearance_data(),
             'user'               => $user,

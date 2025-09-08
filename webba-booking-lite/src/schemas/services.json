@@ -53,7 +53,7 @@
             "misc": {
                 "tooltip": "Specify a date range if the service is only valid for a specific period of time.",
                 "date_format": "M d, Y",
-                "time_zone": "Europe/London"
+                "time_zone": "Europe/Warsaw"
             },
             "required": false,
             "dependency": [],
@@ -208,7 +208,7 @@
             "misc": {
                 "yes": "Yes",
                 "tooltip": "If you accept group reservations, you can specify the minimum number of bookings required per time slot.",
-                "description": "If you accept group reservations, you can specify the minimum number of bookings required per time slot and set the maximum number of bookings allowed per time slot by using the options above."
+                "description": "If you accept group reservations, you can specify the minimum number of bookings required per time slot and set the maximum number of bookings allowed per time slot by enable the option above."
             },
             "required": false,
             "dependency": [],
@@ -492,7 +492,7 @@
             "misc": {
                 "yes": "Yes",
                 "tooltip": "Check this to limit the number of time slots per booking. Applicable only if \"Settings -> User Interface -> Multiple Bookings in One Session\" is enabled.",
-                "description": "You can limit the number of time slots selection per booking by using the options above. If the number of selected time slots is less than the minimum or greater than the maximum, the user will not be able to continue with the booking."
+                "description": "You can limit the number of time slots selection per booking by enable the option above. If the number of selected time slots is less than the minimum or greater than the maximum, the user will not be able to continue with the booking."
             },
             "required": false,
             "dependency": [],
