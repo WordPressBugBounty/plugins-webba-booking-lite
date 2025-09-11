@@ -3135,7 +3135,9 @@ class WBK_Request_Manager {
     public function create_booking( $request ) {
         WBK_Translation_Processor::switch_to_locale_from_get_param();
         global $wpdb;
-        $params = $request->get_params();
+        $params = $request->get_body_params();
+        $params['services'] = ( isset( $params['services'] ) ? json_decode( $params['services'], true ) : [] );
+        $params['places'] = ( isset( $params['places'] ) ? json_decode( $params['places'], true ) : [] );
         date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
         // Validate required fields
         $required_fields = [
@@ -3209,6 +3211,34 @@ class WBK_Request_Manager {
                 $coupon_status = 'valid';
             }
         }
+        $arr_uploaded_urls = [];
+        $files = $request->get_file_params();
+        if ( get_option( 'wbk_allow_attachemnt', 'no' ) == 'yes' && isset( $files['attachments'] ) && is_array( $files['attachments'] ) && count( $files['attachments'] ) > 0 ) {
+            if ( !function_exists( 'wp_handle_upload' ) ) {
+                require_once ABSPATH . 'wp-admin/includes/file.php';
+            }
+            for ($i = 0; $i < count( $files['tmp_name'] ); $i++) {
+                $file = [
+                    'name'      => $files['name'][$i],
+                    'tmp_name'  => $files['tmp_name'][$i],
+                    'type'      => $files['type'][$i],
+                    'error'     => $files['error'][$i],
+                    'size'      => $files['size'][$i],
+                    'full_path' => $files['full_path'][$i],
+                ];
+                $uploaded_file = wp_handle_upload( $file, [
+                    'test_form' => false,
+                ] );
+                if ( $uploaded_file && !isset( $uploaded_file['error'] ) ) {
+                    $arr_uploaded_urls[] = $uploaded_file['file'];
+                }
+            }
+        }
+        if ( count( $arr_uploaded_urls ) > 0 ) {
+            $attachments = json_encode( $arr_uploaded_urls );
+        } else {
+            $attachments = '';
+        }
         // Prepare base booking data
         $base_booking_data = [
             'name'             => sanitize_text_field( $params['first_name'] . ' ' . $params['last_name'] ),
@@ -3218,6 +3248,7 @@ class WBK_Request_Manager {
             'extra'            => ( isset( $params['extra'] ) ? $params['extra'] : '' ),
             'service_category' => ( isset( $params['category'] ) ? intval( $params['category'] ) : 0 ),
             'coupon'           => ( $coupon_result !== false && is_array( $coupon_result ) ? $coupon_result[0] : '' ),
+            'attachment'       => $attachments,
         ];
         $booking_ids = [];
         $booking_times = [];

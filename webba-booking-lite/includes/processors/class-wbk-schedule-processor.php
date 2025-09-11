@@ -160,7 +160,7 @@ class WBK_Schedule_Processor {
             $preparation_time = $service->get_prepare_time();
         }
         $intervals = $this->get_business_hours_intervals_by_dow( date( 'N', $day ), $service_id );
-        $min_quantity = $service->get( 'min_quantity' );
+        $min_quantity = $service->get_min_quantity();
         // special business hours
         $data = trim( get_option( 'wbk_appointments_special_hours', '' ) );
         $intervals_overriden = [];
@@ -280,7 +280,7 @@ class WBK_Schedule_Processor {
                     $free_places = $service->get_quantity() - $booked;
                 }
                 $slot = new WBK_Time_Slot($time, $temp);
-                $slot->set_min_quantity( $service->get( 'min_quantity' ) );
+                $slot->set_min_quantity( $service->get_min_quantity() );
                 $slot->set_free_places( $free_places );
                 $slot->set_status( $status );
                 $timeslots[] = $slot;
@@ -464,7 +464,7 @@ class WBK_Schedule_Processor {
                             $service_id
                         );
                     }
-                    if ( $available < $service->get( 'min_quantity' ) ) {
+                    if ( $available < $service->get_min_quantity() ) {
                         $timeslots[$i]->set_free_places( 0 );
                         if ( $current_quantity > 0 ) {
                             $timeslots[$i]->set_free_places( $current_quantity );

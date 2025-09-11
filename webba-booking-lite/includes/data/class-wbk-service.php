@@ -97,8 +97,8 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_quantity($time = null)
     {
-        if (!isset($this->fields['quantity'])) {
-            return null;
+        if (!isset($this->fields['quantity']) || empty($this->fields['quantity'])) {
+            return 1;
         }
         return apply_filters(
             'wbk_service_quantity',
@@ -114,8 +114,8 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_min_quantity($time = null)
     {
-        if (!isset($this->fields['min_quantity'])) {
-            return null;
+        if (!isset($this->fields['min_quantity']) || empty($this->fields['min_quantity'])) {
+            return 1;
         }
         return apply_filters(
             'wbk_service_quantity',
@@ -131,8 +131,8 @@ class WBK_Service extends WBK_Model_Object
      */
     public function get_max_quantity($time = null)
     {
-        if (!isset($this->fields['quantity'])) {
-            return null;
+        if (!isset($this->fields['quantity']) || empty($this->fields['quantity'])) {
+            return 1;
         }
         return apply_filters(
             'wbk_service_quantity',
