@@ -4,39 +4,17 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02
+class ComposerStaticInitdfea04b17febe8992e644534304b530a
 {
     public static $files = array (
-        '3937806105cc8e221b8fa8db5b70d2f2' => __DIR__ . '/..' . '/wp-cli/mustangostang-spyc/includes/functions.php',
-        'be01b9b16925dcb22165c40b46681ac6' => __DIR__ . '/..' . '/wp-cli/php-cli-tools/lib/cli/cli.php',
-        'ac949ce40a981819ba132473518a9a31' => __DIR__ . '/..' . '/wp-cli/wp-config-transformer/src/WPConfigTransformer.php',
+        '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
+        '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
+        'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         'b46ad4fe52f4d1899a2951c7e6ea56b0' => __DIR__ . '/..' . '/voku/portable-utf8/bootstrap.php',
-        '8a0ad02df6a5087f2c380f8fd52db273' => __DIR__ . '/..' . '/wp-cli/cache-command/cache-command.php',
-        'b66d29757fcb2fb7a9608d068e3716b0' => __DIR__ . '/..' . '/wp-cli/checksum-command/checksum-command.php',
-        '5deaf6ce9c8bbdfb65104c7e938d5875' => __DIR__ . '/..' . '/wp-cli/config-command/config-command.php',
-        '68c39b88215b6cf7a0da164166670ef9' => __DIR__ . '/..' . '/wp-cli/core-command/core-command.php',
-        '7654e00bf0e632580764400bd8293a9c' => __DIR__ . '/..' . '/wp-cli/cron-command/cron-command.php',
-        'c65f753375faee349b7adc48c2ee7cc2' => __DIR__ . '/..' . '/wp-cli/db-command/db-command.php',
-        '021d3a13471556f0b57038d679f7f8ea' => __DIR__ . '/..' . '/wp-cli/embed-command/embed-command.php',
-        'f3f0199a3ecd9f501d0a3b361bd2f61c' => __DIR__ . '/..' . '/wp-cli/entity-command/entity-command.php',
-        'f958dca3f412fd7975da1700912a9321' => __DIR__ . '/..' . '/wp-cli/eval-command/eval-command.php',
-        '5c6ec5cff8f9d625772c8ed147f6b894' => __DIR__ . '/..' . '/wp-cli/export-command/export-command.php',
-        '3f201033d5aceb2293314273be88f7c6' => __DIR__ . '/..' . '/wp-cli/extension-command/extension-command.php',
-        'ffb465a494c3101218c4417180c2c9a2' => __DIR__ . '/..' . '/wp-cli/i18n-command/i18n-command.php',
-        '30cbb6e4122dc988e494c6b9c0438233' => __DIR__ . '/..' . '/wp-cli/import-command/import-command.php',
-        'ace0d205db7f4135ec32132a0076d555' => __DIR__ . '/..' . '/wp-cli/language-command/language-command.php',
-        '1c88c1eff05217a8cac80c64c9ac2080' => __DIR__ . '/..' . '/wp-cli/maintenance-mode-command/maintenance-mode-command.php',
-        '5e099d3cac677dd2bec1003ea7707745' => __DIR__ . '/..' . '/wp-cli/media-command/media-command.php',
-        'ba366f96f4fddbdef61ad7a862b44f61' => __DIR__ . '/..' . '/wp-cli/package-command/package-command.php',
-        'f399c1c8d0c787d5c94c09884cdd9762' => __DIR__ . '/..' . '/wp-cli/rewrite-command/rewrite-command.php',
-        '080fadd667195d055c5a23386f270261' => __DIR__ . '/..' . '/wp-cli/role-command/role-command.php',
-        'd979c11fe80ba96ae3037b43429fe546' => __DIR__ . '/..' . '/wp-cli/scaffold-command/scaffold-command.php',
-        '8ecb13f8bbc22b1b34d12b14ec01077a' => __DIR__ . '/..' . '/wp-cli/search-replace-command/search-replace-command.php',
-        '9f04dd0aa5d67ec75a75c88c345a079e' => __DIR__ . '/..' . '/wp-cli/server-command/server-command.php',
-        '129d58fa8151374aceb8571bcaa97504' => __DIR__ . '/..' . '/wp-cli/shell-command/shell-command.php',
-        '8519779bbb65eeb842af2f629ce7b6f8' => __DIR__ . '/..' . '/wp-cli/super-admin-command/super-admin-command.php',
-        '1f05372afcc7d0c51a305cef1d56dd01' => __DIR__ . '/..' . '/wp-cli/widget-command/widget-command.php',
         '1f155afceeab454b94183cdd8d5248a6' => __DIR__ . '/..' . '/mixpanel/mixpanel-php/lib/Mixpanel.php',
         '7d3b315c4f303f2fc14aca642a738e50' => __DIR__ . '/..' . '/yoast/phpunit-polyfills/phpunitpolyfills-autoload.php',
     );
@@ -51,9 +29,6 @@ class ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02
         array (
             'Webba\\Booking\\Tests\\' => 20,
             'Webba\\Booking\\' => 14,
-            'WP_CLI\\MaintenanceMode\\' => 23,
-            'WP_CLI\\I18n\\' => 12,
-            'WP_CLI\\Embeds\\' => 14,
         ),
         'T' => 
         array (
@@ -61,32 +36,25 @@ class ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02
         ),
         'S' => 
         array (
-            'Symfony\\Component\\Process\\' => 26,
+            'Symfony\\Polyfill\\Mbstring\\' => 26,
+            'Symfony\\Polyfill\\Intl\\Normalizer\\' => 33,
+            'Symfony\\Polyfill\\Intl\\Grapheme\\' => 31,
+            'Symfony\\Polyfill\\Iconv\\' => 23,
             'Stripe\\' => 7,
         ),
         'P' => 
         array (
             'Psr\\Log\\' => 8,
-            'Psr\\Container\\' => 14,
-        ),
-        'M' => 
-        array (
-            'Mustangostang\\' => 14,
+            'PhpParser\\' => 10,
         ),
         'E' => 
         array (
             'Eluceo\\iCal\\' => 12,
         ),
-        'C' => 
+        'D' => 
         array (
-            'Composer\\XdebugHandler\\' => 23,
-            'Composer\\Spdx\\' => 14,
-            'Composer\\Semver\\' => 16,
-            'Composer\\Pcre\\' => 14,
-            'Composer\\MetadataMinifier\\' => 26,
-            'Composer\\ClassMapGenerator\\' => 27,
-            'Composer\\CaBundle\\' => 18,
-            'Composer\\' => 9,
+            'Doctrine\\Instantiator\\' => 22,
+            'DeepCopy\\' => 9,
         ),
     );
 
@@ -108,25 +76,25 @@ class ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02
         array (
             0 => __DIR__ . '/../..' . '/includes',
         ),
-        'WP_CLI\\MaintenanceMode\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/wp-cli/maintenance-mode-command/src',
-        ),
-        'WP_CLI\\I18n\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/wp-cli/i18n-command/src',
-        ),
-        'WP_CLI\\Embeds\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/wp-cli/embed-command/src',
-        ),
         'Twilio\\' => 
         array (
             0 => __DIR__ . '/..' . '/twilio/sdk/src/Twilio',
         ),
-        'Symfony\\Component\\Process\\' => 
+        'Symfony\\Polyfill\\Mbstring\\' => 
         array (
-            0 => __DIR__ . '/..' . '/wp-cli/process',
+            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
+        'Symfony\\Polyfill\\Intl\\Normalizer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer',
+        ),
+        'Symfony\\Polyfill\\Intl\\Grapheme\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme',
+        ),
+        'Symfony\\Polyfill\\Iconv\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-iconv',
         ),
         'Stripe\\' => 
         array (
@@ -136,79 +104,30 @@ class ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02
         array (
             0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
         ),
-        'Psr\\Container\\' => 
+        'PhpParser\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/container/src',
-        ),
-        'Mustangostang\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/wp-cli/mustangostang-spyc/src',
+            0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
         'Eluceo\\iCal\\' => 
         array (
             0 => __DIR__ . '/..' . '/eluceo/ical/src',
         ),
-        'Composer\\XdebugHandler\\' => 
+        'Doctrine\\Instantiator\\' => 
         array (
-            0 => __DIR__ . '/..' . '/composer/xdebug-handler/src',
+            0 => __DIR__ . '/..' . '/doctrine/instantiator/src/Doctrine/Instantiator',
         ),
-        'Composer\\Spdx\\' => 
+        'DeepCopy\\' => 
         array (
-            0 => __DIR__ . '/..' . '/composer/spdx-licenses/src',
-        ),
-        'Composer\\Semver\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/semver/src',
-        ),
-        'Composer\\Pcre\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/pcre/src',
-        ),
-        'Composer\\MetadataMinifier\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/metadata-minifier/src',
-        ),
-        'Composer\\ClassMapGenerator\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/class-map-generator/src',
-        ),
-        'Composer\\CaBundle\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/ca-bundle/src',
-        ),
-        'Composer\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/composer/src/Composer',
+            0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
         ),
     );
 
     public static $prefixesPsr0 = array (
-        'c' => 
-        array (
-            'cli' => 
-            array (
-                0 => __DIR__ . '/..' . '/wp-cli/php-cli-tools/lib',
-            ),
-        ),
-        'W' => 
-        array (
-            'WP_CLI\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/wp-cli/wp-cli/php',
-            ),
-        ),
         'P' => 
         array (
             'PayPal' => 
             array (
                 0 => __DIR__ . '/..' . '/paypal/rest-api-sdk-php/lib',
-            ),
-        ),
-        'M' => 
-        array (
-            'Mustache' => 
-            array (
-                0 => __DIR__ . '/..' . '/wp-cli/mustache/src',
             ),
         ),
         'I' => 
@@ -221,34 +140,8 @@ class ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02
     );
 
     public static $classMap = array (
-        'Cache_Command' => __DIR__ . '/..' . '/wp-cli/cache-command/src/Cache_Command.php',
-        'Capabilities_Command' => __DIR__ . '/..' . '/wp-cli/role-command/src/Capabilities_Command.php',
-        'Checksum_Base_Command' => __DIR__ . '/..' . '/wp-cli/checksum-command/src/Checksum_Base_Command.php',
-        'Checksum_Core_Command' => __DIR__ . '/..' . '/wp-cli/checksum-command/src/Checksum_Core_Command.php',
-        'Checksum_Plugin_Command' => __DIR__ . '/..' . '/wp-cli/checksum-command/src/Checksum_Plugin_Command.php',
-        'Comment_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Comment_Command.php',
-        'Comment_Meta_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Comment_Meta_Command.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'Config_Command' => __DIR__ . '/..' . '/wp-cli/config-command/src/Config_Command.php',
-        'Core_Command' => __DIR__ . '/..' . '/wp-cli/core-command/src/Core_Command.php',
-        'Core_Command_Namespace' => __DIR__ . '/..' . '/wp-cli/checksum-command/src/Core_Command_Namespace.php',
-        'Core_Language_Command' => __DIR__ . '/..' . '/wp-cli/language-command/src/Core_Language_Command.php',
-        'Cron_Command' => __DIR__ . '/..' . '/wp-cli/cron-command/src/Cron_Command.php',
-        'Cron_Event_Command' => __DIR__ . '/..' . '/wp-cli/cron-command/src/Cron_Event_Command.php',
-        'Cron_Schedule_Command' => __DIR__ . '/..' . '/wp-cli/cron-command/src/Cron_Schedule_Command.php',
-        'DB_Command' => __DIR__ . '/..' . '/wp-cli/db-command/src/DB_Command.php',
-        'EvalFile_Command' => __DIR__ . '/..' . '/wp-cli/eval-command/src/EvalFile_Command.php',
-        'Eval_Command' => __DIR__ . '/..' . '/wp-cli/eval-command/src/Eval_Command.php',
-        'Export_Command' => __DIR__ . '/..' . '/wp-cli/export-command/src/Export_Command.php',
-        'Import_Command' => __DIR__ . '/..' . '/wp-cli/import-command/src/Import_Command.php',
-        'Language_Namespace' => __DIR__ . '/..' . '/wp-cli/language-command/src/Language_Namespace.php',
-        'Media_Command' => __DIR__ . '/..' . '/wp-cli/media-command/src/Media_Command.php',
-        'Menu_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Menu_Command.php',
-        'Menu_Item_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Menu_Item_Command.php',
-        'Menu_Location_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Menu_Location_Command.php',
-        'Network_Meta_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Network_Meta_Command.php',
-        'Network_Namespace' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Network_Namespace.php',
-        'Option_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Option_Command.php',
+        'Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
         'PHPUnit\\Exception' => __DIR__ . '/..' . '/phpunit/phpunit/src/Exception.php',
         'PHPUnit\\Framework\\ActualValueIsNotAnObjectException' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Exception/ActualValueIsNotAnObjectException.php',
         'PHPUnit\\Framework\\Assert' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert.php',
@@ -598,19 +491,84 @@ class ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02
         'PHPUnit\\Util\\Xml\\SuccessfulSchemaDetectionResult' => __DIR__ . '/..' . '/phpunit/phpunit/src/Util/Xml/SuccessfulSchemaDetectionResult.php',
         'PHPUnit\\Util\\Xml\\ValidationResult' => __DIR__ . '/..' . '/phpunit/phpunit/src/Util/Xml/ValidationResult.php',
         'PHPUnit\\Util\\Xml\\Validator' => __DIR__ . '/..' . '/phpunit/phpunit/src/Util/Xml/Validator.php',
-        'Package_Command' => __DIR__ . '/..' . '/wp-cli/package-command/src/Package_Command.php',
-        'Plugin_AutoUpdates_Command' => __DIR__ . '/..' . '/wp-cli/extension-command/src/Plugin_AutoUpdates_Command.php',
-        'Plugin_Command' => __DIR__ . '/..' . '/wp-cli/extension-command/src/Plugin_Command.php',
-        'Plugin_Command_Namespace' => __DIR__ . '/..' . '/wp-cli/checksum-command/src/Plugin_Command_Namespace.php',
-        'Plugin_Language_Command' => __DIR__ . '/..' . '/wp-cli/language-command/src/Plugin_Language_Command.php',
-        'Post_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Post_Command.php',
-        'Post_Meta_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Post_Meta_Command.php',
-        'Post_Term_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Post_Term_Command.php',
-        'Post_Type_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Post_Type_Command.php',
-        'Rewrite_Command' => __DIR__ . '/..' . '/wp-cli/rewrite-command/src/Rewrite_Command.php',
-        'Role_Command' => __DIR__ . '/..' . '/wp-cli/role-command/src/Role_Command.php',
-        'Scaffold_Command' => __DIR__ . '/..' . '/wp-cli/scaffold-command/src/Scaffold_Command.php',
-        'Search_Replace_Command' => __DIR__ . '/..' . '/wp-cli/search-replace-command/src/Search_Replace_Command.php',
+        'PharIo\\Manifest\\Application' => __DIR__ . '/..' . '/phar-io/manifest/src/values/Application.php',
+        'PharIo\\Manifest\\ApplicationName' => __DIR__ . '/..' . '/phar-io/manifest/src/values/ApplicationName.php',
+        'PharIo\\Manifest\\Author' => __DIR__ . '/..' . '/phar-io/manifest/src/values/Author.php',
+        'PharIo\\Manifest\\AuthorCollection' => __DIR__ . '/..' . '/phar-io/manifest/src/values/AuthorCollection.php',
+        'PharIo\\Manifest\\AuthorCollectionIterator' => __DIR__ . '/..' . '/phar-io/manifest/src/values/AuthorCollectionIterator.php',
+        'PharIo\\Manifest\\AuthorElement' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/AuthorElement.php',
+        'PharIo\\Manifest\\AuthorElementCollection' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/AuthorElementCollection.php',
+        'PharIo\\Manifest\\BundledComponent' => __DIR__ . '/..' . '/phar-io/manifest/src/values/BundledComponent.php',
+        'PharIo\\Manifest\\BundledComponentCollection' => __DIR__ . '/..' . '/phar-io/manifest/src/values/BundledComponentCollection.php',
+        'PharIo\\Manifest\\BundledComponentCollectionIterator' => __DIR__ . '/..' . '/phar-io/manifest/src/values/BundledComponentCollectionIterator.php',
+        'PharIo\\Manifest\\BundlesElement' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/BundlesElement.php',
+        'PharIo\\Manifest\\ComponentElement' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/ComponentElement.php',
+        'PharIo\\Manifest\\ComponentElementCollection' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/ComponentElementCollection.php',
+        'PharIo\\Manifest\\ContainsElement' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/ContainsElement.php',
+        'PharIo\\Manifest\\CopyrightElement' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/CopyrightElement.php',
+        'PharIo\\Manifest\\CopyrightInformation' => __DIR__ . '/..' . '/phar-io/manifest/src/values/CopyrightInformation.php',
+        'PharIo\\Manifest\\ElementCollection' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/ElementCollection.php',
+        'PharIo\\Manifest\\ElementCollectionException' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/ElementCollectionException.php',
+        'PharIo\\Manifest\\Email' => __DIR__ . '/..' . '/phar-io/manifest/src/values/Email.php',
+        'PharIo\\Manifest\\Exception' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/Exception.php',
+        'PharIo\\Manifest\\ExtElement' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/ExtElement.php',
+        'PharIo\\Manifest\\ExtElementCollection' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/ExtElementCollection.php',
+        'PharIo\\Manifest\\Extension' => __DIR__ . '/..' . '/phar-io/manifest/src/values/Extension.php',
+        'PharIo\\Manifest\\ExtensionElement' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/ExtensionElement.php',
+        'PharIo\\Manifest\\InvalidApplicationNameException' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/InvalidApplicationNameException.php',
+        'PharIo\\Manifest\\InvalidEmailException' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/InvalidEmailException.php',
+        'PharIo\\Manifest\\InvalidUrlException' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/InvalidUrlException.php',
+        'PharIo\\Manifest\\Library' => __DIR__ . '/..' . '/phar-io/manifest/src/values/Library.php',
+        'PharIo\\Manifest\\License' => __DIR__ . '/..' . '/phar-io/manifest/src/values/License.php',
+        'PharIo\\Manifest\\LicenseElement' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/LicenseElement.php',
+        'PharIo\\Manifest\\Manifest' => __DIR__ . '/..' . '/phar-io/manifest/src/values/Manifest.php',
+        'PharIo\\Manifest\\ManifestDocument' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/ManifestDocument.php',
+        'PharIo\\Manifest\\ManifestDocumentException' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/ManifestDocumentException.php',
+        'PharIo\\Manifest\\ManifestDocumentLoadingException' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/ManifestDocumentLoadingException.php',
+        'PharIo\\Manifest\\ManifestDocumentMapper' => __DIR__ . '/..' . '/phar-io/manifest/src/ManifestDocumentMapper.php',
+        'PharIo\\Manifest\\ManifestDocumentMapperException' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/ManifestDocumentMapperException.php',
+        'PharIo\\Manifest\\ManifestElement' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/ManifestElement.php',
+        'PharIo\\Manifest\\ManifestElementException' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/ManifestElementException.php',
+        'PharIo\\Manifest\\ManifestLoader' => __DIR__ . '/..' . '/phar-io/manifest/src/ManifestLoader.php',
+        'PharIo\\Manifest\\ManifestLoaderException' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/ManifestLoaderException.php',
+        'PharIo\\Manifest\\ManifestSerializer' => __DIR__ . '/..' . '/phar-io/manifest/src/ManifestSerializer.php',
+        'PharIo\\Manifest\\NoEmailAddressException' => __DIR__ . '/..' . '/phar-io/manifest/src/exceptions/NoEmailAddressException.php',
+        'PharIo\\Manifest\\PhpElement' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/PhpElement.php',
+        'PharIo\\Manifest\\PhpExtensionRequirement' => __DIR__ . '/..' . '/phar-io/manifest/src/values/PhpExtensionRequirement.php',
+        'PharIo\\Manifest\\PhpVersionRequirement' => __DIR__ . '/..' . '/phar-io/manifest/src/values/PhpVersionRequirement.php',
+        'PharIo\\Manifest\\Requirement' => __DIR__ . '/..' . '/phar-io/manifest/src/values/Requirement.php',
+        'PharIo\\Manifest\\RequirementCollection' => __DIR__ . '/..' . '/phar-io/manifest/src/values/RequirementCollection.php',
+        'PharIo\\Manifest\\RequirementCollectionIterator' => __DIR__ . '/..' . '/phar-io/manifest/src/values/RequirementCollectionIterator.php',
+        'PharIo\\Manifest\\RequiresElement' => __DIR__ . '/..' . '/phar-io/manifest/src/xml/RequiresElement.php',
+        'PharIo\\Manifest\\Type' => __DIR__ . '/..' . '/phar-io/manifest/src/values/Type.php',
+        'PharIo\\Manifest\\Url' => __DIR__ . '/..' . '/phar-io/manifest/src/values/Url.php',
+        'PharIo\\Version\\AbstractVersionConstraint' => __DIR__ . '/..' . '/phar-io/version/src/constraints/AbstractVersionConstraint.php',
+        'PharIo\\Version\\AndVersionConstraintGroup' => __DIR__ . '/..' . '/phar-io/version/src/constraints/AndVersionConstraintGroup.php',
+        'PharIo\\Version\\AnyVersionConstraint' => __DIR__ . '/..' . '/phar-io/version/src/constraints/AnyVersionConstraint.php',
+        'PharIo\\Version\\BuildMetaData' => __DIR__ . '/..' . '/phar-io/version/src/BuildMetaData.php',
+        'PharIo\\Version\\ExactVersionConstraint' => __DIR__ . '/..' . '/phar-io/version/src/constraints/ExactVersionConstraint.php',
+        'PharIo\\Version\\Exception' => __DIR__ . '/..' . '/phar-io/version/src/exceptions/Exception.php',
+        'PharIo\\Version\\GreaterThanOrEqualToVersionConstraint' => __DIR__ . '/..' . '/phar-io/version/src/constraints/GreaterThanOrEqualToVersionConstraint.php',
+        'PharIo\\Version\\InvalidPreReleaseSuffixException' => __DIR__ . '/..' . '/phar-io/version/src/exceptions/InvalidPreReleaseSuffixException.php',
+        'PharIo\\Version\\InvalidVersionException' => __DIR__ . '/..' . '/phar-io/version/src/exceptions/InvalidVersionException.php',
+        'PharIo\\Version\\NoBuildMetaDataException' => __DIR__ . '/..' . '/phar-io/version/src/exceptions/NoBuildMetaDataException.php',
+        'PharIo\\Version\\NoPreReleaseSuffixException' => __DIR__ . '/..' . '/phar-io/version/src/exceptions/NoPreReleaseSuffixException.php',
+        'PharIo\\Version\\OrVersionConstraintGroup' => __DIR__ . '/..' . '/phar-io/version/src/constraints/OrVersionConstraintGroup.php',
+        'PharIo\\Version\\PreReleaseSuffix' => __DIR__ . '/..' . '/phar-io/version/src/PreReleaseSuffix.php',
+        'PharIo\\Version\\SpecificMajorAndMinorVersionConstraint' => __DIR__ . '/..' . '/phar-io/version/src/constraints/SpecificMajorAndMinorVersionConstraint.php',
+        'PharIo\\Version\\SpecificMajorVersionConstraint' => __DIR__ . '/..' . '/phar-io/version/src/constraints/SpecificMajorVersionConstraint.php',
+        'PharIo\\Version\\UnsupportedVersionConstraintException' => __DIR__ . '/..' . '/phar-io/version/src/exceptions/UnsupportedVersionConstraintException.php',
+        'PharIo\\Version\\Version' => __DIR__ . '/..' . '/phar-io/version/src/Version.php',
+        'PharIo\\Version\\VersionConstraint' => __DIR__ . '/..' . '/phar-io/version/src/constraints/VersionConstraint.php',
+        'PharIo\\Version\\VersionConstraintParser' => __DIR__ . '/..' . '/phar-io/version/src/VersionConstraintParser.php',
+        'PharIo\\Version\\VersionConstraintValue' => __DIR__ . '/..' . '/phar-io/version/src/VersionConstraintValue.php',
+        'PharIo\\Version\\VersionNumber' => __DIR__ . '/..' . '/phar-io/version/src/VersionNumber.php',
+        'SebastianBergmann\\CliParser\\AmbiguousOptionException' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/AmbiguousOptionException.php',
+        'SebastianBergmann\\CliParser\\Exception' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/Exception.php',
+        'SebastianBergmann\\CliParser\\OptionDoesNotAllowArgumentException' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/OptionDoesNotAllowArgumentException.php',
+        'SebastianBergmann\\CliParser\\Parser' => __DIR__ . '/..' . '/sebastian/cli-parser/src/Parser.php',
+        'SebastianBergmann\\CliParser\\RequiredOptionArgumentMissingException' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/RequiredOptionArgumentMissingException.php',
+        'SebastianBergmann\\CliParser\\UnknownOptionException' => __DIR__ . '/..' . '/sebastian/cli-parser/src/exceptions/UnknownOptionException.php',
         'SebastianBergmann\\CodeCoverage\\BranchAndPathCoverageNotSupportedException' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Exception/BranchAndPathCoverageNotSupportedException.php',
         'SebastianBergmann\\CodeCoverage\\CodeCoverage' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/CodeCoverage.php',
         'SebastianBergmann\\CodeCoverage\\DeadCodeDetectionNotSupportedException' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Exception/DeadCodeDetectionNotSupportedException.php',
@@ -682,13 +640,97 @@ class ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02
         'SebastianBergmann\\CodeCoverage\\Util\\Percentage' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Util/Percentage.php',
         'SebastianBergmann\\CodeCoverage\\Version' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Version.php',
         'SebastianBergmann\\CodeCoverage\\XmlException' => __DIR__ . '/..' . '/phpunit/php-code-coverage/src/Exception/XmlException.php',
+        'SebastianBergmann\\CodeUnitReverseLookup\\Wizard' => __DIR__ . '/..' . '/sebastian/code-unit-reverse-lookup/src/Wizard.php',
+        'SebastianBergmann\\CodeUnit\\ClassMethodUnit' => __DIR__ . '/..' . '/sebastian/code-unit/src/ClassMethodUnit.php',
+        'SebastianBergmann\\CodeUnit\\ClassUnit' => __DIR__ . '/..' . '/sebastian/code-unit/src/ClassUnit.php',
+        'SebastianBergmann\\CodeUnit\\CodeUnit' => __DIR__ . '/..' . '/sebastian/code-unit/src/CodeUnit.php',
+        'SebastianBergmann\\CodeUnit\\CodeUnitCollection' => __DIR__ . '/..' . '/sebastian/code-unit/src/CodeUnitCollection.php',
+        'SebastianBergmann\\CodeUnit\\CodeUnitCollectionIterator' => __DIR__ . '/..' . '/sebastian/code-unit/src/CodeUnitCollectionIterator.php',
+        'SebastianBergmann\\CodeUnit\\Exception' => __DIR__ . '/..' . '/sebastian/code-unit/src/exceptions/Exception.php',
+        'SebastianBergmann\\CodeUnit\\FunctionUnit' => __DIR__ . '/..' . '/sebastian/code-unit/src/FunctionUnit.php',
+        'SebastianBergmann\\CodeUnit\\InterfaceMethodUnit' => __DIR__ . '/..' . '/sebastian/code-unit/src/InterfaceMethodUnit.php',
+        'SebastianBergmann\\CodeUnit\\InterfaceUnit' => __DIR__ . '/..' . '/sebastian/code-unit/src/InterfaceUnit.php',
+        'SebastianBergmann\\CodeUnit\\InvalidCodeUnitException' => __DIR__ . '/..' . '/sebastian/code-unit/src/exceptions/InvalidCodeUnitException.php',
+        'SebastianBergmann\\CodeUnit\\Mapper' => __DIR__ . '/..' . '/sebastian/code-unit/src/Mapper.php',
+        'SebastianBergmann\\CodeUnit\\NoTraitException' => __DIR__ . '/..' . '/sebastian/code-unit/src/exceptions/NoTraitException.php',
+        'SebastianBergmann\\CodeUnit\\ReflectionException' => __DIR__ . '/..' . '/sebastian/code-unit/src/exceptions/ReflectionException.php',
+        'SebastianBergmann\\CodeUnit\\TraitMethodUnit' => __DIR__ . '/..' . '/sebastian/code-unit/src/TraitMethodUnit.php',
+        'SebastianBergmann\\CodeUnit\\TraitUnit' => __DIR__ . '/..' . '/sebastian/code-unit/src/TraitUnit.php',
+        'SebastianBergmann\\Comparator\\ArrayComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/ArrayComparator.php',
+        'SebastianBergmann\\Comparator\\Comparator' => __DIR__ . '/..' . '/sebastian/comparator/src/Comparator.php',
+        'SebastianBergmann\\Comparator\\ComparisonFailure' => __DIR__ . '/..' . '/sebastian/comparator/src/ComparisonFailure.php',
+        'SebastianBergmann\\Comparator\\DOMNodeComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/DOMNodeComparator.php',
+        'SebastianBergmann\\Comparator\\DateTimeComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/DateTimeComparator.php',
+        'SebastianBergmann\\Comparator\\DoubleComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/DoubleComparator.php',
+        'SebastianBergmann\\Comparator\\Exception' => __DIR__ . '/..' . '/sebastian/comparator/src/exceptions/Exception.php',
+        'SebastianBergmann\\Comparator\\ExceptionComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/ExceptionComparator.php',
+        'SebastianBergmann\\Comparator\\Factory' => __DIR__ . '/..' . '/sebastian/comparator/src/Factory.php',
+        'SebastianBergmann\\Comparator\\MockObjectComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/MockObjectComparator.php',
+        'SebastianBergmann\\Comparator\\NumericComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/NumericComparator.php',
+        'SebastianBergmann\\Comparator\\ObjectComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/ObjectComparator.php',
+        'SebastianBergmann\\Comparator\\ResourceComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/ResourceComparator.php',
+        'SebastianBergmann\\Comparator\\RuntimeException' => __DIR__ . '/..' . '/sebastian/comparator/src/exceptions/RuntimeException.php',
+        'SebastianBergmann\\Comparator\\ScalarComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/ScalarComparator.php',
+        'SebastianBergmann\\Comparator\\SplObjectStorageComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/SplObjectStorageComparator.php',
+        'SebastianBergmann\\Comparator\\TypeComparator' => __DIR__ . '/..' . '/sebastian/comparator/src/TypeComparator.php',
+        'SebastianBergmann\\Complexity\\Calculator' => __DIR__ . '/..' . '/sebastian/complexity/src/Calculator.php',
+        'SebastianBergmann\\Complexity\\Complexity' => __DIR__ . '/..' . '/sebastian/complexity/src/Complexity/Complexity.php',
+        'SebastianBergmann\\Complexity\\ComplexityCalculatingVisitor' => __DIR__ . '/..' . '/sebastian/complexity/src/Visitor/ComplexityCalculatingVisitor.php',
+        'SebastianBergmann\\Complexity\\ComplexityCollection' => __DIR__ . '/..' . '/sebastian/complexity/src/Complexity/ComplexityCollection.php',
+        'SebastianBergmann\\Complexity\\ComplexityCollectionIterator' => __DIR__ . '/..' . '/sebastian/complexity/src/Complexity/ComplexityCollectionIterator.php',
+        'SebastianBergmann\\Complexity\\CyclomaticComplexityCalculatingVisitor' => __DIR__ . '/..' . '/sebastian/complexity/src/Visitor/CyclomaticComplexityCalculatingVisitor.php',
+        'SebastianBergmann\\Complexity\\Exception' => __DIR__ . '/..' . '/sebastian/complexity/src/Exception/Exception.php',
+        'SebastianBergmann\\Complexity\\RuntimeException' => __DIR__ . '/..' . '/sebastian/complexity/src/Exception/RuntimeException.php',
+        'SebastianBergmann\\Diff\\Chunk' => __DIR__ . '/..' . '/sebastian/diff/src/Chunk.php',
+        'SebastianBergmann\\Diff\\ConfigurationException' => __DIR__ . '/..' . '/sebastian/diff/src/Exception/ConfigurationException.php',
+        'SebastianBergmann\\Diff\\Diff' => __DIR__ . '/..' . '/sebastian/diff/src/Diff.php',
+        'SebastianBergmann\\Diff\\Differ' => __DIR__ . '/..' . '/sebastian/diff/src/Differ.php',
+        'SebastianBergmann\\Diff\\Exception' => __DIR__ . '/..' . '/sebastian/diff/src/Exception/Exception.php',
+        'SebastianBergmann\\Diff\\InvalidArgumentException' => __DIR__ . '/..' . '/sebastian/diff/src/Exception/InvalidArgumentException.php',
+        'SebastianBergmann\\Diff\\Line' => __DIR__ . '/..' . '/sebastian/diff/src/Line.php',
+        'SebastianBergmann\\Diff\\LongestCommonSubsequenceCalculator' => __DIR__ . '/..' . '/sebastian/diff/src/LongestCommonSubsequenceCalculator.php',
+        'SebastianBergmann\\Diff\\MemoryEfficientLongestCommonSubsequenceCalculator' => __DIR__ . '/..' . '/sebastian/diff/src/MemoryEfficientLongestCommonSubsequenceCalculator.php',
+        'SebastianBergmann\\Diff\\Output\\AbstractChunkOutputBuilder' => __DIR__ . '/..' . '/sebastian/diff/src/Output/AbstractChunkOutputBuilder.php',
+        'SebastianBergmann\\Diff\\Output\\DiffOnlyOutputBuilder' => __DIR__ . '/..' . '/sebastian/diff/src/Output/DiffOnlyOutputBuilder.php',
+        'SebastianBergmann\\Diff\\Output\\DiffOutputBuilderInterface' => __DIR__ . '/..' . '/sebastian/diff/src/Output/DiffOutputBuilderInterface.php',
+        'SebastianBergmann\\Diff\\Output\\StrictUnifiedDiffOutputBuilder' => __DIR__ . '/..' . '/sebastian/diff/src/Output/StrictUnifiedDiffOutputBuilder.php',
+        'SebastianBergmann\\Diff\\Output\\UnifiedDiffOutputBuilder' => __DIR__ . '/..' . '/sebastian/diff/src/Output/UnifiedDiffOutputBuilder.php',
+        'SebastianBergmann\\Diff\\Parser' => __DIR__ . '/..' . '/sebastian/diff/src/Parser.php',
+        'SebastianBergmann\\Diff\\TimeEfficientLongestCommonSubsequenceCalculator' => __DIR__ . '/..' . '/sebastian/diff/src/TimeEfficientLongestCommonSubsequenceCalculator.php',
+        'SebastianBergmann\\Environment\\Console' => __DIR__ . '/..' . '/sebastian/environment/src/Console.php',
+        'SebastianBergmann\\Environment\\OperatingSystem' => __DIR__ . '/..' . '/sebastian/environment/src/OperatingSystem.php',
+        'SebastianBergmann\\Environment\\Runtime' => __DIR__ . '/..' . '/sebastian/environment/src/Runtime.php',
+        'SebastianBergmann\\Exporter\\Exporter' => __DIR__ . '/..' . '/sebastian/exporter/src/Exporter.php',
         'SebastianBergmann\\FileIterator\\Facade' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Facade.php',
         'SebastianBergmann\\FileIterator\\Factory' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Factory.php',
         'SebastianBergmann\\FileIterator\\Iterator' => __DIR__ . '/..' . '/phpunit/php-file-iterator/src/Iterator.php',
+        'SebastianBergmann\\GlobalState\\CodeExporter' => __DIR__ . '/..' . '/sebastian/global-state/src/CodeExporter.php',
+        'SebastianBergmann\\GlobalState\\Exception' => __DIR__ . '/..' . '/sebastian/global-state/src/exceptions/Exception.php',
+        'SebastianBergmann\\GlobalState\\ExcludeList' => __DIR__ . '/..' . '/sebastian/global-state/src/ExcludeList.php',
+        'SebastianBergmann\\GlobalState\\Restorer' => __DIR__ . '/..' . '/sebastian/global-state/src/Restorer.php',
+        'SebastianBergmann\\GlobalState\\RuntimeException' => __DIR__ . '/..' . '/sebastian/global-state/src/exceptions/RuntimeException.php',
+        'SebastianBergmann\\GlobalState\\Snapshot' => __DIR__ . '/..' . '/sebastian/global-state/src/Snapshot.php',
         'SebastianBergmann\\Invoker\\Exception' => __DIR__ . '/..' . '/phpunit/php-invoker/src/exceptions/Exception.php',
         'SebastianBergmann\\Invoker\\Invoker' => __DIR__ . '/..' . '/phpunit/php-invoker/src/Invoker.php',
         'SebastianBergmann\\Invoker\\ProcessControlExtensionNotLoadedException' => __DIR__ . '/..' . '/phpunit/php-invoker/src/exceptions/ProcessControlExtensionNotLoadedException.php',
         'SebastianBergmann\\Invoker\\TimeoutException' => __DIR__ . '/..' . '/phpunit/php-invoker/src/exceptions/TimeoutException.php',
+        'SebastianBergmann\\LinesOfCode\\Counter' => __DIR__ . '/..' . '/sebastian/lines-of-code/src/Counter.php',
+        'SebastianBergmann\\LinesOfCode\\Exception' => __DIR__ . '/..' . '/sebastian/lines-of-code/src/Exception/Exception.php',
+        'SebastianBergmann\\LinesOfCode\\IllogicalValuesException' => __DIR__ . '/..' . '/sebastian/lines-of-code/src/Exception/IllogicalValuesException.php',
+        'SebastianBergmann\\LinesOfCode\\LineCountingVisitor' => __DIR__ . '/..' . '/sebastian/lines-of-code/src/LineCountingVisitor.php',
+        'SebastianBergmann\\LinesOfCode\\LinesOfCode' => __DIR__ . '/..' . '/sebastian/lines-of-code/src/LinesOfCode.php',
+        'SebastianBergmann\\LinesOfCode\\NegativeValueException' => __DIR__ . '/..' . '/sebastian/lines-of-code/src/Exception/NegativeValueException.php',
+        'SebastianBergmann\\LinesOfCode\\RuntimeException' => __DIR__ . '/..' . '/sebastian/lines-of-code/src/Exception/RuntimeException.php',
+        'SebastianBergmann\\ObjectEnumerator\\Enumerator' => __DIR__ . '/..' . '/sebastian/object-enumerator/src/Enumerator.php',
+        'SebastianBergmann\\ObjectEnumerator\\Exception' => __DIR__ . '/..' . '/sebastian/object-enumerator/src/Exception.php',
+        'SebastianBergmann\\ObjectEnumerator\\InvalidArgumentException' => __DIR__ . '/..' . '/sebastian/object-enumerator/src/InvalidArgumentException.php',
+        'SebastianBergmann\\ObjectReflector\\Exception' => __DIR__ . '/..' . '/sebastian/object-reflector/src/Exception.php',
+        'SebastianBergmann\\ObjectReflector\\InvalidArgumentException' => __DIR__ . '/..' . '/sebastian/object-reflector/src/InvalidArgumentException.php',
+        'SebastianBergmann\\ObjectReflector\\ObjectReflector' => __DIR__ . '/..' . '/sebastian/object-reflector/src/ObjectReflector.php',
+        'SebastianBergmann\\RecursionContext\\Context' => __DIR__ . '/..' . '/sebastian/recursion-context/src/Context.php',
+        'SebastianBergmann\\RecursionContext\\Exception' => __DIR__ . '/..' . '/sebastian/recursion-context/src/Exception.php',
+        'SebastianBergmann\\RecursionContext\\InvalidArgumentException' => __DIR__ . '/..' . '/sebastian/recursion-context/src/InvalidArgumentException.php',
+        'SebastianBergmann\\ResourceOperations\\ResourceOperations' => __DIR__ . '/..' . '/sebastian/resource-operations/src/ResourceOperations.php',
         'SebastianBergmann\\Template\\Exception' => __DIR__ . '/..' . '/phpunit/php-text-template/src/exceptions/Exception.php',
         'SebastianBergmann\\Template\\InvalidArgumentException' => __DIR__ . '/..' . '/phpunit/php-text-template/src/exceptions/InvalidArgumentException.php',
         'SebastianBergmann\\Template\\RuntimeException' => __DIR__ . '/..' . '/phpunit/php-text-template/src/exceptions/RuntimeException.php',
@@ -699,75 +741,45 @@ class ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02
         'SebastianBergmann\\Timer\\ResourceUsageFormatter' => __DIR__ . '/..' . '/phpunit/php-timer/src/ResourceUsageFormatter.php',
         'SebastianBergmann\\Timer\\TimeSinceStartOfRequestNotAvailableException' => __DIR__ . '/..' . '/phpunit/php-timer/src/exceptions/TimeSinceStartOfRequestNotAvailableException.php',
         'SebastianBergmann\\Timer\\Timer' => __DIR__ . '/..' . '/phpunit/php-timer/src/Timer.php',
-        'Server_Command' => __DIR__ . '/..' . '/wp-cli/server-command/src/Server_Command.php',
-        'Shell_Command' => __DIR__ . '/..' . '/wp-cli/shell-command/src/Shell_Command.php',
-        'Sidebar_Command' => __DIR__ . '/..' . '/wp-cli/widget-command/src/Sidebar_Command.php',
-        'Signup_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Signup_Command.php',
-        'Site_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Site_Command.php',
-        'Site_Meta_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Site_Meta_Command.php',
-        'Site_Option_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Site_Option_Command.php',
-        'Site_Switch_Language_Command' => __DIR__ . '/..' . '/wp-cli/language-command/src/Site_Switch_Language_Command.php',
-        'Super_Admin_Command' => __DIR__ . '/..' . '/wp-cli/super-admin-command/src/Super_Admin_Command.php',
-        'Taxonomy_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Taxonomy_Command.php',
-        'Term_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Term_Command.php',
-        'Term_Meta_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/Term_Meta_Command.php',
-        'Theme_AutoUpdates_Command' => __DIR__ . '/..' . '/wp-cli/extension-command/src/Theme_AutoUpdates_Command.php',
-        'Theme_Command' => __DIR__ . '/..' . '/wp-cli/extension-command/src/Theme_Command.php',
-        'Theme_Language_Command' => __DIR__ . '/..' . '/wp-cli/language-command/src/Theme_Language_Command.php',
-        'Theme_Mod_Command' => __DIR__ . '/..' . '/wp-cli/extension-command/src/Theme_Mod_Command.php',
-        'Transient_Command' => __DIR__ . '/..' . '/wp-cli/cache-command/src/Transient_Command.php',
-        'User_Application_Password_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/User_Application_Password_Command.php',
-        'User_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/User_Command.php',
-        'User_Meta_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/User_Meta_Command.php',
-        'User_Session_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/User_Session_Command.php',
-        'User_Term_Command' => __DIR__ . '/..' . '/wp-cli/entity-command/src/User_Term_Command.php',
-        'WP_CLI' => __DIR__ . '/..' . '/wp-cli/wp-cli/php/class-wp-cli.php',
-        'WP_CLI\\CommandWithDBObject' => __DIR__ . '/..' . '/wp-cli/entity-command/src/WP_CLI/CommandWithDBObject.php',
-        'WP_CLI\\CommandWithMeta' => __DIR__ . '/..' . '/wp-cli/entity-command/src/WP_CLI/CommandWithMeta.php',
-        'WP_CLI\\CommandWithTerms' => __DIR__ . '/..' . '/wp-cli/entity-command/src/WP_CLI/CommandWithTerms.php',
-        'WP_CLI\\CommandWithTranslation' => __DIR__ . '/..' . '/wp-cli/language-command/src/WP_CLI/CommandWithTranslation.php',
-        'WP_CLI\\CommandWithUpgrade' => __DIR__ . '/..' . '/wp-cli/extension-command/src/WP_CLI/CommandWithUpgrade.php',
-        'WP_CLI\\Core\\CoreUpgrader' => __DIR__ . '/..' . '/wp-cli/core-command/src/WP_CLI/Core/CoreUpgrader.php',
-        'WP_CLI\\Core\\NonDestructiveCoreUpgrader' => __DIR__ . '/..' . '/wp-cli/core-command/src/WP_CLI/Core/NonDestructiveCoreUpgrader.php',
-        'WP_CLI\\DestructivePluginUpgrader' => __DIR__ . '/..' . '/wp-cli/extension-command/src/WP_CLI/DestructivePluginUpgrader.php',
-        'WP_CLI\\DestructiveThemeUpgrader' => __DIR__ . '/..' . '/wp-cli/extension-command/src/WP_CLI/DestructiveThemeUpgrader.php',
-        'WP_CLI\\Fetchers\\Plugin' => __DIR__ . '/..' . '/wp-cli/extension-command/src/WP_CLI/Fetchers/Plugin.php',
-        'WP_CLI\\Fetchers\\Theme' => __DIR__ . '/..' . '/wp-cli/extension-command/src/WP_CLI/Fetchers/Theme.php',
-        'WP_CLI\\Fetchers\\UnfilteredPlugin' => __DIR__ . '/..' . '/wp-cli/checksum-command/src/WP_CLI/Fetchers/UnfilteredPlugin.php',
-        'WP_CLI\\JsonManipulator' => __DIR__ . '/..' . '/wp-cli/package-command/src/WP_CLI/JsonManipulator.php',
-        'WP_CLI\\LanguagePackUpgrader' => __DIR__ . '/..' . '/wp-cli/language-command/src/WP_CLI/LanguagePackUpgrader.php',
-        'WP_CLI\\Package\\Compat\\Min_Composer_1_10\\NullIOMethodsTrait' => __DIR__ . '/..' . '/wp-cli/package-command/src/WP_CLI/Package/Compat/Min_Composer_1_10/NullIOMethodsTrait.php',
-        'WP_CLI\\Package\\Compat\\Min_Composer_2_3\\NullIOMethodsTrait' => __DIR__ . '/..' . '/wp-cli/package-command/src/WP_CLI/Package/Compat/Min_Composer_2_3/NullIOMethodsTrait.php',
-        'WP_CLI\\Package\\Compat\\NullIOMethodsTrait' => __DIR__ . '/..' . '/wp-cli/package-command/src/WP_CLI/Package/Compat/NullIOMethodsTrait.php',
-        'WP_CLI\\Package\\ComposerIO' => __DIR__ . '/..' . '/wp-cli/package-command/src/WP_CLI/Package/ComposerIO.php',
-        'WP_CLI\\ParsePluginNameInput' => __DIR__ . '/..' . '/wp-cli/extension-command/src/WP_CLI/ParsePluginNameInput.php',
-        'WP_CLI\\ParseThemeNameInput' => __DIR__ . '/..' . '/wp-cli/extension-command/src/WP_CLI/ParseThemeNameInput.php',
-        'WP_CLI\\SearchReplacer' => __DIR__ . '/..' . '/wp-cli/search-replace-command/src/WP_CLI/SearchReplacer.php',
-        'WP_CLI\\Shell\\REPL' => __DIR__ . '/..' . '/wp-cli/shell-command/src/WP_CLI/Shell/REPL.php',
-        'WP_CLI_Command' => __DIR__ . '/..' . '/wp-cli/wp-cli/php/class-wp-cli-command.php',
-        'WP_Export_Base_Writer' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Export_Base_Writer.php',
-        'WP_Export_Exception' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Export_Exception.php',
-        'WP_Export_File_Writer' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Export_File_Writer.php',
-        'WP_Export_Oxymel' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Export_Oxymel.php',
-        'WP_Export_Query' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Export_Query.php',
-        'WP_Export_Returner' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Export_Returner.php',
-        'WP_Export_Split_Files_Writer' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Export_Split_Files_Writer.php',
-        'WP_Export_Term_Exception' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Export_Term_Exception.php',
-        'WP_Export_WXR_Formatter' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Export_WXR_Formatter.php',
-        'WP_Export_XML_Over_HTTP' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Export_XML_Over_HTTP.php',
-        'WP_Iterator_Exception' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Iterator_Exception.php',
-        'WP_Map_Iterator' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Map_Iterator.php',
-        'WP_Post_IDs_Iterator' => __DIR__ . '/..' . '/wp-cli/export-command/src/WP_Post_IDs_Iterator.php',
-        'Widget_Command' => __DIR__ . '/..' . '/wp-cli/widget-command/src/Widget_Command.php',
+        'SebastianBergmann\\Type\\CallableType' => __DIR__ . '/..' . '/sebastian/type/src/type/CallableType.php',
+        'SebastianBergmann\\Type\\Exception' => __DIR__ . '/..' . '/sebastian/type/src/exception/Exception.php',
+        'SebastianBergmann\\Type\\FalseType' => __DIR__ . '/..' . '/sebastian/type/src/type/FalseType.php',
+        'SebastianBergmann\\Type\\GenericObjectType' => __DIR__ . '/..' . '/sebastian/type/src/type/GenericObjectType.php',
+        'SebastianBergmann\\Type\\IntersectionType' => __DIR__ . '/..' . '/sebastian/type/src/type/IntersectionType.php',
+        'SebastianBergmann\\Type\\IterableType' => __DIR__ . '/..' . '/sebastian/type/src/type/IterableType.php',
+        'SebastianBergmann\\Type\\MixedType' => __DIR__ . '/..' . '/sebastian/type/src/type/MixedType.php',
+        'SebastianBergmann\\Type\\NeverType' => __DIR__ . '/..' . '/sebastian/type/src/type/NeverType.php',
+        'SebastianBergmann\\Type\\NullType' => __DIR__ . '/..' . '/sebastian/type/src/type/NullType.php',
+        'SebastianBergmann\\Type\\ObjectType' => __DIR__ . '/..' . '/sebastian/type/src/type/ObjectType.php',
+        'SebastianBergmann\\Type\\Parameter' => __DIR__ . '/..' . '/sebastian/type/src/Parameter.php',
+        'SebastianBergmann\\Type\\ReflectionMapper' => __DIR__ . '/..' . '/sebastian/type/src/ReflectionMapper.php',
+        'SebastianBergmann\\Type\\RuntimeException' => __DIR__ . '/..' . '/sebastian/type/src/exception/RuntimeException.php',
+        'SebastianBergmann\\Type\\SimpleType' => __DIR__ . '/..' . '/sebastian/type/src/type/SimpleType.php',
+        'SebastianBergmann\\Type\\StaticType' => __DIR__ . '/..' . '/sebastian/type/src/type/StaticType.php',
+        'SebastianBergmann\\Type\\TrueType' => __DIR__ . '/..' . '/sebastian/type/src/type/TrueType.php',
+        'SebastianBergmann\\Type\\Type' => __DIR__ . '/..' . '/sebastian/type/src/type/Type.php',
+        'SebastianBergmann\\Type\\TypeName' => __DIR__ . '/..' . '/sebastian/type/src/TypeName.php',
+        'SebastianBergmann\\Type\\UnionType' => __DIR__ . '/..' . '/sebastian/type/src/type/UnionType.php',
+        'SebastianBergmann\\Type\\UnknownType' => __DIR__ . '/..' . '/sebastian/type/src/type/UnknownType.php',
+        'SebastianBergmann\\Type\\VoidType' => __DIR__ . '/..' . '/sebastian/type/src/type/VoidType.php',
+        'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
+        'TheSeer\\Tokenizer\\Exception' => __DIR__ . '/..' . '/theseer/tokenizer/src/Exception.php',
+        'TheSeer\\Tokenizer\\NamespaceUri' => __DIR__ . '/..' . '/theseer/tokenizer/src/NamespaceUri.php',
+        'TheSeer\\Tokenizer\\NamespaceUriException' => __DIR__ . '/..' . '/theseer/tokenizer/src/NamespaceUriException.php',
+        'TheSeer\\Tokenizer\\Token' => __DIR__ . '/..' . '/theseer/tokenizer/src/Token.php',
+        'TheSeer\\Tokenizer\\TokenCollection' => __DIR__ . '/..' . '/theseer/tokenizer/src/TokenCollection.php',
+        'TheSeer\\Tokenizer\\TokenCollectionException' => __DIR__ . '/..' . '/theseer/tokenizer/src/TokenCollectionException.php',
+        'TheSeer\\Tokenizer\\Tokenizer' => __DIR__ . '/..' . '/theseer/tokenizer/src/Tokenizer.php',
+        'TheSeer\\Tokenizer\\XMLSerializer' => __DIR__ . '/..' . '/theseer/tokenizer/src/XMLSerializer.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit24aafee6f627b2c45ff3626fac8f8e02::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitdfea04b17febe8992e644534304b530a::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitdfea04b17febe8992e644534304b530a::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitdfea04b17febe8992e644534304b530a::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitdfea04b17febe8992e644534304b530a::$classMap;
 
         }, null, ClassLoader::class);
     }
