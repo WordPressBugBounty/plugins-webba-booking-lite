@@ -108,7 +108,7 @@ class WBK_Time_Math_Utils
     }
     public static function get_start_of_week()
     {
-        $start_of_week = get_option('start_of_week', 0);
+        $start_of_week = WBK_Date_Time_Utils::getStartOfWeek();
         if ($start_of_week == 0) {
             $start_of_week = 'sunday';
         } else {

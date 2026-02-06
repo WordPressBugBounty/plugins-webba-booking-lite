@@ -14,9 +14,7 @@ final class WBK_Options_Processor
 
     protected $options;
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public function add_option(
         $slug,
@@ -24,7 +22,7 @@ final class WBK_Options_Processor
         $title,
         $section,
         $args = [],
-        $subsection = 'basic',
+        $subsection = '',
         $page = 'wbk-options',
         $group = 'wbk_options'
     ) {
@@ -57,6 +55,26 @@ final class WBK_Options_Processor
                 $render_callback = 'render_select_multiple';
                 $validation_callback = 'validate_select_multiple';
                 break;
+            case 'duration':
+                $render_callback = 'render_duration';
+                $validation_callback = 'validate_duration';
+                break;
+            case 'date_multiple':
+                $render_callback = 'render_date_multiple';
+                $validation_callback = 'validate_date_multiple';
+                break;
+            case 'business_hours':
+                $render_callback = 'render_business_hours';
+                $validation_callback = 'validate_business_hours';
+                break;
+            case 'notice':
+                $render_callback = 'render_notice';
+                $validation_callback = 'validate_notice';
+                break;
+            case 'password':
+                $render_callback = 'render_password';
+                $validation_callback = 'validate_password';
+                break;
             case 'this_domain_url':
                 $render_callback = 'render_text';
                 $validation_callback = 'validate_this_domain_url';
@@ -65,6 +83,11 @@ final class WBK_Options_Processor
                 $render_callback = 'render_zoom_auth';
                 $validation_callback = 'validate_zoom_auth';
                 break;
+            case 'google_connect':
+                $render_callback = 'render_google_connect';
+                $validation_callback = 'validate_google_connect';
+                break;
+
             default:
                 $render_callback = 'render_text';
                 $validation_callback = 'validate_text';
@@ -85,7 +108,11 @@ final class WBK_Options_Processor
         $args = array_merge($default_args, $args);
 
         // update default values
-        if (!empty($args['default']) && get_option($slug) === false && $args['default'] !== false) {
+        if (
+            !empty($args['default']) &&
+            get_option($slug) === false &&
+            $args['default'] !== false
+        ) {
             update_option($slug, $args['default']);
         }
 
@@ -98,7 +125,6 @@ final class WBK_Options_Processor
             $args
         );
         register_setting($group, $slug, [$this, $validation_callback]);
-
     }
     public function validate_text($input)
     {
@@ -138,7 +164,23 @@ final class WBK_Options_Processor
     {
         return $input;
     }
+    public function validate_duration($input)
+    {
+        return $input;
+    }
+    public function validate_date_multiple($input)
+    {
+        return $input;
+    }
+    public function validate_business_hours($input)
+    {
+        return $input;
+    }
     public function validate_zoom_auth($input)
+    {
+        return $input;
+    }
+    public function validate_google_connect($input)
     {
         return $input;
     }
@@ -152,6 +194,14 @@ final class WBK_Options_Processor
             return $input;
         }
         return '';
+    }
+    public function validate_notice($input)
+    {
+        return $input;
+    }
+    public function validate_password($input)
+    {
+        return $input;
     }
     public function render_text($args)
     {
@@ -178,17 +228,39 @@ final class WBK_Options_Processor
     {
         WBK_Renderer::load_template('options/select_multiple_field', $args);
     }
+    public function render_duration($args)
+    {
+        WBK_Renderer::load_template('options/duration_field', $args);
+    }
+    public function render_date_multiple($args)
+    {
+        WBK_Renderer::load_template('options/date_multiple_field', $args);
+    }
+    public function render_business_hours($args)
+    {
+        WBK_Renderer::load_template('options/business_hours_field', $args);
+    }
     public function render_zoom_auth($args)
     {
         WBK_Renderer::load_template('options/zoom_auth', $args);
+    }
+    public function render_google_connect($args)
+    {
+        WBK_Renderer::load_template('options/google_connect', $args);
     }
     public function render_editor($args)
     {
         WBK_Renderer::load_template('options/editor_field', $args);
     }
-    public function wbk_settings_section_callback($arg)
+    public function render_notice($args)
     {
+        WBK_Renderer::load_template('options/notice_field', $args);
     }
+    public function render_password($args)
+    {
+        WBK_Renderer::load_template('options/password_field', $args);
+    }
+    public function wbk_settings_section_callback($arg) {}
 
     /**
      * returns instance of object

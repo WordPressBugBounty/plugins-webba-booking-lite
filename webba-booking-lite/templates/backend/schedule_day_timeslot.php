@@ -114,7 +114,7 @@ if ($timeslot->get_status() != 0) {
 
             $time_range =
                 wp_date(
-                    get_option('time_format'),
+                    WBK_Date_Time_Utils::get_time_format(),
                     $booking->get_start(),
                     new DateTimeZone(date_default_timezone_get())
                 ) . '   ';
@@ -174,9 +174,9 @@ if ($timeslot->get_status() != 0) {
                 ) .
                 '</div>
                                     <div class="popover-time-wb">' .
-                date(get_option('time_format'), $timeslot->start) .
+                date(WBK_Date_Time_Utils::get_time_format(), $timeslot->start) .
                 '-' .
-                date(get_option('time_format'), $timeslot->end) .
+                date(WBK_Date_Time_Utils::get_time_format(), $timeslot->end) .
                 '</div>
                                     <div class="popover-time-wb">' .
                 $booking->get('description') .

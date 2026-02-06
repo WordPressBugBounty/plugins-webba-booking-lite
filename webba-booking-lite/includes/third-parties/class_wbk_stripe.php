@@ -1,5 +1,6 @@
 <?php
 
+use WebbaBooking\Utilities\WBK_Options_Utils;
 if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -8,6 +9,8 @@ class WBK_Stripe {
     protected $api_key;
 
     protected $api_sectet;
+
+    protected $test_mode;
 
     public $tax;
 
@@ -183,11 +186,99 @@ class WBK_Stripe {
         }
     }
 
-    public function create_payment_intent( $booking_ids, $payment_details, $payment_method_id = null ) {
+    public function create_payment_intent(
+        string $payment_method,
+        string $user_email,
+        array $payment_details,
+        $payment_method_id = null
+    ) {
         return [
             'success' => false,
             'error'   => __( 'Payment method not supported', 'webba-booking-lite' ),
         ];
+    }
+
+    /**
+     * Update payment intent
+     *
+     * @param string $intent_id
+     * @param array $params
+     * @return void
+     */
+    public function update_payment_intent( string $intent_id, array $params ) {
+        try {
+            \Stripe\Stripe::setAppInfo(
+                'WordPress Webba Booking plugin',
+                '6.2',
+                'https://webba-booking.com/',
+                'TECH-000370'
+            );
+            \Stripe\Stripe::setApiVersion( '2022-08-01' );
+            \Stripe\Stripe::setApiKey( $this->api_sectet );
+            if ( $this->test_mode === true && $this->get_stripe_key_mode() !== 'test' ) {
+                return [
+                    'success' => false,
+                    'error'   => __( 'Invalid Stripe test keys', 'webba-booking-lite' ),
+                ];
+            } else {
+                if ( $this->test_mode === false && $this->get_stripe_key_mode() !== 'live' ) {
+                    return [
+                        'success' => false,
+                        'error'   => __( 'Invalid Stripe live keys', 'webba-booking-lite' ),
+                    ];
+                }
+            }
+            $payment_intent = \Stripe\PaymentIntent::update( $intent_id, $params );
+            if ( $payment_intent ) {
+                return [
+                    'success' => true,
+                    'data'    => $payment_intent,
+                ];
+            }
+            return [
+                'success' => false,
+                'error'   => __( 'Payment intent not found', 'webba-booking-lite' ),
+            ];
+        } catch ( Exception $e ) {
+            return [
+                'success' => false,
+                'error'   => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Get payment intent
+     * @param string $intent_id
+     */
+    public function get_payment_intent( string $intent_id ) {
+        try {
+            \Stripe\Stripe::setAppInfo(
+                'WordPress Webba Booking plugin',
+                '6.2',
+                'https://webba-booking.com/',
+                'TECH-000370'
+            );
+            \Stripe\Stripe::setApiVersion( '2022-08-01' );
+            \Stripe\Stripe::setApiKey( $this->api_sectet );
+            if ( $this->test_mode === true && $this->get_stripe_key_mode() !== 'test' ) {
+                return [
+                    'success' => false,
+                    'error'   => __( 'Invalid Stripe test keys', 'webba-booking-lite' ),
+                ];
+            } else {
+                if ( $this->test_mode === false && $this->get_stripe_key_mode() !== 'live' ) {
+                    return [
+                        'success' => false,
+                        'error'   => __( 'Invalid Stripe live keys', 'webba-booking-lite' ),
+                    ];
+                }
+            }
+            $intent = Stripe\PaymentIntent::retrieve( $intent_id, [] );
+            return $intent;
+        } catch ( Exception $e ) {
+            return false;
+        }
     }
 
     public function charge(
@@ -218,6 +309,20 @@ class WBK_Stripe {
             return $input .= WBK_Renderer::load_template( 'frontend/stripe_init', [$booking_ids, $button_class], false );
         }
         return $input;
+    }
+
+    /**
+     * Get the Stripe key mode (test or live)
+     *
+     * @return string 'test', 'live' or 'invalid'
+     */
+    public function get_stripe_key_mode() : string {
+        if ( strpos( $this->api_sectet, 'sk_test_' ) === 0 ) {
+            return 'test';
+        } elseif ( strpos( $this->api_sectet, 'sk_live_' ) === 0 ) {
+            return 'live';
+        }
+        return 'invalid';
     }
 
 }

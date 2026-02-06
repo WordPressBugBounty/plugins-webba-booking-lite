@@ -144,7 +144,6 @@ class WBK_Ical
         } else {
             $path = get_temp_dir();
             $filename =
-                $path .
                 'calendar_' .
                 $file_prefix .
                 implode('_', array_values($booking_ids)) .
@@ -158,6 +157,6 @@ class WBK_Ical
         if ($downloadable) {
             return $ical_url . '/' . basename($filename);
         }
-        return $filename;
+        return $path . $filename;
     }
 }

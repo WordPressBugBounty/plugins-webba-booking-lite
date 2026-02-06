@@ -296,6 +296,8 @@
         if (tab != null) {
             jQuery('[data-name="' + tab + '"]').trigger('click')
         }
+
+        wbk_track_sidebar_changes()
     })
 
     function wbk_help_popover() {
@@ -1776,6 +1778,12 @@
 
                     jQuery('.wbk_zoom_ask_to_save').addClass('wbk_hidden')
                     jQuery('.wbk_zoom_auth_link').removeClass('wbk_hidden')
+                    if(result.success === true){
+                        Toast.show('Changes were saved.', {
+                            type: 'success',
+                            duration: 2000
+                        })
+                    }
                 },
             })
         })
@@ -1812,6 +1820,107 @@
             }
         })
     }
+
+    /* START track and revert sidebar changes */
+
+    function wbk_track_sidebar_changes() {
+        let originalValues = {}
+        let originalEditorContents = {}
+        let sidebarOpened = false
+
+        // When sidebar opens, store original values
+        jQuery('[data-js="open-sidebar-wb"]').on('click', function() {
+            const sidebarName = jQuery(this).attr('data-name')
+            const $sidebar = jQuery('[data-js="sidebar-roll-wb"][data-name="' + sidebarName + '"]')
+            
+            // Wait for sidebar to be visible
+            setTimeout(function() {
+                originalValues = {}
+                originalEditorContents = {}
+                sidebarOpened = true
+                
+                // Store all input, select, and textarea values
+                $sidebar.find('input, select, textarea').each(function() {
+                    const $field = jQuery(this)
+                    const fieldId = $field.attr('id') || $field.attr('name')
+                    
+                    if (!fieldId) return
+                    
+                    if ($field.is(':checkbox') || $field.is(':radio')) {
+                        originalValues[fieldId] = $field.is(':checked')
+                    } else {
+                        originalValues[fieldId] = $field.val()
+                    }
+                    
+                    // Store visual editor content if it exists
+                    if (typeof tinymce !== 'undefined' && tinymce.get(fieldId)) {
+                        originalEditorContents[fieldId] = tinymce.get(fieldId).getContent()
+                    }
+                })
+            }, 100)
+        })
+
+        // When sidebar closes without saving, revert changes
+        jQuery('[data-js="close-button-wbkb"]').on('click', function() {
+            if (!sidebarOpened) return
+            
+            const $sidebar = jQuery(this).closest('[data-js="sidebar-roll-wb"]')
+            
+            // Revert all stored values
+            jQuery.each(originalValues, function(fieldId, originalValue) {
+                const $field = $sidebar.find('#' + fieldId + ', [name="' + fieldId + '"]')
+                
+                if ($field.is(':checkbox') || $field.is(':radio')) {
+                    $field.prop('checked', originalValue)
+                } else {
+                    $field.val(originalValue)
+                    
+                    // Update niceSelect if it exists
+                    if ($field.hasClass('wbk_option_select') && $field.next('.nice-select').length) {
+                        $field.niceSelect('update')
+                    }
+                    
+                    // Update Chosen if it exists
+                    if ($field.hasClass('wbk_option_multi_select') && $field.next('.chosen-container').length) {
+                        $field.trigger('chosen:updated')
+                    }
+                }
+                
+                // Revert visual editor content if it exists
+                if (originalEditorContents[fieldId]) {
+                    if (typeof tinymce !== 'undefined' && tinymce.get(fieldId)) {
+                        tinymce.get(fieldId).setContent(originalEditorContents[fieldId])
+                    }
+                    // Also update the textarea
+                    $field.val(originalEditorContents[fieldId])
+                }
+                
+                // Trigger change event for any dependent fields
+                $field.trigger('change')
+            })
+            
+            // Reset tracking
+            originalValues = {}
+            originalEditorContents = {}
+            sidebarOpened = false
+        })
+
+        // When save button is clicked, clear tracking (accept changes)
+        jQuery(document).on('click', '.wb-save-options', function() {
+            originalValues = {}
+            originalEditorContents = {}
+            sidebarOpened = false
+        })
+        
+        // Also handle form submit
+        jQuery(document).on('submit', '.wb-settings-fields-form', function() {
+            originalValues = {}
+            originalEditorContents = {}
+            sidebarOpened = false
+        })
+    }
+
+    /* END track and revert sidebar changes */
 })(jQuery)
 
 function wbk_change_button_status_options(elem, status) {

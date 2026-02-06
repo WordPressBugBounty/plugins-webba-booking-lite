@@ -9,7 +9,7 @@ class WBK_Google{
 	$calendar_id;
 
 	protected
-	$gg_calendar_id;
+	$ggid;
 
 	public function init( $calendar_id ){
 		return FALSE;

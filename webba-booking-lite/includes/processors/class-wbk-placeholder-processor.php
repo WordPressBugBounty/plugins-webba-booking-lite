@@ -1,4 +1,7 @@
 <?php
+
+use WebbaBooking\Utilities\WBK_Options_Utils;
+
 if (!defined('ABSPATH')) {
     exit();
 }
@@ -12,10 +15,7 @@ class WBK_Placeholder_Processor
                 return $message;
             }
 
-            $tax = get_option('wbk_general_tax', '0');
-            if (trim($tax) == '') {
-                $tax = '0';
-            }
+            $tax = WBK_Options_Utils::get_tax();
             $payment_details = WBK_Price_Processor::get_payment_items(
                 [$bookings],
                 $tax,
@@ -29,7 +29,7 @@ class WBK_Placeholder_Processor
                 $payment_details
             );
         } elseif (is_array($bookings)) {
-            $price_format = get_option('wbk_payment_price_format', '$#price');
+            $price_format = WBK_Format_Utils::get_price_format();
             $total_amount = WBK_Price_Processor::get_total_tax_fees($bookings);
             $total_amount = str_replace(
                 '#price',
@@ -120,10 +120,7 @@ class WBK_Placeholder_Processor
             if (!$booking->is_loaded()) {
                 return $message;
             }
-            $tax = get_option('wbk_general_tax', '0');
-            if (trim($tax) == '') {
-                $tax = '0';
-            }
+            $tax = WBK_Options_Utils::get_tax();
             $payment_details = WBK_Price_Processor::get_payment_items(
                 $bookings,
                 $tax,
@@ -201,7 +198,7 @@ class WBK_Placeholder_Processor
                 $service->get_name(),
                 $form_label
             );
-            $price_format = get_option('wbk_payment_price_format', '$#price');
+            $price_format = WBK_Format_Utils::get_price_format();
             $price = str_replace(
                 '#price',
                 number_format(
@@ -530,9 +527,12 @@ class WBK_Placeholder_Processor
             return;
         }
         $current_category = $booking->get('service_category');
+        $current_timezone = date_default_timezone_get();
+        date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
         $timezone_to_use = WBK_Date_Time_Utils::convert_default_time_zone_to_utc(
             $booking->get_start()
         );
+        date_default_timezone_set($current_timezone);
 
         $correction = 0;
         if (WBK_Date_Time_Utils::is_correction_needed($booking->get_start())) {
@@ -580,7 +580,7 @@ class WBK_Placeholder_Processor
         $message = str_replace('#token', $booking->get('token'), $message);
 
         // processing links for payment, cancelation and google event addings
-        $payment_link_url = get_option('wbk_email_landing', '');
+        $payment_link_url = WBK_Options_Utils::get_email_landing_page_link();
         $payment_link_text = get_option('wbk_email_landing_text', '');
         $cancel_link_text = get_option('wbk_email_landing_text_cancel', '');
         $gg_add_link_text = get_option(
@@ -758,24 +758,23 @@ class WBK_Placeholder_Processor
         $created_on = $booking->get('created_on');
 
         $attachment = '';
-        if (get_option('wbk_allow_attachemnt', 'no') == 'yes') {
-            $attachment = $booking->get('attachment');
-            if ($attachment !== '') {
-                $attachment = json_decode($attachment);
-                if (is_array($attachment)) {
-                    $attachment = $attachment[0];
-                    $parts = explode('wp-content', $attachment);
-                    $attachment =
-                        rtrim(site_url(), '/') .
-                        '/wp-content/' .
-                        ltrim($parts[1], '/');
-                    $attachment =
-                        '<a rel="noopener" target="_blank" href="' .
-                        esc_url($attachment) .
-                        '">' .
-                        esc_html($attachment) .
-                        '</a>';
-                }
+        $attachment = $booking->get('attachment');
+        
+        if ($attachment !== '') {
+            $attachment = json_decode($attachment);
+            if (is_array($attachment)) {
+                $attachment = $attachment[0];
+                $parts = explode('wp-content', $attachment);
+                $attachment =
+                    rtrim(site_url(), '/') .
+                    '/wp-content/' .
+                    ltrim($parts[1], '/');
+                $attachment =
+                    '<a rel="noopener" target="_blank" href="' .
+                    esc_url($attachment) .
+                    '">' .
+                    esc_html($attachment) .
+                    '</a>';
             }
         }
 
@@ -873,6 +872,30 @@ class WBK_Placeholder_Processor
             ),
             $message
         );
+
+        $google_meet_link = $booking->get_google_meet_link();
+        if ($google_meet_link != '') {
+            $google_meet_link =
+                '<a target="_blank" target="_blank" href="' .
+                esc_url($google_meet_link) .
+                '">' .
+                trim(
+                    esc_html(
+                        get_option(
+                            'wbk_google_meet_link_text',
+                            'Click here to open your meeting in Google Meet'
+                        )
+                    )
+                ) .
+                '</a>';
+        }
+
+        $message = str_replace(
+            '#google_meet_link',
+            $google_meet_link,
+            $message
+        );
+
         $message = str_replace(
             '#appointment_time',
             wp_date($time_format, $booking_start, $timezone_to_use),
@@ -937,12 +960,12 @@ class WBK_Placeholder_Processor
             get_option('wbk_email_current_invoice_number', '1'),
             $message
         );
-        $price_format = get_option('wbk_payment_price_format', '$#price');
+        $price_format = WBK_Format_Utils::get_price_format();
 
         $one_slot_price = str_replace(
             '#price',
             number_format(
-                $service->get_price(),
+                (float)$service->get_price(),
                 get_option('wbk_price_fractional', '2'),
                 get_option('wbk_price_separator', '.'),
                 ''
@@ -968,7 +991,7 @@ class WBK_Placeholder_Processor
 
         $user_dashboard_page_link = sprintf(
             '<a href="%s" target="_blank">%s</a>',
-            esc_url(get_option('wbk_user_dashboard_page_link', '')),
+            esc_url(WBK_Options_Utils::get_dashboard_page_link()),
             esc_html(get_option('wbk_user_dashboard_link_label', ''))
         );
         $message = str_replace(

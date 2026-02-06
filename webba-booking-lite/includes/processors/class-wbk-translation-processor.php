@@ -35,7 +35,7 @@ class WBK_Translation_Processor
             );
         }
 
-        $template_ids = WBK_Model_Utils::get_email_templates();
+        $template_ids = WBK_Model_Utils::get_all_email_templates();
         foreach ($template_ids as $id => $name) {
             $template = new WBK_Email_Template($id);
             if (!$template->is_loaded()) {
@@ -56,12 +56,30 @@ class WBK_Translation_Processor
         }
 
         $form_ids = WBK_Model_Utils::get_forms();
+        $forms = [];
         foreach ($form_ids as $id => $name) {
             $form = new WBK_Form($id);
             if (!$form->is_loaded()) {
                 continue;
             }
-            $fields = $form->get_fields();
+
+            $forms[$id]['fields'] = $form->get_fields();
+        }
+
+        $forms['default'][
+            'fields'
+        ] = WBK_Form_Builder_Utils::get_default_fields();
+
+        foreach ($forms as $id => $props) {
+            if (
+                !isset($props['fields']) ||
+                !is_array($props['fields']) ||
+                count($props['fields']) === 0
+            ) {
+                continue;
+            }
+
+            $fields = $props['fields'];
             foreach ($fields as $field) {
                 if (isset($field['placeholder'])) {
                     $this->register_strings(
@@ -71,11 +89,7 @@ class WBK_Translation_Processor
                 }
                 if (isset($field['defaultValue'])) {
                     $this->register_strings(
-                        'webba_form_field_' .
-                            $id .
-                            '_' .
-                            $field['slug'] .
-                            '_default',
+                        '   ' . $id . '_' . $field['slug'] . '_default',
                         $field['defaultValue']
                     );
                 }

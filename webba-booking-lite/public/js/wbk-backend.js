@@ -85,21 +85,17 @@ jQuery(function ($) {
                             times_htmls +=
                                 '<div class="field-block-wb"><label class="label-wb"><b>Booking status</b></label><div class="custom-select-wb-holder"><div class="custom-select-wb"><select class="schedule_tools_status_mass_add" >'
                             times_htmls +=
-                                '<option value="pending">Awaiting approval</option>'
+                                '<option value="pending">Pending</option>'
                             times_htmls +=
                                 '<option value="approved">Approved</option>'
                             times_htmls +=
-                                '<option value="paid">Paid (awaiting approval)</option>'
+                                '<option value="rejected">Rejected</option>'
                             times_htmls +=
-                                '<option value="paid_approved">Paid (approved)</option>'
+                                '<option value="cancelled">Cancelled</option>'
                             times_htmls +=
                                 '<option value="arrived">Arrived</option>'
                             times_htmls +=
-                                '<option value="woocommerce">Managed by WooCommerce</option>'
-                            times_htmls +=
-                                '<option value="added_by_admin_not_paid">Added by the administrator (not paid)</option>'
-                            times_htmls +=
-                                '<option value="added_by_admin_paid">Added by the administrator (paid)</option>'
+                                '<option value="noshow">No-Show</option>'
                             times_htmls += '</select></div></div></div>'
 
                             times_htmls +=

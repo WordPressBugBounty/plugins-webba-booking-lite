@@ -6,8 +6,8 @@
             "type": "string",
             "input_type": "text",
             "hidden": false,
-            "title": "Name",
-            "tab": "",
+            "title": "Calendar name (internal use only)",
+            "tab": "general",
             "misc": {
                 "tooltip": "Enter a name to identify the calendar."
             },
@@ -16,17 +16,29 @@
             "default_value": "",
             "editable": true
         },
+        "calendar_easy_auth": {
+            "type": "string",
+            "input_type": "checkbox",
+            "hidden": true,
+            "title": "Automatic authorization (recommended)",
+            "tab": "advanced",
+            "misc": {
+                "yes": "Enabled",
+                "tooltip": "Enable easy authorization for this calendar (recommended)"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "yes",
+            "editable": true
+        },
         "calendar_user_id": {
             "type": "string",
             "input_type": "select",
             "hidden": false,
             "title": "User",
-            "tab": "",
+            "tab": "advanced",
             "misc": {
                 "tooltip": "",
-                "null_value": [
-                    "select option"
-                ],
                 "options": "backend"
             },
             "required": false,
@@ -36,14 +48,35 @@
         },
         "calendar_ggid": {
             "type": "string",
-            "input_type": "text",
+            "input_type": "select",
             "hidden": false,
-            "title": "Calendar ID",
-            "tab": "",
+            "title": "Calendar in Google Account",
+            "tab": "general",
             "misc": {
-                "tooltip": "Enter your Calendar ID."
+                "tooltip": "Select calendar from the auhtorized account.",
+                "enable": {
+                    "endpoint": "get-gg-auth-data",
+                    "data": {
+                        "calendar_id": "id"
+                    },
+                    "conditions": [
+                        {
+                            "operator": "=",
+                            "value": true,
+                            "field": "isAuthenticated"
+                        }
+                    ]
+                },
+                "hide": [
+                    [
+                        "id",
+                        ">",
+                        "0"
+                    ]
+                ],
+                "options": "backend"
             },
-            "required": true,
+            "required": false,
             "dependency": [],
             "default_value": "",
             "editable": true
@@ -53,14 +86,16 @@
             "input_type": "select",
             "hidden": false,
             "title": "Mode",
-            "tab": "",
+            "tab": "general",
             "misc": {
                 "tooltip": "Choose the calendar connection mode",
                 "options": {
                     "One-way": "One-way (export)",
                     "One-way-import": "One-way (import)",
                     "Two-ways": "Two-ways"
-                }
+                },
+                "default_value": "One-way",
+                "description": "<strong>One-way (import):</strong> This mode will import all unavailable times from your Google Calendar to Webba Calendar. No meeting data is imported, only the time slots.<br><br>\n                    <strong>One-way (export):</strong> This mode will automatically add Webba bookings to your Google Calendar, but will not check availability of your Google calendar (risk of double-booking).<br><br>\n                    <strong>Two-ways (recommended):</strong> This mode will both import unavailable times from Google Calendar to Webba Calendar and add Webba bookings to your Google Calendar.<br><br>"
             },
             "required": true,
             "dependency": [],
@@ -76,7 +111,7 @@
             "misc": [],
             "required": false,
             "dependency": [],
-            "default_value": "",
+            "default_value": "general",
             "editable": false
         }
     }

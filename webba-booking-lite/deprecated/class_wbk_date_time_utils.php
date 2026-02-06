@@ -5,10 +5,63 @@ if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
 class WBK_Date_Time_Utils {
-    // get date format option
-    public static function get_date_format() {
-        $date_format = trim( get_option( 'wbk_date_format' ) );
-        if ( empty( $date_format ) ) {
+    /**
+     * Get list of supported date formats
+     *
+     * @return array
+     */
+    public static function get_supported_date_formats() : array {
+        return [
+            'inherit' => __( 'Inherit from WP Settings', 'webba-booking-lite' ),
+            'F j, Y'  => __( 'Month Day, Year', 'webba-booking-lite' ),
+            'M d, Y'  => __( 'Month Day, Year (Short)', 'webba-booking-lite' ),
+            'm/d/Y'   => __( 'MM/DD/YYYY', 'webba-booking-lite' ),
+            'd/m/Y'   => __( 'DD/MM/YYYY', 'webba-booking-lite' ),
+            'd.m.Y'   => __( 'DD.MM.YYYY', 'webba-booking-lite' ),
+            'Y/m/d'   => __( 'YYYY/MM/DD', 'webba-booking-lite' ),
+            'y/m/d'   => __( 'YY/MM/DD', 'webba-booking-lite' ),
+            'y-m-d'   => __( 'YY-MM-DD', 'webba-booking-lite' ),
+            'Y-m-d'   => __( 'YYYY-MM-DD', 'webba-booking-lite' ),
+        ];
+    }
+
+    /**
+     * Get list of supported time formats
+     *
+     * @return array
+     */
+    public static function get_supported_time_formats() : array {
+        return [
+            'g:i a'   => __( '12-hour am/pm', 'webba-booking-lite' ),
+            'g:i A'   => __( '12-hour AM/PM', 'webba-booking-lite' ),
+            'H:i'     => __( '24-hour', 'webba-booking-lite' ),
+            'inherit' => __( 'Inherit from WP Settings', 'webba-booking-lite' ),
+        ];
+    }
+
+    /**
+     * Get list of supported step formats
+     *
+     * @return array
+     */
+    public static function get_supported_step_formats() : array {
+        return [
+            'duration' => __( 'duration of service', 'webba-booking-lite' ),
+            '15'       => __( '15 min', 'webba-booking-lite' ),
+            '30'       => __( '30 min', 'webba-booking-lite' ),
+            '60'       => __( '60 min', 'webba-booking-lite' ),
+            '90'       => __( '90 min', 'webba-booking-lite' ),
+        ];
+    }
+
+    /**
+     * Get the date format from the options
+     *
+     * @return string
+     */
+    public static function get_date_format() : string {
+        $date_format = trim( get_option( 'wbk_date_format_new' ) );
+        if ( empty( $date_format ) || $date_format === 'wordpress' || $date_format === 'inherit' ) {
             $date_format = trim( get_option( 'date_format' ) );
             if ( empty( $date_format ) ) {
                 $date_format = 'l, F j';
@@ -17,27 +70,45 @@ class WBK_Date_Time_Utils {
         return $date_format;
     }
 
-    // get start of week option
-    public static function getStartOfWeek() {
-        $start_of_week = get_option( 'wbk_start_of_week' );
-        if ( $start_of_week == 'wordpress' ) {
-            $start_of_week = get_option( 'start_of_week', 0 );
-            if ( $start_of_week == 0 ) {
-                $start_of_week = 'sunday';
-            } else {
-                $start_of_week = 'monday';
+    /**
+     * Get the start of week from the options
+     *
+     * @return string
+     */
+    public static function getStartOfWeek() : string {
+        $start_of_week = get_option( 'wbk_start_of_week_new' );
+        if ( $start_of_week != 0 && (empty( $start_of_week ) || $start_of_week === 'wordpress' || $start_of_week === 'inherit') ) {
+            $start_of_week = get_option( 'start_of_week' );
+            if ( empty( $start_of_week ) && $start_of_week != 0 ) {
+                $start_of_week = 1;
             }
         }
-        if ( $start_of_week !== 'sunday' && $start_of_week !== 'monday' ) {
-            $start_of_week = 'sunday';
+        if ( !in_array( $start_of_week, [0, 1, 6] ) ) {
+            $start_of_week = 1;
         }
-        return $start_of_week;
+        $week_days = [
+            0 => 'sunday',
+            1 => 'monday',
+            2 => 'tuesday',
+            3 => 'wednesday',
+            4 => 'thursday',
+            5 => 'friday',
+            6 => 'saturday',
+        ];
+        if ( isset( $week_days[$start_of_week] ) ) {
+            return $week_days[$start_of_week];
+        }
+        return $week_days[1];
     }
 
-    // get time format option
-    public static function get_time_format() {
-        $time_format = trim( get_option( 'wbk_time_format' ) );
-        if ( empty( $time_format ) ) {
+    /**
+     * Get the time format from the options
+     *
+     * @return string
+     */
+    public static function get_time_format() : string {
+        $time_format = trim( get_option( 'wbk_time_format_new' ) );
+        if ( empty( $time_format ) || $time_format === 'wordpress' || $time_format === 'inherit' ) {
             $time_format = trim( get_option( 'time_format' ) );
             if ( empty( $time_format ) ) {
                 $time_format = 'H:i';
@@ -46,8 +117,28 @@ class WBK_Date_Time_Utils {
         return $time_format;
     }
 
-    // get start of current week
-    public static function getStartOfCurrentWeek() {
+    /**
+     * Get the date format for the backend interfaces
+     *
+     * @return string
+     */
+    public static function get_date_format_backend() : string {
+        $date_format = trim( get_option( 'wbk_date_format_backend', 'm/d/y' ) );
+        if ( empty( $date_format ) || $date_format === 'wordpress' || $date_format === 'inherit' ) {
+            $date_format = trim( get_option( 'date_format' ) );
+            if ( empty( $date_format ) ) {
+                $date_format = 'm/d/y';
+            }
+        }
+        return $date_format;
+    }
+
+    /**
+     * Get the start of current week
+     *
+     * @return int
+     */
+    public static function getStartOfCurrentWeek() : int {
         $start_of_week = WBK_Date_Time_Utils::getStartOfWeek();
         if ( $start_of_week == 'sunday' ) {
             return strtotime( 'last sunday', strtotime( 'tomorrow' ) );
@@ -56,8 +147,13 @@ class WBK_Date_Time_Utils {
         }
     }
 
-    // get start of current week
-    public static function getStartOfWeekDay( $day ) {
+    /**
+     * Get the start of week day
+     *
+     * @param int $day
+     * @return int
+     */
+    public static function getStartOfWeekDay( int $day ) : int {
         $start_of_week = WBK_Date_Time_Utils::getStartOfWeek();
         if ( $start_of_week == 'sunday' ) {
             if ( date( 'N', $day ) == '7' ) {

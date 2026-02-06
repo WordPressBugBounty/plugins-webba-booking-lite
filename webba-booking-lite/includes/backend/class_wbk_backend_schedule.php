@@ -103,8 +103,9 @@ class WBK_Backend_Schedule
             $count = $wpdb->get_var(
                 $wpdb->prepare(
                     'SELECT COUNT(*) FROM ' .
-                    get_option('wbk_db_prefix', '') .
-                    'wbk_appointments where service_id = %d and time = %d and ' . WBK_Model_Utils::get_not_canclled_sql(),
+                        get_option('wbk_db_prefix', '') .
+                        'wbk_appointments where service_id = %d and time = %d and ' .
+                        WBK_Model_Utils::get_not_canclled_sql(),
                     $service_id,
                     $time
                 )
@@ -116,7 +117,12 @@ class WBK_Backend_Schedule
                 return;
             }
 
-            if (!array_key_exists($booking_status, WBK_Model_Utils::get_booking_status_list())) {
+            if (
+                !array_key_exists(
+                    $booking_status,
+                    WBK_Model_Utils::get_booking_status_list()
+                )
+            ) {
                 echo 'Status error';
                 date_default_timezone_set('UTC');
                 wp_die();
@@ -138,13 +144,11 @@ class WBK_Backend_Schedule
             $booking_factory = new WBK_Booking_Factory();
             $status = $booking_factory->build_from_array($bookin_data);
 
-
             if ($status[0] == true) {
                 $appointment_ids[] = $status[1];
                 $booking = new WBK_Booking($status[1]);
                 $booking->set('status', $booking_status);
                 $booking->save();
-
             }
         }
         $booking_factory = new WBK_Booking_Factory();
@@ -169,13 +173,7 @@ class WBK_Backend_Schedule
         global $wpdb;
         global $current_user;
         date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
-        $service_id = $_POST['service_id'];
-        if (!is_numeric($service_id)) {
-            echo '-1';
-            date_default_timezone_set('UTC');
-            wp_die();
-            return;
-        }
+
         $booking_id = $_POST['appointment_id'];
         if (!is_numeric($booking_id)) {
             echo '-1';
@@ -190,10 +188,13 @@ class WBK_Backend_Schedule
             wp_die();
             return;
         }
+        $service_id = $booking->get_service();
         $day = $booking->get_day();
         // check access
         if (!current_user_can('manage_options')) {
-            if (!WBK_Validator::check_access_to_service($service_id)) {
+            if (
+                !WBK_Validator::check_access_to_service($booking->get_service())
+            ) {
                 echo '-1';
                 date_default_timezone_set('UTC');
                 wp_die();
@@ -203,7 +204,7 @@ class WBK_Backend_Schedule
 
         $bf = new WBK_Booking_Factory();
         $bf->destroy($booking_id, 'administrator', false);
-
+        $service_id = $booking->get_service();
         date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
         $sp = new WBK_Schedule_Processor();
         $time_slots = $sp->get_time_slots_by_day($day, $service_id, [
@@ -1069,8 +1070,8 @@ class WBK_Backend_Schedule
                     $html_schedule = str_replace(
                         'class="timeslot_container"',
                         'class="timeslot_container" style="' .
-                        $background_color .
-                        '"',
+                            $background_color .
+                            '"',
                         $html_schedule
                     );
                     $time_slot->html = $html_schedule;
@@ -1130,8 +1131,8 @@ class WBK_Backend_Schedule
             $wpdb->query(
                 $wpdb->prepare(
                     'DELETE FROM ' .
-                    get_option('wbk_db_prefix', '') .
-                    'wbk_days_on_off WHERE day = %d and service_id = %d',
+                        get_option('wbk_db_prefix', '') .
+                        'wbk_days_on_off WHERE day = %d and service_id = %d',
                     $day,
                     $service_id
                 )
@@ -1212,8 +1213,8 @@ class WBK_Backend_Schedule
             $wpdb->query(
                 $wpdb->prepare(
                     'DELETE FROM ' .
-                    get_option('wbk_db_prefix', '') .
-                    'wbk_days_on_off WHERE day = %d and service_id = %d',
+                        get_option('wbk_db_prefix', '') .
+                        'wbk_days_on_off WHERE day = %d and service_id = %d',
                     $day,
                     $service_id
                 )
@@ -1292,8 +1293,8 @@ class WBK_Backend_Schedule
             $wpdb->query(
                 $wpdb->prepare(
                     'DELETE FROM ' .
-                    get_option('wbk_db_prefix', '') .
-                    'wbk_locked_time_slots WHERE time = %d and service_id = %d',
+                        get_option('wbk_db_prefix', '') .
+                        'wbk_locked_time_slots WHERE time = %d and service_id = %d',
                     $time,
                     $service_id
                 )
@@ -1371,8 +1372,8 @@ class WBK_Backend_Schedule
             $wpdb->query(
                 $wpdb->prepare(
                     'DELETE FROM ' .
-                    get_option('wbk_db_prefix', '') .
-                    'wbk_locked_time_slots WHERE time = %d and service_id = %d',
+                        get_option('wbk_db_prefix', '') .
+                        'wbk_locked_time_slots WHERE time = %d and service_id = %d',
                     $time,
                     $service_id
                 )

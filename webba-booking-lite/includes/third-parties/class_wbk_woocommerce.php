@@ -142,6 +142,7 @@ function wbk_display_booking_data_text_cart(  $item_data, $cart_item  ) {
     } else {
         $order_text = implode( ',', $payment_details['item_names'] );
     }
+    $order_text = ( $payment_details['item_names'] ? implode( ',', $payment_details['item_names'] ) : '' );
     $meta_key = wbk_get_translation_string( 'wbk_product_meta_key', 'wbk_product_meta_key', 'Appointments' );
     $item_data[] = [
         'key'     => $meta_key,
@@ -152,48 +153,6 @@ function wbk_display_booking_data_text_cart(  $item_data, $cart_item  ) {
     return $item_data;
 }
 
-/*
-function wbk_calculate_booking_product_price($cart_object)
-{
-    if (!WC()->session->__isset('reload_checkout')) {
-        foreach ($cart_object->cart_contents as $key => $value) {
-            if (!isset($value['wbk_appointment_ids'])) {
-                continue;
-            }
-            $prod_id = $value['data']->get_id();
-            if (
-                $value['wbk_appointment_ids'] === null &&
-                in_array(
-                    $value['product_id'],
-                    wbk_woocommerce_get_product_ids()
-                )
-            ) {
-                $cart_object->remove_cart_item($key);
-            }
-            $booking_ids = explode(',', $value['wbk_appointment_ids']);
-
-            foreach ($booking_ids as $booking_id) {
-                $booking = new WBK_Booking($booking_id);
-                if (!$booking->is_loaded()) {
-                    continue;
-                }
-
-                if ($prod_id == $booking->get_woo_product()) {
-                    $payment_details = WBK_Price_Processor::get_payment_items(
-                        $booking_ids,
-                        0
-                    );
-                    $price = $payment_details['total'];
-                    if ($price == 0) {
-                        $cart_object->remove_cart_item($key);
-                    }
-                    $value['data']->set_price($price);
-                }
-            }
-        }
-    }
-}
-*/
 function wbk_calculate_booking_product_price(  $cart_object  ) {
     if ( !WC()->session->__isset( 'reload_checkout' ) ) {
         foreach ( $cart_object->cart_contents as $key => $value ) {
@@ -219,8 +178,28 @@ function wbk_calculate_booking_product_price(  $cart_object  ) {
                     continue;
                 }
                 if ( $prod_id == $booking->get_woo_product() ) {
-                    $payment_details = WBK_Price_Processor::get_payment_items( $booking_ids, 0 );
-                    $price = $payment_details['total'];
+                    $booking_ids_list = explode( ',', $value['wbk_booking_ids_list'] );
+                    $all_payment_details = WBK_Price_Processor::get_payment_items( $booking_ids_list, 0 );
+                    $payment_items = $all_payment_details['items'] ?? [];
+                    $have_one_deposit_item = false;
+                    if ( count( $payment_items ) > 0 ) {
+                        foreach ( $payment_items as $payment_item ) {
+                            if ( $payment_item['have_deposit'] ) {
+                                $have_one_deposit_item = true;
+                                break;
+                            }
+                        }
+                    }
+                    $payment_details = WBK_Price_Processor::get_payment_items( [$booking_id], 0 );
+                    $price = $all_payment_details['woo_total'] / count( $booking_ids_list );
+                    // disabled because of no purpose in this case
+                    // if (
+                    //     $have_one_deposit_item &&
+                    //     isset($payment_details['items'][0]['have_deposit']) &&
+                    //     !$payment_details['items'][0]['have_deposit']
+                    // ) {
+                    // $price -= $payment_details['service_fees'];
+                    // }
                     if ( $price == 0 ) {
                         $cart_object->remove_cart_item( $key );
                     }
@@ -264,6 +243,9 @@ function wbk_add_booking_text_to_order_items(
 function wbk_woocommerce_payment_complete(  $order_id  ) {
     $default_value = ['complete_status', 'thankyou_message', 'complete_payment'];
     $complete_action = get_option( 'wbk_woo_complete_action', $default_value );
+    if ( empty( $complete_action ) || !is_array( $complete_action ) ) {
+        $complete_action = $default_value;
+    }
     if ( !in_array( 'complete_payment', $complete_action ) ) {
         return;
     }
@@ -273,7 +255,10 @@ function wbk_woocommerce_payment_complete(  $order_id  ) {
 function wbk_woocommerce_status_complete(  $order_id  ) {
     $default_value = ['complete_status', 'thankyou_message', 'complete_payment'];
     $complete_action = get_option( 'wbk_woo_complete_action', $default_value );
-    if ( !in_array( 'complete_status', $complete_action ) ) {
+    if ( empty( $complete_action ) || !is_array( $complete_action ) ) {
+        $complete_action = $default_value;
+    }
+    if ( !empty( $complete_action ) && is_array( $complete_action ) && !in_array( 'complete_status', $complete_action ) ) {
         return;
     }
     wbk_complete_payment( $order_id );
@@ -282,10 +267,34 @@ function wbk_woocommerce_status_complete(  $order_id  ) {
 function wbk_woocommerce_thankyou(  $order_id  ) {
     $default_value = ['complete_status', 'thankyou_message', 'complete_payment'];
     $complete_action = get_option( 'wbk_woo_complete_action', $default_value );
-    if ( !in_array( 'thankyou_message', $complete_action ) ) {
+    if ( empty( $complete_action ) || !is_array( $complete_action ) ) {
+        $complete_action = $default_value;
+    }
+    if ( !is_array( $complete_action ) || !in_array( 'thankyou_message', $complete_action ) ) {
         return;
     }
     wbk_complete_payment( $order_id );
+}
+
+add_filter(
+    'woocommerce_add_cart_item_data',
+    function ( $cart_item_data, $product_id, $variation_id ) {
+        // Force uniqueness every add — if this doesn't create a new line, something else is blocking it
+        $cart_item_data['__force_unique'] = wp_generate_uuid4();
+        return $cart_item_data;
+    },
+    100,
+    3
+);
+add_action( 'init', 'wbk_init_woocommerce_cart_session', 1 );
+function wbk_init_woocommerce_cart_session() {
+    if ( function_exists( 'wc_load_cart' ) && null === WC()->cart ) {
+        wc_load_cart();
+    }
+    if ( function_exists( 'WC' ) && WC()->session && !WC()->session->has_session() ) {
+        // Create customer session cookie if missing (first interaction)
+        WC()->session->set_customer_session_cookie( true );
+    }
 }
 
 class WBK_WooCommerce {
@@ -462,14 +471,21 @@ function wbk_complete_payment(  $order_id  ) {
             }
         }
     }
-    $update_status = get_option( 'wbk_woo_update_status', 'paid' );
-    if ( $update_status == 'disabled' ) {
-        $update_status = 'woocommerce';
-    }
+    $update_status = get_option( 'wbk_woo_update_status', 'approved' );
     if ( count( $booking_ids ) > 0 ) {
+        if ( $update_status != 'disabled' ) {
+            foreach ( $booking_ids as $booking_id ) {
+                $booking = new WBK_Booking($booking_id);
+                if ( !$booking->is_loaded() ) {
+                    continue;
+                }
+                $booking->set( 'status', $update_status );
+                $booking->save();
+            }
+        }
         $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );
         $bf = new WBK_Booking_Factory();
-        $bf->set_as_paid( $booking_ids, 'woocommerce', $payment_details['total'] );
+        $bf->set_as_paid( $booking_ids, 'woocommerce', $payment_details['to_pay_total'] );
         do_action( 'wbk_woocommerce_order_placed', $booking_ids, $order_id );
     }
 }

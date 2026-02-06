@@ -89,7 +89,7 @@ function wbk_wbkdata_dashboard_before_table($table_name)
             <?php
 }
 
-$price_format = get_option('wbk_payment_price_format', '$#price');
+$price_format = WBK_Format_Utils::get_price_format();
 $user = wp_get_current_user();
 
 
@@ -102,7 +102,7 @@ if (empty($last_24_hours_booking_ids)) {
     $sub_title = sprintf(esc_html__('You have %s new bookings in the past 24 hours', 'webba-booking-lite'), count($last_24_hours_booking_ids));
 }
 
-$date_format = get_option('wbk_date_format_backend', 'm/d/y');
+$date_format = WBK_Date_Time_Utils::get_date_format_backend();
 
 $date_format_js = str_replace('d', 'dd', $date_format);
 $date_format_js = str_replace('j', 'd', $date_format_js);

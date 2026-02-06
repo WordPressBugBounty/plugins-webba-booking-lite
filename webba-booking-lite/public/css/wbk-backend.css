@@ -1735,3 +1735,7 @@ li.search-field{
     line-height: 26px;
     margin-right: 9px;
 }
+
+.timeslot_controls a span{
+    color: #808080!important
+}

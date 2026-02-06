@@ -151,7 +151,7 @@ class Row_Object
      */
     public function get_id()
     {
-        return $this->fields['id'];
+        return isset($this->fields['id']) ? $this->fields['id'] : null;
     }
 
     /**

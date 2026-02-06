@@ -15,6 +15,8 @@ $allowed_params = [
     'PayerID',
     'paymentId',
     'paypal_status',
+    'payment_intent',
+    'redirect_status',
 ];
 
 $extra_data_attrs = '';

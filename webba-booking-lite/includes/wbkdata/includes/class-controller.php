@@ -1,6 +1,7 @@
 <?php
 namespace WbkData;
 
+use WBK_Date_Time_Utils;
 use WBK_Placeholder_Processor;
 use WBK_User_Utils;
 
@@ -84,17 +85,6 @@ class Controller
             if ($action_result[0] == true) {
                 unset($action_result[0]);
                 $model = trim(sanitize_text_field($request['model']));
-                if ($model === 'appointments') {
-                    $action_result['extra_data'][
-                        'dynamic_title'
-                    ] = WBK_Placeholder_Processor::process_placeholders(
-                        get_option(
-                            'wbk_backend_calendar_booking_text',
-                            '#customer_name [#service_name]'
-                        ),
-                        $action_result['id']
-                    );
-                }
 
                 if ($model === 'services') {
                     $action_result['data'][
@@ -122,6 +112,16 @@ class Controller
                         $fields['service_id'],
                         false
                     );
+
+                    $action_result['extra_data'][
+                        'dynamic_title'
+                    ] = WBK_Placeholder_Processor::process_placeholders(
+                        get_option(
+                            'wbk_backend_calendar_booking_text',
+                            '#customer_name [#service_name]'
+                        ),
+                        $action_result['id']
+                    );
                 } else {
                     $action_result['data']['can_edit'] = true;
                     $action_result['data']['can_delete'] = true;
@@ -132,6 +132,7 @@ class Controller
                         'status' => 'succces',
                         'id' => $action_result['id'],
                         'data' => $action_result['data'],
+                        'extra_data' => $action_result['extra_data'],
                     ],
                     200
                 );
@@ -151,6 +152,7 @@ class Controller
                         'status' => 'succces',
                         'id' => $id,
                         'data' => $action_result['data'],
+                        'extra_data' => $action_result['extra_data'],
                     ],
                     200
                 );
@@ -207,6 +209,7 @@ class Controller
         if (false === $result) {
             return $this->send_response(404, $data);
         }
+
         date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
         foreach ($result as $item) {
             if (trim(sanitize_text_field($params['model'])) === 'services') {
@@ -246,6 +249,36 @@ class Controller
                         $item->id
                     ),
                 ];
+                $item->formatted_date = wp_date(
+                    WBK_Date_Time_Utils::get_date_format_backend(),
+                    $item->day,
+                    new \DateTimeZone(get_option('wbk_timezone', 'UTC'))
+                );
+            }
+
+            if (
+                trim(sanitize_text_field($params['model'])) === 'gg_calendars'
+            ) {
+                if ($item->ggid == '' && $item->easy_auth == 'yes') {
+                    $calendars = \WBK_Google::get_google_calendars_in_account(
+                        $item->id
+                    );
+                    if (is_array($calendars) && count($calendars) > 0) {
+                        $selected_key = null;
+                        // Check if primary calendar exists
+                        if (isset($calendars['primary'])) {
+                            $selected_key = 'primary';
+                        } else {
+                            // If no primary calendar found, use the first element's key
+                            $selected_key = array_keys($calendars)[0];
+                        }
+
+                        $item->ggid = $selected_key;
+                        $google = new \WBK_Google_Calendar($item->id);
+                        $google->set('ggid', $item->ggid);
+                        $google->save();
+                    }
+                }
             }
         }
 
@@ -508,7 +541,7 @@ class Controller
                 $formated_row_values[] = [
                     'display' =>
                         date(
-                            get_option('wbk_date_format_backend', 'm/d/y'),
+                            WBK_Date_Time_Utils::get_date_format_backend(),
                             $row['time']
                         ) .
                         '<br />' .

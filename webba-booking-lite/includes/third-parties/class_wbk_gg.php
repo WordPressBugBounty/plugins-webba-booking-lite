@@ -1,5 +1,6 @@
 <?php
 
+use WebbaBooking\Utilities\WBK_Options_Utils;
 if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -18,10 +19,12 @@ class WBK_Google {
 
     protected $calendar_id;
 
-    protected $gg_calendar_id;
+    protected $ggid;
+
+    protected $scopes;
 
     public function init( $calendar_id ) {
-        return FALSE;
+        return false;
     }
 
     public function get_auth_url() {
@@ -33,7 +36,7 @@ class WBK_Google {
     // 1 - authorization success
     // 2 - authorization failed
     public function connect() {
-        return array(2, 'not connected, premium feature not available');
+        return [2, 'not connected, premium feature not available'];
     }
 
     public function render_calendar_block() {
@@ -73,9 +76,12 @@ class WBK_Google {
         $end,
         $time_zone,
         $calendar_id = '',
-        $use_current_time_zone = false
+        $use_current_time_zone = false,
+        $google_meet_enabled = null,
+        $service_email = '',
+        $booking_email = ''
     ) {
-        return FALSE;
+        return false;
     }
 
     public function update_event(
@@ -86,25 +92,29 @@ class WBK_Google {
         $end = null,
         $time_zone = null
     ) {
-        return FALSE;
+        return false;
     }
 
     public function delete_event( $event_id ) {
-        return FALSE;
+        return false;
     }
 
     public function init_calendar_by_authcode( $code ) {
-        return FALSE;
+        return false;
     }
 
     public function getEventsTimeRanges( $start, $end ) {
-        return FALSE;
+        return false;
+    }
+
+    public function get_all_calendars() {
+        return false;
     }
 
     public static function add_booking_to_gg_calendar( $booking_id ) {
     }
 
-    static function set_google_events_data( $booking_id, $event_data ) {
+    static function set_google_events_data( $booking_id, $event_data, $meet_link = null ) {
     }
 
     static function delete_booking_data_from_gg_calendar( $booking_id, $by_time = true ) {
@@ -114,7 +124,11 @@ class WBK_Google {
     }
 
     static function add_booking_to_customer_calendar( $booking_ids, $code ) {
-        return FALSE;
+        return false;
+    }
+
+    public static function get_google_calendars_in_account( $calendar_id ) {
+        return false;
     }
 
 }

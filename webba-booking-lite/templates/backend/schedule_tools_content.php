@@ -2,6 +2,18 @@
 if (!defined('ABSPATH')) {
     exit();
 }
+
+if (!WBK_Feature_Gate::have_required_plan('standard', 'only_old_users')) {
+    echo '<div class="wbk-schedule-row">';
+    WBK_Renderer::load_template(
+        'backend/plan_requirement',
+        ['standard'],
+        true
+    );
+    echo '</div>';
+    return;
+}
+
 $time_format = WBK_Date_Time_Utils::get_time_format();
 date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
 $html_time_options = '';

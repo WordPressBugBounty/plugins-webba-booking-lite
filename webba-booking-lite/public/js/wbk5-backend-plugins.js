@@ -61853,3 +61853,178 @@ Docs & License: https://fullcalendar.io
     )
 })
 //# sourceMappingURL=chart.umd.js.map
+
+
+/**
+ * Simple Toast Notification Plugin
+ * Usage:
+ *   window.Toast.show('Message here', {type: 'success', duration: 3000});
+ *   Types: info (default), success, error, warning
+ */
+;(function (global) {
+    // Inject styles for toast notifications
+    function injectToastStyles() {
+        if (document.getElementById('wbk-toast-styles')) return
+        var style = document.createElement('style')
+        style.type = 'text/css'
+        style.id = 'wbk-toast-styles'
+        style.innerHTML = `
+#wbk-toast-container {
+    position: fixed;
+    z-index: 2147483647;
+    right: 24px;
+    top: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    pointer-events: none;
+}
+.wbk-toast {
+    min-width: 220px;
+    max-width: 320px;
+    box-sizing: border-box;
+    background: #323232;
+    color: #fff;
+    font-family: inherit;
+    font-size: 15px;
+    padding: 14px 20px;
+    border-radius: 7px;
+    box-shadow: 0 2px 12px rgba(20,20,20,0.12), 0 1.5px 7px rgba(0,0,0,0.08);
+    margin: 0;
+    opacity: 0;
+    transform: translateY(-20px) scale(0.98);
+    transition: opacity .23s, transform .23s;
+    display: flex;
+    align-items: center;
+    pointer-events: auto;
+}
+.wbk-toast.wbk-toast--show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.wbk-toast--success {
+    background: #2ecc40;
+    color: #fff;
+}
+.wbk-toast--error {
+    background: #f44336;
+    color: #fff;
+}
+.wbk-toast--warning {
+    background: #f7b731;
+    color: #363636;
+}
+.wbk-toast--info {
+    background: #4069e5;
+    color: #fff;
+}
+.wbk-toast__close {
+    margin-left: 18px;
+    outline: none;
+    border: none;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 17px;
+    line-height: 1;
+    display: inline-block;
+    padding: 0 6px;
+    border-radius: 3px;
+    transition: background .15s;
+}
+.wbk-toast__close:hover {
+    background: rgba(255,255,255,0.1);
+}
+        `
+        document.head.appendChild(style)
+    }
+
+    // Toast container
+    function getToastContainer() {
+        var el = document.getElementById('wbk-toast-container')
+        if (!el) {
+            el = document.createElement('div')
+            el.setAttribute('id', 'wbk-toast-container')
+            document.body.appendChild(el)
+        }
+        return el
+    }
+
+    // Toast close handler
+    function closeToast(toast, timer) {
+        if (toast.classList.contains('wbk-toast--show')) {
+            toast.classList.remove('wbk-toast--show')
+            setTimeout(function () {
+                if (toast.parentNode) toast.parentNode.removeChild(toast)
+            }, 200)
+        }
+        if (timer) {
+            clearTimeout(timer)
+        }
+    }
+
+    var Toast = {
+        /**
+         * Show a toast notification
+         * @param {string} message
+         * @param {object} [opts] {type, duration}
+         */
+        show: function (message, opts) {
+            injectToastStyles()
+            opts = opts || {}
+            var type = opts.type || 'info' // info, success, error, warning
+            var duration = typeof opts.duration === 'number' ? opts.duration : 3000
+
+            var toast = document.createElement('div')
+            toast.className = 'wbk-toast wbk-toast--' + type
+
+            // Close button
+            var closeBtn = document.createElement('button')
+            closeBtn.className = 'wbk-toast__close'
+            closeBtn.innerHTML = '×'
+            closeBtn.setAttribute('aria-label', 'Close notification')
+
+            // Message
+            var msgSpan = document.createElement('span')
+            msgSpan.innerHTML = message
+
+            toast.appendChild(msgSpan)
+            toast.appendChild(closeBtn)
+
+            var container = getToastContainer()
+            container.appendChild(toast)
+
+            // Animate in
+            setTimeout(function () {
+                toast.classList.add('wbk-toast--show')
+            }, 10)
+
+            // Timeout to auto-remove (unless 0)
+            var timer = null
+            if (duration > 0) {
+                timer = setTimeout(function () {
+                    closeToast(toast)
+                }, duration)
+            }
+
+            // Close on button click
+            closeBtn.addEventListener('click', function (event) {
+                event.stopPropagation()
+                closeToast(toast, timer)
+            })
+
+            // Optional: click toast to close
+            toast.addEventListener('click', function (event) {
+                if (event.target === toast) {
+                    closeToast(toast, timer)
+                }
+            })
+        }
+    }
+
+    // Expose as global
+    global.Toast = Toast
+})(window)
+

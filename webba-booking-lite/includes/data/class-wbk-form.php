@@ -38,6 +38,41 @@ class WBK_Form extends WBK_Model_Object
             if (json_last_error() === JSON_ERROR_NONE) {
                 return $decoded;
             }
+            
+            $error = json_last_error();
+            $error_msg = json_last_error_msg();
+            
+            // Try to fix malformed JSON with HTML quotes
+            $fixed = WBK_Format_Utils::fix_malformed_json_quotes($fields);
+            $decoded = json_decode($fixed, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $decoded;
+            }
+            
+            // If still failing, try a more aggressive fix
+            // Look for the specific pattern: href=\"#\" and fix it
+            $fixed = preg_replace('/(href=\\\\")#(\\\\")/', '$1\\"#\\"$2', $fixed);
+            $fixed = preg_replace('/(href=")#(")/', '$1\\"#\\"$2', $fixed);
+            
+            $decoded = json_decode($fixed, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $decoded;
+            }
+            
+            // If still failing, try handling double-encoded JSON
+            if (substr($fixed, 0, 1) === '"' && substr($fixed, -1) === '"') {
+                $unescaped = json_decode($fixed, true);
+                if (is_string($unescaped)) {
+                    $decoded = json_decode($unescaped, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        return $decoded;
+                    }
+                }
+            }
+            
+            // Log the error for debugging
+            error_log('WBK Form: Failed to decode JSON. Error: ' . $error_msg . ' (Code: ' . $error . ')');
+            error_log('WBK Form: JSON string (first 500 chars): ' . substr($fields, 0, 500));
         }
         return $fields;
     }

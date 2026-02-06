@@ -22,4 +22,4 @@ $date = new DateTime( $value );
 
 $time_zone_obj = new DateTimeZone( $time_zone );
 
-echo wp_date( get_option( 'date_format' ), $date->getTimestamp(), $time_zone_obj ) . ' ' . wp_date( get_option( 'time_format' ), $date->getTimestamp(), $time_zone_obj );
+echo wp_date( WBK_Date_Time_Utils::get_date_format(), $date->getTimestamp(), $time_zone_obj ) . ' ' . wp_date( WBK_Date_Time_Utils::get_time_format(), $date->getTimestamp(), $time_zone_obj );

@@ -3,18 +3,21 @@
     "description": "Webba Booking Plugin",
     "type": "wordpress-plugin",
     "require": {
+        "php": ">=7.4",
         "stripe/stripe-php": "^8.11",
         "paypal/rest-api-sdk-php": "*",
         "johngrogg/ics-parser": "^3",
         "twilio/sdk": "^6.39",
         "voku/anti-xss": "^4.1",
         "eluceo/ical": "^2.13",
-        "mixpanel/mixpanel-php": "2.*",
-        "php": ">=7.4"
+        "mixpanel/mixpanel-php": "2.*"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.0",
         "yoast/phpunit-polyfills": "^1.0"
+    },
+    "conflict": {
+        "doctrine/instantiator": ">=2.1"
     },
     "autoload": {
         "psr-4": {
@@ -26,7 +29,12 @@
             "Webba\\Booking\\Tests\\": "tests/"
         }
     },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
     "config": {
+        "platform": {
+            "php": "7.4.0"
+        },
         "platform-check": false,
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
@@ -34,6 +42,10 @@
     },
     "scripts": {
         "test": "phpunit",
-        "test:coverage": "phpunit --coverage-html coverage"
+        "test:coverage": "phpunit --coverage-html coverage",
+        "build:release": [
+            "@composer install --no-dev --prefer-dist --optimize-autoloader",
+            "@composer dump-autoload --no-dev --classmap-authoritative"
+        ]
     }
 }

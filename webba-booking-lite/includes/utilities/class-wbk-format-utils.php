@@ -5,28 +5,24 @@ if (!defined('ABSPATH')) {
 }
 class WBK_Format_Utils
 {
-    public static function get_date_format()
+    /**
+     * Get the date format
+     *
+     * @return string
+     */
+    public static function get_date_format(): string
     {
-        $date_format = trim(get_option('wbk_date_format'));
-        if (empty($date_format)) {
-            $date_format = trim(get_option('date_format'));
-            if (empty($date_format)) {
-                $date_format = 'l, F j';
-            }
-        }
-        return $date_format;
+        return WBK_Date_Time_Utils::get_date_format();
     }
-    // get time format option
-    public static function get_time_format()
+
+    /**
+     * Get the time format
+     *
+     * @return string
+     */
+    public static function get_time_format(): string
     {
-        $time_format = trim(get_option('wbk_time_format'));
-        if (empty($time_format)) {
-            $time_format = trim(get_option('time_format'));
-            if (empty($time_format)) {
-                $time_format = 'H:i';
-            }
-        }
-        return $time_format;
+        return WBK_Date_Time_Utils::get_time_format();
     }
 
     static function price_to_float($s)
@@ -37,9 +33,26 @@ class WBK_Format_Utils
         return (float) $s;
     }
 
+    /**
+     * Get the price format
+     *
+     * @return string
+     */
+    static function get_price_format(): string
+    {
+        $price_format = get_option('wbk_payment_price_format_new', '$');
+        $position = get_option('wbk_currency_symbol_position', 'before');
+        
+        if ($position == 'before') {
+            return $price_format . '#price';
+        } else {
+            return '#price' . $price_format;
+        }
+    }
+
     static function format_price($value)
     {
-        $price_format = get_option('wbk_payment_price_format', '$#price');
+        $price_format = self::get_price_format();
         $value = str_replace(
             '#price',
             number_format(
@@ -88,5 +101,69 @@ class WBK_Format_Utils
             return self::generate_random_color($ignore_list);
         }
         return $color;
+    }
+
+    /**
+     * Fix malformed JSON with unescaped quotes in HTML attributes
+     * @param string $json_string JSON string to fix
+     * @return string Fixed JSON string
+     */
+    public static function fix_malformed_json_quotes($json_string)
+    {
+        $fixed = $json_string;
+        
+        // Direct string replacements for common problematic patterns
+        // Fix href="#" where quote before # is not escaped
+        $fixed = str_replace('href=\\"#\\"', 'href=\\"#\\"', $fixed);
+        $fixed = str_replace('href="#"', 'href=\\"#\\"', $fixed);
+        
+        // More general: find HTML tags and process them
+        // Use a simpler approach - find all HTML tags and fix attributes
+        $fixed = preg_replace_callback(
+            '/<([a-zA-Z][^>]*)>/',
+            function ($matches) {
+                $tag_attrs = $matches[1];
+                
+                // Fix attributes with unescaped quotes in values
+                // Pattern: attr="value" where value contains unescaped quotes
+                $fixed_attrs = preg_replace_callback(
+                    '/([a-zA-Z-]+)=(")([^"]*)(")/',
+                    function ($attr_matches) {
+                        $attr_name = $attr_matches[1];
+                        $value = $attr_matches[3];
+                        
+                        // If value contains unescaped quotes, escape them
+                        if (strpos($value, '"') !== false) {
+                            $escaped_value = str_replace('"', '\\"', $value);
+                            return $attr_name . '=\\"' . $escaped_value . '\\"';
+                        }
+                        return $attr_matches[0];
+                    },
+                    $tag_attrs
+                );
+                
+                // Also handle already-escaped patterns that might be wrong
+                $fixed_attrs = preg_replace_callback(
+                    '/([a-zA-Z-]+)=(\\\\)?"([^"]*)(\\\\)?"/',
+                    function ($attr_matches) {
+                        $attr_name = $attr_matches[1];
+                        $value = $attr_matches[3];
+                        
+                        // Check if value has unescaped quotes
+                        if (preg_match('/(?<!\\\\)"/', $value)) {
+                            $escaped_value = preg_replace('/(?<!\\\\)"/', '\\"', $value);
+                            return $attr_name . '=\\"' . $escaped_value . '\\"';
+                        }
+                        return $attr_matches[0];
+                    },
+                    $fixed_attrs
+                );
+                
+                return '<' . $fixed_attrs . '>';
+            },
+            $fixed
+        );
+        
+        return $fixed;
     }
 }

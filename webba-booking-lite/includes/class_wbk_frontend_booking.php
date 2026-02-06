@@ -1,6 +1,7 @@
 <?php
 
 // check if accessed directly
+use WebbaBooking\Utilities\WBK_Options_Utils;
 if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -82,7 +83,7 @@ class WBK_Frontend_Booking {
                 session_start();
             }
         }
-        // check if called as payment result
+        // process paypal payment result
         if ( isset( $_GET['pp_aprove'] ) ) {
             if ( $_GET['pp_aprove'] == 'true' ) {
                 if ( isset( $_GET['paymentId'] ) && isset( $_GET['PayerID'] ) ) {
@@ -100,7 +101,7 @@ class WBK_Frontend_Booking {
                             wp_redirect( get_permalink() . '?paypal_status=3' );
                             exit;
                         } else {
-                            $pp_redirect_url = trim( get_option( 'wbk_paypal_redirect_url', '' ) );
+                            $pp_redirect_url = trim( WBK_Options_Utils::get_paypal_redirect_url() );
                             if ( $pp_redirect_url != '' ) {
                                 if ( filter_var( $pp_redirect_url, FILTER_VALIDATE_URL ) !== false ) {
                                 }
@@ -123,6 +124,42 @@ class WBK_Frontend_Booking {
                     WBK_Model_Utils::clear_payment_id_by_token( $cancel_token );
                 }
                 wp_redirect( get_permalink() . '?paypal_status=5' );
+                exit;
+            }
+        }
+        // process stripe payment result
+        if ( isset( $_GET['payment_intent'] ) && isset( $_GET['redirect_status'] ) ) {
+            $payment_intent_id = $_GET['payment_intent'];
+            $redirect_status = $_GET['redirect_status'];
+            $failed_redirect_url = WBK_Options_Utils::get_stripe_redirect_url() . '?redirect_status=failed';
+            if ( $redirect_status == 'succeeded' ) {
+                $booking_ids = WBK_Model_Utils::get_booking_ids_by_payment_id( $payment_intent_id );
+                $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );
+                if ( empty( $booking_ids ) ) {
+                    wp_redirect( $failed_redirect_url );
+                    exit;
+                }
+                $first_booking = new WBK_Booking($booking_ids[0]);
+                $service_id = $first_booking->get_service();
+                $stripe = new WBK_Stripe();
+                $stripe->init( $service_id );
+                $payment_intent = $stripe->get_payment_intent( $payment_intent_id );
+                if ( WBK_Stripe::is_currency_zero_decimal( get_option( 'wbk_stripe_currency', '' ) ) ) {
+                    $to_pay_total = $payment_details['to_pay_total'];
+                } else {
+                    $to_pay_total = round( $payment_details['to_pay_total'] * 100 );
+                }
+                $is_to_pay_valid = !empty( $payment_intent->amount ) && intval( $payment_intent->amount ) === intval( $to_pay_total );
+                if ( $is_to_pay_valid && count( $booking_ids ) > 0 && $payment_intent->status === 'succeeded' ) {
+                    $payment_method = ( isset( $_GET['paymentMethod'] ) ? $_GET['paymentMethod'] : 'stripe' );
+                    $booking_factory = new WBK_Booking_Factory();
+                    $booking_factory->set_as_paid( $booking_ids, $payment_method, $payment_details['to_pay_total'] );
+                } else {
+                    wp_redirect( $failed_redirect_url );
+                    exit;
+                }
+            } else {
+                wp_redirect( $failed_redirect_url );
                 exit;
             }
         }

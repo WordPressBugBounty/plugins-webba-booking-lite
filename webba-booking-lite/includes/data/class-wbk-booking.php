@@ -1,13 +1,14 @@
 <?php
-if (!defined('ABSPATH'))
-    exit;
+if (!defined('ABSPATH')) {
+    exit();
+}
 class WBK_Booking extends WBK_Model_Object
 {
     public function __construct($id)
     {
-        $this->table_name = get_option('wbk_db_prefix', '') . 'wbk_appointments';
+        $this->table_name =
+            get_option('wbk_db_prefix', '') . 'wbk_appointments';
         parent::__construct($id);
-
     }
 
     /**
@@ -53,7 +54,6 @@ class WBK_Booking extends WBK_Model_Object
         $this->set('phone', $phone);
         $this->set('description', $description);
         $this->set('extra', $custom_data);
-
     }
     /**
      * get day of the bookings
@@ -79,7 +79,9 @@ class WBK_Booking extends WBK_Model_Object
             return null;
         }
         $service = new WBK_Service($this->fields['service_id']);
-        return $this->fields['time'] + $this->fields['duration'] * 60 + $service->get_interval_between() * 60;
+        return $this->fields['time'] +
+            $this->fields['duration'] * 60 +
+            $service->get_interval_between() * 60;
     }
 
     /**
@@ -111,7 +113,10 @@ class WBK_Booking extends WBK_Model_Object
      */
     public function get_price()
     {
-        if (!isset($this->fields['moment_price']) || $this->fields['moment_price'] == '') {
+        if (
+            !isset($this->fields['moment_price']) ||
+            $this->fields['moment_price'] == ''
+        ) {
             return 0;
         }
         return $this->fields['moment_price'];
@@ -157,7 +162,10 @@ class WBK_Booking extends WBK_Model_Object
      */
     public function get_amount_details()
     {
-        if (!isset($this->fields['amount_details']) || $this->fields['amount_details'] == '') {
+        if (
+            !isset($this->fields['amount_details']) ||
+            $this->fields['amount_details'] == ''
+        ) {
             return '';
         }
         return $this->fields['amount_details'];
@@ -167,7 +175,8 @@ class WBK_Booking extends WBK_Model_Object
     {
         $timezone = new DateTimeZone(get_option('wbk_timezone', 'UTC'));
         $date = (new DateTime('@' . $this->get_day()))->setTimezone($timezone);
-        $current_offset = $this->get('time_offset') * -60 - $timezone->getOffset($date);
+        $current_offset =
+            $this->get('time_offset') * -60 - $timezone->getOffset($date);
         $local_time = absint($this->get('time')) + $current_offset;
         return $local_time;
     }
@@ -206,8 +215,15 @@ class WBK_Booking extends WBK_Model_Object
     {
         $prev_time_zone = date_default_timezone_get();
         date_default_timezone_set(get_option('wbk_timezone', 'Europe/London'));
-        $start_formated = wp_date('Y-m-d H:i:s', $this->get_start(), new DateTimeZone(date_default_timezone_get()));
-        $datetime = new DateTime($start_formated, new DateTimeZone(get_option('wbk_timezone', 'Europe/London')));
+        $start_formated = wp_date(
+            'Y-m-d H:i:s',
+            $this->get_start(),
+            new DateTimeZone(date_default_timezone_get())
+        );
+        $datetime = new DateTime(
+            $start_formated,
+            new DateTimeZone(get_option('wbk_timezone', 'Europe/London'))
+        );
         date_default_timezone_set($prev_time_zone);
         return $datetime;
     }
@@ -216,10 +232,26 @@ class WBK_Booking extends WBK_Model_Object
     {
         $prev_time_zone = date_default_timezone_get();
         date_default_timezone_set(get_option('wbk_timezone', 'Europe/London'));
-        $start_formated = wp_date('Y-m-d H:i:s', $this->get_end(), new DateTimeZone(date_default_timezone_get()));
-        $datetime = new DateTime($start_formated, new DateTimeZone(get_option('wbk_timezone', 'Europe/London')));
+        $start_formated = wp_date(
+            'Y-m-d H:i:s',
+            $this->get_end(),
+            new DateTimeZone(date_default_timezone_get())
+        );
+        $datetime = new DateTime(
+            $start_formated,
+            new DateTimeZone(get_option('wbk_timezone', 'Europe/London'))
+        );
         date_default_timezone_set($prev_time_zone);
         return $datetime;
     }
-
+    public function get_google_meet_link()
+    {
+        if (
+            !isset($this->fields['google_meet_link']) ||
+            $this->fields['google_meet_link'] == ''
+        ) {
+            return '';
+        }
+        return $this->fields['google_meet_link'];
+    }
 }

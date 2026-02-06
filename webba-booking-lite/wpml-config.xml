@@ -198,5 +198,17 @@
 			<key name="the_entered_email_is_invalid"/>
 			<key name="please_enter_a_valid_phone_number"/>
 			<key name="the_entered_number_is_invalid"/>
+			<key name="wbk_woo_button_text"/>
+			<key name="wbk_wording_no_bookings_found"/>
+			<key name="wbk_sidebar_help_title"/>
+			<key name="wbk_wording_please_select_service"/>
+			<key name="please_fill_out_payment_form"/>
+			<key name="wbk_google_pay_button_text"/>
+			<key name="wbk_google_pay_message"/>
+			<key name="wbk_apple_pay_button_text"/>
+			<key name="wbk_apple_pay_message"/>
+			<key name="wbk_apple_pay_message"/>
+			<key name="wbk_stripe_other_button_text"/>
+			<key name="wbk_stripe_other_message"/>
 	</admin-texts>
 </wpml-config>

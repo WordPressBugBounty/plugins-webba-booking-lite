@@ -24,7 +24,6 @@
     font-weight: bold;
 }
 
-
 /* ubuntu */
 @font-face {
     font-family: Ubuntu;
@@ -115,9 +114,9 @@ body {
     margin-left: 46px !important;
 }
 @media (max-width: 768px) {
-    .wbk_go_premium_banner{
-        margin-left: 0!important;
-        max-width: 100%!important;
+    .wbk_go_premium_banner {
+        margin-left: 0 !important;
+        max-width: 100% !important;
         object-fit: contain;
     }
 }
@@ -217,7 +216,7 @@ body {
 
 .main-block-wb b {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 400;
+    font-weight: 400;
     font-weight: normal;
     word-wrap: break-word;
 }
@@ -266,7 +265,7 @@ font-weight: 400;
     width: 100%;
 }
 
-.main-part-wrapper-wb .button-wbkb{
+.main-part-wrapper-wb .button-wbkb {
     margin-left: 20px;
 }
 
@@ -308,7 +307,7 @@ font-weight: 400;
     margin-left: auto;
     display: flex;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
 }
 
 .header-main-wb .main-menu-wb a {
@@ -408,6 +407,11 @@ font-weight: 500;
     box-shadow: 0 0 15px rgba(161, 164, 182, 0.5);
     padding: 30px 30px 40px 30px;
     cursor: pointer;
+    position: relative;
+}
+
+.settings-list-wb li:has(.plan-requirement-wb) {
+    cursor: default;
 }
 
 .settings-list-wb .card-title-wb {
@@ -431,7 +435,7 @@ font-weight: 500;
 .settings-list-wb .card-title-wb .card-title-text-wb {
     font-size: 24px;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     transition: 0.2s;
     position: relative;
     text-transform: capitalize;
@@ -440,13 +444,21 @@ font-weight: 500;
 
 .settings-list-wb .view-settings-link-wb .text-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 400;
+    font-weight: 400;
     margin: 0 10px 0 0;
     transition: 0.2s;
 }
 
 .settings-list-wb li:hover .card-title-text-wb {
     opacity: 0.7;
+}
+
+.settings-list-wb li:has(.plan-requirement-wb):hover .card-title-text-wb {
+    opacity: 1;
+}
+
+.settings-list-wb li:hover .plan-requirement-wb {
+    backdrop-filter: blur(1px);
 }
 
 .settings-list-wb li .view-settings-link-wb .hover-icon-wb {
@@ -760,7 +772,7 @@ font-weight: 400;
     right: 0;
     font-size: 32px;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     line-height: 36px;
     margin: 0 0 30px 0;
     background: #fff;
@@ -805,7 +817,7 @@ font-weight: 500;
     align-items: center;
     font-size: 24px;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     cursor: pointer;
     transition: 0.2s;
     margin: 0 0 30px 0;
@@ -835,6 +847,11 @@ font-weight: 500;
 
 .field-block-wb {
     margin: 0 0 25px 0;
+    position: relative;
+}
+
+.field-block-wb .plan-requirement-wb {
+    backdrop-filter: blur(1.5px);
 }
 
 .field-block-wb .label-wb {
@@ -854,7 +871,7 @@ font-weight: 500;
 .field-block-wb .label-wb label b {
     font-weight: normal;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
 }
 
 .main-block-wb input[type='password'],
@@ -1295,7 +1312,7 @@ input.slidebox-wb:checked:after {
 
 .sidebar-warning-block-wb .warning-text-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
 }
 
 .sidebar-warning-block-wb .button-wbkb {
@@ -1394,7 +1411,7 @@ font-weight: 500;
     list-style: none;
     justify-content: space-between;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     font-size: 24px;
     color: #8a9393;
     align-items: center;
@@ -1519,7 +1536,7 @@ font-weight: 500;
 
 .setup-fields-wb .block-heading-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     font-weight: normal;
     font-size: 32px;
     text-align: center;
@@ -1678,7 +1695,7 @@ font-weight: 500;
 
 .custom-radiobutton-wbkb input:checked ~ .radio-title-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
 }
 
 .custom-radiobutton-wbkb input:checked ~ .radio-title-wb {
@@ -2201,7 +2218,7 @@ font-weight: 500;
 
 .custom-multiple-select-wb .chosen-drop .no-results span {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 400;
+    font-weight: 400;
     margin: 0 0 0 10px;
 }
 
@@ -2305,7 +2322,7 @@ font-weight: 400;
     list-style: none;
     font-size: 22px;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     color: #8a9393;
     border-bottom: 1px solid #8a9393;
     padding: 0 0 1px 0;
@@ -2350,7 +2367,7 @@ font-weight: 500;
 .field-wrapper-wb .block-label-wb {
     display: inline-block;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     margin: 0 0 10px 0;
 }
 
@@ -2578,7 +2595,7 @@ font-weight: 500;
 .field-row-w label {
     display: flex;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 400;
+    font-weight: 400;
     margin: 0 0 10px 0;
 }
 
@@ -2711,7 +2728,7 @@ font-weight: 400;
 
 .appointment-box-wbk .button-wbk {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 400;
+    font-weight: 400;
     display: inline-block;
     background: #1f6763;
     border-radius: 15px;
@@ -2805,7 +2822,7 @@ font-weight: 400;
 .appointment-status-text-mobile-wbk .current-step-wbk {
     font-size: 20px;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
 }
 
 .appearance-block-wb .right-part-wb .buttons-block-wb {
@@ -3043,7 +3060,7 @@ font-weight: 500;
 .mobile-version-wb .heading-mobile-wb {
     display: block;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     font-weight: normal;
     text-align: center;
     margin: 0 0 20px 0;
@@ -3144,7 +3161,7 @@ font-weight: 500;
     padding: 8px 15px 8px 15px;
     color: #fff;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     margin: 0 0 20px 0;
 }
 
@@ -3306,7 +3323,7 @@ font-weight: 500;
 .ui-datepicker .ui-datepicker-header .ui-datepicker-title {
     text-align: center;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 400;
+    font-weight: 400;
     color: #212121;
     line-height: 18px;
 }
@@ -3663,7 +3680,7 @@ font-weight: 400;
     .radio-time-inner-w
     .time-w {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 400;
+    font-weight: 400;
 }
 
 .appontment-time-list-w.group-list-w .radio-time-block-w .group-active-icon-w {
@@ -3675,7 +3692,7 @@ font-weight: 400;
     justify-content: center;
     align-items: center;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 300;;
+    font-weight: 300;
     font-size: 14px;
 }
 
@@ -5399,7 +5416,7 @@ font-weight: 300;;
 .payment-details-wrapper-w table tfoot tr:last-child td {
     padding-top: 10px;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 400;
+    font-weight: 400;
 }
 
 .custom-radiobutton-wbk {
@@ -5927,7 +5944,7 @@ font-weight: 400;
 
 .services-blank-wb .block-title-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     font-size: 32px;
     font-weight: normal;
     margin: 0 0 20px 0;
@@ -5939,7 +5956,7 @@ font-weight: 500;
 
 .services-bank-content-wb .block-text-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     font-size: 24px;
     margin: 20px 0 30px 0;
 }
@@ -5962,7 +5979,7 @@ font-weight: 500;
     list-style: none;
     border-bottom: 1px solid #c2c7c7;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     margin: 0 0 35px 0;
     user-select: none;
 }
@@ -6151,7 +6168,7 @@ font-weight: 500;
 .add-image-block-wb .block-title-wb {
     display: block;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     margin: 10px 0 10px 0;
 }
 
@@ -7293,7 +7310,7 @@ table.dataTable td {
 
 .table-area-wb .block-heading-wb .block-title-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     font-weight: normal;
     font-size: 32px;
 }
@@ -7321,7 +7338,7 @@ font-weight: 500;
     border-bottom: 0;
     vertical-align: middle;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 400;
+    font-weight: 400;
     padding: 20px !important;
     background-color: #cbe7e7;
 }
@@ -7704,7 +7721,7 @@ font-weight: 400;
     background: #cbe7e7 !important;
     color: #1f6763 !important;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 400;
+    font-weight: 400;
     cursor: default;
 }
 
@@ -8159,7 +8176,7 @@ input.slider-range-working-hours-time-wb {
     align-items: center;
     font-size: 32px;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     margin: 0 0 15px 0;
 }
 
@@ -8227,7 +8244,7 @@ font-weight: 500;
 .dashboard-data-wb .data-content-wb .digit-wb {
     display: inline-block;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 400;
+    font-weight: 400;
     font-size: 46px;
     line-height: 1.5;
 }
@@ -8277,7 +8294,7 @@ font-weight: 400;
 .intersests-conversion-block-wb .block-header-wb .title-wb {
     font-size: 32px;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
 }
 
 .intersests-conversion-block-wb .block-header-wb .title-wb .help-popover-wb {
@@ -8300,7 +8317,7 @@ font-weight: 500;
     cursor: pointer;
     transition: 0.2s;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
 }
 
 .toggle-switch-wb li:hover {
@@ -8553,7 +8570,7 @@ font-weight: 500;
 
 .table-empty-content-wb .text-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     font-size: 24px;
     margin: 0 0 20px 0;
 }
@@ -8966,7 +8983,7 @@ font-weight: 500;
 
 .selected-customers-list-wb .name-item-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
 }
 
 .selected-customers-list-wb .delete-row-wb {
@@ -9329,7 +9346,7 @@ font-weight: 500;
 
 .upgrade-message-wb .text-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     margin: 0 10px 0 0;
 }
 
@@ -9347,7 +9364,7 @@ font-weight: 500;
 
 .upgrade-content-wb .text-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     font-size: 24px;
     padding: 25px 0 130px 0;
 }
@@ -9599,7 +9616,7 @@ font-weight: 500;
 
 .add-image-block-wb .add-image-wb .text-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
 }
 
 .add-image-block-wb .add-image-field-wb {
@@ -11156,7 +11173,7 @@ a.fc-event:hover {
 .schedules-calendar-wrapper-wb .fc-header-toolbar .fc-toolbar-title {
     font-weight: normal;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     font-size: 24px;
 }
 
@@ -11244,7 +11261,7 @@ font-weight: 500;
 
 .schedules-calendar-wrapper-wb .fc-timegrid-slot-label-frame {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     font-size: 16px;
 }
 
@@ -11267,7 +11284,7 @@ font-weight: 500;
     color: #212121;
     font-size: 12px;
     font-family: 'Ubuntu', sans-serif;
-font-weight: 500;
+    font-weight: 500;
     padding: 5px;
     border-left: 3px solid #1f6763;
     border-radius: 4px 0 0 4px;
@@ -11384,7 +11401,7 @@ font-weight: 500;
     .event-popover-wb
     .popover-title-wb {
     font-family: 'Ubuntu', sans-serif;
-font-weight: 400;
+    font-weight: 400;
     margin: 0 0 5px 0;
 }
 
@@ -11976,7 +11993,7 @@ span.wbk_email_resend_result {
     color: #fff;
 }
 
-#wpcontent{
+#wpcontent {
     padding-left: 0;
 }
 
@@ -11984,4 +12001,74 @@ span.wbk_email_resend_result {
     .auto-fold #wpcontent {
         padding-left: 0;
     }
+}
+
+.plan-requirement-wb {
+    color: #fff;
+    border-radius: 5px;
+    padding: 3px 8px 3px 8px;
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.0196078431);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.plan-requirement-upgrade-buton-wb {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 10px 28px 10px 28px !important;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: normal;
+    font-style: normal;
+    min-width: 110px;
+    transition: 0.2s all ease;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    white-space: nowrap;
+    background: #ff6d6d;
+    color: #fff;
+    border: none;
+    transition: .3s all ease-in-out;
+
+    img {
+        width: auto;
+        height: 16px;
+        -o-object-fit: contain;
+        object-fit: contain;
+        filter: brightness(0) invert(1);
+    }
+}
+
+.plan-requirement-upgrade-buton-wb:hover {
+    background: #e54a4a;
+    color: #fff;
+    padding: 8px 12px;
+
+    .plan-requirement-icon-hover {
+        display: inline-block;
+    }
+
+    .plan-requirement-icon {
+        display: none;
+    }
+}
+
+.plan-requirement-icon-hover {
+    display: none;
 }

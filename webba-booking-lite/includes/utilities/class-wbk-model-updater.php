@@ -56,6 +56,13 @@ class WBK_Model_Updater
         self::update_default_templates_v_5_1_18();
         self::create_appearance_config_css_v6_0_3();
         self::update_services_6_0_9();
+        self::update_appearance_6_1_0();
+        self::update_settings_fields_6_3_0_clone_modified_options();
+        self::update_settings_fields_6_3_0_update_url_fields();
+        self::update_settings_fields_6_3_0_update_formats();
+        self::update_settings_fields_6_3_0_update_conditional_options();
+        self::update_settings_fields_6_3_0_update_service_categories();
+        self::update_settings_fields_6_3_0_update_service_overrides();
     }
 
     static function update_4_3_0_1()
@@ -83,9 +90,6 @@ class WBK_Model_Updater
     static function update_5_0_0_static()
     {
         update_option('wbk_mode', 'webba5');
-        update_option('wbk_date_format', get_option('date_format'));
-        update_option('wbk_time_format', get_option('time_format'));
-        update_option('wbk_start_of_week', get_option('start_of_week'));
         update_option('wbk_appointments_auto_lock_allow_unlock', 'disallow');
         update_option('wbk_allow_manage_by_link', 'yes');
         update_option('wbk_email_customer_book_multiple_mode', 'one');
@@ -94,6 +98,14 @@ class WBK_Model_Updater
         update_option('wbk_email_customer_cancel_multiple_mode', 'one');
         update_option('wbk_email_admin_cancel_multiple_mode', 'one');
         update_option('wbk_email_admin_cancel_multiple_mode', 'one');
+
+        if (self::is_update_required('update_5_0_0_static')) {
+            update_option('wbk_date_format', get_option('date_format'));
+            update_option('wbk_time_format', get_option('time_format'));
+            update_option('wbk_start_of_week', get_option('start_of_week'));
+
+            self::set_update_as_complete('update_5_0_0_static');
+        }
     }
     static function update_5_0_37()
     {
@@ -1488,11 +1500,11 @@ class WBK_Model_Updater
 
         $data = get_option('wbk_apperance_data', []);
 
-        $colors_shades_css = WBK_Color_Utils::generateCssVariables([
-            'primary' => WBK_Color_Utils::generateColorShades(
+        $colors_shades_css = WBK_Appearance_Utils::generateCssVariables([
+            'primary' => WBK_Appearance_Utils::generateColorShades(
                 $data['wbk_appearance_field_1'] ?? '#14B8A9'
             ),
-            'secondary' => WBK_Color_Utils::generateColorShades(
+            'secondary' => WBK_Appearance_Utils::generateColorShades(
                 $data['wbk_appearance_field_2'] ?? '#F9FAFB'
             ),
         ]);
@@ -1524,7 +1536,7 @@ class WBK_Model_Updater
 
     static function update_services_6_0_9(): void
     {
-        if(!self::is_update_required('update_services_6_0_9')) {
+        if (!self::is_update_required('update_services_6_0_9')) {
             return;
         }
 
@@ -1537,22 +1549,296 @@ class WBK_Model_Updater
                 continue;
             }
 
-            if($service->get('min_quantity') > 1 || $service->get('quantity') > 1) {
+            if (
+                $service->get('min_quantity') > 1 ||
+                $service->get('quantity') > 1
+            ) {
                 $service->set('group_booking', 'yes');
             }
 
-            if($service->get('multi_mode_low_limit') > 1 || $service->get('multi_mode_limit') > 0) {
+            if (
+                $service->get('multi_mode_low_limit') > 1 ||
+                $service->get('multi_mode_limit') > 0
+            ) {
                 $service->set('limited_timeslot', 'yes');
             }
 
-            if(!$service->get('form_builder') || empty($service->get('form_builder'))){
+            if (
+                !$service->get('form_builder') ||
+                empty($service->get('form_builder'))
+            ) {
                 $service->set('form_builder', '0');
             }
-            
+
             $service->save();
         }
-        
+
         self::set_update_as_complete('update_services_6_0_9');
+    }
+
+    static function update_appearance_6_1_0(): void
+    {
+        if (!self::is_update_required('update_appearance_6_1_0')) {
+            return;
+        }
+        $options = [];
+
+        $data = get_option('wbk_apperance_data', []);
+        $primary = WBK_Appearance_Utils::generateColorShades(
+            $data['wbk_appearance_field_1'] ?? '#14B8A9'
+        );
+        $secondary = WBK_Appearance_Utils::generateColorShades(
+            $data['wbk_appearance_field_2'] ?? '#F9FAFB'
+        );
+        $secondary_texts = WBK_Appearance_Utils::generateTextColors(
+            $data['wbk_appearance_field_2'] ?? '#F9FAFB'
+        );
+
+        $options['bg_accent'] = $primary[500];
+        $options['font'] = '"Ubuntu", sans-serif';
+        $options['border_radius'] = '8px';
+        $options['shadow'] = '0px 0px 16px 0px #3f3f4629';
+
+        $options['button_border_radius'] = '8px';
+        // primary button
+        $options['bg_button_primary'] = $primary[500];
+        $options['bg_button_primary_hover'] = $primary[600];
+        $options['color_button_primary'] = '#ffffff';
+        $options['color_button_primary_hover'] = $primary[50];
+        // secondary button
+        $options['bg_button_secondary'] = '#edeff2';
+        $options['bg_button_secondary_hover'] = $primary[500];
+        $options['color_button_secondary'] = '#ffffff';
+        $options['color_button_secondary_hover'] = $primary[50];
+        // inactive button
+        $options['bg_button_inactive'] = '#edeff3';
+        $options['color_button_inactive'] = '#ffffff';
+        // selected button
+        $options['bg_button_selected'] = $primary[500];
+        $options['bg_button_selected_hover'] = $primary[600];
+        $options['color_button_selected'] = '#ffffff';
+        $options['color_button_selected_hover'] = $primary[50];
+        $options['bg_button_selected_selected'] = '#ffffff';
+        $options['color_button_selected_selected'] = '#22292f';
+
+        $options['bg_sidebar'] = $secondary[500];
+        $options['color_sidebar'] = $secondary_texts[800];
+
+        $options['color_border_selected'] = $primary[500];
+
+        update_option('wbk_appearance_options', $options);
+
+        $css_config_string = WBK_Appearance_Utils::generate_css_config(
+            $options
+        );
+        $dir = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'webba_booking_style';
+        file_put_contents(
+            $dir . DIRECTORY_SEPARATOR . 'wbk6-frontend-config.css',
+            $css_config_string
+        );
+
+        self::set_update_as_complete('update_appearance_6_1_0');
+    }
+
+    static function update_settings_fields_6_3_0_clone_modified_options(): void
+    {
+        if(!self::is_update_required('update_settings_fields_6_3_0_clone_modified_options')) {
+            return;
+        }
+
+        // duplicate options so it have rollback compatibility
+        $fields_map = [
+            'wbk_email_landing' => 'wbk_email_landing_new',
+            'wbk_user_dashboard_page_link' => 'wbk_user_dashboard_page_link_new',
+            'wbk_stripe_redirect_url' => 'wbk_stripe_redirect_url_new',
+            'wbk_paypal_redirect_url' => 'wbk_paypal_redirect_url_new',
+            'wbk_payment_price_format' => 'wbk_payment_price_format_new',
+            'wbk_date_format' => 'wbk_date_format_new',
+            'wbk_time_format' => 'wbk_time_format_new',
+            'wbk_start_of_week' => 'wbk_start_of_week_new',
+            'wbk_appointments_allow_cancel_paid' => 'wbk_appointments_allow_cancel_paid_new',
+        ];
+
+        foreach ($fields_map as $old_field => $new_field) {
+            $current_value = get_option($old_field, '');
+            if(!empty($current_value)) {
+                update_option($new_field, $current_value);
+            }
+        }
+
+        self::set_update_as_complete('update_settings_fields_6_3_0_clone_modified_options');
+    }
+
+    public static function update_settings_fields_6_3_0_update_url_fields(): void
+    {
+        if(!self::is_update_required('update_settings_fields_6_3_0_update_url_fields')) {
+            return;
+        }
+       
+        /* URL FIELDS */
+        $url_fields = [
+            'wbk_email_landing_new',
+            'wbk_user_dashboard_page_link_new',
+            'wbk_stripe_redirect_url_new',
+            'wbk_paypal_redirect_url_new',
+        ];
+
+        foreach ($url_fields as $field) {
+            $current_value = get_option($field, '');
+            // Check if the field is not empty and is a URL
+            if (
+                !empty($current_value) &&
+                filter_var($current_value, FILTER_VALIDATE_URL)
+            ) {
+                // Try to get page by url
+                $url = $current_value;
+                $page_id = url_to_postid($url);
+                if ($page_id) {
+                    update_option($field, $page_id);
+                }
+            }
+        }
+
+        self::set_update_as_complete('update_settings_fields_6_3_0_update_url_fields');
+    }
+
+    public static function update_settings_fields_6_3_0_update_formats(): void
+    {
+        if(!self::is_update_required('update_settings_fields_6_3_0_update_formats')) {
+            return;
+        }
+
+        /* PRICE FORMAT */
+        $current_format = get_option('wbk_payment_price_format_new', '$');
+        update_option('wbk_payment_price_format_new', str_replace('#price', '', $current_format));
+
+        /* DATE & TIME FORMAT FIELDS */
+        update_option('wbk_date_format_new', 'inherit');
+        update_option('wbk_time_format_new', 'inherit');
+        update_option('wbk_start_of_week_new', 'inherit');
+
+        self::set_update_as_complete('update_settings_fields_6_3_0_update_formats');
+    }
+
+    public static function update_settings_fields_6_3_0_update_conditional_options(): void
+    {
+        if(!self::is_update_required('update_settings_fields_6_3_0_update_conditional_options')) {
+            return;
+        }
+
+        // BOOKING RULES
+        $allow_paid_bookings_cancellation = get_option('wbk_appointments_allow_cancel_paid_new', '');
+
+        if($allow_paid_bookings_cancellation == 'allow') {
+            update_option('wbk_appointments_allow_cancel_paid_new', 'yes');
+        } else {
+            update_option('wbk_appointments_allow_cancel_paid_new', '');
+        }
+
+        // TAX MIGRATION
+        $current_tax = get_option('wbk_general_tax', '0');
+        $is_service_fee_taxed = get_option('wbk_do_not_tax_deposit', '');
+
+        if(floatval($current_tax) > 0 || $is_service_fee_taxed == 'yes') {
+            update_option('wbk_add_tax_on_top', 'yes');
+        }
+
+        self::set_update_as_complete('update_settings_fields_6_3_0_update_conditional_options');
+    }
+
+    public static function update_settings_fields_6_3_0_update_service_categories(): void
+    {
+        if(!self::is_update_required('update_settings_fields_6_3_0_update_service_categories')) {
+            return;
+        }
+
+         // SERVICE & SERVICE CATEGORY RELATIONS
+         global $wpdb;
+         $service_categories = $wpdb->get_results("SELECT id, list FROM " . get_option('wbk_db_prefix', '') . "wbk_service_categories", ARRAY_A);
+         foreach ($service_categories as $service_category) {
+             $services = $service_category['list'] ?? [];
+ 
+             if (empty($services)) {
+                 continue;
+             }
+ 
+             if (!is_array($services)) {
+                 $services = json_decode($services, true);
+             }
+ 
+             foreach ($services as $service_id) {
+                 $service =  $wpdb->get_row("SELECT id, categories FROM " . get_option('wbk_db_prefix', '') . "wbk_services WHERE id = " . $service_id, ARRAY_A);
+ 
+                 $existing_categories = $service['categories'] ?? [];
+ 
+                 if (empty($existing_categories)) {
+                     $existing_categories = [$service_category['id']];
+                 }
+ 
+                 if (!is_array($existing_categories)) {
+                     $existing_categories = json_decode(
+                         $existing_categories,
+                         true
+                     );
+                 }
+ 
+                 if (empty($existing_categories)) {
+                     $existing_categories = [];
+                 }
+ 
+                 $service_category_id_str = strval($service_category['id']);
+                 $existing_categories_str = array_map(
+                     'strval',
+                     $existing_categories
+                 );
+                 $categories_merged = array_unique(
+                     array_merge($existing_categories_str, [
+                         $service_category_id_str,
+                     ])
+                 );
+ 
+                 $existing_categories_str = array_map('strval', $existing_categories);
+                 $categories_merged = array_unique(array_merge($existing_categories_str, [$service_category_id_str]));
+                 
+                 $wpdb->update(get_option('wbk_db_prefix', '') . "wbk_services", [
+                    'categories' => json_encode($categories_merged)
+                 ], [
+                    'id' => $service_id
+                 ]);
+             }
+         }
+ 
+        self::set_update_as_complete('update_settings_fields_6_3_0_update_service_categories');
+    }
+
+    public static function update_settings_fields_6_3_0_update_service_overrides(): void
+    {
+        if(!self::is_update_required('update_settings_fields_6_3_0_update_service_overrides')) {
+            return;
+        }
+
+        global $wpdb;
+        $services = $wpdb->get_results("SELECT id, service_fee FROM " . get_option('wbk_db_prefix', '') . "wbk_services", ARRAY_A);
+
+         // SERVICE OVERRIDES
+         foreach($services as $service){
+
+            $params = [
+                'override_email' => 'yes',
+                'override_availability' => 'yes',
+                'override_step' => 'yes',
+            ];
+
+            if(floatval($service['service_fee'] ?? 0) > 0) {
+                $params['enable_service_fee'] = 'yes';
+            }
+
+            $wpdb->update(get_option('wbk_db_prefix', '') . "wbk_services", $params, [
+                'id' => $service['id']
+            ]);
+        }
+
+        self::set_update_as_complete('update_settings_fields_6_3_0_update_service_overrides');
     }
 }
 ?>

@@ -47,7 +47,7 @@ if (isset($field->get_extra_data()['time_zone'])) {
 if (isset($field->get_extra_data()['date_format'])) {
     $date_fomrat = $field->get_extra_data()['date_format'];
 } else {
-    $date_fomrat = get_option('date_format');
+    $date_fomrat = WBK_Date_Time_Utils::get_date_format();
 }
 
 $date_fomrat = str_replace('d', 'dd', $date_fomrat);

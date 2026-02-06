@@ -40,7 +40,7 @@
             "tab": "",
             "misc": {
                 "tooltip": "Select the booking date.",
-                "date_format": "M d, Y",
+                "date_format": "F j, Y",
                 "time_zone": "Europe/Warsaw"
             },
             "required": true,
@@ -56,7 +56,7 @@
             "tab": "",
             "misc": {
                 "tooltip": "Select the booking time.",
-                "time_format": "g:i a",
+                "time_format": "H:i",
                 "options": "backend"
             },
             "required": true,

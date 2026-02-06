@@ -1,5 +1,6 @@
 <?php
 
+use function PHPUnit\Framework\isNull;
 if ( !defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -78,7 +79,7 @@ class WBK_Booking_Factory {
         $data['admin_token'] = uniqid();
         $data['created_on'] = time();
         $ip = '';
-        if ( get_option( 'wbk_gdrp', 'disabled' ) == 'enabled' ) {
+        if ( get_option( 'wbk_gdrp', 'disabled' ) == 'enabled' && WBK_Feature_Gate::have_required_plan( 'standard', 'only_old_users' ) ) {
             if ( !isset( $_SERVER['REMOTE_ADDR'] ) ) {
                 $ip = $_SERVER['REMOTE_ADDR'];
             }
@@ -144,7 +145,7 @@ class WBK_Booking_Factory {
                 $booking->get( 'status' )
             );
             WBK_Model_Utils::set_booking_end( $booking->get_id() );
-            if ( get_option( 'wbk_gdrp', 'disabled' ) == 'disabled' ) {
+            if ( get_option( 'wbk_gdrp', 'disabled' ) == 'disabled' && WBK_Feature_Gate::have_required_plan( 'standard', 'only_old_users' ) ) {
                 if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
                     WbkData()->set_value(
                         get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments',
@@ -231,6 +232,17 @@ class WBK_Booking_Factory {
         } else {
             WBK_Email_Processor::send( $notification_booking_ids, 'booking_created_by_admin' );
         }
+        // preset woocommerce order form
+        if ( get_option( 'wbk_woo_prefil_fields', '' ) == 'true' ) {
+            if ( !session_id() ) {
+                session_start();
+            }
+            $full_name = explode( ' ', $booking->get_name() );
+            $_SESSION['wbk_name'] = $full_name[0];
+            $_SESSION['wbk_last_name'] = $full_name[1];
+            $_SESSION['wbk_email'] = $booking->get( 'email' );
+            $_SESSION['wbk_phone'] = $booking->get( 'phone' );
+        }
         do_action( 'wbebba_after_bookings_added', $booking_ids );
         date_default_timezone_set( $prev_time_zone );
     }
@@ -312,6 +324,10 @@ class WBK_Booking_Factory {
             if ( $service->get_payment_methods() != '' ) {
                 $booking_ids[] = $booking_id;
             }
+            if ( $method == 'coupon' ) {
+                $booking->set( 'paid_with_coupon', 'yes' );
+                $booking->save();
+            }
         }
         if ( count( $booking_ids ) > 0 ) {
         }
@@ -337,14 +353,16 @@ class WBK_Booking_Factory {
         }
         if ( $coupon_id !== false ) {
             $coupon = new WBK_Coupon($coupon_id);
-            if ( !$coupon->get( 'used' ) ) {
-                $used = 0;
-            } else {
-                $used = $coupon->get( 'used' );
+            if ( $coupon->is_loaded() ) {
+                if ( !$coupon->get( 'used' ) ) {
+                    $used = 0;
+                } else {
+                    $used = $coupon->get( 'used' );
+                }
+                $used++;
+                $coupon->set( 'used', $used );
+                $coupon->save();
             }
-            $used++;
-            $coupon->set( 'used', $used );
-            $coupon->save();
         }
         // send invoice (email notification)
         $curent_invoice = get_option( 'wbk_email_current_invoice_number', '1' );

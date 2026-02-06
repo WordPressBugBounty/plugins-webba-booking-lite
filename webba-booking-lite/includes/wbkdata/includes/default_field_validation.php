@@ -500,6 +500,21 @@ function validate_wbk_color($input, $value, $slug, $field)
 {
     $value = trim(sanitize_text_field($value));
 
+    if(empty($value)) {
+        $existing_services = WBK_Model_Utils::get_service_ids();
+        $existing_colors = [];
+
+        foreach ($existing_services as $existing_service_id) {
+            $existing_service = new WBK_Service($existing_service_id);
+            if (!$existing_service->is_loaded()) {
+                continue;
+            }
+            $existing_colors[] = $existing_service->get('color');
+        }
+
+        $value = WBK_Appearance_Utils::generate_random_color($existing_colors);
+    }
+
     if (!WbkData\Validator::check_hex_color($value)) {
         return [
             false,
@@ -558,4 +573,49 @@ function validate_wbk_form_fields($input, $value, $slug, $field)
     return [true, $value];
 }
 
+// duration
+add_filter(
+    'wbkdata_property_field_validation_duration',
+    'validate_duration',
+    10,
+    4
+);
+function validate_duration($input, $value, $slug, $field)
+{
+    if (!WbkData\Validator::check_integer($value, 0, 2147483647)) {
+        return [
+            false,
+            __('Duration entered incorrectly', 'webba-booking-lite'),
+            $field->get_title(),
+        ];
+    }
+
+    $value = intval(trim(sanitize_text_field($value)));
+
+    return [true, $value];
+}
+
+// limitation
+add_filter(
+    'wbkdata_property_field_validation_limitation',
+    'validate_limitation',
+    10,
+    4
+);
+function validate_limitation($input, $value, $slug, $field)
+{
+    return [true, $value];
+}
+
+// select custom
+add_filter(
+    'wbkdata_property_field_validation_select_custom',
+    'validate_select_custom',
+    10,
+    4
+);
+function validate_select_custom($input, $value, $slug, $field)
+{
+    return [true, $value];
+}
 ?>

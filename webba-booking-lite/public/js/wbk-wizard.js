@@ -8,7 +8,6 @@ class WBK_Wizard_Form {
 
         // Initialize button text
         const nextButton = container.find('.button-next-wbk')
-        nextButton.text(nextButton.data('launch-text'))
         nextButton.append('<span class="btn-ring-wbk"></span>')
 
         // Initialize handlers
@@ -347,13 +346,6 @@ class WBK_Wizard_Form {
                 .container.find('.wbk_wizard_youtube_link')
                 .addClass('wbk_hidden')
         }
-
-        // Update next button text based on step
-        if (step === 1) {
-            nextButton.html(launchText + '<span class="btn-ring-wbk"></span>')
-        } else {
-            nextButton.html(nextText + '<span class="btn-ring-wbk"></span>')
-        }
     }
 
     prev_step() {
@@ -542,12 +534,6 @@ class WBK_Wizard_Form {
                 next_screen.find('.wbk-input').addClass('linear-animation-w')
                 get_this().toggle_navigation()
 
-                // Update button text based on step
-                if (step === 1) {
-                    nextButton.text(nextButton.data('launch-text'))
-                } else {
-                    nextButton.text(nextButton.data('next-text'))
-                }
                 nextButton.append('<span class="btn-ring-wbk"></span>')
 
                 get_this().validate_prev_next_buttons()

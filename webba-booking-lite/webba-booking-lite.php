@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.0.13
+ * Version: 6.3.4
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -44,9 +44,10 @@ if ( !function_exists( 'wbk_fs' ) ) {
                 'has_paid_plans'  => true,
                 'has_affiliation' => 'selected',
                 'menu'            => [
-                    'slug'       => 'wbk-main',
-                    'first-path' => $first_page,
-                    'support'    => false,
+                    'slug'        => 'wbk-main',
+                    'first-path'  => $first_page,
+                    'support'     => false,
+                    'affiliation' => false,
                 ],
                 'is_live'         => true,
             ] );
@@ -64,7 +65,7 @@ if ( !defined( 'WP_WEBBA_BOOKING__PLUGIN_DIR' ) ) {
     define( 'WP_WEBBA_BOOKING__PLUGIN_URL', plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( 'WP_WEBBA_BOOKING__VERSION' ) ) {
-    define( 'WP_WEBBA_BOOKING__VERSION', '6.0.13' );
+    define( 'WP_WEBBA_BOOKING__VERSION', '6.3.4' );
 }
 if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_textdomain' ) ) {
     include 'vendor/autoload.php';
@@ -80,6 +81,8 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     include 'includes/backend/class-wbk-admin-notices.php';
     require 'deprecated/wbk_wording.php';
     require 'deprecated/class_wbk_date_time_utils.php';
+    include 'includes/class_wbk_webba_connect.php';
+    include 'includes/class-wbk-feature-gate.php';
     if ( get_option( 'wbk_stripe_publishable_key', '' ) != '' ) {
         require 'includes/third-parties/class_wbk_stripe.php';
     } else {
@@ -88,7 +91,11 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     require 'includes/third-parties/class_wbk_woocommerce.php';
     require 'includes/third-parties/class_wbk_gg_blank.php';
     if ( version_compare( PHP_VERSION, '7.4.0' ) >= 0 ) {
-        include 'includes/third-parties/class_wbk_zoom.php';
+        if ( WBK_Feature_Gate::have_required_plan( 'premium' ) ) {
+            include 'includes/third-parties/class_wbk_zoom.php';
+        } else {
+            include 'includes/third-parties/class_wbk_zoom_blank.php';
+        }
     } else {
         include 'includes/third-parties/class_wbk_zoom_blank.php';
     }
@@ -109,7 +116,9 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     include 'includes/utilities/class-wbk-model-updater.php';
     include 'includes/utilities/class-wbk-format-utils.php';
     include 'includes/utilities/class_wbk_validator.php';
-    include 'includes/utilities/class-wbk-color-utils.php';
+    include 'includes/utilities/class-wbk-form-builder-utils.php';
+    include 'includes/utilities/class-wbk-appearance-utils.php';
+    include 'includes/utilities/class_wbk_options_utils.php';
     // Data
     include 'includes/data/class-wbk-model-object.php';
     include 'includes/data/class-wbk-service.php';
@@ -120,8 +129,9 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     include 'includes/data/class-wbk-pricing-rule.php';
     include 'includes/data/class-wbk-booking.php';
     include 'includes/data/class-wbk-model.php';
+    include 'includes/data/class-wbk-google-calendar.php';
     include 'includes/data/class-wbk_time_slot.php';
-    include 'includes/wbkdata_extensions/class-wbk-model-relation-destroyer.php';
+    include 'includes/wbkdata_extensions/class-wbk-model-relation-handler.php';
     // factories
     include 'includes/utilities/class-wbk-booking-factory.php';
     // Request manager
@@ -267,56 +277,6 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
             WP_WEBBA_BOOKING__VERSION
         ];
     }
-    if ( get_option( 'wbk_pickadate_load', 'yes' ) == 'yes' ) {
-        $js_array[] = [
-            'frontend',
-            null,
-            'picker',
-            WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/picker.js',
-            ['jquery', 'jquery-ui-core', 'jquery-effects-core'],
-            WP_WEBBA_BOOKING__VERSION
-        ];
-        $js_array[] = [
-            'frontend',
-            null,
-            'picker-date',
-            WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/picker.date.js',
-            ['jquery', 'jquery-ui-core', 'jquery-effects-core'],
-            WP_WEBBA_BOOKING__VERSION
-        ];
-        $js_array[] = [
-            'frontend',
-            null,
-            'picker-legacy',
-            WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/legacy.js',
-            ['jquery', 'jquery-ui-core', 'jquery-effects-core'],
-            WP_WEBBA_BOOKING__VERSION
-        ];
-        $js_array[] = [
-            'frontend5',
-            null,
-            'picker',
-            WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/picker.js',
-            ['jquery', 'jquery-ui-core', 'jquery-effects-core'],
-            WP_WEBBA_BOOKING__VERSION
-        ];
-        $js_array[] = [
-            'frontend5',
-            null,
-            'picker-date',
-            WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/picker.date.js',
-            ['jquery', 'jquery-ui-core', 'jquery-effects-core'],
-            WP_WEBBA_BOOKING__VERSION
-        ];
-        $js_array[] = [
-            'frontend5',
-            null,
-            'picker-legacy',
-            WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/legacy.js',
-            ['jquery', 'jquery-ui-core', 'jquery-effects-core'],
-            WP_WEBBA_BOOKING__VERSION
-        ];
-    }
     $js_array[] = [
         'frontend',
         null,
@@ -366,6 +326,14 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     $css_array[] = [
         'frontend6',
         null,
+        'wbk-frontend-style-config',
+        content_url() . '/webba_booking_style/wbk6-frontend-config.css',
+        [],
+        WP_WEBBA_BOOKING__VERSION
+    ];
+    $css_array[] = [
+        'backend',
+        ['wbk-appearance'],
         'wbk-frontend-style-config',
         content_url() . '/webba_booking_style/wbk6-frontend-config.css',
         [],
@@ -487,7 +455,9 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
             'wbk-gg-calendars',
             'wbk-pricing-rules',
             'wbk-form-builder',
-            'wbk-calendar'
+            'wbk-appearance',
+            'wbk-calendar',
+            'wbk-options'
         ],
         'wbk-admin-style',
         WP_WEBBA_BOOKING__PLUGIN_URL . '/build/admin/index.css',
@@ -505,7 +475,9 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
             'wbk-email-templates',
             'wbk-dashboard',
             'wbk-form-builder',
-            'wbk-calendar'
+            'wbk-appearance',
+            'wbk-calendar',
+            'wbk-options'
         ],
         'wbk-react-admin',
         WP_WEBBA_BOOKING__PLUGIN_URL . '/build/admin/index.js',
@@ -744,9 +716,6 @@ if ( !function_exists( 'wbk_deactivation_alert' ) ) {
 }
 if ( !function_exists( 'wbk_cleanup_attachements' ) ) {
     function wbk_cleanup_attachements() {
-        if ( get_option( 'wbk_delete_attachemnt', 'no' ) == 'no' || get_option( 'wbk_delete_attachemnt', 'no' ) == '' ) {
-            return;
-        }
         global $wpdb;
         $prefix = $wpdb->prefix;
         $query = $wpdb->prepare( 'SHOW TABLES LIKE %s', $prefix . $wpdb->esc_like( 'wbk_appointments' ) );
@@ -879,4 +848,33 @@ if ( !function_exists( 'add_wbk_custom_permission' ) ) {
     }
 
     wbk_fs()->add_filter( 'permission_list', 'add_wbk_custom_permission' );
+}
+if ( !function_exists( 'wbk_get_installed_at' ) ) {
+    /**
+     * Get the plugin installation timestamp
+     *
+     * @return int|false Unix timestamp of installation or false if not available
+     */
+    function wbk_get_installed_at() {
+        if ( !function_exists( 'wbk_fs' ) ) {
+            return false;
+        }
+        $fs = wbk_fs();
+        if ( !is_object( $fs ) ) {
+            return false;
+        }
+        // Get storage from Freemius SDK
+        if ( !method_exists( $fs, 'get_storage' ) ) {
+            return false;
+        }
+        $storage = $fs->get_storage();
+        if ( !is_object( $storage ) ) {
+            return false;
+        }
+        if ( isset( $storage->install_timestamp ) ) {
+            return $storage->install_timestamp;
+        }
+        return false;
+    }
+
 }

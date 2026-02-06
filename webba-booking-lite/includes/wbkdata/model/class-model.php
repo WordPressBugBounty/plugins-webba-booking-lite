@@ -319,6 +319,31 @@ class Model
                 $conditions .= $condition_this;
             }
         }
+        if (
+            $this->model_name ==
+            get_option('wbk_db_prefix', '') . 'wbk_service_categories'
+        ) {
+            if (
+                in_array('administrator', $user->roles, true) ||
+                (is_multisite() && !is_super_admin())
+            ) {
+            } else {
+                $conditions .= '10 < 1';
+            }
+        }
+        if (
+            $this->model_name ==
+            get_option('wbk_db_prefix', '') . 'wbk_gg_calendars '
+        ) {
+            if (
+                in_array('administrator', $user->roles, true) ||
+                (is_multisite() && !is_super_admin())
+            ) {
+            } else {
+                $user = wp_get_current_user();
+                $conditions .= ' user_id = ' . $user->ID;
+            }
+        }
 
         if ('' !== $conditions) {
             $conditions = ' WHERE ' . $conditions;
@@ -551,6 +576,14 @@ class Model
                     $type = 'string';
                     $input_type = 'file';
                     break;
+                case 'duration':
+                    $type = 'string';
+                    $input_type = 'duration';
+                    break;
+                case 'limitation':
+                    $type = 'string';
+                    $input_type = 'limitation';
+                    break;
                 default:
                     $type = 'not_defined';
                     $input_type = 'not_defined';
@@ -617,7 +650,6 @@ class Model
 
     /**
      * update row
-     * @param $strin $data new data
      * @param mixed $data
      */
     public function add_item($data)

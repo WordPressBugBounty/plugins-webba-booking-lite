@@ -43,21 +43,7 @@
             "misc": {
                 "tooltip": "Choose a trigger when email template is sent.",
                 "multiple": false,
-                "options": {
-                    "booking_created_by_admin": "Booking is made by admin",
-                    "booking_created_by_customer": "Booking is made by customer",
-                    "booking_approved": "Booking status changed to \"Approved\"",
-                    "booking_cancelled_by_admin": "Booking cancelled by admin",
-                    "booking_cancelled_by_customer": "Booking cancelled by customer",
-                    "booking_cancelled_auto": "Booking cancelled automatically",
-                    "booking_updated_by_admin": "Booking updated by admin",
-                    "booking_updated_by_customer": "Booking updated by customer",
-                    "booking_paid": "Booking is paid",
-                    "admin_reminder": "Booking reminder to admin",
-                    "customer_reminder": "Booking reminder to customer",
-                    "user_registered": "New user is created",
-                    "booking_finished": "Booking is finished"
-                },
+                "options": "backend",
                 "disable_condition": {
                     "is_default": "yes"
                 }
@@ -125,7 +111,8 @@
             "misc": {
                 "tooltip": "A PDF attachment will be generated based on input text",
                 "placeholders": true,
-                "pro_version": true
+                "pro_version": true,
+                "required_plan": "premium"
             },
             "required": false,
             "dependency": [],
@@ -141,7 +128,8 @@
             "misc": {
                 "yes": "Yes",
                 "tooltip": "Generate and attach the iCal file for each booking",
-                "pro_version": true
+                "pro_version": true,
+                "required_plan": "premium"
             },
             "required": false,
             "dependency": [],

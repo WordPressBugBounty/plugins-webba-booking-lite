@@ -16,6 +16,7 @@ use PayPal\Api\RedirectUrls;
 use PayPal\Api\Transaction;
 use PayPal\Api\ExecutePayment;
 use PayPal\Api\PaymentExecution;
+use WebbaBooking\Utilities\WBK_Options_Utils;
 class WBK_PayPal {
     protected $apiContext;
 
@@ -38,6 +39,9 @@ class WBK_PayPal {
     }
 
     public function create_payment_v5( $booking_ids ) {
+    }
+
+    public function create_payment_v6( $booking_ids ) {
     }
 
     public function create_payment( $booking_ids, $coupon, $payment_details ) {

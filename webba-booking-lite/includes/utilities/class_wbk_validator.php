@@ -207,6 +207,9 @@ class WBK_Validator
     // check if coupon is applicable
     public static function check_coupon($coupon, $service_ids)
     {
+        if (!WBK_Feature_Gate::have_required_plan('premium')) {
+            return false;
+        }
         global $wpdb;
         $data[0] =
             ' SELECT * FROM ' .
@@ -224,7 +227,11 @@ class WBK_Validator
         if ($result['services'] != '') {
             $services = json_decode($result['services']);
             foreach ($service_ids as $service_id) {
-                if (is_array($services) && !in_array($service_id, $services)) {
+                if (
+                    is_array($services) &&
+                    count($services) > 0 &&
+                    !in_array($service_id, $services)
+                ) {
                     return false;
                 }
             }

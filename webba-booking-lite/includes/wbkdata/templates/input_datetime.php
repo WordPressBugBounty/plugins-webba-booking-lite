@@ -47,7 +47,7 @@ if (isset($field->get_extra_data()['time_zone'])) {
 if (isset($field->get_extra_data()['date_format'])) {
     $date_fomrat = $field->get_extra_data()['date_format'];
 } else {
-    $date_fomrat = get_option('date_format');
+    $date_fomrat = WBK_Date_Time_Utils::get_date_format();
 }
 $date_fomrat = str_replace('d', 'dd', $date_fomrat);
 $date_fomrat = str_replace('j', 'd', $date_fomrat);
@@ -65,7 +65,7 @@ $date_fomrat = str_replace('s', '', $date_fomrat);
 if (isset($field->get_extra_data()['time_format'])) {
     $time_format = $field->get_extra_data()['time_format'];
 } else {
-    $time_format = get_option('time_format');
+    $time_format = WBK_Date_Time_Utils::get_time_format();
 }
 $time_format = str_replace('h', 'hh', $time_format);
 $time_format = str_replace('g', 'h', $time_format);

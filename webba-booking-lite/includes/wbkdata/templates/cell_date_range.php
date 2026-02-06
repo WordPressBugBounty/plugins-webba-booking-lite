@@ -29,4 +29,4 @@ $start = new DateTime($start);
 
 $end = new DateTime($end);
 
-echo wp_date(get_option('wbk_date_format_backend'), $start->getTimestamp(), $time_zone_obj) . ' - ' . wp_date(get_option('wbk_date_format_backend'), $end->getTimestamp(), $time_zone_obj);
+echo wp_date(WBK_Date_Time_Utils::get_date_format_backend(), $start->getTimestamp(), $time_zone_obj) . ' - ' . wp_date(WBK_Date_Time_Utils::get_date_format_backend(), $end->getTimestamp(), $time_zone_obj);

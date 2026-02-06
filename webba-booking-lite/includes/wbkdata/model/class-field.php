@@ -645,6 +645,7 @@ class Field
                 $arr_sql_parts = ['text', '', '', '%s'];
 
                 break;
+            case 'select_custom':
             case 'select':
                 $ed = $this->get_extra_data();
                 if (isset($ed['type']) && 'positive_integer' === $ed['type']) {
@@ -694,6 +695,12 @@ class Field
                 break;
             case 'color':
                 $arr_sql_parts = ['text', '', '', '%s'];
+                break;
+            case 'duration':
+                $arr_sql_parts = ['int', 'unsigned NOT NULL', '', '%d'];
+                break;
+            case 'limitation':
+                $arr_sql_parts = ['int', 'unsigned NOT NULL', '', '%d'];
                 break;
             default:
                 break;

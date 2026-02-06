@@ -2,10 +2,12 @@
 if (!defined('ABSPATH')) {
     exit();
 }
+
 $container_extra_class = '';
 if (isset($_GET['wbk-activation'])) {
     $container_extra_class = ' mail-block-wb-wizard ';
 }
+
 if (isset($_GET['test'])) {
     wbk_daily();
 }
@@ -90,38 +92,7 @@ WBK_Mixpanel::update_configuration(true);
                     }
                     echo $html;
                 } else {
-                    if (current_user_can('manage_options')) {
-                        WBK_Renderer::load_template(
-                            'backend/react_app',
-                            [],
-                            true
-                        );
-                    } else {
-                        $user_id = get_current_user_id();
-                        if ($user_id == 0) {
-                            wp_die();
-                            return;
-                        }
-                        $calendars = WBK_Model_Utils::get_gg_calendars_by_user(
-                            $user_id
-                        );
-                        $html = '';
-                        foreach ($calendars as $calendar) {
-                            $html .= '<h3>' . $calendar->name . '</h3>';
-                            $html .=
-                                '<a target="_blank" class="slf_table_link" href="' .
-                                get_admin_url() .
-                                'admin.php?page=wbk-gg-calendars&clid=' .
-                                $calendar->id .
-                                '">' .
-                                __(
-                                    'Manage authorization',
-                                    'webba-booking-lite'
-                                ) .
-                                '</a></br></br>';
-                        }
-                        echo $html;
-                    }
+                    WBK_Renderer::load_template('backend/react_app', [], true);
                 }
             } else {
                 echo __(
@@ -134,6 +105,18 @@ WBK_Mixpanel::update_configuration(true);
             WBK_Renderer::load_template('backend/react_app', [], true);
             break;
         case 'wbk-pricing-rules':
+            if (
+                !WBK_Feature_Gate::have_required_plan(
+                    'standard',
+                    'only_old_users'
+                )
+            ) {
+                WBK_Renderer::load_template(
+                    'backend/plan_requirement',
+                    ['standard'],
+                    true
+                );
+            }
             WBK_Renderer::load_template('backend/react_app', [], true);
             break;
 
@@ -142,7 +125,7 @@ WBK_Mixpanel::update_configuration(true);
             if (isset($_GET['wbk-activation'])) {
                 WBK_Renderer::load_template('backend/wizard_page', []);
             } else {
-                WBK_Renderer::load_template('backend/options_page', []);
+                WBK_Renderer::load_template('backend/react_app', [], true);
             }
 
             break;
@@ -150,14 +133,20 @@ WBK_Mixpanel::update_configuration(true);
             WBK_Renderer::load_template('backend/react_app', [], true);
             break;
         case 'wbk-appearance':
-            WBK_Renderer::load_template(
-                'backend/appearance_page_content',
-                [],
-                true
-            );
+            WBK_Renderer::load_template('backend/react_app', [], true);
             break;
         case 'wbk-dashboard':
             WBK_Renderer::load_template('backend/react_app', [], true);
+            break;
+
+        case 'webba-google':
+            // Redirect to the options page with Google Calendar settings tab
+            wp_redirect(
+                admin_url(
+                    'admin.php?page=wbk-options&tab=wbk_gg_calendar_settings_section'
+                )
+            );
+            exit();
             break;
 
         default:
