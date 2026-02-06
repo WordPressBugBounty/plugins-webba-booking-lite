@@ -41,7 +41,7 @@
             "misc": {
                 "tooltip": "Select the booking date.",
                 "date_format": "F j, Y",
-                "time_zone": "Europe/Warsaw"
+                "time_zone": "Asia/Dhaka"
             },
             "required": true,
             "dependency": [],
@@ -56,7 +56,7 @@
             "tab": "",
             "misc": {
                 "tooltip": "Select the booking time.",
-                "time_format": "H:i",
+                "time_format": "g:i a",
                 "options": "backend"
             },
             "required": true,

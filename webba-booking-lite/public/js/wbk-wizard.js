@@ -71,17 +71,23 @@ class WBK_Wizard_Form {
             this.value = value
         })
 
-        // Duration field validation (allow only positive integers)
-        container.find('#service-duration-wb').on('input', function () {
-            let value = this.value
+        function syncDurationHmsToHidden(wrapper) {
+            const targetId = wrapper.find('.duration-hms-value-wb').first().data('target')
+            if (!targetId) return
+            const hoursInput = wrapper.find('.duration-hms-value-wb[data-part="hours"]')
+            const minsInput = wrapper.find('.duration-hms-value-wb[data-part="mins"]')
+            let hours = parseInt(hoursInput.val(), 10) || 0
+            let mins = parseInt(minsInput.val(), 10) || 0
+            mins = Math.max(0, Math.min(59, mins))
+            minsInput.val(mins)
+            const total = hours * 60 + mins
+            container.find('#' + targetId).val(total)
+            get_this().validate_form()
+        }
 
-            // Remove any non-numeric characters
-            value = value.replace(/\D/g, '')
-
-            // Remove leading zeros
-            value = value.replace(/^0+(?=\d)/, '')
-
-            this.value = value
+        container.on('input change', '.duration-hms-value-wb', function () {
+            const wrapper = jQuery(this).closest('.duration-hms-wrapper-wb')
+            syncDurationHmsToHidden(wrapper)
         })
 
         get_this().toggle_navigation()
@@ -147,7 +153,9 @@ class WBK_Wizard_Form {
         // Initialize state
         this.container.attr('data-step', '1')
         this.validate_prev_next_buttons()
-        wb_slider_range_working_hours()
+        if (container.find('#wizard-business-hours-wb').length) {
+            wb_wizard_init_business_hours()
+        }
         this.validate_form()
         this.update_steps()
 
@@ -545,9 +553,8 @@ class WBK_Wizard_Form {
                     jQuery('#currency-wb').trigger('change')
                 }
 
-                // Initialize slider when moving to business hours step
-                if (next_screen.find('#slider-range-working-hours-wb').length) {
-                    wb_slider_range_working_hours()
+                if (next_screen.find('#wizard-business-hours-wb').length) {
+                    wb_wizard_init_business_hours()
                 }
 
                 var next_screen_check = get_this().get_next_screen()
@@ -676,67 +683,191 @@ jQuery(function ($) {
     })
 })
 
-function wb_slider_range_working_hours() {
-    jQuery('#slider-range-working-hours-wb').slider({
-        range: true,
-        min: 0,
-        max: 1440,
-        step: 15,
-        values: [535, 1080],
-        slide: function (e, ui) {
-            jQuery('.range_start').val(ui.values[0])
-            jQuery('.range_end').val(ui.values[1])
+var WBK_WIZARD_DAY_NAMES = { '1': 'Mon', '2': 'Tue', '3': 'Wed', '4': 'Thu', '5': 'Fri', '6': 'Sat', '7': 'Sun' }
 
-            var hours1 = Math.floor(ui.values[0] / 60)
-            var minutes1 = ui.values[0] - hours1 * 60
+function wb_wizard_seconds_to_label(seconds) {
+    var h = Math.floor(seconds / 3600)
+    var m = Math.floor((seconds % 3600) / 60)
+    var period = 'AM'
+    if (h >= 12) { period = 'PM'; if (h > 12) h -= 12 }
+    if (h === 0) h = 12
+    return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ' ' + period
+}
 
-            if (hours1.length == 1) hours1 = '0' + hours1
-            if (minutes1.length == 1) minutes1 = '0' + minutes1
-            if (minutes1 == 0) minutes1 = '00'
-            if (hours1 >= 12) {
-                if (hours1 == 12) {
-                    hours1 = hours1
-                    minutes1 = minutes1 + ' PM'
-                } else {
-                    hours1 = hours1 - 12
-                    minutes1 = minutes1 + ' PM'
-                }
-            } else {
-                hours1 = hours1
-                minutes1 = minutes1 + ' AM'
-            }
-            if (hours1 == 0) {
-                hours1 = 12
-                minutes1 = minutes1
-            }
+function wb_wizard_business_hours_time_options() {
+    var opts = []
+    for (var s = 0; s <= 86400; s += 900) {
+        var label = s === 86400 ? '12:00 AM (midnight)' : wb_wizard_seconds_to_label(s)
+        opts.push({ value: s, label: label })
+    }
+    return opts
+}
 
-            var hours2 = Math.floor(ui.values[1] / 60)
-            var minutes2 = ui.values[1] - hours2 * 60
+function wb_wizard_parse_business_hours(jsonStr) {
+    if (!jsonStr || !jsonStr.trim()) return []
+    try {
+        var arr = JSON.parse(jsonStr)
+        return Array.isArray(arr) ? arr : []
+    } catch (e) {
+        return []
+    }
+}
 
-            if (hours2.length == 1) hours2 = '0' + hours2
-            if (minutes2.length == 1) minutes2 = '0' + minutes2
-            if (minutes2 == 0) minutes2 = '00'
-            if (hours2 >= 12) {
-                if (hours2 == 12) {
-                    hours2 = hours2
-                    minutes2 = minutes2 + ' PM'
-                } else if (hours2 == 24) {
-                    hours2 = 0
-                    minutes2 = '00 AM'
-                } else {
-                    hours2 = hours2 - 12
-                    minutes2 = minutes2 + ' PM'
-                }
-            } else {
-                hours2 = hours2
-                minutes2 = minutes2 + ' AM'
-            }
+function wb_wizard_default_business_hours() {
+    var slots = []
+    for (var d = 1; d <= 5; d++) {
+        slots.push({ start: 32400, end: 46800, day_of_week: String(d), status: 'active' })
+        slots.push({ start: 50400, end: 64800, day_of_week: String(d), status: 'active' })
+    }
+    return slots
+}
 
-            jQuery('#slider-range-working-hours-time-wb').val(
-                hours1 + ':' + minutes1 + ' - ' + hours2 + ':' + minutes2
-            )
-        },
+function wb_wizard_sync_business_hours_to_hidden() {
+    var container = jQuery('#wizard-business-hours-wb')
+    if (!container.length) return
+    var slots = []
+    container.find('.wizard-slot-row-wb').each(function () {
+        var row = jQuery(this)
+        var day = row.data('day')
+        var start = parseInt(row.find('.wizard-slot-start-wb').val(), 10)
+        var end = parseInt(row.find('.wizard-slot-end-wb').val(), 10)
+        if (!isNaN(start) && !isNaN(end) && day) {
+            slots.push({ start: start, end: end, day_of_week: String(day), status: 'active' })
+        }
     })
+    jQuery('#wbk-global-working-hours-wb').val(JSON.stringify(slots))
+}
+
+function wb_wizard_render_business_hours(slots) {
+    var daysWrapper = jQuery('#wizard-business-hours-wb .wizard-business-hours-days-wb')
+    if (!daysWrapper.length) return
+    var timeOpts = wb_wizard_business_hours_time_options()
+    var timeOptionsHtml = timeOpts.map(function (o) {
+        return '<option value="' + o.value + '">' + o.label + '</option>'
+    }).join('')
+    var html = ''
+    for (var day = 1; day <= 7; day++) {
+        var daySlots = slots.filter(function (s) { return String(s.day_of_week) === String(day) })
+        var dayName = WBK_WIZARD_DAY_NAMES[String(day)] || ('Day ' + day)
+        html += '<div class="wizard-day-row-wb" data-day="' + day + '">'
+        html += '<div class="wizard-day-header-wb">'
+        html += '<span class="wizard-day-name-wb">' + dayName + '</span>'
+        html += '<div class="wizard-day-actions-wb">'
+        html += '<a href="#" class="wizard-add-slot-wb">+ Add time slot</a>'
+        if (daySlots.length > 0) {
+            html += '<a href="#" class="wizard-apply-all-wb">Apply to all days</a>'
+        }
+        html += '</div></div>'
+        html += '<div class="wizard-day-slots-wb">'
+        if (daySlots.length === 0) {
+            html += '<div class="wizard-no-slots-wb">No time slots set</div>'
+        } else {
+            daySlots.forEach(function (slot) {
+                var startVal = slot.start || 32400
+                var endVal = slot.end || 46800
+                var startOpts = timeOpts.map(function (o) {
+                    return '<option value="' + o.value + '"' + (o.value === startVal ? ' selected' : '') + '>' + o.label + '</option>'
+                }).join('')
+                var endOpts = timeOpts.map(function (o) {
+                    return '<option value="' + o.value + '"' + (o.value === endVal ? ' selected' : '') + '>' + o.label + '</option>'
+                }).join('')
+                html += '<div class="wizard-slot-row-wb" data-day="' + day + '">'
+                html += '<select class="wbk-input wizard-slot-start-wb">' + startOpts + '</select>'
+                html += '<span class="wizard-slot-sep-wb">–</span>'
+                html += '<select class="wbk-input wizard-slot-end-wb">' + endOpts + '</select>'
+                html += '<button type="button" class="wizard-slot-remove-wb" title="Remove">×</button>'
+                html += '</div>'
+            })
+        }
+        html += '</div></div>'
+    }
+    daysWrapper.html(html)
+    daysWrapper.find('.wizard-slot-start-wb, .wizard-slot-end-wb').on('change', wb_wizard_sync_business_hours_to_hidden)
+    daysWrapper.find('.wizard-slot-remove-wb').on('click', function (e) {
+        e.preventDefault()
+        jQuery(this).closest('.wizard-slot-row-wb').remove()
+        var dayRow = jQuery(this).closest('.wizard-day-row-wb')
+        if (dayRow.find('.wizard-slot-row-wb').length === 0) {
+            dayRow.find('.wizard-day-slots-wb').html('<div class="wizard-no-slots-wb">No time slots set</div>')
+            dayRow.find('.wizard-apply-all-wb').remove()
+        }
+        wb_wizard_sync_business_hours_to_hidden()
+    })
+    daysWrapper.find('.wizard-add-slot-wb').on('click', function (e) {
+        e.preventDefault()
+        var dayRow = jQuery(this).closest('.wizard-day-row-wb')
+        var day = dayRow.data('day')
+        var slotsContainer = dayRow.find('.wizard-day-slots-wb')
+        dayRow.find('.wizard-no-slots-wb').remove()
+        var lastEnd = 43200
+        slotsContainer.find('.wizard-slot-end-wb').each(function () {
+            var v = parseInt(jQuery(this).val(), 10)
+            if (v > lastEnd) lastEnd = v
+        })
+        var newStart = lastEnd
+        var newEnd = Math.min(86400, lastEnd + 10800)
+        var timeOpts = wb_wizard_business_hours_time_options()
+        var timeOptionsHtml = timeOpts.map(function (o) {
+            return '<option value="' + o.value + '"' + (o.value === newStart ? ' selected' : '') + '>' + o.label + '</option>'
+        }).join('')
+        var endOptionsHtml = timeOpts.map(function (o) {
+            return '<option value="' + o.value + '"' + (o.value === newEnd ? ' selected' : '') + '>' + o.label + '</option>'
+        }).join('')
+        var rowHtml = '<div class="wizard-slot-row-wb" data-day="' + day + '">'
+        rowHtml += '<select class="wbk-input wizard-slot-start-wb">' + timeOptionsHtml + '</select>'
+        rowHtml += '<span class="wizard-slot-sep-wb">–</span>'
+        rowHtml += '<select class="wbk-input wizard-slot-end-wb">' + endOptionsHtml + '</select>'
+        rowHtml += '<button type="button" class="wizard-slot-remove-wb" title="Remove">×</button></div>'
+        slotsContainer.append(rowHtml)
+        if (dayRow.find('.wizard-apply-all-wb').length === 0) {
+            dayRow.find('.wizard-day-actions-wb').append('<a href="#" class="wizard-apply-all-wb">Apply to all days</a>')
+        }
+        slotsContainer.find('.wizard-slot-row-wb:last-child .wizard-slot-start-wb, .wizard-slot-row-wb:last-child .wizard-slot-end-wb').on('change', wb_wizard_sync_business_hours_to_hidden)
+        slotsContainer.find('.wizard-slot-row-wb:last-child .wizard-slot-remove-wb').on('click', function (ev) {
+            ev.preventDefault()
+            jQuery(this).closest('.wizard-slot-row-wb').remove()
+            if (dayRow.find('.wizard-slot-row-wb').length === 0) {
+                dayRow.find('.wizard-day-slots-wb').html('<div class="wizard-no-slots-wb">No time slots set</div>')
+                dayRow.find('.wizard-apply-all-wb').remove()
+            }
+            wb_wizard_sync_business_hours_to_hidden()
+        })
+        wb_wizard_sync_business_hours_to_hidden()
+    })
+    daysWrapper.find('.wizard-apply-all-wb').on('click', function (e) {
+        e.preventDefault()
+        var sourceDayRow = jQuery(this).closest('.wizard-day-row-wb')
+        var sourceDay = sourceDayRow.data('day')
+        var sourceSlots = []
+        sourceDayRow.find('.wizard-slot-row-wb').each(function () {
+            var row = jQuery(this)
+            sourceSlots.push({
+                start: parseInt(row.find('.wizard-slot-start-wb').val(), 10),
+                end: parseInt(row.find('.wizard-slot-end-wb').val(), 10)
+            })
+        })
+        if (sourceSlots.length === 0) return
+        var allSlots = []
+        for (var d = 1; d <= 7; d++) {
+            sourceSlots.forEach(function (slot) {
+                allSlots.push({ start: slot.start, end: slot.end, day_of_week: String(d), status: 'active' })
+            })
+        }
+        wb_wizard_render_business_hours(allSlots)
+        jQuery('#wbk-global-working-hours-wb').val(JSON.stringify(allSlots))
+    })
+    wb_wizard_sync_business_hours_to_hidden()
+}
+
+function wb_wizard_init_business_hours() {
+    var container = jQuery('#wizard-business-hours-wb')
+    if (!container.length) return
+    var initial = container.attr('data-initial') || ''
+    var slots = wb_wizard_parse_business_hours(initial)
+    if (slots.length === 0) slots = wb_wizard_default_business_hours()
+    wb_wizard_render_business_hours(slots)
+    var hidden = jQuery('#wbk-global-working-hours-wb')
+    if (!hidden.val()) hidden.val(JSON.stringify(slots))
 }
 
 function wbk_copy_shortcode() {

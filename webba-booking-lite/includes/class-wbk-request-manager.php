@@ -1828,8 +1828,18 @@ class WBK_Request_Manager {
             $found_forms = false;
             // Get fields for each service
             if ( !WBK_Feature_Gate::have_required_plan( 'standard' ) ) {
+                // user is free, so we return the default fields
                 $found_forms = true;
                 $all_fields = WBK_Form_Builder_Utils::get_default_fields();
+                // translate default fields
+                $all_fields = array_map( function ( $field ) {
+                    if ( isset( $field['type'] ) && $field['type'] === 'checkbox' ) {
+                        $field['checkboxText'] = WBK_Translation_Processor::translate_string( 'webba_form_field_default_' . $field['slug'], $field['checkboxText'] );
+                    } else {
+                        $field['placeholder'] = WBK_Translation_Processor::translate_string( 'webba_form_field_default_' . $field['slug'], $field['placeholder'] );
+                    }
+                    return $field;
+                }, $all_fields );
             } else {
                 foreach ( $service_ids as $service_id ) {
                     // Get the service
@@ -2199,6 +2209,18 @@ class WBK_Request_Manager {
             // Check booking limits
             if ( get_option( 'wbk_appointments_only_one_per_slot', 'disabled' ) == 'enabled' && WBK_Feature_Gate::have_required_plan( 'premium', 'only_old_users' ) ) {
                 if ( count( WBK_Model_Utils::get_booking_ids_by_time_service_email( $time, $service_id, $booking_data['email'] ) ) > 0 ) {
+                    $not_booked_due_limit = true;
+                    continue;
+                }
+            }
+            if ( get_option( 'wbk_appointments_only_one_per_service', 'disabled' ) == 'enabled' ) {
+                if ( count( WBK_Model_Utils::get_booking_ids_by_service_email( $service_id, $booking_data['email'] ) ) > 0 ) {
+                    $not_booked_due_limit = true;
+                    continue;
+                }
+            }
+            if ( get_option( 'wbk_appointments_only_one_per_day', 'disabled' ) == 'enabled' ) {
+                if ( count( WBK_Model_Utils::get_booking_ids_by_day_service_email( $day, $service_id, $booking_data['email'] ) ) > 0 ) {
                     $not_booked_due_limit = true;
                     continue;
                 }
@@ -2706,7 +2728,7 @@ class WBK_Request_Manager {
                 date_default_timezone_set( 'UTC' );
             }
         }
-        do_action( 'wbk_options_saved' );
+        do_action( 'wbk_options_saved', $options['section'], $options );
         WBK_Mixpanel::update_configuration( false );
         $response = new \WP_REST_Response([
             'status'  => 'success',

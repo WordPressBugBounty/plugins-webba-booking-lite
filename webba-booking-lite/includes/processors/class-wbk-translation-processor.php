@@ -89,7 +89,7 @@ class WBK_Translation_Processor
                 }
                 if (isset($field['defaultValue'])) {
                     $this->register_strings(
-                        '   ' . $id . '_' . $field['slug'] . '_default',
+                        'webba_form_field_' . $id . '_' . $field['slug'] . '_default',
                         $field['defaultValue']
                     );
                 }

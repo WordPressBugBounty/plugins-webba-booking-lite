@@ -113,7 +113,10 @@
             "misc": {
                 "tooltip": "Choose which form customers will see when booking this service. Keep the default Webba Form, or create one in 'Form Builder' and select it here.",
                 "options": "forms",
-                "required_plan": "standard"
+                "required_plan": "standard",
+                "null_value": [
+                    "Default Form"
+                ]
             },
             "required": false,
             "dependency": [],
@@ -329,7 +332,7 @@
                     ]
                 ],
                 "date_format": "F j, Y",
-                "time_zone": "Europe/Warsaw",
+                "time_zone": "Asia/Dhaka",
                 "required_plan": "standard"
             },
             "required": false,
@@ -346,8 +349,9 @@
             "misc": {
                 "tooltip": "Specify a date range if the service is only valid for a specific period of time.",
                 "date_format": "F j, Y",
-                "time_zone": "Europe/Warsaw",
-                "required_plan": "start"
+                "time_zone": "Asia/Dhaka",
+                "required_plan": "start",
+                "available_in_old_free": true
             },
             "required": false,
             "dependency": [],
@@ -370,15 +374,14 @@
             "editable": true
         },
         "service_step": {
-            "type": "string",
-            "input_type": "select",
+            "type": "not_defined",
+            "input_type": "not_defined",
             "hidden": true,
             "title": "Time slot interval (step)",
             "tab": "availability",
             "misc": {
                 "tooltip": "Enter the default time interval for time slots, which helps organize business hours and appointment durations.",
                 "options": {
-                    "custom": "Custom",
                     "duration": "duration of service",
                     "15": "15 min",
                     "30": "30 min",
@@ -396,36 +399,6 @@
             "required": false,
             "dependency": [],
             "default_value": "duration",
-            "editable": true
-        },
-        "service_custom_step": {
-            "type": "string",
-            "input_type": "text",
-            "hidden": true,
-            "title": "Custom step",
-            "tab": "availability",
-            "misc": {
-                "tooltip": "Enter the custom time interval for time slots.",
-                "hide": [
-                    [
-                        "step",
-                        "=",
-                        "custom"
-                    ]
-                ],
-                "sub_type": "positive_integer",
-                "dependent_value": {
-                    "condition": [
-                        "step",
-                        "!=",
-                        "custom"
-                    ],
-                    "value": "0"
-                }
-            },
-            "required": false,
-            "dependency": [],
-            "default_value": "0",
             "editable": true
         },
         "service_limited_timeslot": {
@@ -467,7 +440,7 @@
             },
             "required": false,
             "dependency": [],
-            "default_value": "1",
+            "default_value": "",
             "editable": true
         },
         "service_multi_mode_limit": {
@@ -491,7 +464,7 @@
             },
             "required": false,
             "dependency": [],
-            "default_value": "1",
+            "default_value": "",
             "editable": true
         },
         "service_consecutive_timeslots": {
@@ -614,8 +587,7 @@
                 "tooltip": "Select the preferred payment method(s) for this service.",
                 "multiple": true,
                 "options": "backend",
-                "description": "IMPORTANT! For Google Pay/Apple pay and Other Payment Methods to work you have to activate them in your Stripe account",
-                "required_plan": "standard"
+                "description": "IMPORTANT! For Google Pay/Apple pay and Other Payment Methods to work you have to activate them in your Stripe account"
             },
             "required": false,
             "dependency": [],

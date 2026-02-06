@@ -217,6 +217,9 @@ class WBK_Model
                 ),
                 'options' => 'forms',
                 'required_plan' => 'standard', // TIER 2
+                'null_value' => [
+                    '0' => __('Default Form', 'webba-booking-lite'),
+                ]
             ],
             '0',
             true,
@@ -480,6 +483,7 @@ class WBK_Model
                 'date_format' => $date_format,
                 'time_zone' => get_option('wbk_timezone', 'UTC'),
                 'required_plan' => 'start', // TIER 1
+                'available_in_old_free' => true,
             ],
             '',
             true,

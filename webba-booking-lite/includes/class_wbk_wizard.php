@@ -31,9 +31,7 @@ class WBK_Wizard {
             'service_interval',
             'service_buffer',
             'service_advance',
-            'range_start',
-            'range_end',
-            'dow'
+            'wbk_global_working_hours'
         ];
         foreach ( $required_fields as $field ) {
             if ( !isset( $_POST[$field] ) ) {
@@ -64,38 +62,17 @@ class WBK_Wizard {
             wp_die();
             return;
         }
-        $range_start = intval( $_POST['range_start'] ) * 60;
-        if ( !WBK_Validator::check_integer( $range_start, 0, 86100 ) ) {
+        $business_hours_json = ( isset( $_POST['wbk_global_working_hours'] ) ? stripslashes( sanitize_text_field( $_POST['wbk_global_working_hours'] ) ) : '' );
+        $business_hours_arr = json_decode( $business_hours_json, true );
+        if ( !is_array( $business_hours_arr ) ) {
             echo json_encode( [
                 'status' => 'fail',
-                'reason' => 'wrong start time',
+                'reason' => 'invalid business hours',
             ] );
             wp_die();
             return;
         }
-        $range_end = intval( $_POST['range_end'] ) * 60;
-        if ( !WBK_Validator::check_integer( $range_end, 0, 86400 ) ) {
-            echo json_encode( [
-                'status' => 'fail',
-                'reason' => 'wrong end time',
-            ] );
-            wp_die();
-            return;
-        }
-        // Process business hours
-        $dows_result = [];
-        foreach ( $_POST['dow'] as $dow ) {
-            if ( !WBK_Validator::check_integer( $dow, 1, 7 ) ) {
-                echo json_encode( [
-                    'status' => 'fail',
-                    'reason' => 'wrong day of week',
-                ] );
-                wp_die();
-                return;
-            } else {
-                $dows_result[] = '{"start":"' . $range_start . '","end":"' . $range_end . '","day_of_week":"' . $dow . '","status":"active"}';
-            }
-        }
+        update_option( 'wbk_global_working_hours', $business_hours_json );
         // Create service
         $service = new WBK_Service();
         // Basic info
@@ -115,14 +92,13 @@ class WBK_Wizard {
             $existing_colors[] = $existing_service->get( 'color' );
         }
         $service->set( 'color', WBK_Appearance_Utils::generate_random_color( $existing_colors ) );
-        // Business hours
-        $dow_availability = '[ ' . implode( ',', $dows_result ) . ']';
-        $service->set( 'business_hours', $dow_availability );
+        $service->set( 'business_hours', $business_hours_json );
         $service->set( 'duration', $duration );
         $service->set( 'step', intval( $_POST['service_interval'] ) );
         $service->set( 'interval_between', intval( $_POST['service_buffer'] ) );
         $service->set( 'price', floatval( $_POST['service_price'] ) );
         $service->set( 'service_fee', '0' );
+        $service->set( 'hide_price', ( !empty( $_POST['service_hide_price'] ) && $_POST['service_hide_price'] === 'yes' ? 'yes' : '' ) );
         // Templates
         $service->set( 'notification_template', '0' );
         $service->set( 'reminder_template', '0' );
@@ -135,6 +111,12 @@ class WBK_Wizard {
         // Save global settings
         update_option( 'wbk_timezone', sanitize_text_field( $_POST['timezone'] ) );
         update_option( 'wbk_payment_price_format_new', sanitize_text_field( $_POST['currency_symbol'] ) );
+        if ( isset( $_POST['wbk_sidebar_help_email'] ) ) {
+            update_option( 'wbk_sidebar_help_email', sanitize_text_field( $_POST['wbk_sidebar_help_email'] ) );
+        }
+        if ( isset( $_POST['wbk_sidebar_help_phone'] ) ) {
+            update_option( 'wbk_sidebar_help_phone', sanitize_text_field( $_POST['wbk_sidebar_help_phone'] ) );
+        }
         // Process closed dates
         if ( isset( $_POST['closed_dates'] ) ) {
             $closed_dates = json_decode( stripslashes( $_POST['closed_dates'] ), true );

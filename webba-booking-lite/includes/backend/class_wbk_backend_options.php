@@ -904,7 +904,7 @@ OLD: When one service is booked, it will automatically lock another one on the s
                     'Turn on to restrict same customer from making multiple bookings for the same time slot using the same email address.',
                     'webba-booking-lite'
                 ),
-                'checkbox_value' => 'yes',
+                'checkbox_value' => 'enabled',
                 'default' => '',
                 'dependency' => [['wbk_enable_customer_limits', '=', 'yes']],
                 'dependent_value' => [
@@ -926,7 +926,7 @@ OLD: When one service is booked, it will automatically lock another one on the s
                     'Turn on to restrict same customer from making multiple bookings for the same day using the same email address.',
                     'webba-booking-lite'
                 ),
-                'checkbox_value' => 'yes',
+                'checkbox_value' => 'enabled',
                 'default' => '',
                 'dependency' => [['wbk_enable_customer_limits', '=', 'yes']],
                 'dependent_value' => [
@@ -948,7 +948,7 @@ OLD: When one service is booked, it will automatically lock another one on the s
                     'Turn on to restrict same customers from making multiple bookings for the same service using the same email address.',
                     'webba-booking-lite'
                 ),
-                'checkbox_value' => 'yes',
+                'checkbox_value' => 'enabled',
                 'default' => '',
                 'dependency' => [['wbk_enable_customer_limits', '=', 'yes']],
                 'dependent_value' => [
@@ -2060,6 +2060,28 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 'tab' => 'integrations',
             ]
         );
+
+        $form_fields = WBK_Form_Builder_Utils::get_all_fields_merged();        
+        foreach ($form_fields as $field) {
+            wbk_opt()->add_option(
+                'webba_form_field_' . $field['slug'],
+                'text',
+                __(
+                    $field['placeholder'] ?? $field['checkboxText'] ?? '',
+                    'webba-booking-lite'
+                ),
+                'wbk_translation_settings_section',
+                [
+                    'default' => $field['placeholder'] ?? $field['checkboxText'] ?? '',
+                    'not_translated_title' => 'Text of the form field ' . $field['slug'],
+                    'popup' => __(
+                        'Text of the form field ' . $field['slug'],
+                        'webba-booking-lite'
+                    ),
+                    'tab' => 'form-fields',
+                ]
+            );
+        }
         // ========== WORDING/TRANSLATIONS - INTEGRATIONS Subsection ==========
         wbk_opt()->add_option(
             'wbk_email_landing_text_cancel',

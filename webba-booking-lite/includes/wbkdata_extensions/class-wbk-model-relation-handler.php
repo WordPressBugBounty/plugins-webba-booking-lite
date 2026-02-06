@@ -17,6 +17,91 @@ class WBK_Model_Relation_Destroyer
         add_action('wbkdata_on_after_item_deleted', [$this, 'remove_relations'], 10, 3);
         add_action('wbkdata_on_after_item_updated', [$this, 'sync_connections'], 10, 3);
         add_action('wbkdata_on_after_item_added', [$this, 'sync_connections'], 10, 3);
+        // two way sync for form fields translations
+        add_action('wbk_options_saved', [$this, 'sync_form_fields'], 10, 2);
+        add_action('wbkdata_on_after_item_updated', [$this, 'sync_form_options'], 10, 3);
+        add_action('wbkdata_on_after_item_added', [$this, 'sync_form_options'], 10, 3);
+    }
+
+    /**
+     * Sync form fields translations when saved from options
+     *
+     * @param string $section
+     * @param array $options
+     * @return void
+     */
+    public function sync_form_fields(string $section, array $options): void
+    {
+        if ($section !== 'wbk_translation_settings_section') {
+            return;
+        }
+
+        if (!is_array($options)) {
+            return;
+        }
+
+        $forms = WBK_Model_Utils::get_forms();
+        foreach ($forms as $form_id => $form_name) {
+            $form             = new WBK_Form($form_id);
+            $form_fields      = $form->get_fields();
+            $fields_to_update = [];
+
+            // run through all fields to find and update placeholder/checkboxtext if that is found in option
+            foreach ($form_fields as $field) {
+                if (isset($field['slug'])) {
+                    $option_name = 'webba_form_field_' . $field['slug'];
+                    if (isset($options[$option_name]) && $field['type'] !== 'checkbox') {
+                        $field['placeholder'] = $options[$option_name];
+                    } else if (isset($options[$option_name]) && $field['type'] === 'checkbox') {
+                        $field['checkboxText'] = $options[$option_name];
+                    }
+                }
+
+                $fields_to_update[] = $field;
+            }
+
+            $form->set_fields($fields_to_update);
+            $form->save();
+        }
+    }
+
+    /**
+     * Sync form translations options when forms is saved
+     *
+     * @param string $model_name
+     * @param string $model_name_not_filtered
+     * @param [type] $item
+     * @return void
+     */
+    public function sync_form_options(string $model_name, string $model_name_not_filtered, $item): void
+    {
+        $model_name = $this->extract_model_name($model_name);
+
+        if ($model_name !== 'forms') {
+            return;
+        }
+
+        if(!is_object($item)) {
+            $item = WbkData()->models->get_element_at($model_name_not_filtered)->get_item($item);
+        }
+
+        if(!$item) {
+            return;
+        }
+        
+        $form = new WBK_Form($item->id);
+        $form_fields = $form->get_fields();
+        foreach ($form_fields as $field) {
+            if (isset($field['slug'])) {
+                $option_name = 'webba_form_field_' . $field['slug'];
+                
+                if(isset($field['slug']) && $field['type'] !== 'checkbox') {
+                    update_option($option_name, $field['placeholder']);
+                } else if(isset($field['slug']) && $field['type'] === 'checkbox') {
+                    update_option($option_name, $field['checkboxText']);
+                }
+            }
+        }
     }
 
     /**
@@ -224,7 +309,7 @@ class WBK_Model_Relation_Destroyer
 
             if (!in_array($child_id, $current_parent_value) && in_array($parent_row['id'], $values_to_embed)) {
                 // add
-                $current_parent_value[] = $child_id;
+                $current_parent_value[] = "$child_id";
                 // Remove potential duplicates
                 $current_parent_value = array_values(array_unique($current_parent_value));
             } elseif (in_array($child_id, $current_parent_value) && !in_array($parent_row['id'], $values_to_embed)) {

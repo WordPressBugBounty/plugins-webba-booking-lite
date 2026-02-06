@@ -2,28 +2,32 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
-        "name": {
+        "form_name": {
             "type": "string",
             "input_type": "text",
             "hidden": false,
-            "title": "Name",
-            "tab": "",
-            "misc": [],
-            "required": false,
+            "title": "Form name",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Enter form name."
+            },
+            "required": true,
             "dependency": [],
             "default_value": "",
             "editable": true
         },
-        "fields": {
-            "type": "string",
-            "input_type": "text",
+        "form_fields": {
+            "type": "not_defined",
+            "input_type": "not_defined",
             "hidden": true,
             "title": "Fields",
-            "tab": "",
-            "misc": [],
+            "tab": "general",
+            "misc": {
+                "tooltip": ""
+            },
             "required": false,
             "dependency": [],
-            "default_value": "",
+            "default_value": [],
             "editable": true
         }
     }

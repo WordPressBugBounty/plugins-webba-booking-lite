@@ -4,7 +4,7 @@ Donate link: https://webba-booking.com/
 Tags:  appointments, appointment booking, booking calendar, scheduling, booking system
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 6.3.4
+Stable tag: 6.3.5
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -183,6 +183,17 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 
 == Changelog ==
+06/02/2026
+
+6.3.5
+
+- Improvement: improved experience in setup wizard
+- Improvement: translation improvements
+- Bug fix: certain available dates missing on booking calendar
+- Bug fix: issue with group booking
+- Bug fix: certain booking restrictions rules failure
+- Bug fix: other minor fixes and visual improvements
+
 03/02/2026
 
 6.3.4

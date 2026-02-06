@@ -118,6 +118,48 @@ echo esc_html__( 'We\'ll send booking alerts and notifications here', 'webba-boo
 
                             <div class="field-block-wb">
                                 <div class="label-wb">
+                                    <label for="wbk_sidebar_help_email">
+                                        <?php 
+echo esc_html__( 'Customer support email', 'webba-booking-lite' );
+?>
+                                    </label>
+                                </div>
+                                <div class="field-wrapper-wb">
+                                    <input type="text" name="wbk_sidebar_help_email" id="wbk_sidebar_help_email" class="wbk-input"
+                                        value="<?php 
+echo esc_attr( get_option( 'wbk_sidebar_help_email', '' ) );
+?>">
+                                    <span class="field-description-wb">
+                                        <?php 
+echo esc_html__( 'Will be shown in the booking form', 'webba-booking-lite' );
+?>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="field-block-wb">
+                                <div class="label-wb">
+                                    <label for="wbk_sidebar_help_phone">
+                                        <?php 
+echo esc_html__( 'Customer support phone number', 'webba-booking-lite' );
+?>
+                                    </label>
+                                </div>
+                                <div class="field-wrapper-wb">
+                                    <input type="text" name="wbk_sidebar_help_phone" id="wbk_sidebar_help_phone" class="wbk-input"
+                                        value="<?php 
+echo esc_attr( get_option( 'wbk_sidebar_help_phone', '' ) );
+?>">
+                                    <span class="field-description-wb">
+                                        <?php 
+echo esc_html__( 'Will be shown in the booking form', 'webba-booking-lite' );
+?>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="field-block-wb">
+                                <div class="label-wb">
                                     <label for="timezone-wb">
                                         <?php 
 echo esc_html__( 'Time-zone', 'webba-booking-lite' );
@@ -335,6 +377,15 @@ echo esc_attr__( 'Enter price', 'webba-booking-lite' );
                                             title="Please enter a valid price (up to 2 decimal places)"
                                             value="50">
                                     </div>
+                                    <div class="wizard-toggle-row-wb">
+                                        <input type="checkbox" name="service_hide_price" id="service-hide-price-wb" value="yes" class="wizard-toggle-input-wb">
+                                        <label for="service-hide-price-wb" class="wizard-toggle-label-wb">
+                                            <span class="wizard-toggle-track-wb"><span class="wizard-toggle-handle-wb"></span></span>
+                                            <span class="wizard-toggle-text-wb"><?php 
+echo esc_html__( 'Do not show price', 'webba-booking-lite' );
+?></span>
+                                        </label>
+                                    </div>
                                 </div>
                                 <div class="field-half-wb">
                                     <div class="label-wb">
@@ -344,46 +395,27 @@ echo esc_html__( 'Duration', 'webba-booking-lite' );
 ?>
                                         </label>
                                     </div>
-                                    <div class="field-wrapper-wb duration-field-wrapper-wb">
-                                        <input type="text" class="wbk-input" name="service_duration"
-                                            placeholder="<?php 
-echo esc_attr__( 'Enter duration', 'webba-booking-lite' );
-?>" data-validation="positive"
-                                            id="service-duration-wb" inputmode="numeric" pattern="[0-9]*"
-                                            title="Please enter a whole number" value="60">
-                                        <span class="minutes-label"><?php 
-echo esc_html__( 'minutes', 'webba-booking-lite' );
+                                    <div class="field-wrapper-wb duration-hms-wrapper-wb">
+                                        <input type="hidden" name="service_duration" id="service-duration-wb" data-validation="positive" value="60">
+                                        <div class="duration-hms-inputs-wb">
+                                            <div class="duration-hms-group-wb">
+                                                <input type="number" class="wbk-input duration-hms-value-wb" id="service-duration-hours-wb" min="0" value="1" data-target="service-duration-wb" data-part="hours">
+                                                <span class="duration-hms-unit-wb"><?php 
+echo esc_html__( 'hours', 'webba-booking-lite' );
 ?></span>
+                                            </div>
+                                            <div class="duration-hms-group-wb">
+                                                <input type="number" class="wbk-input duration-hms-value-wb" id="service-duration-mins-wb" min="0" max="59" value="0" data-target="service-duration-wb" data-part="mins">
+                                                <span class="duration-hms-unit-wb"><?php 
+echo esc_html__( 'mins', 'webba-booking-lite' );
+?></span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Timeslot intervals -->
-                            <div class="field-block-wb">
-                                <div class="label-wb">
-                                    <label for="service-interval-wb">
-                                        <?php 
-echo esc_html__( 'What are timeslot intervals you\'d like show for your customers', 'webba-booking-lite' );
-?>
-                                    </label>
-                                </div>
-                                <div class="field-wrapper-wb duration-field-wrapper-wb">
-                                    <input type="text" class="wbk-input" name="service_interval"
-                                        placeholder="<?php 
-echo esc_attr__( 'Enter interval', 'webba-booking-lite' );
-?>" data-validation="positive"
-                                        id="service-interval-wb" inputmode="numeric" pattern="[0-9]*"
-                                        title="Please enter a whole number" value="30">
-                                    <span class="minutes-label"><?php 
-echo esc_html__( 'minutes', 'webba-booking-lite' );
-?></span>
-                                </div>
-                                <span class="field-description-wb">
-                                    <?php 
-echo esc_html__( 'For example, every 30 minutes means customers can book at 9:00, 9:30, 10:00, etc.', 'webba-booking-lite' );
-?>
-                                </span>
-                            </div>
+                            <input type="hidden" name="service_interval" value="30">
 
                             <!-- Buffer time -->
                             <div class="field-block-wb">
@@ -394,16 +426,22 @@ echo esc_html__( 'Break time between appointments (buffer time)', 'webba-booking
 ?>
                                     </label>
                                 </div>
-                                <div class="field-wrapper-wb duration-field-wrapper-wb">
-                                    <input type="text" class="wbk-input" name="service_buffer"
-                                        placeholder="<?php 
-echo esc_attr__( 'Enter buffer time', 'webba-booking-lite' );
-?>" data-validation="positive"
-                                        id="service-buffer-wb" inputmode="numeric" pattern="[0-9]*"
-                                        title="Please enter a whole number" value="15">
-                                    <span class="minutes-label"><?php 
-echo esc_html__( 'minutes', 'webba-booking-lite' );
+                                <div class="field-wrapper-wb duration-hms-wrapper-wb">
+                                    <input type="hidden" name="service_buffer" id="service-buffer-wb" value="15">
+                                    <div class="duration-hms-inputs-wb">
+                                        <div class="duration-hms-group-wb">
+                                            <input type="number" class="wbk-input duration-hms-value-wb" id="service-buffer-hours-wb" min="0" value="0" data-target="service-buffer-wb" data-part="hours">
+                                            <span class="duration-hms-unit-wb"><?php 
+echo esc_html__( 'hours', 'webba-booking-lite' );
 ?></span>
+                                        </div>
+                                        <div class="duration-hms-group-wb">
+                                            <input type="number" class="wbk-input duration-hms-value-wb" id="service-buffer-mins-wb" min="0" max="59" value="15" data-target="service-buffer-wb" data-part="mins">
+                                            <span class="duration-hms-unit-wb"><?php 
+echo esc_html__( 'mins', 'webba-booking-lite' );
+?></span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <span class="field-description-wb">
                                     <?php 
@@ -421,16 +459,22 @@ echo esc_html__( 'How far in advance customers must book', 'webba-booking-lite' 
 ?>
                                     </label>
                                 </div>
-                                <div class="field-wrapper-wb duration-field-wrapper-wb">
-                                    <input type="text" class="wbk-input" name="service_advance"
-                                        placeholder="<?php 
-echo esc_attr__( 'Enter advance time', 'webba-booking-lite' );
-?>" data-validation="positive"
-                                        id="service-advance-wb" inputmode="numeric" pattern="[0-9]*"
-                                        title="Please enter a whole number" value="120">
-                                    <span class="minutes-label"><?php 
-echo esc_html__( 'minutes', 'webba-booking-lite' );
+                                <div class="field-wrapper-wb duration-hms-wrapper-wb">
+                                    <input type="hidden" name="service_advance" id="service-advance-wb" value="120">
+                                    <div class="duration-hms-inputs-wb">
+                                        <div class="duration-hms-group-wb">
+                                            <input type="number" class="wbk-input duration-hms-value-wb" id="service-advance-hours-wb" min="0" value="2" data-target="service-advance-wb" data-part="hours">
+                                            <span class="duration-hms-unit-wb"><?php 
+echo esc_html__( 'hours', 'webba-booking-lite' );
 ?></span>
+                                        </div>
+                                        <div class="duration-hms-group-wb">
+                                            <input type="number" class="wbk-input duration-hms-value-wb" id="service-advance-mins-wb" min="0" max="59" value="0" data-target="service-advance-wb" data-part="mins">
+                                            <span class="duration-hms-unit-wb"><?php 
+echo esc_html__( 'mins', 'webba-booking-lite' );
+?></span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <span class="field-description-wb">
                                     <?php 
@@ -469,19 +513,22 @@ _e( 'Step 3 / Availability', 'webba-booking-lite' );
                     <div class="container-small-wb">
                         <h2 class="block-heading-wb">
                             <?php 
-echo esc_html__( 'General availability', 'webba-booking-lite' );
+echo esc_html__( 'Global availability', 'webba-booking-lite' );
 ?>
                         </h2>
                         <p class="intro-text-wb">
                             <?php 
-echo esc_html__( 'Set your general working hours. You\'ll be able to lock/unlock specific time slots in the schedule tools and connect to your calendar (PRO feature) to manage availability automatically.', 'webba-booking-lite' );
+echo esc_html__( 'Set global working hours that will be used for all services. You can always override them and set specific working hours per service too.', 'webba-booking-lite' );
 ?>
                         </p>
 
                         <div class="fields-wrapper-wb">
-                            <div class="field-block-wb mb-40-wb">
+                            <div class="field-block-wb mb-40-wb wizard-business-hours-block-wb" id="wizard-business-hours-wb"
+                                data-initial="<?php 
+echo esc_attr( \WebbaBooking\Utilities\WBK_Options_Utils::get_service_global_business_hours() );
+?>">
                                 <div class="label-wb">
-                                    <label>
+                                    <label for="wizard-business-hours-wb">
                                         <?php 
 echo esc_html__( 'What are your business hours?', 'webba-booking-lite' );
 ?>
@@ -500,120 +547,8 @@ echo esc_html__( 'Enter your operating hours here. Do not worry - you can change
 echo esc_html__( 'You will be able to adjust and add additional intervals for different weekdays in the Service settings.', 'webba-booking-lite' );
 ?>
                                 </span>
-                                <input type="text" id="slider-range-working-hours-time-wb"
-                                    value="<?php 
-echo esc_attr__( '9:00 AM - 6:00 PM', 'webba-booking-lite' );
-?>" readonly
-                                    class="slider-range-working-hours-time-wb wbk-input">
-                                <div id="slider-range-working-hours-wb" class="slider-range-working-hours-wb">
-                                </div>
-
-                                <input type="hidden" value="540" name="range_start" class="range_start">
-                                <input type="hidden" value="1080" name="range_end" class="range_end">
-                            </div>
-
-                            <div class="field-block-wb">
-                                <div class="label-wb">
-                                    <label>
-                                        <?php 
-echo esc_html__( 'Which days are you open?', 'webba-booking-lite' );
-?>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="field-block-wb with-slidebox-wb wizard-field-holder-wb mb-40-wb">
-                                <label class="checkbox-row-w one-row-w">
-                                    <span class="checkbox-custom-w">
-                                        <input type="checkbox" name="dow[]" value="1" checked="">
-                                        <span class="checkmark-w"></span>
-                                    </span>
-                                    <span class="checkbox-text-w">
-                                        <span class="checkbox-title-w">
-                                            <?php 
-echo esc_html__( 'Mon', 'webba-booking-lite' );
-?>
-                                        </span>
-                                    </span>
-                                </label>
-                                <label class="checkbox-row-w one-row-w">
-                                    <span class="checkbox-custom-w">
-                                        <input type="checkbox" name="dow[]" value="2" checked="">
-                                        <span class="checkmark-w"></span>
-                                    </span>
-                                    <span class="checkbox-text-w">
-                                        <span class="checkbox-title-w">
-                                            <?php 
-echo esc_html__( 'Tue', 'webba-booking-lite' );
-?>
-                                        </span>
-                                    </span>
-                                </label>
-                                <label class="checkbox-row-w one-row-w">
-                                    <span class="checkbox-custom-w">
-                                        <input type="checkbox" name="dow[]" value="3" checked="">
-                                        <span class="checkmark-w"></span>
-                                    </span>
-                                    <span class="checkbox-text-w">
-                                        <span class="checkbox-title-w">
-                                            <?php 
-echo esc_html__( 'Wed', 'webba-booking-lite' );
-?>
-                                        </span>
-                                    </span>
-                                </label>
-                                <label class="checkbox-row-w one-row-w">
-                                    <span class="checkbox-custom-w">
-                                        <input type="checkbox" name="dow[]" value="4" checked="">
-                                        <span class="checkmark-w"></span>
-                                    </span>
-                                    <span class="checkbox-text-w">
-                                        <span class="checkbox-title-w">
-                                            <?php 
-echo esc_html__( 'Thu', 'webba-booking-lite' );
-?>
-                                        </span>
-                                    </span>
-                                </label>
-                                <label class="checkbox-row-w one-row-w">
-                                    <span class="checkbox-custom-w">
-                                        <input type="checkbox" name="dow[]" value="5" checked="">
-                                        <span class="checkmark-w"></span>
-                                    </span>
-                                    <span class="checkbox-text-w">
-                                        <span class="checkbox-title-w">
-                                            <?php 
-echo esc_html__( 'Fri', 'webba-booking-lite' );
-?>
-                                        </span>
-                                    </span>
-                                </label>
-                                <label class="checkbox-row-w one-row-w">
-                                    <span class="checkbox-custom-w">
-                                        <input type="checkbox" name="dow[]" value="6">
-                                        <span class="checkmark-w"></span>
-                                    </span>
-                                    <span class="checkbox-text-w">
-                                        <span class="checkbox-title-w">
-                                            <?php 
-echo esc_html__( 'Sat', 'webba-booking-lite' );
-?>
-                                        </span>
-                                    </span>
-                                </label>
-                                <label class="checkbox-row-w one-row-w">
-                                    <span class="checkbox-custom-w">
-                                        <input type="checkbox" name="dow[]" value="7">
-                                        <span class="checkmark-w"></span>
-                                    </span>
-                                    <span class="checkbox-text-w">
-                                        <span class="checkbox-title-w">
-                                            <?php 
-echo esc_html__( 'Sun', 'webba-booking-lite' );
-?>
-                                        </span>
-                                    </span>
-                                </label>
+                                <input type="hidden" name="wbk_global_working_hours" id="wbk-global-working-hours-wb" value="">
+                                <div class="wizard-business-hours-days-wb"></div>
                             </div>
 
                             <!-- Closed Dates Section -->
