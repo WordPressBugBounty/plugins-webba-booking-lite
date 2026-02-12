@@ -4,7 +4,7 @@ Donate link: https://webba-booking.com/
 Tags:  appointments, appointment booking, booking calendar, scheduling, booking system
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 6.3.5
+Stable tag: 6.3.7
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -183,6 +183,21 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 
 == Changelog ==
+12/02/2026
+
+6.3.7
+
+- Improvement: more compatibly with popular cache plugins
+- Bug fix: form fields not loading on certain configurations
+- Bug fix: reminder emails are sending twice
+- Bug fix: other minor fixes and visual improvements
+
+07/02/2026
+
+6.3.6
+
+- Bug fix: coupon field missing on certain configuration
+
 06/02/2026
 
 6.3.5

@@ -81,6 +81,7 @@ class WBK_Wizard {
         $service->set( 'email', sanitize_email( $_POST['email'] ) );
         $service->set( 'priority', '0' );
         $service->set( 'form', '0' );
+        $service->set( 'extcalendar', '' );
         // service color
         $existing_services = WBK_Model_Utils::get_service_ids();
         $existing_colors = [];

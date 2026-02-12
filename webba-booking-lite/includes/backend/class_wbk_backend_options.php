@@ -3005,7 +3005,7 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             __('Version of Google Client API', 'webba-booking-lite'),
             'wbk_integrations_settings_section',
             [
-                'default' => '2.13.0',
+                'default' => '2.9.1',
                 'extra' => $version_list,
                 'not_translated_title' => 'Version of Google Client API',
                 'popup' => __(

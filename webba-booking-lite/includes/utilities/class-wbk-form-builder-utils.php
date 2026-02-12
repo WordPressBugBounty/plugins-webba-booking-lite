@@ -56,6 +56,16 @@ class WBK_Form_Builder_Utils
             true
         );
 
+        $fields = array_map(function($field) {
+            if($field['type'] === 'checkbox') {
+                $field['checkboxText'] = get_option('webba_form_field_' . $field['slug'], $field['checkboxText']);
+            }else{
+                $field['placeholder'] = get_option('webba_form_field_' . $field['slug'], $field['placeholder']);
+            }
+            
+            return $field;
+        }, $fields);
+
         return $fields;
     }
 

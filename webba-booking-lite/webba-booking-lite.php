@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.3.5
+ * Version: 6.3.7
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -65,7 +65,7 @@ if ( !defined( 'WP_WEBBA_BOOKING__PLUGIN_DIR' ) ) {
     define( 'WP_WEBBA_BOOKING__PLUGIN_URL', plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( 'WP_WEBBA_BOOKING__VERSION' ) ) {
-    define( 'WP_WEBBA_BOOKING__VERSION', '6.3.5' );
+    define( 'WP_WEBBA_BOOKING__VERSION', '6.3.7' );
 }
 if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_textdomain' ) ) {
     include 'vendor/autoload.php';
@@ -73,6 +73,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     include 'includes/wbkdata_extensions/wbkdata_hooks.php';
     include 'deprecated/class_wbk_entity.php';
     include 'includes/class_wbk_backend.php';
+    include 'includes/class-wbk-rest-cache-prevention.php';
     include 'deprecated/class_wbk_appointment_deprecated.php';
     include 'deprecated/class_wbk_service_deprecated.php';
     include 'deprecated/class_wbk_db_utils.php';
@@ -168,6 +169,7 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     // Wizard
     include 'includes/class_wbk_wizard.php';
     $wbk_request_manager = new WBK_Request_Manager();
+    $wbk_rest_cache_prevention = new WBK_REST_Cache_Prevention();
     $wbk_model = new WBK_Model();
     $wbk_model_relation_destroyer = new WBK_Model_Relation_Destroyer();
     $wbk_admin_notices = new WBK_Admin_Notices2();

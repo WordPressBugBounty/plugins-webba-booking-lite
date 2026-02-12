@@ -245,23 +245,6 @@ class WBK_Email_Processor {
                 }
                 remove_filter( 'wp_mail_content_type', 'wbk_wp_mail_content_type' );
             }
-            if ( isset( $notification['attachments'] ) && count( ${$notification}['attachments'] ) > 0 ) {
-                wp_mail(
-                    $notification['address'],
-                    $notification['subject'],
-                    $notification['message'],
-                    $headers,
-                    $notification['attachments']
-                );
-            } else {
-                wp_mail(
-                    $notification['address'],
-                    $notification['subject'],
-                    $notification['message'],
-                    $headers
-                );
-            }
-            remove_filter( 'wp_mail_content_type', 'wbk_wp_mail_content_type' );
         }
     }
 

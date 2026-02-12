@@ -1221,7 +1221,7 @@ class WBK_Request_Manager {
             $user = $current_user->user_login;
             $current_user_email = $current_user->user_email;
         }
-        $coupons_enabled = get_option( 'wbk_allow_coupons', 'yes' ) === 'enabled';
+        $coupons_enabled = get_option( 'wbk_allow_coupons', 'yes' ) === 'yes';
         if ( !WBK_Feature_Gate::have_required_plan( 'premium' ) ) {
             $coupons_enabled = false;
         }
@@ -1827,20 +1827,7 @@ class WBK_Request_Manager {
             $all_fields = [];
             $found_forms = false;
             // Get fields for each service
-            if ( !WBK_Feature_Gate::have_required_plan( 'standard' ) ) {
-                // user is free, so we return the default fields
-                $found_forms = true;
-                $all_fields = WBK_Form_Builder_Utils::get_default_fields();
-                // translate default fields
-                $all_fields = array_map( function ( $field ) {
-                    if ( isset( $field['type'] ) && $field['type'] === 'checkbox' ) {
-                        $field['checkboxText'] = WBK_Translation_Processor::translate_string( 'webba_form_field_default_' . $field['slug'], $field['checkboxText'] );
-                    } else {
-                        $field['placeholder'] = WBK_Translation_Processor::translate_string( 'webba_form_field_default_' . $field['slug'], $field['placeholder'] );
-                    }
-                    return $field;
-                }, $all_fields );
-            } else {
+            if ( WBK_Feature_Gate::have_required_plan( 'standard' ) ) {
                 foreach ( $service_ids as $service_id ) {
                     // Get the service
                     $service = new WBK_Service($service_id);
@@ -1864,16 +1851,30 @@ class WBK_Request_Manager {
                             // Only add the field if it has a slug and we haven't seen this slug before
                             if ( isset( $field['slug'] ) && !isset( $all_fields[$field['slug']] ) && isset( $field['placeholder'] ) ) {
                                 $all_fields[$field['slug']] = $field;
-                                $all_fields[$field['slug']]['placeholder'] = WBK_Translation_Processor::translate_string( 'webba_form_field_' . $form_id . '_' . $field['slug'], $field['placeholder'] );
+                                $all_fields[$field['slug']]['placeholder'] = WBK_Translation_Processor::translate_string( 'webba_form_field_' . $form_id . '_' . $field['slug'], get_option( 'webba_form_field_' . $field['slug'], $field['placeholder'] ) );
                             } elseif ( isset( $field['slug'] ) && !isset( $all_fields[$field['slug']] ) && isset( $field['checkboxText'] ) ) {
                                 $all_fields[$field['slug']] = $field;
-                                $all_fields[$field['slug']]['checkboxText'] = WBK_Translation_Processor::translate_string( 'webba_form_field_' . $form_id . '_' . $field['slug'], $field['checkboxText'] );
+                                $all_fields[$field['slug']]['checkboxText'] = WBK_Translation_Processor::translate_string( 'webba_form_field_' . $form_id . '_' . $field['slug'], get_option( 'webba_form_field_' . $field['slug'], $field['checkboxText'] ) );
                             } else {
                                 $all_fields[$field['slug']] = $field;
                             }
                         }
                     }
                 }
+            }
+            if ( !WBK_Feature_Gate::have_required_plan( 'standard' ) || $found_forms === false ) {
+                // user is free, so we return the default fields
+                $found_forms = true;
+                $all_fields = WBK_Form_Builder_Utils::get_default_fields();
+                // translate default fields
+                $all_fields = array_map( function ( $field ) {
+                    if ( isset( $field['type'] ) && $field['type'] === 'checkbox' ) {
+                        $field['checkboxText'] = WBK_Translation_Processor::translate_string( 'webba_form_field_default_' . $field['slug'], get_option( 'webba_form_field_' . $field['slug'], $field['checkboxText'] ) );
+                    } else {
+                        $field['placeholder'] = WBK_Translation_Processor::translate_string( 'webba_form_field_default_' . $field['slug'], $field['placeholder'], get_option( 'webba_form_field_' . $field['slug'], $field['placeholder'] ) );
+                    }
+                    return $field;
+                }, $all_fields );
             }
             if ( !$found_forms ) {
                 return new WP_REST_Response([

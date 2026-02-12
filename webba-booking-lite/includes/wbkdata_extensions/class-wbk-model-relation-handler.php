@@ -18,9 +18,9 @@ class WBK_Model_Relation_Destroyer
         add_action('wbkdata_on_after_item_updated', [$this, 'sync_connections'], 10, 3);
         add_action('wbkdata_on_after_item_added', [$this, 'sync_connections'], 10, 3);
         // two way sync for form fields translations
-        add_action('wbk_options_saved', [$this, 'sync_form_fields'], 10, 2);
-        add_action('wbkdata_on_after_item_updated', [$this, 'sync_form_options'], 10, 3);
-        add_action('wbkdata_on_after_item_added', [$this, 'sync_form_options'], 10, 3);
+        // add_action('wbk_options_saved', [$this, 'sync_form_fields'], 10, 2);
+        // add_action('wbkdata_on_after_item_updated', [$this, 'sync_form_options'], 10, 3);
+        // add_action('wbkdata_on_after_item_added', [$this, 'sync_form_options'], 10, 3);
     }
 
     /**
