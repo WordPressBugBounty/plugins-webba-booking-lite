@@ -1,18 +1,12 @@
 <?php
 
 use WebbaBooking\Utilities\WBK_Options_Utils;
-if ( !defined( 'ABSPATH' ) ) {
+if ( !defined( "ABSPATH" ) ) {
     exit;
 }
-// webba booking Google integration class
-if ( get_option( 'wbk_gg_client_version', '2.5' ) == '2.5' ) {
-    require_once __DIR__ . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR . 'google_api' . DIRECTORY_SEPARATOR . 'google-api-2.5' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-}
-if ( get_option( 'wbk_gg_client_version', '2.5' ) == '2.9.1' ) {
-    require_once __DIR__ . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR . 'google_api' . DIRECTORY_SEPARATOR . 'google-api-2.9.1' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
-}
-if ( get_option( 'wbk_gg_client_version', '2.5' ) == '2.13.0' ) {
-    require_once __DIR__ . DIRECTORY_SEPARATOR . 'api' . DIRECTORY_SEPARATOR . 'google_api' . DIRECTORY_SEPARATOR . 'google-api-2.13.0' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+// webba booking Google integration class [deprecated]
+if ( get_option( "wbk_gg_client_version", "2.5" ) == "2.13.0" ) {
+    require_once __DIR__ . DIRECTORY_SEPARATOR . "api" . DIRECTORY_SEPARATOR . "google_api" . DIRECTORY_SEPARATOR . "google-api-2.13.0" . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php";
 }
 class WBK_Google {
     protected $client;
@@ -36,11 +30,11 @@ class WBK_Google {
     // 1 - authorization success
     // 2 - authorization failed
     public function connect() {
-        return [2, 'not connected, premium feature not available'];
+        return [2, "not connected, premium feature not available"];
     }
 
     public function render_calendar_block() {
-        return '';
+        return "";
     }
 
     public function process_auth_code( $authCode ) {
@@ -48,7 +42,7 @@ class WBK_Google {
     }
 
     protected function get_access_token() {
-        return '';
+        return "";
     }
 
     protected function get_gg_calendar_id() {
@@ -59,11 +53,11 @@ class WBK_Google {
     }
 
     public function get_calendar_name() {
-        return '';
+        return "";
     }
 
     public function get_calendar_mode() {
-        return '';
+        return "";
     }
 
     public function clearToken() {
@@ -75,11 +69,11 @@ class WBK_Google {
         $start,
         $end,
         $time_zone,
-        $calendar_id = '',
+        $calendar_id = "",
         $use_current_time_zone = false,
         $google_meet_enabled = null,
-        $service_email = '',
-        $booking_email = ''
+        $service_email = "",
+        $booking_email = ""
     ) {
         return false;
     }
@@ -90,7 +84,9 @@ class WBK_Google {
         $description,
         $start = null,
         $end = null,
-        $time_zone = null
+        $time_zone = null,
+        $google_meet_enabled = false,
+        $attendee_emails = []
     ) {
         return false;
     }

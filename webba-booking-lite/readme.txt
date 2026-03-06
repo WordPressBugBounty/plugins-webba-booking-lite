@@ -4,7 +4,7 @@ Donate link: https://webba-booking.com/
 Tags:  appointments, appointment booking, booking calendar, scheduling, booking system
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 6.3.7
+Stable tag: 6.3.12
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -183,6 +183,38 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 
 == Changelog ==
+06/03/2026
+
+6.3.12
+
+- Bug fix: broken booking page on certain configuration
+
+03/03/2026
+
+6.3.11
+
+- Improvement: total slot capacity feature
+- Improvement: more convenient setup journey
+- Improvement: translation improvements in user dashboard and booking form
+- Improvement: "Add to multiple calendars" button on post-booking screen
+- Bug fix: default form selection in service
+- Bug fix: form fields translations issues
+- Bug fix: service description hidden on certain configurations
+- Bug fix: backend customer name placeholders not working
+- Bug fix: other minors fixes and visual improvements
+
+23/02/2026
+
+6.3.10
+
+- Improvement: 2-way synchronization with Outlook Calendar
+
+19/02/2026
+
+6.3.8
+
+- Bug fix: attachment missing on certain configurations
+
 12/02/2026
 
 6.3.7
@@ -270,11 +302,12 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 - Bug fix: unexpected emails in the google calendar integrations
 - Bug fix: PHP warning removed
 
-26/12/2025
+29/12/2025
 
 6.2.8
 
 - Improvement: integration with Google Meet
+- Improvement: minor visual improvements
 
 19/12/2025
 

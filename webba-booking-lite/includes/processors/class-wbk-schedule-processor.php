@@ -666,6 +666,36 @@ class WBK_Schedule_Processor {
         return apply_filters( 'wbk_check_holiday', false );
     }
 
+    /**
+     * Fetch events from a connected calendar using the appropriate processor
+     *
+     * @param int $calendar_id WordPress DB ID of the calendar
+     * @param string $start_iso ISO 8601 formatted start datetime
+     * @param string $end_iso ISO 8601 formatted end datetime
+     * @return array|WP_Error Array of WBK_Time_Slot on success, WP_Error on failure
+     */
+    private static function fetch_connected_calendar_events( $calendar_id, $start_iso, $end_iso ) {
+        $connected_calendar = new WBK_Connected_Calendar($calendar_id);
+        if ( !$connected_calendar->is_loaded() ) {
+            error_log( "[WBK_OUTLOOK_DEBUG] fetch_connected_calendar_events: calendar_id=" . $calendar_id . " - connected_calendar not loaded" );
+            return [];
+        }
+        $mode = $connected_calendar->get_mode();
+        if ( $mode !== 'One-way-import' && $mode !== 'Two-ways' ) {
+            error_log( "[WBK_OUTLOOK_DEBUG] fetch_connected_calendar_events: calendar_id=" . $calendar_id . " - mode=" . $mode . " (skipped, need One-way-import or Two-ways)" );
+            return [];
+        }
+        $processor = WBK_Connected_Calendar_Processor::get_processor_for_calendar( $connected_calendar );
+        if ( $processor === null ) {
+            error_log( "[WBK_OUTLOOK_DEBUG] fetch_connected_calendar_events: calendar_id=" . $calendar_id . " - get_processor_for_calendar returned null" );
+            return [];
+        }
+        $result = $processor->fetch_events_in_range( $start_iso, $end_iso );
+        $result_info = ( is_wp_error( $result ) ? "WP_Error: " . $result->get_error_message() : "array len=" . count( $result ) );
+        error_log( "[WBK_OUTLOOK_DEBUG] fetch_connected_calendar_events: calendar_id=" . $calendar_id . " - result: " . $result_info );
+        return $result;
+    }
+
     public function load_gg_events_in_range( $start, $end, $service ) {
         $event_data_arr = [];
         return $event_data_arr;

@@ -187,6 +187,10 @@ class Row_Object
         if (is_numeric($this->id)) {
             return $wpdb->update($this->table_name, $values, array('id' => $this->id), $formats, array('%d'));
         } else {
+            if (isset($this->fields['id']) && is_numeric($this->fields['id'])) {
+                $values = array('id' => (int) $this->fields['id']) + $values;
+                array_unshift($formats, '%d');
+            }
             $wpdb->insert($this->table_name, $values, $formats);
             return $wpdb->insert_id;
         }

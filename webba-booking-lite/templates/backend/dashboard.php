@@ -84,7 +84,7 @@ function wbk_wbkdata_dashboard_before_table($table_name)
             }
             ?>
             <script>
-                var wbk_custom_fields = '<?php echo esc_html(get_option('wbk_custom_fields_columns')); ?>';
+                var wbk_custom_fields = <?php echo json_encode(WBK_Model_Utils::get_custom_fields_list()); ?>;
             </script>
             <?php
 }

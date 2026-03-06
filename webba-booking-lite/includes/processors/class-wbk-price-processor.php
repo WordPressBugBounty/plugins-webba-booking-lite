@@ -502,7 +502,8 @@ class WBK_Price_Processor
         $booking_ids,
         $tax = 0,
         $coupon = null,
-        $get_item_names = true
+        $get_item_names = true,
+        $pay_full_amount = false
     ) {
         $subtotal = 0;
         $tax_total = 0;
@@ -592,7 +593,8 @@ class WBK_Price_Processor
             $discount_total += $discount;
 
             $to_pay = 0;
-            if ($price['to_pay'] != $price['price']) {
+            $is_deposit = !$pay_full_amount && ($price['to_pay'] != $price['price']);
+            if ($is_deposit) {
                 $has_deposited_item = true;
                 if ($item_net + $item_tax > $price['to_pay']) {
                     $to_pay = $price['to_pay'] * $booking->get_quantity();
@@ -600,7 +602,7 @@ class WBK_Price_Processor
                     $to_pay = $item_net + $item_tax * $booking->get_quantity();
                 }
             } else {
-                $to_pay += $item_net + $item_tax;
+                $to_pay = $item_net + $item_tax;
             }
             $to_pay_total += $to_pay;
             if ($get_item_names) {
@@ -622,7 +624,7 @@ class WBK_Price_Processor
             $item_discounts[] = $discount;
             $item_to_pays[] = $to_pay;
             $booking_ids_array[] = $booking->get_id();
-            $deposit_items[] = $price['to_pay'] != $price['price'];
+            $deposit_items[] = $is_deposit;
             $item_service_fees[] = self::get_service_fees([$booking_id])[0];
         }
 

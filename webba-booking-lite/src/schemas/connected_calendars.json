@@ -2,6 +2,34 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {
+        "calendar_provider": {
+            "type": "string",
+            "input_type": "radio",
+            "hidden": false,
+            "title": "Calendar provider",
+            "tab": "",
+            "misc": {
+                "options": [
+                    {
+                        "value": "google",
+                        "title": "Google Calendar",
+                        "icon": "icon-google.svg",
+                        "required_plan": "start"
+                    },
+                    {
+                        "value": "outlook",
+                        "title": "Microsoft/Outlook",
+                        "icon": "icon-microsoft.svg",
+                        "required_plan": "premium"
+                    }
+                ],
+                "radio_type": "icon"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "google",
+            "editable": true
+        },
         "calendar_name": {
             "type": "string",
             "input_type": "text",
@@ -16,23 +44,6 @@
             "default_value": "",
             "editable": true
         },
-        "calendar_provider": {
-            "type": "string",
-            "input_type": "radio",
-            "hidden": false,
-            "title": "Calendar provider",
-            "tab": "",
-            "misc": {
-                "options": {
-                    "google": "Google Calendar",
-                    "outlook": "Outlook"
-                }
-            },
-            "required": true,
-            "dependency": [],
-            "default_value": "google",
-            "editable": true
-        },
         "calendar_easy_auth": {
             "type": "string",
             "input_type": "checkbox",
@@ -41,7 +52,8 @@
             "tab": "advanced",
             "misc": {
                 "yes": "Enabled",
-                "tooltip": "Enable easy authorization for this calendar (recommended)"
+                "tooltip": "Enable easy authorization for this calendar (recommended)",
+                "hidden": true
             },
             "required": false,
             "dependency": [],
@@ -63,11 +75,11 @@
             "default_value": 0,
             "editable": true
         },
-        "calendar_ggid": {
+        "calendar_in_provider_id": {
             "type": "string",
             "input_type": "select",
             "hidden": false,
-            "title": "Calendar in Google Account",
+            "title": "Calendar in Provider Account",
             "tab": "general",
             "misc": {
                 "tooltip": "Select calendar from the auhtorized account.",
@@ -100,23 +112,33 @@
         },
         "calendar_mode": {
             "type": "string",
-            "input_type": "select",
+            "input_type": "radio",
             "hidden": false,
             "title": "Mode",
             "tab": "general",
             "misc": {
                 "tooltip": "Choose the calendar connection mode",
                 "options": {
-                    "One-way": "One-way (export)",
-                    "One-way-import": "One-way (import)",
-                    "Two-ways": "Two-ways"
+                    "Two-ways": {
+                        "title": "Two-ways",
+                        "description": "Sync events in both directions - import external events and export bookings"
+                    },
+                    "One-way-import": {
+                        "title": "One-way (import)",
+                        "description": "Only import events from external calendar to block availability"
+                    },
+                    "One-way": {
+                        "title": "One-way (export)",
+                        "description": "Only export bookings to external calendar"
+                    }
                 },
-                "default_value": "One-way",
-                "description": "<strong>One-way (import):</strong> This mode will import all unavailable times from your Google Calendar to Webba Calendar. No meeting data is imported, only the time slots.<br><br>\n                    <strong>One-way (export):</strong> This mode will automatically add Webba bookings to your Google Calendar, but will not check availability of your Google calendar (risk of double-booking).<br><br>\n                    <strong>Two-ways (recommended):</strong> This mode will both import unavailable times from Google Calendar to Webba Calendar and add Webba bookings to your Google Calendar.<br><br>"
+                "default_value": "Two-ways",
+                "description": "<strong>One-way (import):</strong> This mode will import all unavailable times from your Connected Calendar to Webba Calendar. No meeting data is imported, only the time slots.<br><br>\n                    <strong>One-way (export):</strong> This mode will automatically add Webba bookings to your Connected Calendar, but will not check availability of your Connected Calendar (risk of double-booking).<br><br>\n                    <strong>Two-ways (recommended):</strong> This mode will both import unavailable times from Connected Calendar to Webba Calendar and add Webba bookings to your Connected Calendar.<br><br>",
+                "radio_type": "dots"
             },
             "required": true,
             "dependency": [],
-            "default_value": null,
+            "default_value": "Two-ways",
             "editable": true
         },
         "calendar_access_token": {
@@ -125,11 +147,13 @@
             "hidden": false,
             "title": "Authorization",
             "tab": null,
-            "misc": [],
+            "misc": {
+                "hidden": true
+            },
             "required": false,
             "dependency": [],
             "default_value": "general",
-            "editable": false
+            "editable": true
         }
     }
 }

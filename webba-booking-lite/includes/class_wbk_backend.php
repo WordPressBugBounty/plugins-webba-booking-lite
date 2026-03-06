@@ -1,10 +1,10 @@
 <?php
 // check if accessed directly
-if (!defined('ABSPATH')) {
+if (!defined("ABSPATH")) {
     exit();
 }
-include 'backend/class_wbk_backend_options.php';
-include 'backend/class_wbk_backend_schedule.php';
+include "backend/class_wbk_backend_options.php";
+include "backend/class_wbk_backend_schedule.php";
 
 // define main backend class
 class WBK_Backend
@@ -16,22 +16,22 @@ class WBK_Backend
         add_action('admin_menu', [$this, 'createAdminMenu'], 9);
         add_action('admin_menu', [$this, 'reorderAdminSubmenu'], 1000000000);
         //set components of backend
-        add_action('admin_notices', [$this, 'admin_notices']);
-        add_action('admin_init', [$this, 'handle_admin_redirects']);
+        add_action("admin_notices", [$this, "admin_notices"]);
+        add_action("admin_init", [$this, "handle_admin_redirects"]);
         add_action(
-            'in_plugin_update_message-webba-booking/webba-booking-lite.php',
-            [$this, 'prefix_plugin_update_message'],
+            "in_plugin_update_message-webba-booking/webba-booking-lite.php",
+            [$this, "prefix_plugin_update_message"],
             10,
-            2
+            2,
         );
         add_action(
-            'in_plugin_update_message-webba-booking-lite/webba-booking-lite.php',
-            [$this, 'prefix_plugin_update_message'],
+            "in_plugin_update_message-webba-booking-lite/webba-booking-lite.php",
+            [$this, "prefix_plugin_update_message"],
             10,
-            2
+            2,
         );
 
-        add_filter('admin_body_class', [$this, 'push_css_top_level_class']);
+        add_filter("admin_body_class", [$this, "push_css_top_level_class"]);
         $backend_schedule = new WBK_Backend_Schedule();
         $backend_options = new WBK_Backend_Options();
     }
@@ -41,25 +41,26 @@ class WBK_Backend
         global $pagenow;
 
         $pages = [
-            'wbk-schedule',
-            'wbk-options',
-            'wbk-gg-calendars',
-            'wbk-form-builder',
-            'wbk-appearance',
-            'wbk-services',
-            'wbk-pricing-rules',
-            'wbk-appointments',
-            'wbk-calendar',
-            'wbk-coupons',
-            'wbk-service-categories',
-            'wbk-email-templates',
-            'wbk-dashboard',
-            'wbk-spa',
+            "wbk-schedule",
+            "wbk-options",
+            "wbk-gg-calendars",
+            "wbk-connected-calendars",
+            "wbk-form-builder",
+            "wbk-appearance",
+            "wbk-services",
+            "wbk-pricing-rules",
+            "wbk-appointments",
+            "wbk-calendar",
+            "wbk-coupons",
+            "wbk-service-categories",
+            "wbk-email-templates",
+            "wbk-dashboard",
+            "wbk-spa",
         ];
-        $current_page = isset($_GET['page']) ? $_GET['page'] : '';
+        $current_page = isset($_GET["page"]) ? $_GET["page"] : "";
 
         if (in_array($current_page, $pages)) {
-            $classes .= ' webba-booking-wp-root';
+            $classes .= " webba-booking-wp-root";
         }
 
         return $classes;
@@ -67,17 +68,13 @@ class WBK_Backend
 
     public function register_and_enqueue_react_admin()
     {
-        wp_enqueue_style('editor-buttons');
+        wp_enqueue_style("editor-buttons");
     }
 
     public function prefix_plugin_update_message($data, $response)
     {
-        if (isset($data['upgrade_notice'])) {
-            $message = str_replace(
-                ['<p>', '</p>'],
-                ['<div>', '</div>'],
-                $data['upgrade_notice']
-            );
+        if (isset($data["upgrade_notice"])) {
+            $message = str_replace(["<p>", "</p>"], ["<div>", "</div>"], $data["upgrade_notice"]);
             echo '<style type="text/css">
 			#webba-booking-lite-update .update-message p:not(:first-child){
 				display: none;
@@ -88,32 +85,31 @@ class WBK_Backend
 
     public function settings_updated()
     {
-        if (isset($_GET['settings-updated']) && $_GET['settings-updated']) {
-            date_default_timezone_set(get_option('wbk_timezone', 'UTC'));
-            $time_corr = intval(
-                get_option('wbk_email_admin_daily_time', '68400')
-            );
-            $midnight = strtotime('today midnight');
-            $timestamp = strtotime('today midnight') + $time_corr;
+        if (isset($_GET["settings-updated"]) && $_GET["settings-updated"]) {
+            date_default_timezone_set(get_option("wbk_timezone", "UTC"));
+            $time_corr = intval(get_option("wbk_email_admin_daily_time", "68400"));
+            $midnight = strtotime("today midnight");
+            $timestamp = strtotime("today midnight") + $time_corr;
             if ($timestamp < time()) {
                 $timestamp += 86400;
             }
-            wp_clear_scheduled_hook('wbk_daily_event');
-            wp_schedule_event($timestamp, 'daily', 'wbk_daily_event');
-            date_default_timezone_set('UTC');
+            wp_clear_scheduled_hook("wbk_daily_event");
+            wp_schedule_event($timestamp, "daily", "wbk_daily_event");
+            date_default_timezone_set("UTC");
         }
     }
 
     public function inline_upload_enquene()
     {
-        wp_enqueue_script('wp-tinymce');
+        wp_enqueue_script("wp-tinymce");
         // add common css
         if (
-            isset($_GET['page']) &&
-            ($_GET['page'] == 'wbk-options' ||
-                $_GET['page'] == 'wbk-schedule' ||
-                $_GET['page'] == 'wbk-gg-calendars' ||
-                $_GET['page'] == 'wbk-forms')
+            isset($_GET["page"]) &&
+            ($_GET["page"] == "wbk-options" ||
+                $_GET["page"] == "wbk-schedule" ||
+                $_GET["page"] == "wbk-gg-calendars" ||
+                $_GET["page"] == "wbk-connected-calendars" ||
+                $_GET["page"] == "wbk-forms")
         ) {
         }
     }
@@ -121,12 +117,12 @@ class WBK_Backend
     {
         global $current_user;
         if (
-            current_user_can('manage_options') ||
+            current_user_can("manage_options") ||
             WBK_Validator::checkAccessToSchedule() ||
             WBK_Validator::checkAccessToGgCalendarPage()
         ) {
-            $root_name = __('Webba Booking', 'webba-booking-lite');
-            $root_name = apply_filters('wbk_root_menu_title', $root_name);
+            $root_name = __("Webba Booking", "webba-booking-lite");
+            $root_name = apply_filters("wbk_root_menu_title", $root_name);
             add_menu_page(
                 $root_name,
                 $root_name,
@@ -137,28 +133,28 @@ class WBK_Backend
                     '/public/images/webba.svg'
             );
             add_submenu_page(
-                'wbk-main',
-                __('Dashboard', 'webba-booking-lite'),
-                __('Dashboard', 'webba-booking-lite'),
-                'manage_options',
-                'wbk-dashboard',
-                ['WBK_Renderer', 'render_backend_page']
+                "wbk-main",
+                __("Dashboard", "webba-booking-lite"),
+                __("Dashboard", "webba-booking-lite"),
+                "manage_options",
+                "wbk-dashboard",
+                ["WBK_Renderer", "render_backend_page"],
             );
             add_submenu_page(
-                'wbk-main',
-                __('Services', 'webba-booking-lite'),
-                __('Services', 'webba-booking-lite'),
-                'read',
-                'wbk-services',
-                ['WBK_Renderer', 'render_backend_page']
+                "wbk-main",
+                __("Services", "webba-booking-lite"),
+                __("Services", "webba-booking-lite"),
+                "read",
+                "wbk-services",
+                ["WBK_Renderer", "render_backend_page"],
             );
             add_submenu_page(
-                'wbk-main',
-                __('Bookings', 'webba-booking-lite'),
-                __('Bookings', 'webba-booking-lite'),
-                'read',
-                'wbk-appointments',
-                ['WBK_Renderer', 'render_backend_page']
+                "wbk-main",
+                __("Bookings", "webba-booking-lite"),
+                __("Bookings", "webba-booking-lite"),
+                "read",
+                "wbk-appointments",
+                ["WBK_Renderer", "render_backend_page"],
             );
             add_submenu_page(
                 'wbk-main',
@@ -212,27 +208,27 @@ class WBK_Backend
                 ['WBK_Renderer', 'render_backend_page']
             );
             add_submenu_page(
-                'wbk-main',
-                __('Google Calendars', 'webba-booking-lite'),
-                __('Google Calendars', 'webba-booking-lite'),
-                'read',
-                'wbk-gg-calendars',
-                ['WBK_Renderer', 'render_backend_page']
+                "wbk-main",
+                __("Connected calendars", "webba-booking-lite"),
+                __("Connected calendars", "webba-booking-lite"),
+                "read",
+                "wbk-connected-calendars",
+                ["WBK_Renderer", "render_backend_page"],
             );
 
             $hook = add_submenu_page(
-                'wbk-main',
-                __('Settings', 'webba-booking-lite'),
-                __('Settings', 'webba-booking-lite'),
-                'manage_options',
-                'wbk-options',
-                ['WBK_Renderer', 'render_backend_page']
+                "wbk-main",
+                __("Settings", "webba-booking-lite"),
+                __("Settings", "webba-booking-lite"),
+                "manage_options",
+                "wbk-options",
+                ["WBK_Renderer", "render_backend_page"],
             );
 
-            add_action('load-' . $hook, [$this, 'settings_updated']);
+            add_action("load-" . $hook, [$this, "settings_updated"]);
 
             global $submenu;
-            unset($submenu['wbk-main'][0]);
+            unset($submenu["wbk-main"][0]);
         }
     }
 
@@ -300,12 +296,12 @@ class WBK_Backend
         if (!is_admin()) {
             return false;
         }
-        if ($new_edit == 'edit') {
-            return in_array($pagenow, ['post.php']);
-        } elseif ($new_edit == 'new') {
-            return in_array($pagenow, ['post-new.php']);
+        if ($new_edit == "edit") {
+            return in_array($pagenow, ["post.php"]);
+        } elseif ($new_edit == "new") {
+            return in_array($pagenow, ["post-new.php"]);
         } else {
-            return in_array($pagenow, ['post.php', 'post-new.php']);
+            return in_array($pagenow, ["post.php", "post-new.php"]);
         }
     }
     public function admin_notices()
@@ -318,16 +314,22 @@ class WBK_Backend
     public function handle_admin_redirects()
     {
         // Handle Google Calendar revocation redirect
-        if (
-            isset($_GET['revoke-gg-calendar']) &&
-            is_numeric($_GET['revoke-gg-calendar'])
-        ) {
-            $calendar_id = intval($_GET['revoke-gg-calendar']);
-            $google = new WBK_Google_Calendar($calendar_id);
+        if (isset($_GET["revoke-gg-calendar"]) && is_numeric($_GET["revoke-gg-calendar"])) {
+            $calendar_id = intval($_GET["revoke-gg-calendar"]);
+            $google = new WBK_Google_Calendar_Processor($calendar_id);
             $google->clear_access_token();
-            $google->save();
 
-            wp_redirect(admin_url('admin.php?page=wbk-gg-calendars'));
+            wp_redirect(admin_url("admin.php?page=wbk-connected-calendars"));
+            exit();
+        }
+
+        // Handle Outlook Calendar revocation redirect
+        if (isset($_GET["revoke-outlook-calendar"]) && is_numeric($_GET["revoke-outlook-calendar"])) {
+            $calendar_id = intval($_GET["revoke-outlook-calendar"]);
+            $outlook = new WBK_Outlook_Calendar_Processor($calendar_id);
+            $outlook->clear_access_token();
+
+            wp_redirect(admin_url("admin.php?page=wbk-connected-calendars"));
             exit();
         }
     }

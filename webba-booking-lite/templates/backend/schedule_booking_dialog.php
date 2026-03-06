@@ -19,28 +19,13 @@ if ( ! defined( 'ABSPATH' ) ) exit;
             <input id="wbk-appointment-quantity-max"  type="hidden" value="" />
 
             <?php
-                $ids = get_option( 'wbk_custom_fields_columns', '' );
-                if( $ids != ''  ){
-                    $ids = explode( ',', $ids );
-                    $html = '';
-                    foreach( $ids as $id ){
-                        $col_title = '';
-                        preg_match("/\[[^\]]*\]/", $id, $matches);
-                        if( is_array( $matches ) && count( $matches ) > 0 ){
-                            $col_title = rtrim( ltrim( $matches[0], '[' ), ']' );
-
-                        }
-                        $id = explode( '[', $id );
-                        $id = $id[0];
-                        if( $col_title == '' ){
-                            $col_title =  $id;
-                        }
-                        $html .= '<label for="' . esc_attr( $id )  . '" class="slf_table_component_label" > ' . esc_html( $col_title  ). '</label><br>';
-                        $html .= '<input type="text"  data-id="' . esc_attr( $id ) . '"  data-label="' . esc_attr( $id ) . '" class="wbk-long-input wbk_table_custom_field_part"  value=""  /><br>';
+                $custom_fields_list = WBK_Model_Utils::get_custom_fields_list();
+                if ( ! empty( $custom_fields_list ) ) {
+                    foreach ( $custom_fields_list as $slug => $col_title ) {
+                        echo '<label for="' . esc_attr( $slug ) . '" class="slf_table_component_label"> ' . esc_html( $col_title ) . '</label><br>';
+                        echo '<input type="text" data-id="' . esc_attr( $slug ) . '" data-label="' . esc_attr( $slug ) . '" class="wbk-long-input wbk_table_custom_field_part" value="" /><br>';
                     }
-                    echo $html;
                 }
-
             ?>
         </div>
         <div id="appointment_dialog_right">

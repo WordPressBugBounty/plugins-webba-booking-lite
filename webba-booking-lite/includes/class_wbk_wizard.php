@@ -5,20 +5,48 @@ if ( !defined( 'ABSPATH' ) ) {
 }
 class WBK_Wizard {
     public function __construct() {
-        add_action( 'admin_enqueue_scripts', [$this, 'admin_enqueue_scripts'], 20 );
-        add_action( 'wp_ajax_wbk_wizard_initial_setup', [$this, 'wbk_wizard_initial_setup'] );
-        add_action( 'wp_ajax_wbk_wizard_final_setup', [$this, 'wbk_wizard_final_setup'] );
+        add_action( 'rest_api_init', function () {
+            register_rest_route( 'webba-booking/v1', '/wizard/submit-initial-setup', [
+                'methods'             => 'POST',
+                'callback'            => [$this, 'wbk_wizard_initial_setup'],
+                'permission_callback' => [$this, 'wbk_wizard_initial_setup_permission'],
+            ] );
+            register_rest_route( 'webba-booking/v1', '/wizard/submit-final-setup', [
+                'methods'             => 'POST',
+                'callback'            => [$this, 'wbk_wizard_final_setup'],
+                'permission_callback' => [$this, 'wbk_wizard_final_setup_permission'],
+            ] );
+        } );
     }
 
-    public function wbk_wizard_initial_setup() {
-        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkb_nonce' ) ) {
-            echo json_encode( [
-                'status' => 'fail',
-                'reason' => 'too many requests',
-            ] );
-            wp_die();
-            return;
-        }
+    /**
+     * Permission callback for the initial setup
+     *
+     * @param WP_REST_Request $request
+     * @return boolean
+     */
+    public function wbk_wizard_initial_setup_permission( WP_REST_Request $request ) : bool {
+        return current_user_can( 'manage_options' );
+    }
+
+    /**
+     * Permission callback for the final setup
+     *
+     * @param WP_REST_Request $request
+     * @return boolean
+     */
+    public function wbk_wizard_final_setup_permission( WP_REST_Request $request ) : bool {
+        return current_user_can( 'manage_options' );
+    }
+
+    /**
+     * Initial setup endpoint
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function wbk_wizard_initial_setup( WP_REST_Request $request ) : WP_REST_Response {
+        $params = $request->get_params();
         // Check required fields
         $required_fields = [
             'email',
@@ -34,51 +62,44 @@ class WBK_Wizard {
             'wbk_global_working_hours'
         ];
         foreach ( $required_fields as $field ) {
-            if ( !isset( $_POST[$field] ) ) {
-                echo json_encode( [
+            if ( !isset( $params[$field] ) ) {
+                return new WP_REST_Response([
                     'status' => 'fail',
                     'reason' => 'missing field: ' . $field,
-                ] );
-                wp_die();
-                return;
+                ], 400);
             }
         }
         // Validate and sanitize input
-        $service_name = esc_html( sanitize_text_field( trim( $_POST['service_name'] ) ) );
+        $service_name = esc_html( sanitize_text_field( trim( $params['service_name'] ) ) );
         if ( $service_name == '' ) {
-            echo json_encode( [
+            return new WP_REST_Response([
                 'status' => 'fail',
                 'reason' => 'wrong service name',
-            ] );
-            wp_die();
-            return;
+            ], 400);
         }
-        $duration = intval( $_POST['service_duration'] );
+        $duration = intval( $params['service_duration'] );
         if ( !WBK_Validator::check_integer( $duration, 5, 1440 ) ) {
-            echo json_encode( [
+            return new WP_REST_Response([
                 'status' => 'fail',
                 'reason' => 'duration',
-            ] );
-            wp_die();
-            return;
+            ], 400);
         }
-        $business_hours_json = ( isset( $_POST['wbk_global_working_hours'] ) ? stripslashes( sanitize_text_field( $_POST['wbk_global_working_hours'] ) ) : '' );
-        $business_hours_arr = json_decode( $business_hours_json, true );
-        if ( !is_array( $business_hours_arr ) ) {
-            echo json_encode( [
+        $min_quantity = 1;
+        $max_quantity = 1;
+        $quantity = 1;
+        if ( !isset( $params['wbk_global_working_hours'] ) || !is_array( $params['wbk_global_working_hours'] ) ) {
+            return new WP_REST_Response([
                 'status' => 'fail',
                 'reason' => 'invalid business hours',
-            ] );
-            wp_die();
-            return;
+            ], 400);
         }
-        update_option( 'wbk_global_working_hours', $business_hours_json );
+        update_option( 'wbk_global_working_hours', json_encode( $params['wbk_global_working_hours'] ) );
         // Create service
         $service = new WBK_Service();
         // Basic info
         $service->set( 'name', $service_name );
-        $service->set( 'description', sanitize_text_field( $_POST['service_description'] ) );
-        $service->set( 'email', sanitize_email( $_POST['email'] ) );
+        $service->set( 'description', sanitize_text_field( $params['service_description'] ) );
+        $service->set( 'email', sanitize_email( $params['email'] ) );
         $service->set( 'priority', '0' );
         $service->set( 'form', '0' );
         $service->set( 'extcalendar', '' );
@@ -95,135 +116,105 @@ class WBK_Wizard {
         $service->set( 'color', WBK_Appearance_Utils::generate_random_color( $existing_colors ) );
         $service->set( 'business_hours', $business_hours_json );
         $service->set( 'duration', $duration );
-        $service->set( 'step', intval( $_POST['service_interval'] ) );
-        $service->set( 'interval_between', intval( $_POST['service_buffer'] ) );
-        $service->set( 'price', floatval( $_POST['service_price'] ) );
+        $service->set( 'step', intval( $params['service_interval'] ) );
+        $service->set( 'interval_between', intval( $params['service_buffer'] ) );
+        $service->set( 'price', floatval( $params['service_price'] ) );
         $service->set( 'service_fee', '0' );
-        $service->set( 'hide_price', ( !empty( $_POST['service_hide_price'] ) && $_POST['service_hide_price'] === 'yes' ? 'yes' : '' ) );
+        $service->set( 'hide_price', ( !empty( $params['service_hide_price'] ) && $params['service_hide_price'] === 'yes' ? 'yes' : '' ) );
+        // overrides
+        $service->set( 'override_email', '' );
+        $service->set( 'override_availability', '' );
+        $service->set( 'override_step', '' );
+        $service->set( 'business_hours', '' );
+        if ( isset( $params['service_payment_methods'] ) ) {
+            $payment_methods = $params['service_payment_methods'];
+            if ( is_string( $payment_methods ) ) {
+                $decoded = json_decode( $payment_methods, true );
+                $payment_methods = ( is_array( $decoded ) ? $decoded : [] );
+            }
+            if ( is_array( $payment_methods ) ) {
+                $service->set( 'payment_methods', json_encode( array_values( $payment_methods ) ) );
+            }
+        }
         // Templates
         $service->set( 'notification_template', '0' );
         $service->set( 'reminder_template', '0' );
         $service->set( 'invoice_template', '0' );
         $service->set( 'booking_changed_template', '0' );
         $service->set( 'approval_template', '0' );
-        $service->set( 'prepare_time', intval( $_POST['service_advance'] ) );
+        $service->set( 'prepare_time', intval( $params['service_advance'] ) );
         // Save service
         $service_id = $service->save();
         // Save global settings
-        update_option( 'wbk_timezone', sanitize_text_field( $_POST['timezone'] ) );
-        update_option( 'wbk_payment_price_format_new', sanitize_text_field( $_POST['currency_symbol'] ) );
-        if ( isset( $_POST['wbk_sidebar_help_email'] ) ) {
-            update_option( 'wbk_sidebar_help_email', sanitize_text_field( $_POST['wbk_sidebar_help_email'] ) );
+        update_option( 'wbk_timezone', sanitize_text_field( $params['timezone'] ) );
+        update_option( 'wbk_payment_price_format_new', sanitize_text_field( $params['currency_symbol'] ) );
+        if ( isset( $params['wbk_sidebar_help_email'] ) ) {
+            update_option( 'wbk_sidebar_help_email', sanitize_text_field( $params['wbk_sidebar_help_email'] ) );
         }
-        if ( isset( $_POST['wbk_sidebar_help_phone'] ) ) {
-            update_option( 'wbk_sidebar_help_phone', sanitize_text_field( $_POST['wbk_sidebar_help_phone'] ) );
+        if ( isset( $params['wbk_sidebar_help_phone'] ) ) {
+            update_option( 'wbk_sidebar_help_phone', sanitize_text_field( $params['wbk_sidebar_help_phone'] ) );
         }
         // Process closed dates
-        if ( isset( $_POST['closed_dates'] ) ) {
-            $closed_dates = json_decode( stripslashes( $_POST['closed_dates'] ), true );
-            $holiday_dates = [];
-            foreach ( $closed_dates as $range ) {
-                $start = DateTime::createFromFormat( 'm/d/Y', $range['start'] );
-                $end = DateTime::createFromFormat( 'm/d/Y', $range['end'] );
-                $interval = new DateInterval('P1D');
-                $date_range = new DatePeriod($start, $interval, $end->modify( '+1 day' ));
-                foreach ( $date_range as $date ) {
-                    $holiday_dates[] = $date->format( 'Y-m-d' );
-                }
-            }
-            update_option( 'wbk_holydays', implode( ',', $holiday_dates ) );
+        if ( isset( $params['closed_dates'] ) ) {
+            update_option( 'wbk_holydays', $params['closed_dates'] );
         }
         // Return shortcode
-        echo json_encode( [
-            'status'    => 'success',
-            'shortcode' => '[webbabooking]',
-        ] );
         WBK_Mixpanel::track_event( 'service created', [] );
         WBK_Mixpanel::track_event( 'setup wizard basic setup complete', [] );
-        wp_die();
-        return;
+        return new WP_REST_Response([
+            'status'    => 'success',
+            'shortcode' => '[webbabooking]',
+        ], 200);
     }
 
-    public function wbk_wizard_final_setup() {
-        if ( !wp_verify_nonce( $_POST['nonce'], 'wbkb_nonce' ) ) {
-            echo json_encode( [
-                'status' => 'fail',
-                'reason' => 'too many requests',
-            ] );
-            wp_die();
-            return;
-        }
-        if ( !isset( $_POST['final_action'] ) ) {
-            echo json_encode( [
-                'status' => 'fail',
-                'reason' => 'wrong finalize',
-            ] );
-            wp_die();
-            return;
-        }
-        if ( $_POST['final_action'] != 'setup_advanced' && $_POST['final_action'] != 'finalize' ) {
-            echo json_encode( [
+    /**
+     * Final setup endpoint
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function wbk_wizard_final_setup( WP_REST_Request $request ) : WP_REST_Response {
+        $params = $request->get_params();
+        if ( !isset( $params['final_action'] ) ) {
+            return new WP_REST_Response([
                 'status' => 'fail',
                 'reason' => 'wrong finalize',
-            ] );
-            wp_die();
-            return;
+            ], 400);
         }
-        if ( isset( $_POST['enable_emails'] ) ) {
+        if ( $params['final_action'] != 'setup_advanced' && $params['final_action'] != 'finalize' ) {
+            return new WP_REST_Response([
+                'status' => 'fail',
+                'reason' => 'wrong finalize',
+            ], 400);
+        }
+        if ( isset( $params['enable_emails'] ) ) {
             update_option( 'wbk_email_customer_book_status', 'true' );
             update_option( 'wbk_email_admin_book_status', 'true' );
         } else {
             update_option( 'wbk_email_customer_book_status', '' );
             update_option( 'wbk_email_admin_book_status', '' );
         }
-        if ( isset( $_POST['enable_sms'] ) ) {
+        if ( isset( $params['enable_sms'] ) ) {
             update_option( 'wbk_sms_setup_required', 'true' );
         } else {
             update_option( 'wbk_sms_setup_required', 'false' );
         }
-        if ( isset( $_POST['enable_payments'] ) ) {
+        if ( isset( $params['enable_payments'] ) ) {
             update_option( 'wbk_payments_setup_required', 'true' );
         } else {
             update_option( 'wbk_payments_setup_required', 'false' );
         }
-        if ( isset( $_POST['enable_google'] ) ) {
+        if ( isset( $params['enable_google'] ) ) {
             update_option( 'wbk_google_setup_required', 'true' );
         } else {
             update_option( 'wbk_google_setup_required', 'false' );
         }
-        $finalize = sanitize_text_field( $_POST['final_action'] );
         $url = esc_url( get_admin_url() . 'admin.php?page=wbk-services' );
-        echo json_encode( [
+        WBK_Mixpanel::track_event( 'setup wizard full setup complete', [] );
+        return new WP_REST_Response([
             'status' => 'success',
             'url'    => $url,
-        ] );
-        WBK_Mixpanel::track_event( 'setup wizard full setup complete', [] );
-        wp_die();
-        return;
-    }
-
-    public function admin_enqueue_scripts() {
-        wp_enqueue_script(
-            'wbk-wizard',
-            WP_WEBBA_BOOKING__PLUGIN_URL . '/public/js/wbk-wizard.js',
-            [
-                'jquery',
-                'jquery-ui-slider',
-                'jquery-touch-punch',
-                'jquery-ui-draggable',
-                'wbk-validator'
-            ],
-            WP_WEBBA_BOOKING__VERSION
-        );
-        $translation_array = [
-            'nonce'                  => wp_create_nonce( 'wbkb_nonce' ),
-            'ajaxurl'                => admin_url( 'admin-ajax.php' ),
-            'setup_advanced_options' => esc_html__( 'Setup Advanced Options', 'webba-booking-lite' ),
-            'finish_setup_wizard'    => esc_html__( 'Finish the Setup Wizard', 'webba-booking-lite' ),
-            'settings_url'           => esc_url( get_admin_url() . 'admin.php?page=wbk-options' ),
-            'admin_url'              => esc_url( get_admin_url() ),
-        ];
-        wp_localize_script( 'wbk-wizard', 'wbk_wizardl10n', $translation_array );
+        ], 200);
     }
 
 }

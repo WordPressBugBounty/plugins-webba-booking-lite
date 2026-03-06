@@ -179,19 +179,25 @@ function wbk_calculate_booking_product_price(  $cart_object  ) {
                 }
                 if ( $prod_id == $booking->get_woo_product() ) {
                     $booking_ids_list = explode( ',', $value['wbk_booking_ids_list'] );
-                    $all_payment_details = WBK_Price_Processor::get_payment_items( $booking_ids_list, 0 );
-                    $payment_items = $all_payment_details['items'] ?? [];
-                    $have_one_deposit_item = false;
-                    if ( count( $payment_items ) > 0 ) {
-                        foreach ( $payment_items as $payment_item ) {
-                            if ( $payment_item['have_deposit'] ) {
-                                $have_one_deposit_item = true;
-                                break;
+                    $session_key = 'wbk_cart_payment_details_' . implode( '_', $booking_ids_list );
+                    $stored_payment_details = ( WC()->session && WC()->session->__isset( $session_key ) ? WC()->session->get( $session_key ) : null );
+                    if ( $stored_payment_details !== null && is_array( $stored_payment_details ) ) {
+                        $price = floatval( $stored_payment_details['woo_total'] ) / count( $booking_ids_list );
+                    } else {
+                        $all_payment_details = WBK_Price_Processor::get_payment_items( $booking_ids_list, 0 );
+                        $payment_items = $all_payment_details['items'] ?? [];
+                        $have_one_deposit_item = false;
+                        if ( count( $payment_items ) > 0 ) {
+                            foreach ( $payment_items as $payment_item ) {
+                                if ( $payment_item['have_deposit'] ) {
+                                    $have_one_deposit_item = true;
+                                    break;
+                                }
                             }
                         }
+                        $payment_details = WBK_Price_Processor::get_payment_items( [$booking_id], 0 );
+                        $price = $all_payment_details['woo_total'] / count( $booking_ids_list );
                     }
-                    $payment_details = WBK_Price_Processor::get_payment_items( [$booking_id], 0 );
-                    $price = $all_payment_details['woo_total'] / count( $booking_ids_list );
                     // disabled because of no purpose in this case
                     // if (
                     //     $have_one_deposit_item &&
@@ -298,7 +304,7 @@ function wbk_init_woocommerce_cart_session() {
 }
 
 class WBK_WooCommerce {
-    static function add_to_cart( $booking_ids ) {
+    static function add_to_cart( $booking_ids, $payment_details = null ) {
         return json_encode( [
             'status'  => 0,
             'details' => __( 'Payment method not supported', 'webba-booking-lite' ),

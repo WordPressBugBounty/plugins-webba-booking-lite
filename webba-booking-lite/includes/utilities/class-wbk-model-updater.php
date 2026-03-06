@@ -1,6 +1,6 @@
 <?php
 
-if (!defined('ABSPATH')) {
+if (!defined("ABSPATH")) {
     exit();
 }
 
@@ -8,11 +8,11 @@ class WBK_Model_Updater
 {
     static function is_update_required($version)
     {
-        if (isset($_GET[$version]) && current_user_can('manage_options')) {
+        if (isset($_GET[$version]) && current_user_can("manage_options")) {
             return true;
         }
-        $update_status = get_option('wbk_update_status', '');
-        if ($update_status == '') {
+        $update_status = get_option("wbk_update_status", "");
+        if ($update_status == "") {
             return true;
         } else {
             if (!isset($update_status[$version])) {
@@ -23,14 +23,14 @@ class WBK_Model_Updater
     }
     static function set_update_as_complete($version)
     {
-        $update_status = get_option('wbk_update_status', '');
-        if ($update_status == '') {
+        $update_status = get_option("wbk_update_status", "");
+        if ($update_status == "") {
             $update_status = [];
             $update_status[$version] = true;
         } else {
             $update_status[$version] = true;
         }
-        update_option('wbk_update_status', $update_status);
+        update_option("wbk_update_status", $update_status);
     }
     public static function run_update()
     {
@@ -63,55 +63,59 @@ class WBK_Model_Updater
         self::update_settings_fields_6_3_0_update_conditional_options();
         self::update_settings_fields_6_3_0_update_service_categories();
         self::update_settings_fields_6_3_0_update_service_overrides();
+        self::update_settings_fields_6_3_9_update_google_calendars();
+        self::update_custom_fields_6_3_11();
+        self::update_services_6_3_11();
+        self::update_email_notifications_6_3_11();
     }
 
     static function update_4_3_0_1()
     {
         global $wpdb;
-        if (self::is_update_required('update_4_3_0_1')) {
+        if (self::is_update_required("update_4_3_0_1")) {
             $wpdb->query(
-                'ALTER TABLE ' .
-                    get_option('wbk_db_prefix', '') .
-                    'wbk_services' .
-                    ' ROW_FORMAT=DYNAMIC'
+                "ALTER TABLE " .
+                    get_option("wbk_db_prefix", "") .
+                    "wbk_services" .
+                    " ROW_FORMAT=DYNAMIC",
             );
             $wpdb->query(
-                'ALTER TABLE ' .
-                    get_option('wbk_db_prefix', '') .
-                    'wbk_appointments' .
-                    ' ROW_FORMAT=DYNAMIC'
+                "ALTER TABLE " .
+                    get_option("wbk_db_prefix", "") .
+                    "wbk_appointments" .
+                    " ROW_FORMAT=DYNAMIC",
             );
 
-            self::set_update_as_complete('update_4_3_0_1');
+            self::set_update_as_complete("update_4_3_0_1");
         }
     }
     static function update_4_5_1() {}
 
     static function update_5_0_0_static()
     {
-        update_option('wbk_mode', 'webba5');
-        update_option('wbk_appointments_auto_lock_allow_unlock', 'disallow');
-        update_option('wbk_allow_manage_by_link', 'yes');
-        update_option('wbk_email_customer_book_multiple_mode', 'one');
-        update_option('wbk_email_admin_book_multiple_mode', 'one');
-        update_option('wbk_email_admin_cancel_multiple_mode', 'one');
-        update_option('wbk_email_customer_cancel_multiple_mode', 'one');
-        update_option('wbk_email_admin_cancel_multiple_mode', 'one');
-        update_option('wbk_email_admin_cancel_multiple_mode', 'one');
+        update_option("wbk_mode", "webba5");
+        update_option("wbk_appointments_auto_lock_allow_unlock", "disallow");
+        update_option("wbk_allow_manage_by_link", "yes");
+        update_option("wbk_email_customer_book_multiple_mode", "one");
+        update_option("wbk_email_admin_book_multiple_mode", "one");
+        update_option("wbk_email_admin_cancel_multiple_mode", "one");
+        update_option("wbk_email_customer_cancel_multiple_mode", "one");
+        update_option("wbk_email_admin_cancel_multiple_mode", "one");
+        update_option("wbk_email_admin_cancel_multiple_mode", "one");
 
-        if (self::is_update_required('update_5_0_0_static')) {
-            update_option('wbk_date_format', get_option('date_format'));
-            update_option('wbk_time_format', get_option('time_format'));
-            update_option('wbk_start_of_week', get_option('start_of_week'));
+        if (self::is_update_required("update_5_0_0_static")) {
+            update_option("wbk_date_format", get_option("date_format"));
+            update_option("wbk_time_format", get_option("time_format"));
+            update_option("wbk_start_of_week", get_option("start_of_week"));
 
-            self::set_update_as_complete('update_5_0_0_static');
+            self::set_update_as_complete("update_5_0_0_static");
         }
     }
     static function update_5_0_37()
     {
         global $wpdb;
-        if (self::is_update_required('update_5_0_37')) {
-            $previous_proudct_id = get_option('wbk_woo_product_id', '');
+        if (self::is_update_required("update_5_0_37")) {
+            $previous_proudct_id = get_option("wbk_woo_product_id", "");
             if (is_numeric($previous_proudct_id)) {
                 $services_ids = WBK_Model_Utils::get_service_ids();
                 foreach ($services_ids as $service_id) {
@@ -119,59 +123,49 @@ class WBK_Model_Updater
                     if (!$service->is_loaded()) {
                         continue;
                     }
-                    if ($service->get_payment_methods() == '') {
+                    if ($service->get_payment_methods() == "") {
                         continue;
                     }
-                    $payment_methods = json_decode(
-                        $service->get_payment_methods(),
-                        true
-                    );
-                    if (
-                        is_array($payment_methods) &&
-                        in_array('woocommerce', $payment_methods)
-                    ) {
-                        $service->set('woo_product', $previous_proudct_id);
+                    $payment_methods = json_decode($service->get_payment_methods(), true);
+                    if (is_array($payment_methods) && in_array("woocommerce", $payment_methods)) {
+                        $service->set("woo_product", $previous_proudct_id);
                         $service->save();
                     }
                 }
             }
-            self::set_update_as_complete('update_5_0_37');
+            self::set_update_as_complete("update_5_0_37");
         }
     }
     static function update_5_0_44()
     {
         global $wpdb;
-        if (self::is_update_required('update_5_0_44_1')) {
+        if (self::is_update_required("update_5_0_44_1")) {
             $wpdb->query(
-                'ALTER TABLE ' .
-                    get_option('wbk_db_prefix', '') .
-                    'wbk_services CHANGE `multi_mode_limit` `multi_mode_limit` INT UNSIGNED NULL DEFAULT NULL'
+                "ALTER TABLE " .
+                    get_option("wbk_db_prefix", "") .
+                    "wbk_services CHANGE `multi_mode_limit` `multi_mode_limit` INT UNSIGNED NULL DEFAULT NULL",
             );
             $wpdb->query(
-                'ALTER TABLE ' .
-                    get_option('wbk_db_prefix', '') .
-                    'wbk_services CHANGE `multi_mode_low_limit` `multi_mode_low_limit` INT UNSIGNED NULL DEFAULT NULL'
+                "ALTER TABLE " .
+                    get_option("wbk_db_prefix", "") .
+                    "wbk_services CHANGE `multi_mode_low_limit` `multi_mode_low_limit` INT UNSIGNED NULL DEFAULT NULL",
             );
 
-            self::set_update_as_complete('update_5_0_44_1');
+            self::set_update_as_complete("update_5_0_44_1");
         }
     }
 
     static function update_5_0_46()
     {
         global $wpdb;
-        if (self::is_update_required('update_5_0_46')) {
-            $default_value = [
-                'complete_status',
-                'thankyou_message',
-                'complete_payment',
-            ];
-            $value = get_option('wbk_woo_complete_action', $default_value);
-            if (is_array($value) && !in_array('complete_payment', $value)) {
-                $value[] = 'complete_payment';
-                update_option('wbk_woo_complete_action', $value);
+        if (self::is_update_required("update_5_0_46")) {
+            $default_value = ["complete_status", "thankyou_message", "complete_payment"];
+            $value = get_option("wbk_woo_complete_action", $default_value);
+            if (is_array($value) && !in_array("complete_payment", $value)) {
+                $value[] = "complete_payment";
+                update_option("wbk_woo_complete_action", $value);
             }
-            self::set_update_as_complete('update_5_0_46');
+            self::set_update_as_complete("update_5_0_46");
         }
     }
 
@@ -182,14 +176,11 @@ class WBK_Model_Updater
      */
     static function update_5_0_55(): void
     {
-        if (!self::is_update_required('update_5_0_55')) {
+        if (!self::is_update_required("update_5_0_55")) {
             return;
         }
 
-        if (
-            !wbk_fs()->is__premium_only() ||
-            !wbk_fs()->can_use_premium_code()
-        ) {
+        if (!wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code()) {
             return;
         }
 
@@ -199,32 +190,29 @@ class WBK_Model_Updater
             return;
         }
 
-        update_option('wbk_create_user_on_booking', true);
+        update_option("wbk_create_user_on_booking", true);
 
-        self::set_update_as_complete('update_5_0_55');
+        self::set_update_as_complete("update_5_0_55");
     }
     static function update_5_1_0()
     {
         global $wpdb;
-        if (self::is_update_required('update_5_1_0')) {
+        if (self::is_update_required("update_5_1_0")) {
             // update business hours format
-            $table_name = get_option('wbk_db_prefix', '') . 'wbk_services';
-            $new_column = 'business_hours';
-            $source_column = 'business_hours_v4';
+            $table_name = get_option("wbk_db_prefix", "") . "wbk_services";
+            $new_column = "business_hours";
+            $source_column = "business_hours_v4";
 
             $source_column_exists = $wpdb->get_results(
-                $wpdb->prepare(
-                    "SHOW COLUMNS FROM `$table_name` LIKE %s",
-                    $source_column
-                )
+                $wpdb->prepare("SHOW COLUMNS FROM `$table_name` LIKE %s", $source_column),
             );
             if (!empty($source_column_exists)) {
                 $wpdb->query(
-                    "UPDATE `$table_name` SET `$new_column` = `$source_column` WHERE `$new_column` IS NULL OR `$new_column` = ''"
+                    "UPDATE `$table_name` SET `$new_column` = `$source_column` WHERE `$new_column` IS NULL OR `$new_column` = ''",
                 );
             }
             $wpdb->query(
-                " ALTER TABLE `$table_name` CHANGE `business_hours` `business_hours` MEDIUMTEXT"
+                " ALTER TABLE `$table_name` CHANGE `business_hours` `business_hours` MEDIUMTEXT",
             );
 
             foreach (WBK_Model_Utils::get_service_ids() as $service_id) {
@@ -233,271 +221,226 @@ class WBK_Model_Updater
                     continue;
                 }
                 $service->set(
-                    'business_hours',
+                    "business_hours",
                     WBK_Model_Utils::extract_bh_availability_from_v4(
-                        $service->get('business_hours')
-                    )
+                        $service->get("business_hours"),
+                    ),
                 );
                 $service->save();
             }
 
-            $prefix = get_option('wbk_db_prefix', '');
+            $prefix = get_option("wbk_db_prefix", "");
 
             // Process Google calendars table
-            $cal_table = $prefix . 'wbk_gg_calendars';
-            $cal_old = 'calendar_id';
-            $cal_new = 'ggid';
+            $cal_table = $prefix . "wbk_gg_calendars";
+            $cal_old = "calendar_id";
+            $cal_new = "ggid";
 
             if ($wpdb->get_var("SHOW TABLES LIKE '$cal_table'") == $cal_table) {
-                $new_exists = $wpdb->get_results(
-                    "SHOW COLUMNS FROM $cal_table LIKE '$cal_new'"
-                );
+                $new_exists = $wpdb->get_results("SHOW COLUMNS FROM $cal_table LIKE '$cal_new'");
                 if (empty($new_exists)) {
-                    $wpdb->query(
-                        "ALTER TABLE $cal_table ADD COLUMN `$cal_new` VARCHAR(256)"
-                    );
+                    $wpdb->query("ALTER TABLE $cal_table ADD COLUMN `$cal_new` VARCHAR(256)");
                 }
-                $old_exists = $wpdb->get_results(
-                    "SHOW COLUMNS FROM $cal_table LIKE '$cal_old'"
-                );
+                $old_exists = $wpdb->get_results("SHOW COLUMNS FROM $cal_table LIKE '$cal_old'");
                 if (!empty($old_exists)) {
                     $wpdb->query(
-                        "UPDATE $cal_table SET `$cal_new` = `$cal_old` WHERE `$cal_old` IS NOT NULL"
+                        "UPDATE $cal_table SET `$cal_new` = `$cal_old` WHERE `$cal_old` IS NOT NULL",
                     );
                 }
             }
 
             // Process service categories table
-            $cat_table = $prefix . 'wbk_service_categories';
-            $cat_old = 'category_list';
-            $cat_new = 'list';
+            $cat_table = $prefix . "wbk_service_categories";
+            $cat_old = "category_list";
+            $cat_new = "list";
 
             if ($wpdb->get_var("SHOW TABLES LIKE '$cat_table'") == $cat_table) {
-                $new_exists = $wpdb->get_results(
-                    "SHOW COLUMNS FROM $cat_table LIKE '$cat_new'"
-                );
+                $new_exists = $wpdb->get_results("SHOW COLUMNS FROM $cat_table LIKE '$cat_new'");
                 if (empty($new_exists)) {
                     $wpdb->query(
-                        "ALTER TABLE $cat_table ADD COLUMN `$cat_new` VARCHAR(1024) NULL DEFAULT NULL"
+                        "ALTER TABLE $cat_table ADD COLUMN `$cat_new` VARCHAR(1024) NULL DEFAULT NULL",
                     );
                 }
-                $old_exists = $wpdb->get_results(
-                    "SHOW COLUMNS FROM $cat_table LIKE '$cat_old'"
-                );
+                $old_exists = $wpdb->get_results("SHOW COLUMNS FROM $cat_table LIKE '$cat_old'");
                 if (!empty($old_exists)) {
                     $wpdb->query(
-                        "UPDATE $cat_table SET `$cat_new` = `$cat_old` WHERE `$cat_old` IS NOT NULL"
+                        "UPDATE $cat_table SET `$cat_new` = `$cat_old` WHERE `$cat_old` IS NOT NULL",
                     );
                 }
             }
-            self::set_update_as_complete('update_5_1_0');
+            self::set_update_as_complete("update_5_1_0");
         }
     }
     static function update_5_1_2()
     {
         global $wpdb;
-        if (self::is_update_required('update_5_1_2')) {
-            $table_name = get_option('wbk_db_prefix', '') . 'wbk_services';
+        if (self::is_update_required("update_5_1_2")) {
+            $table_name = get_option("wbk_db_prefix", "") . "wbk_services";
             $wpdb->query(
-                " ALTER TABLE `$table_name` CHANGE `business_hours` `business_hours` MEDIUMTEXT"
+                " ALTER TABLE `$table_name` CHANGE `business_hours` `business_hours` MEDIUMTEXT",
             );
             foreach (WBK_Model_Utils::get_service_ids() as $service_id) {
                 $service = new WBK_Service($service_id);
                 if (!$service->is_loaded()) {
                     continue;
                 }
-                if (
-                    strpos(
-                        $service->get('business_hours'),
-                        'dow_availability'
-                    ) !== false
-                ) {
+                if (strpos($service->get("business_hours"), "dow_availability") !== false) {
                     $v4_res = WBK_Model_Utils::extract_bh_availability_from_v4(
-                        $service->get('business_hours_v4')
+                        $service->get("business_hours_v4"),
                     );
                     if (!$v4_res) {
-                        $v4_res = '[]';
+                        $v4_res = "[]";
                     }
-                    $service->set('business_hours', $v4_res);
+                    $service->set("business_hours", $v4_res);
                     $service->save();
                 }
             }
         }
-        self::set_update_as_complete('update_5_1_2');
+        self::set_update_as_complete("update_5_1_2");
     }
     static function update_5_1_3()
     {
         global $wpdb;
-        if (self::is_update_required('update_5_1_3')) {
+        if (self::is_update_required("update_5_1_3")) {
             foreach (WBK_Model_Utils::get_service_ids() as $service_id) {
                 $service = new WBK_Service($service_id);
                 if (!$service->is_loaded()) {
                     continue;
                 }
-                $bh = json_decode($service->get('business_hours'));
+                $bh = json_decode($service->get("business_hours"));
                 if ($bh == false || is_null($bh)) {
                     $v4_res = WBK_Model_Utils::extract_bh_availability_from_v4(
-                        $service->get('business_hours_v4')
+                        $service->get("business_hours_v4"),
                     );
                     if (!$v4_res) {
-                        $v4_res = '[]';
+                        $v4_res = "[]";
                     }
-                    $service->set('business_hours', $v4_res);
+                    $service->set("business_hours", $v4_res);
                     $service->save();
                 }
             }
         }
-        self::set_update_as_complete('update_5_1_3');
+        self::set_update_as_complete("update_5_1_3");
     }
 
     static function update_5_1_5()
     {
         global $wpdb;
-        if (self::is_update_required('update_5_1_5')) {
+        if (self::is_update_required("update_5_1_5")) {
             foreach (WBK_Model_Utils::get_pricing_rules() as $id => $name) {
                 $pricing_rule = new WBK_Pricing_Rule($id);
                 if (
                     !$pricing_rule->is_loaded() ||
-                    $pricing_rule->get_type() != 'day_of_week_and_time'
+                    $pricing_rule->get_type() != "day_of_week_and_time"
                 ) {
                     continue;
                 }
-                if (
-                    strpos(
-                        $pricing_rule->get('day_time'),
-                        'dow_availability'
-                    ) !== false
-                ) {
+                if (strpos($pricing_rule->get("day_time"), "dow_availability") !== false) {
                     $v4_res = WBK_Model_Utils::extract_bh_availability_from_v4(
-                        $pricing_rule->get('day_time')
+                        $pricing_rule->get("day_time"),
                     );
                     if (!$v4_res) {
-                        $v4_res = '[]';
+                        $v4_res = "[]";
                     }
-                    $pricing_rule->set('day_time', $v4_res);
+                    $pricing_rule->set("day_time", $v4_res);
                     $pricing_rule->save();
                 }
             }
         }
-        self::set_update_as_complete('update_5_1_5');
+        self::set_update_as_complete("update_5_1_5");
     }
 
     static function update_existing_email_templates_v_5_1_15()
     {
         global $wpdb;
-        if (
-            self::is_update_required('update_existing_email_templates_v_5_1_15')
-        ) {
+        if (self::is_update_required("update_existing_email_templates_v_5_1_15")) {
             $template_data = WBK_Model_Utils::get_email_template_type_usage(
-                'notification_template'
+                "notification_template",
             );
-            foreach (
-                $template_data['email_template_ids']
-                as $email_template_id
-            ) {
+            foreach ($template_data["email_template_ids"] as $email_template_id) {
                 self::supplement_template_from_options(
                     $email_template_id,
-                    get_option('wbk_email_customer_book_subject', ''),
-                    ['customer'],
-                    'booking_created_by_customer',
-                    $template_data['service_ids']
+                    get_option("wbk_email_customer_book_subject", ""),
+                    ["customer"],
+                    "booking_created_by_customer",
+                    $template_data["service_ids"],
+                );
+            }
+
+            $template_data = WBK_Model_Utils::get_email_template_type_usage("arrived_template");
+            foreach ($template_data["email_template_ids"] as $email_template_id) {
+                self::supplement_template_from_options(
+                    $email_template_id,
+                    get_option("wbk_email_customer_arrived_subject", ""),
+                    ["customer"],
+                    "booking_finished",
+                    $template_data["service_ids"],
+                );
+            }
+
+            $template_data = WBK_Model_Utils::get_email_template_type_usage("reminder_template");
+            foreach ($template_data["email_template_ids"] as $email_template_id) {
+                self::supplement_template_from_options(
+                    $email_template_id,
+                    get_option("wbk_email_customer_daily_subject", ""),
+                    ["customer"],
+                    "customer_reminder",
+                    $template_data["service_ids"],
+                );
+            }
+
+            $template_data = WBK_Model_Utils::get_email_template_type_usage("invoice_template");
+            foreach ($template_data["email_template_ids"] as $email_template_id) {
+                self::supplement_template_from_options(
+                    $email_template_id,
+                    get_option("wbk_email_customer_invoice_subject", ""),
+                    ["customer"],
+                    "booking_paid",
+                    $template_data["service_ids"],
                 );
             }
 
             $template_data = WBK_Model_Utils::get_email_template_type_usage(
-                'arrived_template'
+                "booking_changed_template",
             );
-            foreach (
-                $template_data['email_template_ids']
-                as $email_template_id
-            ) {
+            foreach ($template_data["email_template_ids"] as $email_template_id) {
                 self::supplement_template_from_options(
                     $email_template_id,
-                    get_option('wbk_email_customer_arrived_subject', ''),
-                    ['customer'],
-                    'booking_finished',
-                    $template_data['service_ids']
-                );
-            }
-
-            $template_data = WBK_Model_Utils::get_email_template_type_usage(
-                'reminder_template'
-            );
-            foreach (
-                $template_data['email_template_ids']
-                as $email_template_id
-            ) {
-                self::supplement_template_from_options(
-                    $email_template_id,
-                    get_option('wbk_email_customer_daily_subject', ''),
-                    ['customer'],
-                    'customer_reminder',
-                    $template_data['service_ids']
-                );
-            }
-
-            $template_data = WBK_Model_Utils::get_email_template_type_usage(
-                'invoice_template'
-            );
-            foreach (
-                $template_data['email_template_ids']
-                as $email_template_id
-            ) {
-                self::supplement_template_from_options(
-                    $email_template_id,
-                    get_option('wbk_email_customer_invoice_subject', ''),
-                    ['customer'],
-                    'booking_paid',
-                    $template_data['service_ids']
-                );
-            }
-
-            $template_data = WBK_Model_Utils::get_email_template_type_usage(
-                'booking_changed_template'
-            );
-            foreach (
-                $template_data['email_template_ids']
-                as $email_template_id
-            ) {
-                self::supplement_template_from_options(
-                    $email_template_id,
-                    get_option('wbk_email_on_update_booking_subject', ''),
-                    ['customer'],
-                    'booking_updated_by_admin',
-                    $template_data['service_ids']
+                    get_option("wbk_email_on_update_booking_subject", ""),
+                    ["customer"],
+                    "booking_updated_by_admin",
+                    $template_data["service_ids"],
                 );
             }
         }
-        self::set_update_as_complete(
-            'update_existing_email_templates_v_5_1_15'
-        );
+        self::set_update_as_complete("update_existing_email_templates_v_5_1_15");
     }
     static function supplement_template_from_options(
         $template_id,
         $subject,
         $recipients = [],
-        $trigger = '',
+        $trigger = "",
         $services = []
     ) {
         $template = new WBK_Email_Template($template_id);
         if (!$template->is_loaded()) {
             return false;
         }
-        $template->set('subject', $subject);
+        $template->set("subject", $subject);
 
         if (!empty($recipients)) {
-            $template->set('recipients', json_encode($recipients));
+            $template->set("recipients", json_encode($recipients));
         }
 
         if (!empty($trigger)) {
-            $template->set('type', $trigger);
+            $template->set("type", $trigger);
         }
 
         if (!empty($services)) {
-            $template->set('services', json_encode($services));
+            $template->set("services", json_encode($services));
         }
 
-        $template->set('enabled', 'yes');
+        $template->set("enabled", "yes");
 
         return $template->save();
     }
@@ -506,125 +449,117 @@ class WBK_Model_Updater
     {
         return [
             [
-                'name' => 'Send booking confirmation email (to customer)',
-                'key_subject' => 'wbk_email_customer_book_subject',
-                'key_template' => 'wbk_email_customer_book_message',
-                'key_enabled' => 'wbk_email_customer_book_status',
-                'trigger' => 'booking_created_by_customer',
-                'recipients' => ['customer'],
+                "name" => "Send booking confirmation email (to customer)",
+                "key_subject" => "wbk_email_customer_book_subject",
+                "key_template" => "wbk_email_customer_book_message",
+                "key_enabled" => "wbk_email_customer_book_status",
+                "trigger" => "booking_created_by_customer",
+                "recipients" => ["customer"],
             ],
             [
-                'name' => 'Send booking confirmation email (to customer)',
-                'key_subject' => 'wbk_email_customer_manual_book_subject',
-                'key_template' => 'wbk_email_customer_manual_book_message',
-                'key_enabled' => 'wbk_email_customer_book_status',
-                'trigger' => 'booking_created_by_admin',
-                'recipients' => ['customer'],
+                "name" => "Send booking confirmation email (to customer)",
+                "key_subject" => "wbk_email_customer_manual_book_subject",
+                "key_template" => "wbk_email_customer_manual_book_message",
+                "key_enabled" => "wbk_email_customer_book_status",
+                "trigger" => "booking_created_by_admin",
+                "recipients" => ["customer"],
             ],
             [
-                'name' => 'Send booking confirmation email (to admin)',
-                'key_subject' => 'wbk_email_admin_book_subject',
-                'key_template' => 'wbk_email_admin_book_message',
-                'key_enabled' => 'wbk_email_admin_book_status',
-                'recipients' => ['admin'],
-                'trigger' =>
-                    'booking_created_by_admin,booking_created_by_customer',
+                "name" => "Send booking confirmation email (to admin)",
+                "key_subject" => "wbk_email_admin_book_subject",
+                "key_template" => "wbk_email_admin_book_message",
+                "key_enabled" => "wbk_email_admin_book_status",
+                "recipients" => ["admin"],
+                "trigger" => "booking_created_by_admin,booking_created_by_customer",
             ],
             [
-                'name' =>
-                    'Send booking confirmation email (to other customers in the group booking)',
-                'key_subject' => 'wbk_email_secondary_book_subject',
-                'key_template' => 'wbk_email_secondary_book_message',
-                'key_enabled' => 'wbk_email_secondary_book_status',
-                'recipients' => ['group'],
-                'trigger' =>
-                    'booking_created_by_admin,booking_created_by_customer',
+                "name" =>
+                    "Send booking confirmation email (to other customers in the group booking)",
+                "key_subject" => "wbk_email_secondary_book_subject",
+                "key_template" => "wbk_email_secondary_book_message",
+                "key_enabled" => "wbk_email_secondary_book_status",
+                "recipients" => ["group"],
+                "trigger" => "booking_created_by_admin,booking_created_by_customer",
             ],
             [
-                'name' => 'Welcome email body',
-                'key_subject' => 'wbk_user_welcome_email_subject',
-                'key_template' => 'wbk_user_welcome_email_body',
-                'key_enabled' => 'wbk_user_welcome_email_body',
-                'recipients' => ['customer'],
-                'trigger' => 'user_registered',
+                "name" => "Welcome email body",
+                "key_subject" => "wbk_user_welcome_email_subject",
+                "key_template" => "wbk_user_welcome_email_body",
+                "key_enabled" => "wbk_user_welcome_email_body",
+                "recipients" => ["customer"],
+                "trigger" => "user_registered",
             ],
             [
-                'name' => 'Send booking approval email (to customer)',
-                'key_subject' => 'wbk_email_customer_approve_subject',
-                'key_template' => 'wbk_email_customer_approve_message',
-                'key_enabled' => 'wbk_email_customer_approve_status',
-                'recipients' => ['customer'],
-                'trigger' => 'booking_approved',
+                "name" => "Send booking approval email (to customer)",
+                "key_subject" => "wbk_email_customer_approve_subject",
+                "key_template" => "wbk_email_customer_approve_message",
+                "key_enabled" => "wbk_email_customer_approve_status",
+                "recipients" => ["customer"],
+                "trigger" => "booking_approved",
             ],
             [
-                'name' => 'Send booking cancelation email (to admin)',
-                'key_subject' => 'wbk_email_adimn_appointment_cancel_subject',
-                'key_template' => 'wbk_email_adimn_appointment_cancel_message',
-                'key_enabled' => 'wbk_email_adimn_appointment_cancel_status',
-                'recipients' => ['admin'],
-                'trigger' =>
-                    'booking_cancelled_by_customer,booking_cancelled_auto',
+                "name" => "Send booking cancelation email (to admin)",
+                "key_subject" => "wbk_email_adimn_appointment_cancel_subject",
+                "key_template" => "wbk_email_adimn_appointment_cancel_message",
+                "key_enabled" => "wbk_email_adimn_appointment_cancel_status",
+                "recipients" => ["admin"],
+                "trigger" => "booking_cancelled_by_customer,booking_cancelled_auto",
             ],
             [
-                'name' => 'Send booking cancelation email (to customer)',
-                'key_subject' =>
-                    'wbk_email_customer_appointment_cancel_subject',
-                'key_template' =>
-                    'wbk_email_customer_appointment_cancel_message',
-                'key_enabled' => 'wbk_email_customer_appointment_cancel_status',
-                'recipients' => ['customer'],
-                'trigger' =>
-                    'booking_cancelled_by_admin,booking_cancelled_by_customer,booking_cancelled_auto',
+                "name" => "Send booking cancelation email (to customer)",
+                "key_subject" => "wbk_email_customer_appointment_cancel_subject",
+                "key_template" => "wbk_email_customer_appointment_cancel_message",
+                "key_enabled" => "wbk_email_customer_appointment_cancel_status",
+                "recipients" => ["customer"],
+                "trigger" =>
+                    "booking_cancelled_by_admin,booking_cancelled_by_customer,booking_cancelled_auto",
             ],
             [
-                'name' => 'Notification subject (when booking changes)',
-                'key_subject' => 'wbk_email_on_update_booking_subject',
-                'key_template' => '',
-                'key_enabled' => 'wbk_email_on_update_booking_subject',
-                'recipients' => ['customer', 'admin'],
-                'trigger' =>
-                    'booking_updated_by_admin,booking_updated_by_customer',
+                "name" => "Notification subject (when booking changes)",
+                "key_subject" => "wbk_email_on_update_booking_subject",
+                "key_template" => "",
+                "key_enabled" => "wbk_email_on_update_booking_subject",
+                "recipients" => ["customer", "admin"],
+                "trigger" => "booking_updated_by_admin,booking_updated_by_customer",
             ],
             [
-                'name' => 'Send payment received email (to admin)',
-                'key_subject' => 'wbk_email_admin_paymentrcvd_subject',
-                'key_template' => 'wbk_email_admin_paymentrcvd_message',
-                'key_enabled' => 'wbk_email_admin_paymentrcvd_status',
-                'recipients' => ['admin'],
-                'trigger' => 'booking_paid',
+                "name" => "Send payment received email (to admin)",
+                "key_subject" => "wbk_email_admin_paymentrcvd_subject",
+                "key_template" => "wbk_email_admin_paymentrcvd_message",
+                "key_enabled" => "wbk_email_admin_paymentrcvd_status",
+                "recipients" => ["admin"],
+                "trigger" => "booking_paid",
             ],
             [
-                'name' => 'Send payment received email (to customer)',
-                'key_subject' => 'wbk_email_customer_paymentrcvd_subject',
-                'key_template' => 'wbk_email_customer_paymentrcvd_message',
-                'key_enabled' => 'wbk_email_customer_paymentrcvd_status',
-                'recipients' => ['customer'],
-                'trigger' => 'booking_paid',
+                "name" => "Send payment received email (to customer)",
+                "key_subject" => "wbk_email_customer_paymentrcvd_subject",
+                "key_template" => "wbk_email_customer_paymentrcvd_message",
+                "key_enabled" => "wbk_email_customer_paymentrcvd_status",
+                "recipients" => ["customer"],
+                "trigger" => "booking_paid",
             ],
             [
-                'name' => 'Send status "Arrived" email (to customer)',
-                'key_subject' => 'wbk_email_customer_arrived_subject',
-                'key_template' => 'wbk_email_customer_arrived_message',
-                'key_enabled' => 'wbk_email_customer_arrived_status',
-                'recipients' => ['customer'],
-                'trigger' => 'booking_finished',
+                "name" => 'Send status "Arrived" email (to customer)',
+                "key_subject" => "wbk_email_customer_arrived_subject",
+                "key_template" => "wbk_email_customer_arrived_message",
+                "key_enabled" => "wbk_email_customer_arrived_status",
+                "recipients" => ["customer"],
+                "trigger" => "booking_finished",
             ],
             [
-                'name' => 'Send reminder email (to admin)',
-                'key_subject' => 'wbk_email_admin_daily_subject',
-                'key_template' => 'wbk_email_admin_daily_message',
-                'key_enabled' => 'wbk_email_admin_daily_status',
-                'recipients' => ['admin'],
-                'trigger' => 'admin_reminder',
+                "name" => "Send reminder email (to admin)",
+                "key_subject" => "wbk_email_admin_daily_subject",
+                "key_template" => "wbk_email_admin_daily_message",
+                "key_enabled" => "wbk_email_admin_daily_status",
+                "recipients" => ["admin"],
+                "trigger" => "admin_reminder",
             ],
         ];
     }
 
     static function generate_template_from_options_v_5_1_15()
     {
-        if (
-            !self::is_update_required('generate_template_from_options_v_5_1_15')
-        ) {
+        if (!self::is_update_required("generate_template_from_options_v_5_1_15")) {
             return;
         }
 
@@ -633,308 +568,263 @@ class WBK_Model_Updater
 
         self::generate_email_templates($templates);
 
-        self::set_update_as_complete('generate_template_from_options_v_5_1_15');
+        self::set_update_as_complete("generate_template_from_options_v_5_1_15");
     }
     static function generate_default_templates_v_5_1_15(): void
     {
-        if (!self::is_update_required('generate_default_templates_v_5_1_15')) {
+        if (!self::is_update_required("generate_default_templates_v_5_1_15")) {
             return;
         }
 
         $templates = [
             [
-                'name' => __(
-                    'After Booking is made by admin (to ADMIN)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'booking_created_by_admin',
-                'recipients' => ['admin'],
-                'enabled' => false,
-                'subject' => __(
-                    'New Booking created for #service_name',
-                    'webba-booking-lite'
-                ),
-                'template' => __(
+                "name" => __("After Booking is made by admin (to ADMIN)", "webba-booking-lite"),
+                "trigger" => "booking_created_by_admin",
+                "recipients" => ["admin"],
+                "enabled" => false,
+                "subject" => __("New Booking created for #service_name", "webba-booking-lite"),
+                "template" => __(
                     'Hello Admin,<br><br>A new booking has been created for #service_name in Webba:<br>#booking_order<br><br><strong>Details:</strong><br>Name: #customer_name<br>Phone: #customer_phone<br>Email: #customer_email<br>Comment: #customer_comment<br>Custom details: #customer_custom<br>No. of timeslots booked: #items_count<br>No. of items/places booked: #selected_count:<br>Total payment amount: #total_amount<br><br>Current status: #status<br>To change status to "approved", go here: #admin_approve_link<br><br>Thank you!',
-                    'webba-booking-lite'
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'After Booking is made by admin (to CUSTOMER)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'booking_created_by_admin',
-                'recipients' => ['customer'],
-                'enabled' => true,
-                'subject' => __(
-                    'New Booking created for #service_name',
-                    'webba-booking-lite'
-                ),
-                'template' => __(
-                    'Hello #customer_name<br><br>A new booking has been created for #service_name in Webba:<br>#booking_order<br><br><strong>Details:</strong><br>Name: #customer_name<br>Phone: #customer_phone<br>Email: #customer_email<br>Comment: #customer_comment<br>Custom details: #customer_custom<br>No. of timeslots booked: #items_count<br>No. of items/places booked: #selected_count:<br>Total payment amount: #total_amount<br><br>Your booking may need to be first approved by the administrator.<br>Current status: #status<br><br>Thank you!',
-                    'webba-booking-lite'
+                "name" => __("After Booking is made by admin (to CUSTOMER)", "webba-booking-lite"),
+                "trigger" => "booking_created_by_admin",
+                "recipients" => ["customer"],
+                "enabled" => true,
+                "subject" => __("New Booking created for #service_name", "webba-booking-lite"),
+                "template" => __(
+                    "Hello #customer_name<br><br>A new booking has been created for #service_name in Webba:<br>#booking_order<br><br><strong>Details:</strong><br>Name: #customer_name<br>Phone: #customer_phone<br>Email: #customer_email<br>Comment: #customer_comment<br>Custom details: #customer_custom<br>No. of timeslots booked: #items_count<br>No. of items/places booked: #selected_count:<br>Total payment amount: #total_amount<br><br>Your booking may need to be first approved by the administrator.<br>Current status: #status<br><br>Thank you!",
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'After Booking is made by customer (to CUSTOMER)',
-                    'webba-booking-lite'
+                "name" => __(
+                    "After Booking is made by customer (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_created_by_customer',
-                'recipients' => ['customer'],
-                'enabled' => true,
-                'subject' => __(
-                    'Booking Confirmation for #service_name on #appointment_day',
-                    'webba-booking-lite'
+                "trigger" => "booking_created_by_customer",
+                "recipients" => ["customer"],
+                "enabled" => true,
+                "subject" => __(
+                    "Booking Confirmation for #service_name on #appointment_day",
+                    "webba-booking-lite",
                 ),
-                'template' => __(
-                    'Hello #customer_name,<br><br>Thank you for booking #service_name! Here are your booking details:<br><br>#booking_order<br>Duration: #duration<br>Total payment amount: #total_amount<br><br>Your booking may need to be first approved by the administrator.<br>Current status: #status<br><br>To manage, reschedule or cancel your booking, go to your dashboard: #dashboard_page<br><br>If you have any questions, please contact us.<br><br>Thank you!',
-                    'webba-booking-lite'
+                "template" => __(
+                    "Hello #customer_name,<br><br>Thank you for booking #service_name! Here are your booking details:<br><br>#booking_order<br>Duration: #duration<br>Total payment amount: #total_amount<br><br>Your booking may need to be first approved by the administrator.<br>Current status: #status<br><br>To manage, reschedule or cancel your booking, go to your dashboard: #dashboard_page<br><br>If you have any questions, please contact us.<br><br>Thank you!",
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
+                "name" => __(
                     'After Booking status is "Approved" (to CUSTOMER)',
-                    'webba-booking-lite'
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_approved',
-                'recipients' => ['customer'],
-                'enabled' => false,
-                'subject' => __(
-                    'APPROVED: Your Booking for #service_name',
-                    'webba-booking-lite'
-                ),
-                'template' => __(
-                    'Hello #customer_name,<br><br>Great news! Your booking has been approved:<br>#booking_order<br>Current status: #status<br><br>To manage, reschedule or cancel your booking, go to your dashboard: #dashboard_page<br><br>If you have any questions, please contact us.<br><br>We look forward to serving you!',
-                    'webba-booking-lite'
+                "trigger" => "booking_approved",
+                "recipients" => ["customer"],
+                "enabled" => false,
+                "subject" => __("APPROVED: Your Booking for #service_name", "webba-booking-lite"),
+                "template" => __(
+                    "Hello #customer_name,<br><br>Great news! Your booking has been approved:<br>#booking_order<br>Current status: #status<br><br>To manage, reschedule or cancel your booking, go to your dashboard: #dashboard_page<br><br>If you have any questions, please contact us.<br><br>We look forward to serving you!",
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'After Booking cancelled by admin (to CUSTOMER)',
-                    'webba-booking-lite'
+                "name" => __(
+                    "After Booking cancelled by admin (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_cancelled_by_admin',
-                'recipients' => ['customer'],
-                'enabled' => true,
-                'subject' => __(
-                    'CANCELLED: Booking for #service_name on #appointment_day',
-                    'webba-booking-lite'
+                "trigger" => "booking_cancelled_by_admin",
+                "recipients" => ["customer"],
+                "enabled" => true,
+                "subject" => __(
+                    "CANCELLED: Booking for #service_name on #appointment_day",
+                    "webba-booking-lite",
                 ),
-                'template' => __(
+                "template" => __(
                     'Hello #customer_name,<br><br>Admin has cancelled this booking:<br><strong>Booking:</strong> #booking_order<br><br>If you believe it\'s a mistake, please contact us.',
-                    'webba-booking-lite'
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'After Booking cancelled by customer (to CUSTOMER)',
-                    'webba-booking-lite'
+                "name" => __(
+                    "After Booking cancelled by customer (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_cancelled_by_customer',
-                'recipients' => ['customer'],
-                'enabled' => true,
-                'subject' => __(
-                    'CANCELLED: Your Booking for #service_name',
-                    'webba-booking-lite'
-                ),
-                'template' => __(
-                    'Hello #customer_name,<br><br>You have cancelled the following booking:<br>#booking_order<br>Current status: #status<br><br>If you did it by mistake, please contact us.',
-                    'webba-booking-lite'
+                "trigger" => "booking_cancelled_by_customer",
+                "recipients" => ["customer"],
+                "enabled" => true,
+                "subject" => __("CANCELLED: Your Booking for #service_name", "webba-booking-lite"),
+                "template" => __(
+                    "Hello #customer_name,<br><br>You have cancelled the following booking:<br>#booking_order<br>Current status: #status<br><br>If you did it by mistake, please contact us.",
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'After Booking cancelled by customer (to ADMIN)',
-                    'webba-booking-lite'
+                "name" => __(
+                    "After Booking cancelled by customer (to ADMIN)",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_cancelled_by_customer',
-                'recipients' => ['admin'],
-                'enabled' => true,
-                'subject' => __(
-                    'CANCELLED: #customer_name booking for #service_name on #appointment_day',
-                    'webba-booking-lite'
+                "trigger" => "booking_cancelled_by_customer",
+                "recipients" => ["admin"],
+                "enabled" => true,
+                "subject" => __(
+                    "CANCELLED: #customer_name booking for #service_name on #appointment_day",
+                    "webba-booking-lite",
                 ),
-                'template' => __(
+                "template" => __(
                     'Hello Admin,<br><br>#customer_name has cancelled their booking:<br>#booking_order<br><br>If you believe it\'s a mistake, log into the Webba\'s dashboard and change booking status.',
-                    'webba-booking-lite'
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'After Booking cancelled automatically (to CUSTOMER)',
-                    'webba-booking-lite'
+                "name" => __(
+                    "After Booking cancelled automatically (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_cancelled_auto',
-                'recipients' => ['customer'],
-                'enabled' => false,
-                'subject' => __(
-                    'Booking Cancelled for #service_name',
-                    'webba-booking-lite'
-                ),
-                'template' => __(
+                "trigger" => "booking_cancelled_auto",
+                "recipients" => ["customer"],
+                "enabled" => false,
+                "subject" => __("Booking Cancelled for #service_name", "webba-booking-lite"),
+                "template" => __(
                     'Hello #customer_name,<br><br>The following booking has been cancelled automatically:<br>#booking_order<br>Current status: #status<br><br>If you believe it\'s a mistake, please contact us.',
-                    'webba-booking-lite'
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'After Booking is updated by admin (to CUSTOMER)',
-                    'webba-booking-lite'
+                "name" => __(
+                    "After Booking is updated by admin (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_updated_by_admin',
-                'recipients' => ['customer'],
-                'enabled' => false,
-                'subject' => __(
-                    'UPDATED: Your Booking for #service_name',
-                    'webba-booking-lite'
-                ),
-                'template' => __(
-                    'Hello #customer_name,<br><br>Your booking has been updated:<br>#booking_order<br>Current status: #status<br><br>To manage, reschedule or cancel your booking, go to your dashboard: #dashboard_page<br><br>If you have any questions, please contact us.<br><br>We look forward to serving you!',
-                    'webba-booking-lite'
+                "trigger" => "booking_updated_by_admin",
+                "recipients" => ["customer"],
+                "enabled" => false,
+                "subject" => __("UPDATED: Your Booking for #service_name", "webba-booking-lite"),
+                "template" => __(
+                    "Hello #customer_name,<br><br>Your booking has been updated:<br>#booking_order<br>Current status: #status<br><br>To manage, reschedule or cancel your booking, go to your dashboard: #dashboard_page<br><br>If you have any questions, please contact us.<br><br>We look forward to serving you!",
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'After Booking is updated by customer (to CUSTOMER)',
-                    'webba-booking-lite'
+                "name" => __(
+                    "After Booking is updated by customer (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_updated_by_customer',
-                'recipients' => ['customer'],
-                'enabled' => false,
-                'subject' => __(
-                    'UPDATED: Your Booking for #service_name',
-                    'webba-booking-lite'
-                ),
-                'template' => __(
-                    'Hello #customer_name,<br><br>Your booking has been updated:<br>#booking_order<br>Current status: #status<br><br>To manage, reschedule or cancel your booking, go to your dashboard: #dashboard_page<br><br>If you have any questions, please contact us.<br><br>We look forward to serving you!',
-                    'webba-booking-lite'
+                "trigger" => "booking_updated_by_customer",
+                "recipients" => ["customer"],
+                "enabled" => false,
+                "subject" => __("UPDATED: Your Booking for #service_name", "webba-booking-lite"),
+                "template" => __(
+                    "Hello #customer_name,<br><br>Your booking has been updated:<br>#booking_order<br>Current status: #status<br><br>To manage, reschedule or cancel your booking, go to your dashboard: #dashboard_page<br><br>If you have any questions, please contact us.<br><br>We look forward to serving you!",
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'After Booking is updated by customer (to ADMIN)',
-                    'webba-booking-lite'
+                "name" => __(
+                    "After Booking is updated by customer (to ADMIN)",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_updated_by_customer',
-                'recipients' => ['admin'],
-                'enabled' => true,
-                'subject' => __(
-                    'UPDATED: #customer_name updated booking for #service_name',
-                    'webba-booking-lite'
+                "trigger" => "booking_updated_by_customer",
+                "recipients" => ["admin"],
+                "enabled" => true,
+                "subject" => __(
+                    "UPDATED: #customer_name updated booking for #service_name",
+                    "webba-booking-lite",
                 ),
-                'template' => __(
-                    'Hello,<br><br>#customer_name has updated their booking:<br>#booking_order<br><br><strong>Details:</strong><br>Name: #customer_name<br>Phone: #customer_phone<br>Email: #customer_email<br>Comment: #customer_comment<br>Custom details: #customer_custom<br>No. of timeslots booked: #items_count<br>No. of items/places booked: #selected_count:<br>Total payment amount: #total_amount<br>Current status: #status<br><br>Please check the updated details.',
-                    'webba-booking-lite'
-                ),
-            ],
-            [
-                'name' => __(
-                    'After Booking is paid email (to ADMIN)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'booking_paid',
-                'recipients' => ['admin'],
-                'enabled' => true,
-                'subject' => __(
-                    'PAID: #customer_name paid for #service_name',
-                    'webba-booking-lite'
-                ),
-                'template' => __(
-                    'Hello,<br><br>The payment of #total_amount for the booking below has been received:<br>#booking_order<br><br><strong>Details:</strong><br>Name: #customer_name<br>Phone: #customer_phone<br>Email: #customer_email<br>Comment: #customer_comment<br>Custom details: #customer_custom<br>No. of timeslots booked: #items_count<br>No. of items/places booked: #selected_count:<br>Total payment amount: #total_amount<br>Current status: #status<br><br>Thank you!',
-                    'webba-booking-lite'
+                "template" => __(
+                    "Hello,<br><br>#customer_name has updated their booking:<br>#booking_order<br><br><strong>Details:</strong><br>Name: #customer_name<br>Phone: #customer_phone<br>Email: #customer_email<br>Comment: #customer_comment<br>Custom details: #customer_custom<br>No. of timeslots booked: #items_count<br>No. of items/places booked: #selected_count:<br>Total payment amount: #total_amount<br>Current status: #status<br><br>Please check the updated details.",
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'After Booking is paid email (to CUSTOMER)',
-                    'webba-booking-lite'
+                "name" => __("After Booking is paid email (to ADMIN)", "webba-booking-lite"),
+                "trigger" => "booking_paid",
+                "recipients" => ["admin"],
+                "enabled" => true,
+                "subject" => __(
+                    "PAID: #customer_name paid for #service_name",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_paid',
-                'recipients' => ['customer'],
-                'enabled' => false,
-                'subject' => __(
-                    'PAID: Your payment for #service_name is successful',
-                    'webba-booking-lite'
-                ),
-                'template' => __(
-                    'Hello #customer_name,<br><br>Your payment of #total_amount for the booking below has been received:<br>#booking_order<br><br>Thank you!',
-                    'webba-booking-lite'
+                "template" => __(
+                    "Hello,<br><br>The payment of #total_amount for the booking below has been received:<br>#booking_order<br><br><strong>Details:</strong><br>Name: #customer_name<br>Phone: #customer_phone<br>Email: #customer_email<br>Comment: #customer_comment<br>Custom details: #customer_custom<br>No. of timeslots booked: #items_count<br>No. of items/places booked: #selected_count:<br>Total payment amount: #total_amount<br>Current status: #status<br><br>Thank you!",
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'Booking reminder email (to ADMIN)',
-                    'webba-booking-lite'
+                "name" => __("After Booking is paid email (to CUSTOMER)", "webba-booking-lite"),
+                "trigger" => "booking_paid",
+                "recipients" => ["customer"],
+                "enabled" => false,
+                "subject" => __(
+                    "PAID: Your payment for #service_name is successful",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'admin_reminder',
-                'recipients' => ['admin'],
-                'enabled' => true,
-                'subject' => __(
-                    'REMINDER: Upcoming Booking for #service_name',
-                    'webba-booking-lite'
-                ),
-                'template' => __(
-                    'Hello,<br><br>This is an automatic reminder about the upcoming booking:<br>#booking_order<br><br><strong>Details:</strong><br>Name: #customer_name<br>Phone: #customer_phone<br>Email: #customer_email<br>Comment: #customer_comment<br>Custom details: #customer_custom<br>No. of timeslots booked: #items_count<br>No. of items/places booked: #selected_count:<br>Total payment amount: #total_amount<br>Current status: #status<br><br>Please prepare accordingly.',
-                    'webba-booking-lite'
+                "template" => __(
+                    "Hello #customer_name,<br><br>Your payment of #total_amount for the booking below has been received:<br>#booking_order<br><br>Thank you!",
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'Booking reminder email (to CUSTOMER)',
-                    'webba-booking-lite'
+                "name" => __("Booking reminder email (to ADMIN)", "webba-booking-lite"),
+                "trigger" => "admin_reminder",
+                "recipients" => ["admin"],
+                "enabled" => true,
+                "subject" => __(
+                    "REMINDER: Upcoming Booking for #service_name",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'customer_reminder',
-                'recipients' => ['customer'],
-                'enabled' => true,
-                'subject' => __(
-                    'REMINDER: Your Upcoming Booking for #service_name',
-                    'webba-booking-lite'
-                ),
-                'template' => __(
-                    'Hello #customer_name,<br><br>This is a reminder of your upcoming booking:<br>#booking_order<br><br><strong>Details:</strong><br>Name: #customer_name<br>Phone: #customer_phone<br>Email: #customer_email<br>Comment: #customer_comment<br>Custom details: #customer_custom<br>No. of timeslots booked: #items_count<br>No. of items/places booked: #selected_count:<br>Total payment amount: #total_amount<br>Current status: #status<br><br>We look forward to serving you!',
-                    'webba-booking-lite'
+                "template" => __(
+                    "Hello,<br><br>This is an automatic reminder about the upcoming booking:<br>#booking_order<br><br><strong>Details:</strong><br>Name: #customer_name<br>Phone: #customer_phone<br>Email: #customer_email<br>Comment: #customer_comment<br>Custom details: #customer_custom<br>No. of timeslots booked: #items_count<br>No. of items/places booked: #selected_count:<br>Total payment amount: #total_amount<br>Current status: #status<br><br>Please prepare accordingly.",
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'Your Account details email (to CUSTOMER)',
-                    'webba-booking-lite'
+                "name" => __("Booking reminder email (to CUSTOMER)", "webba-booking-lite"),
+                "trigger" => "customer_reminder",
+                "recipients" => ["customer"],
+                "enabled" => true,
+                "subject" => __(
+                    "REMINDER: Your Upcoming Booking for #service_name",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'user_registered',
-                'recipients' => ['customer'],
-                'enabled' => true,
-                'subject' => __(
-                    'Welcome, #customer_name! Here is how to manage your booking.',
-                    'webba-booking-lite'
-                ),
-                'template' => __(
-                    'Hello #customer_name,<br><br>You can now manage your bookings and profile anytime by going here: #dashboard_page<br><br>#user_login / #user_pass<br><br>If you have any questions, please contact us.<br><br>Thank you!',
-                    'webba-booking-lite'
+                "template" => __(
+                    "Hello #customer_name,<br><br>This is a reminder of your upcoming booking:<br>#booking_order<br><br><strong>Details:</strong><br>Name: #customer_name<br>Phone: #customer_phone<br>Email: #customer_email<br>Comment: #customer_comment<br>Custom details: #customer_custom<br>No. of timeslots booked: #items_count<br>No. of items/places booked: #selected_count:<br>Total payment amount: #total_amount<br>Current status: #status<br><br>We look forward to serving you!",
+                    "webba-booking-lite",
                 ),
             ],
             [
-                'name' => __(
-                    'After booking is finished: Thank you email (to CUSTOMER)',
-                    'webba-booking-lite'
+                "name" => __("Your Account details email (to CUSTOMER)", "webba-booking-lite"),
+                "trigger" => "user_registered",
+                "recipients" => ["customer"],
+                "enabled" => true,
+                "subject" => __(
+                    "Welcome, #customer_name! Here is how to manage your booking.",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_finished',
-                'recipients' => ['customer'],
-                'enabled' => false,
-                'subject' => __(
-                    'THANK YOU #customer_name!',
-                    'webba-booking-lite'
+                "template" => __(
+                    "Hello #customer_name,<br><br>You can now manage your bookings and profile anytime by going here: #dashboard_page<br><br>#user_login / #user_pass<br><br>If you have any questions, please contact us.<br><br>Thank you!",
+                    "webba-booking-lite",
                 ),
-                'template' => __(
-                    'Hello #customer_name,<br><br>Thank you for using our service #service_name!<br><br>We hope you enjoyed it and look forward to seeing you again.',
-                    'webba-booking-lite'
+            ],
+            [
+                "name" => __(
+                    "After booking is finished: Thank you email (to CUSTOMER)",
+                    "webba-booking-lite",
+                ),
+                "trigger" => "booking_finished",
+                "recipients" => ["customer"],
+                "enabled" => false,
+                "subject" => __("THANK YOU #customer_name!", "webba-booking-lite"),
+                "template" => __(
+                    "Hello #customer_name,<br><br>Thank you for using our service #service_name!<br><br>We hope you enjoyed it and look forward to seeing you again.",
+                    "webba-booking-lite",
                 ),
             ],
         ];
 
         $templates = array_map(function ($item) {
-            $item['default'] = true;
+            $item["default"] = true;
             return $item;
         }, $templates);
 
@@ -942,36 +832,33 @@ class WBK_Model_Updater
 
         $existing_templates = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT name FROM {$wpdb->prefix}wbk_email_templates WHERE is_default='yes'"
+                "SELECT name FROM {$wpdb->prefix}wbk_email_templates WHERE is_default='yes'",
             ),
-            ARRAY_N
+            ARRAY_N,
         );
 
         $existing_templates = array_map(function ($template) {
             return $template[0];
         }, $existing_templates);
 
-        $templates = array_filter($templates, function ($template) use (
-            $existing_templates
-        ) {
-            return !in_array($template['name'], $existing_templates);
+        $templates = array_filter($templates, function ($template) use ($existing_templates) {
+            return !in_array($template["name"], $existing_templates);
         });
 
         self::generate_email_templates($templates);
 
-        self::set_update_as_complete('generate_default_templates_v_5_1_15');
+        self::set_update_as_complete("generate_default_templates_v_5_1_15");
     }
 
-    static function filter_service_related_email_templates(
-        array $templates
-    ): array {
+    static function filter_service_related_email_templates(array $templates): array
+    {
         // new trigger name => old trigger name
         $old_triggers = [
-            'booking_created_by_admin' => 'notification_template',
-            'booking_created_by_customer' => 'notification_template',
-            'customer_reminder' => 'reminder_template',
-            'booking_updated_by_admin' => 'booking_changed_template',
-            'booking_finished' => 'arrived_template',
+            "booking_created_by_admin" => "notification_template",
+            "booking_created_by_customer" => "notification_template",
+            "customer_reminder" => "reminder_template",
+            "booking_updated_by_admin" => "booking_changed_template",
+            "booking_finished" => "arrived_template",
         ];
 
         // get all services
@@ -981,13 +868,14 @@ class WBK_Model_Updater
 
         // filter templates
         return array_map(function ($template) use ($services, $old_triggers) {
-            $template['services'] = [];
+            $template["services"] = [];
 
             // filter services
-            $allowed_services = array_filter($services, function (
-                $service
-            ) use ($template, $old_triggers) {
-                $triggers = explode(',', $template['trigger']);
+            $allowed_services = array_filter($services, function ($service) use (
+                $template,
+                $old_triggers
+            ) {
+                $triggers = explode(",", $template["trigger"]);
 
                 foreach ($triggers as $trigger) {
                     if (!isset($old_triggers[$trigger])) {
@@ -1009,7 +897,7 @@ class WBK_Model_Updater
             });
 
             foreach ($allowed_services as $service) {
-                $template['services'][] = $service->get_id();
+                $template["services"][] = $service->get_id();
             }
 
             return $template;
@@ -1019,70 +907,55 @@ class WBK_Model_Updater
     static function generate_email_templates(array $templates): void
     {
         foreach ($templates as $template) {
-            $triggers = explode(',', $template['trigger']);
+            $triggers = explode(",", $template["trigger"]);
 
             foreach ($triggers as $trigger) {
-                $enabled = isset($template['key_enabled'])
-                    ? get_option($template['key_enabled'], null)
+                $enabled = isset($template["key_enabled"])
+                    ? get_option($template["key_enabled"], null)
                     : null;
 
                 if (empty($enabled) || $enabled === null || $enabled == false) {
-                    if (isset($template['key_enabled'])) {
+                    if (isset($template["key_enabled"])) {
                         continue;
                     }
                 }
 
                 $email = new WBK_Email_Template(null);
-                $email->set('name', $template['name']);
+                $email->set("name", $template["name"]);
 
-                if (isset($template['key_subject'])) {
-                    $email->set(
-                        'subject',
-                        get_option($template['key_subject'], '')
-                    );
-                } elseif (isset($template['subject'])) {
-                    $email->set('subject', $template['subject']);
+                if (isset($template["key_subject"])) {
+                    $email->set("subject", get_option($template["key_subject"], ""));
+                } elseif (isset($template["subject"])) {
+                    $email->set("subject", $template["subject"]);
                 }
 
-                if (isset($template['key_template'])) {
-                    $email->set(
-                        'template',
-                        get_option($template['key_template'], '')
-                    );
-                } elseif (isset($template['template'])) {
-                    $email->set('template', $template['template']);
+                if (isset($template["key_template"])) {
+                    $email->set("template", get_option($template["key_template"], ""));
+                } elseif (isset($template["template"])) {
+                    $email->set("template", $template["template"]);
                 }
 
-                if (
-                    isset($template['default']) &&
-                    $template['default'] === true
-                ) {
-                    $email->set('is_default', 'yes');
+                if (isset($template["default"]) && $template["default"] === true) {
+                    $email->set("is_default", "yes");
                 }
 
-                if (isset($template['enabled'])) {
-                    $email->set(
-                        'enabled',
-                        $template['enabled'] === true ? 'yes' : ''
-                    );
+                if (isset($template["enabled"])) {
+                    $email->set("enabled", $template["enabled"] === true ? "yes" : "");
                 }
 
-                if (isset($template['services'])) {
-                    $email->set('services', json_encode($template['services']));
+                if (isset($template["services"])) {
+                    $email->set("services", json_encode($template["services"]));
                 }
 
                 if ($enabled) {
-                    $email->set('enabled', 'yes');
+                    $email->set("enabled", "yes");
                 }
 
-                if (isset($template['recipients'])) {
-                    $email->set(
-                        'recipients',
-                        json_encode($template['recipients'])
-                    );
+                if (isset($template["recipients"])) {
+                    $email->set("recipients", json_encode($template["recipients"]));
                 }
 
-                $email->set('type', $trigger);
+                $email->set("type", $trigger);
                 $email->save();
             }
         }
@@ -1092,28 +965,28 @@ class WBK_Model_Updater
         $path =
             WP_WEBBA_BOOKING__PLUGIN_DIR .
             DIRECTORY_SEPARATOR .
-            'export' .
+            "export" .
             DIRECTORY_SEPARATOR .
-            '.htaccess';
-        $content = 'RewriteEngine On' . "\r\n";
+            ".htaccess";
+        $content = "RewriteEngine On" . "\r\n";
         $content .=
-            'RewriteCond %{HTTP_REFERER} !^' .
+            "RewriteCond %{HTTP_REFERER} !^" .
             get_admin_url() .
-            'admin.php\?page\=wbk-appointments' .
-            '.* [NC]' .
+            "admin.php\?page\=wbk-appointments" .
+            ".* [NC]" .
             "\r\n";
-        $content .= 'RewriteRule .* - [F]';
+        $content .= "RewriteRule .* - [F]";
         if (!file_exists($path)) {
             file_put_contents($path, $content);
         }
     }
     static function update_booking_status_v_5_1_15()
     {
-        if (!self::is_update_required('update_booking_status_v_5_1_15')) {
+        if (!self::is_update_required("update_booking_status_v_5_1_15")) {
             return;
         }
         global $wpdb;
-        $table_name = get_option('wbk_db_prefix', '') . 'wbk_appointments';
+        $table_name = get_option("wbk_db_prefix", "") . "wbk_appointments";
         $wpdb->query("
             UPDATE `$table_name`
             SET `status` = 'approved'
@@ -1125,10 +998,8 @@ class WBK_Model_Updater
                 'added_by_admin_paid'
             )
         ");
-        $wpdb->query(
-            'UPDATE ' . $table_name . ' SET amount_paid = moment_price'
-        );
-        self::set_update_as_complete('update_booking_status_v_5_1_15');
+        $wpdb->query("UPDATE " . $table_name . " SET amount_paid = moment_price");
+        self::set_update_as_complete("update_booking_status_v_5_1_15");
     }
 
     /**
@@ -1138,7 +1009,7 @@ class WBK_Model_Updater
      */
     public static function update_service_colors_v_5_1_18(): void
     {
-        if (!self::is_update_required('update_service_colors_v_5_1_18')) {
+        if (!self::is_update_required("update_service_colors_v_5_1_18")) {
             return;
         }
 
@@ -1146,15 +1017,15 @@ class WBK_Model_Updater
         $colors = [];
         $services = $wpdb->get_results(
             $wpdb->prepare(
-                'SELECT id FROM ' .
-                    get_option('wbk_db_prefix', '') .
-                    "wbk_services WHERE color IS NULL OR color=''"
+                "SELECT id FROM " .
+                    get_option("wbk_db_prefix", "") .
+                    "wbk_services WHERE color IS NULL OR color=''",
             ),
-            ARRAY_N
+            ARRAY_N,
         );
 
         if (empty($services)) {
-            self::set_update_as_complete('update_service_colors_v_5_1_18');
+            self::set_update_as_complete("update_service_colors_v_5_1_18");
             return;
         }
 
@@ -1162,13 +1033,13 @@ class WBK_Model_Updater
             $color = WBK_Format_Utils::generate_random_color($colors);
 
             $wpdb->update(
-                get_option('wbk_db_prefix', '') . 'wbk_services',
-                ['color' => $color],
-                ['id' => $service[0]]
+                get_option("wbk_db_prefix", "") . "wbk_services",
+                ["color" => $color],
+                ["id" => $service[0]],
             );
         }
 
-        self::set_update_as_complete('update_service_colors_v_5_1_18');
+        self::set_update_as_complete("update_service_colors_v_5_1_18");
     }
 
     /**
@@ -1178,9 +1049,7 @@ class WBK_Model_Updater
      */
     public static function merge_existing_service_to_en_v_5_1_18(): void
     {
-        if (
-            !self::is_update_required('merge_existing_service_to_en_v_5_1_18')
-        ) {
+        if (!self::is_update_required("merge_existing_service_to_en_v_5_1_18")) {
             return;
         }
 
@@ -1189,60 +1058,57 @@ class WBK_Model_Updater
         $templates = self::filter_service_related_email_templates($templates);
 
         $templates_obj = $wpdb->get_results(
-            'SELECT * FROM ' .
-                get_option('wbk_db_prefix', '') .
+            "SELECT * FROM " .
+                get_option("wbk_db_prefix", "") .
                 "wbk_email_templates
             WHERE (`name`, `type`, `recipients`) IN (
                 " .
                 implode(
-                    ',',
+                    ",",
                     array_map(function ($template) {
                         return "('" .
-                            esc_sql($template['name']) .
+                            esc_sql($template["name"]) .
                             "', '" .
-                            esc_sql($template['trigger']) .
+                            esc_sql($template["trigger"]) .
                             "', '" .
-                            esc_sql(json_encode($template['recipients'])) .
+                            esc_sql(json_encode($template["recipients"])) .
                             "')";
-                    }, $templates)
+                    }, $templates),
                 ) .
                 "
             )",
-            ARRAY_A
+            ARRAY_A,
         );
 
         foreach ($templates_obj as $template_obj) {
-            $existing_services = !empty($template_obj['services'])
-                ? json_decode($template_obj['services'])
+            $existing_services = !empty($template_obj["services"])
+                ? json_decode($template_obj["services"])
                 : [];
-            $template = array_filter($templates, function ($template) use (
-                $template_obj
-            ) {
-                return $template['name'] == $template_obj['name'] &&
-                    $template['trigger'] == $template_obj['type'] &&
-                    json_encode($template['recipients']) ==
-                        $template_obj['recipients'];
+            $template = array_filter($templates, function ($template) use ($template_obj) {
+                return $template["name"] == $template_obj["name"] &&
+                    $template["trigger"] == $template_obj["type"] &&
+                    json_encode($template["recipients"]) == $template_obj["recipients"];
             });
 
             if (!empty($template)) {
                 $template = array_values($template)[0];
-                $template['services'] = array_unique(
-                    array_merge($template['services'], $existing_services)
+                $template["services"] = array_unique(
+                    array_merge($template["services"], $existing_services),
                 );
 
                 $wpdb->update(
-                    get_option('wbk_db_prefix', '') . 'wbk_email_templates',
+                    get_option("wbk_db_prefix", "") . "wbk_email_templates",
                     [
-                        'services' => json_encode($template['services']),
+                        "services" => json_encode($template["services"]),
                     ],
                     [
-                        'id' => $template_obj['id'],
-                    ]
+                        "id" => $template_obj["id"],
+                    ],
                 );
             }
         }
 
-        self::set_update_as_complete('merge_existing_service_to_en_v_5_1_18');
+        self::set_update_as_complete("merge_existing_service_to_en_v_5_1_18");
     }
     /**
      * Improved internal names for default templates
@@ -1252,25 +1118,23 @@ class WBK_Model_Updater
      */
     public static function update_default_templates_v_5_1_18(): void
     {
-        if (!self::is_update_required('update_default_templates_v_5_1_18')) {
+        if (!self::is_update_required("update_default_templates_v_5_1_18")) {
             return;
         }
 
         // added new template
         $templates = [
             [
-                'name' =>
-                    'Booking confirmation to admin (booking made by customer)',
-                'trigger' => 'booking_created_by_customer',
-                'recipients' => ['admin'],
-                'enabled' => true,
-                'subject' =>
-                    'New Booking for #service_name on #appointment_day',
-                'template' => __(
+                "name" => "Booking confirmation to admin (booking made by customer)",
+                "trigger" => "booking_created_by_customer",
+                "recipients" => ["admin"],
+                "enabled" => true,
+                "subject" => "New Booking for #service_name on #appointment_day",
+                "template" => __(
                     'Hello Admin,<br><br>A new booking has been created for <strong>#service_name</strong> in Webba:<br>#booking_order<br><br><strong>Details:</strong><br>Name: #customer_name<br>Phone: #customer_phone<br>Email: #customer_email<br>Comment: #customer_comment<br>Custom details: #customer_custom<br>No. of timeslots booked: #items_count<br>No. of items/places booked: #selected_count:<br>Total payment amount: #total_amount<br><br>Current status: #status<br>To change status to "<strong>approved</strong>", go here: #admin_approve_link<br><br>Thank you!',
-                    'webba-booking-lite'
+                    "webba-booking-lite",
                 ),
-                'default' => true,
+                "default" => true,
             ],
         ];
 
@@ -1278,8 +1142,8 @@ class WBK_Model_Updater
         $template_exists = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT * FROM {$wpdb->prefix}wbk_email_templates WHERE name = %s",
-                $templates[0]['name']
-            )
+                $templates[0]["name"],
+            ),
         );
 
         if (empty($template_exists)) {
@@ -1289,191 +1153,140 @@ class WBK_Model_Updater
         // name update for existing default templates
         $templates = [
             [
-                'name' => __(
-                    'Booking confirmation to admin (booking made by admin)',
-                    'webba-booking-lite'
+                "name" => __(
+                    "Booking confirmation to admin (booking made by admin)",
+                    "webba-booking-lite",
                 ),
-                'old_name' => __(
-                    'After Booking is made by admin (to ADMIN)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'booking_created_by_admin',
+                "old_name" => __("After Booking is made by admin (to ADMIN)", "webba-booking-lite"),
+                "trigger" => "booking_created_by_admin",
             ],
             [
-                'name' => __(
-                    'Booking confirmation to customer (booking made by admin)',
-                    'webba-booking-lite'
+                "name" => __(
+                    "Booking confirmation to customer (booking made by admin)",
+                    "webba-booking-lite",
                 ),
-                'old_name' => __(
-                    'After Booking is made by admin (to CUSTOMER)',
-                    'webba-booking-lite'
+                "old_name" => __(
+                    "After Booking is made by admin (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_created_by_admin',
+                "trigger" => "booking_created_by_admin",
             ],
             [
-                'name' => __(
-                    'Booking confirmation to customer (booking made by customer)',
-                    'webba-booking-lite'
+                "name" => __(
+                    "Booking confirmation to customer (booking made by customer)",
+                    "webba-booking-lite",
                 ),
-                'old_name' => __(
-                    'After Booking is made by customer (to CUSTOMER)',
-                    'webba-booking-lite'
+                "old_name" => __(
+                    "After Booking is made by customer (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_created_by_customer',
+                "trigger" => "booking_created_by_customer",
             ],
             [
-                'name' => __(
-                    '"Booking is approved" (to customer)',
-                    'webba-booking-lite'
-                ),
-                'old_name' => __(
+                "name" => __('"Booking is approved" (to customer)', "webba-booking-lite"),
+                "old_name" => __(
                     'After Booking status is "Approved" (to CUSTOMER)',
-                    'webba-booking-lite'
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_approved',
+                "trigger" => "booking_approved",
             ],
             [
-                'name' => __(
-                    '"Booking is cancelled" (by admin to customer)',
-                    'webba-booking-lite'
+                "name" => __('"Booking is cancelled" (by admin to customer)', "webba-booking-lite"),
+                "old_name" => __(
+                    "After Booking cancelled by admin (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'old_name' => __(
-                    'After Booking cancelled by admin (to CUSTOMER)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'booking_cancelled_by_admin',
+                "trigger" => "booking_cancelled_by_admin",
             ],
             [
-                'name' => __(
+                "name" => __(
                     '"Booking is cancelled" (by customer to customer)',
-                    'webba-booking-lite'
+                    "webba-booking-lite",
                 ),
-                'old_name' => __(
-                    'After Booking cancelled by customer (to CUSTOMER)',
-                    'webba-booking-lite'
+                "old_name" => __(
+                    "After Booking cancelled by customer (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_cancelled_by_customer',
+                "trigger" => "booking_cancelled_by_customer",
             ],
             [
-                'name' => __(
-                    '"Booking is cancelled" (by customer to admin)',
-                    'webba-booking-lite'
+                "name" => __('"Booking is cancelled" (by customer to admin)', "webba-booking-lite"),
+                "old_name" => __(
+                    "After Booking cancelled by customer (to ADMIN)",
+                    "webba-booking-lite",
                 ),
-                'old_name' => __(
-                    'After Booking cancelled by customer (to ADMIN)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'booking_cancelled_by_customer',
+                "trigger" => "booking_cancelled_by_customer",
             ],
             [
-                'name' => __(
+                "name" => __(
                     '"Booking is cancelled" automatically (to customer)',
-                    'webba-booking-lite'
+                    "webba-booking-lite",
                 ),
-                'old_name' => __(
-                    'After Booking cancelled automatically (to CUSTOMER)',
-                    'webba-booking-lite'
+                "old_name" => __(
+                    "After Booking cancelled automatically (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'trigger' => 'booking_cancelled_auto',
+                "trigger" => "booking_cancelled_auto",
             ],
             [
-                'name' => __(
-                    'Booking updated by admin (to customer)',
-                    'webba-booking-lite'
+                "name" => __("Booking updated by admin (to customer)", "webba-booking-lite"),
+                "old_name" => __(
+                    "After Booking is updated by admin (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'old_name' => __(
-                    'After Booking is updated by admin (to CUSTOMER)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'booking_updated_by_admin',
+                "trigger" => "booking_updated_by_admin",
             ],
             [
-                'name' => __(
-                    'Booking updated by customer (to customer)',
-                    'webba-booking-lite'
+                "name" => __("Booking updated by customer (to customer)", "webba-booking-lite"),
+                "old_name" => __(
+                    "After Booking is updated by customer (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'old_name' => __(
-                    'After Booking is updated by customer (to CUSTOMER)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'booking_updated_by_customer',
+                "trigger" => "booking_updated_by_customer",
             ],
             [
-                'name' => __(
-                    'Booking updated by customer (to admin)',
-                    'webba-booking-lite'
+                "name" => __("Booking updated by customer (to admin)", "webba-booking-lite"),
+                "old_name" => __(
+                    "After Booking is updated by customer (to ADMIN)",
+                    "webba-booking-lite",
                 ),
-                'old_name' => __(
-                    'After Booking is updated by customer (to ADMIN)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'booking_updated_by_customer',
+                "trigger" => "booking_updated_by_customer",
             ],
             [
-                'name' => __(
-                    'Booking has been paid (to admin)',
-                    'webba-booking-lite'
-                ),
-                'old_name' => __(
-                    'After Booking is paid email (to ADMIN)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'booking_paid',
+                "name" => __("Booking has been paid (to admin)", "webba-booking-lite"),
+                "old_name" => __("After Booking is paid email (to ADMIN)", "webba-booking-lite"),
+                "trigger" => "booking_paid",
             ],
             [
-                'name' => __(
-                    'Booking has been paid (to customer)',
-                    'webba-booking-lite'
-                ),
-                'old_name' => __(
-                    'After Booking is paid email (to CUSTOMER)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'booking_paid',
+                "name" => __("Booking has been paid (to customer)", "webba-booking-lite"),
+                "old_name" => __("After Booking is paid email (to CUSTOMER)", "webba-booking-lite"),
+                "trigger" => "booking_paid",
             ],
             [
-                'name' => __(
-                    'Booking reminder email (to admin)',
-                    'webba-booking-lite'
-                ),
-                'old_name' => __(
-                    'Booking reminder email (to ADMIN)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'admin_reminder',
+                "name" => __("Booking reminder email (to admin)", "webba-booking-lite"),
+                "old_name" => __("Booking reminder email (to ADMIN)", "webba-booking-lite"),
+                "trigger" => "admin_reminder",
             ],
             [
-                'name' => __(
-                    'Booking reminder email (to customer)',
-                    'webba-booking-lite'
-                ),
-                'old_name' => __(
-                    'Booking reminder email (to CUSTOMER)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'customer_reminder',
+                "name" => __("Booking reminder email (to customer)", "webba-booking-lite"),
+                "old_name" => __("Booking reminder email (to CUSTOMER)", "webba-booking-lite"),
+                "trigger" => "customer_reminder",
             ],
             [
-                'name' => __(
-                    'Account details for managing booking (customer)',
-                    'webba-booking-lite'
+                "name" => __(
+                    "Account details for managing booking (customer)",
+                    "webba-booking-lite",
                 ),
-                'old_name' => __(
-                    'Your Account details email (to CUSTOMER)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'user_registered',
+                "old_name" => __("Your Account details email (to CUSTOMER)", "webba-booking-lite"),
+                "trigger" => "user_registered",
             ],
             [
-                'name' => __(
-                    'Thank you email after booking is finished',
-                    'webba-booking-lite'
+                "name" => __("Thank you email after booking is finished", "webba-booking-lite"),
+                "old_name" => __(
+                    "After booking is finished: Thank you email (to CUSTOMER)",
+                    "webba-booking-lite",
                 ),
-                'old_name' => __(
-                    'After booking is finished: Thank you email (to CUSTOMER)',
-                    'webba-booking-lite'
-                ),
-                'trigger' => 'booking_finished',
+                "trigger" => "booking_finished",
             ],
         ];
 
@@ -1481,62 +1294,62 @@ class WBK_Model_Updater
             $wpdb->query(
                 $wpdb->prepare(
                     "UPDATE {$wpdb->prefix}wbk_email_templates SET name = %s WHERE name = %s AND type = %s AND is_default='yes'",
-                    $template['name'],
-                    $template['old_name'],
-                    $template['trigger']
-                )
+                    $template["name"],
+                    $template["old_name"],
+                    $template["trigger"],
+                ),
             );
         }
 
-        self::set_update_as_complete('update_default_templates_v_5_1_18');
+        self::set_update_as_complete("update_default_templates_v_5_1_18");
     }
 
     public static function update_appearance_configs(): void
     {
-        $dir = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'webba_booking_style';
+        $dir = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . "webba_booking_style";
         if (!is_dir($dir)) {
             mkdir($dir);
         }
 
-        $data = get_option('wbk_apperance_data', []);
+        $data = get_option("wbk_apperance_data", []);
 
         $colors_shades_css = WBK_Appearance_Utils::generateCssVariables([
-            'primary' => WBK_Appearance_Utils::generateColorShades(
-                $data['wbk_appearance_field_1'] ?? '#14B8A9'
+            "primary" => WBK_Appearance_Utils::generateColorShades(
+                $data["wbk_appearance_field_1"] ?? "#14B8A9",
             ),
-            'secondary' => WBK_Appearance_Utils::generateColorShades(
-                $data['wbk_appearance_field_2'] ?? '#F9FAFB'
+            "secondary" => WBK_Appearance_Utils::generateColorShades(
+                $data["wbk_appearance_field_2"] ?? "#F9FAFB",
             ),
         ]);
 
         file_put_contents(
-            $dir . DIRECTORY_SEPARATOR . 'wbk6-frontend-config.css',
-            $colors_shades_css
+            $dir . DIRECTORY_SEPARATOR . "wbk6-frontend-config.css",
+            $colors_shades_css,
         );
     }
 
     public static function create_appearance_config_css_v6_0_3(): void
     {
-        if (!self::is_update_required('create_appearance_config_css_v6_0_3')) {
+        if (!self::is_update_required("create_appearance_config_css_v6_0_3")) {
             return;
         }
 
         self::update_appearance_configs();
 
-        self::set_update_as_complete('create_appearance_config_css_v6_0_3');
+        self::set_update_as_complete("create_appearance_config_css_v6_0_3");
     }
     static function update_6_0_6()
     {
         global $wpdb;
-        if (self::is_update_required('update_6_0_6')) {
-            update_option('wbk_mode', 'webba6');
+        if (self::is_update_required("update_6_0_6")) {
+            update_option("wbk_mode", "webba6");
         }
-        self::set_update_as_complete('update_6_0_6');
+        self::set_update_as_complete("update_6_0_6");
     }
 
     static function update_services_6_0_9(): void
     {
-        if (!self::is_update_required('update_services_6_0_9')) {
+        if (!self::is_update_required("update_services_6_0_9")) {
             return;
         }
 
@@ -1549,147 +1362,136 @@ class WBK_Model_Updater
                 continue;
             }
 
-            if (
-                $service->get('min_quantity') > 1 ||
-                $service->get('quantity') > 1
-            ) {
-                $service->set('group_booking', 'yes');
+            if ($service->get("min_quantity") > 1 || $service->get("quantity") > 1) {
+                $service->set("group_booking", "yes");
             }
 
             if (
-                $service->get('multi_mode_low_limit') > 1 ||
-                $service->get('multi_mode_limit') > 0
+                $service->get("multi_mode_low_limit") > 1 ||
+                $service->get("multi_mode_limit") > 0
             ) {
-                $service->set('limited_timeslot', 'yes');
+                $service->set("limited_timeslot", "yes");
             }
 
-            if (
-                !$service->get('form_builder') ||
-                empty($service->get('form_builder'))
-            ) {
-                $service->set('form_builder', '0');
+            if (!$service->get("form_builder") || empty($service->get("form_builder"))) {
+                $service->set("form_builder", "0");
             }
 
             $service->save();
         }
 
-        self::set_update_as_complete('update_services_6_0_9');
+        self::set_update_as_complete("update_services_6_0_9");
     }
 
     static function update_appearance_6_1_0(): void
     {
-        if (!self::is_update_required('update_appearance_6_1_0')) {
+        if (!self::is_update_required("update_appearance_6_1_0")) {
             return;
         }
         $options = [];
 
-        $data = get_option('wbk_apperance_data', []);
+        $data = get_option("wbk_apperance_data", []);
         $primary = WBK_Appearance_Utils::generateColorShades(
-            $data['wbk_appearance_field_1'] ?? '#14B8A9'
+            $data["wbk_appearance_field_1"] ?? "#14B8A9",
         );
         $secondary = WBK_Appearance_Utils::generateColorShades(
-            $data['wbk_appearance_field_2'] ?? '#F9FAFB'
+            $data["wbk_appearance_field_2"] ?? "#F9FAFB",
         );
         $secondary_texts = WBK_Appearance_Utils::generateTextColors(
-            $data['wbk_appearance_field_2'] ?? '#F9FAFB'
+            $data["wbk_appearance_field_2"] ?? "#F9FAFB",
         );
 
-        $options['bg_accent'] = $primary[500];
-        $options['font'] = '"Ubuntu", sans-serif';
-        $options['border_radius'] = '8px';
-        $options['shadow'] = '0px 0px 16px 0px #3f3f4629';
+        $options["bg_accent"] = $primary[500];
+        $options["font"] = '"Ubuntu", sans-serif';
+        $options["border_radius"] = "8px";
+        $options["shadow"] = "0px 0px 16px 0px #3f3f4629";
 
-        $options['button_border_radius'] = '8px';
+        $options["button_border_radius"] = "8px";
         // primary button
-        $options['bg_button_primary'] = $primary[500];
-        $options['bg_button_primary_hover'] = $primary[600];
-        $options['color_button_primary'] = '#ffffff';
-        $options['color_button_primary_hover'] = $primary[50];
+        $options["bg_button_primary"] = $primary[500];
+        $options["bg_button_primary_hover"] = $primary[600];
+        $options["color_button_primary"] = "#ffffff";
+        $options["color_button_primary_hover"] = $primary[50];
         // secondary button
-        $options['bg_button_secondary'] = '#edeff2';
-        $options['bg_button_secondary_hover'] = $primary[500];
-        $options['color_button_secondary'] = '#ffffff';
-        $options['color_button_secondary_hover'] = $primary[50];
+        $options["bg_button_secondary"] = "#edeff2";
+        $options["bg_button_secondary_hover"] = $primary[500];
+        $options["color_button_secondary"] = "#ffffff";
+        $options["color_button_secondary_hover"] = $primary[50];
         // inactive button
-        $options['bg_button_inactive'] = '#edeff3';
-        $options['color_button_inactive'] = '#ffffff';
+        $options["bg_button_inactive"] = "#edeff3";
+        $options["color_button_inactive"] = "#ffffff";
         // selected button
-        $options['bg_button_selected'] = $primary[500];
-        $options['bg_button_selected_hover'] = $primary[600];
-        $options['color_button_selected'] = '#ffffff';
-        $options['color_button_selected_hover'] = $primary[50];
-        $options['bg_button_selected_selected'] = '#ffffff';
-        $options['color_button_selected_selected'] = '#22292f';
+        $options["bg_button_selected"] = $primary[500];
+        $options["bg_button_selected_hover"] = $primary[600];
+        $options["color_button_selected"] = "#ffffff";
+        $options["color_button_selected_hover"] = $primary[50];
+        $options["bg_button_selected_selected"] = "#ffffff";
+        $options["color_button_selected_selected"] = "#22292f";
 
-        $options['bg_sidebar'] = $secondary[500];
-        $options['color_sidebar'] = $secondary_texts[800];
+        $options["bg_sidebar"] = $secondary[500];
+        $options["color_sidebar"] = $secondary_texts[800];
 
-        $options['color_border_selected'] = $primary[500];
+        $options["color_border_selected"] = $primary[500];
 
-        update_option('wbk_appearance_options', $options);
+        update_option("wbk_appearance_options", $options);
 
-        $css_config_string = WBK_Appearance_Utils::generate_css_config(
-            $options
-        );
-        $dir = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'webba_booking_style';
+        $css_config_string = WBK_Appearance_Utils::generate_css_config($options);
+        $dir = WP_CONTENT_DIR . DIRECTORY_SEPARATOR . "webba_booking_style";
         file_put_contents(
-            $dir . DIRECTORY_SEPARATOR . 'wbk6-frontend-config.css',
-            $css_config_string
+            $dir . DIRECTORY_SEPARATOR . "wbk6-frontend-config.css",
+            $css_config_string,
         );
 
-        self::set_update_as_complete('update_appearance_6_1_0');
+        self::set_update_as_complete("update_appearance_6_1_0");
     }
 
     static function update_settings_fields_6_3_0_clone_modified_options(): void
     {
-        if(!self::is_update_required('update_settings_fields_6_3_0_clone_modified_options')) {
+        if (!self::is_update_required("update_settings_fields_6_3_0_clone_modified_options")) {
             return;
         }
 
         // duplicate options so it have rollback compatibility
         $fields_map = [
-            'wbk_email_landing' => 'wbk_email_landing_new',
-            'wbk_user_dashboard_page_link' => 'wbk_user_dashboard_page_link_new',
-            'wbk_stripe_redirect_url' => 'wbk_stripe_redirect_url_new',
-            'wbk_paypal_redirect_url' => 'wbk_paypal_redirect_url_new',
-            'wbk_payment_price_format' => 'wbk_payment_price_format_new',
-            'wbk_date_format' => 'wbk_date_format_new',
-            'wbk_time_format' => 'wbk_time_format_new',
-            'wbk_start_of_week' => 'wbk_start_of_week_new',
-            'wbk_appointments_allow_cancel_paid' => 'wbk_appointments_allow_cancel_paid_new',
+            "wbk_email_landing" => "wbk_email_landing_new",
+            "wbk_user_dashboard_page_link" => "wbk_user_dashboard_page_link_new",
+            "wbk_stripe_redirect_url" => "wbk_stripe_redirect_url_new",
+            "wbk_paypal_redirect_url" => "wbk_paypal_redirect_url_new",
+            "wbk_payment_price_format" => "wbk_payment_price_format_new",
+            "wbk_date_format" => "wbk_date_format_new",
+            "wbk_time_format" => "wbk_time_format_new",
+            "wbk_start_of_week" => "wbk_start_of_week_new",
+            "wbk_appointments_allow_cancel_paid" => "wbk_appointments_allow_cancel_paid_new",
         ];
 
         foreach ($fields_map as $old_field => $new_field) {
-            $current_value = get_option($old_field, '');
-            if(!empty($current_value)) {
+            $current_value = get_option($old_field, "");
+            if (!empty($current_value)) {
                 update_option($new_field, $current_value);
             }
         }
 
-        self::set_update_as_complete('update_settings_fields_6_3_0_clone_modified_options');
+        self::set_update_as_complete("update_settings_fields_6_3_0_clone_modified_options");
     }
 
     public static function update_settings_fields_6_3_0_update_url_fields(): void
     {
-        if(!self::is_update_required('update_settings_fields_6_3_0_update_url_fields')) {
+        if (!self::is_update_required("update_settings_fields_6_3_0_update_url_fields")) {
             return;
         }
-       
+
         /* URL FIELDS */
         $url_fields = [
-            'wbk_email_landing_new',
-            'wbk_user_dashboard_page_link_new',
-            'wbk_stripe_redirect_url_new',
-            'wbk_paypal_redirect_url_new',
+            "wbk_email_landing_new",
+            "wbk_user_dashboard_page_link_new",
+            "wbk_stripe_redirect_url_new",
+            "wbk_paypal_redirect_url_new",
         ];
 
         foreach ($url_fields as $field) {
-            $current_value = get_option($field, '');
+            $current_value = get_option($field, "");
             // Check if the field is not empty and is a URL
-            if (
-                !empty($current_value) &&
-                filter_var($current_value, FILTER_VALIDATE_URL)
-            ) {
+            if (!empty($current_value) && filter_var($current_value, FILTER_VALIDATE_URL)) {
                 // Try to get page by url
                 $url = $current_value;
                 $page_id = url_to_postid($url);
@@ -1699,146 +1501,322 @@ class WBK_Model_Updater
             }
         }
 
-        self::set_update_as_complete('update_settings_fields_6_3_0_update_url_fields');
+        self::set_update_as_complete("update_settings_fields_6_3_0_update_url_fields");
     }
 
     public static function update_settings_fields_6_3_0_update_formats(): void
     {
-        if(!self::is_update_required('update_settings_fields_6_3_0_update_formats')) {
+        if (!self::is_update_required("update_settings_fields_6_3_0_update_formats")) {
             return;
         }
 
         /* PRICE FORMAT */
-        $current_format = get_option('wbk_payment_price_format_new', '$');
-        update_option('wbk_payment_price_format_new', str_replace('#price', '', $current_format));
+        $current_format = get_option("wbk_payment_price_format_new", '$');
+        update_option("wbk_payment_price_format_new", str_replace("#price", "", $current_format));
 
         /* DATE & TIME FORMAT FIELDS */
-        update_option('wbk_date_format_new', 'inherit');
-        update_option('wbk_time_format_new', 'inherit');
-        update_option('wbk_start_of_week_new', 'inherit');
+        update_option("wbk_date_format_new", "inherit");
+        update_option("wbk_time_format_new", "inherit");
+        update_option("wbk_start_of_week_new", "inherit");
 
-        self::set_update_as_complete('update_settings_fields_6_3_0_update_formats');
+        self::set_update_as_complete("update_settings_fields_6_3_0_update_formats");
     }
 
     public static function update_settings_fields_6_3_0_update_conditional_options(): void
     {
-        if(!self::is_update_required('update_settings_fields_6_3_0_update_conditional_options')) {
+        if (!self::is_update_required("update_settings_fields_6_3_0_update_conditional_options")) {
             return;
         }
 
         // BOOKING RULES
-        $allow_paid_bookings_cancellation = get_option('wbk_appointments_allow_cancel_paid_new', '');
+        $allow_paid_bookings_cancellation = get_option(
+            "wbk_appointments_allow_cancel_paid_new",
+            "",
+        );
 
-        if($allow_paid_bookings_cancellation == 'allow') {
-            update_option('wbk_appointments_allow_cancel_paid_new', 'yes');
+        if ($allow_paid_bookings_cancellation == "allow") {
+            update_option("wbk_appointments_allow_cancel_paid_new", "yes");
         } else {
-            update_option('wbk_appointments_allow_cancel_paid_new', '');
+            update_option("wbk_appointments_allow_cancel_paid_new", "");
         }
 
         // TAX MIGRATION
-        $current_tax = get_option('wbk_general_tax', '0');
-        $is_service_fee_taxed = get_option('wbk_do_not_tax_deposit', '');
+        $current_tax = get_option("wbk_general_tax", "0");
+        $is_service_fee_taxed = get_option("wbk_do_not_tax_deposit", "");
 
-        if(floatval($current_tax) > 0 || $is_service_fee_taxed == 'yes') {
-            update_option('wbk_add_tax_on_top', 'yes');
+        if (floatval($current_tax) > 0 || $is_service_fee_taxed == "yes") {
+            update_option("wbk_add_tax_on_top", "yes");
         }
 
-        self::set_update_as_complete('update_settings_fields_6_3_0_update_conditional_options');
+        self::set_update_as_complete("update_settings_fields_6_3_0_update_conditional_options");
     }
 
     public static function update_settings_fields_6_3_0_update_service_categories(): void
     {
-        if(!self::is_update_required('update_settings_fields_6_3_0_update_service_categories')) {
+        if (!self::is_update_required("update_settings_fields_6_3_0_update_service_categories")) {
             return;
         }
 
-         // SERVICE & SERVICE CATEGORY RELATIONS
-         global $wpdb;
-         $service_categories = $wpdb->get_results("SELECT id, list FROM " . get_option('wbk_db_prefix', '') . "wbk_service_categories", ARRAY_A);
-         foreach ($service_categories as $service_category) {
-             $services = $service_category['list'] ?? [];
- 
-             if (empty($services)) {
-                 continue;
-             }
- 
-             if (!is_array($services)) {
-                 $services = json_decode($services, true);
-             }
- 
-             foreach ($services as $service_id) {
-                 $service =  $wpdb->get_row("SELECT id, categories FROM " . get_option('wbk_db_prefix', '') . "wbk_services WHERE id = " . $service_id, ARRAY_A);
- 
-                 $existing_categories = $service['categories'] ?? [];
- 
-                 if (empty($existing_categories)) {
-                     $existing_categories = [$service_category['id']];
-                 }
- 
-                 if (!is_array($existing_categories)) {
-                     $existing_categories = json_decode(
-                         $existing_categories,
-                         true
-                     );
-                 }
- 
-                 if (empty($existing_categories)) {
-                     $existing_categories = [];
-                 }
- 
-                 $service_category_id_str = strval($service_category['id']);
-                 $existing_categories_str = array_map(
-                     'strval',
-                     $existing_categories
-                 );
-                 $categories_merged = array_unique(
-                     array_merge($existing_categories_str, [
-                         $service_category_id_str,
-                     ])
-                 );
- 
-                 $existing_categories_str = array_map('strval', $existing_categories);
-                 $categories_merged = array_unique(array_merge($existing_categories_str, [$service_category_id_str]));
-                 
-                 $wpdb->update(get_option('wbk_db_prefix', '') . "wbk_services", [
-                    'categories' => json_encode($categories_merged)
-                 ], [
-                    'id' => $service_id
-                 ]);
-             }
-         }
- 
-        self::set_update_as_complete('update_settings_fields_6_3_0_update_service_categories');
+        // SERVICE & SERVICE CATEGORY RELATIONS
+        global $wpdb;
+        $service_categories = $wpdb->get_results(
+            "SELECT id, list FROM " . get_option("wbk_db_prefix", "") . "wbk_service_categories",
+            ARRAY_A,
+        );
+        foreach ($service_categories as $service_category) {
+            $services = $service_category["list"] ?? [];
+
+            if (empty($services)) {
+                continue;
+            }
+
+            if (!is_array($services)) {
+                $services = json_decode($services, true);
+            }
+
+            foreach ($services as $service_id) {
+                $service = $wpdb->get_row(
+                    "SELECT id, categories FROM " .
+                        get_option("wbk_db_prefix", "") .
+                        "wbk_services WHERE id = " .
+                        $service_id,
+                    ARRAY_A,
+                );
+
+                $existing_categories = $service["categories"] ?? [];
+
+                if (empty($existing_categories)) {
+                    $existing_categories = [$service_category["id"]];
+                }
+
+                if (!is_array($existing_categories)) {
+                    $existing_categories = json_decode($existing_categories, true);
+                }
+
+                if (empty($existing_categories)) {
+                    $existing_categories = [];
+                }
+
+                $service_category_id_str = strval($service_category["id"]);
+                $existing_categories_str = array_map("strval", $existing_categories);
+                $categories_merged = array_unique(
+                    array_merge($existing_categories_str, [$service_category_id_str]),
+                );
+
+                $existing_categories_str = array_map("strval", $existing_categories);
+                $categories_merged = array_unique(
+                    array_merge($existing_categories_str, [$service_category_id_str]),
+                );
+
+                $wpdb->update(
+                    get_option("wbk_db_prefix", "") . "wbk_services",
+                    [
+                        "categories" => json_encode($categories_merged),
+                    ],
+                    [
+                        "id" => $service_id,
+                    ],
+                );
+            }
+        }
+
+        self::set_update_as_complete("update_settings_fields_6_3_0_update_service_categories");
     }
 
     public static function update_settings_fields_6_3_0_update_service_overrides(): void
     {
-        if(!self::is_update_required('update_settings_fields_6_3_0_update_service_overrides')) {
+        if (!self::is_update_required("update_settings_fields_6_3_0_update_service_overrides")) {
             return;
         }
 
         global $wpdb;
-        $services = $wpdb->get_results("SELECT id, service_fee FROM " . get_option('wbk_db_prefix', '') . "wbk_services", ARRAY_A);
+        $services = $wpdb->get_results(
+            "SELECT id, service_fee FROM " . get_option("wbk_db_prefix", "") . "wbk_services",
+            ARRAY_A,
+        );
 
-         // SERVICE OVERRIDES
-         foreach($services as $service){
-
+        // SERVICE OVERRIDES
+        foreach ($services as $service) {
             $params = [
-                'override_email' => 'yes',
-                'override_availability' => 'yes',
-                'override_step' => 'yes',
+                "override_email" => "yes",
+                "override_availability" => "yes",
+                "override_step" => "yes",
             ];
 
-            if(floatval($service['service_fee'] ?? 0) > 0) {
-                $params['enable_service_fee'] = 'yes';
+            if (floatval($service["service_fee"] ?? 0) > 0) {
+                $params["enable_service_fee"] = "yes";
             }
 
-            $wpdb->update(get_option('wbk_db_prefix', '') . "wbk_services", $params, [
+            $wpdb->update(get_option("wbk_db_prefix", "") . "wbk_services", $params, [
+                "id" => $service["id"],
+            ]);
+        }
+
+        self::set_update_as_complete("update_settings_fields_6_3_0_update_service_overrides");
+    }
+
+    // Migrate google calendars from wbk_gg_calendars to wbk_connected_calendars
+    // service fields service_gg_calendars replaced with service_connected_calendars
+    // wbk_connected_calendars_when_add from wbk_gg_when_add
+    public static function update_settings_fields_6_3_9_update_google_calendars()
+    {
+        if (!self::is_update_required("update_settings_fields_6_3_10_update_google_calendars")) {
+            return;
+        }
+
+        global $wpdb;
+        $prefix = get_option("wbk_db_prefix", "");
+        $gg_table = $prefix . "wbk_gg_calendars";
+        $connected_table = $prefix . "wbk_connected_calendars";
+
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $gg_table)) !== $gg_table) {
+            return;
+        }
+
+        if (
+            $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $connected_table)) !==
+            $connected_table
+        ) {
+            return;
+        }
+
+        $services_table = $prefix . "wbk_services";
+        $connected_calendars_exists = $wpdb->get_results(
+            $wpdb->prepare("SHOW COLUMNS FROM `$services_table` LIKE %s", "connected_calendars"),
+        );
+        if (empty($connected_calendars_exists)) {
+            $wpdb->query(
+                "ALTER TABLE `$services_table` ADD COLUMN `connected_calendars` VARCHAR(512) NULL DEFAULT NULL",
+            );
+        }
+
+        $gg_calendars_exists = $wpdb->get_results(
+            $wpdb->prepare("SHOW COLUMNS FROM `$services_table` LIKE %s", "gg_calendars"),
+        );
+        if (!empty($gg_calendars_exists)) {
+            $wpdb->query(
+                "UPDATE `$services_table` SET `connected_calendars` = `gg_calendars` WHERE `gg_calendars` IS NOT NULL AND `gg_calendars` != ''",
+            );
+        }
+
+        $gg_calendars = $wpdb->get_results("SELECT * FROM $gg_table", ARRAY_A);
+
+        foreach ($gg_calendars as $gg_row) {
+            $id = (int) $gg_row["id"];
+            $existing = $wpdb->get_var(
+                $wpdb->prepare("SELECT id FROM $connected_table WHERE id = %d", $id),
+            );
+            if ($existing !== null) {
+                continue;
+            }
+
+            $connected_calendar = new WBK_Connected_Calendar();
+            $connected_calendar->set("id", $id);
+            $connected_calendar->set_provider("google");
+            $connected_calendar->set_in_provider_id($gg_row["ggid"] ?? "");
+            $connected_calendar->set_name($gg_row["name"] ?? "");
+            $connected_calendar->set_user_id((int) ($gg_row["user_id"] ?? 0));
+            $connected_calendar->set_mode($gg_row["mode"] ?? "One-way");
+            $connected_calendar->set_access_token($gg_row["access_token"] ?? "");
+            $connected_calendar->set_easy_auth(!empty($gg_row["easy_auth"]) ? "yes" : "");
+
+            $connected_calendar->save();
+        }
+
+        update_option(
+            "wbk_connected_calendars_when_add",
+            get_option("wbk_gg_when_add", "onbooking"),
+        );
+        self::set_update_as_complete("update_settings_fields_6_3_10_update_google_calendars");
+    }
+
+    static function update_custom_fields_6_3_11(): void
+    {
+        if (!self::is_update_required('update_custom_fields_6_3_11')) {
+            return;
+        }
+
+        $raw = get_option('wbk_custom_fields_columns', '');
+        if ($raw === '' || is_array($raw)) {
+            self::set_update_as_complete('update_custom_fields_6_3_11');
+            return;
+        }
+
+        $slugs = [];
+        $parts = explode(',', $raw);
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if ($part === '') {
+                continue;
+            }
+            $bracket = strpos($part, '[');
+            $slug = $bracket !== false ? trim(substr($part, 0, $bracket)) : $part;
+            if ($slug !== '') {
+                $slugs[] = $slug;
+            }
+        }
+
+        update_option('wbk_custom_fields_columns', array_values($slugs));
+        self::set_update_as_complete('update_custom_fields_6_3_11');
+    }
+
+    public static function update_services_6_3_11(): void
+    {
+        if(!self::is_update_required('update_services_6_3_11')) {
+            return;
+        }
+
+        global $wpdb;
+        $services = $wpdb->get_results("SELECT id, quantity FROM " . get_option('wbk_db_prefix', '') . "wbk_services", ARRAY_A);
+        foreach($services as $service){
+            $wpdb->update(get_option('wbk_db_prefix', '') . "wbk_services", [
+                'max_quantity' => $service['quantity']
+            ], [
                 'id' => $service['id']
             ]);
         }
 
-        self::set_update_as_complete('update_settings_fields_6_3_0_update_service_overrides');
+        self::set_update_as_complete('update_services_6_3_11');
+    }
+
+    public static function update_email_notifications_6_3_11(): void
+    {
+        if(!self::is_update_required('update_email_notifications_6_3_11')) {
+            return;
+        }
+        global $wpdb;
+
+        $templates_map = [
+            'Booking confirmation to customer (booking made by customer)' => 'Booking Confirmation',
+            'Booking confirmation to admin (booking made by customer)' => 'New Booking Alert',
+            'Booking confirmation to customer (booking made by admin)' => 'Booking Confirmation (Admin Created)',
+            'Booking confirmation to admin (booking made by admin)' => 'New Booking Alert (Admin Created)',
+            'Account details for managing booking (customer)' => 'User Account Details',
+            '"Booking is approved" (to customer)' => 'Booking Approved Notice',
+            'Booking has been paid (to customer)' => 'Payment Receipt',
+            'Booking has been paid (to admin)' => 'Payment Received Alert',
+            'Booking updated by customer (to customer)' => 'Reschedule Confirmation',
+            'Booking updated by customer (to admin)' => 'Reschedule Alert',
+            'Booking updated by admin (to customer)' => 'Booking Update Notice',
+            '"Booking is cancelled" (by customer to customer)' => 'Cancellation Confirmation',
+            '"Booking is cancelled" (by customer to admin)' => 'Cancellation Alert',
+            '"Booking is cancelled" (by admin to customer)' => 'Cancellation Notice',
+            '"Booking is cancelled" automatically (to customer)' => 'Auto-Cancellation Notice',
+            'Booking reminder email (to customer)' => 'Upcoming Appointment Reminder',
+            'Booking reminder email (to admin)' => 'Upcoming Appointment Alert',
+            'Thank you email after booking is finished' => 'Post-Appointment Thank You'
+        ];
+
+        foreach($templates_map as $old_name => $new_name) {
+            $wpdb->update(get_option('wbk_db_prefix', '') . "wbk_email_templates", [
+                'name' => $new_name
+            ], [
+                'name' => $old_name,
+                'is_default' => 'yes'
+            ]);
+        }
+
+        self::set_update_as_complete('update_email_notifications_6_3_11');
     }
 }
 ?>

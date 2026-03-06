@@ -115,7 +115,7 @@ class WBK_Validator
             $wpdb->prepare(
                 'SELECT count(*) as cnt FROM ' .
                     get_option('wbk_db_prefix', '') .
-                    'wbk_gg_calendars where user_id = %d',
+                    'wbk_connected_calendars where user_id = %d',
                 $user_id
             )
         );
@@ -148,6 +148,34 @@ class WBK_Validator
         }
         return false;
     }
+
+    /**
+     * Check if current user have access to a particular calendar
+     *
+     * @param integer $calendar_id
+     * @return boolean
+     */
+    public static function check_access_to_connected_calendar(int $calendar_id): bool
+    {
+        if (current_user_can('manage_options')) {
+            return true;
+        }
+        $user_id = get_current_user_id();
+        if ($user_id === 0) {
+            return false;
+        }
+        global $wpdb;
+        $table = get_option('wbk_db_prefix', '') . 'wbk_connected_calendars';
+        $count = $wpdb->get_var(
+            $wpdb->prepare(
+                'SELECT COUNT(*) FROM ' . $table . ' WHERE id = %d AND user_id = %d',
+                (int) $calendar_id,
+                $user_id
+            )
+        );
+        return $count > 0;
+    }
+
     // check if current user has access to specified service
     public static function check_access_to_service($service_id)
     {

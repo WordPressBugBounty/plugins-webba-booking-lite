@@ -31,6 +31,26 @@ class WBK_Service extends WBK_Model_Object
     }
 
     /**
+     * Get all connected calendar IDs for availability import (from both gg_calendars and connected_calendars)
+     * @return array IDs of connected calendars
+     */
+    public function get_connected_calendars_for_import()
+    {
+        $calendar_ids = $this->get_gg_calendars();
+        $connected = $this->get('connected_calendars');
+        if (!empty($connected)) {
+            $connected_ids = json_decode($connected);
+            if (is_numeric($connected_ids)) {
+                $connected_ids = [$connected_ids];
+            }
+            if (is_array($connected_ids)) {
+                $calendar_ids = array_unique(array_merge($calendar_ids, $connected_ids));
+            }
+        }
+        return array_values($calendar_ids);
+    }
+
+    /**
      * get interval between $booking_ids
      * @return int interval between bookings
      */
@@ -218,11 +238,32 @@ class WBK_Service extends WBK_Model_Object
     public function get_max_quantity($time = null)
     {
         if (
+            !isset($this->fields['max_quantity']) ||
+            empty($this->fields['max_quantity'])
+        ) {
+            return 1;
+        }
+        return apply_filters(
+            'wbk_service_max_quantity',
+            $this->fields['max_quantity'],
+            $this->get_id(),
+            $time
+        );
+    }
+
+    /**
+     * get maximum capacity
+     * @return int capacity
+     */
+    public function get_total_capacity($time = null)
+    {
+        if (
             !isset($this->fields['quantity']) ||
             empty($this->fields['quantity'])
         ) {
             return 1;
         }
+    
         return apply_filters(
             'wbk_service_quantity',
             $this->fields['quantity'],

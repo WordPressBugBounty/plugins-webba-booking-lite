@@ -41,7 +41,7 @@ class WBK_PayPal {
     public function create_payment_v5( $booking_ids ) {
     }
 
-    public function create_payment_v6( $booking_ids ) {
+    public function create_payment_v6( $booking_ids, $payment_details = null ) {
     }
 
     public function create_payment( $booking_ids, $coupon, $payment_details ) {

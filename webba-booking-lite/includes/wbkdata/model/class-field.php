@@ -1,7 +1,7 @@
 <?php
 
 namespace WbkData;
-if (!defined('ABSPATH')) {
+if (!defined("ABSPATH")) {
     exit();
 }
 
@@ -157,9 +157,9 @@ class Field
         $name,
         $title,
         $type,
-        $section = '',
+        $section = "",
         $extra_data = null,
-        $default_value = '',
+        $default_value = "",
         $editable = true,
         $in_row = true,
         $required = true
@@ -174,13 +174,13 @@ class Field
         $this->editable = $editable;
         $this->default_value = $default_value;
         $this->required = $required;
-        $this->filter_type = '';
+        $this->filter_type = "";
         $this->can_view = [];
         $this->can_add = [];
         $this->can_update = [];
         $this->filter_value = [];
         $this->filter_conditions = [];
-        $this->filter_type = '';
+        $this->filter_type = "";
     }
 
     /**
@@ -191,13 +191,8 @@ class Field
      * @param string $delimiter filter delimiter
      * @param mixed $extra extra-data
      */
-    public function set_filter_data(
-        $type,
-        $conditions,
-        $value,
-        $delimiter,
-        $extra = null
-    ) {
+    public function set_filter_data($type, $conditions, $value, $delimiter, $extra = null)
+    {
         $this->filter_type = $type;
         $this->filter_conditions = $conditions;
         $this->filter_value = $value;
@@ -209,17 +204,17 @@ class Field
     {
         global $wpdb;
         if (is_array($this->filter_value) && 0 === count($this->filter_value)) {
-            return '';
+            return "";
         }
-        $allowed_conditions = ['>', '<', '=', '<=', '>=', 'LIKE', 'IN'];
-        $allowed_delimiters = [' AND ', ' OR ', ''];
+        $allowed_conditions = [">", "<", "=", "<=", ">=", "LIKE", "IN"];
+        $allowed_delimiters = [" AND ", " OR ", ""];
         if (!in_array($this->filter_delimiter, $allowed_delimiters, true)) {
-            return '';
+            return "";
         }
         $formated_conditions = [];
         $i = 0;
         foreach ($this->filter_conditions as $condition) {
-            if ('' === trim($this->filter_value[$i])) {
+            if ("" === trim($this->filter_value[$i])) {
                 continue;
             }
             if (!in_array($condition, $allowed_conditions, true)) {
@@ -227,72 +222,51 @@ class Field
             }
             $format = $this->field_type_to_sql_type(true);
             switch ($format) {
-                case '%s':
+                case "%s":
                     $condition = strtoupper($condition);
                     switch ($condition) {
-                        case 'LIKE':
+                        case "LIKE":
                             $this->filter_value[$i] =
-                                '%' .
-                                mb_strtoupper($this->filter_value[$i]) .
-                                '%';
+                                "%" . mb_strtoupper($this->filter_value[$i]) . "%";
                             $formated_conditions[] =
-                                'UPPER(' .
-                                $this->name .
-                                ') ' .
-                                $condition .
-                                ' "' .
-                                $format .
-                                '"';
+                                "UPPER(" . $this->name . ") " . $condition . ' "' . $format . '"';
 
                             break;
-                        case 'IN':
+                        case "IN":
                             $temp = [];
                             foreach ($this->filter_value as $filter_value) {
-                                $temp[] =
-                                    '(' . $this->name . ' = ' . $format . ')';
+                                $temp[] = "(" . $this->name . " = " . $format . ")";
                             }
-                            $formated_conditions[] = implode(' OR ', $temp);
+                            $formated_conditions[] = implode(" OR ", $temp);
 
                             break;
                         default:
                             $formated_conditions[] =
-                                $this->name .
-                                ' ' .
-                                $condition .
-                                ' ("' .
-                                $format .
-                                '")';
+                                $this->name . " " . $condition . ' ("' . $format . '")';
                             break;
                     }
 
                     break;
-                case '%d':
+                case "%d":
                     switch ($condition) {
-                        case 'IN':
+                        case "IN":
                             $temp = [];
                             foreach ($this->filter_value as $filter_value) {
-                                $temp[] =
-                                    '(' . $this->name . ' = ' . $format . ')';
+                                $temp[] = "(" . $this->name . " = " . $format . ")";
                             }
-                            $formated_conditions[] = implode(' OR ', $temp);
+                            $formated_conditions[] = implode(" OR ", $temp);
 
                             break;
                         default:
                             $formated_conditions[] =
-                                $this->name .
-                                ' ' .
-                                $condition .
-                                ' ("' .
-                                $format .
-                                '")';
+                                $this->name . " " . $condition . ' ("' . $format . '")';
 
                             break;
                     }
 
                     break;
                 default:
-                    $formated_conditions[] =
-                        $this->name . ' ' . $condition . ' ' . $format;
+                    $formated_conditions[] = $this->name . " " . $condition . " " . $format;
 
                     break;
             }
@@ -300,7 +274,7 @@ class Field
         }
 
         if (0 === count($formated_conditions)) {
-            return '';
+            return "";
         }
         $condition = implode($this->filter_delimiter, $formated_conditions);
         return $wpdb->prepare($condition, $this->filter_value);
@@ -409,21 +383,30 @@ class Field
     {
         $user = wp_get_current_user();
         $roles = (array) $user->roles;
-        if (
-            $this->model_name ==
-            get_option('wbk_db_prefix', '') . 'wbk_services'
-        ) {
+        $db_prefix = get_option("wbk_db_prefix", "");
+        $model_name = $this->model_name;
+
+        // Administrators can always view
+        if (current_user_can("manage_options")) {
+            return $roles;
+        }
+
+        if ($this->model_name == get_option("wbk_db_prefix", "") . "wbk_services") {
             return $roles;
         }
         if (
-            $this->model_name ==
-                get_option('wbk_db_prefix', '') . 'wbk_appointments' ||
-            $this->model_name ==
-                get_option('wbk_db_prefix', '') . 'wbk_cancelled_appointments'
+            $this->model_name == get_option("wbk_db_prefix", "") . "wbk_appointments" ||
+            $this->model_name == get_option("wbk_db_prefix", "") . "wbk_cancelled_appointments"
         ) {
             if (\WBK_User_Utils::check_access_to_service()) {
                 return $roles;
             }
+        }
+        if (
+            $this->model_name == $db_prefix . "wbk_gg_calendars" ||
+            $this->model_name == $db_prefix . "WBK_Outlook_Calendar_calendars"
+        ) {
+            return $roles;
         }
         return [];
     }
@@ -541,10 +524,10 @@ class Field
     public function get_can_add()
     {
         return apply_filters(
-            'wbkdata_field_can_add',
+            "wbkdata_field_can_add",
             $this->can_add,
             $this->name,
-            $this->model_name
+            $this->model_name,
         );
     }
     /**
@@ -564,10 +547,10 @@ class Field
     public function get_can_update()
     {
         return apply_filters(
-            'wbkdata_field_can_update',
+            "wbkdata_field_can_update",
             $this->can_update,
             $this->name,
-            $this->model_name
+            $this->model_name,
         );
     }
 
@@ -593,124 +576,127 @@ class Field
         $arr_sql_parts = [];
 
         switch ($this->type) {
-            case 'text':
+            case "text":
                 $ed = $this->get_extra_data();
-                if (isset($ed['type'])) {
-                    switch ($ed['type']) {
-                        case 'positive_integer':
-                            $arr_sql_parts = ['int', 'unsigned NULL', '', '%d'];
+                if (isset($ed["type"])) {
+                    switch ($ed["type"]) {
+                        case "positive_integer":
+                            $arr_sql_parts = ["int", "unsigned NULL", "", "%d"];
 
                             break;
-                        case 'none_negative_integer':
-                            $arr_sql_parts = ['int', 'unsigned NULL', '', '%d'];
+                        case "none_negative_integer":
+                            $arr_sql_parts = ["int", "unsigned NULL", "", "%d"];
 
                             break;
-                        case 'integer':
-                            $arr_sql_parts = ['int', ' NULL ', '', '%d'];
+                        case "integer":
+                            $arr_sql_parts = ["int", " NULL ", "", "%d"];
 
                             break;
-                        case 'float':
-                            $arr_sql_parts = ['float', '', '', '%f'];
+                        case "float":
+                            $arr_sql_parts = ["float", "", "", "%f"];
 
                             break;
-                        case 'none_negative_float':
-                            $arr_sql_parts = ['float', '', '', '%f'];
+                        case "none_negative_float":
+                            $arr_sql_parts = ["float", "", "", "%f"];
 
                             break;
-                        case 'email':
-                            $arr_sql_parts = ['text', '', '', '%s'];
-                            $arr_sql_parts = ['text', '', '', '%s'];
+                        case "email":
+                            $arr_sql_parts = ["text", "", "", "%s"];
+                            $arr_sql_parts = ["text", "", "", "%s"];
 
                             break;
                         default:
-                            $arr_sql_parts = ['text', '', '', '%s'];
-                            $arr_sql_parts = ['text', '', '', '%s'];
+                            $arr_sql_parts = ["text", "", "", "%s"];
+                            $arr_sql_parts = ["text", "", "", "%s"];
 
                             break;
                     }
                 } else {
-                    $arr_sql_parts = ['text', '', '', '%s'];
+                    $arr_sql_parts = ["text", "", "", "%s"];
                 }
 
                 break;
-            case 'radio':
-                $arr_sql_parts = ['text', '', '', '%s'];
+            case "radio":
+                $arr_sql_parts = ["text", "", "", "%s"];
 
                 break;
-            case 'checkbox':
-                $arr_sql_parts = ['text', '', '', '%s'];
+            case "checkbox":
+                $arr_sql_parts = ["text", "", "", "%s"];
 
                 break;
-            case 'multicheckbox':
-                $arr_sql_parts = ['text', '', '', '%s'];
+            case "multicheckbox":
+                $arr_sql_parts = ["text", "", "", "%s"];
 
                 break;
-            case 'select_custom':
-            case 'select':
+            case "select_custom":
+            case "select":
                 $ed = $this->get_extra_data();
-                if (isset($ed['type']) && 'positive_integer' === $ed['type']) {
-                    $arr_sql_parts = ['int', 'unsigned NULL', '', '%d'];
+                if (isset($ed["type"]) && "positive_integer" === $ed["type"]) {
+                    $arr_sql_parts = ["int", "unsigned NULL", "", "%d"];
                 } else {
-                    $arr_sql_parts = ['mediumtext', '', '', '%s'];
+                    $arr_sql_parts = ["mediumtext", "", "", "%s"];
                 }
 
                 break;
-            case 'textarea':
-                $arr_sql_parts = ['TEXT', 65535, '', '%s'];
+            case "textarea":
+                $arr_sql_parts = ["TEXT", 65535, "", "%s"];
 
                 break;
-            case 'datetime':
-                $arr_sql_parts = ['DATETIME', '', '', '%s'];
+            case "datetime":
+                $arr_sql_parts = ["DATETIME", "", "", "%s"];
 
                 break;
-            case 'date':
-                $arr_sql_parts = ['DATE', '', '', '%s'];
+            case "date":
+                $arr_sql_parts = ["DATE", "", "", "%s"];
 
                 break;
-            case 'editor':
-                $arr_sql_parts = ['mediumtext', 'NOT NULL', '', '%s'];
-            case 'wbk_form_fields':
-                $arr_sql_parts = ['mediumtext', 'NOT NULL', '', '%s'];
+            case "editor":
+                $arr_sql_parts = ["mediumtext", "NOT NULL", "", "%s"];
+            case "wbk_form_fields":
+                $arr_sql_parts = ["mediumtext", "NOT NULL", "", "%s"];
                 break;
-            case 'date_range':
-                $arr_sql_parts = ['text', 128, '', '%s'];
+            case "date_range":
+                $arr_sql_parts = ["text", 128, "", "%s"];
                 break;
-            case 'wbk_date':
-                $arr_sql_parts = ['int', 'unsigned NOT NULL', '', '%d'];
+            case "wbk_date":
+                $arr_sql_parts = ["int", "unsigned NOT NULL", "", "%d"];
                 break;
-            case 'wbk_time':
-                $arr_sql_parts = ['int', 'unsigned NOT NULL', '', '%d'];
+            case "wbk_time":
+                $arr_sql_parts = ["int", "unsigned NOT NULL", "", "%d"];
                 break;
-            case 'wbk_google_access_token':
-                $arr_sql_parts = ['TEXT', 65535, '', '%s'];
+            case "wbk_google_access_token":
+                $arr_sql_parts = ["TEXT", 65535, "", "%s"];
                 break;
-            case 'wbk_app_custom_data':
-                $arr_sql_parts = ['TEXT', 65535, '', '%s'];
+            case "WBK_Outlook_Calendar_access_token":
+                $arr_sql_parts = ["TEXT", 65535, "", "%s"];
                 break;
-            case 'wbk_business_hours':
-                $arr_sql_parts = ['TEXT', 65535, '', '%s'];
+            case "wbk_app_custom_data":
+                $arr_sql_parts = ["TEXT", 65535, "", "%s"];
                 break;
-            case 'file':
-                $arr_sql_parts = ['text', '', '', '%s'];
+            case "wbk_business_hours":
+                $arr_sql_parts = ["TEXT", 65535, "", "%s"];
                 break;
-            case 'color':
-                $arr_sql_parts = ['text', '', '', '%s'];
+            case "file":
+                $arr_sql_parts = ["text", "", "", "%s"];
                 break;
-            case 'duration':
-                $arr_sql_parts = ['int', 'unsigned NOT NULL', '', '%d'];
+            case "color":
+                $arr_sql_parts = ["text", "", "", "%s"];
                 break;
-            case 'limitation':
-                $arr_sql_parts = ['int', 'unsigned NOT NULL', '', '%d'];
+            case "duration":
+                $arr_sql_parts = ["int", "unsigned NOT NULL", "", "%d"];
+                break;
+            case "limitation":
+                $arr_sql_parts = ["int", "unsigned NOT NULL", "", "%d"];
                 break;
             default:
                 break;
         }
 
         $arr_sql_parts = apply_filters(
-            'wbkdata_type_to_sql_type',
+            "wbkdata_type_to_sql_type",
             $arr_sql_parts,
             $this->type,
-            $this
+            $this,
         );
 
         if (!is_array($arr_sql_parts)) {
@@ -720,9 +706,9 @@ class Field
             return false;
         }
         if (
-            '%s' !== $arr_sql_parts[3] &&
-            '%d' !== $arr_sql_parts[3] &&
-            '%f' !== $arr_sql_parts[3]
+            "%s" !== $arr_sql_parts[3] &&
+            "%d" !== $arr_sql_parts[3] &&
+            "%f" !== $arr_sql_parts[3]
         ) {
             return false;
         }
@@ -732,20 +718,15 @@ class Field
 
         $result = \WbkData_Model_Utils::clean_up_string($arr_sql_parts[0]);
 
-        if ('%s' === $arr_sql_parts[3]) {
-            if (
-                (int) $arr_sql_parts[1] === $arr_sql_parts[1] &&
-                (int) $arr_sql_parts[1] > 0
-            ) {
-                $result .= '(' . $arr_sql_parts[1] . ') ';
+        if ("%s" === $arr_sql_parts[3]) {
+            if ((int) $arr_sql_parts[1] === $arr_sql_parts[1] && (int) $arr_sql_parts[1] > 0) {
+                $result .= "(" . $arr_sql_parts[1] . ") ";
             }
-            if ('' !== trim($arr_sql_parts[2])) {
-                $result .=
-                    ' default ' .
-                    \WbkData_Model_Utils::clean_up_string($arr_sql_parts[2]);
+            if ("" !== trim($arr_sql_parts[2])) {
+                $result .= " default " . \WbkData_Model_Utils::clean_up_string($arr_sql_parts[2]);
             }
-        } elseif ('%d' === $arr_sql_parts[3]) {
-            $result .= ' ' . $arr_sql_parts[1];
+        } elseif ("%d" === $arr_sql_parts[3]) {
+            $result .= " " . $arr_sql_parts[1];
         }
 
         return $result;

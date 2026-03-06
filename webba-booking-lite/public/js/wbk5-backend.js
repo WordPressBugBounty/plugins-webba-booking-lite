@@ -4500,7 +4500,7 @@ function wbk_init_app_custom_fiels(skip_th = false) {
         return
     }
 
-    if (wbk_custom_fields != '') {
+    if (wbk_custom_fields && (typeof wbk_custom_fields === 'object' ? Object.keys(wbk_custom_fields).length : wbk_custom_fields !== '')) {
         var items = wbk_get_custom_fields(wbk_custom_fields)
         if (!skip_th) {
             var title_html = ''
@@ -4523,7 +4523,7 @@ function wbk_hide_default_custom_field() {
         return
     }
 
-    if (wbk_custom_fields != '') {
+    if (wbk_custom_fields && (typeof wbk_custom_fields === 'object' ? Object.keys(wbk_custom_fields).length : wbk_custom_fields !== '')) {
         var items = wbk_get_custom_fields(wbk_custom_fields)
         if (items.length > 0) {
             jQuery('#title_appointment_extra').addClass('plugion_hidden')
@@ -4562,16 +4562,22 @@ function wbk_set_custom_fields_value(elem, items) {
     jQuery(value_html).insertAfter(td_elem)
 }
 function wbk_get_custom_fields(input) {
-    var items = input.split(',')
+    if (typeof input === 'object' && input !== null && !Array.isArray(input)) {
+        return Object.keys(input).map(function (id) {
+            return [id, input[id]]
+        })
+    }
+    var items = (typeof input === 'string' ? input : '').split(',')
     var result = []
     jQuery.each(items, function (i, val) {
         val = val.trim()
+        if (val === '') return
         var title = val.substring(
             val.lastIndexOf('[') + 1,
             val.lastIndexOf(']')
         )
         var id = val.substring(0, val.lastIndexOf('['))
-        if (id == '') {
+        if (id === '' || val.indexOf('[') === -1) {
             id = val
             title = val
         }

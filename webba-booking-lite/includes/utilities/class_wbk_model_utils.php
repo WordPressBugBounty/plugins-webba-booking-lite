@@ -185,11 +185,20 @@ class WBK_Model_Utils {
      * list of available modes of google calendars
      * @return array key -title pair array
      */
-    public static function get_gg_calendar_modes() {
+    public static function get_connected_calendar_modes() {
         $result = [
-            "One-way"        => __( "One-way (export)", "webba-booking-lite" ),
-            "One-way-import" => __( "One-way (import)", "webba-booking-lite" ),
-            "Two-ways"       => __( "Two-ways", "webba-booking-lite" ),
+            "Two-ways"       => [
+                'title'       => __( "Two-ways", "webba-booking-lite" ),
+                'description' => __( 'Sync events in both directions - import external events and export bookings', 'webba-booking-lite' ),
+            ],
+            "One-way-import" => [
+                'title'       => __( "One-way (import)", "webba-booking-lite" ),
+                'description' => __( 'Only import events from external calendar to block availability', 'webba-booking-lite' ),
+            ],
+            "One-way"        => [
+                'title'       => __( "One-way (export)", "webba-booking-lite" ),
+                'description' => __( 'Only export bookings to external calendar', 'webba-booking-lite' ),
+            ],
         ];
         return $result;
     }
@@ -708,24 +717,37 @@ class WBK_Model_Utils {
     }
 
     static function get_custom_fields_list() {
-        $ids = get_option( "wbk_custom_fields_columns", "" );
-        $result = [];
-        if ( $ids != "" ) {
-            $ids = explode( ",", $ids );
-            $html = "";
-            foreach ( $ids as $id ) {
-                $col_title = "";
-                preg_match( "/\\[[^\\]]*\\]/", $id, $matches );
-                if ( is_array( $matches ) && count( $matches ) > 0 ) {
-                    $col_title = rtrim( ltrim( $matches[0], "[" ), "]" );
+        $option = get_option( "wbk_custom_fields_columns", "" );
+        $slugs = [];
+        if ( is_array( $option ) ) {
+            $slugs = $option;
+        } elseif ( is_string( $option ) && $option !== "" ) {
+            $parts = explode( ",", $option );
+            foreach ( $parts as $part ) {
+                $part = trim( $part );
+                if ( $part === "" ) {
+                    continue;
                 }
-                $id = explode( "[", $id );
-                $id = $id[0];
-                if ( $col_title == "" ) {
-                    $col_title = $id;
+                $bracket = strpos( $part, "[" );
+                $slug = ( $bracket !== false ? trim( substr( $part, 0, $bracket ) ) : $part );
+                if ( $slug !== "" ) {
+                    $slugs[] = $slug;
                 }
-                $result[$id] = stripslashes( $col_title );
             }
+        }
+        $merged = WBK_Form_Builder_Utils::get_all_fields_merged();
+        $slug_to_title = [];
+        foreach ( $merged as $field ) {
+            $slug = ( isset( $field['slug'] ) ? $field['slug'] : '' );
+            if ( $slug === '' ) {
+                continue;
+            }
+            $title = ( isset( $field['placeholder'] ) ? $field['placeholder'] : (( isset( $field['checkboxText'] ) ? $field['checkboxText'] : $slug )) );
+            $slug_to_title[$slug] = $title;
+        }
+        $result = [];
+        foreach ( $slugs as $slug ) {
+            $result[$slug] = ( isset( $slug_to_title[$slug] ) ? stripslashes( $slug_to_title[$slug] ) : $slug );
         }
         return $result;
     }
@@ -1638,9 +1660,6 @@ class WBK_Model_Utils {
         }
         $service = new WBK_Service($booking->get_service());
         if ( !$service->is_loaded() ) {
-            return $customer_name;
-        }
-        if ( !$service->load() ) {
             return $customer_name;
         }
         $template = get_option( "wbk_customer_name_output", "#name" );

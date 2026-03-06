@@ -113,7 +113,10 @@
             "misc": {
                 "tooltip": "Choose which form customers will see when booking this service. Keep the default Webba Form, or create one in 'Form Builder' and select it here.",
                 "options": "forms",
-                "required_plan": "standard"
+                "required_plan": "standard",
+                "null_value": [
+                    "Default Form"
+                ]
             },
             "required": false,
             "dependency": [],
@@ -169,12 +172,29 @@
             "type": "string",
             "input_type": "limitation",
             "hidden": true,
-            "title": "Number of people limitation for same slot",
+            "title": "Group Size Limits",
             "tab": "availability",
             "misc": {
-                "tooltip": "Set the maximum and minimum number of people/unit for the same time slot.",
+                "tooltip": "Set the minimum and maximum number of spots a single customer can reserve in one transaction. E.g. if you require minimum 4 spots for a slot to be booked, enter 4 in the \"min\" field.",
                 "min_field": "min_quantity",
-                "max_field": "quantity",
+                "max_field": "max_quantity",
+                "required_plan": "standard"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "1",
+            "editable": true
+        },
+        "service_max_quantity": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Maximum Capacity Per Slot",
+            "tab": "availability",
+            "misc": {
+                "tooltip": "Set the maximum number of spots available for this service per time slot. Once this limit is reached, the slot will close for everyone.",
+                "sub_type": "positive_integer",
+                "hidden": true,
                 "required_plan": "standard"
             },
             "required": true,
@@ -186,12 +206,11 @@
             "type": "string",
             "input_type": "text",
             "hidden": true,
-            "title": "Maximum Capacity Per Slot",
+            "title": "Total Slot Capacity",
             "tab": "availability",
             "misc": {
-                "tooltip": "Maximum number of participants allowed in the same slot. Set to 1 for individual appointments.",
+                "tooltip": "Set the maximum number of spots available for this service per time slot. Once this limit is reached, the slot will close for everyone.",
                 "sub_type": "positive_integer",
-                "hidden": true,
                 "required_plan": "standard"
             },
             "required": true,
@@ -329,7 +348,7 @@
                     ]
                 ],
                 "date_format": "F j, Y",
-                "time_zone": "Europe/Warsaw",
+                "time_zone": "Europe/Vilnius",
                 "required_plan": "standard"
             },
             "required": false,
@@ -346,8 +365,9 @@
             "misc": {
                 "tooltip": "Specify a date range if the service is only valid for a specific period of time.",
                 "date_format": "F j, Y",
-                "time_zone": "Europe/Warsaw",
-                "required_plan": "start"
+                "time_zone": "Europe/Vilnius",
+                "required_plan": "start",
+                "available_in_old_free": true
             },
             "required": false,
             "dependency": [],
@@ -370,15 +390,14 @@
             "editable": true
         },
         "service_step": {
-            "type": "string",
-            "input_type": "select",
+            "type": "not_defined",
+            "input_type": "not_defined",
             "hidden": true,
             "title": "Time slot interval (step)",
             "tab": "availability",
             "misc": {
                 "tooltip": "Enter the default time interval for time slots, which helps organize business hours and appointment durations.",
                 "options": {
-                    "custom": "Custom",
                     "duration": "duration of service",
                     "15": "15 min",
                     "30": "30 min",
@@ -396,36 +415,6 @@
             "required": false,
             "dependency": [],
             "default_value": "duration",
-            "editable": true
-        },
-        "service_custom_step": {
-            "type": "string",
-            "input_type": "text",
-            "hidden": true,
-            "title": "Custom step",
-            "tab": "availability",
-            "misc": {
-                "tooltip": "Enter the custom time interval for time slots.",
-                "hide": [
-                    [
-                        "step",
-                        "=",
-                        "custom"
-                    ]
-                ],
-                "sub_type": "positive_integer",
-                "dependent_value": {
-                    "condition": [
-                        "step",
-                        "!=",
-                        "custom"
-                    ],
-                    "value": "0"
-                }
-            },
-            "required": false,
-            "dependency": [],
-            "default_value": "0",
             "editable": true
         },
         "service_limited_timeslot": {
@@ -467,7 +456,7 @@
             },
             "required": false,
             "dependency": [],
-            "default_value": "1",
+            "default_value": "",
             "editable": true
         },
         "service_multi_mode_limit": {
@@ -491,7 +480,7 @@
             },
             "required": false,
             "dependency": [],
-            "default_value": "1",
+            "default_value": "",
             "editable": true
         },
         "service_consecutive_timeslots": {
@@ -541,13 +530,6 @@
             "misc": {
                 "yes": "Yes",
                 "tooltip": "If you don't want to show price, turn this on.",
-                "hide": [
-                    [
-                        "price",
-                        "<=",
-                        "0"
-                    ]
-                ],
                 "required_plan": "start"
             },
             "required": false,
@@ -614,8 +596,7 @@
                 "tooltip": "Select the preferred payment method(s) for this service.",
                 "multiple": true,
                 "options": "backend",
-                "description": "IMPORTANT! For Google Pay/Apple pay and Other Payment Methods to work you have to activate them in your Stripe account",
-                "required_plan": "standard"
+                "description": "IMPORTANT! For Google Pay/Apple pay and Other Payment Methods to work you have to activate them in your Stripe account"
             },
             "required": false,
             "dependency": [],
@@ -721,16 +702,16 @@
             "default_value": "0",
             "editable": true
         },
-        "service_gg_calendars": {
+        "service_connected_calendars": {
             "type": "string",
             "input_type": "select",
             "hidden": true,
-            "title": "Connect Google calendar",
+            "title": "Connect calendar",
             "tab": "integrations",
             "misc": {
                 "tooltip": "Select the Google Calendar(s) that should sync with this service's bookings. (Available after connecting your Google account.)",
                 "multiple": true,
-                "options": "gg_calendars",
+                "options": "connected_calendars",
                 "required_plan": "start"
             },
             "required": false,
@@ -834,7 +815,14 @@
             "tab": "integrations",
             "misc": {
                 "tooltip": "Select which Google Calendar to add Google Meet events to. The calendar must be configured in Google Calendar settings.",
-                "options": "source:gg_calendars:gg_calendars",
+                "options": "source:connected_calendars:connected_calendars",
+                "source_filter": [
+                    [
+                        "provider",
+                        "=",
+                        "google"
+                    ]
+                ],
                 "hide": [
                     [
                         "google_meet_enabled",

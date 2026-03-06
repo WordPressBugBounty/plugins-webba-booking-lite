@@ -126,9 +126,18 @@ function wbkdata_property_field_radio_validator($input, $value, $slug, $field)
 {
     $value = trim(sanitize_text_field($value));
     $valid = false;
-    $options = isset($field->get_extra_data()['options'])
-        ? $field->get_extra_data()['options']
+    $extra_data = $field->get_extra_data();
+    $options = isset($extra_data['options'])
+        ? $extra_data['options']
         : [];
+
+    if(isset($extra_data['radio_type']) && $extra_data['radio_type'] === 'icon') {
+        $options = [];
+
+        foreach($extra_data['options'] as $option) {
+            $options[$option['value']] = $option['title'];
+        }
+    }
 
     foreach ($options as $key => $option_value) {
         if ($value == $key) {

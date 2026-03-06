@@ -81,23 +81,23 @@ class WBK_Model_Relation_Destroyer
             return;
         }
 
-        if(!is_object($item)) {
+        if (!is_object($item)) {
             $item = WbkData()->models->get_element_at($model_name_not_filtered)->get_item($item);
         }
 
-        if(!$item) {
+        if (!$item) {
             return;
         }
-        
-        $form = new WBK_Form($item->id);
+
+        $form        = new WBK_Form($item->id);
         $form_fields = $form->get_fields();
         foreach ($form_fields as $field) {
             if (isset($field['slug'])) {
                 $option_name = 'webba_form_field_' . $field['slug'];
-                
-                if(isset($field['slug']) && $field['type'] !== 'checkbox') {
+
+                if (isset($field['slug']) && $field['type'] !== 'checkbox') {
                     update_option($option_name, $field['placeholder']);
-                } else if(isset($field['slug']) && $field['type'] === 'checkbox') {
+                } else if (isset($field['slug']) && $field['type'] === 'checkbox') {
                     update_option($option_name, $field['checkboxText']);
                 }
             }

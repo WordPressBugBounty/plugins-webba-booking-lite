@@ -210,5 +210,9 @@
 			<key name="wbk_apple_pay_message"/>
 			<key name="wbk_stripe_other_button_text"/>
 			<key name="wbk_stripe_other_message"/>
+			<key name="wbk_user_dashboard_manage_appointments_title"/>
+			<key name="wbk_user_dashboard_upcoming_bookings_title"/>
+			<key name="wbk_user_dashboard_past_bookings_title"/>
+			<key name="wbk_user_dashboard_new_booking_title"/>
 	</admin-texts>
 </wpml-config>

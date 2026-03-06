@@ -56,13 +56,15 @@ class WBK_Form_Builder_Utils
             true
         );
 
-        $fields = array_map(function($field) {
-            if($field['type'] === 'checkbox') {
+        $fields = array_map(function ($field) {
+            if ($field['type'] === 'checkbox') {
+                $field['checkboxText__not_translated'] = $field['checkboxText'];
                 $field['checkboxText'] = get_option('webba_form_field_' . $field['slug'], $field['checkboxText']);
-            }else{
+            } else {
+                $field['placeholder__not_translated'] = $field['placeholder'];
                 $field['placeholder'] = get_option('webba_form_field_' . $field['slug'], $field['placeholder']);
             }
-            
+
             return $field;
         }, $fields);
 
@@ -76,25 +78,25 @@ class WBK_Form_Builder_Utils
      */
     public static function get_all_fields_merged(): array
     {
-        $forms = WBK_Model_Utils::get_forms();
+        $forms  = WBK_Model_Utils::get_forms();
         $fields = [];
-        
+
         foreach ($forms as $id => $name) {
-            $form = new WBK_Form($id);
+            $form        = new WBK_Form($id);
             $fields_temp = $form->get_fields();
-            
+
             if (is_array($fields_temp)) {
-                $fields_temp = array_map(function($field) use ($id) {
+                $fields_temp = array_map(function ($field) use ($id) {
                     $field['form_id'] = $id;
+
                     return $field;
                 }, $fields_temp);
-                
+
                 $fields = array_merge($fields, $fields_temp);
             }
         }
 
-        $fields = array_merge($fields, self::get_default_fields());
-
+        $fields        = array_merge($fields, self::get_default_fields());
         $fields_result = [];
 
         foreach ($fields as $field) {
