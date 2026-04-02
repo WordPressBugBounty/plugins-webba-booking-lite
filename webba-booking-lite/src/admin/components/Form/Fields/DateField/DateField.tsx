@@ -7,7 +7,7 @@ import { FormComponentConstructor } from '../../lib/types'
 import { useField } from '../../lib/hooks/useField'
 import { format, fromUnixTime } from 'date-fns'
 
-import styles from './DateField.module.scss'
+import './DateField.scss'
 import {
     fetchConnectedOptions,
     isConnectedField,
@@ -18,6 +18,7 @@ import { toZonedTime } from 'date-fns-tz'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
 import classNames from 'classnames'
+import { convertToJSFormat } from '../../utils/dateTime'
 
 export const createDateField: FormComponentConstructor<any> = ({
     field,
@@ -39,12 +40,7 @@ export const createDateField: FormComponentConstructor<any> = ({
         useLayoutEffect(() => {
             if (value && !isNaN(value) && !initialized) {
                 setInitialized(true)
-                setDate(
-                    toZonedTime(
-                        fromUnixTime(value),
-                        Intl.DateTimeFormat().resolvedOptions().timeZone
-                    )
-                )
+                setDate(toZonedTime(fromUnixTime(value), settings?.timezone))
             } else if (
                 value &&
                 isNaN(value) &&
@@ -52,12 +48,7 @@ export const createDateField: FormComponentConstructor<any> = ({
                 !initialized
             ) {
                 setInitialized(true)
-                setDate(
-                    toZonedTime(
-                        new Date(value),
-                        Intl.DateTimeFormat().resolvedOptions().timeZone
-                    )
-                )
+                setDate(toZonedTime(new Date(value), settings?.timezone))
             }
         }, [value])
 
@@ -76,18 +67,24 @@ export const createDateField: FormComponentConstructor<any> = ({
 
         return (
             <div
-                className={classNames(styles.inputWrapper, {
-                    [styles.open]: open,
+                className={classNames('wbk_formDateField__inputWrapper', {
+                    'wbk_formDateField__inputWrapper--open': open,
                 })}
             >
                 <Label title={label} id={name} tooltip={misc?.tooltip} />
                 <DatePicker
-                    className={styles.dateInput}
-                    calendarClassName={styles.calendar}
-                    dayClassName={() => styles.day}
+                    className={classNames('wbk_formDateField__dateInput', {
+                        'wbk_formDateField__dateInput--focused': open,
+                    })}
+                    calendarClassName="wbk_formDateField__calendar"
+                    dayClassName={() => 'wbk_formDateField__day'}
                     isClearable={true}
                     closeOnScroll={true}
-                    dateFormat={'MMM d, yyyy'}
+                    dateFormat={
+                        (settings?.date_format &&
+                            convertToJSFormat(settings?.date_format)) ||
+                        'MMM d, yyyy'
+                    }
                     selected={date}
                     onChange={(dateParam: any) => {
                         setOpen(false)
@@ -99,7 +96,7 @@ export const createDateField: FormComponentConstructor<any> = ({
                     onInputClick={() => setOpen(true)}
                 />
                 {errors.length > 0 && touched && (
-                    <div className={styles.error}>{errors[0]}</div>
+                    <div className="wbk_formDateField__error">{errors[0]}</div>
                 )}
             </div>
         )

@@ -1,5 +1,5 @@
 import { Cell } from '@tanstack/react-table'
-import styles from './Table.module.scss'
+import './Table.scss'
 
 interface Props {
     cell: Cell<any, any>
@@ -7,8 +7,8 @@ interface Props {
 
 export const WebbaDataCell = ({ cell }: Props) => {
     return (
-        <div className={styles.tableCellContentWrapper}>
-            <div className={styles.tableCellContent}>{cell.getValue()}</div>
+        <div className="wbk_table__tableCellContentWrapper">
+            <div className="wbk_table__tableCellContent">{cell.getValue()}</div>
         </div>
     )
 }

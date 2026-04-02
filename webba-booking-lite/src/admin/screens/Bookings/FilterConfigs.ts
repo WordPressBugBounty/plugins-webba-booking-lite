@@ -38,4 +38,12 @@ export const filterFields: IFilterField[] = [
         null_value: [__('All categories', 'webba-booking-lite')],
         value: 0,
     },
+    {
+        name: 'appointment_staff_member_id',
+        placeholder: __('Filter by Staff member...', 'webba-booking-lite'),
+        type: 'select',
+        options: 'staff_members',
+        null_value: [__('All staff members', 'webba-booking-lite')],
+        value: 0,
+    }
 ]

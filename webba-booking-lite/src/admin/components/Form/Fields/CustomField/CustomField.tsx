@@ -2,7 +2,7 @@ import { useSelect } from '@wordpress/data'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { store_name } from '../../../../../store/backend'
 import { FormComponentConstructor } from '../../lib/types'
-import styles from './CustomField.module.scss'
+import './CustomField.scss'
 import { Label } from '../Label/Label'
 import { useField } from '../../lib/hooks/useField'
 
@@ -61,13 +61,13 @@ export const CreateCustomFields: FormComponentConstructor<any> = ({
 
         const fields: JSX.Element[] = useMemo(() => {
             return Object.keys(custom_fields).map((id) => (
-                <div key={id} className={styles.fieldItem}>
+                <div key={id} className="wbk_customField__fieldItem">
                     <Label title={custom_fields[id]} id={id} />
                     <input
                         type="text"
                         name={id}
                         id={id}
-                        className={styles.input}
+                        className="wbk_customField__input"
                         value={fieldsData[id] || ''}
                         onChange={handleChange}
                     />
@@ -75,6 +75,6 @@ export const CreateCustomFields: FormComponentConstructor<any> = ({
             ))
         }, [custom_fields, fieldsData])
 
-        return <div className={styles.wrapper}>{fields}</div>
+        return <div className="wbk_customField__wrapper">{fields}</div>
     }
 }

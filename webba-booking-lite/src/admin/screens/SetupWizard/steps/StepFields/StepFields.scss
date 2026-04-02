@@ -1,0 +1,26 @@
+.wbk_stepFields__fieldsWrapper {
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background-color: #ffffff;
+    margin-top: 28px;
+    width: 100%;
+}
+
+.wbk_stepFields__fieldBlock {
+    margin-bottom: 22px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.wbk_stepFields__fieldDescription {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0%;
+    color: #6b7280;
+    margin-top: 6.5px;
+    display: block;
+}

@@ -51,12 +51,18 @@ export const valueComparator = ({
     switch (operator) {
         case '=':
             return actualValue === toMatch
+        case '==':
+            return actualValue == toMatch
         case '!=':
-            return actualValue !== toMatch
+            return actualValue != toMatch
         case '>':
             return Number(actualValue) > Number(toMatch)
         case '<':
             return Number(actualValue) < Number(toMatch)
+        case '>=':
+            return Number(actualValue) >= Number(toMatch)
+        case '<=':
+            return Number(actualValue) <= Number(toMatch)
         default:
             throw new Error(`Unknown operation: ${operator}`)
     }

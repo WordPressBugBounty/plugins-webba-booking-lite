@@ -1,0 +1,145 @@
+.wrapper {
+    width: 240px;
+    background-color: #f9fafb;
+    border-right: 1px solid #e5e7eb;
+    padding: 16px 24px;
+    display: flex;
+    flex-flow: column;
+
+    @media screen and (max-width: 768px) {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 65px;
+        left: 0;
+    }
+}
+
+.menuWrapper {
+    display: flex;
+    flex-flow: column;
+    gap: 8px;
+}
+
+.menuItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    transition: 0.3s all ease;
+    cursor: pointer;
+    font-family: colors.$wbk-font;
+    font-size: 16px;
+
+    &:not(.logoutButton) {
+        img {
+            filter: grayscale(100%);
+            transform: 0.3s all ease;
+        }
+    }
+
+    &.active {
+        background-color: colors.$wbk-primary-50;
+        color: #0f766e;
+
+        img {
+            filter: grayscale(0%);
+        }
+    }
+}
+
+.logoutButtonWrapper {
+    padding-top: 25px;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 16px;
+    color: #dc2626;
+}
+
+.help {
+    border-top: 1px solid #e5e7eb;
+    margin-top: auto;
+    padding-top: 22px;
+
+    .helpTitle {
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 22px;
+        letter-spacing: 1%;
+        vertical-align: middle;
+        color: #22292f;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+    }
+
+    .helpText {
+        display: flex;
+        flex-flow: column;
+        gap: 10px;
+
+        a {
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 22px;
+            letter-spacing: 1%;
+            vertical-align: middle;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #668091;
+        }
+    }
+}
+
+.logoutConfirmation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    border-radius: 10px;
+
+    .logoutInnerWrapper {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+        p {
+            margin-bottom: 20px;
+        }
+
+        .logoutConfirmationButtons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+
+            button {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+
+                &.yes {
+                    background-color: #dc2626;
+                    color: #fff;
+                }
+
+                &.no {
+                    background-color: #fff;
+                    border: 1px solid #ddd;
+                    color: #333;
+                }
+            }
+        }
+    }
+}

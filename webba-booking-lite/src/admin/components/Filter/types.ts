@@ -49,6 +49,9 @@ export interface IFilterFormProps {
     columnCount?: number
     customQuery?: TAllowedFilterValue<any>[]
     setCustomQuery?: (value: any) => void
+    classes?: string
+    preventFilterDispatch?: boolean
+    onFiltersChange?: (query: TAllowedFilterValue<any>[]) => void
 }
 
 export type TAllowedFilterModel =

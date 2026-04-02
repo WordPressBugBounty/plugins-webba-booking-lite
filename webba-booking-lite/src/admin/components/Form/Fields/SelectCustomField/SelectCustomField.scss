@@ -1,0 +1,75 @@
+.wbk_selectCustomField {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    gap: 3px;
+
+    &:active,
+    &:focus {
+        z-index: 999999;
+    }
+
+    &.wbk_selectCustomField--invalid {
+        color: red;
+    }
+
+    &.wbk_selectCustomField--invalid .wbk_selectCustomField__selectInput {
+        border-color: red;
+    }
+}
+
+.wbk_selectCustomField__errorContainer {
+    display: absolute;
+    color: red;
+    bottom: -18px;
+}
+
+.wbk_selectCustomField__selectInput {
+    border-radius: 8px;
+    background: colors.$field-background;
+    border: 1px solid colors.$field-border;
+    height: 50px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #333333;
+    width: 100%;
+    max-width: 100%;
+
+    .css-1u9des2-indicatorSeparator {
+        display: none;
+    }
+
+    .css-tj5bde-Svg {
+        fill: #333333;
+    }
+
+    .css-1jqq78o-placeholder {
+        color: #333333;
+    }
+}
+
+.wbk_selectCustomField__customInputContainer {
+    margin-top: 8px;
+}
+
+.wbk_selectCustomField__customInput {
+    border-radius: 8px;
+    background: colors.$field-background;
+    border: 1px solid colors.$field-border;
+    height: 50px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #333333;
+    width: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
+
+    &.wbk_selectCustomField__customInput--focused {
+        @include fields.field-focused-state;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}

@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react'
-import styles from './TableMobile.module.scss'
+import './TableMobile.scss'
 import { ITableMobileProps } from './types'
 import { flexRender, type Cell } from '@tanstack/react-table'
 import { CellProvider } from './context/CellProvider'
@@ -36,23 +36,23 @@ export const TableMobile = ({ table }: ITableMobileProps) => {
     )
 
     return (
-        <div className={styles.wrapper}>
+        <div className="wbk_tableMobile__wrapper">
             {rows.map((row: any) => (
-                <div className={styles.card} key={row.id}>
+                <div className="wbk_tableMobile__card" key={row.id}>
                     <div
                         className={classNames(
-                            styles.rowItem,
-                            styles.firstStage
+                            'wbk_tableMobile__rowItem',
+                            'wbk_tableMobile__firstStage'
                         )}
                     >
                         {/* Render ID and name of the model item */}
-                        <div className={styles.cellItem}>
+                        <div className="wbk_tableMobile__cellItem">
                             {columns.includes('id') && (
-                                <div className={styles.rowItemTitle}>
+                                <div className="wbk_tableMobile__rowItemTitle">
                                     #{row.original.id}
                                 </div>
                             )}
-                            <div className={styles.rowItemContent}>
+                            <div className="wbk_tableMobile__rowItemContent">
                                 {flexRender(
                                     getSpecificCell(row, 'name').column
                                         .columnDef.cell,
@@ -62,7 +62,7 @@ export const TableMobile = ({ table }: ITableMobileProps) => {
                         </div>
                         {/* Render custom actions cells if it matches with pre defined */}
                         {getCustomActionCells(row).length > 0 && (
-                            <div className={styles.cellItem}>
+                            <div className="wbk_tableMobile__cellItem">
                                 {getCustomActionCells(row).map((cell: any) =>
                                     flexRender(
                                         cell.column.columnDef.cell,
@@ -74,8 +74,8 @@ export const TableMobile = ({ table }: ITableMobileProps) => {
                     </div>
                     <div
                         className={classNames(
-                            styles.rowItem,
-                            styles.mappedItems
+                            'wbk_tableMobile__rowItem',
+                            'wbk_tableMobile__mappedItems'
                         )}
                     >
                         {row
@@ -96,12 +96,12 @@ export const TableMobile = ({ table }: ITableMobileProps) => {
                                     : row.getVisibleCells().length
                             )
                             .map((cell: any) => (
-                                <div className={styles.cellItem} key={cell.id}>
+                                <div className="wbk_tableMobile__cellItem" key={cell.id}>
                                     <CellProvider cell={cell}>
-                                        <div className={styles.rowItemTitle}>
+                                        <div className="wbk_tableMobile__rowItemTitle">
                                             {cell.column.columnDef.header}
                                         </div>
-                                        <div className={styles.rowItemContent}>
+                                        <div className="wbk_tableMobile__rowItemContent">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -112,23 +112,23 @@ export const TableMobile = ({ table }: ITableMobileProps) => {
                             ))}
                     </div>
                     {row.getIsExpanded() && (
-                        <div className={styles.rowItem}>
+                        <div className="wbk_tableMobile__rowItem">
                             <ExpandedData row={row} />
                         </div>
                     )}
                     <div
                         className={classNames(
-                            styles.rowItem,
-                            styles.toolPanel,
+                            'wbk_tableMobile__rowItem',
+                            'wbk_tableMobile__toolPanel',
                             {
-                                [styles.expandable]: row.getCanExpand(),
+                                'wbk_tableMobile__toolPanel--expandable': row.getCanExpand(),
                             }
                         )}
                     >
                         {row.getCanExpand() && (
                             <div
-                                className={classNames(styles.expandButton, {
-                                    [styles.expanded]: row.getIsExpanded(),
+                                className={classNames('wbk_tableMobile__expandButton', {
+                                    'wbk_tableMobile__expandButton--expanded': row.getIsExpanded(),
                                 })}
                                 onClick={() => row.toggleExpanded()}
                             >

@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( !defined( "ABSPATH" ) ) {
     exit;
 }
 class WBK_Schedule_Processor {
@@ -10,7 +10,7 @@ class WBK_Schedule_Processor {
 
     protected $locked_time_slots;
 
-    protected $gg_breakers;
+    protected $connected_breakers;
 
     protected $ext_breakers;
 
@@ -41,8 +41,8 @@ class WBK_Schedule_Processor {
             return;
         }
         $date = new DateTime();
-        $date->setTimestamp( strtotime( 'yesterday midnight' ) );
-        $result = $wpdb->get_results( "\n\t\t\t\t\t\tSELECT day, service_id\n\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_days_on_off\n\t\t\t\t\t\twhere status = 0 and day >= " . $date->getTimestamp() );
+        $date->setTimestamp( strtotime( "yesterday midnight" ) );
+        $result = $wpdb->get_results( "\n\t\t\t\t\t\tSELECT day, service_id\n\t\t\t\t\t\tFROM " . get_option( "wbk_db_prefix", "" ) . "wbk_days_on_off\n\t\t\t\t\t\twhere status = 0 and day >= " . $date->getTimestamp() );
         foreach ( $result as $item ) {
             $this->locked_days[$item->service_id][] = $item->day;
         }
@@ -51,8 +51,8 @@ class WBK_Schedule_Processor {
     public function load_unlocked_days() {
         global $wpdb;
         $date = new DateTime();
-        $date->setTimestamp( strtotime( 'yesterday midnight' ) );
-        $result = $wpdb->get_results( "\n                        SELECT day, service_id\n                        FROM " . get_option( 'wbk_db_prefix', '' ) . "wbk_days_on_off\n                        where status = 1 and day >= " . $date->getTimestamp() );
+        $date->setTimestamp( strtotime( "yesterday midnight" ) );
+        $result = $wpdb->get_results( "\n                        SELECT day, service_id\n                        FROM " . get_option( "wbk_db_prefix", "" ) . "wbk_days_on_off\n                        where status = 1 and day >= " . $date->getTimestamp() );
         foreach ( $result as $item ) {
             $this->unlocked_days[$item->service_id][] = $item->day;
         }
@@ -60,7 +60,7 @@ class WBK_Schedule_Processor {
 
     public function load_locked_timeslots() {
         global $wpdb;
-        $result = $wpdb->get_results( "\n\t\t\t\t\t\tSELECT time, service_id\n\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . 'wbk_locked_time_slots' );
+        $result = $wpdb->get_results( "\n\t\t\t\t\t\tSELECT time, service_id\n\t\t\t\t\t\tFROM " . get_option( "wbk_db_prefix", "" ) . "wbk_locked_time_slots" );
         foreach ( $result as $item ) {
             $this->locked_time_slots[$item->service_id][] = $item->time;
         }
@@ -71,38 +71,39 @@ class WBK_Schedule_Processor {
         $service_id,
         $options,
         $current_booking = null,
-        $preload_data = true
+        $preload_data = true,
+        $staff_member_id = null
     ) {
-        if ( isset( $options['skip_gg_calendar'] ) ) {
-            $skip_gg_calendar = $options['skip_gg_calendar'];
+        if ( isset( $options["skip_gg_calendar"] ) ) {
+            $skip_gg_calendar = $options["skip_gg_calendar"];
         } else {
             $skip_gg_calendar = false;
         }
-        if ( isset( $options['ignore_preparation'] ) ) {
-            $ignore_preparation = $options['ignore_preparation'];
+        if ( isset( $options["ignore_preparation"] ) ) {
+            $ignore_preparation = $options["ignore_preparation"];
         } else {
             $ignore_preparation = false;
         }
-        if ( isset( $options['calculate_availability'] ) ) {
-            $calculate_availability = $options['calculate_availability'];
+        if ( isset( $options["calculate_availability"] ) ) {
+            $calculate_availability = $options["calculate_availability"];
         } else {
             $calculate_availability = false;
         }
-        if ( isset( $options['calculate_night_hours'] ) ) {
-            $calculate_night_hours = $options['calculate_night_hours'];
+        if ( isset( $options["calculate_night_hours"] ) ) {
+            $calculate_night_hours = $options["calculate_night_hours"];
         } else {
             $calculate_night_hours = true;
         }
-        if ( isset( $options['filter_availability'] ) ) {
-            $filter_availability = $options['filter_availability'];
+        if ( isset( $options["filter_availability"] ) ) {
+            $filter_availability = $options["filter_availability"];
         } else {
             $filter_availability = true;
         }
-        if ( isset( $options['offset'] ) ) {
-            $offset = $options['offset'];
+        if ( isset( $options["offset"] ) ) {
+            $offset = $options["offset"];
         } else {
-            if ( isset( $_POST['offset'] ) ) {
-                $offset = $_POST['offset'];
+            if ( isset( $_POST["offset"] ) ) {
+                $offset = $_POST["offset"];
                 if ( !is_numeric( $offset ) ) {
                     $offset = 0;
                 }
@@ -110,8 +111,8 @@ class WBK_Schedule_Processor {
                 $offset = 0;
             }
         }
-        $night_hours_addon = get_option( 'wbk_night_hours', '0' );
-        if ( trim( $night_hours_addon ) == '' ) {
+        $night_hours_addon = get_option( "wbk_night_hours", "0" );
+        if ( trim( $night_hours_addon ) == "" ) {
             $night_hours_addon = 0;
         }
         $night_hours_addon = $night_hours_addon * 60 * 60;
@@ -124,56 +125,64 @@ class WBK_Schedule_Processor {
             $this->load_unlocked_days();
             $this->load_locked_timeslots();
         }
-        $working = $this->is_working_day( $day, $service_id );
+        $service_id = (int) $service_id;
+        $is_staff_member_flow = !is_null( $staff_member_id ) && is_numeric( $staff_member_id );
+        $staff_member = null;
+        if ( $is_staff_member_flow ) {
+            $staff_member = new WBK_Staff_Member((int) $staff_member_id);
+            if ( !$staff_member->is_loaded() ) {
+                return [];
+            }
+        }
+        $working = $this->is_working_day( $day, $service_id, $staff_member_id );
         $service = new WBK_Service($service_id);
         $time_format = WBK_Date_Time_Utils::get_time_format();
         $date_format = WBK_Format_Utils::get_date_format();
         $date = new DateTime();
         $this->day = $day;
         $this->breakers = [];
-        if ( !isset( $this->gg_breakers ) ) {
-            $this->gg_breakers = [];
+        if ( !isset( $this->connected_breakers ) ) {
+            $this->connected_breakers = [];
         }
         if ( !isset( $this->ext_breakers ) ) {
             $this->ext_breakers = [];
         }
-        // load appointments
-        if ( get_option( 'wbk_allow_cross_midnight', '' ) == 'true' && WBK_Feature_Gate::have_required_plan( 'premium', 'only_old_users' ) ) {
-            $start_all = WBK_Time_Math_Utils::adjust_times( $day, $service->get_duration() * -60, get_option( 'wbk_timezone', 'UTC' ) );
-            $end_all = WBK_Time_Math_Utils::adjust_times( $day, 86400 + $service->get_duration() * 60, get_option( 'wbk_timezone', 'UTC' ) );
+        if ( get_option( "wbk_allow_cross_midnight", "" ) == "true" && WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+            $start_all = WBK_Time_Math_Utils::adjust_times( $day, $service->get_duration() * -60, get_option( "wbk_timezone", "UTC" ) );
+            $end_all = WBK_Time_Math_Utils::adjust_times( $day, 86400 + $service->get_duration() * 60, get_option( "wbk_timezone", "UTC" ) );
         } else {
             $start_all = $day;
-            $end_all = WBK_Time_Math_Utils::adjust_times( $day, 86400, get_option( 'wbk_timezone', 'UTC' ) );
+            $end_all = WBK_Time_Math_Utils::adjust_times( $day, 86400, get_option( "wbk_timezone", "UTC" ) );
         }
-        $day_end = WBK_Time_Math_Utils::adjust_times( $day, 86400, get_option( 'wbk_timezone', 'UTC' ) );
-        $this->load_appointments_by_day( $day, $service_id );
-        if ( get_option( 'wbk_allow_cross_midnight', '' ) == 'true' && WBK_Feature_Gate::have_required_plan( 'premium', 'only_old_users' ) ) {
-            $prev_day = WBK_Time_Math_Utils::adjust_times( $day, -86400, get_option( 'wbk_timezone', 'UTC' ) );
-            $next_day = WBK_Time_Math_Utils::adjust_times( $day, 86400, get_option( 'wbk_timezone', 'UTC' ) );
-            $this->load_appointments_by_day( $prev_day, $service_id );
-            $this->load_appointments_by_day( $next_day, $service_id );
+        $day_end = WBK_Time_Math_Utils::adjust_times( $day, 86400, get_option( "wbk_timezone", "UTC" ) );
+        // load bookings by day
+        $this->load_appointments_by_day( $day, $service_id, $staff_member_id );
+        if ( get_option( "wbk_allow_cross_midnight", "" ) == "true" && WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+            $prev_day = WBK_Time_Math_Utils::adjust_times( $day, -86400, get_option( "wbk_timezone", "UTC" ) );
+            $next_day = WBK_Time_Math_Utils::adjust_times( $day, 86400, get_option( "wbk_timezone", "UTC" ) );
+            $this->load_appointments_by_day( $prev_day, $service_id, $staff_member_id );
+            $this->load_appointments_by_day( $next_day, $service_id, $staff_member_id );
         }
-        // load data from google caelndar
+        // load data from connected caelndar
         if ( !$skip_gg_calendar ) {
         }
         $betw_interval = $service->get_interval_between() * 60;
         $duration = $service->get_duration() * 60;
         $step = $service->get_step() * 60;
-        $total_duration_optim = $betw_interval + $duration;
         if ( $ignore_preparation ) {
             $preparation_time = 0;
         } else {
             $preparation_time = $service->get_prepare_time();
         }
-        $intervals = $this->get_business_hours_intervals_by_dow( date( 'N', $day ), $service_id );
+        $intervals = $this->get_business_hours_intervals_by_dow( date( "N", $day ), $service_id, $staff_member_id );
         $min_quantity = $service->get_min_quantity();
         // special business hours
-        $data = trim( get_option( 'wbk_appointments_special_hours', '' ) );
+        $data = trim( get_option( "wbk_appointments_special_hours", "" ) );
         $intervals_overriden = [];
-        if ( $data != '' && WBK_Feature_Gate::have_required_plan( 'standard', 'only_old_users' ) ) {
+        if ( !$is_staff_member_flow && $data != "" && WBK_Feature_Gate::have_required_plan( "standard", "only_old_users" ) ) {
             $data = explode( PHP_EOL, $data );
             foreach ( $data as $line ) {
-                $parts = explode( ' ', $line );
+                $parts = explode( " ", $line );
                 if ( count( $parts ) != 2 && count( $parts ) != 3 ) {
                     continue;
                 }
@@ -182,26 +191,26 @@ class WBK_Schedule_Processor {
                         continue;
                     }
                 } else {
-                    array_unshift( $parts, 'x' );
+                    array_unshift( $parts, "x" );
                 }
                 $date_this = strtotime( $parts[1] );
                 if ( $date_this == $day ) {
-                    $intervals_this = explode( ',', $parts[2] );
+                    $intervals_this = explode( ",", $parts[2] );
                     foreach ( $intervals_this as $interval ) {
-                        $times = explode( '-', $interval );
+                        $times = explode( "-", $interval );
                         $time = $times[0];
-                        $splitted_time = explode( ':', $time );
+                        $splitted_time = explode( ":", $time );
                         $seconds = $splitted_time[0] * 60 * 60 + $splitted_time[1] * 60;
                         $start = $seconds;
                         $time = $times[1];
-                        $splitted_time = explode( ':', $time );
+                        $splitted_time = explode( ":", $time );
                         $seconds = $splitted_time[0] * 60 * 60 + $splitted_time[1] * 60;
                         $end = $seconds;
                         $interval_data = new stdClass();
                         $interval_data->start = $start;
                         $interval_data->end = $end;
-                        $interval_data->day_of_week = date( 'N', $day );
-                        $interval_data->status = 'active';
+                        $interval_data->day_of_week = date( "N", $day );
+                        $interval_data->status = "active";
                         $intervals_overriden[] = $interval_data;
                     }
                 }
@@ -210,39 +219,39 @@ class WBK_Schedule_Processor {
         if ( count( $intervals_overriden ) > 0 ) {
             $intervals = $intervals_overriden;
         }
-        if ( WBK_Feature_Gate::have_required_plan( 'premium', 'only_old_users' ) ) {
-            $wbk_disallow_after = get_option( 'wbk_disallow_after', '0' );
-        } else {
-            $wbk_disallow_after = '0';
-        }
-        if ( trim( $wbk_disallow_after ) == '' ) {
-            $wbk_disallow_after = '0';
-        }
-        $wbk_allow_ongoing_time_slot = get_option( 'wbk_allow_ongoing_time_slot', 'disallow' );
-        $wbk_allow_cross_midnight = get_option( 'wbk_allow_cross_midnight', '' );
         // special business hours end
+        if ( WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+            $wbk_disallow_after = get_option( "wbk_disallow_after", "0" );
+        } else {
+            $wbk_disallow_after = "0";
+        }
+        if ( trim( $wbk_disallow_after ) == "" ) {
+            $wbk_disallow_after = "0";
+        }
+        $wbk_allow_ongoing_time_slot = get_option( "wbk_allow_ongoing_time_slot", "disallow" );
+        $wbk_allow_cross_midnight = get_option( "wbk_allow_cross_midnight", "" );
         foreach ( $intervals as $interval ) {
-            if ( $working && $interval->status != 'active' ) {
+            if ( $working && $interval->status != "active" ) {
                 continue;
             }
-            $start = WBK_Time_Math_Utils::adjust_times( $day, $interval->start, get_option( 'wbk_timezone', 'UTC' ) );
-            $end = WBK_Time_Math_Utils::adjust_times( $day, $interval->end, get_option( 'wbk_timezone', 'UTC' ) );
+            $start = WBK_Time_Math_Utils::adjust_times( $day, $interval->start, get_option( "wbk_timezone", "UTC" ) );
+            $end = WBK_Time_Math_Utils::adjust_times( $day, $interval->end, get_option( "wbk_timezone", "UTC" ) );
             for ($time = $start; $time < $end; $time = WBK_Time_Math_Utils::adjust_times(
                 $time,
                 $step,
-                get_option( 'wbk_timezone', 'UTC' ),
+                get_option( "wbk_timezone", "UTC" ),
                 true
             )) {
-                if ( trim( $wbk_disallow_after ) == '' ) {
-                    $wbk_disallow_after = '0';
+                if ( trim( $wbk_disallow_after ) == "" ) {
+                    $wbk_disallow_after = "0";
                 }
-                if ( $wbk_disallow_after != '0' ) {
+                if ( $wbk_disallow_after != "0" ) {
                     if ( $time > time() + $wbk_disallow_after * 60 * 60 ) {
                         continue;
                     }
                 }
                 if ( is_null( $current_booking ) ) {
-                    if ( $wbk_allow_ongoing_time_slot == 'disallow' ) {
+                    if ( $wbk_allow_ongoing_time_slot !== "yes" ) {
                         if ( $time < time() + $preparation_time * 60 ) {
                             continue;
                         }
@@ -253,10 +262,10 @@ class WBK_Schedule_Processor {
                     }
                 }
                 $total_duration = $duration + $betw_interval;
-                $temp = WBK_Time_Math_Utils::adjust_times( $time, $total_duration, get_option( 'wbk_timezone', 'UTC' ) );
+                $temp = WBK_Time_Math_Utils::adjust_times( $time, $total_duration, get_option( "wbk_timezone", "UTC" ) );
                 $allow_cross = false;
-                if ( $wbk_allow_cross_midnight == 'true' && WBK_Feature_Gate::have_required_plan( 'premium', 'only_old_users' ) ) {
-                    if ( date( 'N', $time ) != date( 'N', $temp ) ) {
+                if ( $wbk_allow_cross_midnight == "true" && WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+                    if ( date( "N", $time ) != date( "N", $temp ) ) {
                         $allow_cross = true;
                     }
                 }
@@ -264,9 +273,9 @@ class WBK_Schedule_Processor {
                     continue;
                 }
                 if ( $night_hours_addon != 0 && $calculate_night_hours ) {
-                    $comparation_value = WBK_Time_Math_Utils::adjust_times( $day, $night_hours_addon, get_option( 'wbk_timezone', 'UTC' ) );
+                    $comparation_value = WBK_Time_Math_Utils::adjust_times( $day, $night_hours_addon, get_option( "wbk_timezone", "UTC" ) );
                     if ( $time < $comparation_value && $temp <= $comparation_value ) {
-                        if ( strtotime( 'today midnight' ) != $day ) {
+                        if ( strtotime( "today midnight" ) != $day ) {
                             continue;
                         }
                     }
@@ -298,6 +307,7 @@ class WBK_Schedule_Processor {
         }
         // check for not attached appointments
         $need_sort = false;
+        // to do: remove
         foreach ( $this->appointments as $appointment ) {
             $appointment_found = false;
             foreach ( $timeslots as $timeslot ) {
@@ -328,9 +338,9 @@ class WBK_Schedule_Processor {
             array_multisort( $timeslots, $arr_temp );
         }
         $connected_service_ids = [];
-        if ( WBK_Feature_Gate::have_required_plan( 'standard', 'only_old_users' ) ) {
-            if ( get_option( 'wbk_appointments_auto_lock', 'disabled' ) == 'enabled' ) {
-                if ( get_option( 'wbk_appointments_auto_lock_mode', 'all' ) == 'all' ) {
+        if ( WBK_Feature_Gate::have_required_plan( "standard", "only_old_users" ) ) {
+            if ( get_option( "wbk_appointments_auto_lock", "disabled" ) == "enabled" ) {
+                if ( get_option( "wbk_appointments_auto_lock_mode", "all" ) == "all" ) {
                     foreach ( WBK_Model_Utils::get_service_ids() as $id ) {
                         if ( $id != $service_id ) {
                             $connected_service_ids[] = $id;
@@ -341,14 +351,14 @@ class WBK_Schedule_Processor {
                 }
             }
         }
-        $connected_service_ids = apply_filters( 'webba_connected_services', $connected_service_ids, $service_id );
+        $connected_service_ids = apply_filters( "webba_connected_services", $connected_service_ids, $service_id );
         // clarifying count of available places
         // and updating status if needed
         $connected_services_booking_ids = [];
         foreach ( $connected_service_ids as $connected_service_id ) {
             $bookings_connected = [];
-            $prev_day = strtotime( '-1 day', $day );
-            $next_day = strtotime( '+1 day', $day );
+            $prev_day = strtotime( "-1 day", $day );
+            $next_day = strtotime( "+1 day", $day );
             $bookings_this = WBK_Model_Utils::get_booking_ids_by_day_service( $day, $connected_service_id );
             $connected_services_booking_ids = array_merge( $connected_services_booking_ids, $bookings_this );
             $bookings_this = WBK_Model_Utils::get_booking_ids_by_day_service( $prev_day, $connected_service_id );
@@ -363,19 +373,19 @@ class WBK_Schedule_Processor {
         }
         for ($i = 0; $i < count( $timeslots ); $i++) {
             if ( $calculate_availability ) {
-                if ( WBK_Feature_Gate::have_required_plan( 'premium', 'only_old_users' ) ) {
-                    $max_per_time = trim( get_option( 'wbk_appointments_autolock_avail_limit', '' ) );
+                if ( WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+                    $max_per_time = trim( get_option( "wbk_appointments_autolock_avail_limit", "" ) );
                 } else {
-                    $max_per_time = '';
+                    $max_per_time = "";
                 }
                 $total_quantity = -1;
-                if ( $max_per_time != '' && is_numeric( $max_per_time ) ) {
+                if ( $max_per_time != "" && is_numeric( $max_per_time ) ) {
                     $total_quantity = WBK_Model_Utils::get_all_quantity_intersecting_range( $timeslots[$i]->getStart(), $timeslots[$i]->getEnd() );
                 }
-                if ( WBK_Feature_Gate::have_required_plan( 'premium', 'only_old_users' ) ) {
-                    $lock_before_after = get_option( 'wbk_appointments_lock_one_before_and_one_after', 'x' );
+                if ( WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+                    $lock_before_after = get_option( "wbk_appointments_lock_one_before_and_one_after", "x" );
                 } else {
-                    $lock_before_after = 'x';
+                    $lock_before_after = "x";
                 }
                 if ( is_array( $lock_before_after ) && in_array( $service->get_id(), $lock_before_after ) ) {
                     if ( $timeslots[$i]->get_status() == 0 || is_array( $timeslots[$i]->get_status() ) ) {
@@ -405,12 +415,12 @@ class WBK_Schedule_Processor {
                     }
                     $partial_check = false;
                     if ( is_array( $timeslots[$i]->get_status() ) ) {
-                        if ( WBK_Feature_Gate::have_required_plan( 'premium', 'only_old_users' ) ) {
-                            $parital_mode = get_option( 'wbk_appointments_lock_timeslot_if_parital_booked', '' );
+                        if ( WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+                            $parital_mode = get_option( "wbk_appointments_lock_timeslot_if_parital_booked", "" );
                         } else {
-                            $parital_mode = '';
+                            $parital_mode = "";
                         }
-                        if ( $parital_mode == '' ) {
+                        if ( $parital_mode == "" ) {
                             $parital_mode = [];
                         }
                         if ( in_array( $service_id, $parital_mode ) ) {
@@ -431,10 +441,10 @@ class WBK_Schedule_Processor {
                             }
                         }
                     }
-                    $connected_quantity = apply_filters( 'wbk_connected_quantity', $connected_quantity, $service_id );
+                    $connected_quantity = apply_filters( "wbk_connected_quantity", $connected_quantity, $service_id );
                     // check intersection with time slots of the same service
                     $same_service_quantity = 0;
-                    if ( get_option( 'wbk_mode_overlapping_availabiliy', 'true' ) == 'true' ) {
+                    if ( get_option( "wbk_mode_overlapping_availabiliy", "true" ) == "true" && $staff_member_id == null ) {
                         $booking_ids = WBK_Model_Utils::get_booking_ids_by_day_service( $day, $service_id );
                         foreach ( $booking_ids as $booking_id ) {
                             $booking = new WBK_Booking($booking_id);
@@ -450,26 +460,26 @@ class WBK_Schedule_Processor {
                             }
                         }
                     }
-                    $gg_count = 0;
+                    $connected_count = 0;
                     $ext_count = 0;
                     $current_quantity = 0;
                     if ( !is_null( $current_booking ) ) {
                         $booking = new WBK_Booking($current_booking);
-                        if ( $booking->get_name() != '' ) {
+                        if ( $booking->get_name() != "" ) {
                             if ( $booking->get_start() == $timeslots[$i]->getStart() ) {
                                 $current_quantity = $booking->get_quantity();
                             }
                         }
                     }
-                    $available = $service->get_quantity( $timeslots[$i]->getStart() ) - $booked_count - $connected_quantity - $same_service_quantity - $gg_count - $ext_count + $current_quantity;
+                    $available = $service->get_quantity( $timeslots[$i]->getStart() ) - $booked_count - $connected_quantity - $same_service_quantity - $connected_count - $ext_count + $current_quantity;
                     if ( $service->get_quantity() > 0 ) {
-                        if ( get_option( 'wbk_appointments_auto_lock_group', 'lock' ) == 'lock' ) {
+                        if ( get_option( "wbk_appointments_auto_lock_group", "lock" ) == "lock" ) {
                             if ( $connected_quantity > 0 ) {
                                 $available = 0;
                             }
                         }
                     }
-                    if ( $max_per_time != '' && is_numeric( $max_per_time ) ) {
+                    if ( $max_per_time != "" && is_numeric( $max_per_time ) ) {
                         $remain = $max_per_time - $total_quantity;
                         if ( $available > $remain ) {
                             if ( $current_quantity > 0 ) {
@@ -481,7 +491,7 @@ class WBK_Schedule_Processor {
                     }
                     if ( $filter_availability ) {
                         $available = apply_filters(
-                            'wbk_available_at_time',
+                            "wbk_available_at_time",
                             $available,
                             $timeslots[$i]->getStart(),
                             $day,
@@ -520,21 +530,21 @@ class WBK_Schedule_Processor {
                 $timezone_to_use_end = $timezone_to_use;
             }
             $timezone = $timezone_to_use;
-            $timeslot_time_string = 'start';
+            $timeslot_time_string = "start";
             $current_offset = $offset * -60 - $timezone->getOffset( $date );
-            if ( $timeslot_time_string == 'start' ) {
+            if ( $timeslot_time_string == "start" ) {
                 $time = wp_date( $time_format, $timeslots[$i]->getStart(), $timezone_to_use );
                 $local_start = $timeslots[$i]->getStart() + $current_offset;
                 $local_time = wp_date( $time_format, $local_start, $timezone_to_use );
             }
             $end_minus_gap = $timeslots[$i]->getEnd() - $service->get_interval_between() * 60;
-            if ( $timeslot_time_string == 'start_end' ) {
-                $time = wp_date( $time_format, $timeslots[$i]->getStart(), $timezone_to_use ) . '-' . wp_date( $time_format, $end_minus_gap, $timezone_to_use_end );
+            if ( $timeslot_time_string == "start_end" ) {
+                $time = wp_date( $time_format, $timeslots[$i]->getStart(), $timezone_to_use ) . "-" . wp_date( $time_format, $end_minus_gap, $timezone_to_use_end );
                 $local_start = $timeslots[$i]->getStart() + $current_offset;
                 $local_start = wp_date( $time_format, $local_start, $timezone_to_use );
                 $local_end = $timeslots[$i]->getStart() + $service->get_duration() * 60 + $current_offset;
                 $local_end = wp_date( $time_format, $local_end, $timezone_to_use_end );
-                $local_time = $local_start . '-' . $local_end;
+                $local_time = $local_start . "-" . $local_end;
             }
             $formated_date = wp_date( $date_format, $timeslots[$i]->getStart(), $timezone_to_use );
             $formated_date_local = wp_date( $date_format, $timeslots[$i]->getStart(), $timezone_to_use );
@@ -543,24 +553,31 @@ class WBK_Schedule_Processor {
             $timeslots[$i]->set_formated_time_local( $local_time );
             $timeslots[$i]->set_formated_date( $formated_date );
             $timeslots[$i]->set_formated_date_local( $formated_date_local );
-            $timeslot_time_string_backend = get_option( 'wbk_date_format_time_slot_schedule', 'start' );
-            if ( $timeslot_time_string_backend == 'start' ) {
+            $timeslot_time_string_backend = get_option( "wbk_date_format_time_slot_schedule", "start" );
+            if ( $timeslot_time_string_backend == "start" ) {
                 $time = wp_date( $time_format, $timeslots[$i]->getStart(), $timezone_to_use );
             } else {
-                $time = "<span class='start-time'>" . wp_date( $time_format, $timeslots[$i]->getStart(), $timezone_to_use ) . '</span>' . '-' . "<span class='end-time'>" . wp_date( $time_format, $end_minus_gap, $timezone_to_use ) . '</span>';
+                $time = "<span class='start-time'>" . wp_date( $time_format, $timeslots[$i]->getStart(), $timezone_to_use ) . "</span>" . "-" . "<span class='end-time'>" . wp_date( $time_format, $end_minus_gap, $timezone_to_use ) . "</span>";
             }
             $timeslots[$i]->set_formated_time_backend( $time );
         }
         $sp_tomorrow = new WBK_Schedule_Processor();
-        $tomorrow = strtotime( '+1 day', $day );
+        $tomorrow = strtotime( "+1 day", $day );
         if ( $night_hours_addon != 0 && $calculate_night_hours ) {
-            $tomorrow_timeslots = $sp_tomorrow->get_time_slots_by_day( $tomorrow, $service->get_id(), [
-                'skip_gg_calendar'       => false,
-                'ignore_preparation'     => false,
-                'calculate_availability' => true,
-                'calculate_night_hours'  => false,
-                'offset'                 => $offset,
-            ] );
+            $tomorrow_timeslots = $sp_tomorrow->get_time_slots_by_day(
+                $tomorrow,
+                $service->get_id(),
+                [
+                    "skip_gg_calendar"       => false,
+                    "ignore_preparation"     => false,
+                    "calculate_availability" => true,
+                    "calculate_night_hours"  => false,
+                    "offset"                 => $offset,
+                ],
+                null,
+                true,
+                $staff_member_id
+            );
             for ($i = 0; $i < count( $tomorrow_timeslots ); $i++) {
                 $timeslot = $tomorrow_timeslots[$i];
                 if ( $timeslot->get_start() < $tomorrow + $night_hours_addon && $timeslot->get_end() <= $tomorrow + $night_hours_addon ) {
@@ -569,7 +586,7 @@ class WBK_Schedule_Processor {
             }
         }
         $timeslots = apply_filters(
-            'get_time_slots_by_day',
+            "get_time_slots_by_day",
             $timeslots,
             $day,
             $service_id
@@ -580,7 +597,8 @@ class WBK_Schedule_Processor {
 
     // get day status working / not working
     // 1 - working, 0 - weekend or out of availability date range, 2 - limit reached
-    public function get_day_status( $day, $service_id ) {
+    public function get_day_status( $day, $service_id, $staff_member_id = null ) {
+        $service_id = (int) $service_id;
         $service = new WBK_Service($service_id);
         if ( !is_null( $service->get_availability_range() ) && is_array( $service->get_availability_range() ) && count( $service->get_availability_range() ) == 2 ) {
             $availability_range = $service->get_availability_range();
@@ -591,10 +609,10 @@ class WBK_Schedule_Processor {
             }
         }
         // check Lock day if at least one time slot is booked
-        if ( WBK_Feature_Gate::have_required_plan( 'premium', 'only_old_users' ) ) {
-            $whole_day_checkin = get_option( 'wbk_appointments_lock_day_if_timeslot_booked', '' );
+        if ( WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+            $whole_day_checkin = get_option( "wbk_appointments_lock_day_if_timeslot_booked", "" );
         } else {
-            $whole_day_checkin = '';
+            $whole_day_checkin = "";
         }
         if ( is_array( $whole_day_checkin ) ) {
             if ( in_array( $service_id, $whole_day_checkin, true ) ) {
@@ -605,12 +623,12 @@ class WBK_Schedule_Processor {
             }
         }
         // check overal daily limit
-        if ( WBK_Feature_Gate::have_required_plan( 'premium', 'only_old_users' ) ) {
-            $day_limit = trim( get_option( 'wbk_appointments_limit_by_day', '' ) );
+        if ( WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+            $day_limit = trim( get_option( "wbk_appointments_limit_by_day", "" ) );
         } else {
-            $day_limit = '';
+            $day_limit = "";
         }
-        if ( $day_limit != '' ) {
+        if ( $day_limit != "" ) {
             if ( WBK_Model_Utils::get_total_count_of_bookings_by_day( $day ) >= $day_limit ) {
                 return 2;
             }
@@ -636,8 +654,7 @@ class WBK_Schedule_Processor {
             return 1;
         }
         // check service business hours
-        //
-        if ( $this->is_working_day( $day, $service_id ) === true ) {
+        if ( $this->is_working_day( $day, $service_id, $staff_member_id ) === true ) {
             return 1;
         } else {
             return 0;
@@ -645,25 +662,25 @@ class WBK_Schedule_Processor {
     }
 
     public function is_holyday( $day ) {
-        $holydays = get_option( 'wbk_holydays' );
-        $arr = explode( ',', $holydays );
+        $holydays = get_option( "wbk_holydays" );
+        $arr = explode( ",", $holydays );
         foreach ( $arr as $item ) {
             $holyday = strtotime( $item );
             if ( $holyday == $day ) {
-                return apply_filters( 'wbk_check_holiday', true );
+                return apply_filters( "wbk_check_holiday", true );
             }
-            if ( get_option( 'wbk_recurring_holidays', '' ) == 'true' ) {
-                $holyday_m = date( 'm', $holyday );
-                $holyday_d = date( 'd', $holyday );
-                $holyday_y = date( 'y', $holyday );
-                $current_y = date( 'y', $day );
-                $holyday = strtotime( $holyday_m . '/' . $holyday_d . '/' . $current_y );
+            if ( get_option( "wbk_recurring_holidays", "" ) == "true" ) {
+                $holyday_m = date( "m", $holyday );
+                $holyday_d = date( "d", $holyday );
+                $holyday_y = date( "y", $holyday );
+                $current_y = date( "y", $day );
+                $holyday = strtotime( $holyday_m . "/" . $holyday_d . "/" . $current_y );
                 if ( $holyday == $day ) {
-                    return apply_filters( 'wbk_check_holiday', true );
+                    return apply_filters( "wbk_check_holiday", true );
                 }
             }
         }
-        return apply_filters( 'wbk_check_holiday', false );
+        return apply_filters( "wbk_check_holiday", false );
     }
 
     /**
@@ -677,33 +694,59 @@ class WBK_Schedule_Processor {
     private static function fetch_connected_calendar_events( $calendar_id, $start_iso, $end_iso ) {
         $connected_calendar = new WBK_Connected_Calendar($calendar_id);
         if ( !$connected_calendar->is_loaded() ) {
-            error_log( "[WBK_OUTLOOK_DEBUG] fetch_connected_calendar_events: calendar_id=" . $calendar_id . " - connected_calendar not loaded" );
             return [];
         }
         $mode = $connected_calendar->get_mode();
-        if ( $mode !== 'One-way-import' && $mode !== 'Two-ways' ) {
-            error_log( "[WBK_OUTLOOK_DEBUG] fetch_connected_calendar_events: calendar_id=" . $calendar_id . " - mode=" . $mode . " (skipped, need One-way-import or Two-ways)" );
+        if ( $mode !== "One-way-import" && $mode !== "Two-ways" ) {
             return [];
         }
         $processor = WBK_Connected_Calendar_Processor::get_processor_for_calendar( $connected_calendar );
         if ( $processor === null ) {
-            error_log( "[WBK_OUTLOOK_DEBUG] fetch_connected_calendar_events: calendar_id=" . $calendar_id . " - get_processor_for_calendar returned null" );
             return [];
         }
         $result = $processor->fetch_events_in_range( $start_iso, $end_iso );
-        $result_info = ( is_wp_error( $result ) ? "WP_Error: " . $result->get_error_message() : "array len=" . count( $result ) );
-        error_log( "[WBK_OUTLOOK_DEBUG] fetch_connected_calendar_events: calendar_id=" . $calendar_id . " - result: " . $result_info );
         return $result;
     }
 
-    public function load_gg_events_in_range( $start, $end, $service ) {
+    public function load_connected_events_in_range( $start, $end, $service ) {
         $event_data_arr = [];
         return $event_data_arr;
     }
 
-    public function load_appointments_by_day( $day, $service_id ) {
+    /**
+     * Load blockers for explicitly provided connected calendars.
+     *
+     * @param int $start timestamp.
+     * @param int $end timestamp.
+     * @param array $calendar_ids connected calendar IDs.
+     * @param WBK_Service $service service model used for before/after correction.
+     * @return array
+     */
+    public function load_connected_events_in_range_by_calendar_ids(
+        $start,
+        $end,
+        $calendar_ids,
+        $service
+    ) {
+        $event_data_arr = [];
+        if ( !is_array( $calendar_ids ) || empty( $calendar_ids ) ) {
+            return [];
+        }
+        return $event_data_arr;
+    }
+
+    public function load_appointments_by_day( $day, $service_id, $staff_member_id = null ) {
         global $wpdb;
-        $db_arr = $wpdb->get_results( $wpdb->prepare( "                                       SELECT *\n\t\t\t\t\t\t\t\t\t\t\t\t\tFROM " . get_option( 'wbk_db_prefix', '' ) . 'wbk_appointments where service_id = %d AND day = %d AND ' . WBK_Model_Utils::get_not_canclled_sql(), $service_id, $day ) );
+        if ( !is_null( $staff_member_id ) && is_numeric( $staff_member_id ) ) {
+            $db_arr = $wpdb->get_results( $wpdb->prepare(
+                "SELECT *\n                    FROM " . get_option( "wbk_db_prefix", "" ) . "wbk_appointments where service_id = %d AND day = %d AND staff_member_id = %d AND " . WBK_Model_Utils::get_not_canclled_sql(),
+                $service_id,
+                $day,
+                $staff_member_id
+            ) );
+        } else {
+            $db_arr = $wpdb->get_results( $wpdb->prepare( " SELECT * FROM " . get_option( "wbk_db_prefix", "" ) . "wbk_appointments where service_id = %d AND day = %d AND " . WBK_Model_Utils::get_not_canclled_sql(), $service_id, $day ) );
+        }
         if ( !is_array( $this->appointments ) ) {
             $this->appointments = [];
         }
@@ -745,39 +788,54 @@ class WBK_Schedule_Processor {
         return;
     }
 
-    public function is_working_day( $day, $service_id ) {
-        $service = new WBK_Service($service_id);
-        $busines_hours = json_decode( $service->get_business_hours() );
+    public function is_working_day( $day, $service_id, $staff_member_id = null ) {
+        $service_id = (int) $service_id;
+        $has_staff_member = !is_null( $staff_member_id ) && is_numeric( $staff_member_id );
+        if ( $has_staff_member ) {
+            $staff_member = new WBK_Staff_Member((int) $staff_member_id);
+            if ( !$staff_member->is_loaded() ) {
+                return false;
+            }
+            $busines_hours = json_decode( $staff_member->get_business_hours() );
+        } else {
+            $service = new WBK_Service($service_id);
+            $busines_hours = json_decode( $service->get_business_hours() );
+        }
         if ( !is_array( $busines_hours ) ) {
             return false;
         }
         foreach ( $busines_hours as $item ) {
             if ( $day >= 1 && $day <= 7 ) {
-                if ( $day == $item->day_of_week && $item->status == 'active' ) {
+                if ( $day == $item->day_of_week && $item->status == "active" ) {
                     return true;
                 }
             } else {
-                if ( date( 'N', $day ) == $item->day_of_week && $item->status == 'active' ) {
+                if ( date( "N", $day ) == $item->day_of_week && $item->status == "active" ) {
                     return true;
                 }
-                $data = trim( get_option( 'wbk_appointments_special_hours', '' ) && WBK_Feature_Gate::have_required_plan( 'standard', 'only_old_users' ) );
-                if ( $data != '' ) {
-                    $data = explode( PHP_EOL, $data );
-                    foreach ( $data as $line ) {
-                        $parts = explode( ' ', $line );
-                        if ( count( $parts ) != 2 && count( $parts ) != 3 ) {
-                            continue;
-                        }
-                        if ( count( $parts ) == 3 ) {
-                            if ( $service_id != $parts[0] ) {
+                if ( !$has_staff_member ) {
+                    $data = "";
+                    if ( WBK_Feature_Gate::have_required_plan( "standard", "only_old_users" ) ) {
+                        $data = trim( get_option( "wbk_appointments_special_hours", "" ) );
+                    }
+                    if ( $data != "" ) {
+                        $data = explode( PHP_EOL, $data );
+                        foreach ( $data as $line ) {
+                            $parts = explode( " ", $line );
+                            if ( count( $parts ) != 2 && count( $parts ) != 3 ) {
                                 continue;
                             }
-                        } else {
-                            array_unshift( $parts, 'x' );
-                        }
-                        $date_this = strtotime( $parts[1] );
-                        if ( $date_this == $day ) {
-                            return true;
+                            if ( count( $parts ) == 3 ) {
+                                if ( $service_id != $parts[0] ) {
+                                    continue;
+                                }
+                            } else {
+                                array_unshift( $parts, "x" );
+                            }
+                            $date_this = strtotime( $parts[1] );
+                            if ( $date_this == $day ) {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -789,7 +847,7 @@ class WBK_Schedule_Processor {
     public function is_unlockced_has_dow( $day, $service_id ) {
         if ( isset( $this->unlocked_days[$service_id] ) ) {
             foreach ( $this->unlocked_days[$service_id] as $day_current ) {
-                if ( date( 'N', $day_current ) == $day ) {
+                if ( date( "N", $day_current ) == $day ) {
                     return true;
                 }
             }
@@ -797,9 +855,18 @@ class WBK_Schedule_Processor {
         return false;
     }
 
-    public function get_business_hours_intervals_by_dow( $dow, $service_id ) {
-        $service = new WBK_Service($service_id);
-        $busines_hours = json_decode( $service->get_business_hours() );
+    public function get_business_hours_intervals_by_dow( $dow, $service_id, $staff_member_id = null ) {
+        $has_staff_member = !is_null( $staff_member_id ) && is_numeric( $staff_member_id );
+        if ( $has_staff_member ) {
+            $staff_member = new WBK_Staff_Member((int) $staff_member_id);
+            if ( !$staff_member->is_loaded() ) {
+                return [];
+            }
+            $busines_hours = json_decode( $staff_member->get_business_hours() );
+        } else {
+            $service = new WBK_Service($service_id);
+            $busines_hours = json_decode( $service->get_business_hours() );
+        }
         if ( !is_array( $busines_hours ) ) {
             return [];
         }
@@ -870,8 +937,8 @@ class WBK_Schedule_Processor {
         return $this->unlocked_days;
     }
 
-    public function set_gg_breakers( $input ) {
-        $this->gg_breakers = $input;
+    public function set_connected_breakers( $input ) {
+        $this->connected_breakers = $input;
     }
 
     public function get_available_count( $time ) {

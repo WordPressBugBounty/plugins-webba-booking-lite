@@ -1,0 +1,119 @@
+.wbk_appearanceEditor__wrapper {
+    display: flex;
+    flex-flow: column;
+    gap: 24px;
+}
+
+.wbk_appearanceEditor__section {
+    padding: 24px;
+    background-color: #fff;
+    border-radius: 8px;
+
+    .wbk_appearanceEditor__sectionHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        cursor: pointer;
+
+        .wbk_appearanceEditor__sectionTitle {
+            font-family: typography.$font-primary;
+            font-weight: 600;
+            font-style: Semi Bold;
+            font-size: 18px;
+            leading-trim: NONE;
+            line-height: 28px;
+            letter-spacing: 0%;
+            color: #1d2939;
+            margin: 0;
+        }
+
+        .wbk_appearanceEditor__accordionIcon {
+            transition: 0.3s all linear;
+        }
+
+        .wbk_appearanceEditor__accordionIcon--rotate {
+            transform: rotate(180deg);
+        }
+    }
+
+    .wbk_appearanceEditor__fieldsWrapper {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .wbk_appearanceEditor__sectionBody {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        margin: 0;
+        transition:
+            max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+            opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+            margin-top 0.3s linear;
+        position: relative;
+
+        &.wbk_appearanceEditor__sectionBody--active {
+            max-height: 1400px;
+            opacity: 1;
+            margin-top: 24px;
+            overflow: visible;
+
+            @media (max-width: 782px) {
+                max-height: 2000px;
+            }
+        }
+
+        .wbk_appearanceEditor__proOverlay {
+            background-color: rgb(0 0 0 / 0%);
+            -webkit-backdrop-filter: blur(2px);
+            backdrop-filter: blur(2px);
+            z-index: 9;
+            align-items: flex-start;
+
+            .wbk_appearanceEditor__upgradeButton {
+                box-shadow: 12px 4px 20px #646464;
+                margin-left: auto;
+                margin-right: auto;
+                display: flex;
+                margin-top: 150px;
+                white-space: pre-wrap;
+            }
+        }
+    }
+
+    .wbk_appearanceEditor__subsection {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+
+        .wbk_appearanceEditor__subsectionTitle {
+            font-family: typography.$font-primary;
+            font-weight: 500;
+            font-size: 16px;
+            line-height: 24px;
+            color: #374151;
+            margin: 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .wbk_appearanceEditor__subsectionFields {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+
+            @media (max-width: 768px) {
+                grid-template-columns: 1fr;
+            }
+        }
+    }
+}
+
+.wbk_appearanceEditor__invertedIcon {
+    filter: invert(1);
+}

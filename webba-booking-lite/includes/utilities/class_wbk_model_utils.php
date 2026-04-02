@@ -56,6 +56,142 @@ class WBK_Model_Utils {
     }
 
     /**
+     * get ids of all staff members
+     * @return array ids of staff members
+     */
+    public static function get_staff_member_ids() {
+        global $wpdb;
+        $query = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( get_option( "wbk_db_prefix", "" ) . "wbk_staff_members" ) );
+        if ( !$wpdb->get_var( $query ) == get_option( "wbk_db_prefix", "" ) . "wbk_staff_members" ) {
+            return [];
+        }
+        $staff_member_ids = $wpdb->get_col( "SELECT id FROM " . get_option( "wbk_db_prefix", "" ) . "wbk_staff_members" );
+        return $staff_member_ids;
+    }
+
+    /**
+     * get ids of all locations
+     * @return array ids of locations
+     */
+    public static function get_location_ids() {
+        global $wpdb;
+        $query = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( get_option( "wbk_db_prefix", "" ) . "wbk_locations" ) );
+        if ( !$wpdb->get_var( $query ) == get_option( "wbk_db_prefix", "" ) . "wbk_locations" ) {
+            return [];
+        }
+        $location_ids = $wpdb->get_col( "SELECT id FROM " . get_option( "wbk_db_prefix", "" ) . "wbk_locations" );
+        return $location_ids;
+    }
+
+    /**
+     * get service IDs by location ID
+     * @param int $location_id location ID
+     * @return array array of service IDs that can be provided in the given location
+     */
+    public static function get_service_ids_by_location( $location_id ) {
+        $service_ids = self::get_service_ids();
+        $result = [];
+        $location_id_normalized = (int) $location_id;
+        foreach ( $service_ids as $service_id ) {
+            $service = new WBK_Service($service_id);
+            if ( !$service->is_loaded() ) {
+                continue;
+            }
+            $locations = $service->get( "locations" );
+            if ( empty( $locations ) ) {
+                continue;
+            }
+            $locations = json_decode( $locations );
+            if ( is_array( $locations ) ) {
+                foreach ( $locations as $loc ) {
+                    if ( (int) $loc === $location_id_normalized ) {
+                        $result[] = $service_id;
+                        break;
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * get staff member IDs by service ID
+     * @param int $service_id service ID
+     * @return array array of staff member IDs that can provide the given service
+     */
+    public static function get_staff_member_ids_by_service( $service_id ) {
+        $service = new WBK_Service($service_id);
+        if ( !$service->is_loaded() ) {
+            return [];
+        }
+        $staff_member_ids = self::get_staff_member_ids();
+        $result = [];
+        $service_id_normalized = (int) $service_id;
+        foreach ( $staff_member_ids as $staff_member_id ) {
+            $staff_member = new WBK_Staff_Member($staff_member_id);
+            if ( !$staff_member->is_loaded() ) {
+                continue;
+            }
+            $services = $staff_member->get_services();
+            if ( is_array( $services ) && in_array( $service_id_normalized, $services ) ) {
+                $result[] = $staff_member_id;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Get staff member IDs who can provide the given service in the given location.
+     * @param int $service_id Service ID
+     * @param int|null $location_id Location ID, or null to skip location filtering
+     * @return array Array of staff member IDs
+     */
+    public static function get_staff_member_ids_by_service_and_location( $service_id, $location_id = null ) {
+        $staff_member_ids = self::get_staff_member_ids_by_service( $service_id );
+        if ( $location_id === null || $location_id === "" ) {
+            return $staff_member_ids;
+        }
+        $location_id_normalized = (int) $location_id;
+        if ( $location_id_normalized <= 0 ) {
+            return $staff_member_ids;
+        }
+        $result = [];
+        foreach ( $staff_member_ids as $staff_member_id ) {
+            $staff_member = new WBK_Staff_Member($staff_member_id);
+            if ( !$staff_member->is_loaded() ) {
+                continue;
+            }
+            $staff_locations = $staff_member->get_locations();
+            if ( in_array( $location_id_normalized, $staff_locations, true ) ) {
+                $result[] = $staff_member_id;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * check if there is at least one service that has location assigned
+     * @return bool true if at least one service has location assigned, false otherwise
+     */
+    public static function has_services_with_locations() {
+        $service_ids = self::get_service_ids();
+        foreach ( $service_ids as $service_id ) {
+            $service = new WBK_Service($service_id);
+            if ( !$service->is_loaded() ) {
+                continue;
+            }
+            $locations = $service->get( "locations" );
+            if ( !empty( $locations ) ) {
+                $locations = json_decode( $locations );
+                if ( is_array( $locations ) && count( $locations ) > 0 ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * get pairs of service id - names
      * @return array array of id-name pair
      */
@@ -188,16 +324,16 @@ class WBK_Model_Utils {
     public static function get_connected_calendar_modes() {
         $result = [
             "Two-ways"       => [
-                'title'       => __( "Two-ways", "webba-booking-lite" ),
-                'description' => __( 'Sync events in both directions - import external events and export bookings', 'webba-booking-lite' ),
+                "title"       => __( "Two-ways", "webba-booking-lite" ),
+                "description" => __( "Sync events in both directions - import external events and export bookings", "webba-booking-lite" ),
             ],
             "One-way-import" => [
-                'title'       => __( "One-way (import)", "webba-booking-lite" ),
-                'description' => __( 'Only import events from external calendar to block availability', 'webba-booking-lite' ),
+                "title"       => __( "One-way (import)", "webba-booking-lite" ),
+                "description" => __( "Only import events from external calendar to block availability", "webba-booking-lite" ),
             ],
             "One-way"        => [
-                'title'       => __( "One-way (export)", "webba-booking-lite" ),
-                'description' => __( 'Only export bookings to external calendar', 'webba-booking-lite' ),
+                "title"       => __( "One-way (export)", "webba-booking-lite" ),
+                "description" => __( "Only export bookings to external calendar", "webba-booking-lite" ),
             ],
         ];
         return $result;
@@ -738,11 +874,11 @@ class WBK_Model_Utils {
         $merged = WBK_Form_Builder_Utils::get_all_fields_merged();
         $slug_to_title = [];
         foreach ( $merged as $field ) {
-            $slug = ( isset( $field['slug'] ) ? $field['slug'] : '' );
-            if ( $slug === '' ) {
+            $slug = ( isset( $field["slug"] ) ? $field["slug"] : "" );
+            if ( $slug === "" ) {
                 continue;
             }
-            $title = ( isset( $field['placeholder'] ) ? $field['placeholder'] : (( isset( $field['checkboxText'] ) ? $field['checkboxText'] : $slug )) );
+            $title = ( isset( $field["placeholder"] ) ? $field["placeholder"] : (( isset( $field["checkboxText"] ) ? $field["checkboxText"] : $slug )) );
             $slug_to_title[$slug] = $title;
         }
         $result = [];
@@ -756,7 +892,7 @@ class WBK_Model_Utils {
         $service_id,
         $start_date,
         $number_of_days,
-        $mode = "classic"
+        $staff_member_id = null
     ) {
         $service = new WBK_Service($service_id);
         if ( !$service->is_loaded() ) {
@@ -765,22 +901,14 @@ class WBK_Model_Utils {
         // init service schedulle
         $sp = new WBK_Schedule_Processor();
         $sp->load_data();
-        $date_format = WBK_Format_Utils::get_date_format();
         $prepare_time = round( $service->get_prepare_time() / 1440 );
         $arr_disabled = [];
-        $arr_enabled = [];
         $day_to_render = strtotime( $start_date );
-        $last_day = $day_to_render + 86400 * $number_of_days;
-        $google_events = [];
+        $connected_events = [];
         if ( !is_null( $service->get_availability_range() ) && is_array( $service->get_availability_range() ) && count( $service->get_availability_range() ) == 2 ) {
             $availability_range = $service->get_availability_range();
             $limit_start = strtotime( trim( $availability_range[0] ) );
             $limit_end = strtotime( trim( $availability_range[1] ) );
-        }
-        if ( $mode == "dropdown" ) {
-            $added_dates = 0;
-            $added_dates_limit = $number_of_days;
-            $number_of_days = 1000000;
         }
         for ($i = 1; $i <= $number_of_days; $i++) {
             // check if current day is inside the limit
@@ -813,39 +941,27 @@ class WBK_Model_Utils {
                 $day_to_render = strtotime( "tomorrow", $day_to_render );
                 continue;
             }
-            $day_status = $sp->get_day_status( $day_to_render, $service_id );
+            $day_status = $sp->get_day_status( $day_to_render, $service_id, $staff_member_id );
             if ( $day_status == 0 || $day_status == 2 ) {
-                if ( $mode == "dropdown" && $day_status == 2 ) {
-                    $added_dates++;
-                    $arr_enabled[] = $day_to_render . "-HM-" . wp_date( $date_format, $day_to_render, new DateTimeZone(date_default_timezone_get()) ) . " " . get_option( "wbk_daily_limit_reached_message", __( "Daily booking limit is reached, please select another date", "webba-booking-lite" ) ) . "-HM-wbk_dropdown_limit_reached";
-                }
                 $day_to_render = strtotime( "tomorrow", $day_to_render );
                 continue;
             } else {
                 if ( get_option( "wbk_disable_day_on_all_booked", "disabled" ) == "enabled" || get_option( "wbk_disable_day_on_all_booked", "disabled" ) == "enabled_plus" ) {
-                    if ( get_option( "wbk_disable_day_on_all_booked", "disabled" ) == "enabled" ) {
-                        $calculate_availability = false;
-                    } elseif ( get_option( "wbk_disable_day_on_all_booked", "disabled" ) == "enabled_plus" ) {
-                        $calculate_availability = true;
-                    }
                     $sp->get_time_slots_by_day(
                         $day_to_render,
                         $service_id,
                         [
-                            "calculate_availability" => $calculate_availability,
+                            "calculate_availability" => true,
                             "calculate_night_hours"  => false,
                             "skip_gg_calendar"       => true,
                             null,
                             null,
                         ],
                         null,
-                        false
+                        false,
+                        $staff_member_id
                     );
                     if ( !$sp->has_free_time_slots() ) {
-                        if ( $mode == "dropdown" ) {
-                            $added_dates++;
-                            $arr_enabled[] = $day_to_render . "-HM-" . wp_date( $date_format, $day_to_render, new DateTimeZone(date_default_timezone_get()) ) . " " . get_option( "wbk_daily_limit_reached_message", __( "Daily booking limit is reached, please select another date", "webba-booking-lite" ) ) . "-HM-wbk_dropdown_limit_reached";
-                        }
                         $day_to_render = strtotime( "tomorrow", $day_to_render );
                         continue;
                     }
@@ -861,19 +977,10 @@ class WBK_Model_Utils {
                 $day_to_render = strtotime( "tomorrow", $day_to_render );
                 continue;
             }
-            if ( $mode == "dropdown" ) {
-                $added_dates++;
-                $arr_enabled[] = $day_to_render . "-HM-" . wp_date( $date_format, $day_to_render, new DateTimeZone(date_default_timezone_get()) ) . "-HM-wbk_dropdown_regular_item";
-            } else {
-                $arr_disabled[] = date( "Y", $day_to_render ) . "," . intval( date( "n", $day_to_render ) - 1 ) . "," . date( "j", $day_to_render );
-            }
+            $arr_disabled[] = date( "Y", $day_to_render ) . "," . intval( date( "n", $day_to_render ) - 1 ) . "," . date( "j", $day_to_render );
             $day_to_render = strtotime( "tomorrow", $day_to_render );
         }
-        if ( $mode == "dropdown" ) {
-            return $arr_enabled;
-        } else {
-            return $arr_disabled;
-        }
+        return $arr_disabled;
     }
 
     static function get_quantity_by_range_sevices( $start, $end, $services ) {

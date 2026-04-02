@@ -1,0 +1,16 @@
+.wbk_errorMessage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: column;
+    text-align: center;
+
+    img {
+        width: 120px;
+        height: auto;
+        object-fit: contain;
+    }
+}
+
+.wbk_errorMessage__error {
+}

@@ -1,0 +1,77 @@
+$input-size: 40px;
+$border: 1.5px solid #edeff2;
+
+.wbk_input {
+    &__number {
+        &__inner-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        &__input-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        &__input {
+            height: $input-size;
+            max-height: $input-size;
+            border: $border !important;
+            text-align: center;
+            outline: none !important;
+            box-shadow: none;
+            border-radius: 0;
+            max-width: 48px;
+            background-color: #ffffff !important;
+        }
+
+        &__quantity-button {
+            width: $input-size;
+            max-width: $input-size;
+            min-width: $input-size;
+            height: $input-size;
+            max-height: $input-size;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: $border;
+            cursor: pointer;
+            background-color: #ffffff;
+
+            &--increase {
+                border-left: none;
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
+            }
+
+            &--reduce {
+                border-right: none;
+                border-top-left-radius: 8px;
+                border-bottom-left-radius: 8px;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            $input-size: 30px !global;
+
+            &__input {
+                height: $input-size;
+                max-height: $input-size;
+                max-width: 28px;
+            }
+
+            &__quantity-button {
+                width: $input-size;
+                max-width: $input-size;
+                min-width: $input-size;
+                height: $input-size;
+                max-height: $input-size;
+            }
+        }
+    }
+}

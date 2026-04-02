@@ -1,0 +1,52 @@
+.wbk_appearanceEditorScreen__wrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 0px 30px 30px 30px;
+    gap: 36px;
+    height: calc(100vh - 230px);
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin-top: -20px;
+    padding-top: 20px;
+
+    @media (min-width: 1660px) {
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .wbk_booking_form__body__inner-wrapper {
+        max-height: calc(100vh - 270px);
+        min-height: calc(100vh - 270px);
+    }
+    .wbk_booking_form__body__wrapper {
+        min-height: calc(100vh - 270px);
+    }
+
+    .wbk_appearanceEditorScreen__leftCol {
+        width: 40%;
+    }
+    .wbk_appearanceEditorScreen__rightCol {
+        width: 60%;
+
+        @media (min-width: 782px) {
+            position: sticky;
+            top: 0;
+        }
+    }
+
+    @media (max-width: 782px) {
+        flex-flow: column-reverse;
+
+        .wbk_appearanceEditorScreen__leftCol,
+        .wbk_appearanceEditorScreen__rightCol {
+            width: 100%;
+        }
+    }
+}
+
+.wbk_appearanceEditorScreen__toast {
+    margin-top: 50px;
+}

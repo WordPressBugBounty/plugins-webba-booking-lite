@@ -1,0 +1,30 @@
+.wbk_customField__wrapper {
+    display: flex;
+    flex-flow: column;
+    gap: 24px;
+}
+
+.wbk_customField__fieldItem {
+    display: flex;
+    flex-flow: column;
+    gap: 3px;
+}
+
+.wbk_customField__errorContainer {
+    color: red;
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+}
+
+.wbk_customField__input {
+    border: 1px solid #8a9393;
+    border-radius: 15px;
+    height: 50px;
+    margin: 0;
+    padding: 0 20px 0 20px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #212121;
+    width: 100%;
+}

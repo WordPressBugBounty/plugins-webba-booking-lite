@@ -1,0 +1,113 @@
+.wbk_status__statusWrapper {
+    position: relative;
+    display: inline-flex;
+
+    .wbk_status__status {
+        display: flex;
+        flex-flow: row;
+        padding: 5px 12px;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 5px;
+        cursor: pointer;
+        width: 100px;
+        border-radius: 9999px;
+        transition: 0.2s background-color ease-in-out;
+
+        .wbk_status__arrow {
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        .wbk_status__statusText {
+            margin: 0;
+            max-width: 100%;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            text-align: left;
+            @include typography.use-font(
+                $font: typography.$font-primary,
+                $size: 14px,
+                $weight: 400
+            );
+        }
+
+        &::after {
+            content: '';
+            width: 5px;
+            height: 5px;
+            min-width: 5px;
+            min-height: 5px;
+            border-bottom: 1.5px solid #212121;
+            border-right: 1.5px solid #212121;
+            transform: rotate(45deg);
+            top: 12px;
+            right: 12px;
+            margin-left: auto;
+            margin-right: 0;
+        }
+    }
+
+    .wbk_status__optionsWrapper {
+        display: none;
+        flex-flow: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        position: absolute;
+        background-color: #fff;
+        top: 100%;
+        right: 0;
+        z-index: 99;
+        box-shadow: 0 0 10px rgba(161, 164, 182, 0.3);
+        border-radius: 15px;
+        overflow: hidden;
+        max-height: 175px;
+        overflow: auto;
+        margin-top: 0;
+        width: calc(100% + 80px);
+        max-width: 200px;
+        min-width: 100px;
+
+        &.wbk_status__optionsWrapper--open {
+            display: flex;
+        }
+
+        .wbk_status__optionItem {
+            padding: 5px 20px 5px 20px;
+            cursor: pointer;
+            color: #212121;
+            text-align: left;
+            line-height: 24px;
+            width: 100%;
+            transition: 0.2s all ease-in-out;
+
+            &:hover {
+                background-color: #cbe7e7;
+            }
+        }
+    }
+
+    &.wbk_status__statusWrapper--isLastTwo {
+        .wbk_status__optionsWrapper {
+            bottom: 0;
+            top: unset;
+            z-index: 999999;
+        }
+    }
+}
+
+@each $status, $color in colors.$status-colors {
+    .wbk_status__status.wbk_status__status--#{$status} {
+        background-color: rgba($color, 20%);
+
+        &::after {
+            border-bottom: 1.5px solid $color;
+            border-right: 1.5px solid $color;
+        }
+
+        .wbk_status__statusText {
+            color: $color;
+        }
+    }
+}

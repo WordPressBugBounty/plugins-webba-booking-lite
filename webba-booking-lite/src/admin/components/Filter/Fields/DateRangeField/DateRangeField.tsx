@@ -2,7 +2,7 @@ import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
-import styles from './DateRangeField.module.scss'
+import './DateRangeField.scss'
 import { IFilterFieldProps } from '../../types'
 import { useFilterField } from '../../hooks/useFilterField'
 import { formatWbkDate } from '../../utils'
@@ -65,12 +65,12 @@ export const DateRangeField = ({
     }, [value])
 
     return (
-        <div className={styles.inputWrapper}>
+        <div className={"wbk_dateRangeField__inputWrapper"}>
             {label && <Label title={label} id={name} />}
             <DatePicker
-                className={styles.dateInput}
-                calendarClassName={styles.calendar}
-                dayClassName={() => styles.day}
+                className="wbk_dateRangeField__dateInput"
+                calendarClassName="wbk_dateRangeField__calendar"
+                dayClassName={() => 'wbk_dateRangeField__day'}
                 startDate={range[0]}
                 endDate={range[1]}
                 selectsRange={true}

@@ -15,42 +15,50 @@ import WbkSelect from './components/wbkselect.js'
 import WbkText from './components/wbktext.js'
 import store from './store/index.js'
 import { useDispatch, useSelect } from '@wordpress/data'
-import { SelectControl } from '@wordpress/components'
+import {
+    SelectControl,
+    FormTokenField,
+    BaseControl,
+} from '@wordpress/components'
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
+import { BookingFormProvider } from '../frontend/providers/BookingFormProvider/BookingFormProvider.tsx'
+import { BookingForm } from '../frontend/screens/BookingForm/BookingForm.tsx'
+import { store_name } from '../store/frontend/index.ts'
 
 export default function Edit({ attributes, setAttributes }) {
-    const blockProps = useBlockProps()
+    const { serviceId, categoryId, singleOrMulripleService, locationIds } = attributes
 
-    const data = useSelect((select) => {
-        const store = select('webba_booking/assets_store')
-        return store.getData()
-    }, [])
+    const data = useSelect(
+        (select) => select(store_name).getPreset(),
+        [store_name]
+    )
 
     let is_single_service = attributes.singleOrMulripleService == 'single'
     let steps = []
     let filtered_services
-    if (data.services) {
-        if (attributes.singleOrMulripleService == 'multiple') {
-            steps.push(__('Services', 'webba-booking-lite'))
-        }
-        steps.push(__('Date & time', 'webba-booking-lite'))
-        steps.push(__('Details', 'webba-booking-lite'))
-        filtered_services = data.services
-        if (attributes.categoryId > 0 && !attributes.showCategoryList) {
-            filtered_services = []
-            let services_in_category = data.categories.find(
-                (item) => item.value == attributes.categoryId
-            ).services
-            services_in_category.forEach((item) => {
-                filtered_services.push(
-                    data.services.find(
-                        (item_service) => item_service.value == item
-                    )
-                )
-            })
-        }
-    }
+
+    // if (data.services) {
+    //     if (attributes.singleOrMulripleService == 'multiple') {
+    //         steps.push(__('Services', 'webba-booking-lite'))
+    //     }
+    //     steps.push(__('Date & time', 'webba-booking-lite'))
+    //     steps.push(__('Details', 'webba-booking-lite'))
+    //     filtered_services = data.services
+    //     if (attributes.categoryId > 0 && !attributes.showCategoryList) {
+    //         filtered_services = []
+    //         let services_in_category = data.categories.find(
+    //             (item) => item.value == attributes.categoryId
+    //         ).services
+    //         services_in_category.forEach((item) => {
+    //             filtered_services.push(
+    //                 data.services.find(
+    //                     (item_service) => item_service.value == item
+    //                 )
+    //             )
+    //         })
+    //     }
+    // }
 
     const onChangeSingleOrMulripleService = (newValue) => {
         setAttributes({ singleOrMulripleService: newValue })
@@ -68,9 +76,34 @@ export default function Edit({ attributes, setAttributes }) {
         setAttributes({ categoryId: Number(newValue) })
     }
 
+    const locationSuggestions = (data.locations || []).map((loc) => loc.label)
+    const locationTokens = (locationIds || [])
+        .map((id) => {
+            const loc = (data.locations || []).find(
+                (l) =>
+                    String(l.id) === String(id) ||
+                    String(l.value) === String(id)
+            )
+            return loc ? loc.label : null
+        })
+        .filter(Boolean)
+    const onLocationTokensChange = (newTokens) => {
+        const ids = newTokens
+            .map((label) => {
+                const loc = (data.locations || []).find(
+                    (l) => l.label === label
+                )
+                return loc ? String(loc.id || loc.value) : null
+            })
+            .filter(Boolean)
+        setAttributes({ locationIds: ids })
+    }
+
     const [selectedServices, setSelectedServices] = useState(null)
 
-    const handleServiceSelect = () => {}
+    const handleServiceSelect = () => { }
+
+
 
     return (
         <div {...useBlockProps()}>
@@ -124,18 +157,6 @@ export default function Edit({ attributes, setAttributes }) {
                             <>
                                 <CheckboxControl
                                     label={__(
-                                        'Allow selection of multiple services',
-                                        'webba-booking-lite'
-                                    )}
-                                    help={__(
-                                        'If enabled, the customer can book more than one service at one booking session.',
-                                        'webba-booking-lite'
-                                    )}
-                                    checked={attributes.multipleServices}
-                                    onChange={onChangeMultipleServices}
-                                />
-                                <CheckboxControl
-                                    label={__(
                                         'Show category list in the form',
                                         'webba-booking-lite'
                                     )}
@@ -159,133 +180,53 @@ export default function Edit({ attributes, setAttributes }) {
                                         value={attributes.categoryId}
                                         options={[
                                             { value: 0, label: __('Select') },
-                                            ...data.categories,
+                                            ...(data.categories || []).map((category) => ({ label: category.name, value: category.id })),
                                         ]}
                                         onChange={onChangeCategoryId}
                                     />
                                 )}
+                                {data.locations &&
+                                    data.locations.length > 0 && (
+                                        <BaseControl
+                                            label={__(
+                                                'Select locations',
+                                                'webba-booking-lite'
+                                            )}
+                                            help={__(
+                                                'Choose one or more locations to show in the form. Leave empty to show all.',
+                                                'webba-booking-lite'
+                                            )}
+                                        >
+                                            <div className="wbk-block-location-token-field">
+                                                <FormTokenField
+                                                    value={locationTokens}
+                                                    suggestions={
+                                                        locationSuggestions
+                                                    }
+                                                    onChange={
+                                                        onLocationTokensChange
+                                                    }
+                                                    placeholder={__(
+                                                        'Type or select locations…',
+                                                        'webba-booking-lite'
+                                                    )}
+                                                    __experimentalExpandOnFocus
+                                                />
+                                            </div>
+                                        </BaseControl>
+                                    )}
                             </>
                         )}
                     </PanelBody>
                 )}
             </InspectorControls>
             <div className="main-block-w">
-                {data.services ? (
-                    <div
-                        className={
-                            data.settings.narrow_form
-                                ? 'appointment-box-w narrow-form-w'
-                                : 'appointment-box-w'
-                        }
-                    >
-                        <div
-                            className="appointment-status-wrapper-w"
-                            style={{ background: data.appearance[0] }}
-                        >
-                            <>
-                                <StatusBar steps={steps} />
-                                <div className="circle-chart-wb">
-                                    <span
-                                        style={{
-                                            background: data.appearance[0],
-                                        }}
-                                        className="circle-chart-text-wb"
-                                    >
-                                        1{' '}
-                                        {__('of', 'webba-booking-lite') +
-                                            ' ' +
-                                            steps.length}
-                                    </span>
-                                </div>
-                                <div className="appointment-status-text-mobile-wb">
-                                    <p className="current-step-w">Services</p>
-                                    <p className="next-step-w">
-                                        Next
-                                        <span className="btn-ring-w"></span>:
-                                        Date and time
-                                    </p>
-                                </div>
-                            </>
-                        </div>
-
-                        <div className="appointment-content-w">
-                            <div className="appointment-content-scroll-w">
-                                {data.services &&
-                                    (is_single_service ? (
-                                        <>
-                                            <WbkText
-                                                value=""
-                                                name={'date'}
-                                                placeholder={
-                                                    data.wording
-                                                        .date_placeholder
-                                                }
-                                                label={data.wording.date_label}
-                                            />
-                                        </>
-                                    ) : (
-                                        <>
-                                            {attributes.showCategoryList && (
-                                                <WbkSelect
-                                                    options={data.categories}
-                                                    label={
-                                                        data.wording
-                                                            .category_label
-                                                    }
-                                                />
-                                            )}
-                                            <label className="input-label-w service-label-w">
-                                                {data.wording.service_label}
-                                            </label>
-                                            <ul className="wbk_v5_service_list">
-                                                {filtered_services.map(
-                                                    (value, index) => (
-                                                        <ServiceBlock
-                                                            data={value}
-                                                            selected={
-                                                                selectedServices
-                                                            }
-                                                            onChange={
-                                                                handleServiceSelect
-                                                            }
-                                                            type={
-                                                                attributes.multipleServices
-                                                            }
-                                                            environment={data}
-                                                            key={index}
-                                                        />
-                                                    )
-                                                )}
-                                            </ul>
-                                        </>
-                                    ))}{' '}
-                            </div>
-                            <div className="button-block-w two-buttons-w">
-                                <button
-                                    type="button"
-                                    className="button-w button-prev-w"
-                                    style={{ background: data.appearance[1] }}
-                                >
-                                    {__('Back', 'webba-booking-lite')}
-                                </button>
-                                <div className="button-container-w">
-                                    <button
-                                        className="button-w button-next-w"
-                                        style={{
-                                            background: data.appearance[1],
-                                        }}
-                                    >
-                                        {__('Next', 'webba-booking-lite')}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="appointment-box-w loading-holder-w">
-                        <Skeleton count={5} height={30} />
-                    </div>
-                )}
+                <div className="main-block-w-inner">
+                    <div>Webba booking form</div>
+                    {/* <BookingFormProvider key={JSON.stringify({ serviceId, categoryId, singleOrMulripleService })} attrService={serviceId > 0 && singleOrMulripleService === 'single' && serviceId || '0'} attrCategory={categoryId > 0 && singleOrMulripleService === 'multiple' && categoryId || '0'}>
+                        <BookingForm />
+                    </BookingFormProvider> */}
+                </div>
             </div>
         </div>
     )

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import styles from './SelectField.module.scss'
+import './SelectField.scss'
 import Select, { components, MultiValueProps } from 'react-select'
 import classNames from 'classnames'
 import { IOption } from '../../../Form/types'
@@ -22,7 +22,7 @@ const CustomMultiValue = (props: MultiValueProps<IOption>) => {
 
     if (index === MAX_DISPLAYED_OPTIONS) {
         const remaining = selectedValues.length - MAX_DISPLAYED_OPTIONS
-        return <div className={styles.multiValueMore}>+{remaining}</div>
+        return <div className="wbk_selectField__multiValueMore">+{remaining}</div>
     }
 
     return null
@@ -114,7 +114,7 @@ export const SelectField = ({
     }, [])
 
     return (
-        <div className={classNames(styles.selectField)}>
+        <div className={classNames('wbk_selectField')}>
             {label && <Label title={label} id={name} />}
             <div>
                 <Select
@@ -125,8 +125,8 @@ export const SelectField = ({
                     }
                     classNames={{
                         control: (state) =>
-                            classNames(styles.selectInput, {
-                                [styles.preventOverlap]: misc?.preventOverlap,
+                            classNames('wbk_selectField__selectInput', {
+                                'wbk_selectField__selectInput--preventOverlap': misc?.preventOverlap,
                             }),
                     }}
                     id={name}

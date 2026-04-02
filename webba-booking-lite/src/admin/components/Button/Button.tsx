@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import styles from './Button.module.scss'
+import './Button.scss'
 import { useCallback, useState, useTransition } from '@wordpress/element'
 
 interface ButtonProps {
@@ -8,7 +8,7 @@ interface ButtonProps {
     className?: string
     id?: string
     name?: string
-    type?: 'primary' | 'secondary' | 'custom' | 'no-border'
+    type?: 'primary' | 'secondary' | 'secondary-green' | 'custom' | 'no-border'
     actionType?: 'button' | 'submit' | 'reset'
     isLoading?: boolean
     form?: string
@@ -46,10 +46,10 @@ export const Button = ({
             type={actionType || 'button'}
             className={classNames(
                 className,
-                styles.button,
-                styles[type || 'primary'],
-                { [styles.disabled]: disabled },
-                { [styles.loading]: maybeLoading || isLoading }
+                'wbk_adminButton',
+                `wbk_adminButton--${type || 'primary'}`,
+                { 'wbk_adminButton--disabled': disabled },
+                { 'wbk_adminButton--loading': maybeLoading || isLoading }
             )}
             disabled={disabled || maybeLoading || isLoading || false}
             name={name}
@@ -58,7 +58,7 @@ export const Button = ({
             data-title={tooltip}
         >
             {(maybeLoading || isLoading) && (
-                <div className={styles.loader}></div>
+                <div className="wbk_adminButton__loader"></div>
             )}
             {children}
         </button>

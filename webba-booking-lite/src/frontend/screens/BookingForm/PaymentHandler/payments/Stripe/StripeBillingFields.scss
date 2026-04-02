@@ -1,0 +1,96 @@
+.wbk-stripe-billing-fields {
+    margin-top: 20px;
+
+    &__title {
+        font-size: 16px;
+        font-weight: 500;
+        color: #30313d;
+        margin-bottom: 16px;
+        letter-spacing: -0.2px;
+    }
+
+    &__container {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    &__row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__label {
+        font-size: 13px;
+        font-weight: 400;
+        color: #30313d;
+        line-height: 16px;
+        letter-spacing: -0.1px;
+    }
+
+    &__input,
+    &__select {
+        padding: 10px 12px !important;
+        font-size: 16px !important;
+        line-height: 24px !important;
+        color: #30313d !important;
+        border: 1px solid #e6e6e6 !important;
+        border-radius: 5px !important;
+        background-color: #ffffff !important;
+        transition: all 0.15s ease !important;
+        font-family: colors.$wbk-font !important;
+        box-shadow:
+            0px 1px 1px rgba(0, 0, 0, 0.03),
+            0px 3px 6px rgba(0, 0, 0, 0.02) !important;
+
+        &:hover {
+            border-color: #cbd2d9;
+        }
+
+        &:focus,
+        &:active {
+            outline: none;
+            border-color: #0570de !important;
+            box-shadow:
+                0px 1px 1px rgba(0, 0, 0, 0.03),
+                0px 3px 6px rgba(0, 0, 0, 0.02),
+                0 0 0 3px hsla(210, 96%, 45%, 25%),
+                0 1px 1px 0 rgba(0, 0, 0, 0.08) !important;
+        }
+
+        &::placeholder {
+            color: #8898aa !important;
+        }
+
+        &:disabled {
+            background-color: #f6f9fc !important;
+            color: #8898aa !important;
+            cursor: not-allowed !important;
+        }
+    }
+
+    &__select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2330313d' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
+        cursor: pointer;
+
+        &::-ms-expand {
+            display: none;
+        }
+
+        option {
+            color: #30313d !important;
+            background-color: #ffffff !important;
+        }
+    }
+}

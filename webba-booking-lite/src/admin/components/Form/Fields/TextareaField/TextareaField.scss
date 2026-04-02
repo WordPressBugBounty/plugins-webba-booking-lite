@@ -1,0 +1,22 @@
+.wbk_textareaField__error {
+    color: red;
+    margin-top: 5px;
+}
+
+.wbk_textareaField__textarea {
+    border: 1px solid colors.$field-border;
+    border-radius: 8px;
+    background: colors.$field-background;
+    height: 50px;
+    margin: 0;
+    padding: 10px 20px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #212121;
+    width: 100%;
+    min-height: 150px;
+
+    &:focus {
+        @include fields.field-focused-state;
+    }
+}

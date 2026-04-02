@@ -348,7 +348,7 @@
                     ]
                 ],
                 "date_format": "F j, Y",
-                "time_zone": "Europe/Vilnius",
+                "time_zone": "Europe/Warsaw",
                 "required_plan": "standard"
             },
             "required": false,
@@ -365,7 +365,7 @@
             "misc": {
                 "tooltip": "Specify a date range if the service is only valid for a specific period of time.",
                 "date_format": "F j, Y",
-                "time_zone": "Europe/Vilnius",
+                "time_zone": "Europe/Warsaw",
                 "required_plan": "start",
                 "available_in_old_free": true
             },
@@ -584,6 +584,23 @@
             "required": true,
             "dependency": [],
             "default_value": "0",
+            "editable": true
+        },
+        "service_locations": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Locations",
+            "tab": "details",
+            "misc": {
+                "tooltip": "Select the locations where this service is available.",
+                "options": "locations",
+                "multiple": true,
+                "required_plan": "pro"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
             "editable": true
         },
         "service_payment_methods": {

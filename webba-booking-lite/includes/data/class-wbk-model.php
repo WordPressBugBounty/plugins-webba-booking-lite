@@ -212,11 +212,11 @@ class WBK_Model
                     'Choose which form customers will see when booking this service. Keep the default Webba Form, or create one in \'Form Builder\' and select it here.',
                     "webba-booking-lite",
                 ),
-                'options' => 'forms',
-                'required_plan' => 'standard', // TIER 2
-                'null_value' => [
-                    '0' => __('Default Form', 'webba-booking-lite'),
-                ]
+                "options" => "forms",
+                "required_plan" => "standard", // TIER 2
+                "null_value" => [
+                    "0" => __("Default Form", "webba-booking-lite"),
+                ],
             ],
             "0",
             true,
@@ -275,19 +275,19 @@ class WBK_Model
         );
         // Number of people limitation for same slot
         $table->add_field(
-            'service_min_quantity',
-            'min_quantity',
-            __('Group Size Limits', 'webba-booking-lite'),
-            'limitation',
-            'availability',
+            "service_min_quantity",
+            "min_quantity",
+            __("Group Size Limits", "webba-booking-lite"),
+            "limitation",
+            "availability",
             [
-                'tooltip' => __(
+                "tooltip" => __(
                     'Set the minimum and maximum number of spots a single customer can reserve in one transaction. E.g. if you require minimum 4 spots for a slot to be booked, enter 4 in the "min" field.',
-                    'webba-booking-lite'
+                    "webba-booking-lite",
                 ),
-                'min_field' => 'min_quantity',
-                'max_field' => 'max_quantity',
-                'required_plan' => 'standard', // TIER 2
+                "min_field" => "min_quantity",
+                "max_field" => "max_quantity",
+                "required_plan" => "standard", // TIER 2
             ],
             "1",
             true,
@@ -296,15 +296,15 @@ class WBK_Model
 
         // Maximum Capacity Per Slot (hidden, handled by limitation field)
         $table->add_field(
-            'service_max_quantity',
-            'max_quantity',
-            __('Maximum Capacity Per Slot', 'webba-booking-lite'),
-            'text',
-            'availability',
+            "service_max_quantity",
+            "max_quantity",
+            __("Maximum Capacity Per Slot", "webba-booking-lite"),
+            "text",
+            "availability",
             [
-                'tooltip' => __(
-                    'Set the maximum number of spots available for this service per time slot. Once this limit is reached, the slot will close for everyone.',
-                    'webba-booking-lite'
+                "tooltip" => __(
+                    "Set the maximum number of spots available for this service per time slot. Once this limit is reached, the slot will close for everyone.",
+                    "webba-booking-lite",
                 ),
                 "sub_type" => "positive_integer",
                 "hidden" => true,
@@ -317,22 +317,22 @@ class WBK_Model
 
         // Total Slot Capacity (hidden, handled by limitation field)
         $table->add_field(
-            'service_quantity',
-            'quantity',
-            __('Total Slot Capacity', 'webba-booking-lite'),
-            'text',
-            'availability',
+            "service_quantity",
+            "quantity",
+            __("Total Slot Capacity", "webba-booking-lite"),
+            "text",
+            "availability",
             [
-                'tooltip' => __(
-                    'Set the maximum number of spots available for this service per time slot. Once this limit is reached, the slot will close for everyone.',
-                    'webba-booking-lite'
+                "tooltip" => __(
+                    "Set the maximum number of spots available for this service per time slot. Once this limit is reached, the slot will close for everyone.",
+                    "webba-booking-lite",
                 ),
-                'sub_type' => 'positive_integer',
-                'required_plan' => 'standard', // TIER 2
+                "sub_type" => "positive_integer",
+                "required_plan" => "standard", // TIER 2
             ],
-            '1',
+            "1",
             true,
-            false
+            false,
         );
 
         // ========== AVAILABILITY TAB - RULES & LIMITATIONS Subsection ==========
@@ -494,11 +494,11 @@ class WBK_Model
             "date_range",
             "availability",
             [
-                'tooltip' => $tooltip,
-                'date_format' => $date_format,
-                'time_zone' => get_option('wbk_timezone', 'UTC'),
-                'required_plan' => 'start', // TIER 1
-                'available_in_old_free' => true,
+                "tooltip" => $tooltip,
+                "date_format" => $date_format,
+                "time_zone" => get_option("wbk_timezone", "UTC"),
+                "required_plan" => "start", // TIER 1
+                "available_in_old_free" => true,
             ],
             "",
             true,
@@ -585,7 +585,7 @@ class WBK_Model
                 "max_field" => "multi_mode_limit",
                 "required_plan" => "standard", // TIER 2
             ],
-            '',
+            "",
             true,
             false,
             false,
@@ -607,7 +607,7 @@ class WBK_Model
                 "hidden" => true,
                 "required_plan" => "standard", // TIER 2
             ],
-            '',
+            "",
             true,
             false,
             false,
@@ -669,7 +669,7 @@ class WBK_Model
                     'If you don\'t want to show price, turn this on.',
                     "webba-booking-lite",
                 ),
-                'required_plan' => 'start', // TIER 1
+                "required_plan" => "start", // TIER 1
             ],
             "",
             true,
@@ -723,7 +723,187 @@ class WBK_Model
             false,
         );
 
-        // Payment methods
+        $tooltip = __(
+            "Select the locations where this service is available.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "service_locations",
+            "locations",
+            __("Locations", "webba-booking-lite"),
+            "select",
+            "details",
+            [
+                "tooltip" => $tooltip,
+                "options" => "locations",
+                "multiple" => true,
+                "required_plan" => "pro", // TIER 3
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __("Enter the duration of each booking in minutes.", "webba-booking-lite");
+        $table->add_field(
+            "service_duration",
+            "duration",
+            __("Duration", "webba-booking-lite"),
+            "text",
+            "hours",
+            ["sub_type" => "positive_integer", "tooltip" => $tooltip],
+            "30",
+        );
+
+        $tooltip = __(
+            'Specify the buffer period for new reservations. E.g., if it\'s 9 AM and you want to offer time slots starting 24 hours later, enter 1440 (24 hours * 60 minutes).',
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "service_prepare_time",
+            "prepare_time",
+            __("Preparation time (minutes)", "webba-booking-lite"),
+            "text",
+            "general",
+            ["sub_type" => "none_negative_integer", "tooltip" => $tooltip],
+            "0",
+            true,
+            false,
+        );
+
+        $tooltip = __(
+            "Enter the time needed between bookings. Default is zero for back-to-back scheduling.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "service_interval_between",
+            "interval_between",
+            __("Gap (minutes)", "webba-booking-lite"),
+            "text",
+            "hours",
+            ["tooltip" => $tooltip, "sub_type" => "none_negative_integer"],
+            "0",
+            true,
+            false,
+        );
+
+        $tooltip = __(
+            "Enter the default time interval for time slots, which helps organize business hours and appointment durations.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "service_step",
+            "step",
+            __("Step (minutes)", "webba-booking-lite"),
+            "text",
+            "hours",
+            ["tooltip" => $tooltip, "sub_type" => "positive_integer"],
+            "30",
+            true,
+            false,
+        );
+
+        $tooltip = __(
+            "Select a template for booking confirmation notifications.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "service_notification_template",
+            "notification_template",
+            __('\'On Booking\' notification template (customer)', "webba-booking-lite"),
+            "select",
+            "email",
+            [
+                "tooltip" => $tooltip,
+                "options" => "email_templates",
+                "null_value" => ["0" => __("Default", "webba-booking-lite")],
+            ],
+            "0",
+            false,
+            false,
+            false,
+        );
+
+        $tooltip = __("Select a template for booking reminders.", "webba-booking-lite");
+        $table->add_field(
+            "service_reminder_template",
+            "reminder_template",
+            __("Reminder notification template", "webba-booking-lite"),
+            "select",
+            "email",
+            [
+                "tooltip" => $tooltip,
+                "items" => WBK_Model_Utils::get_email_templates(),
+                "null_value" => ["0" => __("Default", "webba-booking-lite")],
+                "options" => "email_templates",
+            ],
+            "0",
+            false,
+            false,
+            false,
+        );
+
+        $tooltip = __("Select a template for invoices.", "webba-booking-lite");
+        $table->add_field(
+            "service_invoice_template",
+            "invoice_template",
+            __("Invoice notification template", "webba-booking-lite"),
+            "select",
+            "email",
+            [
+                "tooltip" => $tooltip,
+                "items" => WBK_Model_Utils::get_email_templates(),
+                "null_value" => ["0" => __("Default", "webba-booking-lite")],
+                "options" => "email_templates",
+            ],
+            "0",
+            false,
+            false,
+            false,
+        );
+
+        $tooltip = __("Select a template for booking changes notifications.", "webba-booking-lite");
+        $table->add_field(
+            "service_booking_changed_template",
+            "booking_changed_template",
+            __("Booking changes template", "webba-booking-lite"),
+            "select",
+            "email",
+            [
+                "tooltip" => $tooltip,
+                "items" => WBK_Model_Utils::get_email_templates(),
+                "null_value" => ["0" => __("Default", "webba-booking-lite")],
+                "options" => "email_templates",
+            ],
+            "0",
+            false,
+            false,
+            false,
+        );
+
+        $tooltip = __(
+            'Select a template for status "Arrived" notification. ',
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "service_arrived_template",
+            "arrived_template",
+            __('Status "arrived" template', "webba-booking-lite"),
+            "select",
+            "email",
+            [
+                "tooltip" => $tooltip,
+                "items" => WBK_Model_Utils::get_email_templates(),
+                "null_value" => ["0" => __("Default", "webba-booking-lite")],
+                "options" => "email_templates",
+            ],
+            "0",
+            false,
+            false,
+            false,
+        );
+
         $tooltip = __(
             "Select the preferred payment method(s) for this service.",
             "webba-booking-lite",
@@ -736,11 +916,14 @@ class WBK_Model
             "select",
             "pricing",
             [
-                'tooltip' => $tooltip,
-                'multiple' => true,
-                'options' => 'backend',
-                'items' => $payment_methods,
-                'description' => __('IMPORTANT! For Google Pay/Apple pay and Other Payment Methods to work you have to activate them in your Stripe account', 'webba-booking-lite'),
+                "tooltip" => $tooltip,
+                "multiple" => true,
+                "options" => "backend",
+                "items" => $payment_methods,
+                "description" => __(
+                    "IMPORTANT! For Google Pay/Apple pay and Other Payment Methods to work you have to activate them in your Stripe account",
+                    "webba-booking-lite",
+                ),
             ],
             null,
             true,
@@ -1342,6 +1525,7 @@ class WBK_Model
             "moment_price",
             "status",
             "service_id",
+            "staff_member_id",
             "phone",
         ]);
 
@@ -1386,6 +1570,43 @@ class WBK_Model
             true,
             in_array("service_id", $allowed_fields),
             true,
+        );
+
+        $tooltip = __("Select the staff member for this booking.", "webba-booking-lite");
+        $table->add_field(
+            "appointment_staff_member_id",
+            "staff_member_id",
+            __("Staff member", "webba-booking-lite"),
+            "select",
+            "",
+            [
+                "tooltip" => $tooltip,
+
+                "options" => "backend",
+                "sub_type" => "positive_integer",
+            ],
+            null,
+            true,
+            in_array("staff_member_id", $allowed_fields),
+            false,
+        );
+
+        $tooltip = __("Select the location for this booking.", "webba-booking-lite");
+        $table->add_field(
+            "appointment_location_id",
+            "location_id",
+            __("Location", "webba-booking-lite"),
+            "select",
+            "",
+            [
+                "tooltip" => $tooltip,
+                "options" => "locations",
+                "sub_type" => "positive_integer",
+            ],
+            null,
+            true,
+            true,
+            false,
         );
 
         $tooltip = __("Select the booking date.", "webba-booking-lite");
@@ -1933,6 +2154,9 @@ class WBK_Model
             ->get_element_at("appointment_day")
             ->set_filter_data("wbk_date_range", [">=", "<="], $default_range, " AND ");
         $table->fields
+            ->get_element_at("appointment_staff_member_id")
+            ->set_filter_data("select", ["IN"], [], "", WBK_Model_Utils::get_staff_member_ids());
+        $table->fields
             ->get_element_at("appointment_created_on")
             ->set_filter_data("wbk_date_range", [">=", "<="], [null, null], " AND ");
         date_default_timezone_set("UTC");
@@ -2316,13 +2540,13 @@ class WBK_Model
                     [
                         "value" => "google",
                         "title" => __("Google Calendar", "webba-booking-lite"),
-                        "icon" =>  'icon-google.svg',
+                        "icon" => "icon-google.svg",
                         "required_plan" => "start",
                     ],
                     [
                         "value" => "outlook",
                         "title" => __("Microsoft/Outlook", "webba-booking-lite"),
-                        "icon" => 'icon-microsoft.svg',
+                        "icon" => "icon-microsoft.svg",
                         "required_plan" => "premium",
                     ],
                 ],
@@ -2356,7 +2580,7 @@ class WBK_Model
                     "Enable easy authorization for this calendar (recommended)",
                     "webba-booking-lite",
                 ),
-                'hidden' => true,
+                "hidden" => true,
             ],
             "yes",
             true,
@@ -2430,9 +2654,9 @@ class WBK_Model
                     <strong>Two-ways (recommended):</strong> This mode will both import unavailable times from Connected Calendar to Webba Calendar and add Webba bookings to your Connected Calendar.<br><br>',
                     "webba-booking-lite",
                 ),
-                'radio_type' => 'dots'
+                "radio_type" => "dots",
             ],
-            'Two-ways',
+            "Two-ways",
             true,
             true,
             true,
@@ -2445,7 +2669,7 @@ class WBK_Model
             "wbk_google_access_token",
             null,
             [
-                'hidden' => true,
+                "hidden" => true,
             ],
             "general",
             true,
@@ -2980,6 +3204,268 @@ class WBK_Model
 
         $table->sync_structure();
         $table = WbkData()->models->add($table, $db_prefix . "wbk_forms");
+
+        // Locations
+        $table = new WbkData\Model($db_prefix . "wbk_locations");
+        $table->set_single_item_name(__("Location", "webba-booking-lite"));
+        $table->set_multiple_item_name(__("Locations", "webba-booking-lite"));
+        $table->sections["general"] = __("General", "webba-booking-lite");
+
+        $tooltip = __("Enter location name.", "webba-booking-lite");
+        $table->add_field(
+            "location_name",
+            "name",
+            __("Name", "webba-booking-lite"),
+            "text",
+            "general",
+            ["tooltip" => $tooltip],
+        );
+
+        $tooltip = __("Enter a description of the location.", "webba-booking-lite");
+        $table->add_field(
+            "location_description",
+            "description",
+            __("Description", "webba-booking-lite"),
+            "editor",
+            "general",
+            [
+                "tooltip" => $tooltip,
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+        $tooltip = __("Enter address.", "webba-booking-lite");
+        $table->add_field(
+            "location_address",
+            "address",
+            __("Address", "webba-booking-lite"),
+            "text",
+            "general",
+            ["tooltip" => $tooltip],
+            "",
+            true,
+            true,
+            false,
+        );
+
+        $table->sync_structure();
+        WbkData()->models->add($table, $db_prefix . "wbk_locations");
+
+        // Staff members
+        $table = new WbkData\Model($db_prefix . "wbk_staff_members");
+        $table->set_single_item_name(__("Staff member", "webba-booking-lite"));
+        $table->set_multiple_item_name(__("Staff members", "webba-booking-lite"));
+        $table->sections["general"] = __("General", "webba-booking-lite");
+        $table->sections["hours"] = __("Schedule", "webba-booking-lite");
+
+        $tooltip = __("Enter staff member name.", "webba-booking-lite");
+        $table->add_field(
+            "staff_name",
+            "name",
+            __("Name", "webba-booking-lite"),
+            "text",
+            "general",
+            ["tooltip" => $tooltip],
+        );
+
+        $tooltip = __("Enter staff member email address.", "webba-booking-lite");
+        $table->add_field(
+            "staff_email",
+            "email",
+            __("Email", "webba-booking-lite"),
+            "text",
+            "general",
+            [
+                "tooltip" => $tooltip,
+                "sub_type" => "email",
+            ],
+            "",
+            true,
+            true,
+            false,
+        );
+
+        $tooltip = __(
+            "Select the WordPress user associated with this staff member.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "staff_wordpress_user",
+            "wordpress_user",
+            __("WordPress user", "webba-booking-lite"),
+            "select",
+            "general",
+            [
+                "tooltip" => $tooltip,
+                "options" => "backend",
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __("Select a photo for this staff member.", "webba-booking-lite");
+        $table->add_field(
+            "staff_photo",
+            "photo",
+            __("Photo", "webba-booking-lite"),
+            "file",
+            "general",
+            [
+                "tooltip" => $tooltip,
+            ],
+            "",
+            true,
+            true,
+            false,
+        );
+
+        $tooltip = __(
+            "Select the services that this staff member can provide.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "staff_services",
+            "services",
+            __("Services", "webba-booking-lite"),
+            "select",
+            "general",
+            [
+                "tooltip" => $tooltip,
+                "items" => WBK_Model_Utils::get_services(),
+                "options" => "services",
+                "multiple" => true,
+            ],
+            null,
+            true,
+            true,
+            false,
+        );
+
+        $tooltip = __("Select the location where this staff member works.", "webba-booking-lite");
+        $table->add_field(
+            "staff_locations",
+            "locations",
+            __("Locations", "webba-booking-lite"),
+            "select",
+            "general",
+            [
+                "tooltip" => $tooltip,
+                "options" => "locations",
+                "multiple" => true,
+            ],
+            null,
+            true,
+            true,
+            false,
+        );
+
+        $tooltip = __(
+            "Select the connected calendar(s) available for this staff member.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "staff_connected_calendars",
+            "connected_calendars",
+            __("Connected calendars", "webba-booking-lite"),
+            "select",
+            "integrations",
+            [
+                "tooltip" => $tooltip,
+                "options" => "connected_calendars",
+                "multiple" => true,
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __(
+            "Select the days and time intervals when this staff member is available.",
+            "webba-booking-lite",
+        );
+        $business_hours_default = [
+            [
+                "start" => 32400,
+                "end" => 46800,
+                "day_of_week" => "1",
+                "status" => "active",
+            ],
+            [
+                "start" => 50400,
+                "end" => 64800,
+                "day_of_week" => "1",
+                "status" => "active",
+            ],
+            [
+                "start" => 32400,
+                "end" => 46800,
+                "day_of_week" => "2",
+                "status" => "active",
+            ],
+            [
+                "start" => 50400,
+                "end" => 64800,
+                "day_of_week" => "2",
+                "status" => "active",
+            ],
+            [
+                "start" => 32400,
+                "end" => 46800,
+                "day_of_week" => "3",
+                "status" => "active",
+            ],
+            [
+                "start" => 50400,
+                "end" => 64800,
+                "day_of_week" => "3",
+                "status" => "active",
+            ],
+            [
+                "start" => 32400,
+                "end" => 46800,
+                "day_of_week" => "4",
+                "status" => "active",
+            ],
+            [
+                "start" => 50400,
+                "end" => 64800,
+                "day_of_week" => "4",
+                "status" => "active",
+            ],
+            [
+                "start" => 32400,
+                "end" => 46800,
+                "day_of_week" => "5",
+                "status" => "active",
+            ],
+            [
+                "start" => 50400,
+                "end" => 64800,
+                "day_of_week" => "5",
+                "status" => "active",
+            ],
+        ];
+
+        $table->add_field(
+            "staff_business_hours",
+            "business_hours",
+            __("Business hours", "webba-booking-lite"),
+            "wbk_business_hours",
+            "hours",
+            ["tooltip" => $tooltip],
+            $business_hours_default,
+            true,
+            false,
+            false,
+        );
+
+        $table->sync_structure();
+        WbkData()->models->add($table, $db_prefix . "wbk_staff_members");
     }
 }
 ?>

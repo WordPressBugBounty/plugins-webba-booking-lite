@@ -1,0 +1,173 @@
+.wbk_shadowOption__wrapper {
+    position: relative;
+    display: flex;
+    flex-flow: column;
+    gap: 8px;
+}
+
+.wbk_shadowOption__inputPreview {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0 10px;
+
+    &:hover {
+        border-color: #9ca3af;
+    }
+}
+
+.wbk_shadowOption__colorSwatch {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    margin-right: 10px;
+    border: 1px solid #d6d6d6;
+}
+
+.wbk_shadowOption__previewText {
+    flex: 1;
+    font-family: typography.$font-primary;
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wbk_shadowOption__popup {
+    position: absolute;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #d0d3db;
+    box-shadow: 0px 6px 24px rgba(30, 41, 59, 0.1);
+    border-radius: 10px;
+    padding: 24px;
+    min-width: 360px;
+    margin-top: 8px;
+    right: 0;
+    top: 100%;
+}
+
+.wbk_shadowOption__popupHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+}
+
+.wbk_shadowOption__popupTitle {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.wbk_shadowOption__removeButton {
+    background: none;
+    border: none;
+    color: #4094f7;
+    padding: 0;
+    cursor: pointer;
+    font-size: 13px;
+
+    &:hover {
+        color: #2563eb;
+    }
+}
+
+.wbk_shadowOption__colorRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.wbk_shadowOption__label {
+    min-width: 70px;
+}
+
+.wbk_shadowOption__colorInput {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    margin-right: 8px;
+    margin-left: auto;
+}
+
+.wbk_shadowOption__colorTextInput {
+    width: 66px;
+    text-align: center;
+    border: 1px solid #d0d3db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-family: monospace;
+    background: #f9f9f9;
+}
+
+.wbk_shadowOption__sliderRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.wbk_shadowOption__sliderContainer {
+    flex: 1;
+}
+
+.wbk_shadowOption__numberInput {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #d0d3db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.wbk_shadowOption__selectRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wbk_shadowOption__selectContainer {
+    flex: 1;
+}
+
+.wbk_shadowOption__slider {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    position: relative;
+}
+
+.wbk_shadowOption__track {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+}
+
+.wbk_shadowOption__thumb {
+    height: 16px;
+    width: 16px;
+    background: #4094f7;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    margin-top: -5px;
+
+    &:hover {
+        background: #2563eb;
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 3px rgba(64, 148, 247, 0.2);
+    }
+}

@@ -1,6 +1,6 @@
 import { CellContext } from '@tanstack/react-table'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import styles from './Status.module.scss'
+import './Status.scss'
 import classNames from 'classnames'
 import { __ } from '@wordpress/i18n'
 import { dispatch } from '@wordpress/data'
@@ -15,10 +15,13 @@ export const StatusCell = ({ getValue, row, table }: CellContext<any, any>) => {
     )
     const value = getValue() as Status
     const [open, setOpen] = useState(false)
-    const [current, setCurrent] = useState(
-        options.filter((o) => o.value === value)[0]
+    const [current, setCurrent] = useState<IOption | undefined>(() =>
+        options.find((o) => o.value === value) ?? options[0]
     )
-    const { label } = useMemo(() => current, [current, value])
+    const label = useMemo(
+        () => current?.label ?? '',
+        [current, value]
+    )
     const totalRows = table.getRowModel().rows.length
     const isLastTwo = row.index >= totalRows - 2
 
@@ -37,7 +40,7 @@ export const StatusCell = ({ getValue, row, table }: CellContext<any, any>) => {
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             const target = event.target as Element
-            if (open && !target.closest(`.${styles.statusWrapper}`)) {
+            if (open && !target.closest('.wbk_status__statusWrapper')) {
                 setOpen(false)
             }
         }
@@ -49,31 +52,35 @@ export const StatusCell = ({ getValue, row, table }: CellContext<any, any>) => {
         }
     }, [open])
 
-    useEffect(()=> {
-        setCurrent(options.filter((o) => o.value === getValue())[0])
+    useEffect(() => {
+        const match = options.find((o) => o.value === getValue())
+        setCurrent(match ?? options[0])
     }, [getValue])
 
     return (
         <div
-            className={classNames(styles.statusWrapper, {
-                [styles.isLastTwo]: isLastTwo,
+            className={classNames('wbk_status__statusWrapper', {
+                'wbk_status__statusWrapper--isLastTwo': isLastTwo,
             })}
         >
             <div
-                className={classNames(styles.status, styles[current.value])}
+                className={classNames(
+                    'wbk_status__status',
+                    current?.value && `wbk_status__status--${current.value}`
+                )}
                 onClick={() => setOpen(!open)}
             >
-                <p className={styles.statusText}>{label}</p>
+                <p className="wbk_status__statusText">{label}</p>
             </div>
             <div
-                className={classNames(styles.optionsWrapper, {
-                    [styles.open]: open,
+                className={classNames('wbk_status__optionsWrapper', {
+                    'wbk_status__optionsWrapper--open': open,
                 })}
             >
                 {options &&
                     options.map((option) => (
                         <div
-                            className={styles.optionItem}
+                            className="wbk_status__optionItem"
                             key={option.value}
                             onClick={() => handleClick(option)}
                         >

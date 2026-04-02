@@ -8,7 +8,6 @@ import { createEmailField } from '../Fields/EmailField/EmailField'
 import { GenericFormField } from '../Fields/GenericFormField/GenericFormField'
 import { createGenericSelectField } from '../Fields/GenericSelectField/GenericSelectField'
 import { createNumericField } from '../Fields/NumericField/NumericField'
-import { createPaymentSelectField } from '../Fields/PaymentSelectField/PaymentSelectField'
 import { createTextField } from '../Fields/TextField/TextField'
 import { useField } from '../lib/hooks/useField'
 import {
@@ -20,11 +19,19 @@ import { FormSections, ResolvedFormField } from '../types'
 import { createRadioButton } from '../Fields/RadioButton/RadioButton'
 import { createTextareaField } from '../Fields/TextareaField/TextareaField'
 import { createDateField } from '../Fields/DateField/DateField'
+import { createDateMultipleField } from '../Fields/DateMultipleField/DateMultipleField'
 import { createCheckboxField } from '../Fields/CheckboxField/CheckboxField'
 import { CreateCustomFields } from '../Fields/CustomField/CustomField'
 import { InputWrapper } from '../Fields/InputWrapper/InputWrapper'
 import { createMultiCheckbox } from '../Fields/MultiCheckbox/MultiCheckbox'
 import { createColorField } from '../Fields/ColorField/ColorField'
+import { createFileUploadField } from '../Fields/FileUploadField/FileUploadField'
+import { createDurationField } from '../Fields/DurationField/DurationField'
+import { createZoomAuthField } from '../Fields/ZoomAuthField/ZoomAuthField'
+import { createPasswordField } from '../Fields/PasswordField/PasswordField'
+import { createLimitationField } from '../Fields/LimitationField/LimitationField'
+import { createNoticeField } from '../Fields/NoticeField/NoticeField'
+import { createSelectCustomField } from '../Fields/SelectCustomField/SelectCustomField'
 
 interface CustomFieldConfig {
     title?: string
@@ -54,78 +61,67 @@ export const getFieldComponentFromType = ({
         fieldConfig,
     }
 
-    if (name === 'email') {
-        return createEmailField(constructorConfig)
-    }
-
-    if (inputType === 'select') {
-        return createGenericSelectField(constructorConfig)
-    }
-
-    if (inputType === 'text') {
-        return createTextField(constructorConfig)
-    }
-
-    if (inputType === 'number') {
-        return createNumericField(constructorConfig)
-    }
-
-    if (inputType === 'textarea') {
-        return createTextareaField(constructorConfig)
-    }
-
-    if (inputType === 'editor') {
-        return createEditorField(constructorConfig)
-    }
-
-    if (inputType === 'business_hours') {
-        return createBusinessHoursField(constructorConfig)
-    }
-
-    if (inputType === 'date_range') {
-        return createDateRangeField(constructorConfig)
-    }
-
-    if (inputType === 'radio') {
-        return createRadioButton(constructorConfig)
-    }
-
-    if (inputType === 'date') {
-        return createDateField(constructorConfig)
-    }
-
-    if (inputType === 'time') {
-        return createGenericSelectField(constructorConfig)
-    }
-
-    if (inputType === 'checkbox') {
-        return createCheckboxField(constructorConfig)
-    }
-
-    if (inputType === 'multicheckbox') {
-        return createMultiCheckbox(constructorConfig)
-    }
-
-    if (inputType === 'webba_custom_data') {
-        return CreateCustomFields(constructorConfig)
-    }
-
-    if (inputType === 'color') {
-        return createColorField(constructorConfig)
-    }
-
-    return ({ name, label }) => {
-        const { value, setValue } = useField(field)
-
-        return (
-            <GenericFormField
-                value={value}
-                onChange={setValue}
-                type="text"
-                label={label}
-                id={name}
-            />
-        )
+    switch (true) {
+        case name === 'email':
+            return createEmailField(constructorConfig)
+        case inputType === 'select':
+        case inputType === 'select_multiple':
+            return createGenericSelectField(constructorConfig)
+        case inputType === 'text':
+            return createTextField(constructorConfig)
+        case inputType === 'number':
+            return createNumericField(constructorConfig)
+        case inputType === 'textarea':
+            return createTextareaField(constructorConfig)
+        case inputType === 'editor':
+            return createEditorField(constructorConfig)
+        case inputType === 'business_hours':
+            return createBusinessHoursField(constructorConfig)
+        case inputType === 'date_range':
+            return createDateRangeField(constructorConfig)
+        case inputType === 'radio':
+            return createRadioButton(constructorConfig)
+        case inputType === 'date':
+            return createDateField(constructorConfig)
+        case inputType === 'date_multiple':
+            return createDateMultipleField(constructorConfig)
+        case inputType === 'time':
+            return createGenericSelectField(constructorConfig)
+        case inputType === 'checkbox':
+            return createCheckboxField(constructorConfig)
+        case inputType === 'multicheckbox':
+            return createMultiCheckbox(constructorConfig)
+        case inputType === 'webba_custom_data':
+            return CreateCustomFields(constructorConfig)
+        case inputType === 'color':
+            return createColorField(constructorConfig)
+        case inputType === 'file':
+            return createFileUploadField(constructorConfig)
+        case inputType === 'duration':
+            return createDurationField(constructorConfig)
+        case inputType === 'zoom_auth':
+            return createZoomAuthField(constructorConfig)
+        case inputType === 'password':
+            return createPasswordField(constructorConfig)
+        case inputType === 'limitation':
+            return createLimitationField(constructorConfig)
+        case inputType === 'notice':
+            return createNoticeField(constructorConfig)
+        case inputType === 'select_custom':
+            return createSelectCustomField(constructorConfig)
+        default:
+            return ({ name, label }) => {
+                const { value, setValue } = useField(field)
+                return (
+                    <GenericFormField
+                        value={value}
+                        onChange={setValue}
+                        type="text"
+                        label={label}
+                        id={name}
+                    />
+                )
+            }
     }
 }
 
@@ -142,7 +138,9 @@ export const createFormMenuSectionsFromModel = function <T extends Model>({
 
     const shownFields = Object.keys(model.properties).filter(
         (property) =>
-            !config[property]?.hidden && !!model.properties[property].editable
+            !config[property]?.hidden &&
+            !model.properties[property].misc?.hidden &&
+            !!model.properties[property].editable
     )
 
     for (const fieldName of shownFields) {
@@ -161,8 +159,11 @@ export const createFormMenuSectionsFromModel = function <T extends Model>({
 
         const label = config[fieldName]?.title || modelField.title || fieldName
 
-        const dependencies = model.properties[fieldName].dependency
-
+        const dependencies = model.properties[fieldName]?.dependency?.length
+            ? model.properties[fieldName].dependency
+            : model.properties[fieldName]?.misc?.hide?.length
+              ? model.properties[fieldName].misc.hide
+              : []
         const component = (
             <InputWrapper field={formField} fieldConfig={modelField}>
                 <Component
@@ -177,8 +178,10 @@ export const createFormMenuSectionsFromModel = function <T extends Model>({
             tab: modelField.tab,
             name: fieldName,
             label,
-            element: dependencies.length ? (
-                <DependencyValidator field={formField}>
+            subsection: modelField.misc?.subsection || null,
+            required_plan: modelField.misc?.required_plan,
+            element: dependencies?.length ? (
+                <DependencyValidator field={formField} misc={modelField.misc}>
                     {component}
                 </DependencyValidator>
             ) : (
@@ -219,8 +222,26 @@ export const createEmptyObjectFromSchema = function <
     return object as Record<keyof T['properties'], any>
 }
 
-export const capitalize = (word: string) => {
-    return word.charAt(0).toUpperCase() + word.slice(1)
+const fixMalformedJsonQuotes = (jsonString: string): string => {
+    let result = jsonString
+    
+    result = result.replace(/(<[^>]*?[a-zA-Z-]+=)(\\?")([^"]*?)(\\?")([^>]*>)/g, (match, before, q1, value, q2, after) => {
+        if (value && value.includes('"') && !value.match(/\\"/)) {
+            const escapedValue = value.replace(/"/g, '\\"')
+            return before + '\\"' + escapedValue + '\\"' + after
+        }
+        return match
+    })
+    
+    result = result.replace(/(<[^>]*?[a-zA-Z-]+=)"([^"]*)"([^>]*>)/g, (match, before, value, after) => {
+        if (value && value.includes('"') && !value.match(/\\"/)) {
+            const escapedValue = value.replace(/"/g, '\\"')
+            return before + '\\"' + escapedValue + '\\"' + after
+        }
+        return match
+    })
+    
+    return result
 }
 
 export const safeParse = function <T = any>(
@@ -230,7 +251,99 @@ export const safeParse = function <T = any>(
     try {
         const getValue = () => {
             if (maybeJsonString) {
-                return JSON.parse(maybeJsonString)
+                if (typeof maybeJsonString !== 'string') {
+                    return maybeJsonString
+                }
+                const trimmed = maybeJsonString.trim()
+                if (!trimmed || trimmed === '') {
+                    return defaultValue || null
+                }
+
+                try {
+                    const parsed = JSON.parse(trimmed)
+                    if (typeof parsed === 'string') {
+                        try {
+                            return JSON.parse(parsed)
+                        } catch {
+                            return parsed
+                        }
+                    }
+                    return parsed
+                } catch (firstError) {
+                    let toTry = trimmed
+                    
+                    if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+                        try {
+                            const firstParse = JSON.parse(trimmed)
+                            if (typeof firstParse === 'string') {
+                                toTry = firstParse
+                            } else {
+                                return firstParse
+                            }
+                        } catch {
+                        }
+                    }
+                    
+                    try {
+                        return JSON.parse(toTry)
+                    } catch (secondError) {
+                        try {
+                            let fixed = toTry
+                            
+                            fixed = fixed.replace(/(<[^>]*?href=)(\\?")([^"]*?)(\\?")([^>]*>)/g, (match, before, q1, value, q2, after) => {
+                                if (value.includes('#') && !value.includes('\\"')) {
+                                    return before + '\\"#' + '\\"' + after
+                                }
+                                return match
+                            })
+                            
+                            fixed = fixed.replace(/(<[^>]*?href=)"([^"]*)"([^>]*>)/g, (match, before, value, after) => {
+                                if (value.includes('#') && !value.includes('\\"')) {
+                                    return before + '\\"#' + '\\"' + after
+                                }
+                                return match
+                            })
+                            
+                            const parsed = JSON.parse(fixed)
+                            console.log('Successfully fixed and parsed malformed JSON')
+                            return parsed
+                        } catch (thirdError) {
+                            try {
+                                const fixed = fixMalformedJsonQuotes(toTry)
+                                const parsed = JSON.parse(fixed)
+                                console.log('Successfully fixed with fixMalformedJsonQuotes')
+                                return parsed
+                            } catch (fourthError) {
+                                console.log('Failed to fix JSON, trying alternative methods')
+                                let unescaped = toTry
+                                
+                                const hasExtraEscaping = 
+                                    unescaped.includes('\\\\') || 
+                                    (unescaped.match(/\\"/g) && unescaped.match(/"/g) && 
+                                     unescaped.match(/\\"/g)!.length > unescaped.match(/"/g)!.length)
+                                
+                                if (hasExtraEscaping) {
+                                    unescaped = unescaped.replace(/\\\\/g, '\\')
+                                    unescaped = unescaped.replace(/\\"/g, '"')
+                                    try {
+                                        const parsed = JSON.parse(unescaped)
+                                        if (typeof parsed === 'string') {
+                                            try {
+                                                return JSON.parse(parsed)
+                                            } catch {
+                                                return parsed
+                                            }
+                                        }
+                                        return parsed
+                                    } catch {
+                                    }
+                                }
+                                
+                                throw firstError
+                            }
+                        }
+                    }
+                }
             }
 
             if (defaultValue) {
@@ -245,9 +358,18 @@ export const safeParse = function <T = any>(
             error: null,
         }
     } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : String(e)
+        const errorStack = e instanceof Error ? e.stack : undefined
+        console.error('JSON parse error:', {
+            error: errorMessage,
+            stack: errorStack,
+            errorObject: e,
+            input: maybeJsonString?.substring(0, 200),
+            inputLength: maybeJsonString?.length,
+        })
         return {
             value: null,
-            error: e as Error,
+            error: e instanceof Error ? e : new Error(String(e)),
         }
     }
 }

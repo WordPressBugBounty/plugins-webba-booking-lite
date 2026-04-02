@@ -1,6 +1,6 @@
 import { FilterForm } from '../../components/Filter/FilterForm'
 import { filterFields } from './FilterConfigs'
-import styles from './Dashboard.module.scss'
+import './Dashboard.scss'
 import { Chart } from './Chart'
 import iconApprovedBookings from '../../../../public/images/data-approved-bookings-icon.png'
 import iconPendingBookings from '../../../../public/images/data-pending-bookings-icon.png'
@@ -18,15 +18,15 @@ export const Dashboard = () => {
         (select) => select(store_name).getDashboardStats(),
         []
     )
-    const filterForm = <FilterForm fields={filterFields} model="dashboard" />
+    const filterForm = <FilterForm fields={filterFields} model="dashboard" columnCount={3} />
     const balanceDetail = useMemo(() => {
         return (
-            <div className={styles.balanceDetail}>
-                <span className={styles.balancePositive}>
+            <div className="wbk_dashboard__balanceDetail">
+                <span className="wbk_dashboard__balancePositive">
                     {data?.balance_approved || 0}
                 </span>
                 <span>|</span>
-                <span className={styles.balanceNegative}>
+                <span className="wbk_dashboard__balanceNegative">
                     {data?.balance_pending || 0}
                 </span>
             </div>
@@ -34,12 +34,12 @@ export const Dashboard = () => {
     }, [data])
 
     return (
-        <div className={styles.wrapper}>
+        <div className="wbk_dashboard__wrapper">
             <RecentBookings />
-            <div className={styles.bottomContent}>
+            <div className="wbk_dashboard__bottomContent">
                 {filterForm}
                 {data && (
-                    <div className={styles.blocks}>
+                    <div className="wbk_dashboard__blocks">
                         <Stat
                             icon={iconRevenue}
                             title={data?.balance}

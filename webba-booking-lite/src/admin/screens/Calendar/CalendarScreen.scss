@@ -1,0 +1,111 @@
+@mixin wbk_calendar_event {
+    border-color: #d8eded;
+    margin: 0;
+    border-left: 10px solid transparent;
+    border-radius: 4px;
+    padding: 0 0 0 2px;
+    background-color: transparent;
+    color: #212121;
+}
+
+.wbk_calendar__eventWrapper {
+    border-radius: 4px;
+
+    @each $status, $color in colors.$status-colors {
+    &.wbk_calendar__eventWrapper--#{$status} {
+            .rbc-event {
+                border-left-color: $color;
+            }
+        }
+    }
+}
+
+.wbk_calendar__wrapper {
+    padding: 0 20px 0 20px;
+
+    .rbc-header {
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .rbc-toolbar {
+        margin: 20px;
+
+        label {
+            padding: 20px 0;
+        }
+
+        button {
+            transition: 0.2s all ease-in-out;
+
+            &.rbc-active,
+            &:active,
+            &:focus {
+                background-color: #1f6763;
+                color: #ffffff;
+                border-color: #1f6763;
+            }
+
+            &.rbc-active {
+                background-color: #1f6763;
+                color: #ffffff;
+                border-color: #1f6763;
+            }
+
+            &:hover {
+                background-color: lighten(#1f6763, 5%);
+                color: #ffffff;
+                border-color: #1f6763;
+            }
+        }
+    }
+
+    .rbc-event {
+        @include wbk_calendar_event;
+    }
+
+    .wbk_calendar__toolWrapper {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+        margin-bottom: 20px;
+
+        .wbk_calendar__filterWrapper {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+            flex-flow: column-reverse;
+
+            .wbk_calendar__addButton {
+                margin-left: 0;
+            }
+        }
+    }
+
+    .rbc-show-more {
+        color: #1f6763;
+    }
+
+    .wbk_calendar__addButton {
+        margin-left: auto;
+    }
+
+    .rbc-event[role='button'] {
+        background-color: inherit;
+    }
+}
+
+.rbc-overlay {
+    .rbc-event {
+        @include wbk_calendar_event;
+
+        &:not(:last-child) {
+            margin-bottom: 1px;
+        }
+    }
+}

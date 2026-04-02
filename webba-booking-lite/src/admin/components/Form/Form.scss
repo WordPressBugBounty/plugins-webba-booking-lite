@@ -1,0 +1,356 @@
+.wbk_form__container {
+    font-family: typography.$font-primary;
+    font-weight: 400;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    height: 100%;
+
+    * {
+        box-sizing: border-box;
+    }
+}
+
+.wbk_form__form {
+    height: calc(100% - 90px);
+    overflow-y: auto;
+}
+
+.wbk_form__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #000;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.wbk_form__headerTitle {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 30px;
+}
+
+.wbk_form__closeBtn {
+    all: unset;
+    cursor: pointer;
+    border-radius: 10px;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 !important;
+    position: relative;
+
+    &:hover {
+        .wbk_form__closeBtnText {
+            display: flex;
+        }
+    }
+}
+
+.wbk_form__resetButton {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    font-family: typography.$font-primary !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    color: #6b7280 !important;
+    width: auto !important;
+}
+
+.wbk_form__sectionNavigationWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.wbk_form__sectionNavigation {
+    flex: 1;
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 2px 20px 0;
+    gap: 0;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.wbk_form__sectionNavigationArrow {
+    all: unset;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    transition: background-color 200ms ease;
+    z-index: 1;
+
+    &:hover {
+        background-color: #f3f4f6;
+    }
+
+    &:active {
+        background-color: #e5e7eb;
+    }
+
+    img {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.wbk_form__sectionNavigationBtn {
+    all: unset;
+    cursor: pointer;
+    padding: 14px 10px;
+    transition: opacity 200ms ease;
+    font-family: typography.$font-primary;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 100%;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.wbk_form__sectionNavigationBtnText {
+    transition: opacity 100ms ease;
+}
+
+.wbk_form__sectionNavigationBtn:not(.wbk_form__sectionNavigationBtn--active) .wbk_form__sectionNavigationBtnText:hover {
+    opacity: 0.7;
+}
+
+.wbk_form__sectionNavigationBtn--active {
+    color: #206764;
+    border-bottom: 2px solid #206764;
+}
+
+.wbk_form__buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid #e5e7eb;
+    margin-top: auto;
+    background-color: #f9fafb;
+    border-bottom-right-radius: 16px;
+    border-bottom-left-radius: 16px;
+}
+
+.wbk_form__editButtons {
+    display: flex;
+    gap: 5px;
+}
+
+.wbk_form__editButtons button {
+    all: unset;
+    cursor: pointer;
+    border: 1px solid #8a9393;
+    border-radius: 6px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wbk_form__input {
+    padding: 0px 20px;
+    border-radius: 15px;
+    height: 50px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #212121;
+    width: 100%;
+    max-width: 100%;
+}
+
+.wbk_form__invalidFormNotificationContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: typography.$font-primary;
+}
+
+.wbk_form__invalidFormNotificationHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wbk_form__invalidFormNotificationIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wbk_form__errorIcon {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+.wbk_form__invalidFormNotificationTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.wbk_form__invalidFormNotificationContent {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+    padding-left: 32px;
+
+    > div:first-child {
+        margin-bottom: 4px;
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    > div:last-child {
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+    }
+}
+
+.wbk_form__fieldWrapper:empty {
+    display: none;
+}
+
+.wbk_form__accordion {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.wbk_form__accordionHeader {
+    all: unset;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background-color 200ms ease;
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #f3f4f6;
+
+    &:hover {
+        background: darken(#f3f4f6, 10%);
+    }
+    &:active {
+        background: darken(#f3f4f6, 20%);
+    }
+}
+
+.wbk_form__accordionTitle {
+    font-size: 16px;
+    font-weight: 500;
+    color: #212121;
+}
+
+.wbk_form__accordionIcon {
+    width: 12px;
+    height: 12px;
+    transition: transform 300ms ease;
+    transform: rotate(-90deg);
+    display: inline-block;
+}
+
+.wbk_form__accordionIcon--open {
+    transform: rotate(0deg);
+}
+
+.wbk_form__accordionContent {
+    max-height: 0;
+    overflow: hidden;
+    transition:
+        max-height 300ms ease,
+        padding 300ms ease;
+    box-sizing: border-box;
+    background: #fff;
+}
+
+.wbk_form__accordionContent--open {
+    max-height: 4000px;
+}
+
+.wbk_form__fieldsWithSubsections {
+    display: flex;
+    flex-direction: column;
+}
+
+.wbk_form__innerFieldsWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px;
+    position: relative;
+}
+
+.wbk_form__buttonCancel {
+    margin-left: auto;
+}
+
+.wbk_form__submitButtonIconWrapper {
+    display: inline-flex;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+
+    svg {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.wbk_form__closeBtnText {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 99%;
+    white-space: nowrap;
+    background: #1f6763;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #fff;
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.wbk_form__proFeatureWrapper {
+    position: relative;
+}
+
+.wbk_form__proFeatureButton {
+    position: absolute;
+    left: 50%;
+    top: 100px;
+    transform: translateX(-50%);
+}

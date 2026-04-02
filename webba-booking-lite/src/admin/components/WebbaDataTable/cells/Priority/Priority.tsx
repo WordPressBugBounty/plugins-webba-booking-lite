@@ -1,5 +1,5 @@
 import { CellContext } from '@tanstack/react-table'
-import styles from './/Priority.module.scss'
+import './Priority.scss'
 import classNames from 'classnames'
 
 type TPriority = 1 | 10 | 20
@@ -16,8 +16,8 @@ export const PriorityCell = ({ getValue }: CellContext<any, any>) => {
     return (
         <div
             className={classNames(
-                styles.priority,
-                styles[priorityTitles[value].toString().toLocaleLowerCase()]
+                'wbk_priority__priority',
+                `wbk_priority__priority--${priorityTitles[value].toString().toLowerCase()}`
             )}
         >
             {priorityTitles[value]}

@@ -48,6 +48,8 @@ class WBK_Assets_Manager
             'wbk-pricing-rules',
             'wbk-dashboard',
             'wbk-spa',
+            'wbk-locations',
+            'wbk-staff-members',
         ];
 
         if (isset($_GET['page']) && in_array($_GET['page'], $admin_pages)) {
@@ -210,6 +212,8 @@ class WBK_Assets_Manager
             'wbk-pricing-rules',
             'wbk-dashboard',
             'wbk-spa',
+            'wbk-locations',
+            'wbk-staff-members',
             'wbk-options',
         ];
 

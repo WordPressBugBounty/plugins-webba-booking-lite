@@ -1,6 +1,7 @@
 import { CellContext } from '@tanstack/react-table'
 import { useMemo } from 'react'
 import metadata from '../../../../../schemas/email_templates.json'
+import './EmailReceivers.scss'
 
 export const EmailReceivers = ({ getValue }: CellContext<any, any>) => {
     const value: string[] = useMemo(() => {
@@ -14,13 +15,22 @@ export const EmailReceivers = ({ getValue }: CellContext<any, any>) => {
     const options: Record<string, string> =
         metadata.properties?.recipients.misc.options
 
-    const formattedOptions: string[] = useMemo(
-        () =>
-            value && value.map((receiver: string) =>
-                options[receiver] ? options[receiver] : receiver
-            ),
-        [value]
-    )
+    const getBadgeClass = (receiver: string) => {
+        if (receiver === 'customer') return 'wbk_emailReceivers__badge--customer'
+        if (receiver === 'admin') return 'wbk_emailReceivers__badge--admin'
+        return 'wbk_emailReceivers__badge--default'
+    }
 
-    return <div>{formattedOptions && formattedOptions.join(', ')}</div>
+    return (
+        <div className="wbk_emailReceivers__badges">
+            {value?.map((receiver: string) => (
+                <span
+                    key={receiver}
+                    className={`wbk_emailReceivers__badge ${getBadgeClass(receiver)}`}
+                >
+                    {options[receiver] ? options[receiver] : receiver}
+                </span>
+            ))}
+        </div>
+    )
 }

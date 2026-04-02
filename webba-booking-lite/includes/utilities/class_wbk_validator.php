@@ -124,6 +124,48 @@ class WBK_Validator
         }
         return false;
     }
+
+    /**
+     * Check if current user has access to bookings
+     *
+     * @return boolean true if has access
+     */
+    public static function checkStaffAccessToBookings(){
+        global $wpdb;
+        $user_id = get_current_user_id();
+
+        if ($user_id == 0) {
+            return false;
+        }
+
+        $staff_member_id = $wpdb->get_var(
+            $wpdb->prepare(
+                'SELECT id FROM ' .
+                get_option('wbk_db_prefix', '') .
+                'wbk_staff_members where wordpress_user = %d',
+                $user_id
+            )
+        );
+
+        if ($staff_member_id == 0 || $staff_member_id == null) {
+            return false;
+        }
+
+        $count = $wpdb->get_var(
+            $wpdb->prepare(
+                'SELECT count(*) as cnt FROM ' .
+                get_option('wbk_db_prefix', '') .
+                'wbk_appointments where staff_member_id = %d',
+                $staff_member_id
+            )
+        );
+        
+        if ($count > 0) {
+            return true;
+        }
+
+        return false;
+    }
     public static function checkAccessToGgCalendar($calendar_id)
     {
         global $current_user;

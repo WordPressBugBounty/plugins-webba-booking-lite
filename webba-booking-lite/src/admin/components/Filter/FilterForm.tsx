@@ -1,10 +1,11 @@
 import { FilterProvider } from './FilterProvider'
-import styles from './FilterForm.module.scss'
-import { useEffect, useRef, useState } from 'react'
+import './FilterForm.scss'
+import { useEffect, useState } from 'react'
 import { createFilterFields, createFilterStructure } from './utils'
 import { dispatch } from '@wordpress/data'
 import { store_name } from '../../../store/backend'
 import { IFilterFormProps, TAllowedFilterValue } from './types'
+import classNames from 'classnames'
 
 export const FilterForm = ({
     fields,
@@ -12,11 +13,12 @@ export const FilterForm = ({
     columnCount,
     customQuery,
     setCustomQuery,
+    classes,
+    preventFilterDispatch,
+    onFiltersChange,
 }: IFilterFormProps) => {
     const fieldComponents = createFilterFields(fields)
     const [fieldsObj, setFieldsObj] = useState(fields)
-    const isFirstRender = useRef(true)
-    const [fieldCounter, setFieldCounter] = useState(0)
 
     useEffect(() => {
         const query: TAllowedFilterValue<any>[] = createFilterStructure(
@@ -25,20 +27,20 @@ export const FilterForm = ({
         )
 
         setCustomQuery && setCustomQuery(query)
-        // @ts-ignore
-        dispatch(store_name).setFilters(model, query)
-
-        if (fieldCounter <= fieldsObj.length - 1) {
-            setFieldCounter(fieldCounter + 1)
-            return
+        onFiltersChange && onFiltersChange(query)
+        if (!preventFilterDispatch) {
+            // @ts-ignore
+            dispatch(store_name).setFilters(model, query)
         }
 
-        if (isFirstRender.current) {
-            isFirstRender.current = false
+        if (preventFilterDispatch) {
             return
         }
 
         if (model === 'dashboard') {
+            if (query.length < 3) {
+                return
+            }
             // @ts-ignore
             dispatch(store_name).filterDashboardStats(query)
 
@@ -56,7 +58,7 @@ export const FilterForm = ({
             model={model}
         >
             <div
-                className={styles.wrapper}
+                className={classNames('wbk_filterForm', classes)}
                 style={{
                     gridTemplateColumns: `repeat(${columnCount || 4}, 1fr)`,
                 }}

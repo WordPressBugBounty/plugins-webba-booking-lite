@@ -1,0 +1,101 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+
+    p {
+        margin: 0;
+        margin-top: 10px;
+    }
+
+    @media screen and (max-width: 768px) {
+        h2,
+        .headerAddButton {
+            display: none;
+        }
+    }
+}
+
+.wrapper {
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+    padding: 18px;
+
+    @media screen and (max-width: 768px) {
+        padding: 16px;
+        border-top: 1px solid #e5e7eb;
+    }
+}
+
+.tabWrapper {
+    margin-top: 24px;
+
+    .tabHeader {
+        background-color: #f3f4f6;
+        border-radius: 10px;
+        width: 100%;
+        padding: 4px;
+        display: flex;
+    }
+
+    .tabIndex {
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 100%;
+        letter-spacing: 0%;
+        text-align: center;
+        color: #111827;
+        transition: 0.3s all linear;
+        cursor: pointer;
+        user-select: none;
+        border: 1px solid transparent;
+
+        &.active {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0px 1px 2px 0px #0000000d;
+        }
+    }
+
+    .tabBody {
+        margin-top: 24px;
+        display: flex;
+        flex-flow: column;
+    }
+
+    .itemsWrapper {
+        display: flex;
+        flex-flow: column;
+        gap: 16px;
+        list-style-type: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+
+.reschedulePanel {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}
+
+.rescheduleFooter {
+    margin-top: auto;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid #efefef;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+}
+
+.toast {
+    margin-top: 50px;
+    font-size: 14px;
+    font-family: colors.$wbk-font;
+}

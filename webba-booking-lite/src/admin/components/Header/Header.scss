@@ -1,0 +1,162 @@
+.wbk_header * {
+    box-sizing: border-box;
+}
+
+.wbk_header {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid lightgray;
+    padding: 20px;
+    margin: 0 0 30px 0;
+    gap: 10px;
+    background-color: colors.$background-white;
+    max-height: 100px;
+}
+
+.wbk_header__title {
+    font-size: 22px;
+    line-height: 32px;
+    white-space: nowrap;
+    margin: 0;
+
+    @media (max-width: 768px) {
+        font-size: 18px;
+        line-height: 28px;
+    }
+}
+
+.wbk_header__logoLinkContainer {
+    display: flex;
+}
+
+.wbk_header__logoLink {
+    all: unset;
+    cursor: pointer;
+    display: block;
+    position: relative;
+
+    @media (max-width: 768px) {
+        width: 150px;
+    }
+}
+
+.wbk_header__logoImg {
+    width: 100%;
+    height: auto;
+    max-height: 80px;
+    object-fit: contain;
+    min-height: 80px;
+    min-width: 130px;
+
+    @media (max-width: 768px) {
+        max-width: 140px;
+    }
+}
+
+.wbk_header__tabItemsContainer {
+    width: 100%;
+    display: flex;
+    gap: 60px;
+    justify-content: flex-end;
+}
+
+.wbk_header__tabItem {
+    all: unset;
+    cursor: pointer;
+    text-align: center;
+}
+
+.wbk_header__tabItemActive {
+    font-weight: bold;
+}
+
+.wbk_header__verticalLine {
+    width: 1px;
+    height: 20px;
+    background-color: lightgray;
+}
+
+.wbk_header__quickLinksContainer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+
+    .wbk_header__quickLinksSeparator {
+        width: 1px;
+        height: 20px;
+        background-color: lightgray;
+    }
+
+    .wbk_header__iconButton {
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        gap: 0px;
+        overflow: hidden;
+        white-space: nowrap;
+        transition: width 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+
+        &:hover {
+            width: 190px;
+            padding: 0 10px;
+            background: #eef2f3;
+            border-color: #d1d5db;
+            gap: 2px;
+        }
+    }
+
+    .wbk_header__iconButtonLabel {
+        opacity: 0;
+        max-width: 0;
+        transition: opacity 0.15s ease, max-width 0.2s ease;
+        font-size: 13px;
+        font-weight: 600;
+        color: #22292f;
+    }
+
+    .wbk_header__iconButton:hover .wbk_header__iconButtonLabel {
+        opacity: 1;
+        max-width: 240px;
+    }
+
+    a,
+    .wbk_header__settingsLink {
+        color: #000;
+        font-size: 14px;
+        line-height: 20px;
+        font-weight: 500;
+        white-space: nowrap;
+        font-family: typography.$font-primary;
+        text-decoration: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+
+        &:not(:last-child) {
+            border-right: 1px solid lightgray;
+            padding-right: 10px;
+        }
+
+        &:last-child {
+            border-right: none;
+            padding-right: 0;
+        }
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    @include mobile {
+        display: none;
+    }
+}

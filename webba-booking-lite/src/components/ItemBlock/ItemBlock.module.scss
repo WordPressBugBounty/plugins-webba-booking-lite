@@ -1,0 +1,138 @@
+.wrapper {
+    border: 1px solid #e5e7eb;
+    background-color: #ffffff;
+    padding: 17px;
+    border-radius: 10px;
+}
+
+.heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    .title {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0%;
+        color: #111827;
+    }
+
+    .status {
+        border-radius: 9999px;
+        padding: 4px 6px;
+        font-weight: 300;
+        font-size: 12px;
+        line-height: 100%;
+        letter-spacing: 0%;
+
+        @media screen and (max-width: 768px) {
+            margin-left: auto;
+        }
+    }
+
+    .price {
+        margin-left: auto;
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 28px;
+        letter-spacing: 0%;
+        color: #111827;
+
+        @media screen and (max-width: 768px) {
+            display: none;
+        }
+    }
+}
+
+.itemContent {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 8px;
+
+    @media screen and (max-width: 768px) {
+        flex-flow: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .itemInfoWrapper {
+        display: flex;
+        flex-flow: column;
+        gap: 4px;
+
+        .itemInfo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 300;
+            font-size: 14px;
+            line-height: 20px;
+            letter-spacing: 0%;
+            color: #4b5563;
+        }
+    }
+
+    .actionsWrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        @media screen and (max-width: 768px) {
+            border-top: 1px solid #f3f4f6;
+            padding-top: 8px;
+            justify-content: flex-end;
+            width: 100%;
+        }
+    }
+
+    .itemButton {
+        border: 1px solid transparent;
+        border-radius: 8px;
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 100%;
+        letter-spacing: 0%;
+        text-align: center;
+        color: #374151;
+        padding: 8px 12px;
+        transition: 0.3s all ease;
+        cursor: pointer;
+        text-decoration: none;
+        outline: none;
+
+        &.primary {
+            border-color: #d1d5db;
+
+            &:hover {
+                background-color: lighten(#d1d5db, 10);
+            }
+        }
+
+        &.secondary {
+            border-color: #fca5a5;
+            color: #b91c1c;
+
+            &:hover {
+                background-color: lighten(#fca5a5, 10);
+            }
+        }
+    }
+}
+
+.mobilePrice {
+    margin-left: auto;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 28px;
+    letter-spacing: 0%;
+    color: #111827;
+    display: none;
+
+    @media screen and (max-width: 768px) {
+        display: block;
+        margin-right: auto;
+    }
+}

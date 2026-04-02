@@ -1,0 +1,22 @@
+.wbk_serviceDetail__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px 24px;
+    padding: 16px;
+    background-color: colors.$background-offwhite;
+}
+
+.wbk_serviceDetail__gridItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wbk_serviceDetail__label {
+    font-size: 0.875rem;
+    color: colors.$light-grey;
+}
+
+.wbk_serviceDetail__value {
+    font-size: 1rem;
+}

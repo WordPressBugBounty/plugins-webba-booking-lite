@@ -1,5 +1,5 @@
 import { Table } from '@tanstack/react-table'
-import styles from './Table.module.scss'
+import './Table.scss'
 import classNames from 'classnames'
 import { usePagination } from './hooks/usePagination'
 import { __ } from '@wordpress/i18n'
@@ -73,8 +73,8 @@ export const Pagination = ({ table }: PaginationProps) => {
     // }, [table.getPaginationRowModel()])
 
     return (
-        <div className={styles.paginationContainer}>
-            <div className={styles.itemCountWrapper}>
+        <div className="wbk_table__paginationContainer">
+            <div className="wbk_table__itemCountWrapper">
                 <p>{__('Show', 'webba-booking-lite')}</p>
                 <select
                     value={table.getState().pagination.pageSize}
@@ -91,7 +91,7 @@ export const Pagination = ({ table }: PaginationProps) => {
                 <p>{__('entries', 'webba-booking-lite')}</p>
             </div>
             {pageCount >= 2 && (
-                <div className={styles.paginationTools}>
+                <div className="wbk_table__paginationTools">
                     <button
                         onClick={() => {
                             table.previousPage()
@@ -105,11 +105,11 @@ export const Pagination = ({ table }: PaginationProps) => {
                             alt={__('Previous page', 'webba-booking-lite')}
                         />
                     </button>
-                    <div className={styles.pagination}>
+                    <div className="wbk_table__pagination">
                         {pagination.range.map((page) => {
                             if (page === 'dots') {
                                 return (
-                                    <div className={styles.paginationButton}>
+                                    <div className="wbk_table__paginationBtn">
                                         ...
                                     </div>
                                 )
@@ -120,9 +120,9 @@ export const Pagination = ({ table }: PaginationProps) => {
                             return (
                                 <button
                                     className={classNames(
-                                        styles.paginationButton,
+                                        'wbk_table__paginationBtn',
                                         {
-                                            [styles.active]:
+                                            'wbk_table__paginationBtn--active':
                                                 index === currentPageIndex,
                                         }
                                     )}

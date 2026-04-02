@@ -1,0 +1,172 @@
+.wbk_timeslots {
+    gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(99px, 1fr));
+    padding: 16px;
+
+    &--noitems {
+        padding: 0;
+    }
+
+    &__item {
+        border-radius: 4px;
+        border: 1px solid #edeff2;
+        background-color: #ffffff;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 22px;
+        letter-spacing: 1%;
+        vertical-align: middle;
+        color: #22292f;
+        transition: 0.2s all linear;
+        padding: 9px 18px;
+        white-space: nowrap;
+        width: 100%;
+        min-width: 100px;
+        cursor: pointer;
+        text-align: center;
+        flex: 1 0 120px;
+        max-width: 180px;
+        box-sizing: border-box;
+
+        &--selected {
+            border-color: colors.$wbk-color-border-selected;
+            color: colors.$wbk-primary-500;
+            background-color: colors.$wbk-primary-50;
+        }
+
+        &--max-reached,
+        &--disabled {
+            background-color: #f8f9fa;
+            border-color: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6 !important;
+        }
+
+        @include mobile {
+            padding: 9px 0;
+            min-width: 80px;
+        }
+    }
+
+    &__slot-appear {
+        animation: slotSlideFadeIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) both;
+    }
+
+    &__free-places {
+        font-size: 12px;
+        color: colors.$wbk-primary-500;
+    }
+
+    &__skeleton-slot {
+        height: 36px;
+        flex: 0 0 120px;
+        width: 100%;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        background: linear-gradient(
+            90deg,
+            #f0f0f0 25%,
+            #e0e0e0 50%,
+            #f0f0f0 75%
+        );
+        background-size: 400% 100%;
+        background-position: 100% 50%;
+        animation: skeleton-loading 1.2s infinite linear !important;
+    }
+
+    &__staff-members {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(22px, 1fr));
+        gap: 4px;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    &__staff-member-wrapper {
+        position: relative;
+        display: inline-flex;
+    }
+
+    &__staff-member {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        cursor: pointer;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        span {
+            font-size: 10px;
+            line-height: 1;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        &--selected {
+            border-color: colors.$wbk-color-border-selected;
+            box-shadow: 0 0 0 1px colors.$wbk-color-border-selected;
+        }
+    }
+
+    &__staff-tooltip {
+        position: absolute;
+        left: 50%;
+        bottom: calc(100% + 6px);
+        transform: translateX(-50%);
+        background: #111827;
+        color: #fff;
+        font-size: 11px;
+        line-height: 14px;
+        padding: 4px 6px;
+        border-radius: 4px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.15s ease;
+        z-index: 3;
+    }
+
+    &__staff-member-wrapper:hover &__staff-tooltip {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    @media screen and (max-width: 768px) {
+        grid-template-columns: repeat(3, minmax(50px, 1fr));
+    }
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+@keyframes slotSlideFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

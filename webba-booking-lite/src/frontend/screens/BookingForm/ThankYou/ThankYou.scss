@@ -1,0 +1,256 @@
+.wbk_thank_you__wrapper {
+
+    &,
+    * {
+        box-sizing: border-box;
+    }
+}
+
+.wbk_thank_you {
+    &__wrapper {
+        width: 100%;
+        max-width: 500px;
+        min-height: 750px;
+        max-height: 750px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 16px 0px #3f3f4629;
+        padding: 32px 24px;
+        background-color: #fff;
+
+        h1,
+        h3 {
+            font-weight: 400;
+            font-size: 20px;
+            line-height: 28px;
+            letter-spacing: 0.5%;
+            margin: 0;
+        }
+
+        h4 {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 24px;
+            letter-spacing: 0.5%;
+            margin: 0;
+        }
+
+        p,
+        li {
+            font-weight: 300;
+            font-size: 14px;
+            line-height: 18px;
+            letter-spacing: 1%;
+            color: #668091;
+            margin: 0;
+        }
+
+        strong {
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 22px;
+            letter-spacing: 1%;
+            vertical-align: middle;
+            color: #22292f;
+        }
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-flow: column;
+        gap: 24px;
+        width: 100%;
+
+        &__content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-flow: column;
+            gap: 8px;
+            text-align: center;
+        }
+
+        svg {
+            width: 88px;
+            height: 88px;
+            max-width: 88px;
+            max-height: 88px;
+            object-fit: contain;
+
+            path {
+                fill: colors.$wbk-bg-accent !important;
+            }
+        }
+
+        &--hidden {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            transform: translateY(40px);
+            transition:
+                opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        &--visible {
+            opacity: 1;
+            position: relative;
+            transform: translateY(0);
+            transition:
+                opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    }
+
+    // Outermost wrapper for box-shadow and border-radius
+    &__outer-wrapper {
+        width: 100%;
+        max-width: 750px;
+        min-height: 750px;
+        max-height: 750px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 16px 0px #3f3f4629;
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: flex-start;
+        margin: 0 auto;
+    }
+
+    &__inner-wrapper {
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 16px;
+        height: 100%;
+    }
+
+    &__information {
+        margin-top: auto;
+        width: 100%;
+
+        ul {
+            margin-top: 12px;
+        }
+    }
+
+    &__booking_items {
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-flow: column;
+        gap: 12px;
+        width: 100%;
+    }
+
+    &__panel-wrapper {
+        padding: 16px;
+        border: 1.5px solid #edeff2;
+        border-radius: 8px;
+        width: 100%;
+    }
+
+    &__cart-items {
+        margin-top: 12px;
+        display: flex;
+        flex-flow: column;
+
+        &__item {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+
+            &--total {
+                padding-top: 20px;
+                margin-top: 4px;
+                border-top: 1px solid #edeff2;
+
+                strong {
+                    color: colors.$wbk-primary-500;
+                }
+            }
+
+            &__total-right {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 2px;
+            }
+
+            &__tax-included {
+                margin: 0;
+                font-size: 12px;
+                font-weight: 400;
+                color: colors.$wbk-color-sidebar;
+                opacity: 0.85;
+            }
+        }
+    }
+
+    &__custom-scroll {
+        width: 100%;
+    }
+
+    &__staff_name {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 2px;
+        color: #668091;
+
+        svg {
+            width: 13px;
+            height: 13px;
+            opacity: 0.8;
+        }
+
+        small {
+            font-size: 12px;
+            line-height: 16px;
+            color: #668091;
+        }
+    }
+
+    &__calendar {
+        &--hidden {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            transform: translateY(40px);
+            transition:
+                opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        &--visible {
+            opacity: 1;
+            position: relative;
+            transform: translateY(0);
+            transition:
+                opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    }
+}
+
+// Red semi-transparent background for cancel icon
+.wbk_cancel_icon_bg {
+    background: rgba(220, 38, 38, 0.12); // red-600 with 12% opacity
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+
+    img {
+        width: 72px;
+        height: 72px;
+        max-width: 72px;
+        max-height: 72px;
+        object-fit: contain;
+    }
+}

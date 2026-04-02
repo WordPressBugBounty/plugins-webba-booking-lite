@@ -6,7 +6,8 @@ if (!defined('ABSPATH')) {
 $service = $data[0];
 $category_list = $data[1];
 $category = $data[2];
-$multiservice = $data[3] ?? false;
+$location = isset($data[3]) ? $data[3] : '0';
+$staff = isset($data[4]) ? $data[4] : '0';
 $allowed_params = [
     'admin_approve',
     'admin_cancel',
@@ -34,5 +35,5 @@ foreach ($allowed_params as $param) {
     data-category-list="<?php echo esc_attr(
         $category_list
     ); ?>" data-category="<?php echo esc_attr($category); ?>"
-    data-multiservice="<?php echo esc_attr($multiservice); ?>" <?php echo $extra_data_attrs; ?>></div>
+    data-location="<?php echo esc_attr($location); ?>" data-staff="<?php echo esc_attr($staff); ?>" <?php echo $extra_data_attrs; ?>></div>
     

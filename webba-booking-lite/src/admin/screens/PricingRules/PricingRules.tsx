@@ -14,6 +14,8 @@ import { createFormFromModel } from '../../components/Form/lib/createForm'
 import { PriorityCell } from '../../components/WebbaDataTable/cells/Priority/Priority'
 import { __ } from '@wordpress/i18n'
 import { PricingRuleType } from '../../components/WebbaDataTable/cells/PricingRuleType/PricingRuleType'
+import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
+import noItemsImage from '../../../../public/images/bookings-empty.png'
 
 const columns = generateColumnDefsFromModel(pricingRulesModel, {
     priority: {
@@ -33,11 +35,11 @@ const formSections = createFormMenuSectionsFromModel({
 })
 
 export const PricingRulesScreen = () => {
-    const { deleteItems, addItem } = useDispatch(store)
+    const { deleteItems, addItem, setToastNotification } = useDispatch(store)
     const { pricingRules, isLoading } = useSelect(
         (select) => ({
             pricingRules: select(store).getItems('pricing_rules'),
-            isLoading: select(store).getLoading(),
+            isLoading: select(store).getLoadingState('pricing_rules'),
         }),
         []
     )
@@ -76,7 +78,13 @@ export const PricingRulesScreen = () => {
                                 sections={formSections}
                                 onSubmit={async (data) => {
                                     await onSubmit(data)
-                                    sidebar.close()
+                                    setToastNotification({
+                                        type: 'success',
+                                        message: __(
+                                            'Changes were saved.',
+                                            'webba-booking-lite'
+                                        ),
+                                    })
                                 }}
                                 onDelete={async () => {
                                     await onDelete()
@@ -108,34 +116,38 @@ export const PricingRulesScreen = () => {
 
     const addModelItem = async (data: any) => {
         try {
-            await addItem('pricing_rules', data)
+            return await addItem('pricing_rules', data)
         } catch (e) {
             console.error('failed to add pricing rule', e)
         }
     }
 
     return (
-        <Table
-            title={__('Pricing rules', 'webba-booking-lite')}
-            addButtonTitle={__('Add Pricing Rule', 'webba-booking-lite')}
-            table={table}
-            loading={isLoading}
-            onDeleteSelected={onDeleteSelected}
-            onAdd={() =>
-                sidebar.open(
-                    <Form
-                        name={__('Add Pricing Rule', 'webba-booking-lite')}
-                        id="add-pricing-rule-form"
-                        form={form}
-                        sections={formSections}
-                        onSubmit={async (data) => {
-                            await addModelItem(data)
-                            sidebar.close()
-                        }}
-                    />
-                )
-            }
-            noItemsImageUrl={plugin_url + '/public/images/bookings-empty.png'}
-        />
+        <>
+            <Table
+                title={__('Pricing rules', 'webba-booking-lite')}
+                addButtonTitle={__('Add Pricing Rule', 'webba-booking-lite')}
+                table={table}
+                loading={isLoading}
+                onDeleteSelected={onDeleteSelected}
+                onAdd={() =>
+                    sidebar.open(
+                        <Form
+                            name={__('Add Pricing Rule', 'webba-booking-lite')}
+                            id="add-pricing-rule-form"
+                            form={form}
+                            sections={formSections}
+                            onSubmit={async (data) => {
+                                return await addModelItem(data)
+                            }}
+                        />
+                    )
+                }
+                noItemsImageUrl={
+                    noItemsImage
+                }
+            />
+            <SuccessMessage />
+        </>
     )
 }

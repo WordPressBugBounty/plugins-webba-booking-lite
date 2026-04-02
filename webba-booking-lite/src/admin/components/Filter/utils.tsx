@@ -147,3 +147,27 @@ export const formatDateRange = (range: [Date, Date]) =>
     formatWbkDate(range[0]) + ' - ' + formatWbkDate(range[1])
 
 export const formatWbkDate = (date: Date) => format(date, 'M/d/y')
+
+export const applyFiltersToFields = (
+    fields: IFilterField[],
+    filters: { name: string; value: any }[] | Record<string, unknown>
+): IFilterField[] => {
+    const filterArray = Array.isArray(filters) ? filters : []
+    if (!filterArray.length) return fields
+
+    const filterMap: Record<string, any[]> = {}
+    filterArray.forEach((f) => {
+        if (!filterMap[f.name]) filterMap[f.name] = []
+        filterMap[f.name].push(f.value)
+    })
+
+    return fields.map((field) => {
+        const values = filterMap[field.name]
+        if (!values || !values.length) return field
+        if (field.type === 'date_range') {
+            const [start = '', end = ''] = values
+            return { ...field, value: `${start} - ${end}` }
+        }
+        return { ...field, value: values.length === 1 ? values[0] : values }
+    })
+}

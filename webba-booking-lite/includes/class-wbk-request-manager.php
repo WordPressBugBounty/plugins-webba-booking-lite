@@ -58,11 +58,6 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "get_user_bookings"],
                 "permission_callback" => [$this, "get_user_bookings_permission"],
             ] );
-            register_rest_route( "wbk/v2", "/get-time-slots", [
-                "methods"             => "GET",
-                "callback"            => [$this, "get_time_slots"],
-                "permission_callback" => [$this, "get_time_slots_permission"],
-            ] );
             register_rest_route( "wbk/v2", "/update-booking", [
                 "methods"             => "POST",
                 "callback"            => [$this, "update_booking"],
@@ -102,6 +97,11 @@ class WBK_Request_Manager {
                 "methods"             => "GET",
                 "callback"            => [$this, "get_service_availability"],
                 "permission_callback" => [$this, "get_service_availability_permission"],
+            ] );
+            register_rest_route( "webba-booking/v1", "/get-staff-members/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_staff_members"],
+                "permission_callback" => [$this, "get_staff_members_permission"],
             ] );
             register_rest_route( "wbk/v1", "/get-available-time-slots-day/", [
                 "methods"             => "POST",
@@ -178,24 +178,12 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "remove_zoom_auth"],
                 "permission_callback" => [$this, "remove_zoom_auth_permission"],
             ] );
-            register_rest_route( 'wbk/v2', 'update-user-calendar/', [
+            register_rest_route( "wbk/v2", "update-user-calendar/", [
                 "methods"             => "POST",
                 "callback"            => [$this, "update_user_calendar"],
                 "permission_callback" => [$this, "update_user_calendar_permission"],
             ] );
         } );
-        add_action( "wp_ajax_wbk_calculate_amounts", [$this, "calculate_amounts"] );
-        add_action( "wp_ajax_nopriv_wbk_calculate_amounts", [$this, "calculate_amounts"] );
-        add_action( "wp_ajax_wbk_search_time", [$this, "search_time"] );
-        add_action( "wp_ajax_nopriv_wbk_search_time", [$this, "search_time"] );
-        add_action( "wp_ajax_wbk-render-days", [$this, "render_days"] );
-        add_action( "wp_ajax_nopriv_wbk-render-days", [$this, "render_days"] );
-        add_action( "wp_ajax_wbk_render_booking_form", [$this, "render_booking_form"] );
-        add_action( "wp_ajax_nopriv_wbk_render_booking_form", [$this, "render_booking_form"] );
-        add_action( "wp_ajax_wbk_book", [$this, "book"] );
-        add_action( "wp_ajax_nopriv_wbk_book", [$this, "book"] );
-        add_action( "wp_ajax_wbk_prepare_payment", [$this, "prepare_payment"] );
-        add_action( "wp_ajax_nopriv_wbk_prepare_payment", [$this, "prepare_payment"] );
         add_action( "wp_ajax_wbk_cancel_appointment", [$this, "cancel_booking"] );
         add_action( "wp_ajax_nopriv_wbk_cancel_appointment", [$this, "cancel_booking"] );
         add_action( "wp_ajax_wbk_schedule_tools_action", [$this, "schedule_tools_action"] );
@@ -474,6 +462,7 @@ class WBK_Request_Manager {
         $times = [];
         $booking_services = [];
         $quantities = [];
+        $staff_members = [];
         foreach ( $places as $service_id => $slots ) {
             if ( !WBK_Validator::check_integer( $service_id, 1, 2758537351 ) ) {
                 return new WP_REST_Response([
@@ -501,6 +490,7 @@ class WBK_Request_Manager {
                 $times[] = intval( $time );
                 $booking_services[] = intval( $service_id );
                 $quantities[] = intval( $quantity );
+                $staff_members[] = ( isset( $slot["staff_member_id"] ) ? intval( $slot["staff_member_id"] ) : null );
             }
         }
         // Validate services from the services array
@@ -537,6 +527,9 @@ class WBK_Request_Manager {
                 $desc,
                 $extra_data
             );
+            if ( isset( $staff_members[$i] ) && $staff_members[$i] !== null ) {
+                $booking->set_staff_member( $staff_members[$i] );
+            }
             $bookings[] = $booking;
         }
         // Calculate totals
@@ -559,7 +552,7 @@ class WBK_Request_Manager {
                 $coupon_result = null;
             }
         }
-        $pay_full_amount = isset( $params['pay_full_amount'] ) && ($params['pay_full_amount'] === true || $params['pay_full_amount'] === 'true' || $params['pay_full_amount'] === 1);
+        $pay_full_amount = isset( $params["pay_full_amount"] ) && ($params["pay_full_amount"] === true || $params["pay_full_amount"] === "true" || $params["pay_full_amount"] === 1);
         $payment_data = WBK_Price_Processor::get_payment_items(
             $bookings,
             0,
@@ -1017,59 +1010,6 @@ class WBK_Request_Manager {
         return $response;
     }
 
-    public function get_time_slots_permission( $request ) {
-        return is_user_logged_in();
-    }
-
-    public function get_time_slots( $request ) {
-        WBK_Translation_Processor::switch_to_locale_from_get_param();
-        $day = explode( "00:00:00", $request["date"] );
-        $day = $day[0];
-        if ( !WBK_Validator::is_date( $day ) ) {
-            return $this->response_error( "Wrong date." );
-        }
-        date_default_timezone_set( "UTC" );
-        $day = date( "d-m-Y", strtotime( $day ) - $request["offset"] * 60 );
-        date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
-        $day = strtotime( $day . " 00:00:00" );
-        $services = [];
-        if ( isset( $request["services"] ) && $request["services"] != "" ) {
-            $services = explode( ",", $request["services"] );
-        }
-        if ( isset( $request["booking"] ) ) {
-            if ( ctype_digit( $request["booking"] ) ) {
-                $booking = new WBK_Booking($request["booking"]);
-                if ( $booking->is_loaded() ) {
-                    $services = [$booking->get_service()];
-                }
-            }
-        }
-        if ( count( $services ) == 0 ) {
-            return $this->response_error( "No valid services found." );
-        }
-        foreach ( $services as $service_id ) {
-            if ( !WBK_Validator::is_service_exists( $service_id ) ) {
-                return $this->response_error( "Wrong service ID." );
-            }
-            $sp = new WBK_Schedule_Processor();
-            $timeslots = $sp->get_time_slots_by_day( $day, $service_id, [
-                "skip_gg_calendar"       => false,
-                "ignore_preparation"     => false,
-                "calculate_availability" => true,
-                "filter_availability"    => false,
-            ] );
-            if ( $booking->is_loaded() ) {
-                $filtered = array_values( array_filter( $timeslots, fn( $obj ) => $obj->get_free_places() >= $booking->get_quantity() ) );
-            } else {
-                $filtered = $timeslots;
-            }
-        }
-        return new \WP_REST_Response([
-            "status"    => "success",
-            "timeslots" => $filtered,
-        ], 200);
-    }
-
     public function update_booking_permission( $request ) {
         if ( !isset( $request["booking"] ) || !ctype_digit( $request["booking"] ) ) {
             return false;
@@ -1183,6 +1123,15 @@ class WBK_Request_Manager {
             }
             $name = WBK_Translation_Processor::translate_string( "webba_service_" . $id, $name );
             $description = WBK_Translation_Processor::translate_string( "webba_service_description_" . $id, $service->get_description() );
+            // Get locations for the service
+            $locations = $service->get( "locations" );
+            $locations_array = [];
+            if ( !empty( $locations ) ) {
+                $locations_decoded = json_decode( $locations );
+                if ( is_array( $locations_decoded ) ) {
+                    $locations_array = $locations_decoded;
+                }
+            }
             $service_data = [
                 "id"                    => $id,
                 "value"                 => $id,
@@ -1201,6 +1150,8 @@ class WBK_Request_Manager {
                 "consecutive_timeslots" => $service->get( "consecutive_timeslots" ) === "yes",
                 "group_booking"         => $service->get( "group_booking" ) === "yes",
                 "limited_timeslot"      => $service->get( "limited_timeslot" ) === "yes",
+                "locations"             => $locations_array,
+                "staff_members"         => WBK_Model_Utils::get_staff_member_ids_by_service( $id ),
                 "hide_price"            => $service->get_hide_price(),
             ];
             $services_arr[] = $service_data;
@@ -1227,20 +1178,68 @@ class WBK_Request_Manager {
             $current_user = wp_get_current_user();
             $user = $current_user->user_login;
             $current_user_email = $current_user->user_email;
+        } else {
+            $user = false;
+            $current_user_email = false;
         }
-        $coupons_enabled = get_option( 'wbk_allow_coupons', 'yes' ) === 'yes';
-        if ( !WBK_Feature_Gate::have_required_plan( 'premium' ) ) {
+        $coupons_enabled = get_option( "wbk_allow_coupons", "yes" ) === "yes";
+        if ( !WBK_Feature_Gate::have_required_plan( "premium" ) ) {
             $coupons_enabled = false;
         }
+        // Get locations data
+        $location_ids = WBK_Model_Utils::get_location_ids();
+        $locations_arr = [];
+        foreach ( $location_ids as $location_id ) {
+            $location = new WBK_Location($location_id);
+            if ( !$location->is_loaded() ) {
+                continue;
+            }
+            $name = WBK_Translation_Processor::translate_string( "webba_location_" . $location_id, $location->get_name() );
+            $description = WBK_Translation_Processor::translate_string( "webba_location_description_" . $location_id, $location->get_description() );
+            $location_data = [
+                "id"          => $location_id,
+                "value"       => $location_id,
+                "label"       => $name,
+                "description" => $description,
+            ];
+            $locations_arr[] = $location_data;
+        }
+        // Get staff members data
+        $staff_member_ids = WBK_Model_Utils::get_staff_member_ids();
+        $staff_members_arr = [];
+        foreach ( $staff_member_ids as $staff_member_id ) {
+            $staff_member = new WBK_Staff_Member($staff_member_id);
+            if ( !$staff_member->is_loaded() ) {
+                continue;
+            }
+            $name = $staff_member->get_name();
+            $photo = $staff_member->get_photo();
+            $services = $staff_member->get_services();
+            $locations = $staff_member->get_locations();
+            $staff_member_data = [
+                "id"                  => $staff_member_id,
+                "value"               => $staff_member_id,
+                "label"               => $name,
+                "photo"               => ( !empty( $photo ) && $photo ? wp_get_attachment_url( $photo ) : false ),
+                "services"            => $services,
+                "locations"           => $locations,
+                "wordpress_user"      => $staff_member->get( "wordpress_user" ),
+                "connected_calendars" => $staff_member->get_connected_calendars_for_import(),
+            ];
+            $staff_members_arr[] = $staff_member_data;
+        }
         $data = [
-            "services"           => $services_arr,
-            "categories"         => $categories_arr,
-            "plugin_url"         => WP_WEBBA_BOOKING__PLUGIN_URL,
-            "site_url"           => get_site_url(),
-            "admin_url"          => admin_url(),
-            "plan_map"           => WBK_Feature_Gate::get_plan_map(),
-            "multiservice"       => WBK_Feature_Gate::have_required_plan( "start", "only_old_users" ),
-            "settings"           => [
+            "services"                    => $services_arr,
+            "categories"                  => $categories_arr,
+            "locations"                   => $locations_arr,
+            "staff_members"               => $staff_members_arr,
+            "has_services_with_locations" => WBK_Model_Utils::has_services_with_locations(),
+            "plugin_url"                  => WP_WEBBA_BOOKING__PLUGIN_URL,
+            "site_url"                    => get_site_url(),
+            "admin_url"                   => admin_url(),
+            "plan_map"                    => WBK_Feature_Gate::get_plan_map(),
+            "multiservice"                => WBK_Feature_Gate::have_required_plan( "start", "only_old_users" ),
+            "settings"                    => [
                 "narrow_form"                        => get_option( "wbk_form_layout", "yes" ) !== "yes",
                 "week_start"                         => WBK_Date_Time_Utils::getStartOfWeek(),
                 "time_format"                        => WBK_Date_Time_Utils::get_time_format(),
@@ -1265,7 +1264,7 @@ class WBK_Request_Manager {
                 "wbk_global_working_hours"           => get_option( "wbk_global_working_hours", "" ),
                 "wbk_holydays"                       => get_option( "wbk_holydays", "" ),
             ],
-            "wording"            => [
+            "wording"                     => [
                 "service_label"                           => get_option( "wbk_service_label", __( "Select a service", "webba-booking-lite" ) ),
                 "category_label"                          => get_option( "wbk_category_label", __( "Select category", "webba-booking-lite" ) ),
                 "date_label"                              => get_option( "wbk_date_basic_label", __( "Book an appointment on", "webba-booking-lite" ) ),
@@ -1391,19 +1390,25 @@ class WBK_Request_Manager {
                 "left_to_pay"                             => get_option( "wbk_wording_left_to_pay", __( "Left to pay", "webba-booking-lite" ) ),
                 "show_details"                            => get_option( "wbk_wording_show_details", __( "Show details", "webba-booking-lite" ) ),
                 "hide_details"                            => get_option( "wbk_wording_hide_details", __( "Hide details", "webba-booking-lite" ) ),
+                "location"                                => get_option( "wbk_wording_location", __( "Location", "webba-booking-lite" ) ),
+                "select_location"                         => get_option( "wbk_wording_select_location", __( "Select location", "webba-booking-lite" ) ),
+                "please_select_location"                  => get_option( "wbk_wording_please_select_location", __( "Please select a location first to choose services.", "webba-booking-lite" ) ),
+                "select_staff_member"                     => get_option( "wbk_wording_select_staff_member", __( "SELECT STAFF MEMBER", "webba-booking-lite" ) ),
+                "any_available"                           => get_option( "wbk_wording_any_available", __( "Any Available", "webba-booking-lite" ) ),
+                "best_available_time"                     => get_option( "wbk_wording_best_available_time", __( "Best available time.", "webba-booking-lite" ) ),
             ],
-            "appearance"         => WBK_Model_Utils::get_appearance_data(),
-            "appearance_options" => get_option( "wbk_appearance_options", [] ),
-            "user"               => $user,
-            "current_user_email" => $current_user_email,
-            "is_logged_in"       => is_user_logged_in(),
-            "user_data"          => [
+            "appearance"                  => WBK_Model_Utils::get_appearance_data(),
+            "appearance_options"          => get_option( "wbk_appearance_options", [] ),
+            "user"                        => $user,
+            "current_user_email"          => $current_user_email,
+            "is_logged_in"                => is_user_logged_in(),
+            "user_data"                   => [
                 "first_name" => ( isset( $current_user ) ? $current_user->user_firstname : "" ),
                 "last_name"  => ( isset( $current_user ) ? $current_user->user_lastname : "" ),
                 "email"      => $current_user_email,
                 "phone"      => ( isset( $current_user ) ? get_user_meta( $current_user->ID, "billing_phone", true ) : "" ),
             ],
-            "current_user_id"    => get_current_user_id(),
+            "current_user_id"             => get_current_user_id(),
         ];
         $response = new \WP_REST_Response($data);
         $response->set_status( 200 );
@@ -1469,32 +1474,51 @@ class WBK_Request_Manager {
                 case "woo_product":
                     $data[$model][$field] = WBK_Model_Utils::get_woocommerce_products();
             }
-        } elseif ( $model === "appointments" && ($field === "service_id" || $field === "day" || $field === "time") && $form["service_id"] && $form["day"] ) {
-            $sp = new WBK_Schedule_Processor();
-            date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
-            $day = strtotime( $form["day"] );
-            $timeslots = $sp->get_time_slots_by_day(
-                $day,
-                $form["service_id"] ?? 0,
-                [
-                    "skip_gg_calendar"       => false,
-                    "ignore_preparation"     => true,
-                    "calculate_availability" => true,
-                    "calculate_night_hours"  => false,
-                    "filter_availability"    => false,
-                ],
-                $form["id"] ?? null
-            );
-            foreach ( $timeslots as $slot ) {
-                $data[$model]["time"][$slot->start] = sprintf( "%s (%d available)", $slot->formated_time, $slot->free_places );
-                for ($place = 1; $place <= $slot->free_places && $form["time"] == $slot->start; $place++) {
-                    $data[$model]["quantity"][$place] = sprintf( "%d", $place );
+        } elseif ( $model === "appointments" && ($field === "staff_member_id" || $field === "appointment_staff_member_id") ) {
+        } elseif ( $model === "appointments" && ($field === "service_id" || $field === "day" || $field === "time") ) {
+            if ( $field === "service_id" ) {
+                $service_id = ( isset( $form["service_id"] ) ? (int) $form["service_id"] : 0 );
+                if ( !$service_id && isset( $form["appointment_service_id"] ) ) {
+                    $service_id = (int) $form["appointment_service_id"];
                 }
+                $staff_member_ids = ( $service_id > 0 ? WBK_Model_Utils::get_staff_member_ids_by_service( $service_id ) : [] );
+                $staff_members_options = [];
+                foreach ( $staff_member_ids as $staff_member_id ) {
+                    $staff_member = new WBK_Staff_Member($staff_member_id);
+                    if ( !$staff_member->is_loaded() ) {
+                        continue;
+                    }
+                    $staff_members_options[$staff_member_id] = $staff_member->get_name();
+                }
+                $data[$model]["staff_member_id"] = $staff_members_options;
             }
-            if ( empty( $data[$model]["time"] ) ) {
-                $data[$model]["time"] = [
-                    "wbk_null" => __( "No time slots available", "webba-booking-lite" ),
-                ];
+            if ( $form["service_id"] && $form["day"] ) {
+                $sp = new WBK_Schedule_Processor();
+                date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+                $day = strtotime( $form["day"] );
+                $timeslots = $sp->get_time_slots_by_day(
+                    $day,
+                    $form["service_id"] ?? 0,
+                    [
+                        "skip_gg_calendar"       => false,
+                        "ignore_preparation"     => true,
+                        "calculate_availability" => true,
+                        "calculate_night_hours"  => false,
+                        "filter_availability"    => false,
+                    ],
+                    $form["id"] ?? null
+                );
+                foreach ( $timeslots as $slot ) {
+                    $data[$model]["time"][$slot->start] = sprintf( "%s (%d available)", $slot->formated_time, $slot->free_places );
+                    for ($place = 1; $place <= $slot->free_places && $form["time"] == $slot->start; $place++) {
+                        $data[$model]["quantity"][$place] = sprintf( "%d", $place );
+                    }
+                }
+                if ( empty( $data[$model]["time"] ) ) {
+                    $data[$model]["time"] = [
+                        "wbk_null" => __( "No time slots available", "webba-booking-lite" ),
+                    ];
+                }
             }
         } elseif ( $model === "connected_calendars" ) {
             switch ( $field ) {
@@ -1502,7 +1526,7 @@ class WBK_Request_Manager {
                     $data[$model][$field] = WBK_User_Utils::get_none_admin_wp_users();
                     break;
                 case "in_provider_id":
-                case 'provider':
+                case "provider":
                     $calendar_id = ( isset( $form["id"] ) ? sanitize_text_field( $form["id"] ) : "" );
                     $provider = ( isset( $form["provider"] ) ? $form["provider"] : (( isset( $form["calendar_provider"] ) ? $form["calendar_provider"] : "" )) );
                     if ( $provider === "google" ) {
@@ -1516,7 +1540,7 @@ class WBK_Request_Manager {
                         if ( empty( $calendars_list ) ) {
                             $calendars_list["wbk_null"] = __( "No Google calendars available", "webba-booking-lite" );
                         }
-                        $data[$model]['in_provider_id'] = $calendars_list;
+                        $data[$model]["in_provider_id"] = $calendars_list;
                     } elseif ( $provider === "outlook" ) {
                         $outlook_calendar = new WBK_Outlook_Calendar_Processor($calendar_id);
                         $calendars_result = $outlook_calendar->get_calendars();
@@ -1528,9 +1552,9 @@ class WBK_Request_Manager {
                         if ( empty( $calendars_list ) ) {
                             $calendars_list["wbk_null"] = __( "No Outlook calendars available", "webba-booking-lite" );
                         }
-                        $data[$model]['in_provider_id'] = $calendars_list;
+                        $data[$model]["in_provider_id"] = $calendars_list;
                     } else {
-                        $data[$model]['in_provider_id'] = [];
+                        $data[$model]["in_provider_id"] = [];
                     }
                     break;
                 default:
@@ -1557,18 +1581,42 @@ class WBK_Request_Manager {
                     }
                     $data[$model][$field] = $pages_array;
                     break;
-                case 'wbk_custom_fields_columns':
+                case "wbk_custom_fields_columns":
                     $all_fields = WBK_Form_Builder_Utils::get_all_fields_merged();
                     $options = [];
                     foreach ( $all_fields as $f ) {
-                        $slug = ( isset( $f['slug'] ) ? $f['slug'] : '' );
-                        if ( $slug === '' ) {
+                        $slug = ( isset( $f["slug"] ) ? $f["slug"] : "" );
+                        if ( $slug === "" ) {
                             continue;
                         }
-                        $label = ( isset( $f['placeholder'] ) ? $f['placeholder'] : (( isset( $f['checkboxText'] ) ? $f['checkboxText'] : $slug )) );
+                        $label = ( isset( $f["placeholder"] ) ? $f["placeholder"] : (( isset( $f["checkboxText"] ) ? $f["checkboxText"] : $slug )) );
                         $options[$slug] = $label;
                     }
                     $data[$model][$field] = $options;
+                    break;
+                default:
+                    break;
+            }
+        } elseif ( $model === "staff_members" ) {
+            switch ( $field ) {
+                case "wordpress_user":
+                    $users = WBK_User_Utils::get_none_admin_wp_users();
+                    $users_array = [];
+                    foreach ( $users as $user_id => $user_name ) {
+                        $is_used = WBK_User_Utils::is_wp_user_used_by_staff_member( $user_id );
+                        if ( $is_used ) {
+                            $users_array[$user_id] = [
+                                "label"       => sprintf( "%s (%s)", $user_name, __( "already used", "webba-booking-lite" ) ),
+                                "is_disabled" => true,
+                            ];
+                        } else {
+                            $users_array[$user_id] = [
+                                "label"       => $user_name,
+                                "is_disabled" => false,
+                            ];
+                        }
+                    }
+                    $data[$model][$field] = $users_array;
                     break;
                 default:
                     break;
@@ -1742,6 +1790,78 @@ class WBK_Request_Manager {
         return $response;
     }
 
+    public function get_staff_members_permission( $request ) : bool {
+        return true;
+        // Public endpoint
+    }
+
+    public function get_staff_members( WP_REST_Request $request ) : WP_REST_Response {
+        try {
+            WBK_Translation_Processor::switch_to_locale_from_get_param();
+            $service_id = $request->get_param( "service_id" );
+            $location_id = $request->get_param( "location_id" );
+            if ( !is_numeric( $service_id ) || intval( $service_id ) <= 0 ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid service ID",
+                ], 400);
+            }
+            $service_id = intval( $service_id );
+            $service = new WBK_Service($service_id);
+            if ( !$service->is_loaded() ) {
+                return new WP_REST_Response([
+                    "error" => "Service not found",
+                ], 404);
+            }
+            $location_filter_applied = !is_null( $location_id ) && $location_id !== "";
+            if ( $location_filter_applied ) {
+                if ( !is_numeric( $location_id ) || intval( $location_id ) <= 0 ) {
+                    return new WP_REST_Response([
+                        "error" => "Invalid location ID",
+                    ], 400);
+                }
+                $location_id = intval( $location_id );
+                $location = new WBK_Location($location_id);
+                if ( !$location->is_loaded() ) {
+                    return new WP_REST_Response([
+                        "error" => "Invalid location ID",
+                    ], 400);
+                }
+            }
+            $staff_ids = WBK_Model_Utils::get_staff_member_ids_by_service( $service_id );
+            $staff_members = [];
+            foreach ( $staff_ids as $staff_id ) {
+                $staff_member = new WBK_Staff_Member($staff_id);
+                if ( !$staff_member->is_loaded() ) {
+                    continue;
+                }
+                $staff_locations = $staff_member->get_location();
+                if ( $location_filter_applied && !in_array( intval( $location_id ), $staff_locations, true ) ) {
+                    continue;
+                }
+                $photo = $staff_member->get_photo();
+                $staff_members[] = [
+                    "id"        => intval( $staff_id ),
+                    "value"     => intval( $staff_id ),
+                    "label"     => $staff_member->get_name(),
+                    "photo"     => ( !empty( $photo ) && $photo ? wp_get_attachment_url( $photo ) : false ),
+                    "services"  => $staff_member->get_services(),
+                    "locations" => $staff_locations,
+                ];
+            }
+            $data = [
+                "service_id"              => $service_id,
+                "location_id"             => ( $location_filter_applied ? $location_id : null ),
+                "location_filter_applied" => $location_filter_applied,
+                "staff_members"           => $staff_members,
+            ];
+            return new WP_REST_Response($data, 200);
+        } catch ( \Exception $e ) {
+            return new WP_REST_Response([
+                "error" => "Internal server error",
+            ], 500);
+        }
+    }
+
     /**
      * Get service availability permission check
      * @return bool
@@ -1762,6 +1882,7 @@ class WBK_Request_Manager {
             $service_id = $request->get_param( "service_id" );
             $start_date = $request->get_param( "start_date" );
             $end_date = $request->get_param( "end_date" );
+            $staff_member_id = $request->get_param( "staff_member_id" );
             if ( !is_numeric( $service_id ) ) {
                 return new WP_REST_Response([
                     "error" => "Invalid service ID",
@@ -1786,7 +1907,27 @@ class WBK_Request_Manager {
                 ], 400);
             }
             $days_difference = ceil( ($end_timestamp - $start_timestamp) / 86400 ) + 1;
-            $available_dates = WBK_Model_Utils::get_service_availability_in_range( $service_id, $start_date, $days_difference );
+            if ( $staff_member_id !== null && (int) $staff_member_id === 0 ) {
+                $staff_member_ids = WBK_Model_Utils::get_staff_member_ids_by_service( $service_id );
+                $available_dates = [];
+                foreach ( $staff_member_ids as $staff_id ) {
+                    $dates = WBK_Model_Utils::get_service_availability_in_range(
+                        $service_id,
+                        $start_date,
+                        $days_difference,
+                        $staff_id
+                    );
+                    $available_dates = array_merge( $available_dates, $dates );
+                }
+                $available_dates = array_unique( $available_dates );
+            } else {
+                $available_dates = WBK_Model_Utils::get_service_availability_in_range(
+                    $service_id,
+                    $start_date,
+                    $days_difference,
+                    $staff_member_id
+                );
+            }
             // Filter dates based on the date parts in the format YYYY,M,D
             $filtered_dates = array_filter( $available_dates, function ( $date ) use($start_timestamp, $end_timestamp) {
                 $date_parts = explode( ",", $date );
@@ -1834,6 +1975,7 @@ class WBK_Request_Manager {
             $service_id = $request->get_param( "service_id" );
             $date = $request->get_param( "date" );
             $offset = $request->get_param( "offset" ) ?? 0;
+            $staff_member_id = $request->get_param( "staff_member_id" );
             if ( !is_numeric( $service_id ) ) {
                 return new WP_REST_Response([
                     "error" => "Invalid service ID",
@@ -1844,6 +1986,31 @@ class WBK_Request_Manager {
                 return new WP_REST_Response([
                     "error" => "Service not found",
                 ], 404);
+            }
+            $staff_member = null;
+            if ( isset( $staff_member_id ) && $staff_member_id !== "" ) {
+                if ( !ctype_digit( $staff_member_id ) ) {
+                    return new WP_REST_Response([
+                        "error" => "Wrong staff member ID.",
+                    ], 400);
+                }
+                $staff_member_id = (int) $staff_member_id;
+                if ( $staff_member_id !== 0 ) {
+                    $staff_member = new WBK_Staff_Member($staff_member_id);
+                    if ( !$staff_member->is_loaded() ) {
+                        return new WP_REST_Response([
+                            "error" => "Staff member not found.",
+                        ], 404);
+                    }
+                    $staff_services = $staff_member->get_services();
+                    if ( !in_array( (int) $service_id, array_map( "intval", (array) $staff_services ), true ) ) {
+                        return new WP_REST_Response([
+                            "error" => "Staff member does not provide this service.",
+                        ], 400);
+                    }
+                }
+            } else {
+                $staff_member_id = null;
             }
             if ( empty( $date ) ) {
                 return new WP_REST_Response([
@@ -1862,25 +2029,78 @@ class WBK_Request_Manager {
                 ], 400);
             }
             $sp = new WBK_Schedule_Processor();
-            $timeslots = $sp->get_time_slots_by_day( $day_to_render, $service_id, [
+            $options = [
                 "skip_gg_calendar"       => false,
                 "ignore_preparation"     => false,
                 "calculate_availability" => true,
                 "filter_availability"    => false,
                 "offset"                 => $offset,
-            ] );
-            if ( !is_array( $timeslots ) ) {
-                $timeslots = [];
+            ];
+            if ( $staff_member_id !== null && $staff_member_id === 0 ) {
+                $staff_member_ids = WBK_Model_Utils::get_staff_member_ids_by_service( $service_id );
+                $slots_by_start = [];
+                foreach ( $staff_member_ids as $staff_id ) {
+                    $timeslots = $sp->get_time_slots_by_day(
+                        $day_to_render,
+                        $service_id,
+                        $options,
+                        null,
+                        true,
+                        $staff_id
+                    );
+                    if ( !is_array( $timeslots ) ) {
+                        continue;
+                    }
+                    foreach ( $timeslots as $slot ) {
+                        $start = $slot->get_start();
+                        if ( !isset( $slots_by_start[$start] ) ) {
+                            $slots_by_start[$start] = [
+                                "slot"             => $slot,
+                                "staff_member_ids" => [],
+                                "free_places"      => 0,
+                            ];
+                        }
+                        $slots_by_start[$start]["staff_member_ids"][] = $staff_id;
+                        $slots_by_start[$start]["free_places"] += $slot->get_free_places();
+                    }
+                }
+                ksort( $slots_by_start );
+                $formatted_slots = array_map( function ( $item ) {
+                    return [
+                        "start_time"           => $item["slot"]->get_start(),
+                        "end_time"             => $item["slot"]->get_end(),
+                        "free_places"          => $item["free_places"],
+                        "formatted_time"       => $item["slot"]->get_formated_time(),
+                        "formatted_time_local" => $item["slot"]->get_formated_time_local(),
+                        "staff_member_ids"     => $item["staff_member_ids"],
+                    ];
+                }, array_values( $slots_by_start ) );
+            } else {
+                $timeslots = $sp->get_time_slots_by_day(
+                    $day_to_render,
+                    $service_id,
+                    $options,
+                    null,
+                    true,
+                    $staff_member_id
+                );
+                if ( !is_array( $timeslots ) ) {
+                    $timeslots = [];
+                }
+                $formatted_slots = array_map( function ( $slot ) use($staff_member_id) {
+                    $result = [
+                        "start_time"           => $slot->get_start(),
+                        "end_time"             => $slot->get_end(),
+                        "free_places"          => $slot->get_free_places(),
+                        "formatted_time"       => $slot->get_formated_time(),
+                        "formatted_time_local" => $slot->get_formated_time_local(),
+                    ];
+                    if ( $staff_member_id !== null ) {
+                        $result["staff_member_ids"] = [$staff_member_id];
+                    }
+                    return $result;
+                }, $timeslots );
             }
-            $formatted_slots = array_map( function ( $slot ) {
-                return [
-                    "start_time"           => $slot->get_start(),
-                    "end_time"             => $slot->get_end(),
-                    "free_places"          => $slot->get_free_places(),
-                    "formatted_time"       => $slot->get_formated_time(),
-                    "formatted_time_local" => $slot->get_formated_time_local(),
-                ];
-            }, $timeslots );
             return new WP_REST_Response([
                 "service_id" => $service_id,
                 "date"       => date( "Y-m-d", $day_to_render ),
@@ -1926,7 +2146,7 @@ class WBK_Request_Manager {
             $all_fields = [];
             $found_forms = false;
             // Get fields for each service
-            if ( WBK_Feature_Gate::have_required_plan( 'standard' ) ) {
+            if ( WBK_Feature_Gate::have_required_plan( "standard" ) ) {
                 foreach ( $service_ids as $service_id ) {
                     // Get the service
                     $service = new WBK_Service($service_id);
@@ -1950,10 +2170,10 @@ class WBK_Request_Manager {
                             // Only add the field if it has a slug and we haven't seen this slug before
                             if ( isset( $field["slug"] ) && !isset( $all_fields[$field["slug"]] ) && isset( $field["placeholder"] ) ) {
                                 $all_fields[$field["slug"]] = $field;
-                                $all_fields[$field["slug"]]["placeholder"] = WBK_Translation_Processor::translate_string( 'webba_form_field_' . $form_id . '_' . $field['slug'], $field['placeholder'] );
+                                $all_fields[$field["slug"]]["placeholder"] = WBK_Translation_Processor::translate_string( "webba_form_field_" . $form_id . "_" . $field["slug"], $field["placeholder"] );
                             } elseif ( isset( $field["slug"] ) && !isset( $all_fields[$field["slug"]] ) && isset( $field["checkboxText"] ) ) {
                                 $all_fields[$field["slug"]] = $field;
-                                $all_fields[$field["slug"]]["checkboxText"] = WBK_Translation_Processor::translate_string( 'webba_form_field_' . $form_id . '_' . $field['slug'], $field['checkboxText'] );
+                                $all_fields[$field["slug"]]["checkboxText"] = WBK_Translation_Processor::translate_string( "webba_form_field_" . $form_id . "_" . $field["slug"], $field["checkboxText"] );
                             } else {
                                 $all_fields[$field["slug"]] = $field;
                             }
@@ -1961,16 +2181,16 @@ class WBK_Request_Manager {
                     }
                 }
             }
-            if ( !WBK_Feature_Gate::have_required_plan( 'standard' ) || $found_forms === false ) {
+            if ( !WBK_Feature_Gate::have_required_plan( "standard" ) || $found_forms === false ) {
                 // user is free, so we return the default fields
                 $found_forms = true;
                 $all_fields = WBK_Form_Builder_Utils::get_default_fields();
                 // translate default fields
                 $all_fields = array_map( function ( $field ) {
-                    if ( isset( $field['type'] ) && $field['type'] === 'checkbox' ) {
-                        $field['checkboxText'] = WBK_Translation_Processor::translate_string( 'webba_form_field_default_' . $field['slug'], get_option( 'webba_form_field_' . $field['slug'], $field['checkboxText'] ) );
+                    if ( isset( $field["type"] ) && $field["type"] === "checkbox" ) {
+                        $field["checkboxText"] = WBK_Translation_Processor::translate_string( "webba_form_field_default_" . $field["slug"], get_option( "webba_form_field_" . $field["slug"], $field["checkboxText"] ) );
                     } else {
-                        $field['placeholder'] = WBK_Translation_Processor::translate_string( 'webba_form_field_default_' . $field['slug'], $field['placeholder'], get_option( 'webba_form_field_' . $field['slug'], $field['placeholder'] ) );
+                        $field["placeholder"] = WBK_Translation_Processor::translate_string( "webba_form_field_default_" . $field["slug"], $field["placeholder"], get_option( "webba_form_field_" . $field["slug"], $field["placeholder"] ) );
                     }
                     return $field;
                 }, $all_fields );
@@ -2129,6 +2349,11 @@ class WBK_Request_Manager {
         $params = $request->get_body_params();
         $params["services"] = ( isset( $params["services"] ) ? json_decode( $params["services"], true ) : [] );
         $params["places"] = ( isset( $params["places"] ) ? json_decode( $params["places"], true ) : [] );
+        $params["staff"] = ( isset( $params["staff"] ) ? json_decode( $params["staff"], true ) : [] );
+        if ( !is_array( $params["staff"] ) ) {
+            $params["staff"] = [];
+        }
+        $params["location"] = ( isset( $params["location"] ) ? json_decode( $params["location"], true ) : null );
         date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
         // Validate required fields
         $required_fields = [
@@ -2163,7 +2388,7 @@ class WBK_Request_Manager {
         $times = [];
         $quantities = [];
         $days = [];
-        foreach ( $params['places'] as $service_id => $slots ) {
+        foreach ( $params["places"] as $service_id => $slots ) {
             foreach ( $slots as $slot ) {
                 // Support both new (time) and old (timeslot) formats
                 $slot_time = null;
@@ -2180,7 +2405,7 @@ class WBK_Request_Manager {
                 }
                 $times[] = $slot_time;
                 $quantities[] = ( isset( $slot["quantity"] ) && is_numeric( $slot["quantity"] ) ? $slot["quantity"] : 1 );
-                $days[] = strtotime( 'today midnight', intval( $slot['day'] ) );
+                $days[] = strtotime( "today midnight", intval( $slot["day"] ) );
             }
         }
         // Validate services
@@ -2205,7 +2430,7 @@ class WBK_Request_Manager {
         }
         $arr_uploaded_urls = [];
         $files = $request->get_file_params();
-        if ( isset( $files['attachments'] ) && is_array( $files['attachments'] ) && count( $files['attachments'] ) > 0 ) {
+        if ( isset( $files["attachments"] ) && is_array( $files["attachments"] ) && count( $files["attachments"] ) > 0 ) {
             if ( !function_exists( "wp_handle_upload" ) ) {
                 require_once ABSPATH . "wp-admin/includes/file.php";
             }
@@ -2259,7 +2484,7 @@ class WBK_Request_Manager {
             }
             // Check if time is in the past
             $ongoing_valid = false;
-            if ( get_option( "wbk_allow_ongoing_time_slot", "disallow" ) == "disallow" ) {
+            if ( get_option( "wbk_allow_ongoing_time_slot", "" ) !== "yes" ) {
                 if ( $time > time() ) {
                     $ongoing_valid = true;
                 }
@@ -2273,6 +2498,21 @@ class WBK_Request_Manager {
                 $skipped_count++;
                 continue;
             }
+            // Resolve staff member for this service (format: {"68":"3"} = service_id => staff_member_id)
+            $staff_member_id = null;
+            if ( isset( $params["staff"][$service_id] ) && is_numeric( $params["staff"][$service_id] ) ) {
+                $staff_member_id = (int) $params["staff"][$service_id];
+                $staff_member = new WBK_Staff_Member($staff_member_id);
+                if ( !$staff_member->is_loaded() ) {
+                    $skipped_count++;
+                    continue;
+                }
+                $staff_services = array_map( "intval", $staff_member->get_services() );
+                if ( !in_array( (int) $service_id, $staff_services, true ) ) {
+                    $skipped_count++;
+                    continue;
+                }
+            }
             // Prepare booking data for this slot
             $booking_data = array_merge( $base_booking_data, [
                 "time"        => $time,
@@ -2281,18 +2521,31 @@ class WBK_Request_Manager {
                 "time_offset" => $offset,
                 "quantity"    => $quantities[$i] ?? 1,
             ] );
+            if ( $staff_member_id !== null ) {
+                $booking_data["staff_member_id"] = $staff_member_id;
+            }
+            if ( $params["location"] !== null ) {
+                $booking_data["location_id"] = $params["location"];
+            }
             // Validate time slot availability
             $day = $days[$i];
-            if ( $sp->get_day_status( $day, $service_id ) != 1 ) {
+            if ( $sp->get_day_status( $day, $service_id, $staff_member_id ) != 1 ) {
                 $skipped_count++;
                 continue;
             }
-            $timeslots = $sp->get_time_slots_by_day( $day, $service_id, [
-                "skip_gg_calendar"       => false,
-                "ignore_preparation"     => true,
-                "calculate_availability" => true,
-                "offset"                 => $offset,
-            ] );
+            $timeslots = $sp->get_time_slots_by_day(
+                $day,
+                $service_id,
+                [
+                    "skip_gg_calendar"       => false,
+                    "ignore_preparation"     => true,
+                    "calculate_availability" => true,
+                    "offset"                 => $offset,
+                ],
+                null,
+                true,
+                $staff_member_id
+            );
             $time_slot_valid = false;
             foreach ( $timeslots as $timeslot ) {
                 if ( $timeslot->get_start() == $time ) {
@@ -2313,14 +2566,14 @@ class WBK_Request_Manager {
                     continue;
                 }
             }
-            if ( get_option( 'wbk_appointments_only_one_per_service', 'disabled' ) == 'enabled' ) {
-                if ( count( WBK_Model_Utils::get_booking_ids_by_service_email( $service_id, $booking_data['email'] ) ) > 0 ) {
+            if ( get_option( "wbk_appointments_only_one_per_service", "disabled" ) == "enabled" ) {
+                if ( count( WBK_Model_Utils::get_booking_ids_by_service_email( $service_id, $booking_data["email"] ) ) > 0 ) {
                     $not_booked_due_limit = true;
                     continue;
                 }
             }
-            if ( get_option( 'wbk_appointments_only_one_per_day', 'disabled' ) == 'enabled' ) {
-                if ( count( WBK_Model_Utils::get_booking_ids_by_day_service_email( $day, $service_id, $booking_data['email'] ) ) > 0 ) {
+            if ( get_option( "wbk_appointments_only_one_per_day", "disabled" ) == "enabled" ) {
+                if ( count( WBK_Model_Utils::get_booking_ids_by_day_service_email( $day, $service_id, $booking_data["email"] ) ) > 0 ) {
                     $not_booked_due_limit = true;
                     continue;
                 }
@@ -2372,7 +2625,7 @@ class WBK_Request_Manager {
         if ( $coupon_status !== "not_provided" ) {
             $response_data["coupon_status"] = $coupon_status;
         }
-        $pay_full_amount = isset( $params['pay_full_amount'] ) && ($params['pay_full_amount'] === true || $params['pay_full_amount'] === 'true' || $params['pay_full_amount'] === 1);
+        $pay_full_amount = isset( $params["pay_full_amount"] ) && ($params["pay_full_amount"] === true || $params["pay_full_amount"] === "true" || $params["pay_full_amount"] === 1);
         // Check if payment method is valid
         if ( isset( $params["payment_method"] ) && !empty( $payment_methods ) ) {
             if ( !in_array( $params["payment_method"], $payment_methods ) ) {
@@ -2842,7 +3095,7 @@ class WBK_Request_Manager {
                 date_default_timezone_set( "UTC" );
             }
         }
-        do_action( 'wbk_options_saved', $options['section'], $options );
+        do_action( "wbk_options_saved", $options["section"], $options );
         WBK_Mixpanel::update_configuration( false );
         $response = new \WP_REST_Response([
             "status"  => "success",
@@ -2926,9 +3179,9 @@ class WBK_Request_Manager {
                 $section_data["icon"] = ( isset( $section_info["icon"] ) ? $section_info["icon"] : "" );
                 $section_data["description"] = ( isset( $section_info["description"] ) ? $section_info["description"] : "" );
                 $section_data["sections"] = ( isset( $section_info["sections"] ) ? $section_info["sections"] : [] );
-                $section_data['tabs'] = ( isset( $section_info['tabs'] ) ? $section_info['tabs'] : [] );
-                $section_data['required_plan'] = ( isset( $section_info['required_plan'] ) ? $section_info['required_plan'] : '' );
-                $section_data['editor_view'] = ( isset( $section_info['editor_view'] ) ? $section_info['editor_view'] : false );
+                $section_data["tabs"] = ( isset( $section_info["tabs"] ) ? $section_info["tabs"] : [] );
+                $section_data["required_plan"] = ( isset( $section_info["required_plan"] ) ? $section_info["required_plan"] : "" );
+                $section_data["editor_view"] = ( isset( $section_info["editor_view"] ) ? $section_info["editor_view"] : false );
             }
             // Iterate through all fields in the section
             foreach ( $fields as $field ) {
@@ -3077,9 +3330,29 @@ class WBK_Request_Manager {
         $approved_data = [];
         $prev_time_zone = date_default_timezone_get();
         date_default_timezone_set( get_option( "wbk_timezone" ) );
+        $appointment_day_values = [];
+        $staff_member_filter = null;
+        if ( !empty( $filters ) && is_array( $filters ) ) {
+            foreach ( $filters as $filter_row ) {
+                if ( !is_array( $filter_row ) ) {
+                    continue;
+                }
+                $filter_name = $filter_row["name"] ?? "";
+                $filter_value = $filter_row["value"] ?? "";
+                if ( $filter_name === "appointment_day" && $filter_value !== "" ) {
+                    $appointment_day_values[] = $filter_value;
+                }
+                if ( $filter_name === "appointment_staff_member_id" && $filter_value !== "" && $filter_value !== "0" && ctype_digit( (string) $filter_value ) ) {
+                    $staff_member_filter = (int) $filter_value;
+                }
+            }
+        }
         if ( empty( $filters ) ) {
             $start = strtotime( "today midnight" ) - 86400 * 31;
             $end = strtotime( "today midnight" ) - 86400;
+        } elseif ( count( $appointment_day_values ) >= 2 ) {
+            $start = strtotime( $appointment_day_values[0] );
+            $end = strtotime( $appointment_day_values[1] );
         } else {
             $start = strtotime( $filters[0]["value"] );
             $end = strtotime( $filters[1]["value"] );
@@ -3115,6 +3388,9 @@ class WBK_Request_Manager {
                         ]);
                         $response->set_status( 400 );
                         return $response;
+                    }
+                    if ( $staff_member_filter !== null && (int) $booking->get_staff_member() !== $staff_member_filter ) {
+                        continue;
                     }
                     $price = intval( $booking->get_price() ) * intval( $booking->get_quantity() );
                     if ( in_array( $booking->get_status(), $approved_search_arr ) ) {
@@ -3365,14 +3641,14 @@ class WBK_Request_Manager {
      */
     public function update_user_calendar( WP_REST_Request $request ) : WP_REST_Response {
         $data = $request->get_params();
-        if ( !isset( $data['id'] ) || !isset( $data['in_provider_id'] ) ) {
+        if ( !isset( $data["id"] ) || !isset( $data["in_provider_id"] ) ) {
             $response = new WP_REST_Response([
                 "message" => "Invalid request",
             ]);
             $response->set_status( 400 );
             return $response;
         }
-        $calendar = new WBK_Connected_Calendar($data['id']);
+        $calendar = new WBK_Connected_Calendar($data["id"]);
         if ( !$calendar->is_loaded() ) {
             $response = new WP_REST_Response([
                 "message" => "Calendar not found",
@@ -3380,7 +3656,7 @@ class WBK_Request_Manager {
             $response->set_status( 404 );
             return $response;
         }
-        $calendar->set( 'in_provider_id', sanitize_text_field( $data['in_provider_id'] ) );
+        $calendar->set( "in_provider_id", sanitize_text_field( $data["in_provider_id"] ) );
         $calendar->save();
         $response = new WP_REST_Response([
             "message" => "User calendar updated successfully",
@@ -3396,11 +3672,11 @@ class WBK_Request_Manager {
      * @return boolean
      */
     public function update_user_calendar_permission( WP_REST_Request $request ) : bool {
-        if ( !current_user_can( 'read' ) ) {
+        if ( !current_user_can( "read" ) ) {
             return false;
         }
         $params = $request->get_params();
-        $calendar_id = ( isset( $params['id'] ) ? absint( $params['id'] ) : 0 );
+        $calendar_id = ( isset( $params["id"] ) ? absint( $params["id"] ) : 0 );
         if ( $calendar_id === 0 ) {
             return false;
         }

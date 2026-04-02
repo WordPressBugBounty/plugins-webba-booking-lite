@@ -1,0 +1,48 @@
+.wbk_select {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    gap: 3px;
+
+    &:active,
+    &:focus {
+        z-index: 999999;
+    }
+}
+
+.wbk_select.wbk_select--invalid {
+    color: red;
+}
+
+.wbk_select.wbk_select--invalid .wbk_select__selectInput {
+    border-color: red;
+}
+
+.wbk_select__errorContainer {
+    display: absolute;
+    color: red;
+    bottom: -18px;
+}
+
+.wbk_select__selectInput {
+    border-radius: 15px;
+    border: 1px solid #8a9393;
+    height: 50px;
+    font-family: poppins, arial;
+    font-size: 16px;
+    color: #333333;
+    width: 100%;
+    max-width: 100%;
+
+    .css-1u9des2-indicatorSeparator {
+        display: none;
+    }
+
+    .css-tj5bde-Svg {
+        fill: #333333;
+    }
+
+    .css-1jqq78o-placeholder {
+        color: #333333;
+    }
+}

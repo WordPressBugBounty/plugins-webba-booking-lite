@@ -1,0 +1,114 @@
+.wbk_booking_form__wrapper {
+    * {
+        box-sizing: border-box;
+        font-family: colors.$wbk-font;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: colors.$wbk-font;
+    }
+}
+
+.wbk_booking_form {
+    &__wrapper {
+        position: relative;
+        width: calc(100vw - 32px);
+        text-align: left;
+        max-width: min(750px, 100%);
+        flex-shrink: 0;
+        flex-grow: 0;
+        align-self: center;
+        justify-self: center;
+
+        &--compact-form {
+            max-width: 500px;
+            background-color: #ffffff;
+            border-radius: colors.$wbk-border-radius;
+        }
+
+        &__loading-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        &:not(.wbk_booking_form__wrapper--expanded) {
+            .wbk_booking_form__left-panel {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+    }
+
+    &__content {
+        padding: 24px;
+        display: flex;
+        flex-flow: column;
+        gap: 16px;
+        height: calc(100% - 80px);
+    }
+
+    &__left-panel {
+        max-width: calc(100% - 250px);
+        width: 100%;
+        transition: 0.3s all linear;
+        display: flex;
+        flex-direction: column;
+        max-height: inherit;
+
+        :global(.custom-scroll-handle) {
+            left: 4px !important;
+        }
+    }
+
+    &__right-panel {
+        margin-left: auto;
+    }
+
+    &__body {
+        &__wrapper {
+            max-width: 750px;
+            min-height: 750px;
+            box-shadow: colors.$wbk-shadow;
+            width: 100%;
+            border-radius: colors.$wbk-border-radius;
+            display: flex;
+            flex-flow: column;
+        }
+
+        &__inner-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 750px;
+            min-height: 750px;
+            max-height: 750px;
+            background-color: #ffffff;
+            border-radius: colors.$wbk-border-radius;
+
+            &--bottom-view {
+                border-bottom-right-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+        }
+    }
+
+    @media screen and (max-width: 768px) {
+        & {
+            min-width: 100%;
+            max-width: 100%;
+            position: relative;
+        }
+
+        &__left-panel {
+            max-width: 100%;
+            width: 100%;
+        }
+    }
+}

@@ -1,0 +1,112 @@
+.wbk_successMessage__toastContainer {
+    margin-top: 50px;
+    z-index: 99999999 !important;
+
+    &,
+    .Toastify__toast-container {
+        z-index: 99999999 !important;
+    }
+
+    .Toastify__toast {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 16px 20px;
+        min-height: auto;
+        font-family: inherit;
+        overflow: visible;
+        width: auto !important;
+        max-width: 320px !important;
+        margin: 0 auto !important;
+        z-index: 99999999 !important;
+    }
+
+    .Toastify__toast--success {
+        background-color: #15B8A9 !important;
+    }
+
+    .Toastify__toast--error {
+        background-color: #DC3545 !important;
+        color: rgba(255, 255, 255, 0.9) !important;
+        max-width: 400px !important;
+        padding: 20px 24px !important;
+    }
+
+    .Toastify__toast--info {
+        background-color: #0D6EFD !important;
+    }
+
+    .Toastify__toast--warning {
+        background-color: #FFC107 !important;
+    }
+
+    .Toastify__toast-icon {
+        display: none !important;
+    }
+
+    .Toastify__toast-body {
+        padding: 0 !important;
+        margin: 0 !important;
+        text-align: center !important;
+    }
+
+    .Toastify__toast--error .Toastify__toast-body {
+        text-align: left !important;
+    }
+
+    .Toastify__progress-bar {
+        height: 3px !important;
+        background: rgba(255, 255, 255, 0.4) !important;
+        bottom: 0 !important;
+    }
+
+    .Toastify__progress-bar--success {
+        background: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    .Toastify__progress-bar--error {
+        background: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    .Toastify__progress-bar--info {
+        background: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    .Toastify__progress-bar--warning {
+        background: rgba(255, 255, 255, 0.4) !important;
+    }
+
+    .Toastify__close-button {
+        display: none !important;
+    }
+
+    .Toastify__toast {
+        cursor: pointer !important;
+    }
+}
+
+.wbk_successMessage__messageWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.wbk_successMessage__iconContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wbk_successMessage__icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+.wbk_successMessage__message {
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.4;
+}

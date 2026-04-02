@@ -1,0 +1,115 @@
+.wrapper {
+    width: 100%;
+    max-width: 900px;
+    height: 638px;
+    position: relative;
+
+    &.loginWrapper {
+        max-width: 448px;
+        max-height: 568px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    @media screen and (max-width: 768px) {
+        max-width: 100%;
+    }
+
+    &,
+    * {
+        box-sizing: border-box;
+    }
+}
+
+.innerWrapper {
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    overflow: hidden;
+    height: 100%;
+
+    @media screen and (max-width: 768px) {
+        flex-flow: column;
+    }
+}
+
+.content {
+    width: 100%;
+
+    h2 {
+        font-weight: 500;
+        font-size: 24px;
+        line-height: 32px;
+        letter-spacing: 0%;
+        color: #111827;
+        margin: 0;
+    }
+
+    p {
+        font-weight: 300;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0%;
+        color: #6b7280;
+    }
+}
+
+.mobileHeader {
+    display: none;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 16px;
+
+    .rightPanel {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .menuToggle {
+        display: flex;
+        flex-flow: column;
+        gap: 3px;
+        cursor: pointer;
+        position: relative;
+        width: 17.5px;
+        height: 15px;
+        align-items: center;
+        justify-content: center;
+
+        div {
+            width: 17.5px;
+            height: 3px;
+            border-radius: 10px;
+            background-color: #4b5563;
+            cursor: 0.3s all ease;
+        }
+
+        &.expanded {
+            div {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                transition: transform 0.2s ease-in-out;
+            }
+
+            div:nth-child(1) {
+                transform: translate(-50%, -50%) rotate(45deg);
+            }
+
+            div:nth-child(2) {
+                opacity: 0;
+            }
+
+            div:nth-child(3) {
+                transform: translate(-50%, -50%) rotate(-45deg);
+            }
+        }
+    }
+
+    @media screen and (max-width: 768px) {
+        display: flex;
+    }
+}

@@ -23,12 +23,14 @@ export default function save({ attributes }) {
         return !isNaN(parseFloat(value)) && isFinite(value)
     }
     let shortcode = ''
-    let multiService = ''
+
     let categoryString = ''
+    let locationString = ''
+    const locationIds = attributes.locationIds || []
+    if (locationIds.length > 0) {
+        locationString = ' location=' + locationIds.join(',')
+    }
     if (attributes.singleOrMulripleService == 'multiple') {
-        if (attributes.multipleServices) {
-            multiService = ' multiservice = yes '
-        }
         if (attributes.showCategoryList) {
             categoryString = ' category_list=yes '
         } else {
@@ -36,10 +38,14 @@ export default function save({ attributes }) {
                 categoryString = ' category=' + attributes.categoryId
             }
         }
-        shortcode = '[webbabooking ' + categoryString + multiService + ']'
+        shortcode = '[webbabooking ' + categoryString + locationString + ']'
     } else {
         if (isNumeric(attributes.serviceId)) {
-            shortcode = '[webbabooking service=' + attributes.serviceId + ']'
+            shortcode =
+                '[webbabooking service=' +
+                attributes.serviceId +
+                locationString +
+                ']'
         } else {
             shortcode = ''
         }

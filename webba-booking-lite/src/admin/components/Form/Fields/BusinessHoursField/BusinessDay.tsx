@@ -4,9 +4,9 @@ import ReactSlider from 'react-slider'
 import { store_name } from '../../../../../store'
 import { UnwrappedField } from '../../lib/types'
 import { daysOfWeek, getReadableTime } from '../../utils/dateTime'
-import { Toggle } from '../Toggle/Toggle'
-import styles from './BusinessHours.module.scss'
-import { BusinessDay as BusinessDayType } from './types'
+import { Toggle } from '../../../Toggle/Toggle'
+import './BusinessHours.scss'
+import { BusinessDayStatus, BusinessDaySlot as BusinessDayType } from './types'
 import closeIcon2 from '../../../../../../public/images/close-icon2.png'
 
 interface BusinessDayProps {
@@ -19,48 +19,57 @@ export const BusinessDay = ({
     field: { value, setValue },
 }: BusinessDayProps) => {
     const valueObj: BusinessDayType[] = useMemo(() => {
-        try{
+        try {
             return JSON.parse(value as string)
-        }catch(e){
+        } catch (e) {
             return value
         }
     }, [value])
 
     const { start, end, day_of_week, status } = valueObj[index]
 
-    const setRange = useCallback(([start, end]: [number, number]) => {
-        let oldVal = [...valueObj]
+    const setRange = useCallback(
+        ([start, end]: [number, number]) => {
+            let oldVal = [...valueObj]
 
-        oldVal[index] = {
-            ...oldVal[index],
-            start,
-            end,
-        }
+            oldVal[index] = {
+                ...oldVal[index],
+                start,
+                end,
+            }
 
-        setValue(oldVal)
-    }, [valueObj])
+            setValue(oldVal)
+        },
+        [valueObj]
+    )
 
-    const setDay = useCallback((day: string) => {
-        let oldVal = [...valueObj]
+    const setDay = useCallback(
+        (day: string) => {
+            let oldVal = [...valueObj]
 
-        oldVal[index] = {
-            ...oldVal[index],
-            day_of_week: day,
-        }
+            oldVal[index] = {
+                ...oldVal[index],
+                day_of_week: day,
+            }
 
-        setValue(oldVal)
-    }, [valueObj])
+            setValue(oldVal)
+        },
+        [valueObj]
+    )
 
-    const setStatus = useCallback((status: string) => {
-        let oldVal = [...valueObj]
+    const setStatus = useCallback(
+        (status: string) => {
+            let oldVal = [...valueObj]
 
-        oldVal[index] = {
-            ...oldVal[index],
-            status,
-        }
+            oldVal[index] = {
+                ...oldVal[index],
+                status: status as BusinessDayStatus,
+            }
 
-        setValue(oldVal)
-    }, [valueObj])
+            setValue(oldVal)
+        },
+        [valueObj]
+    )
 
     const removeDay = useCallback(() => {
         let oldVal = [...valueObj]
@@ -92,25 +101,25 @@ export const BusinessDay = ({
     )
 
     return (
-        <div className={styles.businessDay}>
+        <div className="wbk_businessHours__businessDay">
             <select
                 value={day_of_week}
                 onChange={(e: any) => setDay(e.target.value)}
                 disabled={status === 'inactive'}
-                className={styles.select}
+                className="wbk_businessHours__select"
             >
                 {Object.keys(daysOfWeek).map((key) => (
                     <option value={key}>{daysOfWeek[key]}</option>
                 ))}
             </select>
-            <div className={styles.sliderWrapper}>
-                <p className={styles.readableTime}>
+            <div className="wbk_businessHours__sliderWrapper">
+                <p className="wbk_businessHours__readableTime">
                     {readableTime.start} -{readableTime.end}
                 </p>
                 <ReactSlider
-                    className={styles.slider}
-                    thumbClassName={styles.thumb}
-                    trackClassName={styles.track}
+                    className="wbk_businessHours__slider"
+                    thumbClassName="wbk_businessHours__thumb"
+                    trackClassName="wbk_businessHours__track"
                     min={0}
                     max={86400}
                     step={300}
@@ -120,12 +129,16 @@ export const BusinessDay = ({
                 />
             </div>
             <Toggle
-                initialValue={status || 'inactive'}
-                valueOn="active"
-                valueOff="inactive"
-                onChange={setStatus}
+                value={(!!status && status === 'active') || false}
+                onChange={(value) => {
+                    if (value) {
+                        setStatus('active')
+                    } else {
+                        setStatus('inactive')
+                    }
+                }}
             />
-            <div className={styles.buttonClose} onClick={removeDay}>
+            <div className="wbk_businessHours__buttonClose" onClick={removeDay}>
                 <img src={closeIcon2} />
             </div>
         </div>

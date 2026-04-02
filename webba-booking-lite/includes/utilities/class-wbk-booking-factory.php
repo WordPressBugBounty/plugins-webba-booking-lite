@@ -106,6 +106,22 @@ class WBK_Booking_Factory {
             $data["locale"] = "";
         }
         $data["lang"] = $data["locale"];
+        if ( isset( $data["staff_member_id"] ) && $data["staff_member_id"] !== "" && $data["staff_member_id"] !== 0 ) {
+            if ( !WBK_Validator::check_integer( $data["staff_member_id"], 1, 9999999999 ) ) {
+                return [false, "Incorrect staff member id"];
+            }
+            $data["staff_member_id"] = (int) $data["staff_member_id"];
+        } else {
+            $data["staff_member_id"] = 0;
+        }
+        if ( isset( $data["location_id"] ) && $data["location_id"] !== "" && $data["location_id"] !== 0 ) {
+            if ( !WBK_Validator::check_integer( $data["location_id"], 1, 9999999999 ) ) {
+                return [false, "Incorrect location id"];
+            }
+            $data["location_id"] = (int) $data["location_id"];
+        } else {
+            $data["location_id"] = 0;
+        }
         $booking = new WBK_Booking($data);
         if ( $booking->save() == false ) {
             return [false, "Unknown error"];

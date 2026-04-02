@@ -1,13 +1,12 @@
 import { useSelect } from '@wordpress/data'
-import { store_name } from '../../../../../store'
+import { store } from '../../../../../store/backend'
 import { CellContext } from '@tanstack/react-table'
 import { __ } from '@wordpress/i18n'
-import styles from './ServiceName.module.scss'
+import './ServiceName.scss'
 
 export const ServiceName = ({ getValue }: CellContext<any, any>) => {
     const { services } = useSelect(
-        // @ts-ignore
-        (select) => select(store_name).getPreset(),
+        (select) => select(store).getPreset(),
         [getValue]
     )
 
@@ -16,7 +15,7 @@ export const ServiceName = ({ getValue }: CellContext<any, any>) => {
             services.find(
                 (service: any) => service.id?.toString() === getValue()
             )?.label) || (
-            <div className={styles.nullService}>
+            <div className="wbk_serviceName__nullService">
                 {__('NULL', 'webba-booking-lite')}
             </div>
         )

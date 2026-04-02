@@ -1,0 +1,87 @@
+.wbk_bookings__app {
+    margin-bottom: 20px;
+    padding-right: 20px;
+}
+
+.wbk_bookings__bookingsTable tr {
+    display: grid;
+    grid-template-areas:
+        'select menu menu'
+        'customer service date'
+        'payment phone phone'
+        'status status status';
+}
+
+.wbk_bookings__bookingsTable td[data-column-name='id'] {
+    display: none;
+}
+
+.wbk_bookings__bookingsTable td[data-column-name='select'] {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.wbk_bookings__bookingsTable td[data-column-name='menu'] {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.wbk_bookings__bookingsTable td[data-column-name='status'] select {
+    width: 100%;
+}
+
+@media screen and (min-width: 1200px) {
+    .wbk_bookings__bookingsTable tr {
+        display: table-row;
+    }
+
+    .wbk_bookings__bookingsTable td {
+        display: table-cell !important;
+    }
+}
+
+.wbk_bookings__exportButton {
+    color: #a1a3b6;
+    padding: 0;
+    gap: 10px;
+    transition: $transition;
+
+    img {
+        transition: $transition;
+    }
+
+    &:hover {
+        img {
+            transform: translateX(3px);
+        }
+    }
+}
+
+.wbk_bookings__buttonNavigation {
+    display: flex;
+    gap: 10px;
+    cursor: pointer;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    transition: 0.3s all ease;
+
+    &.wbk_bookings__buttonNavigation--red {
+        color: rgb(255, 70, 70);
+    }
+
+    &.wbk_bookings__buttonNavigation--green {
+        color: #1f6763;
+    }
+
+    &.wbk_bookings__buttonNavigation--left {
+        &:hover {
+            transform: translateX(-5px);
+        }
+    }
+
+    &.wbk_bookings__buttonNavigation--right {
+        &:hover {
+            transform: translateX(5px);
+        }
+    }
+}

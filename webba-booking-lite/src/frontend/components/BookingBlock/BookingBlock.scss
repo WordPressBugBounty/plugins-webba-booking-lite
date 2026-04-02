@@ -1,0 +1,47 @@
+.wbk_booking_block {
+    padding: 16px;
+    display: flex;
+    // align-items: center;
+    gap: 16px;
+    border-radius: 8px;
+    border: 1.5px solid #edeff2;
+    width: 100%;
+
+    &__date-label {
+        background-color: #f9fafb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-flow: column;
+        gap: 4px;
+        border-radius: 4px;
+        padding: 4px 12px;
+
+        p {
+            white-space: nowrap;
+        }
+    }
+
+    h4 {
+        font-weight: 500;
+        font-size: 20px;
+        line-height: 24px !important;
+        letter-spacing: 0.5% !important;
+        text-align: center;
+        color: #22292f;
+        margin: 0;
+    }
+
+    p {
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 18px;
+        letter-spacing: 1%;
+        color: #668091;
+    }
+
+    &__info {
+        display: flex;
+        flex-flow: column;
+    }
+}

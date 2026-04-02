@@ -19,22 +19,18 @@ import { EmailStatus } from '../../components/WebbaDataTable/cells/EmailStatus/E
 import { SearchField } from '../../components/Filter/Fields/SearchField/SearchField'
 import { useState } from 'react'
 import metadata from '../../../schemas/email_templates.json'
+import noItemsImage from '../../../../public/images/bookings-empty.png'
 
 const columns = generateColumnDefsFromModel(
     emailTemplatesModel,
+    {},
     {
-        recipients: {
-            cell: EmailReceivers,
-        },
-        type: {
-            cell: EmailType,
-        },
-        enabled: {
-            cell: EmailStatus,
-        },
-    },
-    {
+        enabled: { index: 0, cell: EmailStatus },
+        type: { index: 1, cell: EmailType },
+        name: { index: 2 },
+        recipients: { index: 3, cell: EmailReceivers },
         test: {
+            index: 4,
             header: '',
             cell: EmailTestButton,
             enableSorting: false,
@@ -55,7 +51,7 @@ export const EmailTemplateScreen = () => {
     const { emailTemplates, isLoading } = useSelect(
         (select) => ({
             emailTemplates: select(store).getItems('email_templates'),
-            isLoading: select(store).getLoading(),
+            isLoading: select(store).getLoadingState('email_templates'),
         }),
         []
     )
@@ -65,6 +61,12 @@ export const EmailTemplateScreen = () => {
         (select) => select(store_name).getPreset(),
         []
     )
+    const typeOptions = useSelect(
+        (select) =>
+            // @ts-ignore
+            select(store).getFieldOptions('email_templates', 'type', []),
+        []
+    )
 
     const customGlobalFilterFn = (
         row: any,
@@ -72,29 +74,45 @@ export const EmailTemplateScreen = () => {
         filterValue: any
     ) => {
         if (!filterValue) return true
-        return Object.values(row.original).some((value) => {
+        const searchTerm = String(filterValue).toLowerCase()
+        return Object.entries(row.original).some(([fieldName, value]) => {
             if (typeof value === 'string' || typeof value === 'number') {
                 const fields: Record<string, any> = metadata?.properties
+                const fieldSchema = fields[fieldName]
 
                 if (
-                    fields[columnId]?.input_type === 'select' ||
-                    fields[columnId]?.input_type === 'multicheckbox'
+                    fieldSchema?.input_type === 'select' ||
+                    fieldSchema?.input_type === 'multicheckbox'
                 ) {
                     const options: Record<string, string> =
-                        fields[columnId]?.misc?.options
+                        fieldSchema?.misc?.options
+                    const backendOptions =
+                        fieldName === 'type' ? typeOptions : null
 
-                    for (let key in options) {
-                        if (key === value) {
-                            return String(options[key])
+                    if (backendOptions && typeof backendOptions === 'object') {
+                        const displayLabel = backendOptions[value]
+                        if (
+                            displayLabel &&
+                            String(displayLabel)
                                 .toLowerCase()
-                                .includes(String(filterValue).toLowerCase())
+                                .includes(searchTerm)
+                        ) {
+                            return true
+                        }
+                    }
+
+                    if (options) {
+                        for (const key in options) {
+                            if (key === value) {
+                                return String(options[key])
+                                    .toLowerCase()
+                                    .includes(searchTerm)
+                            }
                         }
                     }
                 }
 
-                return String(value)
-                    .toLowerCase()
-                    .includes(String(filterValue).toLowerCase())
+                return String(value).toLowerCase().includes(searchTerm)
             }
             return false
         })
@@ -133,7 +151,6 @@ export const EmailTemplateScreen = () => {
                                 sections={formSections}
                                 onSubmit={async (data) => {
                                     await onSubmit(data)
-                                    sidebar.close()
                                 }}
                                 onDelete={async () => {
                                     await onDelete()
@@ -172,7 +189,7 @@ export const EmailTemplateScreen = () => {
 
     const addModelItem = async (data: any) => {
         try {
-            await addItem('email_templates', data)
+            return await addItem('email_templates', data)
         } catch (e) {
             console.error('failed to add emailTemplate', e)
         }
@@ -195,13 +212,12 @@ export const EmailTemplateScreen = () => {
                         form={form}
                         sections={formSections}
                         onSubmit={async (data) => {
-                            await addModelItem(data)
-                            sidebar.close()
+                            return await addModelItem(data)
                         }}
                     />
                 )
             }
-            noItemsImageUrl={plugin_url + '/public/images/bookings-empty.png'}
+            noItemsImageUrl={noItemsImage}
         />
     )
 }

@@ -22,11 +22,12 @@ import { BookingDetail } from '../../components/WebbaDataTable/cells/BookingDeta
 import { useMemo, useState } from 'react'
 import { wbkFormat } from '../../components/Form/utils/dateTime'
 import { getUnixTime } from 'date-fns'
-import styles from './Dashboard.module.scss'
+import './Dashboard.scss'
 import helloIcon from '../../../../public/images/hello-dashboard.png'
 import { CustomerName } from '../../components/WebbaDataTable/cells/CustomerName/CustomerName'
 import { BookingTime } from '../../components/WebbaDataTable/cells/BookingTime/BookingTime'
 import { DurationCell } from '../../components/WebbaDataTable/cells/DurationCell/DurationCell'
+import noItemsImage from '../../../../public/images/bookings-empty.png'
 
 export const bookingsModel = removePrefixesFromModelFields(
     BookingsModel,
@@ -149,7 +150,6 @@ export const RecentBookings = () => {
                                 sections={menuSections}
                                 onSubmit={async (data) => {
                                     await onSubmit(data)
-                                    sidebar.close()
                                 }}
                                 onDelete={async () => {
                                     await onDelete()
@@ -186,8 +186,8 @@ export const RecentBookings = () => {
     }
 
     return (
-        <div className={styles.recentBookings}>
-            <div className={styles.welcomeMessage}>
+        <div className="wbk_dashboard__recentBookings">
+            <div className="wbk_dashboard__welcomeMessage">
                 <h2>
                     <img
                         src={helloIcon}
@@ -217,7 +217,7 @@ export const RecentBookings = () => {
                     loading={loading}
                     onDeleteSelected={onDeleteSelected}
                     noItemsImageUrl={
-                        plugin_url + '/public/images/bookings-empty.png'
+                        noItemsImage
                     }
                 />
             </TableProvider>{' '}

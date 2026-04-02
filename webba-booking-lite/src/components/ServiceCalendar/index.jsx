@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
 import Calendar from 'react-calendar'
 import { store_name } from '../../store/frontend'
-import { select, useSelect } from '@wordpress/data'
+import { select } from '@wordpress/data'
 import 'react-calendar/dist/Calendar.css'
 
 const ServiceCalendar = ({ onChange }) => {

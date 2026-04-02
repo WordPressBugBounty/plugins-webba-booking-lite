@@ -1,0 +1,41 @@
+.wbk_textField__field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    position: relative;
+}
+
+.wbk_textField__inputContainer {
+    display: flex;
+}
+
+.wbk_textField__field.wbk_textField__field--invalid .wbk_textField__input {
+    border-color: red;
+}
+
+.wbk_textField__labelContainer {
+    display: flex;
+}
+
+.wbk_textField__errorContainer {
+    color: red;
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+}
+
+.wbk_textField__input {
+    border: 1px solid #8a9393;
+    border-radius: 15px;
+    height: 50px;
+    margin: 0;
+    padding: 0 20px 0 20px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #212121;
+    width: 100%;
+
+    &:focus {
+        @include fields.field-focused-state;
+    }
+}

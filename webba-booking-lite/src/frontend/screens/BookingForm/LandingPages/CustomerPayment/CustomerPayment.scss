@@ -1,0 +1,11 @@
+.wbk_customer_panel {
+    display: flex;
+    flex-flow: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 16px;
+}
+
+.wbk_customer_panel__stripe {
+    width: 100%;
+}

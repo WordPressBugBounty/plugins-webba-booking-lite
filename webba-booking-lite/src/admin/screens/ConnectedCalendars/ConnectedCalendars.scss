@@ -1,0 +1,16 @@
+.wbk_connectedCalendars__table {
+    td:nth-child(4) {
+        max-width: 370px;
+        overflow-wrap: break-word;
+    }
+}
+
+.wbk_connectedCalendars__calendarId {
+    max-width: 200px;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+}
+
+.wbk_connectedCalendars__wrapper {
+    position: relative;
+}

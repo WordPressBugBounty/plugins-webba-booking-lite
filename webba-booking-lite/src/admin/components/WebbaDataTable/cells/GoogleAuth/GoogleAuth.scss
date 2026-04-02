@@ -1,0 +1,70 @@
+.wbk_googleAuth__message {
+    &.wbk_googleAuth__message--failed {
+        .wbk_googleAuth__title {
+            color: #fc2525;
+        }
+    }
+
+    &.wbk_googleAuth__message--success {
+        .wbk_googleAuth__title {
+            color: #7dc677;
+        }
+    }
+
+    &.wbk_googleAuth__message--loading {
+        .wbk_googleAuth__title {
+            color: #666;
+            align-items: center;
+        }
+    }
+
+    .wbk_googleAuth__title {
+        font-size: 16px;
+        line-height: 1.1;
+        margin-bottom: 10px;
+        display: flex;
+        gap: 5px;
+    }
+
+    .wbk_googleAuth__subtitle {
+        font-size: 13px;
+        line-height: 1;
+        text-align: left;
+        margin-top: 10px;
+    }
+}
+
+.wbk_googleAuth__wrapper {
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.wbk_googleAuth__icon {
+    max-width: 16px;
+    width: 16px;
+    height: 16px;
+    max-height: 16px;
+    object-fit: contain;
+}
+
+.wbk_googleAuth__loader {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 2px solid #666;
+    animation: wbk_googleAuth_spin 1s linear infinite;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+@keyframes wbk_googleAuth_spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

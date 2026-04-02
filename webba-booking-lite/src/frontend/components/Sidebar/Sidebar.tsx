@@ -1,0 +1,502 @@
+import { FC, useMemo, useRef, useEffect, useState } from 'react'
+import { __ } from '@wordpress/i18n'
+import { ISidebarProps } from './types'
+import ChevronLeftIcon from '../../../../public/images/chevron-left-icon.svg'
+import './Sidebar.scss'
+import classNames from 'classnames'
+import { Button } from '../Button/Button'
+import { useBookingContext } from '../../providers/BookingFormProvider/BookingFormProvider'
+import { wbkFormatPrice } from '../../providers/BookingFormProvider/utils'
+import { SidebarItem } from './SidebarItem'
+import { ReactComponent as CloseIcon } from '../../../../public/images/icon-close.svg'
+import { ReactComponent as ArrowDownIcon } from '../../../../public/images/arrow-down.svg'
+import iconPhone from '../../../../public/images/icon-phone.svg'
+import iconEmail from '../../../../public/images/icon-email.svg'
+import { useWording } from '../../hooks/useWording'
+
+export const Sidebar: FC<ISidebarProps> = ({
+    onAddMore,
+    toggle,
+    onToggle,
+    title,
+}) => {
+    const { services, attrService, priceFormat, amountData, preset } =
+        useBookingContext()
+    const wording = useWording()
+    const [animatedIds, setAnimatedIds] = useState<number[]>([])
+    const [showSummary, setShowSummary] = useState(false)
+    const prevIdsRef = useRef<number[]>([])
+
+    const { help_title, help_phone, help_email } = useMemo(() => {
+        const wording = preset?.wording || {}
+        const help_title = wording.help_title || ''
+        const help_phone = wording.help_phone || ''
+        const help_email = wording.help_email || ''
+        return { help_title, help_phone, help_email }
+    }, [preset])
+
+    const items = useMemo(() => {
+        return services.filter(({ selected }) => selected)
+    }, [services])
+
+    // Helper to get price for an item from amountData.items
+    const getApiItemPrice = (itemId: number, index: number) => {
+        if (Array.isArray(amountData.items) && amountData.items.length > 0) {
+            // Find the nth occurrence of itemId in amountData.items
+            let count = 0
+            for (let i = 0; i < amountData.items.length; i++) {
+                if (amountData.items[i].id === itemId) {
+                    if (count === index) {
+                        return amountData.items[i].price
+                    }
+                    count++
+                }
+            }
+        }
+        return undefined
+    }
+
+    // Always sort selected services by selectedAt before rendering
+    const sortedItems = items.sort(
+        (a, b) => (a.selectedAt || 0) - (b.selectedAt || 0)
+    )
+
+    useEffect(() => {
+        const currentIds = sortedItems.map((item) => item.id)
+        const prevIds = prevIdsRef.current
+        const newIds = currentIds.filter((id) => !prevIds.includes(id))
+        if (newIds.length > 0) {
+            setAnimatedIds(newIds)
+            setTimeout(() => setAnimatedIds([]), 500)
+        }
+        prevIdsRef.current = currentIds
+    }, [sortedItems])
+
+    // Local fallback calculation for total
+    const localCalculatedTotal = useMemo(() => {
+        let total = 0
+        sortedItems.forEach((service) => {
+            const matchedItems = amountData.items.filter(
+                (item) => item.id === service.id
+            )
+            if (matchedItems.length > 0) {
+                total += matchedItems.reduce(
+                    (sum, item) => sum + (item.price || 0),
+                    0
+                )
+            } else {
+                const numericPrice = Number(service.price)
+                if (numericPrice > 0 && service.quantity > 0) {
+                    total += numericPrice * service.quantity
+                }
+            }
+        })
+        return total
+    }, [amountData, sortedItems])
+
+    // Use API total if available, otherwise fallback
+    const apiTotal = Number(amountData.to_pay_total)
+    const displayTotal = !isNaN(apiTotal) ? apiTotal : localCalculatedTotal
+
+    const isNarrowForm = preset?.settings?.narrow_form === true
+
+    // Fallback tax calculation logic
+    const apiTax = Number(amountData.tax_to_pay)
+    let displayTax = 0
+    if (!isNaN(apiTax) && apiTax > 0) {
+        displayTax = apiTax
+    } else {
+        const presetTax = Number(preset?.settings?.tax)
+        if (!isNaN(presetTax) && presetTax > 0) {
+            // Calculate tax based on localCalculatedTotal
+            displayTax = (localCalculatedTotal * presetTax) / 100
+        }
+    }
+
+    const isAddMoreVisible = useMemo(() => {
+        return (
+            preset?.settings?.allowed_multiple_service_selection === true &&
+            (!attrService || attrService === '0')
+        )
+    }, [preset, attrService])
+
+    const depositTotal = useMemo(() => {
+        if (!Array.isArray(amountData?.items)) return 0
+        return amountData.items.reduce(
+            (sum, item) =>
+                item.have_deposit && typeof item.item_to_pay === 'number'
+                    ? sum + item.item_to_pay
+                    : sum,
+            0
+        )
+    }, [amountData?.items])
+
+    const hasSummaryAmounts = useMemo(
+        () =>
+            depositTotal > 0 ||
+            Number(amountData?.service_fees) > 0 ||
+            displayTax > 0 ||
+            Number(amountData?.left_to_pay) > 0,
+        [depositTotal, amountData?.service_fees, amountData?.left_to_pay, displayTax]
+    )
+
+    return (
+        <div
+            className={classNames('wbk_sidebar__wrapper', {
+                ['wbk_sidebar__wrapper--open']: toggle,
+                ['wbk_sidebar__wrapper--hidden']: !toggle,
+            })}
+        >
+            <div
+                className={classNames('wbk_sidebar__toggle-button', {
+                    ['wbk_sidebar__toggle-button--open']: toggle,
+                    ['wbk_sidebar__toggle-button--hidden']: !toggle,
+                    ['wbk_sidebar__toggle-button--narrow']: isNarrowForm,
+                })}
+                onClick={() => onToggle(!toggle)}
+            >
+                <img src={ChevronLeftIcon} />
+            </div>
+            <div
+                className={classNames('wbk_sidebar__inner-wrapper', {
+                    ['wbk_sidebar__inner-wrapper--open']: toggle,
+                    ['wbk_sidebar__inner-wrapper--hidden']: !toggle,
+                })}
+            >
+                <div
+                    onClick={() => onToggle(!toggle)}
+                    className={'wbk_sidebar__mobile-close-button'}
+                >
+                    <CloseIcon />
+                </div>
+                <h3 className={'wbk_sidebar__title'}>{title}</h3>
+                {!!sortedItems.length &&
+                    sortedItems.some(
+                        (item) => item.places && item.places.length > 0
+                    ) ? (
+                    <>
+                        <div className={'wbk_sidebar__items'}>
+                            <div className={'wbk_sidebar__items__inner'}>
+                                {sortedItems.map((item, idx) => {
+                                    // Find the price for this item from API, fallback to local
+                                    // If there are multiple items with the same id, use index
+                                    const apiPrice = getApiItemPrice(
+                                        item.id,
+                                        idx
+                                    )
+                                    const price =
+                                        typeof apiPrice === 'number' &&
+                                            !isNaN(apiPrice)
+                                            ? apiPrice
+                                            : Number(item.price) || 0
+                                    return (
+                                        <div
+                                            key={item.id + '-' + idx}
+                                            className={classNames(
+                                                'wbk_sidebar__items__item wbk_sidebar__items__item--vertical',
+                                                {
+                                                    ['wbk_sidebar__items__item--animated']:
+                                                        animatedIds.includes(
+                                                            item.id
+                                                        ),
+                                                }
+                                            )}
+                                        >
+                                            <SidebarItem
+                                                {...item}
+                                                price={String(price)}
+                                            />
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                        <div className={'wbk_sidebar__items wbk_sidebar__items--less-gap'}>
+                            {/* discount */}
+                            {Number(amountData.discount) > 0 && (
+                                <div className={'wbk_sidebar__items__item'}>
+                                    <h4
+                                        className={
+                                            'wbk_sidebar__items__item__title'
+                                        }
+                                    >
+                                        {wording.discount ||
+                                            __(
+                                                'Discount (-)',
+                                                'webba-booking-lite'
+                                            )}
+                                    </h4>
+                                    <div>
+                                        <p
+                                            className={
+                                                'wbk_sidebar__items__item__title'
+                                            }
+                                        >
+                                            {wbkFormatPrice(
+                                                amountData.discount,
+                                                priceFormat
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                            {/* discount end */}
+                            {/* service fees */}
+                            {/* {Number(amountData?.service_fees) > 0 && (
+                                <div className={'wbk_sidebar__items__item'}>
+                                    <h4
+                                        className={
+                                            'wbk_sidebar__items__item__title'
+                                        }
+                                    >
+                                        {wording.service_fees ||
+                                            __(
+                                                'Service Fees',
+                                                'webba-booking-lite'
+                                            )}
+                                    </h4>
+                                    <div>
+                                        <p
+                                            className={
+                                                'wbk_sidebar__items__item__title'
+                                            }
+                                        >
+                                            {wbkFormatPrice(
+                                                Number(amountData.service_fees),
+                                                priceFormat
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                            )} */}
+                            {/* service fees end */}
+                            {/* tax */}
+                            {/* {displayTax > 0 && (
+                                <div className={'wbk_sidebar__items__item'}>
+                                    <h4
+                                        className={
+                                            'wbk_sidebar__items__item__title'
+                                        }
+                                    >
+                                        {wording.tax ||
+                                            __('Tax', 'webba-booking-lite')}
+                                    </h4>
+                                    <div>
+                                        <p
+                                            className={
+                                                'wbk_sidebar__items__item__price'
+                                            }
+                                        >
+                                            {wbkFormatPrice(
+                                                displayTax,
+                                                priceFormat
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                            )} */}
+                            {/* tax end */}
+                            {/* total */}
+                            <div className={'wbk_sidebar__items__item'}>
+                                <h4
+                                    className={
+                                        'wbk_sidebar__items__item__title'
+                                    }
+                                >
+                                    {wording.total ||
+                                        __('TOTAL TODAY', 'webba-booking-lite')}
+                                </h4>
+                                <div className={'wbk_sidebar__items__item__price'}>
+                                    <p
+                                        className={
+                                            'wbk_sidebar__items__item__title'
+                                        }
+                                    >
+                                        <strong>
+                                            {(displayTotal &&
+                                                displayTotal > 0 &&
+                                                wbkFormatPrice(
+                                                    displayTotal,
+                                                    priceFormat
+                                                )) ||
+                                                wording.free ||
+                                                __('Free', 'webba-booking-lite')}
+                                        </strong>
+                                    </p>
+                                    {displayTotal > 0 && (
+                                        <p
+                                            className={
+                                                'wbk_sidebar__items__item__subline'
+                                            }
+                                        >
+                                            {wording.tax_included ||
+                                                __(
+                                                    'Tax incl.',
+                                                    'webba-booking-lite'
+                                                )}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                            {/* total end */}
+                            {/* left to pay */}
+                            {/* {Number(amountData?.left_to_pay) > 0 && (<div className={'wbk_sidebar__items__item'}>
+                                <h4
+                                    className={
+                                        'wbk_sidebar__items__item__title'
+                                    }
+                                >
+                                    {wording.left_to_pay ||
+                                        __('Left to pay', 'webba-booking-lite')}
+                                </h4>
+                                <div>
+                                    <p
+                                        className={
+                                            'wbk_sidebar__items__item__title'
+                                        }
+                                    >
+                                        {(amountData?.left_to_pay &&
+                                            amountData.left_to_pay > 0 &&
+                                            wbkFormatPrice(
+                                                amountData.left_to_pay,
+                                                priceFormat
+                                            )) ||
+                                            wording.free ||
+                                            __('Free', 'webba-booking-lite')}
+                                    </p>
+                                </div>
+                            </div>)} */}
+                            {/* left to pay end */}
+                            {hasSummaryAmounts && (
+                                <div className={'wbk_sidebar__summary-toggle'}>
+                                    <div
+                                        role="button"
+                                        tabIndex={0}
+                                        className={'wbk_sidebar__summary-toggle__btn'}
+                                        onClick={() => setShowSummary((s) => !s)}
+                                        onKeyDown={(e) =>
+                                            (e.key === 'Enter' || e.key === ' ') &&
+                                            setShowSummary((s) => !s)
+                                        }
+                                    >
+                                        <span>
+                                            {showSummary
+                                                ? __('Hide summary', 'webba-booking-lite')
+                                                : __('Show summary', 'webba-booking-lite')}
+                                        </span>
+                                        <ArrowDownIcon
+                                            className={classNames(
+                                                'wbk_sidebar__summary-toggle__icon',
+                                                {
+                                                    ['wbk_sidebar__summary-toggle__icon--expanded']:
+                                                        showSummary,
+                                                }
+                                            )}
+                                        />
+                                    </div>
+                                    {showSummary && (
+                                        <div className={'wbk_sidebar__summary-detail'}>
+                                            {depositTotal > 0 && (
+                                                <div className={'wbk_sidebar__summary-detail__row'}>
+                                                    <span>{__('Deposits', 'webba-booking-lite')}:</span>
+                                                    <span>{wbkFormatPrice(depositTotal, priceFormat)}</span>
+                                                </div>
+                                            )}
+                                            {Number(amountData?.service_fees) > 0 && (
+                                                <div className={'wbk_sidebar__summary-detail__row'}>
+                                                    <span>{wording.service_fees || __('Service fees', 'webba-booking-lite')}:</span>
+                                                    <span>{wbkFormatPrice(Number(amountData.service_fees), priceFormat)}</span>
+                                                </div>
+                                            )}
+                                            {displayTax > 0 && (
+                                                <div className={'wbk_sidebar__summary-detail__row'}>
+                                                    <span>{wording.tax || __('Taxes', 'webba-booking-lite')}:</span>
+                                                    <span>{wbkFormatPrice(displayTax, priceFormat)}</span>
+                                                </div>
+                                            )}
+                                            {Number(amountData?.left_to_pay) > 0 && (
+                                                <div className={'wbk_sidebar__summary-detail__row'}>
+                                                    <span>{__('Left to pay later', 'webba-booking-lite')}:</span>
+                                                    <span>{wbkFormatPrice(Number(amountData.left_to_pay), priceFormat)}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        {isAddMoreVisible && (
+                            <div className={'wbk_sidebar__add-more'}>
+                                <Button
+                                    onClick={onAddMore}
+                                    type="secondary"
+                                    classes={'wbk_sidebar__add-more__button'}
+                                >
+                                    {wording.add_more ||
+                                        __('+ Add more', 'webba-booking-lite')}
+                                </Button>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <p className={'wbk_sidebar__empty'}>
+                        {wording.empty_summary ||
+                            __(
+                                'Please select a service and slot to see a summary here.',
+                                'webba-booking-lite'
+                            )}
+                    </p>
+                )}
+                {(!!help_phone || !!help_email) && help_title && (
+                    <div className={'wbk_sidebar__help'}>
+                        {!!help_title && (!!help_phone || !!help_email) && (
+                            <h4 className={'wbk_sidebar__help__title'}>
+                                {help_title}
+                            </h4>
+                        )}
+                        {(!!help_phone || !!help_email) && (
+                            <div className={'wbk_sidebar__help__text'}>
+                                {!!help_phone && (
+                                    <a
+                                        href={`tel:${help_phone}`}
+                                        target="_blank"
+                                    >
+                                        <img
+                                            src={iconPhone}
+                                            alt={
+                                                wording.phone ||
+                                                __(
+                                                    'Phone',
+                                                    'webba-booking-lite'
+                                                )
+                                            }
+                                        />
+                                        {help_phone}
+                                    </a>
+                                )}
+                                {!!help_email && (
+                                    <a
+                                        href={`mailto:${help_email}`}
+                                        target="_blank"
+                                    >
+                                        <img
+                                            src={iconEmail}
+                                            alt={
+                                                wording.email ||
+                                                __(
+                                                    'Email',
+                                                    'webba-booking-lite'
+                                                )
+                                            }
+                                        />
+                                        {help_email}
+                                    </a>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    )
+}

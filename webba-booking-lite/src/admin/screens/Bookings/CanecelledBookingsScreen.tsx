@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import { useRoute } from '../../components/Router/useRoute'
-import styles from './Bookings.module.scss'
+import './Bookings.scss'
 import { __ } from '@wordpress/i18n'
 import { useSelect } from '@wordpress/data'
 import { useMemo, useState } from 'react'
@@ -19,6 +19,7 @@ import { Table } from '../../components/WebbaDataTable/Table'
 import { isForbidden } from '../../utils/errors'
 import { wbkFormat } from '../../components/Form/utils/dateTime'
 import { ServiceName } from '../../components/WebbaDataTable/cells/ServiceName/ServiceName'
+import noItemsImage from '../../../../public/images/bookings-empty.png'
 
 export const bookingsModel = removePrefixesFromModelFields(
     BookingsModel,
@@ -35,7 +36,7 @@ export const CanecelledBookingsScreen = () => {
         []
     )
     const [search, setSearch] = useState('')
-    const { plugin_url, settings, is_pro } = useSelect(
+    const { plugin_url, settings } = useSelect(
         // @ts-ignore
         (select) => select(store_name).getPreset(),
         []
@@ -47,7 +48,7 @@ export const CanecelledBookingsScreen = () => {
                 header: __('Created on', 'webba-booking-lite'),
                 cell: ({ cell }) =>
                     wbkFormat(
-                        cell.row.original.created_on,
+                        Number(cell.row.original.created_on),
                         `${settings ? settings.date_format : 'dd/mm/yyyy'} ${
                             settings ? settings.time_format : 'HH:mm'
                         }`,
@@ -83,9 +84,9 @@ export const CanecelledBookingsScreen = () => {
         <div>
             <div
                 className={classNames(
-                    styles.buttonNavigation,
-                    styles.green,
-                    styles.left
+                    'wbk_bookings__buttonNavigation',
+                    'wbk_bookings__buttonNavigation--green',
+                    'wbk_bookings__buttonNavigation--left'
                 )}
                 onClick={() => setRoute('bookings')}
             >
@@ -101,7 +102,7 @@ export const CanecelledBookingsScreen = () => {
                     table={dynamicTable}
                     loading={loading}
                     noItemsImageUrl={
-                        plugin_url + '/public/images/bookings-empty.png'
+                        noItemsImage
                     }
                     search={searchField}
                     isItemsForbidden={isForbidden(bookings)}

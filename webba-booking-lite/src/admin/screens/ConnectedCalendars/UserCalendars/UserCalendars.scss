@@ -1,0 +1,200 @@
+.wbk_userCalendars__wrapper {
+    margin: 20px;
+    display: grid;
+    @include grid(3, 20);
+    @include mobile-grid(1, 20);
+    @include tablet-grid(2, 20);
+
+    @include mobile {
+        margin: 10px;
+    }
+}
+
+.wbk_userCalendars__message {
+    padding: 0 20px 16px;
+
+    &.wbk_userCalendars__message--failed {
+        .wbk_userCalendars__title {
+            color: #fc2525;
+        }
+    }
+
+    &.wbk_userCalendars__message--success {
+        .wbk_userCalendars__title {
+            color: #7dc677;
+        }
+    }
+
+    .wbk_userCalendars__title {
+        font-size: 16px;
+        line-height: 1.1;
+        margin-bottom: 10px;
+        display: flex;
+        gap: 5px;
+    }
+
+    .wbk_userCalendars__subtitle {
+        font-size: 13px;
+        line-height: 1;
+        text-align: left;
+        margin-top: 10px;
+    }
+}
+
+.wbk_userCalendars__calendarItem {
+    border-radius: 8px;
+    background-color: #fff;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    position: relative;
+}
+
+.wbk_userCalendars__title {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.1;
+    margin: 0;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+.wbk_userCalendars__headingRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px 0;
+    flex-wrap: wrap;
+}
+
+.wbk_userCalendars__heading {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.1;
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+}
+
+.wbk_userCalendars__providerBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.wbk_userCalendars__providerBadge--google {
+    background-color: rgba(66, 133, 244, 0.15);
+    color: #1a73e8;
+}
+
+.wbk_userCalendars__providerBadge--outlook {
+    background-color: rgba(0, 120, 212, 0.15);
+    color: #0078d4;
+}
+
+.wbk_userCalendars__providerBadgeIcon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.wbk_userCalendars__providerBadgeLabel {
+    font-weight: 600;
+}
+
+.wbk_userCalendars__icon {
+    max-width: 16px;
+    width: 16px;
+    height: 16px;
+    max-height: 16px;
+    object-fit: contain;
+}
+
+.wbk_userCalendars__loader {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 2px solid #3498db;
+    animation: wbk_userCalendars_spin 1s linear infinite;
+    margin-right: 8px;
+}
+
+.wbk_userCalendars__authLoading {
+    .wbk_userCalendars__title {
+        align-items: center;
+        color: #666;
+    }
+}
+
+.wbk_userCalendars__spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e8e8e8;
+    border-radius: 50%;
+    border-top-color: #3498db;
+    animation: wbk_userCalendars_spin 0.8s linear infinite;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.wbk_userCalendars__info {
+    max-width: 100%;
+    text-wrap: wrap;
+    word-break: break-all;
+    font-size: 14px;
+    line-height: 20px;
+    padding: 0px 20px;
+}
+
+.wbk_userCalendars__calendarSelect {
+    margin-top: 4px;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    padding: 6px 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.wbk_userCalendars__easyAuth {
+    padding: 2px 6px;
+    border-radius: 16px;
+    color: #fff;
+    background: rgb(1, 143, 1);
+    display: inline-flex;
+    margin: 0 0 10px;
+    font-size: 12px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(-50%, -50%);
+}
+
+.wbk_userCalendars__divider {
+    width: 100%;
+    height: 1px;
+    background-color: #efefef;
+    margin: 10px 0;
+}
+
+@keyframes wbk_userCalendars_spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

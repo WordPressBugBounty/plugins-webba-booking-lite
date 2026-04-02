@@ -2,6 +2,7 @@
 namespace WbkData;
 
 use WBK_User_Utils;
+use WBK_Validator;
 
 if (!defined("ABSPATH")) {
     exit();
@@ -280,8 +281,25 @@ class Model
             ) {
             } else {
                 $services = \WBK_Model_Utils::get_service_ids(true);
-                $condition_this = " AND service_id in (" . implode(",", $services) . ")";
-                $conditions .= $condition_this;
+                if (count($services) > 0) {
+                    $condition_this = " AND service_id in (" . implode(",", $services) . ")";
+                    $conditions .= $condition_this;
+                }
+            }
+
+            if (WBK_Validator::checkStaffAccessToBookings()) {
+                $staff_member_id = $wpdb->get_var(
+                    $wpdb->prepare(
+                        "SELECT id FROM " .
+                            get_option("wbk_db_prefix", "") .
+                            "wbk_staff_members where wordpress_user = %d",
+                        get_current_user_id(),
+                    ),
+                );
+
+                if ($staff_member_id != 0 && $staff_member_id != null) {
+                    $conditions .= " AND staff_member_id = " . $staff_member_id;
+                }
             }
         }
         if ($this->model_name == get_option("wbk_db_prefix", "") . "wbk_services") {

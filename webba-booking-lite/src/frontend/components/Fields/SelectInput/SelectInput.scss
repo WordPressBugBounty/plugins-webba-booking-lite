@@ -1,0 +1,21 @@
+.wbk_input {
+    &__select {
+        &__input {
+            padding: 4px;
+            border-radius: 8px !important;
+        }
+
+        &__option {
+            font-weight: 300;
+            font-size: 14px !important;
+            line-height: 22px !important;
+            letter-spacing: 1%;
+        }
+    }
+
+    .css-19bb58m {
+        input {
+            min-height: initial !important;
+        }
+    }
+}

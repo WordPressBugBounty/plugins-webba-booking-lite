@@ -861,6 +861,16 @@ class WBK_Placeholder_Processor
             $message
         );
 
+        $staff_member_name = '';
+        $staff_member_id = $booking->get('staff_member_id');
+        if (is_numeric($staff_member_id) && (int) $staff_member_id > 0) {
+            $staff_member = new WBK_Staff_Member((int) $staff_member_id);
+            if ($staff_member->is_loaded()) {
+                $staff_member_name = $staff_member->get_name();
+            }
+        }
+        $message = str_replace('#staff_member', $staff_member_name, $message);
+
         $booking_start = $booking->get_start() + $correction;
 
         $message = str_replace(

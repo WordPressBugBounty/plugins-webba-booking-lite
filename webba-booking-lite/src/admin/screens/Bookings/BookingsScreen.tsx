@@ -17,7 +17,7 @@ import {
     minutesToText,
     removePrefixesFromModelFields,
 } from '../../components/WebbaDataTable/utils'
-import styles from './Bookings.module.scss'
+import './Bookings.scss'
 import BookingsModel from '../../../schemas/appointments.json'
 import { getCellActions } from '../../components/WebbaDataTable/helpers/getCellActions'
 import { createFormFromModel } from '../../components/Form/lib/createForm'
@@ -25,7 +25,9 @@ import { __ } from '@wordpress/i18n'
 import { StatusCell } from '../../components/WebbaDataTable/cells/Status/Status'
 import { ServiceName } from '../../components/WebbaDataTable/cells/ServiceName/ServiceName'
 import { FilterForm } from '../../components/Filter/FilterForm'
+import { applyFiltersToFields } from '../../components/Filter/utils'
 import { filterFields } from './FilterConfigs'
+import { ExportCSV } from './ExportCSV'
 import { BookingDetail } from '../../components/WebbaDataTable/cells/BookingDetail/BookingDetail'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { SearchField } from '../../components/Filter/Fields/SearchField/SearchField'
@@ -41,39 +43,82 @@ import classNames from 'classnames'
 import { BookingTime } from '../../components/WebbaDataTable/cells/BookingTime/BookingTime'
 import { CustomerName } from '../../components/WebbaDataTable/cells/CustomerName/CustomerName'
 import { DurationCell } from '../../components/WebbaDataTable/cells/DurationCell/DurationCell'
+import { formatPrice } from '../../utils/currency'
+import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
+import noItemsImage from '../../../../public/images/bookings-empty.png'
+import { LocationNames } from '../../components/WebbaDataTable/cells/LocationNames/LocationNames'
 
 export const bookingsModel = removePrefixesFromModelFields(
     BookingsModel,
     'appointment_'
 )
 
-export const form = createFormFromModel(bookingsModel)
-
-export const menuSections = createFormMenuSectionsFromModel({
-    model: bookingsModel,
-    form,
-    modelName: 'appointments',
-})
-
 export const BookingsScreen = () => {
-    const { deleteItems, addItem } = useDispatch(store)
+    const { deleteItems, addItem, setToastNotification } = useDispatch(store)
     const sidebar = useSidebar()
-    const { plugin_url, settings, is_pro } = useSelect(
+    const { plugin_url, settings, plan_map, services } = useSelect(
         // @ts-ignore
         (select) => select(store_name).getPreset(),
         []
     )
+    const [currentFilters, setCurrentFilters] = useState<
+        { name: string; value: any }[]
+    >([])
     const { setRoute, route } = useRoute()
     const [downloadPending, setDownloadPending] = useState(false)
 
     // @ts-ignore
-    const loading = useSelect((select) => select(store_name).getLoading(), [])
+    const loading = useSelect(
+        (select) => select(store).getLoadingState('appointments'),
+        []
+    )
     const bookings = useSelect(
         // @ts-ignore
         (select) => select(store_name).getItems('appointments'),
         []
     )
     const [search, setSearch] = useState('')
+    const formModel = useMemo(() => {
+        const model = JSON.parse(
+            JSON.stringify(bookingsModel)
+        ) as typeof bookingsModel
+        const servicesWithoutStaff = Array.isArray(services)
+            ? services.filter(
+                (service: any) =>
+                    !Array.isArray(service.staff_members) ||
+                    service.staff_members.length === 0
+            )
+            : []
+
+        const staffField = model?.properties?.staff_member_id
+        if (staffField) {
+            staffField.required = true
+            if (servicesWithoutStaff.length > 0) {
+                ; (staffField as any).dependency = servicesWithoutStaff.map(
+                    (service: any) =>
+                        [
+                            'service_id',
+                            '!=',
+                            String(service.id),
+                        ] as [string, string, string]
+                )
+            } else {
+                ; (staffField as any).dependency = []
+            }
+        }
+
+        return model
+    }, [services])
+    const form = useMemo(() => createFormFromModel(formModel), [formModel])
+    const menuSections = useMemo(
+        () =>
+            createFormMenuSectionsFromModel({
+                model: formModel,
+                form,
+                modelName: 'appointments',
+            }),
+        [formModel, form]
+    )
     const customGlobalFilterFn = (
         row: any,
         columnId: any,
@@ -103,6 +148,16 @@ export const BookingsScreen = () => {
                 service_id: {
                     cell: ServiceName,
                 },
+                staff_member_id: {
+                    cell: ({ cell }) => {
+                        const { staff_member_id } = cell.row.original
+                        const staff_members = useSelect((select) => select(store).getItems('staff_members'), [])
+                        return staff_members.find((staff_member: any) => staff_member.id === staff_member_id)?.name || __('Unknown', 'webba-booking-lite')
+                    },
+                },
+                location_id: {
+                    cell: LocationNames
+                }
             },
             {
                 id: {
@@ -125,12 +180,13 @@ export const BookingsScreen = () => {
                     cell: ({ row }) => {
                         const { amount_paid, moment_price } = row.original
 
-                        return (amount_paid && amount_paid > 0) ||
-                            moment_price > 0
-                            ? settings?.price_format.replace(
-                                  '#price',
-                                  amount_paid || 0
-                              )
+                        return moment_price > 0
+                            ? formatPrice(
+                                amount_paid,
+                                settings?.price_format,
+                                settings?.price_separator,
+                                settings?.price_fractional
+                            )
                             : __('Free', 'webba-booking-lite')
                     },
                 },
@@ -138,8 +194,53 @@ export const BookingsScreen = () => {
         )
     }, [settings])
 
+    const servicesInCurrentBookings = useMemo(() => {
+        if (!Array.isArray(services) || !Array.isArray(bookings)) return []
+
+        const bookedServiceIds = new Set<string>()
+        bookings.forEach((booking: any) => {
+            const serviceId = booking?.service_id
+            if (serviceId === undefined || serviceId === null) return
+            const normalizedId = String(serviceId)
+            if (normalizedId !== '') {
+                bookedServiceIds.add(normalizedId)
+            }
+        })
+
+        return services.filter((service: any) =>
+            bookedServiceIds.has(String(service?.id))
+        )
+    }, [services, bookings])
+
+    const filteredColumns = useMemo(() => {
+        return columns.filter((column) => {
+            if (column.id === 'staff_member_id') {
+                const anyServiceHasStaff = servicesInCurrentBookings.some(
+                    (service: any) =>
+                        Array.isArray(service.staff_members) &&
+                        service.staff_members.length > 0
+                )
+
+                if (!anyServiceHasStaff) {
+                    return false
+                }
+            } else if (column.id === 'location_id') {
+                const anyServiceHasLocation = servicesInCurrentBookings.some(
+                    (service: any) =>
+                        Array.isArray(service.locations) &&
+                        service.locations.length > 0
+                )
+
+                if (!anyServiceHasLocation) {
+                    return false
+                }
+            }
+            return true
+        })
+    }, [servicesInCurrentBookings, columns])
+
     const dynamicTable = useWbkTable({
-        columns,
+        columns: filteredColumns,
         data: bookings,
         selectable: true,
         isAdmin: settings?.is_admin,
@@ -166,7 +267,13 @@ export const BookingsScreen = () => {
                                 sections={menuSections}
                                 onSubmit={async (data) => {
                                     await onSubmit(data)
-                                    sidebar.close()
+                                    setToastNotification({
+                                        type: 'success',
+                                        message: __(
+                                            'Changes were saved.',
+                                            'webba-booking-lite'
+                                        ),
+                                    })
                                 }}
                                 onDelete={async () => {
                                     await onDelete()
@@ -204,38 +311,52 @@ export const BookingsScreen = () => {
 
     const addBooking = async (data: any) => {
         try {
-            await addItem('appointments', data)
+            return await addItem('appointments', data)
         } catch (e) {
             console.error('failed to add booking', e)
         }
     }
 
-    const filterForm = <FilterForm fields={filterFields} model="appointments" />
+    const filterForm = (
+        <FilterForm
+            fields={filterFields}
+            model="appointments"
+            onFiltersChange={setCurrentFilters}
+            columnCount={5}
+        />
+    )
     const searchField = (
         <SearchField name="search" onChange={setSearch} label="Search" />
     )
 
-    const exportCSV = useCallback(async () => {
-        setDownloadPending(true)
-        const { url }: { url: string } = await apiFetch({
-            path: 'wbk/v1/csv-export',
-            method: 'POST',
-            data: {
-                filters: select(store_name).getFilters('appointments'),
-            },
-        })
-        setDownloadPending(false)
-        const link = document.createElement('a')
-        link.href = url
-        link.click()
-    }, [])
+    const exportCSV = useCallback(() => {
+        const selectedIds = dynamicTable
+            .getSelectedRowModel()
+            .rows.map((row) => row.original.id)
+        const initialFilterFields = applyFiltersToFields(
+            filterFields,
+            currentFilters
+        )
+        sidebar.open(
+            <ExportCSV
+                selectedIds={selectedIds}
+                filterFields={initialFilterFields}
+            />,
+            {
+                view: 'modal',
+                width: 'medium',
+                height: 'auto',
+                position: 'center',
+            }
+        )
+    }, [sidebar, dynamicTable, currentFilters])
 
     const exportButton = useMemo(() => {
         return (
             <Button
                 onClick={exportCSV}
                 type="no-border"
-                className={styles.exportButton}
+                className="wbk_bookings__exportButton"
                 isLoading={downloadPending}
             >
                 {__('Export to CSV file', 'webba-booking-lite')}
@@ -245,7 +366,11 @@ export const BookingsScreen = () => {
                 />
             </Button>
         )
-    }, [downloadPending])
+    }, [downloadPending, exportCSV])
+    const exportButtonRequiredPlans = ['standard', 'premium']
+    const isExportButtonAvailable =
+        plan_map &&
+        exportButtonRequiredPlans.some((plan) => plan_map[plan] === true)
 
     return (
         <TableProvider table={dynamicTable}>
@@ -264,8 +389,7 @@ export const BookingsScreen = () => {
                             form={form}
                             sections={menuSections}
                             onSubmit={async (data) => {
-                                await addBooking(data)
-                                sidebar.close()
+                                return await addBooking(data)
                             }}
                             defaultValue={
                                 {} as FormValueFromModel<typeof bookingsModel>
@@ -274,26 +398,20 @@ export const BookingsScreen = () => {
                     )
                 }
                 noItemsImageUrl={
-                    plugin_url + '/public/images/bookings-empty.png'
+                    noItemsImage
                 }
                 filter={filterForm}
                 search={searchField}
                 isItemsForbidden={isForbidden(bookings)}
-                exportButton={is_pro && exportButton}
+                exportButton={
+                    isExportButtonAvailable && exportButton
+                        ? exportButton
+                        : undefined
+                }
                 forcePermission={true}
             />
+            <SuccessMessage />
             <FailedMessage />
-            <div
-                className={classNames(
-                    styles.buttonNavigation,
-                    styles.red,
-                    styles.right
-                )}
-                onClick={() => setRoute('cancelled-bookings')}
-            >
-                {__('Cancelled Bookings (legacy)', 'webba-booking-lite')}
-                &nbsp;&#8594;
-            </div>
         </TableProvider>
     )
 }

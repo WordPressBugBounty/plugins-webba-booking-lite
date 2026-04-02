@@ -1,7 +1,7 @@
 import { CellContext } from '@tanstack/react-table'
-import { Toggle } from '../../../Form/Fields/Toggle/Toggle'
+import { Toggle } from '../../../Toggle/Toggle'
 import { useCallback } from 'react'
-import styles from './EmailStatus.module.scss'
+import './EmailStatus.scss'
 import { useDispatch } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
 
@@ -19,14 +19,12 @@ export const EmailStatus = ({ cell, getValue }: CellContext<any, any>) => {
     )
 
     return (
-        <div className={styles.wrapper}>
+        <div className="wbk_emailStatus__wrapper">
             <Toggle
                 name="status"
-                initialValue={getValue() || ''}
-                valueOn="yes"
-                valueOff=""
+                value={getValue() || ''}
                 onChange={(value) => {
-                    updateStatus(value)
+                    updateStatus(value ? 'yes' : '')
                 }}
             />
         </div>

@@ -1,0 +1,36 @@
+.wbk_selectOption__wrapper {
+    display: flex;
+    flex-flow: column;
+    gap: 8px;
+    z-index: 2;
+}
+
+.wbk_selectOption__selectInput {
+    padding: 0;
+    border-radius: 6px;
+    border-color: #d1d5db;
+
+    .css-19bb58m {
+        height: 30px;
+    }
+
+    .css-19bb58m input {
+        height: 30px;
+    }
+}
+
+.wbk_selectOption__warning {
+    font-size: 10px;
+    display: flex;
+    gap: 4px;
+    align-items: flex-start;
+    line-height: 14px;
+    color: rgb(193, 131, 56);
+
+    img {
+        max-width: 12px;
+        max-height: 12px;
+        object-fit: contain;
+        margin-top: 1px;
+    }
+}

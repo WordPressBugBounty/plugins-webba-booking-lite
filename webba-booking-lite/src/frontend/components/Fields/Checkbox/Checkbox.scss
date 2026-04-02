@@ -1,0 +1,18 @@
+.wbk_input_checkbox__label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+
+    span {
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 18px;
+        letter-spacing: 1%;
+        color: #668091;
+    }
+
+    input {
+        outline: none;
+    }
+}

@@ -1,0 +1,189 @@
+.wbk_radioButton__buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+
+    .wbk_radioButton__item {
+        display: block;
+        border: 1px solid #8a9393;
+        border-radius: 16px;
+        line-height: 1;
+        padding: 16px 10px 16px 10px;
+        cursor: pointer;
+        transition: 0.2s;
+        text-align: center;
+        transition: 0.2s all ease-in-out;
+        font-size: 16px;
+
+        &.wbk_radioButton__item--checked {
+            background: #1f6763;
+            border-color: #1f6763;
+            color: #fff;
+        }
+    }
+
+    &.wbk_radioButton__buttons--buttonsIcon {
+        gap: 16px;
+        flex-wrap: nowrap;
+
+        .wbk_radioButton__itemIcon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            min-width: 140px;
+            padding: 20px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            width: 100%;
+
+            &.wbk_radioButton__itemIcon--checked {
+                border-color: #1f6763;
+                background: rgba(31, 103, 99, 0.1);
+                color: inherit;
+            }
+
+            .wbk_radioButton__label {
+                font-size: 14px;
+                font-weight: 400;
+                color: inherit;
+            }
+
+            .wbk_radioButton__icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 0;
+
+                img {
+                    width: 22px;
+                    height: 22px;
+                    display: block;
+                }
+            }
+
+            &.wbk_radioButton__itemIcon--itemLocked {
+                position: relative;
+                opacity: 0.9;
+                cursor: not-allowed;
+                pointer-events: none;
+
+                .wbk_radioButton__upgradeLink {
+                    pointer-events: auto;
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 5px;
+                    padding: 6px 8px;
+                    margin: 6px;
+                    border-radius: 6px;
+                    border: 1px solid #f88a80;
+                    background-color: #fff5f5;
+                    text-decoration: none;
+                    font-weight: 500;
+                    font-size: 10px;
+                    line-height: 1.2;
+                    letter-spacing: -0.2px;
+                    color: #111827;
+                    transition: 0.2s ease;
+                }
+
+                .wbk_radioButton__upgradeLink:hover {
+                    background-color: #ffebeb;
+                    border-color: #ff6d6d;
+                }
+
+                .wbk_radioButton__upgradeLockIcon {
+                    width: 12px;
+                    height: 12px;
+                    flex-shrink: 0;
+                    object-fit: contain;
+                    filter: brightness(0) saturate(100%) invert(69%) sepia(62%) saturate(4916%) hue-rotate(323deg) brightness(112%) contrast(101%);
+                }
+
+                .wbk_radioButton__upgradeText {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 100%;
+                }
+            }
+        }
+    }
+
+    &.wbk_radioButton__buttons--buttonsDots {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+
+        .wbk_radioButton__itemDots {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            cursor: pointer;
+            position: relative;
+
+            .wbk_radioButton__radioInput {
+                position: absolute;
+                opacity: 0;
+                width: 0;
+                height: 0;
+                margin: 0;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+            }
+
+            .wbk_radioButton__dot {
+                flex-shrink: 0;
+                width: 20px;
+                height: 20px;
+                margin-top: 2px;
+                border: 2px solid #8a9393;
+                border-radius: 50%;
+                background: #fff;
+                transition: border-color 0.2s, background 0.2s;
+            }
+
+            .wbk_radioButton__dot--checked {
+                border-color: #2271b1;
+                background: #2271b1;
+                box-shadow: inset 0 0 0 3px #fff;
+            }
+
+            .wbk_radioButton__dotsContent {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                min-width: 0;
+            }
+
+            .wbk_radioButton__dotsLabel {
+                font-weight: 600;
+                font-size: 14px;
+                line-height: 1.3;
+                color: #1e1e1e;
+            }
+
+            .wbk_radioButton__dotsDescription {
+                font-size: 13px;
+                line-height: 1.4;
+                color: #646970;
+                padding-left: 0;
+            }
+
+            &.wbk_radioButton__itemDots--locked {
+                opacity: 0.7;
+                cursor: not-allowed;
+            }
+        }
+    }
+}

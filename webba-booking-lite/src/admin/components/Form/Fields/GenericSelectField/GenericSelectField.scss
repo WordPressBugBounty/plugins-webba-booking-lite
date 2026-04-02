@@ -1,0 +1,70 @@
+.wbk_genericSelectField {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    gap: 3px;
+
+    &:active,
+    &:focus {
+        z-index: 999999;
+    }
+
+    &.wbk_genericSelectField--invalid {
+        color: red;
+    }
+
+    &.wbk_genericSelectField--invalid .wbk_genericSelectField__selectInput {
+        border-color: red;
+    }
+}
+
+.wbk_genericSelectField__errorContainer {
+    display: absolute;
+    color: red;
+    bottom: -18px;
+}
+
+.wbk_genericSelectField__selectInput {
+    border-radius: 8px;
+    background: colors.$field-background;
+    border: 1px solid colors.$field-border;
+    height: 50px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #333333;
+    width: 100%;
+    max-width: 100%;
+
+    .css-1u9des2-indicatorSeparator {
+        display: none;
+    }
+
+    .css-tj5bde-Svg {
+        fill: #333333;
+    }
+
+    .css-1jqq78o-placeholder {
+        color: #333333;
+    }
+
+    &.wbk_genericSelectField__selectInput--focused {
+        @include fields.field-focused-state;
+    }
+}
+
+.wbk_genericSelectField__multiValueMore {
+    display: flex;
+    min-width: 0;
+    background-color: hsl(0, 0%, 90%);
+    border-radius: 2px;
+    margin: 2px;
+    box-sizing: border-box;
+    max-width: 100px;
+    white-space: nowrap;
+    border-radius: 2px;
+    color: hsl(0, 0%, 20%);
+    font-size: 85%;
+    padding: 3px;
+    padding-left: 6px;
+    min-width: 30px;
+}

@@ -15,6 +15,8 @@ $red: #ef4444;
 $green: #0f766e;
 $border-dark: #8a9393;
 
+$field-background: #f9fafb;
+$field-border: #d1d5db;
 
 $status-colors: (
     'pending': #ff7e07,
@@ -29,3 +31,87 @@ $status-colors: (
     'rejected': #fe0606,
     'noshow': #fe0606,
 );
+
+$wbk-primary-50: var(--wbk-primary-50);
+$wbk-primary-100: var(--wbk-primary-100);
+$wbk-primary-200: var(--wbk-primary-200);
+$wbk-primary-300: var(--wbk-primary-300);
+$wbk-primary-400: var(--wbk-primary-400);
+$wbk-primary-500: var(--wbk-primary-500);
+$wbk-primary-600: var(--wbk-primary-600);
+$wbk-primary-700: var(--wbk-primary-700);
+$wbk-primary-800: var(--wbk-primary-800);
+$wbk-primary-900: var(--wbk-primary-900);
+$wbk-primary-950: var(--wbk-primary-950);
+
+$wbk-secondary-50: var(--wbk-secondary-50);
+$wbk-secondary-100: var(--wbk-secondary-100);
+$wbk-secondary-200: var(--wbk-secondary-200);
+$wbk-secondary-300: var(--wbk-secondary-300);
+$wbk-secondary-400: var(--wbk-secondary-400);
+$wbk-secondary-500: var(--wbk-secondary-500);
+$wbk-secondary-600: var(--wbk-secondary-600);
+$wbk-secondary-700: var(--wbk-secondary-700);
+$wbk-secondary-800: var(--wbk-secondary-800);
+$wbk-secondary-900: var(--wbk-secondary-900);
+$wbk-secondary-950: var(--wbk-secondary-950);
+
+$wbk-primary-text-50: var(--wbk-primary-text-50);
+$wbk-primary-text-100: var(--wbk-primary-text-100);
+$wbk-primary-text-200: var(--wbk-primary-text-200);
+$wbk-primary-text-300: var(--wbk-primary-text-300);
+$wbk-primary-text-400: var(--wbk-primary-text-400);
+$wbk-primary-text-500: var(--wbk-primary-text-500);
+$wbk-primary-text-600: var(--wbk-primary-text-600);
+$wbk-primary-text-700: var(--wbk-primary-text-700);
+$wbk-primary-text-800: var(--wbk-primary-text-800);
+$wbk-primary-text-900: var(--wbk-primary-text-900);
+$wbk-primary-text-950: var(--wbk-primary-text-950);
+
+$wbk-secondary-text-50: var(--wbk-secondary-text-50);
+$wbk-secondary-text-100: var(--wbk-secondary-text-100);
+$wbk-secondary-text-200: var(--wbk-secondary-text-200);
+$wbk-secondary-text-300: var(--wbk-secondary-text-300);
+$wbk-secondary-text-400: var(--wbk-secondary-text-400);
+$wbk-secondary-text-500: var(--wbk-secondary-text-500);
+$wbk-secondary-text-600: var(--wbk-secondary-text-600);
+$wbk-secondary-text-700: var(--wbk-secondary-text-700);
+$wbk-secondary-text-800: var(--wbk-secondary-text-800);
+$wbk-secondary-text-900: var(--wbk-secondary-text-900);
+$wbk-secondary-text-950: var(--wbk-secondary-text-950);
+
+// image filters
+$wbk-primary-filter-500: var(--wbk-primary-filter-500);
+$wbk-secondary-filter-500: var(--wbk-secondary-filter-500);
+
+// Main settings
+$wbk-bg-accent: var(--wbk-bg-accent);
+$wbk-font: var(--wbk-font);
+$wbk-border-radius: var(--wbk-border-radius);
+$wbk-shadow: var(--wbk-shadow);
+
+// Buttons
+$wbk-bg-button-primary: var(--wbk-bg-button-primary);
+$wbk-color-button-primary: var(--wbk-color-button-primary);
+$wbk-bg-button-primary-hover: var(--wbk-bg-button-primary-hover);
+$wbk-color-button-primary-hover: var(--wbk-color-button-primary-hover);
+$wbk-bg-button-secondary: var(--wbk-bg-button-secondary);
+$wbk-color-button-secondary: var(--wbk-color-button-secondary);
+$wbk-bg-button-secondary-hover: var(--wbk-bg-button-secondary-hover);
+$wbk-color-button-secondary-hover: var(--wbk-color-button-secondary-hover);
+$wbk-bg-button-inactive: var(--wbk-bg-button-inactive);
+$wbk-color-button-inactive: var(--wbk-color-button-inactive);
+$wbk-bg-button-selected: var(--wbk-bg-button-selected);
+$wbk-color-button-selected: var(--wbk-color-button-selected);
+$wbk-bg-button-selected-selected: var(--wbk-bg-button-selected-selected);
+$wbk-color-button-selected-selected: var(--wbk-color-button-selected-selected);
+$wbk-bg-button-selected-hover: var(--wbk-bg-button-selected-hover);
+$wbk-color-button-selected-hover: var(--wbk-color-button-selected-hover);
+$wbk-button-border-radius: var(--wbk-button-border-radius);
+
+// Sidebar
+$wbk-bg-sidebar: var(--wbk-bg-sidebar);
+$wbk-color-sidebar: var(--wbk-color-sidebar);
+
+// Selected elements
+$wbk-color-border-selected: var(--wbk-color-border-selected);

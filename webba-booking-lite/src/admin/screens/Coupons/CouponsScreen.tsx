@@ -15,6 +15,11 @@ import { generateColumnDefsFromModel } from '../../components/WebbaDataTable/uti
 import { couponsModel } from './model'
 import { createFormFromModel } from '../../components/Form/lib/createForm'
 import { __ } from '@wordpress/i18n'
+import { useMemo } from 'react'
+import './CouponsScreen.scss'
+import { ProFeatuerWrapper } from '../../components/ProFeatuerWrapper/ProFeatuerWrapper'
+import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
+import noItemsImage from '../../../../public/images/bookings-empty.png'
 
 const columns = generateColumnDefsFromModel(couponsModel)
 
@@ -27,19 +32,24 @@ const formSections = createFormMenuSectionsFromModel({
 })
 
 export const CouponsScreen = () => {
-    const { deleteItems, addItem } = useDispatch(store)
+    const { deleteItems, addItem, setToastNotification } = useDispatch(store)
     const { coupons, isLoading } = useSelect(
         (select) => ({
             coupons: select(store).getItems('coupons'),
-            isLoading: select(store).getLoading(),
+            isLoading: select(store).getLoadingState('coupons'),
         }),
         []
     )
     const sidebar = useSidebar()
-    const { plugin_url, settings } = useSelect(
+    const { plugin_url, settings, plan_map } = useSelect(
         // @ts-ignore
         (select) => select(store_name).getPreset(),
         []
+    )
+    const requiredPlans = ['premium', 'pro']
+    const isCouponsAvailable = useMemo(
+        () => plan_map && requiredPlans.some((plan) => plan_map[plan] === true),
+        [requiredPlans, plan_map]
     )
 
     const table = useWbkTable({
@@ -67,7 +77,13 @@ export const CouponsScreen = () => {
                                 sections={formSections}
                                 onSubmit={async (data) => {
                                     await onSubmit(data)
-                                    sidebar.close()
+                                    setToastNotification({
+                                        type: 'success',
+                                        message: __(
+                                            'Changes were saved.',
+                                            'webba-booking-lite'
+                                        ),
+                                    })
                                 }}
                                 onDelete={async () => {
                                     await onDelete()
@@ -99,34 +115,43 @@ export const CouponsScreen = () => {
 
     const addModelItem = async (data: any) => {
         try {
-            await addItem('coupons', data)
+            return await addItem('coupons', data)
         } catch (e) {
             console.error('failed to add coupon', e)
         }
     }
 
     return (
-        <Table
-            title={__('Coupons', 'webba-booking-lite')}
-            addButtonTitle={__('Add coupon', 'webba-booking-lite')}
-            table={table}
-            loading={isLoading}
-            onDeleteSelected={onDeleteSelected}
-            onAdd={() =>
-                sidebar.open(
-                    <Form
-                        name={__('Add coupon', 'webba-booking-lite')}
-                        id="add-coupon-form"
-                        form={form}
-                        sections={formSections}
-                        onSubmit={async (data) => {
-                            await addModelItem(data)
-                            sidebar.close()
-                        }}
-                    />
-                )
-            }
-            noItemsImageUrl={plugin_url + '/public/images/bookings-empty.png'}
-        />
+        <>
+            <div className="wbk_couponsScreen__wrapper">
+                {!isCouponsAvailable && (
+                    <ProFeatuerWrapper requiredPlans={['premium', 'pro']} />
+                )}
+                <Table
+                    title={__('Coupons', 'webba-booking-lite')}
+                    addButtonTitle={__('Add coupon', 'webba-booking-lite')}
+                    table={table}
+                    loading={isLoading}
+                    onDeleteSelected={onDeleteSelected}
+                    onAdd={() =>
+                        sidebar.open(
+                            <Form
+                                name={__('Add coupon', 'webba-booking-lite')}
+                                id="add-coupon-form"
+                                form={form}
+                                sections={formSections}
+                                onSubmit={async (data) => {
+                                    return await addModelItem(data)
+                                }}
+                            />
+                        )
+                    }
+                    noItemsImageUrl={
+                        noItemsImage
+                    }
+                />
+            </div>
+            <SuccessMessage />
+        </>
     )
 }

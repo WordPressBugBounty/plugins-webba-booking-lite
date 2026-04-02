@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useField } from '../../lib/hooks/useField'
 import { FormComponentConstructor } from '../../lib/types'
 import { Label } from '../Label/Label'
-import styles from './MultiCheckbox.module.scss'
+import './MultiCheckbox.scss'
 
 export const createMultiCheckbox: FormComponentConstructor<string> = ({
     field,
@@ -22,7 +22,7 @@ export const createMultiCheckbox: FormComponentConstructor<string> = ({
 
         for (let key in options) {
             const field = (
-                <div className={styles.itemWrapper}>
+                <div className="wbk_multiCheckbox__itemWrapper">
                     <input
                         type="checkbox"
                         name={key}
@@ -50,8 +50,8 @@ export const createMultiCheckbox: FormComponentConstructor<string> = ({
         return (
             <div>
                 <Label title={label} id={field.name} tooltip={misc?.tooltip} />
-                <div className={styles.checkboxesWrapper}>{checkboxes}</div>
-                {errors && <div className={styles.error}>{errors}</div>}
+                <div className="wbk_multiCheckbox__checkboxesWrapper">{checkboxes}</div>
+                {errors && <div className="wbk_multiCheckbox__error">{errors}</div>}
             </div>
         )
     }

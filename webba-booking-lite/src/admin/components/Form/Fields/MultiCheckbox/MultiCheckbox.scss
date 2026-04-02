@@ -1,0 +1,21 @@
+.wbk_multiCheckbox__checkboxesWrapper {
+    display: flex;
+    flex-flow: column;
+    gap: 10px;
+}
+
+.wbk_multiCheckbox__itemWrapper {
+    input,
+    label {
+        cursor: pointer;
+    }
+
+    input {
+        margin-top: 0;
+    }
+}
+
+.wbk_multiCheckbox__error {
+    color: red;
+    margin-top: 5px;
+}

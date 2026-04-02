@@ -1,0 +1,73 @@
+.wbk_formDateRangeField__dateInput {
+    border: 1px solid colors.$field-border;
+    background: colors.$field-background;
+    border-radius: 8px;
+    height: 50px;
+    margin: 0;
+    padding: 0 20px 0 20px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #212121;
+    width: 100%;
+
+    &:active,
+    &:focus {
+        position: relative;
+        z-index: 99999;
+    }
+
+    &.wbk_formDateRangeField__dateInput--focused {
+        @include fields.field-focused-state;
+    }
+}
+
+.wbk_formDateRangeField__inputWrapper {
+    .react-datepicker-wrapper {
+        width: 100%;
+    }
+
+    .react-datepicker-popper {
+        z-index: 99999;
+    }
+
+    .react-datepicker__close-icon {
+        z-index: 99999;
+
+        &::after {
+            background-color: #1f6763;
+        }
+    }
+}
+
+.wbk_formDateRangeField__calendar {
+    z-index: 9;
+}
+
+.wbk_formDateRangeField__day.react-datepicker__day--in-range {
+    background-color: #1f6763;
+
+    &:hover {
+        background-color: #1f6763;
+    }
+}
+
+.wbk_formDateRangeField__day.react-datepicker__day--in-selecting-range {
+    background-color: #1f676350;
+}
+
+.wbk_formDateRangeField__day.react-datepicker__day--selecting-range-end {
+    background-color: #1f6763;
+
+    &:hover {
+        background-color: #1f6763;
+    }
+}
+
+.wbk_formDateRangeField__day.react-datepicker__day--range-start {
+    background-color: #1f676350;
+}
+
+.wbk_formDateRangeField__error {
+    color: red;
+    margin-top: 5px;
+}

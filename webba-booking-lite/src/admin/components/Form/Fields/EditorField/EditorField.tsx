@@ -4,7 +4,7 @@ import { FormFieldProps } from '../../types'
 import { __ } from '@wordpress/i18n'
 import { Label } from '../Label/Label'
 import { useState } from 'react'
-import styles from './../GenericFormField/GenericFormField.module.scss'
+import './../GenericFormField/GenericFormField.scss'
 import { FormComponentConstructor } from '../../lib/types'
 import { useField } from '../../lib/hooks/useField'
 import classNames from 'classnames'
@@ -136,7 +136,12 @@ const placeHolders: Record<
     {
         name: 'wbk_user_pass_button',
         text: __('User password (account)', 'webba-booking-lite'),
-        content: '##user_pass',
+        content: '#user_pass',
+    },
+    {
+        name: 'wbk_google_meet_link',
+        text: __('Google Meet link', 'webba-booking-lite'),
+        content: '#google_meet_link',
     },
     {
         name: 'wbk_multiple_loop',
@@ -268,18 +273,18 @@ export const createEditorField: FormComponentConstructor<any> = ({ field }) => {
                 <div>
                     <Label id={name} title={label} tooltip={misc?.tooltip} />
                 </div>
-                <div className={styles.editorToggle}>
+                <div className="wbk_genericFormField__editorToggle">
                     <div
-                        className={classNames(styles.editorToggleButton, {
-                            [styles.editorToggleButtonActive]: isVisual,
+                        className={classNames('wbk_genericFormField__editorToggleButton', {
+                            'wbk_genericFormField__editorToggleButton--active': isVisual,
                         })}
                         onClick={() => setIsVisual(true)}
                     >
                         {__('Visual', 'webba-booking-lite')}
                     </div>
                     <div
-                        className={classNames(styles.editorToggleButton, {
-                            [styles.editorToggleButtonActive]: !isVisual,
+                        className={classNames('wbk_genericFormField__editorToggleButton', {
+                            'wbk_genericFormField__editorToggleButton--active': !isVisual,
                         })}
                         onClick={() => setIsVisual(false)}
                     >
@@ -301,8 +306,8 @@ export const createEditorField: FormComponentConstructor<any> = ({ field }) => {
                     {!isVisual && (
                         <textarea
                             className={classNames(
-                                styles.rawEditor,
-                                styles.input
+                                'wbk_genericFormField__rawEditor',
+                                'wbk_genericFormField__input'
                             )}
                             name={name}
                             id={name}
@@ -313,7 +318,7 @@ export const createEditorField: FormComponentConstructor<any> = ({ field }) => {
                     )}
                 </div>
                 {showErrors && (
-                    <div className={styles.errorContainer}>{firstError}</div>
+                    <div className="wbk_genericFormField__errorContainer">{firstError}</div>
                 )}
             </div>
         )

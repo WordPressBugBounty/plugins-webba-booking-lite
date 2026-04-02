@@ -522,6 +522,7 @@ class WBK_Price_Processor
         $booking_ids_array = [];
         $deposit_items = [];
         $item_service_fees = [];
+        $item_staffs = [];
 
         $bookings = [];
         foreach ($booking_ids as $booking_id) {
@@ -626,6 +627,7 @@ class WBK_Price_Processor
             $booking_ids_array[] = $booking->get_id();
             $deposit_items[] = $is_deposit;
             $item_service_fees[] = self::get_service_fees([$booking_id])[0];
+            $item_staffs[] = $booking->get_staff_member();
         }
 
         $subtotal = apply_filters(
@@ -726,6 +728,7 @@ class WBK_Price_Processor
                 'booking_id' => $booking_ids_array[$i],
                 'have_deposit' => $deposit_items[$i],
                 'service_fee' => $item_service_fees[$i],
+                'staff_member' => $item_staffs[$i] ?? null,
             ];
         }
 

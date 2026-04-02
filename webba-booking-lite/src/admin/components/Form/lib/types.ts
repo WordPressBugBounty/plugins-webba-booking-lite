@@ -2,10 +2,7 @@ import { ComponentType } from 'react'
 import { Model } from '../../../types'
 import { FormFieldMisc, FormFieldProps } from '../types'
 import { ValidatorFn } from '../utils/validation'
-
-export interface Primitive<T> {
-    value: T
-}
+import { Primitive } from '../../../utils/primitive'
 
 export type FormValueFromModel<
     T extends Model,
@@ -86,12 +83,23 @@ export interface FormComponentContstructorConfig<T> {
     fieldConfig: FieldConfig
 }
 
+export type CreateFieldGroupConfig = Record<string, CreateFieldParams<unknown>>
+
+export type FieldGroup<T extends CreateFieldGroupConfig> =
+    T extends CreateFieldGroupConfig
+        ? {
+              [K in keyof T]: T[K] extends CreateFieldParams<infer V>
+                  ? FormField<V>
+                  : never
+          }
+        : never
+
 export type FormComponentConstructor<
     T,
     P extends FormFieldProps = FormFieldProps,
 > = (config: FormComponentContstructorConfig<T>) => ComponentType<P>
 
-export type Operator = '=' | '!=' | '>' | '<'
+export type Operator = '=' | '==' | '!=' | '>' | '<' | '>=' | '<='
 
 type FieldName = string
 

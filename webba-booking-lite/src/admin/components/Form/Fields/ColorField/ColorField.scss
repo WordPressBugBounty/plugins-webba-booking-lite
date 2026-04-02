@@ -1,0 +1,42 @@
+.wbk_colorField {
+    input {
+        padding: 0;
+        margin: 0;
+        border: none;
+        outline: none;
+        height: 50px;
+        width: 50px;
+        -webkit-appearance: none;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        cursor: pointer;
+
+        &::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        &::-webkit-color-swatch {
+            border: none;
+        }
+    }
+
+    .wbk_colorField__boxWrapper {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: flex-start;
+        border: 1px solid colors.$field-border;
+        border-radius: 8px;
+        background: colors.$field-background;
+        overflow: hidden;
+        cursor: pointer;
+
+        span {
+            cursor: text;
+        }
+    }
+}
+
+.wbk_colorField__error {
+    color: red;
+}

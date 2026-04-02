@@ -1,0 +1,68 @@
+.paymentContainer {
+    text-align: center;
+    margin-top: 32px;
+}
+
+.orderSummary {
+    margin: 16px 0;
+    text-align: left;
+    display: inline-block;
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 16px 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.orderList {
+    padding-left: 20px;
+    margin-bottom: 12px;
+}
+
+.stripePlaceholder {
+    margin: 24px 0;
+    color: #888;
+    font-style: italic;
+}
+
+.wbk_stripe_form {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    width: 100%;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+
+    &__wrapper {
+        width: 100%;
+    }
+}
+
+.jsonDetails {
+    text-align: left;
+    display: inline-block;
+    background: #f4f4f4;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #333;
+    margin-top: 16px;
+}
+
+.actionButtonContainer {
+    margin-top: 24px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-flow: column;
+    text-align: center;
+}
+
+.actionButtonError {
+    color: #dc2626;
+    font-size: 15px;
+}

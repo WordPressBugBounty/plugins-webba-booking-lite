@@ -1,0 +1,25 @@
+.wbk_emailReceivers__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.wbk_emailReceivers__badge {
+    padding: 2px 8px;
+    font-weight: 500;
+    color: #ffffff;
+    font-size: 12px;
+    border-radius: 8px;
+
+    &--customer {
+        background-color: #2aa6ce;
+    }
+
+    &--admin {
+        background-color: #174f4d;
+    }
+
+    &--default {
+        background-color: #6c757d;
+    }
+}

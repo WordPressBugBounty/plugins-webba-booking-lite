@@ -5,7 +5,7 @@ import apiFetch from '@wordpress/api-fetch'
 import emailTestIcon from '../../../../../../public/images/email-test-icon.png'
 import successIcon from '../../../../../../public/images/succesessful-icon.png'
 import sendIcon from '../../../../../../public/images/arrow-right-custom-active-icon.png'
-import styles from './EmailTestButton.module.scss'
+import './EmailTestButton.scss'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
 import classNames from 'classnames'
@@ -110,24 +110,24 @@ export const EmailTestButton = ({ cell, row }: CellContext<any, any>) => {
 
     return (
         <div
-            className={classNames({
-                [styles.pop]: step > 1 && step < 5,
+            className={classNames('wbk_emailTestButton', {
+                'wbk_emailTestButton__pop': step > 1 && step < 5,
             })}
             onClick={(e: any) => {
                 updateStep(1)
             }}
         >
             <div
-                className={styles.innerWrapper}
+                className="wbk_emailTestButton__innerWrapper"
                 onClick={(e: any) => e.stopPropagation()}
             >
-                <div onClick={() => updateStep(1)} className={styles.closeIcon}>
+                <div onClick={() => updateStep(1)} className="wbk_emailTestButton__closeIcon">
                     <img
                         src={closeIcon}
                         alt={__('Close icon', 'webba-booking-lite')}
                     />
                 </div>
-                <div className={styles.header}>
+                <div className="wbk_emailTestButton__popHeader">
                     <img
                         src={emailTestIcon}
                         alt={__('Test email icon', 'webba-booking-lite')}
@@ -137,7 +137,7 @@ export const EmailTestButton = ({ cell, row }: CellContext<any, any>) => {
                         {cell.row.original.name}
                     </p>
                 </div>
-                <div className={styles.wrapper}>
+                <div className="wbk_emailTestButton__wrapper">
                     {step === 2 && isEligible && (
                         <Select
                             value={selectedBookings}
@@ -149,9 +149,9 @@ export const EmailTestButton = ({ cell, row }: CellContext<any, any>) => {
                                 setSelectedBookings(selectedOptions as any)
                             }
                             isClearable={false}
-                            className={styles.selectBox}
+                            className="wbk_emailTestButton__selectBox"
                             classNames={{
-                                control: (state) => styles.selectControl,
+                                control: () => 'wbk_emailTestButton__selectControl',
                             }}
                             placeholder={__(
                                 'Select bookings to test',
@@ -164,15 +164,15 @@ export const EmailTestButton = ({ cell, row }: CellContext<any, any>) => {
                             type="email"
                             value={email}
                             placeholder="emailtotest@test.com"
-                            className={styles.inputEmail}
+                            className="wbk_emailTestButton__inputEmail"
                             onChange={(e) => setEmail(e.target.value)}
                         />
                     )}
                     <button
                         onClick={() => updateStep(step + 1)}
-                        className={classNames(styles.buttonWrapper, {
-                            [styles.noCutRadius]: step === 4,
-                            [styles.hidden]: step > 1 && !isEligible,
+                        className={classNames('wbk_emailTestButton__buttonWrapper', {
+                            'wbk_emailTestButton__buttonWrapper--noCutRadius': step === 4,
+                            'wbk_emailTestButton__hidden': step > 1 && !isEligible,
                         })}
                         disabled={
                             (step === 2 && !selectedBookings.length) ||
@@ -208,7 +208,7 @@ export const EmailTestButton = ({ cell, row }: CellContext<any, any>) => {
                             __('Sent', 'webba-booking-lite')}
                     </button>
                     {step > 1 && !isEligible && (
-                        <p className={styles.error}>{errorMessage}</p>
+                        <p className="wbk_emailTestButton__error">{errorMessage}</p>
                     )}
                 </div>
             </div>

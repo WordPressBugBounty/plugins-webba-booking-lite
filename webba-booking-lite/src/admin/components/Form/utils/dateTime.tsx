@@ -1,8 +1,10 @@
 import * as dateFns from 'date-fns'
-import { toZonedTime } from 'date-fns-tz'
+import { toZonedTime, getTimezoneOffset } from 'date-fns-tz'
 import { format } from 'date-fns'
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns'
 
 export const daysOfWeek: { [key: string]: string } = {
+    '0': 'Sunday',
     '1': 'Monday',
     '2': 'Tuesday',
     '3': 'Wednesday',
@@ -10,6 +12,16 @@ export const daysOfWeek: { [key: string]: string } = {
     '5': 'Friday',
     '6': 'Saturday',
     '7': 'Sunday',
+}
+
+export const weekDaysSlugs: { [key: string]: number } = {
+    sunday: 0,
+    monday: 1,
+    tuesday: 2,
+    wednesday: 3,
+    thursday: 4,
+    friday: 5,
+    saturday: 6,
 }
 
 export const getReadableTime = (timeInSeconds: number, format: string) => {
@@ -42,24 +54,88 @@ export const convertToJSFormat = (format: string) => {
         s: 'ss', // Seconds
     }
 
-    const jsTimeFormat = format.replace(
-        /[gGiaAFMmdjYlDynhHs]/g,
-        (match) => formatMap[match] || match
-    )
-
-    return jsTimeFormat
+    // Process the format string character by character, handling escapes
+    let result = ''
+    let escaping = false
+    for (let i = 0; i < format.length; i++) {
+        const char = format[i]
+        if (escaping) {
+            result += `'${char}'`
+            escaping = false
+        } else if (char === '\\') {
+            escaping = true
+        } else if (formatMap[char]) {
+            result += formatMap[char]
+        } else {
+            result += char
+        }
+    }
+    return result
 }
 
 export const wbkFormat = (
-    timestamp: number,
-    timeFormat: string,
-    timezone: string = Intl.DateTimeFormat().resolvedOptions().timeZone
+    timestamp: number | Date,
+    timeFormat: string = 'dd/mm/yyyy HH:mm',
+    timezone: string = '',
+    options?: any
 ) => {
-    const dateTime = dateFns.fromUnixTime(timestamp)
+    const dateTime = Number(
+        typeof timestamp === 'number'
+            ? dateFns.fromUnixTime(timestamp)
+            : timestamp === undefined
+              ? new Date()
+              : timestamp
+    )
+
+    if (timezone.length === 0) {
+        timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    }
+
     const zonedDate = toZonedTime(dateTime, timezone)
     const jsFormat = convertToJSFormat(timeFormat || 'dd/mm/yyyy HH:mm')
 
-    return format(zonedDate, jsFormat)
+    return format(zonedDate, jsFormat, options)
 }
 
 export const formatWbkDate = (date: Date) => format(date, 'M/d/y')
+
+export const getCalendarMonthRange = (date: Date) => [
+    startOfWeek(startOfMonth(date), { weekStartsOn: 0 }),
+    endOfWeek(endOfMonth(date), { weekStartsOn: 0 }),
+]
+
+export const wbkGetTimezoneOffset = (timezone: string) => {
+    const rawOffset = getTimezoneOffset(timezone)
+    const minutes = rawOffset / (1000 * 60)
+
+    return minutes * -1
+}
+
+export const getNamedTimezoneFromOffset = (
+    offsetSeconds: number,
+    date: Date = new Date()
+): string | undefined => {
+    if (
+        typeof Intl === 'undefined' ||
+        typeof Intl.supportedValuesOf === 'undefined'
+    ) {
+        console.warn(
+            'Intl.supportedValuesOf is not supported in this environment.'
+        )
+        return undefined
+    }
+
+    const allTimezones = Intl.supportedValuesOf('timeZone')
+
+    for (const tz of allTimezones) {
+        try {
+            const currentTzOffset = wbkGetTimezoneOffset(tz)
+            if (currentTzOffset === offsetSeconds) {
+                return tz
+            }
+        } catch (e) {
+            console.warn(`Error calculating offset for timezone ${tz}:`, e)
+        }
+    }
+    return undefined
+}

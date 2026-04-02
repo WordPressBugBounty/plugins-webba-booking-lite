@@ -45,6 +45,10 @@ registerBlockType(metadata.name, {
             type: 'integer',
             default: 0,
         },
+        locationIds: {
+            type: 'array',
+            default: [],
+        },
     },
     icon: 'calendar-alt',
     edit: Edit,

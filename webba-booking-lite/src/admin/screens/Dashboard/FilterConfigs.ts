@@ -27,4 +27,12 @@ export const filterFields: IFilterField[] = [
         value: 'l_30',
         triggerDateRange: true,
     },
+    {
+        name: 'appointment_staff_member_id',
+        placeholder: __('Filter by Staff member...', 'webba-booking-lite'),
+        type: 'select',
+        options: 'staff_members',
+        null_value: [__('All staff members', 'webba-booking-lite')],
+        value: 0,
+    },
 ]

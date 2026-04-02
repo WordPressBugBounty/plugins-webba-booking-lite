@@ -7,8 +7,9 @@ import { Validators } from '../../utils/validation'
 import { FormComponentConstructor } from '../../lib/types'
 import { useField } from '../../lib/hooks/useField'
 
-import styles from './DateRangeField.module.scss'
+import './DateRangeField.scss'
 import { formatWbkDate } from '../../utils/dateTime'
+import classNames from 'classnames'
 
 type DateRange = Date[] | null[]
 
@@ -34,7 +35,7 @@ export const createDateRangeField: FormComponentConstructor<any> = ({
             if (!range[0] && !range[1] && value) {
                 setRange(splitDates(value))
             }
-        }, [])
+        }, [value])
 
         useEffect(() => {
             if (range[0] && range[1]) {
@@ -47,12 +48,14 @@ export const createDateRangeField: FormComponentConstructor<any> = ({
         }, [range])
 
         return (
-            <div className={styles.inputWrapper}>
+            <div className="wbk_formDateRangeField__inputWrapper">
                 <Label title={label} id={name} tooltip={misc?.tooltip} />
                 <DatePicker
-                    className={styles.dateInput}
-                    calendarClassName={styles.calendar}
-                    dayClassName={() => styles.day}
+                    className={classNames('wbk_formDateRangeField__dateInput', {
+                        'wbk_formDateRangeField__dateInput--focused': open,
+                    })}
+                    calendarClassName="wbk_formDateRangeField__calendar"
+                    dayClassName={() => 'wbk_formDateRangeField__day'}
                     startDate={range[0]}
                     endDate={range[1]}
                     selectsRange={true}
@@ -72,7 +75,7 @@ export const createDateRangeField: FormComponentConstructor<any> = ({
                     onInputClick={() => setOpen(true)}
                 />
                 {errors.length > 0 && touched && (
-                    <div className={styles.error}>{errors[0]}</div>
+                    <div className="wbk_formDateRangeField__error">{errors[0]}</div>
                 )}
             </div>
         )

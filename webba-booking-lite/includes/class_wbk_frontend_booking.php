@@ -176,6 +176,12 @@ class WBK_Frontend_Booking {
             'category_list' => 'no',
         ], $attr ) );
         extract( shortcode_atts( [
+            'location' => '0',
+        ], $attr ) );
+        extract( shortcode_atts( [
+            'staff' => '0',
+        ], $attr ) );
+        extract( shortcode_atts( [
             'compatibility' => 'no',
         ], $attr ) );
         $tracking_service = $service;
@@ -188,7 +194,13 @@ class WBK_Frontend_Booking {
         if ( isset( $_GET['service'] ) && is_numeric( $_GET['service'] ) ) {
             $service = $_GET['service'];
         }
-        $cnt = WBK_Renderer::load_template( 'frontend_v6/booking_form', [$service, $category_list, $category], false );
+        $cnt = WBK_Renderer::load_template( 'frontend_v6/booking_form', [
+            $service,
+            $category_list,
+            $category,
+            $location,
+            $staff
+        ], false );
         return $cnt;
     }
 

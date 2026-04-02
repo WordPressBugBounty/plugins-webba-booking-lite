@@ -4,6 +4,10 @@ declare module '*.png' {
 }
 
 declare module '*.svg' {
-    const file: string
-    export default file
+    import { FC, SVGProps } from 'react'
+
+    const content: string
+    export default content
+
+    export const ReactComponent: FC<SVGProps<SVGSVGElement>>
 }

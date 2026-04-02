@@ -1,14 +1,14 @@
 import { IStatProps } from '../../../types'
 import { __ } from '@wordpress/i18n'
-import styles from './Stat.module.scss'
+import './Stat.scss'
 
 export const Stat = ({ icon, title, value }: IStatProps) => {
     return (
-        <div className={styles.wrapper}>
-            <div className={styles.topContents}>
-                <h3 className={styles.title}>{title}</h3>
+        <div className="wbk_stat__wrapper">
+            <div className="wbk_stat__topContents">
+                <h3 className="wbk_stat__title">{title}</h3>
                 {icon && (
-                    <div className={styles.iconWrapper}>
+                    <div className="wbk_stat__iconWrapper">
                         <img
                             src={icon}
                             alt={__('Icon', 'webba-booking-lite')}
@@ -16,7 +16,7 @@ export const Stat = ({ icon, title, value }: IStatProps) => {
                     </div>
                 )}
             </div>
-            <div className={styles.bottomContents}>{value}</div>
+            <div className="wbk_stat__bottomContents">{value}</div>
         </div>
     )
 }

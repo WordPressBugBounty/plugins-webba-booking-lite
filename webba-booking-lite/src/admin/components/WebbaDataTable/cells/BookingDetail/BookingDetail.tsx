@@ -1,5 +1,5 @@
 import { CellContext, flexRender } from '@tanstack/react-table'
-import styles from './BookingDetail.module.scss'
+import './BookingDetail.scss'
 import { __ } from '@wordpress/i18n'
 import { Button } from '../../../Button/Button'
 import { useCallback, useLayoutEffect, useMemo } from 'react'
@@ -12,6 +12,26 @@ import { decodeHtmlEntities, mapServiceCategories } from '../../utils'
 import classNames from 'classnames'
 import { CellProvider } from '../../context/CellProvider'
 import { customActionCells, ignoreMappingCells } from '../../TableMobile'
+import { useWording } from '../../../../../frontend/hooks/useWording'
+import { fromUnixTime } from 'date-fns'
+import { formatPrice } from '../../../../utils/currency'
+
+function formatCreatedAt(
+    createdOn: unknown,
+    dateFormat?: string,
+    timezone?: string
+): string {
+    if (createdOn == null) return ''
+    const num = Number(createdOn)
+    if (!Number.isFinite(num)) return ''
+    const date = fromUnixTime(num)
+    if (Number.isNaN(date.getTime())) return ''
+    try {
+        return wbkFormat(date, dateFormat ?? '', timezone ?? '')
+    } catch {
+        return ''
+    }
+}
 
 export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
     const {
@@ -25,8 +45,12 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
         created_by,
         extra,
         description,
+        created_on,
     } = cell.row.original
-    const [emailType, setEmailType] = useState<string>('booking_created_by_customer')
+    const wording = useWording()
+    const [emailType, setEmailType] = useState<string>(
+        'booking_created_by_customer'
+    )
     const [message, setMessage] = useState<string | null>(null)
     const sendEmail = useCallback(async () => {
         await apiFetch({
@@ -59,8 +83,8 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
     const visibleCells = row.getVisibleCells()
 
     return (
-        <div className={styles.wrapper}>
-            <table className={styles.table}>
+        <div className="wbk_bookingDetail__wrapper">
+            <table className="wbk_bookingDetail__table">
                 <tbody>
                     <tr>
                         {window.innerWidth < 768 &&
@@ -84,12 +108,12 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                                     </CellProvider>
                                 ))}
                         <td>
-                            <div className={styles.column}>
+                            <div className="wbk_bookingDetail__column">
                                 {associatedCategories.length > 0 && (
                                     <div
                                         className={classNames(
-                                            styles.columnItem,
-                                            styles.wrapMobile
+                                            'wbk_bookingDetail__columnItem',
+                                            'wbk_bookingDetail__columnItem--wrapMobile'
                                         )}
                                     >
                                         <span>
@@ -110,8 +134,8 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                                 )}
                                 <div
                                     className={classNames(
-                                        styles.columnItem,
-                                        styles.wrapMobile
+                                        'wbk_bookingDetail__columnItem',
+                                        'wbk_bookingDetail__columnItem--wrapMobile'
                                     )}
                                 >
                                     <span>
@@ -125,8 +149,8 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                                 {phone && (
                                     <div
                                         className={classNames(
-                                            styles.columnItem,
-                                            styles.wrapMobile
+                                            'wbk_bookingDetail__columnItem',
+                                            'wbk_bookingDetail__columnItem--wrapMobile'
                                         )}
                                     >
                                         <span>
@@ -138,11 +162,11 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                             </div>
                         </td>
                         <td>
-                            <div className={styles.column}>
+                            <div className={'wbk_bookingDetail__column'}>
                                 <div
                                     className={classNames(
-                                        styles.columnItem,
-                                        styles.wrapMobile
+                                        'wbk_bookingDetail__columnItem',
+                                        'wbk_bookingDetail__columnItem--wrapMobile'
                                     )}
                                 >
                                     <span>
@@ -160,19 +184,36 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                                               )}
                                     </p>
                                 </div>
+                                <div
+className={classNames(
+                                            'wbk_bookingDetail__columnItem',
+                                            'wbk_bookingDetail__columnItem--wrapMobile'
+                                        )}
+                                    >
+                                    <span>
+                                        {__('Created at', 'webba-booking-lite')}
+                                    </span>
+                                    <p>
+                                        {formatCreatedAt(
+                                            created_on,
+                                            settings?.date_format,
+                                            settings?.timezone
+                                        ) || '—'}
+                                    </p>
+                                </div>
                                 {payment_method && (
                                     <div
                                         className={classNames(
-                                            styles.columnItem,
-                                            styles.wrapMobile
+                                            'wbk_bookingDetail__columnItem',
+                                            'wbk_bookingDetail__columnItem--wrapMobile'
                                         )}
                                     >
-                                        <span>
-                                            {__(
-                                                'Payment method',
-                                                'webba-booking-lite'
-                                            )}
-                                        </span>
+                                    <span>
+                                        {__(
+                                            'Payment method',
+                                            'webba-booking-lite'
+                                        )}
+                                    </span>
                                         <p>
                                             {paymentMethods[payment_method] ||
                                                 payment_method}
@@ -181,8 +222,8 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                                 )}
                                 <div
                                     className={classNames(
-                                        styles.columnItem,
-                                        styles.wrapMobile
+                                        'wbk_bookingDetail__columnItem',
+                                        'wbk_bookingDetail__columnItem--wrapMobile'
                                     )}
                                 >
                                     <span>
@@ -190,17 +231,20 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                                     </span>
                                     <p>
                                         {moment_price && moment_price > 0
-                                            ? settings?.price_format.replace(
-                                                  '#price',
-                                                  moment_price
+                                            ? formatPrice(
+                                                  moment_price,
+                                                  settings?.price_format,
+                                                  settings?.price_separator,
+                                                  settings?.price_fractional
                                               )
-                                            : __('Free', 'webba-booking-lite')}
+                                            : wording.free ||
+                                              __('Free', 'webba-booking-lite')}
                                     </p>
                                 </div>
                                 <div
                                     className={classNames(
-                                        styles.columnItem,
-                                        styles.wrapMobile
+                                        'wbk_bookingDetail__columnItem',
+                                        'wbk_bookingDetail__columnItem--wrapMobile'
                                     )}
                                 >
                                     <span>
@@ -212,20 +256,23 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                                     <p>
                                         {(amount_paid && amount_paid > 0) ||
                                         moment_price > 0
-                                            ? settings?.price_format.replace(
-                                                  '#price',
-                                                  amount_paid || 0
+                                            ? formatPrice(
+                                                  amount_paid || 0,
+                                                  settings?.price_format,
+                                                  settings?.price_separator,
+                                                  settings?.price_fractional
                                               )
-                                            : __('Free', 'webba-booking-lite')}
+                                            : wording.free ||
+                                              __('Free', 'webba-booking-lite')}
                                     </p>
                                 </div>
                             </div>
                         </td>
                         <td>
-                            <div className={styles.mobileDivider}></div>
-                            <div className={styles.emailSender}>
-                                <div className={styles.column}>
-                                    <div className={styles.columnItem}>
+                            <div className="wbk_bookingDetail__mobileDivider"></div>
+                            <div className="wbk_bookingDetail__emailSender">
+                                <div className="wbk_bookingDetail__column">
+                                    <div className="wbk_bookingDetail__columnItem">
                                         <span>
                                             {__(
                                                 'Notification status',
@@ -233,18 +280,18 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                                             )}
                                         </span>
                                         {message && (
-                                            <p className={styles.emailMessage}>
+                                            <p className="wbk_bookingDetail__emailMessage">
                                                 {message}
                                             </p>
                                         )}
                                     </div>
-                                    <div className={styles.emailSelectWrapper}>
+                                    <div className="wbk_bookingDetail__emailSelectWrapper">
                                         <select
                                             value={emailType}
                                             onChange={(e) =>
                                                 setEmailType(e.target.value)
                                             }
-                                            className={styles.emailSelect}
+                                            className="wbk_bookingDetail__emailSelect"
                                         >
                                             <option value="booking_created_by_customer">
                                                 {__(
@@ -273,7 +320,7 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                                         </select>
                                         <Button
                                             onClick={sendEmail}
-                                            className={styles.emailButton}
+                                            className="wbk_bookingDetail__emailButton"
                                         >
                                             {(message &&
                                                 __(
@@ -290,9 +337,9 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                             </div>
                         </td>
                         {extra && JSON.parse(extra).length > 0 && (
-                            <td className={styles.customDetailWrapper}>
-                                <div className={styles.column}>
-                                    <div className={styles.columnItem}>
+                            <td className="wbk_bookingDetail__customDetailWrapper">
+                                <div className="wbk_bookingDetail__column">
+                                    <div className="wbk_bookingDetail__columnItem">
                                         <span>
                                             {__(
                                                 'Custom details',
@@ -317,8 +364,8 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                             </td>
                         )}
                         <td>
-                            <div className={styles.column}>
-                                <div className={styles.columnItem}>
+                            <div className="wbk_bookingDetail__column">
+                                <div className="wbk_bookingDetail__columnItem">
                                     <span>
                                         {__(
                                             'Internal note',
@@ -327,7 +374,7 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                                     </span>
                                     <p>
                                         <textarea
-                                            className={styles.inputNote}
+                                            className="wbk_bookingDetail__inputNote"
                                             onBlur={(e) =>
                                                 setItem('appointments', {
                                                     ...cell.row.original,

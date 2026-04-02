@@ -1,0 +1,525 @@
+$menu-icon-size: 20px;
+
+@mixin mobile {
+    @media screen and (max-width: 768px) {
+        @content;
+    }
+}
+
+@mixin tablet {
+    @media screen and (max-width: 1200px) {
+        @content;
+    }
+}
+
+.wbk_table__dataTable {
+    border-collapse: collapse;
+    width: 100%;
+    text-align: center;
+    margin-top: 24px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+
+    tbody {
+        > tr {
+            background-color: colors.$background-white;
+            border: 1px solid colors.$row-border;
+
+            &:last-child {
+                border-bottom-left-radius: 12px;
+                border-bottom-right-radius: 12px;
+
+                td:first-child {
+                    border-bottom-left-radius: 12px;
+                }
+
+                td:last-child {
+                    border-bottom-right-radius: 12px;
+                }
+            }
+        }
+    }
+}
+
+.wbk_table__head {
+    display: none;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.wbk_table__header {
+    padding: 15px;
+    cursor: pointer;
+    text-align: left;
+    @include typography.use-font(
+        $font: typography.$font-primary,
+        $size: 14px,
+        $weight: 300
+    );
+    color: colors.$text-grey;
+}
+
+.wbk_table__headerContent {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.wbk_table__header:first-child {
+    border-radius: 10px 0 0 10px;
+}
+
+.wbk_table__header:last-child {
+    border-radius: 0 10px 10px 0;
+}
+
+.wbk_table__cell {
+    padding: 15px;
+    text-align: left;
+    @include typography.use-font(
+        $font: typography.$font-primary,
+        $size: 16px,
+        $weight: 300
+    );
+
+    &:first-child {
+        max-width: 50px;
+        width: 50px;
+    }
+
+    &:last-child {
+        text-align: right;
+    }
+}
+
+.wbk_table__rowExpanded {
+    > td {
+        padding: 0;
+    }
+}
+
+.wbk_table__menuBtn {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    transition:
+        opacity 200ms,
+        transform 500ms;
+    padding: 0;
+    min-width: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:active {
+        transform: scale(0.9);
+    }
+
+    &[data-title] {
+        position: relative;
+
+        &::after {
+            content: attr(data-title);
+            display: flex;
+            padding: 2px 5px;
+            border-radius: 2px;
+            background-color: #111827dd;
+            color: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: scale(0) translate(-50%, -100%);
+            white-space: nowrap;
+        }
+
+        &:hover {
+            &::after {
+                top: calc(-100% - 15px);
+                right: 0;
+                left: unset;
+                transform: translateX(-25%) scale(1);
+            }
+        }
+    }
+}
+
+.wbk_table__menuBtn img {
+    width: $menu-icon-size;
+    height: $menu-icon-size;
+    min-width: $menu-icon-size;
+    min-height: $menu-icon-size;
+    max-width: $menu-icon-size;
+    min-height: $menu-icon-size;
+}
+
+.wbk_table__menuBtn:hover img {
+    opacity: 0.7;
+}
+
+.wbk_table__menuBtn--hidden {
+    visibility: hidden;
+}
+
+.wbk_table__menuBtn--open {
+    transform: rotate(180deg);
+}
+
+.wbk_table__titleContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    @include mobile {
+        flex-flow: column;
+        align-items: flex-start;
+    }
+}
+
+.wbk_table__addItemButton {
+    border: none;
+    background-color: green;
+    color: white;
+    padding: 10px;
+    font-size: 18px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.wbk_table__title {
+    font-family: typography.$font-primary;
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 40px;
+    margin: 0;
+}
+
+.wbk_table__expandedData {
+    padding: 15px;
+}
+
+.wbk_table__selectAllCheckboxMobile {
+    margin-bottom: 15px;
+}
+
+.wbk_table__selectAllCheckboxMobile input {
+    display: none;
+}
+
+.wbk_table__toolPanel {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 16px;
+
+    @include mobile {
+        white-space: nowrap;
+        flex-flow: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 10px;
+        width: 100%;
+        margin-top: 20px;
+
+        input[id='search'] {
+            width: 100%;
+        }
+    }
+}
+
+.wbk_table__paginationContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+}
+
+.wbk_table__itemCountWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    p {
+        font-family: typography.$font-primary;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 14px;
+        letter-spacing: 0%;
+        color: colors.$text-grey;
+
+        &:nth-child(3) {
+            @include mobile {
+                display: none;
+            }
+        }
+    }
+
+    select {
+        border-radius: 4px;
+        border: 1px solid colors.$input-border;
+        font-family: typography.$font-primary;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 100%;
+        letter-spacing: 0%;
+        text-align: center;
+        color: colors.$input-text;
+    }
+}
+
+.wbk_table__paginationTools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    button {
+        border: 1px solid colors.$input-border;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-family: typography.$font-primary;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 100%;
+        letter-spacing: 0%;
+        text-align: center;
+        color: colors.$input-text;
+        transition: $transition;
+        background-color: transparent;
+
+        &:hover,
+        &.wbk_table__paginationBtn--active {
+            background-color: colors.$primary;
+            color: white;
+        }
+
+        &:not(:disabled) {
+            cursor: pointer;
+        }
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        img {
+            display: none;
+        }
+
+        @include mobile {
+            img {
+                display: flex;
+            }
+
+            span {
+                display: none;
+            }
+        }
+    }
+}
+
+.wbk_table__pagination {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.wbk_table__head {
+    display: table-header-group;
+}
+
+.wbk_table__container {
+    box-shadow: 0 0 15px rgba(161, 164, 182, 0.5);
+    border-radius: 20px;
+    padding: 32px;
+    margin: 20px;
+    background: colors.$background-offwhite;
+
+    @include mobile {
+        margin: 10px;
+        padding: 25px;
+    }
+}
+
+.wbk_table__menu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    row-gap: 1px;
+    column-gap: 12px;
+    width: 170px;
+    max-width: 170px;
+
+    .wbk_table__expandButton {
+        @include mobile {
+            display: none;
+        }
+    }
+
+    @include mobile {
+        width: auto;
+        max-width: unset;
+    }
+}
+
+.wbk_table__wrapper {
+    @media (max-width: 1400px) {
+        overflow-x: auto;
+        overflow-y: clip;
+    }
+
+    &.wbk_table__wrapper--horizontalOverflow {
+        overflow-x: auto;
+    }
+}
+
+.wbk_table__rowItemTitle {
+    font-family: typography.$font-primary;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 26px;
+    letter-spacing: 0%;
+    color: colors.$off-black;
+    margin: 0;
+    word-wrap: break-word;
+}
+
+.wbk_table__rowItemContent {
+    font-family: typography.$font-primary;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 26px;
+    letter-spacing: 0%;
+    color: colors.$light-grey;
+    margin: 0;
+    word-wrap: break-word;
+}
+
+.wbk_table__noWrapContainer {
+    * {
+        white-space: nowrap;
+    }
+}
+
+.wbk_table__bulkActionsOuterWrapper {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: calc(100% - 160px);
+    z-index: 999;
+
+    @media (max-width: 960px) {
+        width: calc(100% - 36px);
+    }
+
+    @media (max-width: 782px) {
+        width: 100%;
+    }
+}
+
+.wbk_table__bulkActionsWrapper {
+    width: 100%;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border: 1px solid colors.$input-border;
+    border-bottom: none;
+    padding: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: colors.$background-white;
+
+    @media (max-width: 960px) {
+        flex-flow: column;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .wbk_table__selectedItemsCount {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        p {
+            font-family: typography.$font-primary;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 26px;
+            letter-spacing: 0%;
+            color: colors.$text-grey;
+            margin: 0;
+        }
+
+        span {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: typography.$font-primary;
+            font-weight: 300;
+            font-size: 16px;
+            line-height: 100%;
+            letter-spacing: 0%;
+            text-align: center;
+            color: colors.$light-grey;
+            cursor: pointer;
+
+            img {
+                width: 12px;
+                height: 12px;
+                object-fit: contain;
+            }
+        }
+    }
+
+    .wbk_table__bulkActionButtons {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    .wbk_table__bulkButtonWrapper {
+        padding: 0;
+    }
+
+    .wbk_table__bulkButton {
+        background-color: colors.$background-white;
+        color: colors.$red;
+        border: 1px solid colors.$red;
+        padding: 11px 17px;
+        font-family: typography.$font-primary;
+        font-weight: 300;
+        font-size: 16px;
+        line-height: 100%;
+        letter-spacing: 0%;
+        text-align: center;
+    }
+
+    select {
+        padding: 11px 17px;
+        border-radius: 8px;
+        font-family: typography.$font-primary;
+        font-weight: 300;
+        font-size: 16px;
+        line-height: 100%;
+        letter-spacing: 0%;
+    }
+}
+
+.wbk_table__row {}
+
+.wbk_table__selectRowCheckbox {}
+
+.wbk_table__selectAllCheckbox {}
+
+.wbk_table__tableCellContentWrapper {}
+
+.wbk_table__tableCellContent {}
+
+.wbk_table__paginationBtn {}
+
+.wbk_table__paginationBtn--active {
+    background-color: colors.$primary;
+    color: white;
+}

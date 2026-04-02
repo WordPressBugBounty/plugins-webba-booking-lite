@@ -32,6 +32,38 @@
             "default_value": null,
             "editable": true
         },
+        "appointment_staff_member_id": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Staff member",
+            "tab": "",
+            "misc": {
+                "tooltip": "Select the staff member for this booking.",
+                "options": "backend",
+                "sub_type": "positive_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "appointment_location_id": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Location",
+            "tab": "",
+            "misc": {
+                "tooltip": "Select the location for this booking.",
+                "options": "locations",
+                "sub_type": "positive_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
         "appointment_day": {
             "type": "string",
             "input_type": "date",
@@ -41,7 +73,7 @@
             "misc": {
                 "tooltip": "Select the booking date.",
                 "date_format": "F j, Y",
-                "time_zone": "Europe/Vilnius"
+                "time_zone": "Europe/Warsaw"
             },
             "required": true,
             "dependency": [],
@@ -56,7 +88,7 @@
             "tab": "",
             "misc": {
                 "tooltip": "Select the booking time.",
-                "time_format": "g:i a",
+                "time_format": "H:i",
                 "options": "backend"
             },
             "required": true,

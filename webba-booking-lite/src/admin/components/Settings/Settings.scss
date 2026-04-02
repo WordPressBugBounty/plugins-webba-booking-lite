@@ -1,0 +1,143 @@
+.wbk_settings__wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(302px, 1fr));
+    gap: 24px;
+
+    .wbk_settings__section {
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        box-shadow: 0px 1px 2px 0px #0000000d;
+        background-color: #ffffff;
+        padding: 25px;
+        display: flex;
+        flex-flow: column;
+        min-height: 290px;
+        position: relative;
+        cursor: pointer;
+
+        .wbk_settings__icon {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            border-radius: 12px;
+            background-color: #e0f7f8;
+
+            img {
+                max-width: 100%;
+                height: auto;
+                object-fit: contain;
+            }
+        }
+
+        .wbk_settings__title {
+            margin: 0;
+            margin-top: 16px;
+            font-family: typography.$font-primary;
+            font-weight: 300;
+            font-style: Regular;
+            font-size: 18px;
+            leading-trim: NONE;
+            line-height: 28px;
+            letter-spacing: 0%;
+        }
+
+        .wbk_settings__description {
+            margin: 0;
+            margin-top: 4px;
+            font-family: typography.$font-primary;
+            font-weight: 300;
+            font-style: Regular;
+            font-size: 14px;
+            leading-trim: NONE;
+            line-height: 20px;
+            letter-spacing: 0%;
+            color: #4a5c71;
+        }
+
+        .wbk_settings__actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+            flex-flow: column;
+
+            button {
+                border: none;
+                background: transparent;
+                display: flex;
+                gap: 8px;
+                align-items: center;
+                color: #00a3ad;
+                cursor: pointer;
+                transition: 0.2s all ease;
+            }
+        }
+
+        &:hover {
+            button {
+                gap: 16px;
+            }
+        }
+    }
+
+    .wbk_settings__section--supportCard {
+        background: linear-gradient(135deg, #1a2e44 0%, #4a5c71 70.71%);
+        box-shadow: 0px 10px 15px 0px #0000001a;
+        box-shadow: 0px 4px 6px 0px #0000001a;
+
+        .wbk_settings__icon {
+            background: #ffffff33;
+        }
+
+        .wbk_settings__title {
+            color: #ffffff;
+        }
+
+        .wbk_settings__description {
+            color: #ffffffcc;
+        }
+
+        .wbk_settings__actions {
+            button,
+            a,
+            .wbk_settings__button {
+                padding: 8px;
+                border-radius: 8px;
+                border: 1px solid #e5e7eb;
+                justify-content: center;
+                text-align: center;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: 0.2s all ease;
+                cursor: pointer;
+
+                &:nth-child(1) {
+                    background: #ffffff;
+                    color: #1a2e44;
+
+                    &:hover {
+                        background: #ffffff4d;
+                        color: #1a2e44;
+                    }
+                }
+
+                &:nth-child(2) {
+                    background: #ffffff33;
+                    color: #ffffff;
+                    border: 1px solid #ffffff4d;
+
+                    &:hover {
+                        background: #ffffff4d;
+                        color: #ffffff;
+                    }
+                }
+            }
+        }
+    }
+}

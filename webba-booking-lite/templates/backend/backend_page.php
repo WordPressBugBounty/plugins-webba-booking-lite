@@ -107,6 +107,12 @@ if (isset($_GET["test"])) {
             );
             exit();
             break;
+        case 'wbk-locations':
+            WBK_Renderer::load_template('backend/react_app', [], true);
+            break;
+        case 'wbk-staff-members':
+            WBK_Renderer::load_template('backend/react_app', [], true);
+            break;
 
         default:
             break;

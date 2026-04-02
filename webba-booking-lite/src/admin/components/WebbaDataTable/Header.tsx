@@ -1,5 +1,5 @@
 import { flexRender, Header as HeaderType } from '@tanstack/react-table'
-import styles from './Table.module.scss'
+import './Table.scss'
 import iconSortNull from '../../../../public/images/sort-null.png'
 import iconSortAsc from '../../../../public/images/sort-asc.png'
 import iconSortDesc from '../../../../public/images/sort-desc.png'
@@ -22,7 +22,7 @@ export const Header = ({ header }: HeaderProps) => {
         ((header.column.getCanSort() && <img src={iconSortNull} />) || null)
 
     const element = (
-        <div className={styles.tableHeaderContent}>
+        <div className="wbk_table__headerContent">
             {cellContent} {sortLabel}
         </div>
     )
@@ -30,7 +30,7 @@ export const Header = ({ header }: HeaderProps) => {
     return (
         <th
             key={header.id}
-            className={styles.tableHeader}
+            className="wbk_table__header"
             onClick={header.column.getToggleSortingHandler()}
         >
             {header.isPlaceholder ? null : element}

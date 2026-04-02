@@ -155,15 +155,18 @@ export const removePrefixesFromModelFields = function <
 export const mapServiceCategories = (service: number, categories: []) =>
     categories.filter((category: any) => category.services.includes(service))
 
-export const minutesToText = (minutes: number) => {
+export const minutesToText = (
+    minutes: number,
+    translations: Record<'h' | 'min', string> = { h: 'h', min: 'min' }
+) => {
     const hours = Math.floor(minutes / 60)
     const minutesLeft = minutes % 60
 
     if (hours === 0) {
-        return `${minutesLeft}min`
+        return `${minutesLeft} ${translations.min}`
     }
 
-    return `${hours}h ${minutesLeft > 0 ? minutesLeft + 'min' : ''}`
+    return `${hours}${translations.h} ${minutesLeft > 0 ? minutesLeft + translations.min : ''}`
 }
 
 export const decodeHtmlEntities = (encoded: string): string => {

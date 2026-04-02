@@ -2,7 +2,7 @@ import { Calendar, dateFnsLocalizer } from 'react-big-calendar'
 import {
     format,
     parse,
-    startOfWeek,
+    startOfWeek as dateFnsStartOfWeek,
     getDay,
     fromUnixTime,
     getUnixTime,
@@ -13,7 +13,7 @@ import {
 } from 'date-fns'
 import * as locales from 'date-fns/locale'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
-import styles from './CalendarScreen.module.scss'
+import './CalendarScreen.scss'
 import { useCallback, useMemo, useState } from 'react'
 import { createFormFromModel } from '../../components/Form/lib/createForm'
 import { useSidebar } from '../../components/Sidebar/SidebarContext'
@@ -33,14 +33,7 @@ import metadata from '../../../schemas/appointments.json'
 import { TAllowedFilterValue } from '../../components/Filter/types'
 import { increaseOpacity } from '../../components/Form/Fields/ColorField/utils'
 import classNames from 'classnames'
-
-const localizer = dateFnsLocalizer({
-    format,
-    parse,
-    startOfWeek,
-    getDay,
-    locales,
-})
+import { weekDaysSlugs } from '../../components/Form/utils/dateTime'
 
 const bookingsModel = removePrefixesFromModelFields(
     BookingsModel,
@@ -58,21 +51,81 @@ const menuSections = createFormMenuSectionsFromModel({
 export const CalendarScreen = () => {
     const sidebar = useSidebar()
     const { filterItems } = useDispatch(store_name)
+    const [currentView, setCurrentView] = useState<string>('month')
     const allStatus: Record<string, string> = useMemo(
         () => metadata.properties?.appointment_status.misc?.options,
         []
     )
+
+    const { settings, admin_url } = useSelect(
+        // @ts-ignore
+        (select) => select(store_name).getPreset(),
+        []
+    )
+
+    const weekStart = useMemo(() => {
+        const weekStartValue = settings?.week_start
+        if (weekStartValue === undefined || weekStartValue === null) {
+            return 0
+        }
+
+        const valueStr = String(weekStartValue).toLowerCase()
+        if (weekDaysSlugs.hasOwnProperty(valueStr)) {
+            return weekDaysSlugs[valueStr]
+        }
+
+        const parsed = parseInt(String(weekStartValue), 10)
+        const result = isNaN(parsed) ? 0 : parsed
+        return result
+    }, [settings?.week_start])
+
+    const customStartOfWeek = useCallback(
+        (date: Date, locale?: any) => {
+            return dateFnsStartOfWeek(date, {
+                weekStartsOn: weekStart as 0 | 1 | 2 | 3 | 4 | 5 | 6,
+                locale,
+            })
+        },
+        [weekStart]
+    )
+
+    const customEndOfWeek = useCallback(
+        (date: Date, locale?: any) => {
+            return endOfWeek(date, {
+                weekStartsOn: weekStart as 0 | 1 | 2 | 3 | 4 | 5 | 6,
+                locale,
+            })
+        },
+        [weekStart]
+    )
+
+    const localizer = useMemo(
+        () =>
+            dateFnsLocalizer({
+                format,
+                parse,
+                startOfWeek: customStartOfWeek,
+                getDay,
+                locales,
+            }),
+        [customStartOfWeek]
+    )
+
     const bookings = useSelect(
         (select) =>
             // @ts-ignore
             select(store_name).getItems('appointments', [
                 {
                     name: 'appointment_day',
-                    value: formatWbkDate(startOfWeek(startOfMonth(new Date()))),
+                    value: formatWbkDate(
+                        customStartOfWeek(startOfMonth(new Date()))
+                    ),
                 },
                 {
                     name: 'appointment_day',
-                    value: formatWbkDate(endOfWeek(endOfMonth(new Date()))),
+                    value: formatWbkDate(
+                        customEndOfWeek(endOfMonth(new Date()))
+                    ),
                 },
                 {
                     name: 'appointment_status',
@@ -81,17 +134,11 @@ export const CalendarScreen = () => {
                     ),
                 },
             ]),
-        []
+        [customStartOfWeek, customEndOfWeek, allStatus]
     )
     const services = useSelect(
         // @ts-ignore
         (select) => select(store_name).getItems('services'),
-        []
-    )
-
-    const { settings } = useSelect(
-        // @ts-ignore
-        (select) => select(store_name).getPreset(),
         []
     )
     const { deleteItems, setItem, addItem }: any = dispatch(store_name)
@@ -110,7 +157,6 @@ export const CalendarScreen = () => {
 
     const onSubmit = useCallback(async (update: any, id: number) => {
         await setItem('appointments', { ...update, id })
-        sidebar.close()
     }, [])
 
     const onDuplicate = useCallback(async (data: any) => {
@@ -143,9 +189,9 @@ export const CalendarScreen = () => {
     )
     const addBooking = async (data: any) => {
         try {
-            await addItem('appointments', data)
+            return await addItem('appointments', data)
         } catch (e) {
-            console.error('failed to add booking', e)
+            console.error(e)
         }
     }
     const handleAddBookingClick = () => {
@@ -156,8 +202,7 @@ export const CalendarScreen = () => {
                 form={form}
                 sections={menuSections}
                 onSubmit={async (data) => {
-                    await addBooking(data)
-                    sidebar.close()
+                    return await addBooking(data)
                 }}
             />
         )
@@ -198,7 +243,7 @@ export const CalendarScreen = () => {
             }
             return {
                 id: booking.id.toString(),
-                title: booking?.extra_data.dynamic_title || booking.name,
+                title: booking?.extra_data?.dynamic_title || booking.name,
                 start: toZonedTime(
                     fromUnixTime(booking.time),
                     settings?.timezone ||
@@ -223,11 +268,11 @@ export const CalendarScreen = () => {
     >([
         {
             name: 'appointment_day',
-            value: formatWbkDate(startOfWeek(startOfMonth(new Date()))),
+            value: formatWbkDate(customStartOfWeek(startOfMonth(new Date()))),
         },
         {
             name: 'appointment_day',
-            value: formatWbkDate(endOfWeek(endOfMonth(new Date()))),
+            value: formatWbkDate(customEndOfWeek(endOfMonth(new Date()))),
         },
     ])
 
@@ -269,8 +314,8 @@ export const CalendarScreen = () => {
         ({ event, children }: any) => (
             <div
                 className={classNames(
-                    styles.eventWrapper,
-                    styles[event.status]
+                    'wbk_calendar__eventWrapper',
+                    event.status && `wbk_calendar__eventWrapper--${event.status}`
                 )}
                 style={{ backgroundColor: increaseOpacity(event.color, 0.5) }}
             >
@@ -281,23 +326,35 @@ export const CalendarScreen = () => {
     )
 
     return (
-        <div className={styles.wrapper}>
-            <div className={styles.toolWrapper}>
+        <div className="wbk_calendar__wrapper">
+            <div className="wbk_calendar__toolWrapper">
                 <FilterForm
                     fields={filterFields}
                     model="appointments"
                     columnCount={2}
                     customQuery={customFilter}
                     setCustomQuery={setCustomFilter}
+                    classes="wbk_calendar__filterWrapper"
                 />
                 <Button
                     onClick={handleAddBookingClick}
-                    className={styles.addButton}
+                    className="wbk_calendar__addButton"
                 >
                     {__('Add booking +', 'webba-booking-lite')}
                 </Button>
+                <Button
+                    onClick={() =>
+                        (window.location.href =
+                            admin_url +
+                            `/admin.php?page=wbk-calendar&tools=true`)
+                    }
+                    type="secondary-green"
+                >
+                    {__('Schedule tools', 'webba-booking-lite')}
+                </Button>
             </div>
             <Calendar
+                key={`calendar-${weekStart}`}
                 events={events}
                 startAccessor="start"
                 endAccessor="end"
@@ -314,17 +371,52 @@ export const CalendarScreen = () => {
                 messages={messages}
                 step={15}
                 popup
-                onRangeChange={(fullRange) => updateRange(fullRange)}
+                onRangeChange={(fullRange, view) => {
+                    updateRange(fullRange)
+                    if (view) {
+                        setCurrentView(view as string)
+                    }
+                }}
                 components={{
                     eventWrapper: EventWrapper,
+                    event: (props: any) => {
+                        // Only customize for day view
+                        if (props.isAllDay || props.view !== 'day') {
+                            // Use default rendering for other views
+                            return <span>{props.title}</span>
+                        }
+                        // Use the event color with opacity if available, fallback to default
+                        const bgColor = props.event.color
+                            ? increaseOpacity(props.event.color, 0.5)
+                            : undefined
+                        return (
+                            <div
+                                className={classNames(
+                                    'wbk_calendar__eventWrapper',
+                                    props.event.status && `wbk_calendar__eventWrapper--${props.event.status}`
+                                )}
+                                style={{
+                                    backgroundColor: bgColor,
+                                    marginTop: 2,
+                                    marginBottom: 2,
+                                    width: '98%',
+                                    left: '1%',
+                                    position: 'relative',
+                                    zIndex: 1,
+                                }}
+                            >
+                                <div style={{ fontSize: 12, fontWeight: 600 }}>
+                                    {props.event.title}
+                                </div>
+                            </div>
+                        )
+                    },
                 }}
+                dayLayoutAlgorithm="no-overlap"
+                // Track current view to help with event rendering
+                view={currentView as any}
+                onView={(view) => setCurrentView(view)}
             />
-            <a
-                href="/wp-admin/admin.php?page=wbk-options&tools=true"
-                className="schedule-tools-button-wbk"
-            >
-                {__('Schedule tools', 'webba-booking-lite')}
-            </a>
         </div>
     )
 }

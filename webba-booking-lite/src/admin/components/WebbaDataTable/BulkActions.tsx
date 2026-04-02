@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n'
 import { ConfirmationButton } from '../ConfirmationButton/ConfirmationButton'
 import { IBulkActionsProps } from './types'
 import { useTable } from './context/TableProvider'
-import styles from './Table.module.scss'
+import './Table.scss'
 import { useDispatch } from '@wordpress/data'
 import { store_name } from '../../../store/backend'
 import { useCallback } from 'react'
@@ -42,9 +42,9 @@ export const BulkActions = ({
         bookingsMetadata.properties.appointment_status?.misc?.options
 
     return (
-        <div className={styles.bulkActionsOuterWrapper}>
-            <div className={styles.bulkActionsWrapper}>
-                <div className={styles.selectedItemsCount}>
+        <div className="wbk_table__bulkActionsOuterWrapper">
+            <div className="wbk_table__bulkActionsWrapper">
+                <div className="wbk_table__selectedItemsCount">
                     <p>
                         {table.getSelectedRowModel().rows.length}{' '}
                         {__('items selected', 'webba-booking-lite')}
@@ -57,7 +57,7 @@ export const BulkActions = ({
                         />
                     </span>
                 </div>
-                <div className={styles.bulkActionButtons}>
+                <div className="wbk_table__bulkActionButtons">
                     {collectionName === 'appointments' && (
                         <select onChange={updateStatus}>
                             <option value="" selected disabled>
@@ -85,8 +85,8 @@ export const BulkActions = ({
                             icon={cancelIcon}
                             action={cancelBookings}
                             buttonType="custom"
-                            classes={styles.bulkButton}
-                            wrapperClass={styles.bulkButtonWrapper}
+                            classes="wbk_table__bulkButton"
+                            wrapperClass="wbk_table__bulkButtonWrapper"
                             position="top"
                         />
                     )}
@@ -103,8 +103,8 @@ export const BulkActions = ({
                                 table.resetRowSelection()
                             }}
                             buttonType="custom"
-                            wrapperClass={styles.bulkButtonWrapper}
-                            classes={styles.bulkButton}
+                            wrapperClass="wbk_table__bulkButtonWrapper"
+                            classes="wbk_table__bulkButton"
                             position="top"
                         />
                     )}

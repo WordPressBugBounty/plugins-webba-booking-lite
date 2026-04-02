@@ -1,12 +1,11 @@
 import { useSelect } from '@wordpress/data'
-import { store_name } from '../../../../../store'
 import { CellContext } from '@tanstack/react-table'
 import { useMemo } from 'react'
+import { store } from '../../../../../store/backend'
 
 export const ServiceNames = ({ getValue }: CellContext<any, any>) => {
     const services = useSelect(
-        // @ts-ignore
-        (select) => select(store_name).getItems('services'),
+        (select) => select(store).getItems('services'),
         [getValue]
     )
 
@@ -20,7 +19,9 @@ export const ServiceNames = ({ getValue }: CellContext<any, any>) => {
         const names = services
             .filter(
                 (service: any) =>
+                    service.id &&
                     selectedServices &&
+                    selectedServices.length > 0 &&
                     selectedServices.includes(service.id.toString())
             )
             .map((service: any) => service.name)

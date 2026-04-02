@@ -9,7 +9,7 @@ import {
     TableOptions,
     useReactTable,
 } from '@tanstack/react-table'
-import styles from '../Table.module.scss'
+import '../Table.scss'
 import { getColumnVisibility } from '../utils'
 
 interface WebbaDataTableOptions<T>
@@ -28,7 +28,7 @@ const createColumns = function <T>(tableOptions: WebbaDataTableOptions<T>) {
             id: 'select',
             cell: ({ row }) => (
                 <input
-                    className={styles.selectRowCheckbox}
+                    className="wbk_table__selectRowCheckbox"
                     type="checkbox"
                     onChange={row.getToggleSelectedHandler()}
                     checked={row.getIsSelected()}
@@ -36,7 +36,7 @@ const createColumns = function <T>(tableOptions: WebbaDataTableOptions<T>) {
             ),
             header: ({ table }) => (
                 <input
-                    className={styles.selectAllCheckbox}
+                    className="wbk_table__selectAllCheckbox"
                     type="checkbox"
                     onChange={table.getToggleAllRowsSelectedHandler()}
                     checked={table.getIsAllRowsSelected()}

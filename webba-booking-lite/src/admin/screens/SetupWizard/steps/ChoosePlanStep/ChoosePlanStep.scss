@@ -1,0 +1,223 @@
+.wbk_choosePlanStep__page {
+    width: 100%;
+}
+
+.wbk_choosePlanStep__heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: column;
+    gap: 12px;
+    text-align: center;
+}
+
+.wbk_choosePlanStep__title {
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 36px;
+    letter-spacing: 0%;
+    text-align: center;
+    color: #111827;
+    margin: 0;
+}
+
+.wbk_choosePlanStep__subtitle {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0%;
+    text-align: center;
+    color: #4b5563;
+    margin: 0;
+}
+
+.wbk_choosePlanStep__body {
+    margin-top: 36px;
+    display: flex;
+    align-items: stretch;
+    gap: 15px;
+    max-width: 1136px;
+    margin-left: auto;
+    margin-right: auto;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    @media (max-width: 678px) {
+        flex-flow: column;
+    }
+}
+
+.wbk_choosePlanStep__plan {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 26px;
+    min-height: 478px;
+    display: flex;
+    flex-flow: column;
+    position: relative;
+    flex: 1;
+    min-width: 280px;
+    max-width: 360px;
+
+    &--popular {
+        border-color: #14b8a9;
+    }
+}
+
+.wbk_choosePlanStep__planPopular {
+    border-color: #14b8a9;
+    min-height: 500px;
+    padding: 28px;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    .wbk_choosePlanStep__planButton {
+        background-color: #14b8a9;
+        color: #ffffff;
+        border-color: #14b8a9;
+
+        &:hover {
+            background-color: #0e9482;
+            color: #ffffff;
+            border-color: #0e9482;
+        }
+    }
+}
+
+.wbk_choosePlanStep__ribbon {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #14b8a9;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    text-align: center;
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 9999px;
+}
+
+.wbk_choosePlanStep__planTitle {
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 28px;
+    letter-spacing: 0%;
+    color: #111827;
+}
+
+.wbk_choosePlanStep__planPrice {
+    margin-top: 8px;
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 40px;
+    letter-spacing: 0%;
+    color: #111827;
+
+    span {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0%;
+        color: #6b7280;
+    }
+}
+
+.wbk_choosePlanStep__planDescription {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0%;
+    color: #4b5563;
+    margin-top: 12px;
+}
+
+.wbk_choosePlanStep__planFeatures {
+    display: flex;
+    flex-flow: column;
+    gap: 12px;
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+
+    li {
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: 0%;
+        color: #000000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        &::before {
+            content: '';
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            min-width: 12px;
+            background-color: #14b8a9;
+            mask-image: url("data:image/svg+xml,%3Csvg width='13' height='14' viewBox='0 0 13 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11.9929 2.88208C12.3347 3.22388 12.3347 3.77895 11.9929 4.12075L4.99294 11.1208C4.65115 11.4625 4.09607 11.4625 3.75427 11.1208L0.254272 7.62075C-0.0875244 7.27896 -0.0875244 6.72388 0.254272 6.38208C0.596069 6.04028 1.15115 6.04028 1.49294 6.38208L4.37498 9.26138L10.757 2.88208C11.0988 2.54028 11.6539 2.54028 11.9957 2.88208H11.9929Z' fill='%2314B8A9'/%3E%3C/svg%3E");
+            mask-repeat: no-repeat;
+            mask-position: center;
+            mask-size: contain;
+            background-size: contain;
+        }
+    }
+}
+
+.wbk_choosePlanStep__featureCons::before {
+    background-color: #9ca3af;
+    mask-image: url("data:image/svg+xml,%3Csvg width='12' height='2' viewBox='0 0 12 2' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11.375 0.875C11.375 1.35898 10.984 1.75 10.5 1.75H0.875C0.391016 1.75 0 1.35898 0 0.875C0 0.391016 0.391016 0 0.875 0H10.5C10.984 0 11.375 0.391016 11.375 0.875Z' fill='%239CA3AF'/%3E%3C/svg%3E");
+}
+
+.wbk_choosePlanStep__skipPlanWrapper {
+    margin-top: 40px;
+    text-align: center;
+    width: 100%;
+}
+
+.wbk_choosePlanStep__skipPlanButton {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    text-align: center;
+    text-decoration: underline;
+    color: #6b7280;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s all ease;
+    font-family: inherit;
+
+    &:hover {
+        color: #000000;
+    }
+}
+
+.wbk_choosePlanStep__planButton {
+    display: flex;
+    padding: 16px;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    text-align: center;
+    text-decoration: none;
+    color: #14b8a9;
+    border: 2px solid #14b8a9;
+    transition: all 0.3s ease;
+    margin-top: auto;
+    cursor: pointer;
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        background-color: #14b8a9;
+        color: #ffffff;
+        border-color: #14b8a9;
+    }
+}

@@ -1,0 +1,18 @@
+.wbk_input {
+    &__phone {
+        &__input {
+            .PhoneInputInput {
+                border: none !important;
+                font-weight: 300;
+                font-size: 14px;
+                line-height: 22px;
+                letter-spacing: 1%;
+                padding: 0 !important;
+                height: auto !important;
+                outline: none !important;
+                box-shadow: none !important;
+                min-height: initial !important;
+            }
+        }
+    }
+}

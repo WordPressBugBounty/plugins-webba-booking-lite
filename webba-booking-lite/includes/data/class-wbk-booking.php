@@ -254,4 +254,17 @@ class WBK_Booking extends WBK_Model_Object
         }
         return $this->fields['google_meet_link'];
     }
+
+    public function get_staff_member()
+    {
+        if (!isset($this->fields['staff_member_id'])) {
+            return null;
+        }
+        return $this->fields['staff_member_id'];
+    }
+
+    public function set_staff_member($staff_member_id)
+    {
+        $this->fields['staff_member_id'] = $staff_member_id;
+    }
 }

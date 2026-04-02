@@ -422,20 +422,20 @@ class WBK_Backend_Options
         );
 
         wbk_opt()->add_option(
-            'wbk_custom_fields_columns',
-            'select_multiple',
-            __('Custom fields in Bookings table', 'webba-booking-lite'),
-            'wbk_general_settings_section',
+            "wbk_custom_fields_columns",
+            "select_multiple",
+            __("Custom fields in Bookings table", "webba-booking-lite"),
+            "wbk_general_settings_section",
             [
-                'not_translated_title' => 'Custom fields in Bookings table',
-                'popup' => __(
-                    'Choose which custom fields to display in the Custom Fields column in Bookings table.',
-                    'webba-booking-lite'
+                "not_translated_title" => "Custom fields in Bookings table",
+                "popup" => __(
+                    "Choose which custom fields to display in the Custom Fields column in Bookings table.",
+                    "webba-booking-lite",
                 ),
-                'default' => [],
-                'tab' => 'admin-interface',
-                'extra' => 'backend',
-            ]
+                "default" => [],
+                "tab" => "admin-interface",
+                "extra" => "backend",
+            ],
         );
 
         // ========== ADVANCED BOOKING RULES - General Tab ==========
@@ -1823,11 +1823,11 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             __("Total title", "webba-booking-lite"),
             "wbk_translation_settings_section",
             [
-                'default' => __('TOTAL TODAY', 'webba-booking-lite'),
-                'not_translated_title' => 'Total title',
-                'popup' => __(
-                    'Label for the total amount in payment details',
-                    'webba-booking-lite'
+                "default" => __("TOTAL TODAY", "webba-booking-lite"),
+                "not_translated_title" => "Total title",
+                "popup" => __(
+                    "Label for the total amount in payment details",
+                    "webba-booking-lite",
                 ),
                 "tab" => "payments",
             ],
@@ -1892,7 +1892,11 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             wbk_opt()->add_option(
                 "webba_form_field_" . $field["slug"],
                 "text",
-                __($field["placeholder__not_translated"] ?? ($field["checkboxText__not_translated"] ?? ""), "webba-booking-lite"),
+                __(
+                    $field["placeholder__not_translated"] ??
+                        ($field["checkboxText__not_translated"] ?? ""),
+                    "webba-booking-lite",
+                ),
                 "wbk_translation_settings_section",
                 [
                     "default" => $field["placeholder"] ?? ($field["checkboxText"] ?? ""),
@@ -4550,25 +4554,25 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "not_translated_title" => "Thank you for your payment label",
                 "popup" => __(
                     "Label for thank you for your payment message.",
-                    "webba-booking-lite"
+                    "webba-booking-lite",
                 ),
                 "tab" => "payments",
             ],
         );
         wbk_opt()->add_option(
-            'wbk_wording_total_amount_tax_incl',
-            'text',
-            __('Total Amount (tax incl.)', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_total_amount_tax_incl",
+            "text",
+            __("Total Amount (tax incl.)", "webba-booking-lite"),
+            "wbk_translation_settings_section",
             [
-                'default' => __('Total Amount (tax incl.)', 'webba-booking-lite'),
-                'not_translated_title' => 'Total Amount (tax incl.)',
-                'popup' => __(
-                    'Label for total amount (tax incl.) in payment summary.',
-                    'webba-booking-lite'
+                "default" => __("Total Amount (tax incl.)", "webba-booking-lite"),
+                "not_translated_title" => "Total Amount (tax incl.)",
+                "popup" => __(
+                    "Label for total amount (tax incl.) in payment summary.",
+                    "webba-booking-lite",
                 ),
-                'tab' => 'payments',
-            ]
+                "tab" => "payments",
+            ],
         );
         wbk_opt()->add_option(
             "wbk_wording_total_amount_due",
@@ -4849,6 +4853,84 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "default" => __("min", "webba-booking-lite"),
                 "not_translated_title" => "Minutes",
                 "popup" => __("Label for Minutes.", "webba-booking-lite"),
+                "tab" => "form-fields",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_location",
+            "text",
+            __("Location", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Location", "webba-booking-lite"),
+                "not_translated_title" => "Location",
+                "popup" => __("Label for Location.", "webba-booking-lite"),
+                "tab" => "form-fields",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_select_location",
+            "text",
+            __("Select location", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Select location", "webba-booking-lite"),
+                "not_translated_title" => "Select location",
+                "popup" => __("Label for Select location.", "webba-booking-lite"),
+                "tab" => "form-fields",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_please_select_location",
+            "text",
+            __("Please select a location first to choose services.", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Please select a location first to choose services.", "webba-booking-lite"),
+                "not_translated_title" => "Please select a location first to choose services.",
+                "popup" => __("Label for Please select a location first to choose services.", "webba-booking-lite"),
+                "tab" => "form-fields",
+            ],
+        );
+        
+        wbk_opt()->add_option(
+            "wbk_wording_select_staff_member",
+            "text",
+            __('SELECT STAFF MEMBER', "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __('SELECT STAFF MEMBER', "webba-booking-lite"),
+                "not_translated_title" => 'SELECT STAFF MEMBER',
+                "popup" => __('Label for SELECT STAFF MEMBER.', "webba-booking-lite"),
+                "tab" => "form-fields",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_any_available",
+            "text",
+            __('Any Available', "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __('Any Available', "webba-booking-lite"),
+                "not_translated_title" => 'Any Available',
+                "popup" => __('Label for Any Available.', "webba-booking-lite"),
+                "tab" => "form-fields",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_best_available_time",
+            "text",
+            __('Best available time.', "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __('Best available time.', "webba-booking-lite"),
+                "not_translated_title" => 'Best available time.',
+                "popup" => __('Label for Best available time.', "webba-booking-lite"),
                 "tab" => "form-fields",
             ],
         );

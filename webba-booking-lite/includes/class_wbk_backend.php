@@ -48,6 +48,7 @@ class WBK_Backend
             "wbk-form-builder",
             "wbk-appearance",
             "wbk-services",
+            "wbk-staff-members",
             "wbk-pricing-rules",
             "wbk-appointments",
             "wbk-calendar",
@@ -56,6 +57,7 @@ class WBK_Backend
             "wbk-email-templates",
             "wbk-dashboard",
             "wbk-spa",
+            "wbk-locations",
         ];
         $current_page = isset($_GET["page"]) ? $_GET["page"] : "";
 
@@ -116,10 +118,12 @@ class WBK_Backend
     public function createAdminMenu()
     {
         global $current_user;
+        $is_admin = current_user_can("manage_options");
         if (
-            current_user_can("manage_options") ||
+            $is_admin ||
             WBK_Validator::checkAccessToSchedule() ||
-            WBK_Validator::checkAccessToGgCalendarPage()
+            WBK_Validator::checkAccessToGgCalendarPage() ||
+            WBK_Validator::checkStaffAccessToBookings()
         ) {
             $root_name = __("Webba Booking", "webba-booking-lite");
             $root_name = apply_filters("wbk_root_menu_title", $root_name);
@@ -148,6 +152,24 @@ class WBK_Backend
                 "wbk-services",
                 ["WBK_Renderer", "render_backend_page"],
             );
+            if($is_admin){
+                add_submenu_page(
+                    'wbk-main',
+                    __('Staff members', 'webba-booking-lite'),
+                    __('Staff members', 'webba-booking-lite'),
+                    'read',
+                    'wbk-staff-members',
+                    ['WBK_Renderer', 'render_backend_page']
+                );
+                add_submenu_page(
+                    'wbk-main',
+                    __('Locations', 'webba-booking-lite'),
+                    __('Locations', 'webba-booking-lite'),
+                    'read',
+                    'wbk-locations',
+                    ['WBK_Renderer', 'render_backend_page']
+                );
+            }
             add_submenu_page(
                 "wbk-main",
                 __("Bookings", "webba-booking-lite"),

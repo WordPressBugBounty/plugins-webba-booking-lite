@@ -1,0 +1,24 @@
+.wbk_noticeField {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    border-radius: 8px;
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: 1%;
+    color: #668091;
+}
+
+.wbk_noticeField__content {
+    flex: 1;
+    color: #1e40af;
+}
+
+.wbk_noticeField__icon {
+    width: 24px;
+    height: 24px;
+}

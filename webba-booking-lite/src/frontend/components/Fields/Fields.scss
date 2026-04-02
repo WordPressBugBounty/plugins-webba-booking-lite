@@ -1,0 +1,57 @@
+.wbk_input {
+    width: 100%;
+
+    &--half-width {
+        width: calc(50% - 6px);
+
+        @include mobile {
+            width: 100%;
+        }
+    }
+
+    &__label {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.5%;
+        color: #22292f;
+    }
+
+    &__main {
+        border-radius: 8px !important;
+        border: 1px solid #d4dde2 !important;
+        outline: none !important;
+        padding: 9px 16px !important;
+        font-weight: 300 !important;
+        font-size: 14px !important;
+        line-height: 22px !important;
+        letter-spacing: 1% !important;
+        vertical-align: middle;
+        color: #22292f !important;
+        transition: 0.2s all ease !important;
+        width: 100% !important;
+        max-width: unset !important;
+        box-shadow: none !important;
+        background-color: #ffffff !important;
+        margin: 0 !important;
+
+        &::placeholder {
+            color: #668091 !important;
+        }
+
+        &--error {
+            border-color: red !important;
+        }
+
+        &:focus {
+            border-color: colors.$wbk-primary-500 !important;
+        }
+    }
+
+    &__error {
+        font-size: 14px;
+        font-weight: 300;
+        line-height: 24px;
+        color: red;
+    }
+}

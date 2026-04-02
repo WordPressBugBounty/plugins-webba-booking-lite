@@ -22,11 +22,23 @@ export const useOptions = ({ options, nullValue = [] }: IOptionRequest) => {
             options === 'services') ||
         options === 'service_categories'
     ) {
-        const { services, categories } = useSelect(
+        const { services, categories } = useSelect((select) => {
             // @ts-ignore
-            (select) => select(store_name).getPreset(),
-            []
-        )
+            const services = select(store_name).getItems('services') || []
+            const categories =
+                // @ts-ignore
+                select(store_name).getItems('service_categories') || []
+            return {
+                services: services.map((service: any) => ({
+                    value: service.id,
+                    label: service.name,
+                })),
+                categories: categories.map((category: any) => ({
+                    value: category.id,
+                    label: category.name,
+                })),
+            }
+        }, [])
 
         if (options === 'services') {
             return [...nullValues, ...formatOptionsWithId(services)]

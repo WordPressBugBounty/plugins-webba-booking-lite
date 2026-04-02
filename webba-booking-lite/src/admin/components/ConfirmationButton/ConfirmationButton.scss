@@ -1,0 +1,58 @@
+.wbk_confirmationButton {
+    position: relative;
+    display: inline-block;
+    width: auto;
+    padding: 1px 6px;
+    z-index: 0;
+
+    &.wbk_confirmationButton--active {
+        z-index: 9999;
+
+        &[data-title]::after {
+            display: none;
+        }
+    }
+}
+
+.wbk_confirmationButton__confirmation {
+    position: absolute;
+    width: max-content;
+    line-height: 32px;
+    background: #1f6763;
+    border: 1px solid transparent;
+    border-radius: 15px;
+    color: #fff;
+    padding: 0 20px 0 20px;
+    cursor: pointer;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: 0.2s all ease;
+    z-index: -1;
+
+    &.wbk_confirmationButton__confirmation--opened {
+        z-index: inherit;
+
+        &.wbk_confirmationButton__confirmation--top {
+            top: unset;
+            bottom: calc(100% + 5px);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        &.wbk_confirmationButton__confirmation--right {
+            left: calc(100% + 5px);
+            transform: translateY(-50%);
+        }
+
+        &.wbk_confirmationButton__confirmation--bottom {
+            top: calc(100% + 5px);
+            transform: translate(-50%, 0) scale(1);
+        }
+
+        &.wbk_confirmationButton__confirmation--left {
+            left: calc(50% - 15px);
+            transform: translate(-100%, -50%) scale(1);
+        }
+    }
+}

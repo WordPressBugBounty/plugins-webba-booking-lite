@@ -1,0 +1,111 @@
+.wbk_payment-selector {
+    &__wrapper {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+        width: 100%;
+    }
+
+    &__method {
+        height: auto;
+        box-sizing: border-box;
+        flex: 0 0 84px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 21px 16px;
+        gap: 8px;
+        border-radius: 8px;
+        border: 1.5px solid #edeff2;
+        cursor: pointer;
+        min-width: 125px;
+
+        &,
+        * {
+            transition: 0.2s all ease-in;
+        }
+
+        img {
+            filter: grayscale(1);
+        }
+
+        span {
+            font-weight: 300;
+            font-size: 14px;
+            line-height: 22px;
+            letter-spacing: 1%;
+            text-align: center;
+            vertical-align: middle;
+            color: #668091;
+            width: 100%;
+        }
+
+        &--selected {
+            border-color: colors.$wbk-color-border-selected;
+            background-color: colors.$wbk-primary-50;
+            color: colors.$wbk-primary-50;
+
+            img {
+                filter: colors.$wbk-primary-filter-500;
+            }
+
+            span {
+                color: #22292f;
+            }
+        }
+
+        &:hover {
+            background-color: colors.$wbk-primary-50;
+        }
+
+        &--appear {
+            animation: methodSlideFadeIn 0.7s cubic-bezier(0.23, 1, 0.32, 1)
+                both;
+        }
+    }
+
+    &__no-methods {
+        margin-top: 16px;
+        color: red;
+    }
+
+    &__checking-indicator {
+        display: inline-block;
+        margin-left: 8px;
+        font-size: 12px;
+        color: #668091;
+    }
+
+    &__loading-spinner {
+        display: block;
+        width: 24px!important;
+        height: 24px!important;
+        border: 3px solid #edeff2;
+        border-top: 3px solid #668091;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin: 0 auto;
+    }
+}
+
+@keyframes methodSlideFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

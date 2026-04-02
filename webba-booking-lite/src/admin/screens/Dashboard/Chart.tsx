@@ -12,13 +12,11 @@ import {
 } from 'chart.js'
 import { useMemo } from 'react'
 import { Line } from 'react-chartjs-2'
-import styles from './Dashboard.module.scss'
-import interestIcon from '../../../../public/images/interests-empty.png'
+import './Dashboard.scss'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../store/backend'
-import { __, sprintf } from '@wordpress/i18n'
-import { Button } from '../../components/Button/Button'
-import upgradeIcon from '../../../../public/images/upgrade-premium.png'
+import { __ } from '@wordpress/i18n'
+import { ProFeatuerWrapper } from '../../components/ProFeatuerWrapper/ProFeatuerWrapper'
 
 ChartJS.register(
     CategoryScale,
@@ -32,11 +30,15 @@ ChartJS.register(
 )
 
 export const Chart = ({ data, priceFormat }: any) => {
-    const { is_pro, admin_url } = useSelect(
+    const { plan_map } = useSelect(
         // @ts-ignore
         (select) => select(store_name).getPreset(),
         []
     )
+    const requiredPlans = ['standard', 'premium', 'pro']
+    const isChartAvailable = useMemo(() => {
+        return plan_map && requiredPlans.some((plan) => plan_map[plan] === true)
+    }, [requiredPlans, plan_map])
 
     const options: ChartOptions<'line'> = useMemo(() => {
         return {
@@ -73,33 +75,52 @@ export const Chart = ({ data, priceFormat }: any) => {
         }
     }, [])
 
-    const upgradeLink = sprintf('%sadmin.php?page=wbk-main-pricing', admin_url)
+    const dummyData = {
+        labels: [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
+        ],
+        datasets: [
+            {
+                label: 'No. of bookings',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                borderWidth: 1,
+                yAxisID: 'y',
+            },
+            {
+                label: 'Revenue (approved)',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                borderWidth: 1,
+                yAxisID: 'yRevenu',
+            },
+            {
+                label: 'Revenue (pending)',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                borderWidth: 1,
+                yAxisID: 'yRevenu',
+            },
+        ],
+    }
 
     return (
-        <div className={styles.chart}>
-            {!is_pro && (
-                <div className={styles.promotionWrapper}>
-                    <img
-                        src={interestIcon}
-                        alt={__('Upgrade logo', 'webba-booking-lite')}
-                    />
-                    <p>
-                        {__(
-                            'Booking statistics graph is available for Webba Booking Pro users only',
-                            'webba-booking-lite'
-                        )}
-                    </p>
-                    <Button onClick={() => window.open(upgradeLink, '_self')}>
-                        {__('Upgrade to Pro', 'webba-booking-lite')}
-                        <img
-                            className={styles.invertedIcon}
-                            src={upgradeIcon}
-                            alt={__('Upgrade icon', 'webba-booking-lite')}
-                        />
-                    </Button>
-                </div>
+        <div className="wbk_dashboard__chart">
+            {!isChartAvailable && (
+                <ProFeatuerWrapper requiredPlans={requiredPlans} />
             )}
-            {is_pro && <Line data={data} options={options} />}
+            <Line
+                data={isChartAvailable ? data : dummyData}
+                options={options}
+            />
         </div>
     )
 }

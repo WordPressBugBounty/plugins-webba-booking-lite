@@ -5,7 +5,7 @@ import DuplicateIcon from '../../../../public/images/duplicate-icon.svg'
 import CancelIcon from '../../../../public/images/icon-cancel.svg'
 import MoreIcon from '../../../../public/images/icon-expand.svg'
 import { ConfirmationButton } from '../ConfirmationButton/ConfirmationButton'
-import styles from './Table.module.scss'
+import './Table.scss'
 import { useCell } from './context/CellProvider'
 import { __ } from '@wordpress/i18n'
 import { useSelect } from '@wordpress/data'
@@ -39,10 +39,10 @@ export const Menu = ({
         cell.row.original?.can_delete === false
 
     return (
-        <div className={styles.menu}>
+        <div className="wbk_table__menu">
             {cell.row.original?.can_edit && (
                 <button
-                    className={styles.menuBtn}
+                    className="wbk_table__menuBtn"
                     type="button"
                     onClick={onEdit}
                     data-title={__('Edit', 'webba-booking-lite')}
@@ -52,7 +52,7 @@ export const Menu = ({
             )}
             {settings?.is_admin && (
                 <Button
-                    className={styles.menuBtn}
+                    className="wbk_table__menuBtn"
                     onClick={onDuplicate}
                     tooltip={__('Duplicate', 'webba-booking-lite')}
                     type="no-border"
@@ -68,8 +68,8 @@ export const Menu = ({
                             'Yes, delete it',
                             'webba-booking-lite'
                         )}
-                        classes={styles.menuBtn}
-                        wrapperClass={styles.menuBtn}
+                        classes="wbk_table__menuBtn"
+                        wrapperClass="wbk_table__menuBtn"
                         icon={DeleteIcon}
                         tooltip={__('Delete', 'webba-booking-lite')}
                         position="left"
@@ -84,8 +84,8 @@ export const Menu = ({
                             'Yes, cancel it',
                             'webba-booking-lite'
                         )}
-                        classes={styles.menuBtn}
-                        wrapperClass={styles.menuBtn}
+                        classes="wbk_table__menuBtn"
+                        wrapperClass="wbk_table__menuBtn"
                         icon={CancelIcon}
                         tooltip={__('Cancel', 'webba-booking-lite')}
                         position="left"
@@ -94,9 +94,9 @@ export const Menu = ({
             {showExpand && (
                 <button
                     type="button"
-                    className={classNames(styles.menuBtn, styles.expandButton, {
-                        [styles.hidden]: !showExpand,
-                        [styles.open]: cell.row.getIsExpanded(),
+                    className={classNames('wbk_table__menuBtn', 'wbk_table__expandButton', {
+                        'wbk_table__menuBtn--hidden': !showExpand,
+                        'wbk_table__menuBtn--open': cell.row.getIsExpanded(),
                     })}
                     onClick={() => cell.row.toggleExpanded()}
                     data-title={__('Show details', 'webba-booking-lite')}

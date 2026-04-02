@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "location_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Name",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Enter location name."
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "location_description": {
+            "type": "string",
+            "input_type": "editor",
+            "hidden": true,
+            "title": "Description",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Enter a description of the location."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "location_address": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Address",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Enter address."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        }
+    }
+}

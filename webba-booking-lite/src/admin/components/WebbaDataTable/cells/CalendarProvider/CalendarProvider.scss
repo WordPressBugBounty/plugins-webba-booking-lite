@@ -1,0 +1,17 @@
+.wbk_calendarProvider__wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.wbk_calendarProvider__icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.wbk_calendarProvider__label {
+    font-weight: 500;
+    font-size: 13px;
+}

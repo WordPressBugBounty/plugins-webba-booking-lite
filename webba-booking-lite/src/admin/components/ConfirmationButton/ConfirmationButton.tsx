@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n'
 import { IConfirmationProps } from '../../types'
-import styles from './ConfirmationButton.module.scss'
+import './ConfirmationButton.scss'
 import { useState, useEffect, useRef } from 'react'
 import { Button } from '../Button/Button'
 import classNames from 'classnames'
@@ -48,8 +48,8 @@ export const ConfirmationButton = ({
     return (
         <div
             ref={wrapperRef}
-            className={classNames(styles.wrapper, wrapperClass, {
-                [styles['active']]: visible,
+            className={classNames('wbk_confirmationButton', wrapperClass, {
+                'wbk_confirmationButton--active': visible,
             })}
             data-title={tooltip}
         >
@@ -65,10 +65,10 @@ export const ConfirmationButton = ({
             <div
                 onClick={handleAction}
                 className={classNames(
-                    styles.confirmation,
-                    styles[(position as string) || 'bottom'],
+                    'wbk_confirmationButton__confirmation',
+                    `wbk_confirmationButton__confirmation--${(position as string) || 'bottom'}`,
                     {
-                        [styles['opened']]: visible,
+                        'wbk_confirmationButton__confirmation--opened': visible,
                     }
                 )}
             >

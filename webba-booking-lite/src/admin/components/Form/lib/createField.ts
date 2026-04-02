@@ -1,7 +1,7 @@
-import { primitive } from './primitive'
-import { CreateFieldParams, FormField, Primitive } from './types'
+import { CreateFieldParams, FormField } from './types'
 import { validate, Validators } from '../utils/validation'
 import { derive } from 'derive-valtio'
+import { Primitive, primitive } from '../../../utils/primitive'
 
 export const createField = <T>({
     name,
@@ -22,7 +22,8 @@ export const createField = <T>({
         required: !!required,
         isIgnored: primitive(false),
         errors: derive({
-            value: (get) => validate(get(_value).value, get(_validators).value),
+            value: (get) =>
+                validate(get(_value).value, get(_validators).value, get),
         }) as Primitive<string[]>,
         setValue: (value) => {
             _value.value = value

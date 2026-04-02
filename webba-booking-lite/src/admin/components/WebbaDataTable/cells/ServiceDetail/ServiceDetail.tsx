@@ -2,80 +2,73 @@ import { CellContext } from '@tanstack/react-table'
 import { useSelect } from '@wordpress/data'
 import { __ } from '@wordpress/i18n'
 import { useMemo } from 'react'
-import { store_name } from '../../../../../store/backend'
-import styles from './ServiceDetail.module.scss'
+import { store } from '../../../../../store/backend'
+import { useSettings } from '../../../../providers/SettingsProvider'
+import { minutesToText } from '../../utils'
+import './ServiceDetail.scss'
 
 export const ServiceDetail = ({ cell }: CellContext<any, any>) => {
     const {
-        id,
-        min_quantity,
         quantity,
-        form,
+        form_builder: form,
         interval_between,
-        step,
-        payment_methods,
+        prepare_time,
+        override_email,
+        email,
     } = cell.row.original
 
-    const paymentMethods: Record<string, string> = useMemo(() => {
-        return {
-            paypal: __('PayPal', 'webba-booking-lite'),
-            stripe: __('Stripe', 'webba-booking-lite'),
-            arrival: __('On arrival', 'webba-booking-lite'),
-            bank: __('Bank transfer', 'webba-booking-lite'),
-            woocommerce: __('WooCommerce', 'webba-booking-lite'),
-        }
-    }, [])
+    const settings = useSettings()
+    const notificationsEmail =
+        override_email === 'yes' ? email : settings?.admin_email || ''
 
-    const { forms } = useSelect(
-        // @ts-ignore
-        (select) => select(store_name).getCellData('services'),
-        []
+    const forms = useSelect((select) => select(store).getItems('forms'), [])
+    const SelectedForm = useMemo(
+        () => forms.find((f: any) => Number(f.id) === Number(form)),
+        [forms, form]
     )
 
+    const bufferTimeText = useMemo(
+        () => minutesToText(Number(interval_between) || 0),
+        [interval_between]
+    )
+    const noticeTimeText = useMemo(
+        () => minutesToText(Number(prepare_time) || 0),
+        [prepare_time]
+    )
+
+    const fields = [
+        {
+            label: __('Total slot capacity', 'webba-booking-lite'),
+            value: String(quantity ?? 1),
+        },
+        {
+            label: __('Buffer time', 'webba-booking-lite'),
+            value: bufferTimeText,
+        },
+        {
+            label: __('Notice time', 'webba-booking-lite'),
+            value: noticeTimeText,
+        },
+        {
+            label: __('Booking form', 'webba-booking-lite'),
+            value:
+                (SelectedForm && SelectedForm.name) ||
+                __('Default Form', 'webba-booking-lite'),
+        },
+        {
+            label: __('Notifications email', 'webba-booking-lite'),
+            value: notificationsEmail,
+        },
+    ]
+
     return (
-        <table className={styles.table}>
-            <tbody>
-                <tr>
-                    <td>
-                        {__('ID:', 'webba-booking-lite')}&nbsp;
-                        <strong>{id}</strong>
-                    </td>
-                    <td>
-                        {__('Minimum booking count per time slot:')}&nbsp;
-                        <strong>{min_quantity}</strong>
-                    </td>
-                    <td>
-                        {__('Maximum booking count per time slot:')}&nbsp;
-                        <strong>{quantity}</strong>
-                    </td>
-                    <td>
-                        {__('Booking form:')}&nbsp;
-                        <strong>
-                            {forms && forms[form] ? forms[form] : ''}
-                        </strong>
-                    </td>
-                    <td>
-                        {__('Gap (minutes):')}&nbsp;
-                        <strong>{interval_between}</strong>
-                    </td>
-                    <td>
-                        {__('Step (minutes):')}&nbsp;
-                        <strong>{step}</strong>
-                    </td>
-                    {payment_methods && (
-                        <td>
-                            {__('Payment methods:')}&nbsp;
-                            <strong>
-                                {JSON.parse(payment_methods)
-                                    .map(
-                                        (method: any) => paymentMethods[method]
-                                    )
-                                    .join(', ')}
-                            </strong>
-                        </td>
-                    )}
-                </tr>
-            </tbody>
-        </table>
+        <div className="wbk_serviceDetail__grid">
+            {fields.map(({ label, value }) => (
+                <div key={label} className="wbk_serviceDetail__gridItem">
+                    <span className="wbk_serviceDetail__label">{label}</span>
+                    <strong className="wbk_serviceDetail__value">{value}</strong>
+                </div>
+            ))}
+        </div>
     )
 }

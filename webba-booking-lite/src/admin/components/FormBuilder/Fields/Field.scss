@@ -1,0 +1,132 @@
+$menu-icon-size: 24px;
+
+.wbk_formBuilderField__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    &.wbk_formBuilderField__fields--collapsed {
+        display: none;
+    }
+}
+
+.wbk_formBuilderField__fieldsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background-color: #efefef;
+    padding: 6px 4px;
+    border-radius: 8px;
+
+    &:not(.wbk_formBuilderField__fieldsContainer--containerCollapsed) {
+        padding: 12px;
+    }
+}
+
+.wbk_formBuilderField__fieldSummary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wbk_formBuilderField__slugInput {
+    width: 70%;
+}
+
+.wbk_formBuilderField__widthField {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.wbk_formBuilderField__requiredField {
+    flex-direction: column-reverse;
+}
+
+.wbk_formBuilderField__menuBtn {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 1px 6px;
+    min-width: unset;
+}
+
+.wbk_formBuilderField__moreIcon {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    min-height: 24px;
+    max-width: 24px;
+    min-height: 24px;
+}
+
+.wbk_formBuilderField__deleteIcon {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    max-width: 16px;
+    min-height: 16px;
+}
+
+.wbk_formBuilderField__menuBtn:hover {
+    opacity: 0.7;
+}
+
+.wbk_formBuilderField__menuBtn.wbk_formBuilderField__menuBtn--hidden {
+    visibility: hidden;
+}
+
+.wbk_formBuilderField__menuBtn.wbk_formBuilderField__menuBtn--open {
+    transform: rotate(180deg);
+}
+
+.wbk_formBuilderField__handle {
+    border: none;
+    background-color: transparent;
+    cursor: grab;
+    padding: 0;
+    min-width: unset;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+.wbk_formBuilderField__requiredToggleWrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.wbk_formBuilderField__requiredToggleHoverArea {
+    display: inline-block;
+}
+
+.wbk_formBuilderField__requiredTooltip {
+    display: none;
+    position: absolute;
+    right: 0;
+    left: auto;
+    top: -32px;
+    transform: none;
+    background: #222;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    white-space: nowrap;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.95;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wbk_formBuilderField__requiredToggleWrapper:hover .wbk_formBuilderField__requiredTooltip {
+    display: block;
+}

@@ -1,7 +1,7 @@
 import { flexRender, type Table as TanstackTable } from '@tanstack/react-table'
 import classNames from 'classnames'
 import { ExpandedData } from './ExpandedData'
-import styles from './Table.module.scss'
+import './Table.scss'
 import { Header } from './Header'
 import { CellProvider } from './context/CellProvider'
 import { TableProvider } from './context/TableProvider'
@@ -14,6 +14,7 @@ import { ErrorMessage } from '../ErrorMessage/ErrorMessage'
 import { BulkActions } from './BulkActions'
 import { useMemo } from 'react'
 import { TableMobile } from './TableMobile'
+import { Loading } from '../Loading/Loading'
 
 interface Props {
     table: TanstackTable<any>
@@ -61,10 +62,10 @@ export const Table = ({
 
     return (
         <TableProvider table={table}>
-            <div className={styles.tableContainer}>
-                <div className={styles.tableTitleContainer}>
-                    <h2 className={styles.tableTitle}>{title}</h2>
-                    <div className={styles.toolPanel}>
+            <div className="wbk_table__container">
+                <div className="wbk_table__titleContainer">
+                    <h2 className="wbk_table__title">{title}</h2>
+                    <div className="wbk_table__toolPanel">
                         {exportButton && settings?.is_admin && exportButton}
                         {search && search}
                         {(forcePermission || settings?.is_admin) &&
@@ -81,7 +82,7 @@ export const Table = ({
                     </div>
                 </div>
                 {filter && filter}
-                {loading && <div>Loading...</div>}
+                {loading && <Loading minHeight="100%" transparent />}
                 {isEmpty && !isItemsForbidden && !loading && (
                     <div
                         style={{
@@ -116,8 +117,8 @@ export const Table = ({
                     <>
                         {!isEmpty && !isItemsForbidden && (
                             <div
-                                className={classNames(styles.tableWrapper, {
-                                    [styles.horizontalOverflow]:
+                                className={classNames('wbk_table__wrapper', {
+                                    'wbk_table__wrapper--horizontalOverflow':
                                         horizontalOverflow,
                                 })}
                             >
@@ -125,11 +126,11 @@ export const Table = ({
                                 {!isMobile && (
                                     <table
                                         className={classNames(
-                                            styles.webbaDataTable,
+                                            'wbk_table__dataTable',
                                             className
                                         )}
                                     >
-                                        <thead className={styles.tableHead}>
+                                        <thead className="wbk_table__head">
                                             {table
                                                 .getHeaderGroups()
                                                 .map((headerGroup) => (
@@ -153,9 +154,7 @@ export const Table = ({
                                                     <>
                                                         <tr
                                                             key={row.id}
-                                                            className={
-                                                                styles.tableRow
-                                                            }
+                                                            className="wbk_table__row"
                                                         >
                                                             {row
                                                                 .getVisibleCells()
@@ -166,9 +165,7 @@ export const Table = ({
                                                                         }
                                                                     >
                                                                         <td
-                                                                            className={
-                                                                                styles.tableCell
-                                                                            }
+                                                                            className="wbk_table__cell"
                                                                             data-column-name={
                                                                                 cell
                                                                                     .column
@@ -194,14 +191,10 @@ export const Table = ({
                                                         </tr>
                                                         {row.getIsExpanded() && (
                                                             <tr
-                                                                className={
-                                                                    styles.tableRowExpanded
-                                                                }
+                                                                className="wbk_table__rowExpanded"
                                                             >
                                                                 <td
-                                                                    className={
-                                                                        styles.expandedData
-                                                                    }
+                                                                    className="wbk_table__expandedData"
                                                                     colSpan={
                                                                         row.getVisibleCells()
                                                                             .length

@@ -1,0 +1,187 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "staff_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Name",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Enter staff member name."
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "staff_email": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Email",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Enter staff member email address.",
+                "sub_type": "email"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "staff_wordpress_user": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "WordPress user",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Select the WordPress user associated with this staff member.",
+                "options": "backend"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "staff_photo": {
+            "type": "string",
+            "input_type": "file",
+            "hidden": false,
+            "title": "Photo",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Select a photo for this staff member."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "staff_services": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Services",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Select the services that this staff member can provide.",
+                "options": "services",
+                "multiple": true
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "staff_locations": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Locations",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Select the location where this staff member works.",
+                "options": "locations",
+                "multiple": true
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "staff_connected_calendars": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Connected calendars",
+            "tab": "integrations",
+            "misc": {
+                "tooltip": "Select the connected calendar(s) available for this staff member.",
+                "options": "connected_calendars",
+                "multiple": true
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "staff_business_hours": {
+            "type": "json",
+            "input_type": "business_hours",
+            "hidden": true,
+            "title": "Business hours",
+            "tab": "hours",
+            "misc": {
+                "tooltip": "Select the days and time intervals when this staff member is available."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": [
+                {
+                    "start": 32400,
+                    "end": 46800,
+                    "day_of_week": "1",
+                    "status": "active"
+                },
+                {
+                    "start": 50400,
+                    "end": 64800,
+                    "day_of_week": "1",
+                    "status": "active"
+                },
+                {
+                    "start": 32400,
+                    "end": 46800,
+                    "day_of_week": "2",
+                    "status": "active"
+                },
+                {
+                    "start": 50400,
+                    "end": 64800,
+                    "day_of_week": "2",
+                    "status": "active"
+                },
+                {
+                    "start": 32400,
+                    "end": 46800,
+                    "day_of_week": "3",
+                    "status": "active"
+                },
+                {
+                    "start": 50400,
+                    "end": 64800,
+                    "day_of_week": "3",
+                    "status": "active"
+                },
+                {
+                    "start": 32400,
+                    "end": 46800,
+                    "day_of_week": "4",
+                    "status": "active"
+                },
+                {
+                    "start": 50400,
+                    "end": 64800,
+                    "day_of_week": "4",
+                    "status": "active"
+                },
+                {
+                    "start": 32400,
+                    "end": 46800,
+                    "day_of_week": "5",
+                    "status": "active"
+                },
+                {
+                    "start": 50400,
+                    "end": 64800,
+                    "day_of_week": "5",
+                    "status": "active"
+                }
+            ],
+            "editable": true
+        }
+    }
+}

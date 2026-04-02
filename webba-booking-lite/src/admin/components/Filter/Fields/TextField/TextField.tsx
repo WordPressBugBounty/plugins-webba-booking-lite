@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import { InputHTMLAttributes, useState } from 'react'
-import styles from './TextField.module.scss'
+import './TextField.scss'
 import { IFilterField, IFilterFieldProps } from '../../types'
 import { useFilter } from '../../FilterProvider'
 import { useFilterField } from '../../hooks/useFilterField'
@@ -15,12 +15,12 @@ export const TextField = ({
     const { value, setFilter } = useFilterField(name)
 
     return (
-        <div className={styles.field}>
+        <div className={"wbk_textField__field"}>
             {label && <Label title={label} id={name} />}
-            <div className={styles.inputContainer}>
+            <div className={"wbk_textField__inputContainer"}>
                 <input
                     id={name}
-                    className={styles.input}
+                    className={"wbk_textField__input"}
                     type="text"
                     value={value}
                     onChange={(e) => setFilter(e.target.value)}

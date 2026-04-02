@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.3.12
+ * Version: 6.4.0
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -12,7 +12,7 @@
 if ( !defined( "ABSPATH" ) ) {
     exit;
 }
-// added for the capabilities with the old versions of WordPress
+// Added for the capabilities with the old versions of WordPress
 if ( !function_exists( "wp_date" ) ) {
     function wp_date(  $format, $timestamp, $timezone  ) {
         return date_i18n( $format, $timestamp );
@@ -40,14 +40,14 @@ if ( !function_exists( "wbk_fs" ) ) {
                 "type"             => "plugin",
                 "public_key"       => "pk_89934c199e211bbc3aa24e2396ef9",
                 "is_premium"       => false,
-                'has_addons'       => false,
-                'has_paid_plans'   => true,
-                'has_affiliation'  => 'selected',
-                'menu'             => [
-                    'slug'        => 'wbk-main',
-                    'first-path'  => $first_page,
-                    'support'     => false,
-                    'affiliation' => false,
+                "has_addons"       => false,
+                "has_paid_plans"   => true,
+                "has_affiliation"  => "selected",
+                "menu"             => [
+                    "slug"        => "wbk-main",
+                    "first-path"  => $first_page,
+                    "support"     => false,
+                    "affiliation" => false,
                 ],
                 'is_live'          => true,
                 'is_org_compliant' => true,
@@ -65,28 +65,28 @@ if ( !defined( "WP_WEBBA_BOOKING__PLUGIN_DIR" ) ) {
     define( "WP_WEBBA_BOOKING__PLUGIN_DIR", dirname( __FILE__ ) );
     define( "WP_WEBBA_BOOKING__PLUGIN_URL", plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
-if ( !defined( 'WP_WEBBA_BOOKING__VERSION' ) ) {
-    define( 'WP_WEBBA_BOOKING__VERSION', '6.3.12' );
+if ( !defined( "WP_WEBBA_BOOKING__VERSION" ) ) {
+    define( "WP_WEBBA_BOOKING__VERSION", "6.4.0" );
 }
-if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_textdomain' ) ) {
-    include 'vendor/autoload.php';
-    include 'includes/wbkdata/autoload.php';
-    include 'includes/wbkdata_extensions/wbkdata_hooks.php';
-    include 'deprecated/class_wbk_entity.php';
-    include 'includes/class_wbk_backend.php';
-    include 'includes/class-wbk-rest-cache-prevention.php';
-    include 'deprecated/class_wbk_appointment_deprecated.php';
-    include 'deprecated/class_wbk_service_deprecated.php';
-    include 'deprecated/class_wbk_db_utils.php';
-    include 'deprecated/class_wbk_email_notifications.php';
-    include 'includes/backend/class_wbk_admin_notices.php';
-    include 'includes/backend/class-wbk-admin-notices.php';
-    require 'deprecated/wbk_wording.php';
-    require 'deprecated/class_wbk_date_time_utils.php';
-    include 'includes/class_wbk_webba_connect.php';
-    include 'includes/class-wbk-feature-gate.php';
-    if ( get_option( 'wbk_stripe_publishable_key', '' ) != '' ) {
-        require 'includes/third-parties/class_wbk_stripe.php';
+if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_textdomain" ) ) {
+    include "vendor/autoload.php";
+    include "includes/wbkdata/autoload.php";
+    include "includes/wbkdata_extensions/wbkdata_hooks.php";
+    include "deprecated/class_wbk_entity.php";
+    include "includes/class_wbk_backend.php";
+    include "includes/class-wbk-rest-cache-prevention.php";
+    include "deprecated/class_wbk_appointment_deprecated.php";
+    include "deprecated/class_wbk_service_deprecated.php";
+    include "deprecated/class_wbk_db_utils.php";
+    include "deprecated/class_wbk_email_notifications.php";
+    include "includes/backend/class_wbk_admin_notices.php";
+    include "includes/backend/class-wbk-admin-notices.php";
+    require "deprecated/wbk_wording.php";
+    require "deprecated/class_wbk_date_time_utils.php";
+    include "includes/class_wbk_webba_connect.php";
+    include "includes/class-wbk-feature-gate.php";
+    if ( get_option( "wbk_stripe_publishable_key", "" ) != "" ) {
+        require "includes/third-parties/class_wbk_stripe.php";
     } else {
         require "includes/third-parties/class_wbk_stripe_blank.php";
     }
@@ -124,6 +124,8 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     // Data
     include "includes/data/class-wbk-model-object.php";
     include "includes/data/class-wbk-service.php";
+    include "includes/data/class-wbk-location.php";
+    include "includes/data/class-wbk-staff-member.php";
     include "includes/data/class-wbk-form.php";
     include "includes/data/class-wbk-service-category.php";
     include "includes/data/class-wbk-coupon.php";
@@ -132,12 +134,10 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     include "includes/data/class-wbk-booking.php";
     include "includes/data/class-wbk-model.php";
     include "includes/data/class-wbk_time_slot.php";
-    include "includes/wbkdata_extensions/class-wbk-model-relation-handler.php";
     include "includes/data/class-wbk-connected-calendar.php";
+    include "includes/wbkdata_extensions/class-wbk-model-relation-handler.php";
     // factories
     include "includes/utilities/class-wbk-booking-factory.php";
-    // Request manager
-    include "includes/class-wbk-request-manager.php";
     // Processors
     include "includes/processors/class-wbk-schedule-processor.php";
     require_once "includes/processors/class-wbk-connected-calendar-processor.php";
@@ -149,6 +149,8 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
     include "includes/processors/class-wbk-email-processor.php";
     include "includes/processors/class-wbk-pdf-processor.php";
     include "includes/processors/class-wbk-translation-processor.php";
+    // Request manager
+    include "includes/class-wbk-request-manager.php";
     // user controller
     include "includes/class-wbk-booking-user.php";
     // Assets manager
@@ -402,7 +404,9 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
             "wbk-service-categories",
             "wbk-email-templates",
             "wbk-dashboard",
-            "wbk-spa"
+            "wbk-spa",
+            "wbk-locations",
+            "wbk-staff-members"
         ],
         "wbk-backend-style",
         WP_WEBBA_BOOKING__PLUGIN_URL . "/public/css/wbk5-backend.css",
@@ -465,7 +469,9 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
             "wbk-form-builder",
             "wbk-appearance",
             "wbk-calendar",
-            "wbk-options"
+            "wbk-options",
+            "wbk-locations",
+            "wbk-staff-members"
         ],
         "wbk-admin-style",
         WP_WEBBA_BOOKING__PLUGIN_URL . "/build/admin/index.css",
@@ -486,7 +492,9 @@ if ( !function_exists( 'wbk_plugins_loaded' ) && !function_exists( 'wbk_load_tex
             "wbk-form-builder",
             "wbk-appearance",
             "wbk-calendar",
-            "wbk-options"
+            "wbk-options",
+            "wbk-locations",
+            "wbk-staff-members"
         ],
         "wbk-react-admin",
         WP_WEBBA_BOOKING__PLUGIN_URL . "/build/admin/index.js",
@@ -887,3 +895,4 @@ if ( !function_exists( "wbk_get_installed_at" ) ) {
     }
 
 }
+// build push 4

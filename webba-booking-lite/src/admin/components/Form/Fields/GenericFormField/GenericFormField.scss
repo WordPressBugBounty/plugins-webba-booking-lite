@@ -1,0 +1,67 @@
+.wbk_genericFormField__field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    position: relative;
+}
+
+.wbk_genericFormField__inputContainer {
+    display: flex;
+}
+
+.wbk_genericFormField__field.wbk_genericFormField__field--invalid .wbk_genericFormField__input {
+    border-color: red;
+}
+
+.wbk_genericFormField__labelContainer {
+    display: flex;
+}
+
+.wbk_genericFormField__errorContainer {
+    color: red;
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+}
+
+.wbk_genericFormField__input {
+    border: 1px solid colors.$field-border;
+    background: colors.$field-background;
+    border-radius: 8px;
+    height: 50px;
+    margin: 0;
+    padding: 0 20px 0 20px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #212121;
+    width: 100%;
+
+    &:focus {
+        @include fields.field-focused-state;
+    }
+}
+
+.wbk_genericFormField__rawEditor {
+    width: 100%;
+    min-height: 280px;
+    border-radius: 2px;
+    padding: 10px;
+}
+
+.wbk_genericFormField__editorToggle {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    .wbk_genericFormField__editorToggleButton {
+        padding: 5px 8px;
+        background-color: darker(#f6f7f7, 5);
+        color: #595959;
+        cursor: pointer;
+        border: 1px solid #dcdcde;
+
+        &.wbk_genericFormField__editorToggleButton--active {
+            background-color: #f6f7f7;
+        }
+    }
+}

@@ -1,19 +1,10 @@
 import { useMemo } from 'react'
 import { proxy, useSnapshot } from 'valtio'
-import { FormFromModel, FormValueFromModel, Primitive } from '../types'
+import { FormFromModel, FormValueFromModel } from '../types'
 import { Model } from '../../../../types'
+import { Primitive, unwrapValues } from '../../../../utils/primitive'
 
 const getFormValueProxies = ({ fields }: FormFromModel) => {
-    const result: Record<string, Primitive<any>> = {}
-
-    for (const key of Object.keys(fields)) {
-        result[key] = fields[key].value
-    }
-
-    return result
-}
-
-const unwrapValues = (fields: Record<string, Primitive<any>>) => {
     const result: Record<string, Primitive<any>> = {}
 
     for (const key of Object.keys(fields)) {

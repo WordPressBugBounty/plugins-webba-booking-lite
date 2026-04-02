@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import styles from './DateField.module.scss'
+import './DateField.scss'
 import { IFilterFieldProps } from '../../types'
 import { useFilterField } from '../../hooks/useFilterField'
 import { formatWbkDate } from '../../utils'
@@ -20,12 +20,12 @@ export const DateField = ({
     useEffect(() => setFilter((date && formatWbkDate(date)) || ''), [date])
 
     return (
-        <div className={styles.inputWrapper}>
+        <div className={"wbk_dateField__inputWrapper"}>
             {label && <Label title={label} id={name} />}
             <DatePicker
-                className={styles.dateInput}
-                calendarClassName={styles.calendar}
-                dayClassName={() => styles.day}
+                className="wbk_dateField__dateInput"
+                calendarClassName="wbk_dateField__calendar"
+                dayClassName={() => 'wbk_dateField__day'}
                 isClearable={true}
                 closeOnScroll={true}
                 dateFormat={'MMM d, yyyy'}

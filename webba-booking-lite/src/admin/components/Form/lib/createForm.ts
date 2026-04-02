@@ -7,11 +7,11 @@ import {
     FormFromModel,
     FormStateFromModel,
     FormValueFromModel,
-    Primitive,
 } from './types'
 import { valueComparator } from './utils'
 import { validate } from '../utils/validation'
 import { __ } from '@wordpress/i18n'
+import { Primitive } from '../../../utils/primitive'
 
 export const createFormFromModel = <T extends Model>({
     properties,
@@ -33,10 +33,20 @@ export const createFormFromModel = <T extends Model>({
 
         defaultValue[key] = field.default_value
 
-        if (field.dependency.length) {
+        if (Array.isArray(field.dependency) && field.dependency.length) {
             dependencyMap[key] = field.dependency
+        } else if (field?.misc?.hide) {
+            dependencyMap[key] = field?.misc?.hide
         }
     }
+
+    fields['id'] = createField({
+        name: 'id',
+        defaultValue: '',
+        validators: [],
+        required: false,
+        label: __('ID', 'webba-booking-lite'),
+    })
 
     for (const key of Object.keys(dependencyMap)) {
         const isIgnored = derive({
@@ -60,7 +70,8 @@ export const createFormFromModel = <T extends Model>({
                     !get(isIgnored).value
                         ? validate(
                               get(fields[key].value).value,
-                              get(fields[key].validators).value
+                              get(fields[key].validators).value,
+                              get
                           )
                         : [],
             }),

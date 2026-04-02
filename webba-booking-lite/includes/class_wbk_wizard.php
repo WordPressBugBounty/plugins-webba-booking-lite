@@ -115,6 +115,10 @@ class WBK_Wizard {
         }
         $service->set( 'color', WBK_Appearance_Utils::generate_random_color( $existing_colors ) );
         $service->set( 'business_hours', $business_hours_json );
+        // Service settings (group size limits & slot capacity)
+        $service->set( 'min_quantity', $min_quantity );
+        $service->set( 'max_quantity', $max_quantity );
+        $service->set( 'quantity', $quantity );
         $service->set( 'duration', $duration );
         $service->set( 'step', intval( $params['service_interval'] ) );
         $service->set( 'interval_between', intval( $params['service_buffer'] ) );

@@ -1,0 +1,41 @@
+.wbk_input {
+    &__radio {
+        &__inner-wrapper {
+            display: flex;
+            flex-flow: column;
+            gap: 12px;
+        }
+
+        &__buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+
+            label {
+                font-weight: 300;
+                font-size: 14px;
+                line-height: 18px;
+                letter-spacing: 1%;
+                color: #668091;
+            }
+        }
+
+        &__item-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        &--half-width {
+            .wbk_input__radio__buttons {
+                flex-flow: column;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .wbk_input__radio__buttons {
+                flex-flow: column;
+            }
+        }
+    }
+}

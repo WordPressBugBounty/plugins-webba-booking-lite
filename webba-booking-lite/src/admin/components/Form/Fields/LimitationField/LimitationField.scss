@@ -1,0 +1,90 @@
+.wbk_limitationField__field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    position: relative;
+}
+
+.wbk_limitationField__inputsContainer {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.wbk_limitationField__inputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    color: #212121;
+    font-family: Ubuntu, sans-serif;
+    font-size: 16px;
+    height: 50px;
+    margin: 0;
+    padding: 0 20px;
+    width: 100%;
+
+    &.wbk_limitationField__inputWrapper--focused {
+        @include fields.field-focused-state;
+    }
+}
+
+.wbk_limitationField__input {
+    border: none;
+    background: transparent;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #212121;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 30px;
+    width: 50%;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    &[type='number'] {
+        -moz-appearance: textfield;
+    }
+
+    &:focus,
+    &:active {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.wbk_limitationField__label {
+    color: #8a9393;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.wbk_limitationField__errorContainer {
+    color: red;
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+    font-size: 12px;
+}
+
+.wbk_limitationField__field.wbk_limitationField__field--invalid .wbk_limitationField__inputWrapper {
+    border-color: red;
+}

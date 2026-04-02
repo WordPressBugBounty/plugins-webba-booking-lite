@@ -1,0 +1,85 @@
+.wbk_durationField {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    position: relative;
+
+    &.wbk_durationField--invalid .wbk_durationField__inputWrapper {
+        border-color: red;
+    }
+}
+
+.wbk_durationField__inputsContainer {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.wbk_durationField__inputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    color: #212121;
+    font-family: Ubuntu, sans-serif;
+    font-size: 16px;
+    height: 50px;
+    margin: 0;
+    padding: 0 20px;
+    width: 100%;
+
+    &.wbk_durationField__inputWrapper--focused {
+        @include fields.field-focused-state;
+    }
+}
+
+.wbk_durationField__input {
+    border: none;
+    background: transparent;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #212121;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 30px;
+    width: 50%;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    &[type='number'] {
+        -moz-appearance: textfield;
+    }
+
+    &:focus,
+    &:active {
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+}
+
+.wbk_durationField__label {
+    color: #8a9393;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.wbk_durationField__errorContainer {
+    color: red;
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+    font-size: 12px;
+}

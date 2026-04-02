@@ -1,0 +1,307 @@
+.wbk_businessHours__daysWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.wbk_businessHours__dayRow {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wbk_businessHours__dayHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.wbk_businessHours__dayHeaderLeft {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wbk_businessHours__dayName {
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    font-weight: 400;
+    color: #212121;
+}
+
+.wbk_businessHours__dayHeaderRight {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-left: auto;
+}
+
+.wbk_businessHours__addTimeSlotButton {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: #1f6763;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+    text-decoration: none;
+
+    &:hover:not(:disabled) {
+        color: #155350;
+    }
+
+    &:disabled {
+        color: #8a9393;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+.wbk_businessHours__plusIcon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.wbk_businessHours__applyToAllButton {
+    background: none;
+    border: none;
+    color: #8a9393;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+    text-decoration: none;
+
+    &:hover:not(:disabled) {
+        color: #212121;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.wbk_businessHours__timeSlotsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.wbk_businessHours__noTimeSlots {
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    color: #8a9393;
+    padding: 8px 0;
+}
+
+.wbk_businessHours__timeSlotRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+    background-color: #e5e7eb;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.wbk_businessHours__slotToggle {
+    flex-shrink: 0;
+}
+
+.wbk_businessHours__timeInputWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    background-color: #fff;
+    padding: 0 35px 0 12px;
+    height: 40px;
+    transition: border-color 0.2s;
+    cursor: pointer;
+
+    &:hover:not(.wbk_businessHours__timeInputWrapper--disabled) {
+        border-color: #8a9393;
+    }
+
+    &.wbk_businessHours__timeInputWrapper--disabled {
+        background-color: #f5f5f5;
+        border-color: #e0e0e0;
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.wbk_businessHours__timeDisplay {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    color: #212121;
+}
+
+.wbk_businessHours__periodLabel {
+    font-size: 12px;
+    color: #8a9393;
+    margin-left: 2px;
+}
+
+.wbk_businessHours__timeDropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.wbk_businessHours__timeSelectorColumns {
+    display: flex;
+    max-height: 200px;
+    overflow: hidden;
+}
+
+.wbk_businessHours__hourColumn,
+.wbk_businessHours__minuteColumn {
+    overflow-y: auto;
+    max-height: 200px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    cursor: grab;
+
+    &:active {
+        cursor: grabbing;
+    }
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.wbk_businessHours__hourColumn {
+    border-right: 1px solid #e0e0e0;
+    min-width: 60px;
+}
+
+.wbk_businessHours__minuteColumn {
+    min-width: 50px;
+}
+
+.wbk_businessHours__timeOption {
+    padding: 8px 16px;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    color: #212121;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    &:hover {
+        background-color: #f5f5f5;
+    }
+
+    &.wbk_businessHours__timeOption--selected {
+        background-color: #1f6763;
+        color: #fff;
+
+        .wbk_businessHours__periodLabel {
+            color: #fff;
+        }
+    }
+}
+
+.wbk_businessHours__clockIcon {
+    position: absolute;
+    right: 12px;
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+}
+
+.wbk_businessHours__timeSeparator {
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    color: #212121;
+    margin: 0 8px;
+}
+
+.wbk_businessHours__colonSeparator {
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    color: #212121;
+}
+
+.wbk_businessHours__removeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+    margin-left: auto;
+
+    &:hover:not(:disabled) {
+        opacity: 0.7;
+    }
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    img {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+.wbk_businessHours__error {
+    color: #dc3545;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.wbk_businessHours__overlapError {
+    color: #dc3545;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    margin-top: 8px;
+    padding-top: 8px;
+}
+
+.wbk_businessHours__businessDay {}
+
+.wbk_businessHours__select {}
+
+.wbk_businessHours__sliderWrapper {}
+
+.wbk_businessHours__readableTime {}
+
+.wbk_businessHours__slider {}
+
+.wbk_businessHours__thumb {}
+
+.wbk_businessHours__track {}
+
+.wbk_businessHours__buttonClose {}

@@ -1,0 +1,279 @@
+$border: 1.5px solid #edeff2;
+$border-active: 1.5px solid colors.$wbk-color-border-selected;
+$transition: 0.3s all linear;
+$background-active: colors.$wbk-primary-50;
+
+.wbk_services {
+    &_wrapper {
+        display: flex;
+        flex-flow: column;
+        gap: 8px;
+        font-family: colors.$wbk-font;
+        margin-top: 8px;
+        border-radius: 12px;
+
+        p {
+            margin: 0;
+        }
+    }
+
+    &_skeleton {
+        height: 96px;
+        border-radius: 12px;
+        background: linear-gradient(
+            90deg,
+            #f0f0f0 25%,
+            #e0e0e0 50%,
+            #f0f0f0 75%
+        );
+        background-size: 400% 100%;
+        background-position: 100% 50%;
+        animation: skeleton-loading 1.2s infinite linear;
+        margin-bottom: 8px;
+    }
+
+    &_item_appear {
+        animation: slideFadeIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
+    }
+}
+
+.wbk_service_item {
+    border: $border;
+    border-radius: 12px;
+    cursor: pointer;
+    transform: $transition;
+    overflow: hidden;
+    user-select: none;
+
+    &--selected {
+        border: $border-active;
+        background-color: $background-active;
+
+        h3,
+        .wbk_service_item__heading-wrapper__price {
+            color: colors.$wbk-primary-text-50;
+        }
+
+        p {
+            color: colors.$wbk-primary-text-100;
+        }
+
+        .wbk_service_item__quantity-select {
+            border-color: colors.$wbk-primary-500;
+            background-color: $background-active;
+            color: colors.$wbk-primary-text-50;
+        }
+    }
+
+    &__top-part {
+        display: flex;
+        gap: 16px;
+        padding: 16px 16px 24px;
+    }
+
+    &__staff-section {
+        border-top: 1.5px solid #edeff2;
+        padding: 12px 16px 16px 16px;
+        margin-top: 4px;
+
+        .wbk_staff_selector {
+            margin-top: 12px;
+        }
+    }
+
+    &__staff-section-label {
+        margin: 0;
+        font-family: colors.$wbk-font;
+        font-weight: 600;
+        font-size: 12px;
+        line-height: 16px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #668091;
+    }
+
+    &__image {
+        width: 72px;
+        height: 72px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    &__content-wrapper {
+        display: flex;
+        flex-flow: column;
+        gap: 12px;
+        width: 100%;
+    }
+
+    &__heading-wrapper {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+
+        h3 {
+            margin: 0;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 24px;
+            letter-spacing: 0.5%;
+            margin-bottom: 4px;
+            color: #22292f;
+        }
+
+        &__duration {
+            color: #668091;
+        }
+
+        p {
+            margin: 0;
+            font-weight: 300;
+            font-size: 14px;
+            line-height: 22px;
+            letter-spacing: 1%;
+            vertical-align: middle;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        &__price-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        &__price {
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 24px;
+            letter-spacing: 0.5%;
+            vertical-align: middle;
+            white-space: nowrap;
+            color: #22292f;
+        }
+    }
+
+    &__quantity-select {
+        min-width: 56px;
+        height: 32px;
+        padding: 0 8px;
+        border: $border;
+        border-radius: 8px;
+        font-size: 14px;
+        line-height: 22px;
+        color: #22292f;
+        background-color: #ffffff;
+        cursor: pointer;
+        appearance: auto;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    &__description {
+        margin: 0;
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 18px;
+        letter-spacing: 1%;
+        color: #668091;
+    }
+
+    &__description-toggle {
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 22px;
+        letter-spacing: 1%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 4px;
+        cursor: pointer;
+
+        img {
+            transition: 0.3s all linear;
+        }
+
+        &--expanded {
+            img {
+                transform: rotate(180deg);
+            }
+        }
+    }
+
+    &__mobile-select-button {
+        display: none;
+        margin: 16px;
+        width: calc(100% - 32px);
+
+        @media screen and (max-width: 768px) {
+            display: flex;
+        }
+
+        background-color: colors.$wbk-bg-button-selected !important;
+        color: colors.$wbk-color-button-selected !important;
+
+        svg {
+            path {
+                fill: colors.$wbk-color-button-selected !important;
+            }
+        }
+
+        &:hover {
+            background-color: colors.$wbk-bg-button-selected-hover !important;
+            color: colors.$wbk-color-button-selected-hover !important;
+
+            svg {
+                path {
+                    fill: colors.$wbk-color-button-selected-hover !important;
+                }
+            }
+        }
+
+        &--selected {
+            background-color: colors.$wbk-bg-button-selected-selected !important;
+            color: colors.$wbk-color-button-selected-selected !important;
+
+            &:hover {
+                background-color: colors.$wbk-bg-button-selected-hover !important;
+                color: colors.$wbk-color-button-selected-hover !important;
+
+                svg {
+                    path {
+                        fill: colors.$wbk-color-button-selected-hover !important;
+                    }
+                }
+            }
+
+            svg {
+                path {
+                    fill: colors.$wbk-color-button-selected-selected !important;
+                }
+            }
+        }
+    }
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+@keyframes slideFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
