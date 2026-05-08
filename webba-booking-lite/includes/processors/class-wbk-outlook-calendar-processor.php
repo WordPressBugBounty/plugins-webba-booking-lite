@@ -273,4 +273,16 @@ class WBK_Outlook_Calendar_Processor extends WBK_Connected_Calendar_Processor {
     public static function process_adding_for_calendars( $booking, $service, $calendar_ids ) {
     }
 
+    /**
+     * Add unit-only booking to Outlook; same as service flow (service is unused in process_adding_for_calendars).
+     *
+     * @param WBK_Booking $booking        Booking.
+     * @param array       $calendar_ids  Connected calendar row IDs.
+     * @return void|WP_Error
+     */
+    public static function process_adding_for_unit_booking( $booking, $calendar_ids ) {
+        $dummy = new WBK_Service(0);
+        return self::process_adding_for_calendars( $booking, $dummy, $calendar_ids );
+    }
+
 }

@@ -62,14 +62,17 @@ interface LocationDropdownProps {
 export const LocationDropdown = ({
     locations: locationsOverride = undefined,
 }: LocationDropdownProps = {}) => {
-    const { preset, formData, onLocationSelect, extractedAttrLocations } =
+    const { bookingMode, preset, formData, onLocationSelect, extractedAttrLocations } =
         useBookingContext()
     const wording = preset?.wording ?? {}
     const allLocations: ILocationOption[] = useMemo(() => {
         const raw = (preset?.locations ?? []) as ILocationOption[]
-        const services = (preset?.services ?? []) as Array<{ locations?: any[] }>
-        return getServiceAssociatedLocations(raw, services)
-    }, [preset?.locations, preset?.services])
+        const linkedEntities =
+            bookingMode === 'units'
+                ? ((preset?.units ?? []) as Array<{ locations?: any[] }>)
+                : ((preset?.services ?? []) as Array<{ locations?: any[] }>)
+        return getServiceAssociatedLocations(raw, linkedEntities)
+    }, [bookingMode, preset?.locations, preset?.services, preset?.units])
     const baseLocations =
         extractedAttrLocations.length > 0
             ? allLocations.filter(
@@ -82,7 +85,8 @@ export const LocationDropdown = ({
         locationsOverride ?? baseLocations
     const selectedId = formData?.location != null ? String(formData.location) : ''
     const selected = locations.find(
-        (loc) => loc.id === selectedId || loc.value === selectedId
+        (loc) =>
+            String(loc.id) === selectedId || String(loc.value) === selectedId
     )
     const [isOpen, setIsOpen] = useState(false)
     const wrapperRef = useRef<HTMLDivElement>(null)

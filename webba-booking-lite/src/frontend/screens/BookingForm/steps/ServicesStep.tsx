@@ -13,7 +13,9 @@ import { getServiceAssociatedLocations } from '../../../lib/locationFilter/getSe
 
 export const ServicesStep = () => {
     const {
+        bookingMode,
         categories,
+        attrHideCategory,
         extractedAttrCats,
         extractedAttrLocations,
         extractedAttrStaff,
@@ -21,10 +23,12 @@ export const ServicesStep = () => {
         formData,
         attrService,
         onLocationSelect,
+        disableCustomScroll,
     } =
         useBookingContext()
     const wording = preset?.wording ?? {}
-    const presetServices = preset?.services ?? []
+    const presetServices =
+        bookingMode === 'units' ? preset?.units ?? [] : preset?.services ?? []
     const locations = useMemo(
         () =>
             getServiceAssociatedLocations(
@@ -52,36 +56,36 @@ export const ServicesStep = () => {
 
         let filtered = locations as ILocationOption[]
 
-        if (hasPredefinedCategory && !hasPredefinedService) {
+        if (bookingMode === 'services' && hasPredefinedCategory && !hasPredefinedService) {
             const categoryServiceIds = new Set<string>()
-            ;(
-                presetCategories as Array<{
-                    id: string | number
-                    services?: Array<string | number>
-                }>
-            )
-                .filter((category) =>
-                    extractedAttrCats.includes(Number(category.id))
+                ; (
+                    presetCategories as Array<{
+                        id: string | number
+                        services?: Array<string | number>
+                    }>
                 )
-                .forEach((category) => {
-                    ;(category.services || []).forEach((serviceId) =>
-                        categoryServiceIds.add(String(serviceId))
+                    .filter((category) =>
+                        extractedAttrCats.includes(Number(category.id))
                     )
-                })
+                    .forEach((category) => {
+                        ; (category.services || []).forEach((serviceId) =>
+                            categoryServiceIds.add(String(serviceId))
+                        )
+                    })
 
             const locationIds = new Set<string>()
-            ;(
-                presetServices as Array<{
-                    id: string | number
-                    locations?: Array<string | number>
-                }>
-            )
-                .filter((service) => categoryServiceIds.has(String(service.id)))
-                .forEach((service) => {
-                    ;(service.locations || []).forEach((locationId) =>
-                        locationIds.add(String(locationId))
-                    )
-                })
+                ; (
+                    presetServices as Array<{
+                        id: string | number
+                        locations?: Array<string | number>
+                    }>
+                )
+                    .filter((service) => categoryServiceIds.has(String(service.id)))
+                    .forEach((service) => {
+                        ; (service.locations || []).forEach((locationId) =>
+                            locationIds.add(String(locationId))
+                        )
+                    })
 
             filtered = filtered.filter(
                 (location) =>
@@ -93,20 +97,20 @@ export const ServicesStep = () => {
 
         if (extractedAttrStaff.length > 0) {
             const staffLocationIds = new Set<string>()
-            ;(
-                presetStaffMembers as Array<{
-                    id: string | number
-                    location?: Array<string | number>
-                }>
-            )
-                .filter((staff) =>
-                    extractedAttrStaff.includes(String(staff.id))
+                ; (
+                    presetStaffMembers as Array<{
+                        id: string | number
+                        location?: Array<string | number>
+                    }>
                 )
-                .forEach((staff) => {
-                    ;(staff.location || []).forEach((locationId) =>
-                        staffLocationIds.add(String(locationId))
+                    .filter((staff) =>
+                        extractedAttrStaff.includes(String(staff.id))
                     )
-                })
+                    .forEach((staff) => {
+                        ; (staff.location || []).forEach((locationId) =>
+                            staffLocationIds.add(String(locationId))
+                        )
+                    })
 
             filtered = filtered.filter(
                 (location) =>
@@ -141,6 +145,18 @@ export const ServicesStep = () => {
 
     const lockServicesUntilLocation =
         showLocationDropdown && !isLocationSelected
+    const locationRequiredText =
+        bookingMode === 'units'
+            ? wording.please_select_location_units ??
+            __('Please select a location first to choose units.', 'webba-booking-lite')
+            : wording.please_select_location ??
+            __('Please select a location first to choose services.', 'webba-booking-lite')
+    const emptyStateText =
+        bookingMode === 'units'
+            ? wording.no_units_found ??
+            __('No units found!', 'webba-booking-lite')
+            : wording.no_services_found ??
+            __('No services found!', 'webba-booking-lite')
 
     useEffect(() => {
         if (!shouldAllowLocationStep) return
@@ -165,7 +181,7 @@ export const ServicesStep = () => {
         <>
             {showLocationDropdown && (
                 <LocationDropdown
-                    locations={filteredLocationsForPredefinedFilters}
+                    locations={effectiveLocations}
                 />
             )}
             {lockServicesUntilLocation && (
@@ -174,10 +190,7 @@ export const ServicesStep = () => {
                         <InfoIcon aria-hidden="true" />
                     </span>
                     <span>
-                        {wording.please_select_location ?? __(
-                            'Please select a location first to choose services.',
-                            'webba-booking-lite'
-                        )}
+                        {locationRequiredText}
                     </span>
                 </div>
             )}
@@ -186,17 +199,25 @@ export const ServicesStep = () => {
                     'wbk_step__services_area--locked': lockServicesUntilLocation,
                 })}
             >
-                {categories &&
+                {bookingMode === 'services' &&
+                    attrHideCategory !== 'yes' &&
+                    categories &&
                     categories?.length > 0 &&
                     (extractedAttrCats.length > 1 ||
                         extractedAttrCats.length === 0) && <Categories />}
-                <CustomScroll
-                    flex="1"
-                    className={'wbk_step__scroll-wrapper'}
-                    allowOuterScroll={true}
-                >
-                    <Services />
-                </CustomScroll>
+                {disableCustomScroll ? (
+                    <div className={'wbk_step__native-scroll-wrapper'}>
+                        <Services emptyStateText={emptyStateText} />
+                    </div>
+                ) : (
+                    <CustomScroll
+                        flex="1"
+                        className={'wbk_step__scroll-wrapper'}
+                        allowOuterScroll={true}
+                    >
+                        <Services emptyStateText={emptyStateText} />
+                    </CustomScroll>
+                )}
             </div>
         </>
     )

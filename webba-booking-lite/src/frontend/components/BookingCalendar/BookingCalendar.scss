@@ -181,4 +181,47 @@
             }
         }
     }
+
+    &--range {
+        .react-calendar__month-view__days__day {
+            background-color: #ffffff !important;
+            color: #374151 !important;
+            border: 1px solid #e5e7eb !important;
+        }
+
+        .react-calendar__month-view__days__day--neighboringMonth {
+            color: #9ca3af !important;
+            background-color: #f9fafb !important;
+        }
+
+        .react-calendar__tile--now {
+            background-color: colors.$wbk-primary-100 !important;
+        }
+
+        .react-calendar__tile--active,
+        .react-calendar__tile--hasActive {
+            background-color: colors.$wbk-primary-50 !important;
+            color: colors.$wbk-primary-text-50 !important;
+        }
+
+        .react-calendar__tile--range,
+        .react-calendar__tile--hover {
+            background-color: colors.$wbk-primary-50 !important;
+            color: colors.$wbk-primary-text-50 !important;
+        }
+
+        .react-calendar__tile--rangeStart,
+        .react-calendar__tile--rangeEnd,
+        .react-calendar__tile--rangeBothEnds {
+            background-color: colors.$wbk-primary-100 !important;
+            border: 1.5px solid colors.$wbk-color-border-selected !important;
+            color: #111827 !important;
+            font-weight: 600;
+        }
+
+        .react-calendar__tile--hover.react-calendar__tile--rangeStart,
+        .react-calendar__tile--hover.react-calendar__tile--rangeEnd {
+            background-color: rgba(14, 165, 233, 0.22) !important;
+        }
+    }
 }

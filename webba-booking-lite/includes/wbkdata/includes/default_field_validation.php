@@ -627,4 +627,40 @@ function validate_select_custom($input, $value, $slug, $field)
 {
     return [true, $value];
 }
+
+// price variant
+add_filter(
+    'wbkdata_property_field_validation_price_variant',
+    'validate_price_variant',
+    10,
+    4
+);
+function validate_price_variant($input, $value, $slug, $field)
+{
+    return [true, $value];
+}
+
+// availability ranges
+add_filter(
+    'wbkdata_property_field_validation_availability_ranges',
+    'validate_availability_ranges',
+    10,
+    4
+);
+function validate_availability_ranges($input, $value, $slug, $field)
+{
+    return [true, $value];
+}
+
+// number of people
+add_filter(
+    'wbkdata_property_field_validation_number_of_people',
+    'validate_number_of_people',
+    10,
+    4
+);
+function validate_number_of_people($input, $value, $slug, $field)
+{
+    return [true, $value];
+}
 ?>

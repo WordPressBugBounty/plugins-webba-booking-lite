@@ -1,6 +1,5 @@
 <?php
 
-use function PHPUnit\Framework\isNull;
 if ( !defined( "ABSPATH" ) ) {
     exit;
 }
@@ -13,23 +12,54 @@ class WBK_Booking_Factory {
         if ( !WBK_Validator::check_email( $data["email"] ) ) {
             return [false, "Incorrect email"];
         }
+        $is_unit_only_booking = !empty( $data["wbk_unit_range_booking"] ) && (int) ($data["service_id"] ?? 0) === 0;
+        if ( $is_unit_only_booking ) {
+            $range = $data["range"] ?? $data["unit_range"] ?? null;
+            if ( is_array( $range ) && isset( $range["start"], $range["end"] ) && $range["start"] !== "" && $range["end"] !== "" ) {
+                $start_ts = strtotime( (string) $range["start"] );
+                $end_ts = strtotime( (string) $range["end"] );
+                if ( $start_ts === false || $end_ts === false || $end_ts < $start_ts ) {
+                    return [false, "Invalid range"];
+                }
+                $start_day = strtotime( date( "Y-m-d", $start_ts ) );
+                $end_day = strtotime( date( "Y-m-d", $end_ts ) );
+                $inclusive_days = (int) (($end_day - $start_day) / DAY_IN_SECONDS) + 1;
+                if ( $inclusive_days < 1 ) {
+                    $inclusive_days = 1;
+                }
+                $data["time"] = $start_day;
+                $data["duration"] = $inclusive_days * 1440;
+            }
+        }
         if ( !WBK_Validator::check_integer( $data["time"], 1438426800, 4901674778 ) ) {
             return [false, "Incorrect time"];
         }
         if ( !WBK_Validator::check_integer( $data["quantity"], 1, 1754046000 ) ) {
             return [false, "Incorrect quantity"];
         }
-        if ( !WBK_Validator::check_integer( $data["service_id"], 1, 9999999999 ) ) {
-            return [false, "Incorrect service id"];
-        }
-        $service = new WBK_Service($data["service_id"]);
-        if ( !$service->is_loaded() ) {
-            return [false, "Service not loaded"];
+        if ( $is_unit_only_booking ) {
+            if ( !WBK_Validator::check_integer( $data["unit_id"] ?? 0, 1, 9999999999 ) ) {
+                return [false, "Incorrect unit id"];
+            }
+            $data["service_id"] = 0;
+            $service = null;
+        } else {
+            if ( !WBK_Validator::check_integer( $data["service_id"], 1, 9999999999 ) ) {
+                return [false, "Incorrect service id"];
+            }
+            $service = new WBK_Service($data["service_id"]);
+            if ( !$service->is_loaded() ) {
+                return [false, "Service not loaded"];
+            }
         }
         if ( !WBK_Validator::check_integer( $data["service_category"], 0, 9999999999 ) ) {
             return [false, "Incorrect service category"];
         }
-        if ( !WBK_Validator::check_integer( $data["duration"], 1, 1440 ) ) {
+        $max_duration_minutes = 1440;
+        if ( !empty( $data["wbk_unit_range_booking"] ) ) {
+            $max_duration_minutes = 535680;
+        }
+        if ( !WBK_Validator::check_integer( $data["duration"], 1, $max_duration_minutes ) ) {
             return [false, "Incorrect duration"];
         }
         if ( !WBK_Validator::check_string_size( $data["description"], 0, 1024 ) ) {
@@ -93,10 +123,9 @@ class WBK_Booking_Factory {
         }
         if ( get_option( "wbk_appointments_delete_not_paid_mode", "disabled" ) == "on_booking" ) {
             $expiration_time = get_option( "wbk_appointments_expiration_time", "60" );
+            $expiration_value = 0;
             if ( is_numeric( $expiration_time ) && intval( $expiration_time ) >= 1 ) {
-                if ( $service->get_price() == 0 ) {
-                    $expiration_value = 0;
-                } else {
+                if ( $service !== null && $service->is_loaded() && $service->get_price() != 0 ) {
                     $expiration_value = time() + $expiration_time * 60;
                 }
             }
@@ -136,9 +165,10 @@ class WBK_Booking_Factory {
         $result = [];
         foreach ( $booking_ids as $booking_id ) {
             $booking = new WBK_Booking($booking_id);
-            $service_id = $booking->get_service();
+            $service_id = (int) $booking->get_service();
             $service = new WBK_Service($service_id);
-            if ( $service->has_only_arrival_payment_method() ) {
+            $service_loaded = $service->is_loaded();
+            if ( $service_loaded && $service->has_only_arrival_payment_method() ) {
                 $booking->set( "payment_method", "Pay on arrival" );
                 $booking->save();
             }
@@ -148,11 +178,16 @@ class WBK_Booking_Factory {
                 $booking->get_id(),
                 time()
             );
+            if ( (int) $booking->get( "unit_id" ) > 0 ) {
+                $duration_for_meta = (int) $booking->get( "duration" );
+            } else {
+                $duration_for_meta = ( $service_loaded ? $service->get_duration() : (int) $booking->get( "duration" ) );
+            }
             WbkData()->set_value(
                 get_option( "wbk_db_prefix", "" ) . "wbk_appointments",
                 "appointment_duration",
                 $booking->get_id(),
-                $service->get_duration()
+                $duration_for_meta
             );
             WbkData()->set_value(
                 get_option( "wbk_db_prefix", "" ) . "wbk_appointments",
@@ -171,8 +206,29 @@ class WBK_Booking_Factory {
                     );
                 }
             }
+            $is_unit_booking = (int) $booking->get( "unit_id" ) > 0;
+            $amount = [
+                "price"         => 0,
+                "price_details" => [],
+            ];
             if ( $event != "on_manual_booking" ) {
-                $amount = WBK_Price_Processor::calculate_single_booking_price( $booking_id, $booking_ids );
+                if ( $is_unit_booking ) {
+                    $unit_payment_items = WBK_Price_Processor::get_unit_payment_items_post_booked( [$booking_id] );
+                    if ( is_array( $unit_payment_items ) ) {
+                        $amount = [
+                            "price"         => (float) ($unit_payment_items["subtotal"] ?? 0),
+                            "price_details" => [[
+                                "type"      => "unit_price",
+                                "subtotal"  => (float) ($unit_payment_items["subtotal"] ?? 0),
+                                "tax"       => (float) ($unit_payment_items["tax_to_pay"] ?? 0),
+                                "total"     => (float) ($unit_payment_items["to_pay_total"] ?? 0),
+                                "breakdown" => ( isset( $unit_payment_items["unit_breakdowns"][0] ) && is_array( $unit_payment_items["unit_breakdowns"][0] ) ? $unit_payment_items["unit_breakdowns"][0] : [] ),
+                            ]],
+                        ];
+                    }
+                } else {
+                    $amount = WBK_Price_Processor::calculate_single_booking_price( $booking_id, $booking_ids );
+                }
                 WBK_Model_Utils::set_amount_for_booking( $booking_id, $amount["price"], json_encode( $amount["price_details"] ) );
                 WbkData()->set_value(
                     get_option( "wbk_db_prefix", "" ) . "wbk_appointments",
@@ -208,8 +264,14 @@ class WBK_Booking_Factory {
             }
             if ( get_option( "wbk_appointments_delete_not_paid_mode", "disabled" ) == "on_booking" ) {
                 $expiration_time = get_option( "wbk_appointments_expiration_time", "60" );
+                $expiration_value = 0;
                 if ( is_numeric( $expiration_time ) && intval( $expiration_time ) >= 1 ) {
-                    if ( $service->get_price() == 0 || $amount["price"] == 0 ) {
+                    if ( $is_unit_booking ) {
+                        $service_price_zero = (float) $amount["price"] == 0;
+                    } else {
+                        $service_price_zero = !$service_loaded || $service->get_price() == 0;
+                    }
+                    if ( $service_price_zero || $amount["price"] == 0 ) {
                         $expiration_value = 0;
                     } else {
                         $expiration_value = time() + $expiration_time * 60;
@@ -224,10 +286,10 @@ class WBK_Booking_Factory {
                 $data["expiration_time"] = $expiration_value;
             }
             // *** Add event to the connected calendars (all types: Google, Outlook, etc.)
-            if ( get_option( "wbk_connected_calendars_when_add", "onbooking" ) == "onbooking" ) {
+            if ( WBK_Connected_Calendar_Processor::booking_has_connected_calendars_for_export( $booking ) && get_option( "wbk_connected_calendars_when_add", "onbooking" ) == "onbooking" ) {
             }
             // add to Zoom
-            if ( get_option( "wbk_zoom_when_add", "onbooking" ) == "onbooking" ) {
+            if ( $service_loaded && get_option( "wbk_zoom_when_add", "onbooking" ) == "onbooking" ) {
             }
         }
         $sort_array = [];
@@ -334,10 +396,10 @@ class WBK_Booking_Factory {
                 continue;
             }
             $service = new WBK_Service($booking->get_service());
-            if ( !$service->is_loaded() ) {
-                continue;
-            }
-            if ( $service->get_payment_methods() != "" ) {
+            $unit = new WBK_Unit($booking->get( "unit_id" ));
+            $is_service_payable = $service->is_loaded() && $service->get_payment_methods() != "";
+            $is_unit_payable = $unit->is_loaded() && $unit->get( "payment_methods" ) != "";
+            if ( $is_service_payable || $is_unit_payable ) {
                 $booking_ids[] = $booking_id;
             }
             if ( $method == "coupon" ) {

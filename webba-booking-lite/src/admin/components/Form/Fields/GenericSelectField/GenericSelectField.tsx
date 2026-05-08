@@ -186,17 +186,25 @@ export const createGenericSelectField: FormComponentConstructor<any> = ({
         )
 
         const handleChange = (selectedOptions: any) => {
+            let nextValue: string | string[] = []
             if (multiple && selectedOptions && selectedOptions[0]?.value) {
-                setValue(selectedOptions.map((option: IOption) => option.value))
-            } else if (!multiple && selectedOptions.value) {
-                setValue(selectedOptions?.value as string)
+                nextValue = selectedOptions.map((option: IOption) => option.value)
+                setValue(nextValue)
+            } else if (!multiple && selectedOptions?.value) {
+                nextValue = String(selectedOptions.value)
+                setValue(nextValue)
             } else {
                 setValue([])
             }
 
             if (isConnectedField(fieldConfig?.modelName as string, name)) {
+                const currentValues = getFormState(form).values as Record<string, string>
+                const valueForRequest =
+                    multiple && Array.isArray(nextValue) ? JSON.stringify(nextValue) : String(nextValue)
+
                 fetchConnectedOptions(fieldConfig?.modelName as string, name, {
-                    ...getFormState(form).values,
+                    ...currentValues,
+                    [name]: valueForRequest,
                     id: form.defaultValue?.id,
                 })
             }

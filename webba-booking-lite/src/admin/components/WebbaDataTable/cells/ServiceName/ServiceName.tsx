@@ -16,7 +16,7 @@ export const ServiceName = ({ getValue }: CellContext<any, any>) => {
                 (service: any) => service.id?.toString() === getValue()
             )?.label) || (
             <div className="wbk_serviceName__nullService">
-                {__('NULL', 'webba-booking-lite')}
+                {__('N/A', 'webba-booking-lite')}
             </div>
         )
     )

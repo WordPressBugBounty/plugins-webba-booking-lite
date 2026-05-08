@@ -1,4 +1,4 @@
-import { Stripe, StripeElements } from '@stripe/stripe-js'
+import type { Stripe, StripeElements } from '@stripe/stripe-js'
 import { TAllowedMethods } from '../../../../../components/PaymentSelector/types'
 
 export interface IStripeProps {

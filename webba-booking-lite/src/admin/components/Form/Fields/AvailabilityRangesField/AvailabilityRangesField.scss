@@ -1,0 +1,244 @@
+.wbk_availabilityRangesField__fieldWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+}
+
+.wbk_availabilityRangesField__description {
+    font-size: 14px;
+    color: #8a9393;
+    font-family: typography.$font-primary;
+    margin-top: -8px;
+}
+
+.wbk_availabilityRangesField__datesList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.wbk_availabilityRangesField__dateItem {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wbk_availabilityRangesField__dateItem .wbk_availabilityRangesField__inputContainer {
+    flex: 1;
+    position: relative;
+}
+
+.wbk_availabilityRangesField__inputContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 8px;
+}
+
+.wbk_availabilityRangesField__inputWrapper {
+    position: relative;
+    flex: 1;
+}
+
+.wbk_availabilityRangesField__dateInput {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    height: 50px;
+    padding: 0 50px 0 20px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #212121;
+    width: 100%;
+    background: #fff;
+    position: relative;
+
+    &::placeholder {
+        color: #8a9393;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: #1f6763;
+    }
+}
+
+.wbk_availabilityRangesField__calendarButton {
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+
+    &:hover {
+        opacity: 0.7;
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.wbk_availabilityRangesField__calendarIcon {
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+}
+
+.wbk_availabilityRangesField__deleteButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+
+    &:hover {
+        opacity: 0.7;
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.wbk_availabilityRangesField__deleteIcon {
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+}
+
+.wbk_availabilityRangesField__inputWrapper {
+    .wbk_availabilityRangesField__calendarWrapper {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 8px;
+    }
+}
+
+.wbk_availabilityRangesField__calendar {
+    .react-datepicker {
+        border: none;
+        font-family: typography.$font-primary;
+    }
+
+    .react-datepicker__header {
+        background-color: #fff;
+        border-bottom: 1px solid #e0e0e0;
+        padding-top: 8px;
+    }
+
+    .react-datepicker__current-month {
+        font-weight: 600;
+        color: #212121;
+        margin-bottom: 8px;
+    }
+
+    .react-datepicker__day-names {
+        margin-bottom: 4px;
+    }
+
+    .react-datepicker__day-name {
+        color: #8a9393;
+        font-weight: 500;
+        width: 36px;
+        line-height: 36px;
+        margin: 0;
+    }
+
+    .react-datepicker__day {
+        width: 36px;
+        height: 36px;
+        line-height: 36px;
+        margin: 0;
+        border-radius: 4px;
+        transition: all 0.2s;
+
+        &:hover {
+            border-radius: 4px;
+        }
+    }
+}
+
+.wbk_availabilityRangesField__day {
+    background-color: transparent;
+    color: #212121 !important;
+
+    &.wbk_availabilityRangesField__day--daySelected {
+        background-color: #1f6763 !important;
+        color: white !important;
+        border-radius: 4px !important;
+
+        &:hover {
+            background-color: #1f6763 !important;
+            color: white !important;
+        }
+    }
+
+    &.wbk_availabilityRangesField__day--dayNotSelected {
+        color: #212121 !important;
+
+        &:hover {
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+    }
+}
+
+.wbk_availabilityRangesField__addButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: #1f6763;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+    align-self: flex-start;
+
+    &:hover {
+        opacity: 0.7;
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.wbk_availabilityRangesField__plusIcon {
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+}
+
+.wbk_availabilityRangesField__error {
+    color: #dc3545;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    margin-top: 4px;
+}

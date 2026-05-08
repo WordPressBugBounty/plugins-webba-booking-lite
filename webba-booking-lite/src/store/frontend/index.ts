@@ -47,6 +47,14 @@ interface State {
     // bookingFormFields: IField[]
     // paymentMethods: IPaymentMethod[]
     // bookingData: unknown
+    unitAvailability: {
+        [unitId: number]: {
+            [rangeKey: string]: any
+        }
+    }
+    unitAvailabilityDateRanges: {
+        [unitId: number]: any
+    }
     bookingAmounts: {
         total: number
         subtotal: number
@@ -60,6 +68,7 @@ interface State {
         timeSlots: boolean
         serviceAvailability: { [serviceId: number]: boolean }
         serviceTimeslots: { [serviceId: number]: boolean }
+        unitAvailability: { [unitId: number]: boolean }
         bookingFields: boolean
         paymentMethods: boolean
         bookingAmounts: boolean
@@ -97,6 +106,75 @@ const addLangToQueryArgs = (path: string, args: Record<string, any> = {}) => {
     })
 }
 
+const normalizeUnitPeoplePayload = (
+    numberOfPeople: unknown
+): { adult: number; child: number; infant: number } => {
+    if (typeof numberOfPeople === 'object' && numberOfPeople !== null) {
+        const peopleObj = numberOfPeople as Record<string, unknown>
+        return {
+            adult: Math.max(0, Number(peopleObj.adult) || 0),
+            child: Math.max(0, Number(peopleObj.child) || 0),
+            infant: Math.max(0, Number(peopleObj.infant) || 0),
+        }
+    }
+
+    const qty = Math.max(1, Number(numberOfPeople) || 1)
+    return {
+        adult: qty,
+        child: 0,
+        infant: 0,
+    }
+}
+
+const buildUnitBookingsPayload = (formData: IFormData) => {
+    if (formData?.booking_mode !== 'units') {
+        return null
+    }
+
+    const unitIdRaw = (formData as Record<string, unknown>)?.unit_id
+    const unitId = Number(unitIdRaw)
+    const range = (formData as Record<string, any>)?.range as
+        | { start?: string; end?: string }
+        | undefined
+
+    if (!Number.isFinite(unitId) || !range?.start || !range?.end) {
+        return null
+    }
+
+    let peoplePayload = (formData as Record<string, unknown>)?.number_of_people
+    if (
+        (peoplePayload === null ||
+            peoplePayload === undefined ||
+            peoplePayload === '') &&
+        formData?.unit_attendees &&
+        formData.unit_attendees[unitId]
+    ) {
+        peoplePayload = formData.unit_attendees[unitId]
+    }
+    if (
+        (peoplePayload === null ||
+            peoplePayload === undefined ||
+            peoplePayload === '') &&
+        formData?.unit_quantity &&
+        formData.unit_quantity[unitId] != null
+    ) {
+        peoplePayload = formData.unit_quantity[unitId]
+    }
+
+    const numberOfPeople = normalizeUnitPeoplePayload(peoplePayload)
+
+    return [
+        {
+            unit_id: unitId,
+            range: {
+                start: range.start,
+                end: range.end,
+            },
+            number_of_people: numberOfPeople,
+        },
+    ]
+}
+
 let getPresetRequestInFlight: Promise<void> | null = null
 let getPresetLoaded = false
 
@@ -116,6 +194,8 @@ const DEFAULT_STATE: State = {
     },
     serviceUnavailableDates: {},
     serviceTimeslots: {},
+    unitAvailability: {},
+    unitAvailabilityDateRanges: {},
     bookingFormFields: [],
     paymentMethods: [],
     bookingData: null,
@@ -125,12 +205,14 @@ const DEFAULT_STATE: State = {
         discount: 0,
         tax: 0,
         items: [],
+        left_to_pay: 0,
     },
     loading: {
         preset: true,
         timeSlots: false,
-        serviceAvailability: false,
+        serviceAvailability: {},
         serviceTimeslots: {},
+        unitAvailability: {},
         bookingFields: false,
         paymentMethods: false,
         bookingAmounts: false,
@@ -257,6 +339,100 @@ const actions = {
             }
         }
     },
+    fetchUnitAvailabilityForRange: (
+        unitId: number,
+        range: { start: string; end: string },
+        numberOfPeople: unknown,
+        locationId: string | number | null = null
+    ) => {
+        return async ({ dispatch }: any) => {
+            dispatch.setLoading('unitAvailability', true, unitId)
+            try {
+                const requestData: Record<string, unknown> = {
+                    unit_id: unitId,
+                    range,
+                    number_of_people: normalizeUnitPeoplePayload(numberOfPeople),
+                }
+                if (
+                    locationId !== null &&
+                    locationId !== undefined &&
+                    String(locationId) !== ''
+                ) {
+                    requestData.location_id = Number(locationId)
+                }
+                const response = await apiFetch({
+                    path: addLangToQueryArgs(
+                        `/webba-booking/v1/get-unit-availability-for-range/`
+                    ),
+                    method: 'POST',
+                    data: requestData,
+                })
+                dispatch({
+                    type: 'SET_UNIT_AVAILABILITY',
+                    unitId,
+                    range,
+                    data: response,
+                })
+                return response
+            } finally {
+                dispatch.setLoading('unitAvailability', false, unitId)
+            }
+        }
+    },
+    fetchUnitAvailabilityDateRanges: (unitId: number) => {
+        return async ({ dispatch }: any) => {
+            const response = await apiFetch({
+                path: addLangToQueryArgs(
+                    `/webba-booking/v1/get-unit-availability-date-ranges/`,
+                    {
+                        unit_id: unitId,
+                    }
+                ),
+                method: 'GET',
+            })
+            dispatch({
+                type: 'SET_UNIT_AVAILABILITY_DATE_RANGES',
+                unitId,
+                data: response,
+            })
+            return response
+        }
+    },
+    fetchClosestIntervalsForRange: (
+        unitId: number,
+        range: { start: string; end: string },
+        numberOfPeople: unknown,
+        daysToShift = 3,
+        locationId: string | number | null = null
+    ) => {
+        return async ({ dispatch }: any) => {
+            dispatch.setLoading('unitAvailability', true, unitId)
+            try {
+                const requestData: Record<string, unknown> = {
+                    unit_id: unitId,
+                    range,
+                    number_of_people: normalizeUnitPeoplePayload(numberOfPeople),
+                    days_to_shift: daysToShift,
+                }
+                if (
+                    locationId !== null &&
+                    locationId !== undefined &&
+                    String(locationId) !== ''
+                ) {
+                    requestData.location_id = Number(locationId)
+                }
+                return await apiFetch({
+                    path: addLangToQueryArgs(
+                        `/webba-booking/v1/get-closest-intervals-for-range/`
+                    ),
+                    method: 'POST',
+                    data: requestData,
+                })
+            } finally {
+                dispatch.setLoading('unitAvailability', false, unitId)
+            }
+        }
+    },
     fetchBookingFields: (services: number[]) => {
         return async ({ dispatch }: any) => {
             if (services.length === 0) return
@@ -276,15 +452,23 @@ const actions = {
             }
         }
     },
-    fetchPaymentMethods: (services: number[]) => {
+    fetchPaymentMethods: (
+        payload: number[] | { ids?: number[]; unit_id?: number }
+    ) => {
         return async ({ dispatch }: any) => {
             try {
+                const queryArgs = Array.isArray(payload)
+                    ? { ids: payload }
+                    : {
+                          ...(payload.ids ? { ids: payload.ids } : {}),
+                          ...(payload.unit_id != null
+                              ? { unit_id: payload.unit_id }
+                              : {}),
+                      }
                 const response = await apiFetch({
                     path: addLangToQueryArgs(
                         `webba-booking/v1/get-payment-methods`,
-                        {
-                            ids: services,
-                        }
+                        queryArgs
                     ),
                 })
 
@@ -308,10 +492,19 @@ const actions = {
         return async ({ dispatch }: any) => {
             dispatch.setLoading('bookingAmounts', true)
             try {
+                const unitBookings = buildUnitBookingsPayload(formData)
+                const requestPayload =
+                    formData?.booking_mode === 'units'
+                        ? {
+                              ...formData,
+                              places: {},
+                              unit_bookings: unitBookings || [],
+                          }
+                        : formData
                 const response = await apiFetch({
                     path: 'webba-booking/v1/calculate-amounts',
                     method: 'POST',
-                    data: formData,
+                    data: requestPayload,
                 })
 
                 // Explicitly type response as any for conversion
@@ -448,7 +641,7 @@ const actions = {
         },
     submitStripePayment:
         (payment_intent_id: string, payment_method: string) =>
-        async ({ dispatch }) => {
+        async ({ dispatch }: any) => {
             const response = await apiFetch({
                 path: '/webba-booking/v1/execute-stripe-payment',
                 method: 'POST',
@@ -561,6 +754,27 @@ export const store: StoreDescriptor = createReduxStore(
                                 ] || {}),
                                 [action.data.start_date]: action.data.dates,
                             },
+                        },
+                    }
+                case 'SET_UNIT_AVAILABILITY': {
+                    const rangeKey = `${action.range?.start || ''}_${action.range?.end || ''}`
+                    return {
+                        ...state,
+                        unitAvailability: {
+                            ...state.unitAvailability,
+                            [action.unitId]: {
+                                ...(state.unitAvailability?.[action.unitId] || {}),
+                                [rangeKey]: action.data,
+                            },
+                        },
+                    }
+                }
+                case 'SET_UNIT_AVAILABILITY_DATE_RANGES':
+                    return {
+                        ...state,
+                        unitAvailabilityDateRanges: {
+                            ...state.unitAvailabilityDateRanges,
+                            [action.unitId]: action.data,
                         },
                     }
                 case 'SET_BOOKING_FORM_FIELDS':
@@ -677,6 +891,25 @@ export const store: StoreDescriptor = createReduxStore(
                     state.serviceTimeslots[serviceId][date]
                     ? state.serviceTimeslots[serviceId][date]
                     : []
+            },
+            getUnitAvailability(
+                state: State,
+                unitId: number,
+                rangeStart: string,
+                rangeEnd: string
+            ) {
+                const rangeKey = `${rangeStart || ''}_${rangeEnd || ''}`
+                return state.unitAvailability &&
+                    state.unitAvailability[unitId] &&
+                    state.unitAvailability[unitId][rangeKey]
+                    ? state.unitAvailability[unitId][rangeKey]
+                    : null
+            },
+            getUnitAvailabilityDateRanges(state: State, unitId: number) {
+                return state.unitAvailabilityDateRanges &&
+                    state.unitAvailabilityDateRanges[unitId]
+                    ? state.unitAvailabilityDateRanges[unitId]
+                    : null
             },
             getBookingFields(state: State) {
                 return state.bookingFormFields

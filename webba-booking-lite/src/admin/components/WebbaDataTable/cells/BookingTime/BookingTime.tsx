@@ -25,7 +25,11 @@ export const BookingTime = ({ cell }: CellContext<any, any>) => {
     return (
         <div className="wbk_table__noWrapContainer">
             <p className="wbk_table__rowItemTitle">{date}</p>
-            <p className="wbk_table__rowItemContent">{time}</p>
+            {
+                Number(cell.row.original?.service_id) > 0 && (
+                    <p className="wbk_table__rowItemContent">{time}</p>
+                )
+            }
         </div>
     )
 }

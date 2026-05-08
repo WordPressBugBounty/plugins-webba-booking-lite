@@ -24,11 +24,26 @@ export const bookingScenarios: IScenario[] = [
         description: 'choose_service_proceed',
         Screen: ServicesStep,
         validationRules: {
-            services: (value) =>
-                !!value && value.length > 0 ? true : 'please_select_service',
+            services: (value) => {
+                const { bookingMode, units } = useBookingContext()
+                if (bookingMode === 'units') {
+                    const selectedUnits = (units || []).filter(
+                        ({ selected }) => selected
+                    )
+                    return selectedUnits.length > 0
+                        ? true
+                        : 'please_select_service'
+                }
+                return !!value && value.length > 0
+                    ? true
+                    : 'please_select_service'
+            },
         },
         isVisible: () => {
-            const { attrService } = useBookingContext()
+            const { attrService, bookingMode } = useBookingContext()
+            if (bookingMode === 'units') {
+                return true
+            }
 
             return attrService === undefined || attrService === '0'
         },
@@ -39,7 +54,46 @@ export const bookingScenarios: IScenario[] = [
         Screen: CalendarStep,
         validationRules: {
             places: (value) => {
-                const { services } = useBookingContext()
+                const { services, bookingMode, formData, units } = useBookingContext()
+                if (bookingMode === 'units') {
+                    const selectedUnits = (units || []).filter(
+                        ({ selected }) => selected
+                    )
+                    if (selectedUnits.length === 0) {
+                        return 'please_select_service'
+                    }
+                    const selectedUnit = selectedUnits[0]
+                    const placesMap = formData.places as
+                        | Record<string, unknown>
+                        | undefined
+                    const unitPlaces = placesMap?.[String(selectedUnit.id)] as
+                        | unknown[]
+                        | undefined
+                    if (!Array.isArray(unitPlaces) || unitPlaces.length === 0) {
+                        return 'please_select_timeslot'
+                    }
+                    const range = (formData as Record<string, any>)?.range
+                    if (!range?.start || !range?.end) {
+                        return 'please_select_timeslot'
+                    }
+                    const attendees = selectedUnit?.attendees || {
+                        adult: 0,
+                        child: 0,
+                        infant: 0,
+                    }
+                    const totalAttendees =
+                        Number(attendees.adult || 0) +
+                        Number(attendees.child || 0) +
+                        Number(attendees.infant || 0)
+                    const unitCapacity = Math.max(
+                        1,
+                        Number(selectedUnit?.capacity) || 1
+                    )
+                    if (totalAttendees > unitCapacity) {
+                        return 'the_entered_number_is_invalid'
+                    }
+                    return true
+                }
 
                 const selectedServices = services
                     .filter(({ selected }) => selected)

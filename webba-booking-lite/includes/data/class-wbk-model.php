@@ -737,7 +737,7 @@ class WBK_Model
                 "tooltip" => $tooltip,
                 "options" => "locations",
                 "multiple" => true,
-                "required_plan" => "pro", // TIER 3
+                "required_plan" => "premium", // TIER 3
             ],
             null,
             true,
@@ -1279,6 +1279,7 @@ class WBK_Model
         $table->set_multiple_item_name(__("Categories", "webba-booking-lite"));
         $table->sections["name"] = __("Category name", "webba-booking-lite");
         $table->sections["category_list"] = __("Services", "webba-booking-lite");
+        $table->sections["category_units"] = __("Units", "webba-booking-lite");
         $tooltip = __("Enter category name.", "webba-booking-lite");
         $table->add_field(
             "category_name",
@@ -1301,6 +1302,26 @@ class WBK_Model
                 "items" => WBK_Model_Utils::get_services(),
                 "options" => "services",
                 "multiple" => true,
+            ],
+            null,
+            true,
+            true,
+            false,
+        );
+
+        $tooltip = __("Select the units to be included in this category.", "webba-booking-lite");
+        $table->add_field(
+            "units",
+            "units",
+            __("Units", "webba-booking-lite"),
+            "select",
+            "general",
+            [
+                "tooltip" => $tooltip,
+                "items" => WBK_Model_Utils::get_units(),
+                "options" => "units",
+                "multiple" => true,
+                'required_plan' => 'pro', // TIER 2
             ],
             null,
             true,
@@ -1488,7 +1509,7 @@ class WBK_Model
         $table->add_field(
             "services",
             "services",
-            __("Services", "webba-booking-lite"),
+            __("Hourly services", "webba-booking-lite"),
             "select",
             "general",
             [
@@ -1503,8 +1524,29 @@ class WBK_Model
             false,
         );
 
+        $table->add_field(
+            "units",
+            "units",
+            __("Daily services", "webba-booking-lite"),
+            "select",
+            "general",
+            [
+                "tooltip" => $tooltip,
+                "items" => WBK_Model_Utils::get_units(),
+                "options" => "units",
+                "multiple" => true,
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+
         $table->fields
             ->get_element_at("services")
+            ->set_dependency([["use_for_all_services", "!=", "yes"]]);
+        $table->fields
+            ->get_element_at("units")
             ->set_dependency([["use_for_all_services", "!=", "yes"]]);
 
         $table->sync_structure();
@@ -1525,6 +1567,7 @@ class WBK_Model
             "moment_price",
             "status",
             "service_id",
+            "unit_id",
             "staff_member_id",
             "phone",
         ]);
@@ -1569,8 +1612,38 @@ class WBK_Model
             null,
             true,
             in_array("service_id", $allowed_fields),
-            true,
+            false,
         );
+
+        $tooltip = __("Select the unit for this booking.", "webba-booking-lite");
+        $table->add_field(
+            "appointment_unit_id",
+            "unit_id",
+            __("Unit", "webba-booking-lite"),
+            "select",
+            "",
+            [
+                "tooltip" => $tooltip,
+                "items" => WBK_Model_Utils::get_units(),
+                "options" => "units",
+                "sub_type" => "positive_integer",
+            ],
+            null,
+            true,
+            in_array("unit_id", $allowed_fields),
+            false,
+        );
+
+        if ($table->fields->get_element_at("appointment_service_id") != false) {
+            $table->fields
+                ->get_element_at("appointment_service_id")
+                ->set_dependency([["unit_id", "<=", "0"]]);
+        }
+        if ($table->fields->get_element_at("appointment_unit_id") != false) {
+            $table->fields
+                ->get_element_at("appointment_unit_id")
+                ->set_dependency([["service_id", "<=", "0"]]);
+        }
 
         $tooltip = __("Select the staff member for this booking.", "webba-booking-lite");
         $table->add_field(
@@ -1590,6 +1663,11 @@ class WBK_Model
             in_array("staff_member_id", $allowed_fields),
             false,
         );
+        if ($table->fields->get_element_at("appointment_staff_member_id") != false) {
+            $table->fields
+                ->get_element_at("appointment_staff_member_id")
+                ->set_dependency([["unit_id", "<=", "0"]]);
+        }
 
         $tooltip = __("Select the location for this booking.", "webba-booking-lite");
         $table->add_field(
@@ -1600,7 +1678,7 @@ class WBK_Model
             "",
             [
                 "tooltip" => $tooltip,
-                "options" => "locations",
+                "options" => "backend",
                 "sub_type" => "positive_integer",
             ],
             null,
@@ -1642,6 +1720,11 @@ class WBK_Model
             true,
             in_array("time", $allowed_fields),
         );
+        if ($table->fields->get_element_at("appointment_time") != false) {
+            $table->fields
+                ->get_element_at("appointment_time")
+                ->set_dependency([["unit_id", "<=", "0"]]);
+        }
 
         $table->add_field(
             "appointment_token",
@@ -1687,8 +1770,35 @@ class WBK_Model
             null,
             true,
             in_array("quantity", $allowed_fields),
-            true,
+            false,
         );
+        if ($table->fields->get_element_at("appointment_quantity") != false) {
+            $table->fields
+                ->get_element_at("appointment_quantity")
+                ->set_dependency([["unit_id", "<=", "0"]]);
+        }
+
+        $tooltip = __(
+            "Breakdown by attendee types (e.g. adults, children, infants) when your booking flow collects per-type counts.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "appointment_number_of_people",
+            "number_of_people",
+            __("Breakdown by attendee types", "webba-booking-lite"),
+            "number_of_people",
+            "",
+            ["tooltip" => $tooltip],
+            "",
+            true,
+            false,
+            false,
+        );
+        if ($table->fields->get_element_at("appointment_number_of_people") != false) {
+            $table->fields
+                ->get_element_at("appointment_number_of_people")
+                ->set_dependency([["unit_id", ">", "0"]]);
+        }
 
         $table->add_field(
             "appointment_duration",
@@ -3252,6 +3362,449 @@ class WBK_Model
 
         $table->sync_structure();
         WbkData()->models->add($table, $db_prefix . "wbk_locations");
+
+        // Units
+        $table = new WbkData\Model($db_prefix . "wbk_units");
+        $table->set_single_item_name(__("Unit", "webba-booking-lite"));
+        $table->set_multiple_item_name(__("Units", "webba-booking-lite"));
+        $table->sections["general"] = __("General", "webba-booking-lite");
+        $table->sections["availability"] = __("Availability", "webba-booking-lite");
+        $table->sections["price"] = __("Price", "webba-booking-lite");
+        $table->sections["integrations"] = __("Integrations", "webba-booking-lite");
+
+        $tooltip = __("Enter the unit name.", "webba-booking-lite");
+        $table->add_field(
+            "unit_name",
+            "name",
+            __("Name", "webba-booking-lite"),
+            "text",
+            "general",
+            ["tooltip" => $tooltip],
+        );
+
+        $tooltip = __("Enter a description of the unit.", "webba-booking-lite");
+        $table->add_field(
+            "unit_description",
+            "description",
+            __("Description", "webba-booking-lite"),
+            "editor",
+            "general",
+            ["tooltip" => $tooltip],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __(
+            "Upload an image for this unit. Leave empty if you do not want to show an image.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "unit_image",
+            "image",
+            __("Image", "webba-booking-lite"),
+            "file",
+            "general",
+            ["tooltip" => $tooltip],
+            "",
+            true,
+            true,
+            false,
+        );
+
+        $tooltip = __("Select the locations where this unit is available.", "webba-booking-lite");
+        $table->add_field(
+            "unit_locations",
+            "locations",
+            __("Locations", "webba-booking-lite"),
+            "select",
+            "general",
+            [
+                "tooltip" => $tooltip,
+                "options" => "locations",
+                "multiple" => true,
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __(
+            "Choose which form customers will see when booking this unit. Keep the default Webba Form, or create one in Form Builder and select it here.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "unit_form_id",
+            "form_id",
+            __("Booking form", "webba-booking-lite"),
+            "select",
+            "general",
+            [
+                "tooltip" => $tooltip,
+                "options" => "forms",
+                "null_value" => [
+                    "0" => __("Default Form", "webba-booking-lite"),
+                ],
+            ],
+            "0",
+            true,
+            false,
+            false,
+        );
+        /*
+        $tooltip = __(
+            "Select other units to suggest as similar alternatives.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "unit_similar_units",
+            "similar_units",
+            __("Similar units", "webba-booking-lite"),
+            "select",
+            "general",
+            [
+                "tooltip" => $tooltip,
+                "options" => "units",
+                "multiple" => true,
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+        */
+
+        $tooltip = __(
+            "How many units of this type are available at the selected location(s).",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "unit_quantity",
+            "quantity",
+            __("Quantity", "webba-booking-lite"),
+            "text",
+            "availability",
+            [
+                "tooltip" => $tooltip,
+                "sub_type" => "positive_integer",
+            ],
+            "1",
+        );
+
+        $tooltip = __(
+            "Maximum number of people allowed per unit. Leave empty if not applicable.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "unit_capacity",
+            "capacity",
+            __("Capacity", "webba-booking-lite"),
+            "text",
+            "availability",
+            [
+                "tooltip" => $tooltip,
+            ],
+            "1",
+            true,
+            true,
+            false,
+        );
+
+        $tooltip = __("Count adults separately for this unit.", "webba-booking-lite");
+        $table->add_field(
+            "unit_attendee_type_adult",
+            "attendee_type_adult",
+            __("Adult", "webba-booking-lite"),
+            "checkbox",
+            "availability",
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => $tooltip,
+                "at_least_one_checked_rule" => [
+                    "threshold_field" => "capacity",
+                    "threshold_operator" => ">",
+                    "threshold_value" => "0",
+                    "target_fields" => [
+                        "attendee_type_adult",
+                        "attendee_type_child",
+                        "attendee_type_infant",
+                    ],
+                    "checked_value" => "yes",
+                    "message" => __(
+                        "Turn on at least one attendee type (Adult, Child, or Infant) when capacity is greater than 0.",
+                        "webba-booking-lite",
+                    ),
+                ],
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __("Count children separately for this unit.", "webba-booking-lite");
+        $table->add_field(
+            "unit_attendee_type_child",
+            "attendee_type_child",
+            __("Child", "webba-booking-lite"),
+            "checkbox",
+            "availability",
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => $tooltip,
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __("Count infants separately for this unit.", "webba-booking-lite");
+        $table->add_field(
+            "unit_attendee_type_infant",
+            "attendee_type_infant",
+            __("Infant", "webba-booking-lite"),
+            "checkbox",
+            "availability",
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => $tooltip,
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __(
+            "Describe when this unit is bookable (e.g. date ranges). Leave empty for year-round availability (360 days).",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "unit_availability_date_ranges",
+            "availability_date_ranges",
+            __("Availability date ranges", "webba-booking-lite"),
+            "availability_ranges",
+            "availability",
+            ["tooltip" => $tooltip],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __(
+            "When enabled, availability rules repeat each year on the same calendar dates.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "unit_availability_recurring_annually",
+            "availability_recurring_annually",
+            __("Recurring annually", "webba-booking-lite"),
+            "checkbox",
+            "availability",
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => $tooltip,
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __(
+            "Minimum number of days required between the booking date and the start of the stay (or rental period).",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "unit_buffer_before",
+            "buffer_before",
+            __("Buffer before (days)", "webba-booking-lite"),
+            "text",
+            "availability",
+            ["tooltip" => $tooltip, "sub_type" => "none_negative_integer"],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __(
+            "Minimum number of days required after the end of the stay before the unit can be booked again.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "unit_buffer_after",
+            "buffer_after",
+            __("Buffer after (days)", "webba-booking-lite"),
+            "text",
+            "availability",
+            ["tooltip" => $tooltip, "sub_type" => "none_negative_integer"],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __("Minimum length of a booking in days.", "webba-booking-lite");
+        $table->add_field(
+            "unit_min_booking_days",
+            "min_booking_days",
+            __("Min booking days", "webba-booking-lite"),
+            "text",
+            "availability",
+            ["tooltip" => $tooltip, "sub_type" => "positive_integer"],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __("Maximum length of a booking in days.", "webba-booking-lite");
+        $table->add_field(
+            "unit_max_booking_days",
+            "max_booking_days",
+            __("Max booking days", "webba-booking-lite"),
+            "text",
+            "availability",
+            ["tooltip" => $tooltip, "sub_type" => "positive_integer"],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __("Enter the price for this unit.", "webba-booking-lite");
+        $table->add_field(
+            "unit_price",
+            "price",
+            __("Price", "webba-booking-lite"),
+            "price_variant",
+            "price",
+            ["tooltip" => $tooltip],
+            "0",
+            true,
+            true,
+            true,
+        );
+
+        $tooltip = __(
+            "Enable to charge this unit based on the number of people instead of charging one fixed unit price.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "unit_charge_per_person",
+            "charge_per_person",
+            __("Charge per person", "webba-booking-lite"),
+            "checkbox",
+            "price",
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => $tooltip,
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __(
+            "Select the preferred payment method(s) for this unit.",
+            "webba-booking-lite",
+        );
+        $payment_methods = WBK_Model_Utils::get_all_payment_methods();
+        $table->add_field(
+            "unit_payment_methods",
+            "payment_methods",
+            __("Payment methods", "webba-booking-lite"),
+            "select",
+            "price",
+            [
+                "tooltip" => $tooltip,
+                "multiple" => true,
+                "options" => "backend",
+                "items" => $payment_methods,
+                "description" => __(
+                    "IMPORTANT! For Google Pay/Apple pay and Other Payment Methods to work you have to activate them in your Stripe account",
+                    "webba-booking-lite",
+                ),
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+
+        // WooCommerce product ID
+        $table->add_field(
+            "unit_woo_product",
+            "woo_product",
+            __("WooCommerce product ID for unit", "webba-booking-lite"),
+            "select",
+            "price",
+            [
+                "tooltip" => __(
+                    "Set ID of the product associated with this unit. Set only if WooCommerce is used as payment method.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "none_negative_integer",
+                "pro_version" => true,
+                "required_plan" => "standard", // TIER 2
+                "options" => "backend",
+            ],
+            "0",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __(
+            'Select the connected calendar(s) that should sync with this unit\'s bookings. (Available after connecting your Google account.)',
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "unit_connected_calendars",
+            "connected_calendars",
+            __("Connected calendars", "webba-booking-lite"),
+            "select",
+            "integrations",
+            [
+                "tooltip" => $tooltip,
+                "multiple" => true,
+                "options" => "connected_calendars",
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+
+        if ($table->fields->get_element_at("unit_attendee_type_adult") != false) {
+            $table->fields
+                ->get_element_at("unit_attendee_type_adult")
+                ->set_dependency([["capacity", ">", "0"]]);
+        }
+        if ($table->fields->get_element_at("unit_attendee_type_child") != false) {
+            $table->fields
+                ->get_element_at("unit_attendee_type_child")
+                ->set_dependency([["capacity", ">", "0"]]);
+        }
+        if ($table->fields->get_element_at("unit_attendee_type_infant") != false) {
+            $table->fields
+                ->get_element_at("unit_attendee_type_infant")
+                ->set_dependency([["capacity", ">", "0"]]);
+        }
+        if ($table->fields->get_element_at("unit_charge_per_person") != false) {
+            $table->fields
+                ->get_element_at("unit_charge_per_person")
+                ->set_dependency([["capacity", ">", "1"]]);
+        }
+
+        $table->sync_structure();
+        WbkData()->models->add($table, $db_prefix . "wbk_units");
 
         // Staff members
         $table = new WbkData\Model($db_prefix . "wbk_staff_members");

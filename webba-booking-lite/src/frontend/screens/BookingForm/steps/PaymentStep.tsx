@@ -1,6 +1,14 @@
 import { useBookingContext } from '../../../providers/BookingFormProvider/BookingFormProvider'
 import { PaymentSelector } from '../../../components/PaymentSelector/PaymentSelector'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+    lazy,
+    Suspense,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react'
 import { FormNotice } from '../../../components/FormNotice/FormNotice'
 import { __ } from '@wordpress/i18n'
 import './Steps.scss'
@@ -12,10 +20,15 @@ import protectedPrivacyLogo from '../../../../../public/images/logos/privacy-pro
 import { CustomScroll } from 'react-custom-scroll'
 import classNames from 'classnames'
 import { useWording } from '../../../hooks/useWording'
-import { Stripe } from '../PaymentHandler/payments/Stripe/Stripe'
 import { stripeMethods } from '../PaymentHandler/payments/Stripe/StripeMethods'
-import { StripeWrapper } from '../PaymentHandler/payments/Stripe/StripeWrapper'
-import { StripeBillingFields } from '../PaymentHandler/payments/Stripe/StripeBillingFields'
+
+const PaymentStepStripeSection = lazy(() =>
+    import(
+        /* webpackMode: "eager" */ './PaymentStepStripeSection/PaymentStepStripeSection'
+    ).then(
+        (module) => ({ default: module.PaymentStepStripeSection })
+    )
+)
 
 const scrollToElementInContainer = (element: HTMLElement | null) => {
     if (!element) return
@@ -45,7 +58,7 @@ const scrollToElementInContainer = (element: HTMLElement | null) => {
 export const PaymentStep = () => {
     const { fetchBookingAmounts, setLoading, setBookingAmounts } =
         useDispatch(store_name)
-    const { formData, setFormData, paymentMethods, amountData, preset } =
+    const { formData, setFormData, paymentMethods, amountData, preset, disableCustomScroll } =
         useBookingContext()
 
     const couponInputRef = useRef<HTMLInputElement>(null)
@@ -102,7 +115,10 @@ export const PaymentStep = () => {
             return
         }
 
-        await fetchBookingAmounts(updatedFormData)
+        await fetchBookingAmounts({
+            ...updatedFormData,
+            generate_stripe_intent: true,
+        })
         setApplied(true)
         setShowFeedback(true)
         setLoading('applyingCoupon', false)
@@ -111,7 +127,10 @@ export const PaymentStep = () => {
     // fetch amount data on stripe payment selection
     useEffect(() => {
         if (stripeMethods.includes(formData.payment_method)) {
-            fetchBookingAmounts(formData)
+            fetchBookingAmounts({
+                ...formData,
+                generate_stripe_intent: true,
+            })
         }
     }, [formData.payment_method, fetchBookingAmounts])
 
@@ -153,12 +172,7 @@ export const PaymentStep = () => {
         }
     }, [wording, formData.payment_method])
 
-    return (
-        <CustomScroll
-            flex="1"
-            className={'wbk_step__scroll-wrapper'}
-            allowOuterScroll={true}
-        >
+    const content = (
             <div className={'wbk_step__payment-step'}>
                 {paymentMethods.length > 1 && amountData?.to_pay_total > 0 && (
                     <PaymentSelector
@@ -192,6 +206,7 @@ export const PaymentStep = () => {
                                 fetchBookingAmounts({
                                     ...formData,
                                     pay_full_amount: checked,
+                                    generate_stripe_intent: true,
                                 })
                             }}
                         />
@@ -282,33 +297,21 @@ export const PaymentStep = () => {
                 {stripeMethods.includes(formData?.payment_method) &&
                     amountData?.stripe_details?.client_secret &&
                     amountData?.to_pay_total > 0 && (
-                        <div
-                            className="wbk_step__stripe-wrapper"
-                            key={amountData?.stripe_details?.client_secret}
-                            ref={stripeWrapperRef}
-                        >
-                            <StripeWrapper
+                        <Suspense fallback={null}>
+                            <PaymentStepStripeSection
                                 clientSecret={
                                     amountData?.stripe_details?.client_secret
                                 }
-                            >
-                                <Stripe
-                                    selectedMethod={formData?.payment_method}
-                                    onLoadingChange={handleLoadingChange}
-                                />
-                                {formData?.payment_method === 'stripe' &&
-                                    preset?.settings?.stripe_fields?.length >
-                                        0 && (
-                                        <StripeBillingFields
-                                            stripeFields={
-                                                preset?.settings?.stripe_fields
-                                            }
-                                            formData={formData}
-                                            setFormData={setFormData}
-                                        />
-                                    )}
-                            </StripeWrapper>
-                        </div>
+                                selectedMethod={formData?.payment_method}
+                                onLoadingChange={handleLoadingChange}
+                                stripeWrapperRef={stripeWrapperRef}
+                                formData={formData}
+                                setFormData={setFormData}
+                                stripeFields={
+                                    preset?.settings?.stripe_fields
+                                }
+                            />
+                        </Suspense>
                     )}
 
                 <div className={'wbk_step__certificates'}>
@@ -325,6 +328,19 @@ export const PaymentStep = () => {
                     />
                 </div>
             </div>
-        </CustomScroll>
+    )
+
+    return (
+        disableCustomScroll ? (
+            <div className={'wbk_step__native-scroll-wrapper'}>{content}</div>
+        ) : (
+            <CustomScroll
+                flex="1"
+                className={'wbk_step__scroll-wrapper'}
+                allowOuterScroll={true}
+            >
+                {content}
+            </CustomScroll>
+        )
     )
 }

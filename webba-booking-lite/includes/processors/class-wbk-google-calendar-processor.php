@@ -263,6 +263,17 @@ class WBK_Google_Calendar_Processor extends WBK_Connected_Calendar_Processor {
     }
 
     /**
+     * Add unit-only booking (no service) to Google calendars. Skips group-service and Google Meet
+     * options that depend on WBK_Service.
+     *
+     * @param WBK_Booking $booking        Booking.
+     * @param array       $calendar_ids  Connected calendar row IDs.
+     * @return void|WP_Error
+     */
+    public static function process_adding_for_unit_booking( $booking, $calendar_ids ) {
+    }
+
+    /**
      * Process adding a booking to Google Calendar for group services
      * Creates one event for all bookings at the same time slot, or updates existing event
      *

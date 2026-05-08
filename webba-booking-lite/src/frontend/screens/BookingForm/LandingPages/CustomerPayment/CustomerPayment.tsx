@@ -127,7 +127,7 @@ export const CustomerPayment = ({
     ) => {
         const price = Number(prices[idx] || 0)
         const quantity = Number(quantities[idx] || 1)
-        return price * quantity
+        return price
     }
     // Cost breakdown
     const costItems = useMemo(() => {
@@ -315,7 +315,7 @@ export const CustomerPayment = ({
                                 </div>
                             ))}
                             {/* Show tax if greater than 0 */}
-                            {tax && Number(tax) > 0 && (
+                            {Number(tax || 0) > 0 && (
                                 <div
                                     className={classNames(
                                         'wbk_thank_you__cart-items__item',

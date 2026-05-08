@@ -5,7 +5,7 @@
   "version": "5.0.14",
   "title": "Webba Booking Form",
   "category": "widgets",
-  "icon": "flag",
+  "icon": "calendar-alt",
   "description": "Webba Booking Plugin",
   "supports": {
     "html": false
@@ -13,5 +13,122 @@
   "textdomain": "webba-booking-lite",
   "editorScript": "file:./index.js",
   "editorStyle": "file:./index.css",
-  "style": "file:./style-index.css"
+  "attributes": {
+    "service": {
+      "type": "string",
+      "default": ""
+    },
+    "category": {
+      "type": "array",
+      "default": []
+    },
+    "location": {
+      "type": "array",
+      "default": []
+    },
+    "staff": {
+      "type": "array",
+      "default": []
+    },
+    "categoryList": {
+      "type": "boolean",
+      "default": true
+    },
+    "bg_accent": {
+      "type": "string",
+      "default": "#15B8A9"
+    },
+    "font": {
+      "type": "string",
+      "default": "\"Ubuntu\", sans-serif"
+    },
+    "border_radius": {
+      "type": "string",
+      "default": "8px"
+    },
+    "shadow": {
+      "type": "string",
+      "default": "0px 0px 16px 0px #3f3f4629"
+    },
+    "button_border_radius": {
+      "type": "string",
+      "default": "8px"
+    },
+    "bg_button_primary": {
+      "type": "string",
+      "default": "#15B8A9"
+    },
+    "color_button_primary": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "bg_button_primary_hover": {
+      "type": "string",
+      "default": "#1A5B57"
+    },
+    "color_button_primary_hover": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "bg_button_inactive": {
+      "type": "string",
+      "default": "#edeff3"
+    },
+    "color_button_inactive": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "bg_button_selected": {
+      "type": "string",
+      "default": "#15B8A9"
+    },
+    "color_button_selected": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "bg_button_selected_hover": {
+      "type": "string",
+      "default": "#1A5B57"
+    },
+    "color_button_selected_hover": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "bg_button_selected_selected": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "color_button_selected_selected": {
+      "type": "string",
+      "default": "#22292f"
+    },
+    "bg_button_secondary": {
+      "type": "string",
+      "default": "#edeff2"
+    },
+    "color_button_secondary": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "bg_button_secondary_hover": {
+      "type": "string",
+      "default": "#1A5B57"
+    },
+    "color_button_secondary_hover": {
+      "type": "string",
+      "default": "#ffffff"
+    },
+    "bg_sidebar": {
+      "type": "string",
+      "default": "#f9fafb"
+    },
+    "color_sidebar": {
+      "type": "string",
+      "default": "#22292F"
+    },
+    "color_border_selected": {
+      "type": "string",
+      "default": "#15B8A9"
+    }
+  }
 }

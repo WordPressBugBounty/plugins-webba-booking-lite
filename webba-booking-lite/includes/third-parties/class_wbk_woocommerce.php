@@ -230,15 +230,18 @@ function wbk_add_booking_text_to_order_items(
     }
     date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
     $booking_ids = explode( ',', wc_clean( $values['wbk_appointment_ids'] ) );
-    $payment_details = WBK_Price_Processor::get_payment_items( $booking_ids, 0 );
-    if ( !is_array( $payment_details ) ) {
-        return;
+    $first_booking = ( count( $booking_ids ) > 0 ? new WBK_Booking($booking_ids[0]) : null );
+    $is_unit_booking = $first_booking instanceof WBK_Booking && $first_booking->is_loaded() && (int) $first_booking->get( 'unit_id' ) > 0;
+    if ( $is_unit_booking ) {
+        $payment_details = WBK_Price_Processor::get_unit_payment_items_post_booked( $booking_ids );
+    } else {
+        $payment_details = WBK_Price_Processor::get_payment_items( $booking_ids, 0 );
     }
     $booking_order_text = get_option( 'wbk_woo_cart_title', '' );
     if ( $booking_order_text != '' ) {
         $order_text = WBK_Placeholder_Processor::process_placeholders( $booking_order_text, $booking_ids );
     } else {
-        $order_text = implode( ',', $payment_details['item_names'] );
+        $order_text = ( is_array( $payment_details ) && isset( $payment_details['item_names'] ) && is_array( $payment_details['item_names'] ) ? implode( ',', $payment_details['item_names'] ) : implode( ',', $booking_ids ) );
     }
     $meta_key = wbk_get_translation_string( 'wbk_product_meta_key', 'wbk_product_meta_key', 'Appointments' );
     $item->add_meta_data( $meta_key, $order_text );
@@ -405,6 +408,12 @@ function wbk_woocommerce_get_product_ids() {
             $result[] = $service->get_woo_product();
         }
     }
+    foreach ( WBK_Model_Utils::get_unit_ids() as $unit_id ) {
+        $unit = new WBK_Unit($unit_id);
+        if ( $unit->get( 'woo_product' ) != 0 ) {
+            $result[] = $unit->get( 'woo_product' );
+        }
+    }
     return $result;
 }
 
@@ -470,6 +479,15 @@ function wbk_complete_payment(  $order_id  ) {
         if ( !is_object( $item ) ) {
             continue;
         }
+        $item_ids_meta = wc_get_order_item_meta( $item_id, 'IDs', true );
+        if ( is_string( $item_ids_meta ) && trim( $item_ids_meta ) !== '' ) {
+            $booking_ids_this = explode( ',', $item_ids_meta );
+            if ( is_array( $booking_ids_this ) ) {
+                $booking_ids = array_merge( $booking_ids, $booking_ids_this );
+            }
+            continue;
+        }
+        // Fallback to legacy matching by known Webba products.
         if ( in_array( $item->get_product_id(), wbk_woocommerce_get_product_ids() ) ) {
             $booking_ids_this = explode( ',', wc_get_order_item_meta( $item_id, 'IDs', true ) );
             if ( is_array( $booking_ids_this ) ) {
@@ -477,6 +495,9 @@ function wbk_complete_payment(  $order_id  ) {
             }
         }
     }
+    $booking_ids = array_values( array_filter( array_unique( array_map( 'trim', $booking_ids ) ), function ( $id ) {
+        return $id !== '' && is_numeric( $id );
+    } ) );
     $update_status = get_option( 'wbk_woo_update_status', 'approved' );
     if ( count( $booking_ids ) > 0 ) {
         if ( $update_status != 'disabled' ) {
@@ -489,7 +510,12 @@ function wbk_complete_payment(  $order_id  ) {
                 $booking->save();
             }
         }
-        $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );
+        $first_booking = new WBK_Booking($booking_ids[0]);
+        if ( $first_booking->is_loaded() && $first_booking->get( 'unit_id' ) > 0 ) {
+            $payment_details = WBK_Price_Processor::get_unit_payment_items_post_booked( $booking_ids );
+        } else {
+            $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );
+        }
         $bf = new WBK_Booking_Factory();
         $bf->set_as_paid( $booking_ids, 'woocommerce', $payment_details['to_pay_total'] );
         do_action( 'wbk_woocommerce_order_placed', $booking_ids, $order_id );

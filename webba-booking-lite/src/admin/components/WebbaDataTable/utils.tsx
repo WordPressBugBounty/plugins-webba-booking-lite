@@ -157,15 +157,27 @@ export const mapServiceCategories = (service: number, categories: []) =>
 
 export const minutesToText = (
     minutes: number,
-    translations: Record<'h' | 'min', string> = { h: 'h', min: 'min' }
+    translations: Record<'h' | 'min' | 'd', string> = { h: 'h', min: 'min', d: 'd' }
 ) => {
     const hours = Math.floor(minutes / 60)
     const minutesLeft = minutes % 60
 
+    // Display as days if 24 or more hours
+    if (hours >= 24) {
+        const days = Math.floor(hours / 24)
+        const remainingHours = hours % 24
+        let text = `${days}${translations.d}`
+        if (remainingHours > 0) {
+            text += ` ${remainingHours}${translations.h}`
+        }
+        if (minutesLeft > 0) {
+            text += ` ${minutesLeft}${translations.min}`
+        }
+        return text
+    }
     if (hours === 0) {
         return `${minutesLeft} ${translations.min}`
     }
-
     return `${hours}${translations.h} ${minutesLeft > 0 ? minutesLeft + translations.min : ''}`
 }
 

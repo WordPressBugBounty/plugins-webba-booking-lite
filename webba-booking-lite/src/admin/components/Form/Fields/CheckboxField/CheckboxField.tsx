@@ -10,6 +10,8 @@ import { __, sprintf } from '@wordpress/i18n'
 import { processUpgradeMessage } from '../../../../../utilities/planHelper'
 import lockedIcon from '../../../../../../public/images/icon-lock.png'
 import '../InputWrapper/InputWrapper.scss'
+import { useForm } from '../../lib/FormProvider'
+import { Validators } from '../../utils/validation'
 
 export const createCheckboxField: FormComponentConstructor<any> = ({
     field,
@@ -17,6 +19,7 @@ export const createCheckboxField: FormComponentConstructor<any> = ({
 }) => {
     return ({ name, label, misc }) => {
         const { value, setValue } = useField(field)
+        const form = useForm()
         const valueToCompare = misc?.checkboxValue || 'yes'
         const { admin_url, plan_map, wording } = useSelect(
             // @ts-ignore
@@ -59,6 +62,29 @@ export const createCheckboxField: FormComponentConstructor<any> = ({
         }, [requiredPlan, plan_map, (misc as any)?.available_in_old_free])
 
         const lastEligibilityRef = useRef<boolean | null>(null)
+
+        useEffect(() => {
+            const rule = misc?.at_least_one_checked_rule
+            if (!rule) {
+                return
+            }
+            const thresholdFieldPrimitive =
+                form.fields[rule.threshold_field]?.value
+            const targetFieldPrimitives = rule.target_fields
+                .map((fieldName) => form.fields[fieldName]?.value)
+                .filter(Boolean)
+
+            field.setValidators([
+                Validators.atLeastOneCheckedWhenThreshold({
+                    thresholdFieldPrimitive,
+                    targetFieldPrimitives,
+                    thresholdOperator: rule.threshold_operator || '>',
+                    thresholdValue: rule.threshold_value,
+                    checkedValue: rule.checked_value || valueToCompare,
+                    message: rule.message,
+                }),
+            ])
+        }, [form, field, misc, valueToCompare])
 
         useEffect(() => {
             if (lastEligibilityRef.current === isPlanEligible) {

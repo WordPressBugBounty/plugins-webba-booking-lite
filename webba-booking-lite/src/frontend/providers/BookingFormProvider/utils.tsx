@@ -9,6 +9,7 @@ import { IOption, TAcceptedInputValues } from '../../components/Form/types'
 import {
     IFormPlace,
     IServiceProps,
+    IUnitProps,
 } from '../../components/Services/types'
 import { wbkFormat, wbkGetTimezoneOffset } from '../../../admin/components/Form/utils/dateTime'
 import { IBookingFormObj } from './types'
@@ -62,7 +63,8 @@ const serviceHasStaffMembers = (
     )
 
 export const constructFormData = (formObj: IBookingFormObj) => {
-    const { fields, services, formData, userTimezone, preset } = formObj
+    const { fields, services, units, formData, userTimezone, preset, bookingMode } =
+        formObj
 
     const staffByService =
         (typeof formData.staff === 'object' && formData.staff !== null
@@ -71,6 +73,7 @@ export const constructFormData = (formObj: IBookingFormObj) => {
 
     const staffMembers = preset?.staff_members as { services?: string[] }[] | undefined
     const selectedServices = services.filter((service) => service.selected)
+    const selectedUnits = (units || []).filter((unit) => unit.selected)
 
     const payloadStaff = selectedServices.reduce(
         (acc: Record<string, string>, service) => {
@@ -87,37 +90,39 @@ export const constructFormData = (formObj: IBookingFormObj) => {
     )
 
     const formPlaces: Record<number, IFormPlace[]> = {}
-    services
-        .filter((service) => service.selected)
-        .forEach(({ id, places, quantity }) => {
-            if (!places || places.length === 0) return
+    if (bookingMode === 'services') {
+        services
+            .filter((service) => service.selected)
+            .forEach(({ id, places, quantity }) => {
+                if (!places || places.length === 0) return
 
-            const staffId = staffByService[String(id)] ?? null
-            const hasStaffValue = staffId != null && staffId !== ''
-            const includeStaff =
-                serviceHasStaffMembers(staffMembers, id) && hasStaffValue
-            formPlaces[id] = places.map(
-                ({ timeslot, date, day, staff_member_id }) => {
-                    const placeStaffId =
-                        staff_member_id != null &&
-                        staff_member_id !== ''
-                            ? staff_member_id
-                            : staffId
-                    return {
-                        date,
-                        time: timeslot,
-                        day: day,
-                        quantity,
-                        ...(formData?.location != null
-                            ? { location_id: formData.location }
-                            : {}),
-                        ...(includeStaff && placeStaffId != null
-                            ? { staff_member_id: placeStaffId }
-                            : {}),
+                const staffId = staffByService[String(id)] ?? null
+                const hasStaffValue = staffId != null && staffId !== ''
+                const includeStaff =
+                    serviceHasStaffMembers(staffMembers, id) && hasStaffValue
+                formPlaces[id] = places.map(
+                    ({ timeslot, date, day, staff_member_id }) => {
+                        const placeStaffId =
+                            staff_member_id != null &&
+                            staff_member_id !== ''
+                                ? staff_member_id
+                                : staffId
+                        return {
+                            date,
+                            time: timeslot,
+                            day: day,
+                            quantity,
+                            ...(formData?.location != null
+                                ? { location_id: formData.location }
+                                : {}),
+                            ...(includeStaff && placeStaffId != null
+                                ? { staff_member_id: placeStaffId }
+                                : {}),
+                        }
                     }
-                }
-            )
-        })
+                )
+            })
+    }
 
     const fieldValues = fields.reduce(
         (
@@ -169,25 +174,107 @@ export const constructFormData = (formObj: IBookingFormObj) => {
     const { staff: _staffOmitted, ...formDataWithoutStaff } =
         formData as Record<string, unknown>
 
+    const serializedExtra =
+        (fieldValues?.extra &&
+            JSON.stringify(
+                Object.values(fieldValues?.extra).map((fieldJSON) =>
+                    JSON.parse(fieldJSON)
+                )
+            )) ||
+        ''
+
+    if (bookingMode === 'units') {
+        const selectedUnit = selectedUnits[0] as IUnitProps | undefined
+        const unitRange =
+            (formData as Record<string, any>)?.range ||
+            (formData as Record<string, any>)?.unit_range ||
+            null
+        const payment_method =
+            (formData as Record<string, any>)?.payment_method ?? ('' as any)
+        const coupon = (formData as Record<string, any>)?.coupon ?? ''
+        const attachments =
+            (formData as Record<string, any>)?.attachments ?? []
+
+        const unitPeoplePayload = (() => {
+            const attendees = selectedUnit?.attendees
+            const totalAttendees =
+                attendees != null
+                    ? Number(attendees.adult || 0) +
+                      Number(attendees.child || 0) +
+                      Number(attendees.infant || 0)
+                    : 0
+            if (totalAttendees > 0) {
+                return attendees
+            }
+            const qty = Math.max(1, Number(selectedUnit?.quantity) || 1)
+            return qty
+        })()
+
+        const existingUnitPlaces = (formData as Record<string, any>)?.places as
+            | Record<number, IFormPlace[]>
+            | undefined
+
+        return {
+            ...formDataWithoutStaff,
+            ...fieldValues,
+            booking_mode: 'units' as const,
+            extra: serializedExtra as any,
+            places:
+                existingUnitPlaces && Object.keys(existingUnitPlaces).length > 0
+                    ? existingUnitPlaces
+                    : {},
+            services: [],
+            units: selectedUnits.map((unit) => unit.id),
+            unit_id: selectedUnit?.id || null,
+            range: unitRange,
+            number_of_people: unitPeoplePayload,
+            payment_method,
+            coupon,
+            attachments,
+            unit_quantity: selectedUnits.reduce(
+                (acc: Record<number, number>, unit) => ({
+                    ...acc,
+                    [unit.id]: Math.max(1, Number(unit.quantity) || 1),
+                }),
+                {}
+            ),
+            unit_attendees: selectedUnits.reduce(
+                (
+                    acc: Record<number, { adult: number; child: number; infant: number }>,
+                    unit
+                ) => ({
+                    ...acc,
+                    [unit.id]: unit.attendees || {
+                        adult: 0,
+                        child: 0,
+                        infant: 0,
+                    },
+                }),
+                {}
+            ),
+            offset: wbkGetTimezoneOffset(formObj.userTimezone),
+            time_zone_client: userTimezone,
+            locale: document.documentElement.getAttribute('lang') || 'en-US',
+        }
+    }
+
+    const payment_method =
+        (formData as Record<string, any>)?.payment_method ?? ('' as any)
+    const coupon = (formData as Record<string, any>)?.coupon ?? ''
+    const attachments = (formData as Record<string, any>)?.attachments ?? []
+
     return {
         ...formDataWithoutStaff,
         ...(Object.keys(payloadStaff).length > 0 ? { staff: payloadStaff } : {}),
         ...fieldValues,
-        extra:
-            (fieldValues?.extra &&
-                JSON.stringify(
-                    Object.values(fieldValues?.extra).map((fieldJSON) =>
-                        JSON.parse(fieldJSON)
-                    )
-                )) ||
-            '',
+        extra: serializedExtra as any,
         places: formPlaces,
-        services: selectedServices
-            .flatMap(({ id, places }) =>
-                places && places.length > 0
-                    ? Array(places.length).fill(id)
-                    : [id]
-            ),
+        services: selectedServices.flatMap(({ id, places }) =>
+            places && places.length > 0 ? Array(places.length).fill(id) : [id]
+        ),
+        payment_method,
+        coupon,
+        attachments,
         offset: wbkGetTimezoneOffset(formObj.userTimezone),
         time_zone_client: userTimezone,
         locale: document.documentElement.getAttribute('lang') || 'en-US',

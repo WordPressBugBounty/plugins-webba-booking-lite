@@ -1,6 +1,7 @@
-import { ComponentType, ReactNode } from 'react'
+import type { ComponentType, ReactNode, RefObject } from 'react'
 import { IFormPlace, IPlace } from '../../components/Services/types'
 import { TAllowedMethods } from '../../components/PaymentSelector/types'
+import type { StripeFieldName } from './PaymentHandler/payments/Stripe/types'
 
 export type ValidationResult = true | string
 export type ValidationRule = (value: any) => ValidationResult
@@ -30,8 +31,20 @@ export interface IScenarioState {
     steps: IScenario[]
 }
 
+export interface IUnitDateOffer {
+    id: string
+    start: Date
+    end: Date
+    days: number
+    total: string | number
+}
+
 export interface IFormData {
     services: number[]
+    units?: number[]
+    booking_mode?: 'services' | 'units'
+    unit_attendees?: Record<number, { adult: number; child: number; infant: number }>
+    unit_quantity?: Record<number, number>
     places: Record<number, IFormPlace[]>
     payment_method: TAllowedMethods
     [key: string]: unknown
@@ -39,6 +52,7 @@ export interface IFormData {
     coupon: string
     attachments: File[]
     stripe_details?: IStripeDetails
+    generate_stripe_intent?: boolean
 }
 
 export interface IAmountItem {
@@ -76,6 +90,16 @@ export interface IStripeDetails {
         postal_code: string
         country: string
     }
+}
+
+export interface IPaymentStepStripeSectionProps {
+    clientSecret: string
+    selectedMethod: string
+    onLoadingChange: (loading: boolean) => void
+    stripeWrapperRef: RefObject<HTMLDivElement | null>
+    formData: IFormData
+    setFormData: (slug: string, value: unknown) => void
+    stripeFields?: StripeFieldName[]
 }
 
 export interface INavigationProps

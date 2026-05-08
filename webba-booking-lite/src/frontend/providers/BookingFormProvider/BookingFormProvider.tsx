@@ -13,10 +13,14 @@ import {
 } from './types'
 import { useSelect } from '@wordpress/data'
 import { store, store_name } from '../../../store/frontend'
-import { IServiceProps } from '../../components/Services/types'
+import {
+    IServiceProps,
+    IUnitAttendees,
+    IUnitProps,
+} from '../../components/Services/types'
 import { IFormData } from '../../screens/BookingForm/types'
 import { ICategory } from '../../components/Categories/types'
-import { IFieldConstructor } from '../../components/Form/types'
+import { IFieldConfig } from '../../components/Form/types'
 import { constructFormData } from './utils'
 import { generateColorShades } from '../../lib/colorShades'
 
@@ -39,7 +43,10 @@ export const BookingFormProvider = ({
     attrCategory,
     attrLocation,
     attrStaff,
+    attrUnits,
+    attrHideCategory,
     preset: customPreset,
+    disableCustomScroll = false,
     children,
 }: PropsWithChildren<IBookingFormProviderProps>) => {
     // Separate customPreset logic from useSelect
@@ -52,10 +59,20 @@ export const BookingFormProvider = ({
 
     const {
         services: allServices = [],
+        units: allUnits = [],
         categories: allCategories = [],
         settings = {},
         appearance = [],
     } = preset || {}
+
+    const bookingMode: 'services' | 'units' =
+        ['yes', '1', 'true'].includes(
+            String(attrUnits || '')
+                .trim()
+                .toLowerCase()
+        )
+            ? 'units'
+            : 'services'
 
     const {
         date_format = 'F j, Y',
@@ -67,55 +84,113 @@ export const BookingFormProvider = ({
     const extractedAttrCats =
         attrCategory && String(attrCategory).length > 0 && attrCategory !== '0'
             ? String(attrCategory)
-                  .split(',')
-                  .map((cat) => Number(cat))
+                .split(',')
+                .map((cat) => Number(cat))
             : []
 
     const extractedAttrLocations =
         attrLocation && String(attrLocation).length > 0 && attrLocation !== '0'
             ? String(attrLocation)
-                  .split(',')
-                  .map((s) => s.trim())
-                  .filter(Boolean)
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean)
             : []
 
     const extractedAttrStaff =
         attrStaff && String(attrStaff).length > 0 && attrStaff !== '0'
             ? String(attrStaff)
-                  .split(',')
-                  .map((s) => s.trim())
-                  .filter(Boolean)
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean)
             : []
+
+    const getEnabledAttendees = (unit: IUnitProps): IUnitAttendees => {
+        const hasAdult = unit.attendee_type_adult === 'yes'
+        const hasChild = unit.attendee_type_child === 'yes'
+        const hasInfant = unit.attendee_type_infant === 'yes'
+
+        return {
+            adult: hasAdult ? 1 : 0,
+            child: hasChild ? 0 : 0,
+            infant: hasInfant ? 0 : 0,
+        }
+    }
+
+    const clampUnitAttendees = (
+        attendees: IUnitAttendees,
+        capacity: number
+    ): IUnitAttendees => {
+        const safeCapacity = Math.max(1, Number(capacity) || 1)
+        const total = attendees.adult + attendees.child + attendees.infant
+        if (total <= safeCapacity) {
+            return attendees
+        }
+
+        let overflow = total - safeCapacity
+        const updated = { ...attendees }
+            ; (['infant', 'child', 'adult'] as const).forEach((key) => {
+                if (overflow <= 0) {
+                    return
+                }
+                const removable = Math.min(updated[key], overflow)
+                updated[key] -= removable
+                overflow -= removable
+            })
+
+        return updated
+    }
 
     const [formObj, setFormObj] = useState<IBookingFormObj>({
         categories: [] as ICategory[],
         services: [] as IServiceProps[],
+        units: [] as IUnitProps[],
+        bookingMode: 'services',
         preset: {},
         attrService: null,
         attrCategory: null,
         attrLocation: null,
+        attrStaff: null,
+        attrUnits: null,
         extractedAttrCats: [],
         extractedAttrLocations: [],
         extractedAttrStaff: [],
-        formData: {} as IFormData,
+        attrHideCategory: 'no',
+        formData: {
+            services: [],
+            places: {},
+            payment_method: '' as any,
+            extra: {},
+            coupon: '',
+            attachments: [],
+        } as IFormData,
         dateFormat: 'F j, Y',
         timeFormat: 'g:i a',
         priceFormat: '$#price',
-        fields: [] as IFieldConstructor[],
+        fields: [] as IFieldConfig[],
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         userTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         paymentMethods: [],
         amountData: {
             total: 0,
-            tax: 0,
             discount: 0,
             subtotal: 0,
+            tax_to_pay: 0,
             items: [],
+            service_fees: 0,
+            left_to_pay: 0,
+            order_total: 0,
+            to_pay_total: 0,
+            stripe_details: {
+                client_secret: '',
+                intent_id: '',
+            },
         },
+        stripeObj: {} as any,
         colors: {
             primary: {},
             secondary: {},
         },
+        disableCustomScroll,
     })
 
     const onCategorySelect = useCallback((id: number) => {
@@ -175,7 +250,7 @@ export const BookingFormProvider = ({
                 })
                 const prevStaff =
                     typeof prev.formData.staff === 'object' &&
-                    prev.formData.staff !== null
+                        prev.formData.staff !== null
                         ? (prev.formData.staff as Record<string, string | null>)
                         : {}
                 const nextStaff: Record<string, string> = {}
@@ -230,14 +305,82 @@ export const BookingFormProvider = ({
         [preset]
     )
 
+    const onUnitUpdate = useCallback(
+        (id: number, unitProps: Partial<IUnitProps>) => {
+            setFormObj((prev) => {
+                const isSelectingThisUnit = unitProps.selected === true
+                const isTogglingSelection = 'selected' in unitProps
+
+                const updatedUnits = prev.units.map((unit: IUnitProps) => {
+                    if (unit.id !== id) {
+                        if (isTogglingSelection && isSelectingThisUnit) {
+                            return {
+                                ...unit,
+                                selected: false,
+                                selectedAt: null,
+                            }
+                        }
+                        return unit
+                    }
+
+                    const nextUnit = {
+                        ...unit,
+                        ...unitProps,
+                    }
+
+                    const unitCapacity = Math.max(1, Number(nextUnit.capacity) || 1)
+                    const nextAttendees = clampUnitAttendees(
+                        (nextUnit.attendees || getEnabledAttendees(nextUnit)) as IUnitAttendees,
+                        unitCapacity
+                    )
+
+                    return {
+                        ...nextUnit,
+                        attendees: nextAttendees,
+                        quantity:
+                            unitCapacity > 1
+                                ? Math.min(
+                                    unitCapacity,
+                                    Math.max(1, Number(nextUnit.quantity) || 1)
+                                )
+                                : 1,
+                        selectedAt:
+                            'selected' in unitProps
+                                ? unitProps.selected
+                                    ? unit.selectedAt || Date.now()
+                                    : null
+                                : unit.selectedAt,
+                    }
+                })
+
+                return {
+                    ...prev,
+                    units: updatedUnits,
+                    formData: {
+                        ...prev.formData,
+                        units: updatedUnits
+                            .filter((unit: IUnitProps) => unit.selected)
+                            .map((unit: IUnitProps) => unit.id),
+                    },
+                }
+            })
+        },
+        []
+    )
+
     useEffect(() => {
-        if (!allServices || !allCategories) return
+        if (!allServices || !allCategories || !allUnits) return
 
         setFormObj((prev) => {
             const prevServiceIds = (prev.services || [])
                 .map((s: any) => s.id)
                 .join(',')
             const newServiceIds = allServices.map((s: any) => s.id).join(',')
+
+            const prevUnitIds = (prev.units || [])
+                .map((u: any) => u.id)
+                .join(',')
+            const newUnitIds = allUnits.map((u: any) => u.id).join(',')
 
             const prevCategoryIds = (prev.categories || [])
                 .map((c: any) => c.id)
@@ -246,7 +389,9 @@ export const BookingFormProvider = ({
 
             if (
                 prevServiceIds === newServiceIds &&
-                prevCategoryIds === newCategoryIds
+                prevUnitIds === newUnitIds &&
+                prevCategoryIds === newCategoryIds &&
+                prev.bookingMode === bookingMode
             ) {
                 return prev
             }
@@ -255,7 +400,7 @@ export const BookingFormProvider = ({
                 const isSelected = Number(attrService) === Number(service.id)
                 return {
                     ...service,
-                    selected: isSelected,
+                    selected: bookingMode === 'services' ? isSelected : false,
                     selectedAt: isSelected ? Date.now() : null,
                     quantity: service.min_quantity || 1,
                     onUpdate: (serviceProps: Partial<IServiceProps>) =>
@@ -263,6 +408,28 @@ export const BookingFormProvider = ({
                     selectedDate: new Date(),
                     selectedMonth: new Date(),
                     places: [],
+                    expanded: false,
+                }
+            })
+
+            const units = allUnits.map((unit: IUnitProps) => {
+                const isSelected = Number(attrService) === Number(unit.id)
+                const unitCapacity = Math.max(1, Number(unit.capacity) || 1)
+                const defaultAttendees = clampUnitAttendees(
+                    getEnabledAttendees(unit),
+                    unitCapacity
+                )
+
+                return {
+                    ...unit,
+                    selected: bookingMode === 'units' ? isSelected : false,
+                    selectedAt: isSelected ? Date.now() : null,
+                    quantity: unitCapacity > 1 ? 1 : 1,
+                    attendees: defaultAttendees,
+                    onUpdate: (unitProps: Partial<IUnitProps>) =>
+                        onUnitUpdate(unit.id, unitProps),
+                    selectedDate: new Date(),
+                    selectedMonth: new Date(),
                     expanded: false,
                 }
             })
@@ -278,16 +445,34 @@ export const BookingFormProvider = ({
             return {
                 ...prev,
                 services,
+                units,
                 categories,
+                bookingMode,
                 preset,
                 dateFormat: date_format,
                 timeFormat: time_format,
                 timezone,
                 priceFormat: price_format,
+                formData: {
+                    ...prev.formData,
+                    services:
+                        bookingMode === 'services'
+                            ? services
+                                .filter((service: IServiceProps) => service.selected)
+                                .map((service: IServiceProps) => service.id)
+                            : [],
+                    units:
+                        bookingMode === 'units'
+                            ? units
+                                .filter((unit: IUnitProps) => unit.selected)
+                                .map((unit: IUnitProps) => unit.id)
+                            : [],
+                },
             }
         })
     }, [
         allServices?.length,
+        allUnits?.length,
         allCategories?.length,
         date_format,
         time_format,
@@ -295,6 +480,9 @@ export const BookingFormProvider = ({
         price_format,
         preset,
         attrService,
+        bookingMode,
+        onServiceUpdate,
+        onUnitUpdate,
     ])
 
     useEffect(() => {
@@ -322,6 +510,16 @@ export const BookingFormProvider = ({
         []
     )
 
+    const mergeFormData = useCallback((patch: Partial<IFormData>) => {
+        setFormObj((prev) => ({
+            ...prev,
+            formData: {
+                ...prev.formData,
+                ...patch,
+            },
+        }))
+    }, [])
+
     const onLocationSelect = useCallback((id: string | number) => {
         setFormData('location', id)
     }, [setFormData])
@@ -341,7 +539,7 @@ export const BookingFormProvider = ({
             setFormObj((prev) => {
                 const current =
                     typeof prev.formData.staff === 'object' &&
-                    prev.formData.staff !== null
+                        prev.formData.staff !== null
                         ? (prev.formData.staff as Record<string, string | null>)
                         : {}
                 const staffNext = { ...current }
@@ -414,7 +612,7 @@ export const BookingFormProvider = ({
             if (selectedIds.length === 0) return prev
             const current =
                 typeof prev.formData.staff === 'object' &&
-                prev.formData.staff !== null
+                    prev.formData.staff !== null
                     ? (prev.formData.staff as Record<string, string | null>)
                     : {}
             let staffChanged = false
@@ -430,8 +628,8 @@ export const BookingFormProvider = ({
             if (!staffChanged) return prev
             const services = (prev.services || []).map((s: any) =>
                 selectedIds.includes(s.id) &&
-                serviceHasStaff(s.id) &&
-                (s.staffId === undefined || s.staffId === null)
+                    serviceHasStaff(s.id) &&
+                    (s.staffId === undefined || s.staffId === null)
                     ? { ...s, staffId: '0' as string }
                     : s
             )
@@ -451,7 +649,7 @@ export const BookingFormProvider = ({
     ])
 
     const setFields = useCallback(
-        (fields: IFieldConstructor[]) => {
+        (fields: IFieldConfig[]) => {
             setFormObj((prev) => ({
                 ...prev,
                 fields,
@@ -461,13 +659,13 @@ export const BookingFormProvider = ({
     )
 
     useEffect(() => {
-        if (!formObj.services || !formObj.fields) return
+        if (!formObj.services || !formObj.units || !formObj.fields) return
 
         setFormObj((prev) => ({
             ...prev,
             formData: constructFormData(prev),
         }))
-    }, [formObj.services, formObj.fields])
+    }, [formObj.services, formObj.units, formObj.bookingMode, formObj.fields])
 
     const amountData = useSelect(
         (select: any) => select(store_name).getBookingAmounts(),
@@ -502,8 +700,8 @@ export const BookingFormProvider = ({
         setFormObj((prev) => ({
             ...prev,
             userTimezone: settings?.timezone_picker_enabled ?
-                    timezoneData?.selectedZone ||
-                    Intl.DateTimeFormat().resolvedOptions().timeZone
+                timezoneData?.selectedZone ||
+                Intl.DateTimeFormat().resolvedOptions().timeZone
                 : settings?.timezone,
         }))
     }, [timezoneData, settings?.timezone_picker_enabled, settings?.timezone])
@@ -513,16 +711,20 @@ export const BookingFormProvider = ({
             value={{
                 ...formObj,
                 setFormData,
+                mergeFormData,
                 setFields,
                 onLocationSelect,
                 onStaffSelect,
+                disableCustomScroll,
                 attrService,
                 attrCategory,
                 attrLocation,
                 attrStaff,
+                attrUnits,
                 extractedAttrCats,
                 extractedAttrLocations,
                 extractedAttrStaff,
+                attrHideCategory: attrHideCategory || 'no',
                 loading,
                 setFormObj(key, value) {
                     setFormObj((prev) => {

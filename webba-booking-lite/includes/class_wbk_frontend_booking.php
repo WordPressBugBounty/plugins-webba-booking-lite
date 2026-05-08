@@ -170,6 +170,9 @@ class WBK_Frontend_Booking {
             'service' => '0',
         ], $attr ) );
         extract( shortcode_atts( [
+            'units' => 'no',
+        ], $attr ) );
+        extract( shortcode_atts( [
             'category' => '0',
         ], $attr ) );
         extract( shortcode_atts( [
@@ -183,6 +186,9 @@ class WBK_Frontend_Booking {
         ], $attr ) );
         extract( shortcode_atts( [
             'compatibility' => 'no',
+        ], $attr ) );
+        extract( shortcode_atts( [
+            'hide_category' => 'no',
         ], $attr ) );
         $tracking_service = $service;
         if ( $category > 0 ) {
@@ -199,7 +205,9 @@ class WBK_Frontend_Booking {
             $category_list,
             $category,
             $location,
-            $staff
+            $staff,
+            $units,
+            $hide_category
         ], false );
         return $cnt;
     }

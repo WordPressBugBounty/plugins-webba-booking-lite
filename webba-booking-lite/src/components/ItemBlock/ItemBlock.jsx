@@ -8,6 +8,8 @@ import classNames from 'classnames'
 import iconCalendar from '../../../public/images/icon-ud-calendar.svg'
 import iconTime from '../../../public/images/icon-ud-time.svg'
 import iconCurrency from '../../../public/images/icon-ud-currency.svg'
+import { wbkFormatPrice } from '../../frontend/providers/BookingFormProvider/utils'
+import { __ } from '@wordpress/i18n'
 
 export default function ItemBlock({
     data,
@@ -40,7 +42,7 @@ export default function ItemBlock({
 
     const {
         wording,
-        settings: { timezone, price_format },
+        settings: { timezone, price_format, price_separator, price_fractional },
     } = select(store_name).getPreset()
     const allStatus = useMemo(
         () => bookingsSchema.properties.appointment_status.misc.options,
@@ -92,8 +94,8 @@ export default function ItemBlock({
                         </div>
                         {amount_paid && (
                             <div className={styles.itemInfo}>
-                                <img src={iconCurrency} />
-                                {time_formated}
+                                <strong>{__('Amount paid: ', 'webba-booking-lite')}</strong>
+                                {wbkFormatPrice(amount_paid, price_format, price_separator, price_fractional)}
                             </div>
                         )}
                     </div>

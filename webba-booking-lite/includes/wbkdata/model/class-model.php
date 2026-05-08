@@ -567,6 +567,18 @@ class Model
                     $type = "string";
                     $input_type = "limitation";
                     break;
+                case "price_variant":
+                    $type = "string";
+                    $input_type = "price_variant";
+                    break;
+                case "availability_ranges":
+                    $type = "string";
+                    $input_type = "availability_ranges";
+                    break;
+                case "number_of_people":
+                    $type = "string";
+                    $input_type = "number_of_people";
+                    break;
                 default:
                     $type = "not_defined";
                     $input_type = "not_defined";

@@ -27,8 +27,36 @@
                 "options": "services",
                 "sub_type": "positive_integer"
             },
-            "required": true,
-            "dependency": [],
+            "required": false,
+            "dependency": [
+                [
+                    "unit_id",
+                    "<=",
+                    "0"
+                ]
+            ],
+            "default_value": null,
+            "editable": true
+        },
+        "appointment_unit_id": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Unit",
+            "tab": "",
+            "misc": {
+                "tooltip": "Select the unit for this booking.",
+                "options": "units",
+                "sub_type": "positive_integer"
+            },
+            "required": false,
+            "dependency": [
+                [
+                    "service_id",
+                    "<=",
+                    "0"
+                ]
+            ],
             "default_value": null,
             "editable": true
         },
@@ -44,7 +72,13 @@
                 "sub_type": "positive_integer"
             },
             "required": false,
-            "dependency": [],
+            "dependency": [
+                [
+                    "unit_id",
+                    "<=",
+                    "0"
+                ]
+            ],
             "default_value": null,
             "editable": true
         },
@@ -56,7 +90,7 @@
             "tab": "",
             "misc": {
                 "tooltip": "Select the location for this booking.",
-                "options": "locations",
+                "options": "backend",
                 "sub_type": "positive_integer"
             },
             "required": false,
@@ -73,7 +107,7 @@
             "misc": {
                 "tooltip": "Select the booking date.",
                 "date_format": "F j, Y",
-                "time_zone": "Europe/Warsaw"
+                "time_zone": "Asia/Dhaka"
             },
             "required": true,
             "dependency": [],
@@ -88,11 +122,17 @@
             "tab": "",
             "misc": {
                 "tooltip": "Select the booking time.",
-                "time_format": "H:i",
+                "time_format": "g:i a",
                 "options": "backend"
             },
             "required": true,
-            "dependency": [],
+            "dependency": [
+                [
+                    "unit_id",
+                    "<=",
+                    "0"
+                ]
+            ],
             "default_value": "",
             "editable": true
         },
@@ -107,9 +147,35 @@
                 "sub_type": "positive_integer",
                 "options": "backend"
             },
-            "required": true,
-            "dependency": [],
+            "required": false,
+            "dependency": [
+                [
+                    "unit_id",
+                    "<=",
+                    "0"
+                ]
+            ],
             "default_value": null,
+            "editable": true
+        },
+        "appointment_number_of_people": {
+            "type": "string",
+            "input_type": "number_of_people",
+            "hidden": true,
+            "title": "Breakdown by attendee types",
+            "tab": "",
+            "misc": {
+                "tooltip": "Breakdown by attendee types (e.g. adults, children, infants) when your booking flow collects per-type counts."
+            },
+            "required": false,
+            "dependency": [
+                [
+                    "unit_id",
+                    ">",
+                    "0"
+                ]
+            ],
+            "default_value": "",
             "editable": true
         },
         "appointment_duration": {

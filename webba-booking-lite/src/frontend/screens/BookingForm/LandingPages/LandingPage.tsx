@@ -62,10 +62,10 @@ const LandingPageInner = ({ token, token_type, action }: ILandingPageProps) => {
                                 fromUnixTime(Number(item.time) * 1000),
                                 token_type === 'customer_token'
                                     ? String(
-                                          getNamedTimezoneFromOffset(
-                                              Number(item.offset)
-                                          )
-                                      )
+                                        getNamedTimezoneFromOffset(
+                                            Number(item.offset)
+                                        )
+                                    )
                                     : timezone
                             )
                         ) / 1000,
@@ -85,7 +85,7 @@ const LandingPageInner = ({ token, token_type, action }: ILandingPageProps) => {
             const quantity = Number(quantities[idx] || 1)
             return {
                 name,
-                price: price * quantity,
+                price,
             }
         })
     }, [paymentDetails])
@@ -162,19 +162,19 @@ const LandingPageInner = ({ token, token_type, action }: ILandingPageProps) => {
                                 )}
                                 {(action === 'cancelation' ||
                                     action === 'admin_cancel') && (
-                                    <div className={'wbk_cancel_icon_bg'}>
-                                        <img
-                                            src={iconCancel}
-                                            alt={
-                                                wording?.booking_cancelled ||
-                                                __(
-                                                    'Booking cancelled',
-                                                    'webba-booking-lite'
-                                                )
-                                            }
-                                        />
-                                    </div>
-                                )}
+                                        <div className={'wbk_cancel_icon_bg'}>
+                                            <img
+                                                src={iconCancel}
+                                                alt={
+                                                    wording?.booking_cancelled ||
+                                                    __(
+                                                        'Booking cancelled',
+                                                        'webba-booking-lite'
+                                                    )
+                                                }
+                                            />
+                                        </div>
+                                    )}
                                 <div
                                     className={'wbk_thank_you__header__content'}
                                 >
@@ -295,7 +295,7 @@ const LandingPageInner = ({ token, token_type, action }: ILandingPageProps) => {
                                         </div>
                                     ))}
                                     {/* Show tax if greater than 0 */}
-                                    {tax && Number(tax) > 0 && (
+                                    {Number(tax || 0) > 0 && (
                                         <div
                                             className={classNames(
                                                 'wbk_thank_you__cart-items__item',
@@ -363,20 +363,20 @@ const LandingPageInner = ({ token, token_type, action }: ILandingPageProps) => {
                                     )}
                                     {(action === 'cancelation' ||
                                         action === 'admin_cancel') && (
-                                        <Button
-                                            type="error"
-                                            title={
-                                                wording?.cancel_appointment ||
-                                                __(
-                                                    'Cancel Appointment',
-                                                    'webba-booking-lite'
-                                                )
-                                            }
-                                            showLoading={buttonLoading}
-                                            onClick={handleAction}
-                                            disabled={buttonLoading}
-                                        />
-                                    )}
+                                            <Button
+                                                type="error"
+                                                title={
+                                                    wording?.cancel_appointment ||
+                                                    __(
+                                                        'Cancel Appointment',
+                                                        'webba-booking-lite'
+                                                    )
+                                                }
+                                                showLoading={buttonLoading}
+                                                onClick={handleAction}
+                                                disabled={buttonLoading}
+                                            />
+                                        )}
                                     {buttonError && (
                                         <span
                                             className={

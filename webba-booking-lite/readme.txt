@@ -4,7 +4,7 @@ Donate link: https://webba-booking.com/
 Tags:  appointments, appointment booking, booking calendar, scheduling, booking system
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 6.4.0
+Stable tag: 6.4.6
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -183,6 +183,48 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 
 == Changelog ==
+06/05/2026
+
+6.4.6
+
+- Improvement: added advanced features in Gutenberg block
+- Improvement: new feature - Elementor & Divi widget for booking form
+
+04/05/2026
+
+6.4.5
+
+- Bug fix: minor fixes and improved experience in daily bookings
+
+30/04/2026
+
+6.4.4
+
+- Improvement: new feature - daily bookings
+
+20/04/2026
+
+6.4.3
+
+- Improvement: optimized Stripe payment logs
+
+17/04/2026
+
+6.4.2
+
+- Bug fix: Stripe payment failing on certain configurations
+
+14/04/2026
+
+6.4.1
+
+- Improvement: prohibit loading Stripe cookies if it's disabled
+- Bug fix: CSV export failure on certain configurations
+- Bug fix: wrong prices on confirmation screen on certain configurations
+- Bug fix: staff members and location features are disabled on certain licenses
+- Bug fix: particular translations not working in user dashboard
+- Bug fix: other minor fixes and a few improvements
+
 31/03/2026
 
 6.4.0

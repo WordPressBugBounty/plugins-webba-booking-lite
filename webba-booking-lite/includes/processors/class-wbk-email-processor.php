@@ -1,6 +1,6 @@
 <?php
 
-if ( !defined( 'ABSPATH' ) ) {
+if ( !defined( "ABSPATH" ) ) {
     exit;
 }
 class WBK_Email_Processor {
@@ -13,41 +13,61 @@ class WBK_Email_Processor {
             return;
         }
         WBK_Model_Utils::switch_locale_by_booking_id( $bookings[0] );
-        $service = new WBK_Service($booking->get_service());
-        if ( !$service->is_loaded() ) {
+        $filter_service = null;
+        $filter_unit = null;
+        $notification_service = null;
+        $notification_unit = null;
+        if ( $booking->get_booking_target_type() === WBK_Booking::BOOKING_TARGET_UNIT ) {
+            $notification_unit = new WBK_Unit($booking->get_unit_id());
+            if ( !$notification_unit->is_loaded() ) {
+                return;
+            }
+            $filter_unit = $booking->get_unit_id();
+        } elseif ( $booking->get_booking_target_type() === WBK_Booking::BOOKING_TARGET_SERVICE ) {
+            $notification_service = new WBK_Service($booking->get_service());
+            if ( !$notification_service->is_loaded() ) {
+                return;
+            }
+            $filter_service = $booking->get_service();
+        } else {
             return;
         }
-        $headers[] = 'From: ' . stripslashes( get_option( 'wbk_from_name' ) ) . ' <' . get_option( 'wbk_from_email' ) . '>';
+        $headers[] = "From: " . stripslashes( get_option( "wbk_from_name" ) ) . " <" . get_option( "wbk_from_email" ) . ">";
         $attachments = [];
         $queue = [];
-        $email_templates = WBK_Model_Utils::get_email_templates( true, $trigger, $booking->get_service() );
+        $email_templates = WBK_Model_Utils::get_email_templates(
+            true,
+            $trigger,
+            $filter_service,
+            $filter_unit
+        );
         foreach ( $email_templates as $id => $name ) {
             $et = new WBK_Email_Template($id);
             if ( !$et->is_loaded() ) {
                 continue;
             }
-            $message = $et->get( 'template' );
-            $subject = $et->get( 'subject' );
-            $message = WBK_Translation_Processor::translate_string( 'webba_email_template_message_' . $id, $message );
-            $subject = WBK_Translation_Processor::translate_string( 'webba_email_template_subject_' . $id, $subject );
+            $message = $et->get( "template" );
+            $subject = $et->get( "subject" );
+            $message = WBK_Translation_Processor::translate_string( "webba_email_template_message_" . $id, $message );
+            $subject = WBK_Translation_Processor::translate_string( "webba_email_template_subject_" . $id, $subject );
             $message = WBK_Placeholder_Processor::process( $message, $bookings );
             $subject = WBK_Placeholder_Processor::process( $subject, $bookings );
-            $reminders_available = WBK_Feature_Gate::have_required_plan( 'start', 'only_old_users' );
-            if ( !$reminders_available && ($trigger == 'admin_reminder' || $trigger == 'customer_reminder') ) {
+            $reminders_available = WBK_Feature_Gate::have_required_plan( "start", "only_old_users" );
+            if ( !$reminders_available && ($trigger == "admin_reminder" || $trigger == "customer_reminder") ) {
                 continue;
             }
-            if ( $trigger == 'admin_reminder' ) {
+            if ( $trigger == "admin_reminder" ) {
                 $message = WBK_Placeholder_Processor::process_agenda_placehoder( $message, $bookings );
             }
-            $recipients = json_decode( $et->get( 'recipients' ) );
+            $recipients = json_decode( $et->get( "recipients" ) );
             if ( !$recipients || !is_array( $recipients ) ) {
                 continue;
             }
             foreach ( $recipients as $recipient ) {
                 $attachments = [];
-                if ( $recipient == 'admin' ) {
-                    $attachment = $booking->get( 'attachment' );
-                    if ( $attachment == '' ) {
+                if ( $recipient == "admin" ) {
+                    $attachment = $booking->get( "attachment" );
+                    if ( $attachment == "" ) {
                         $attachment = [];
                     } else {
                         $attachment = json_decode( $attachment );
@@ -55,65 +75,69 @@ class WBK_Email_Processor {
                     $attachments = array_merge( $attachments, $attachment );
                 }
                 $item_header = [];
-                if ( $recipient == 'admin' ) {
-                    if ( get_option( 'wbk_email_override_replyto', 'true' ) == 'true' ) {
-                        $item_header[] = 'Reply-To: ' . $booking->get( 'name' ) . ' <' . $booking->get( 'email' ) . '>';
+                if ( $recipient == "admin" ) {
+                    if ( get_option( "wbk_email_override_replyto", "true" ) == "true" ) {
+                        $item_header[] = "Reply-To: " . $booking->get( "name" ) . " <" . $booking->get( "email" ) . ">";
                     }
-                    $email = $service->get_email();
-                } elseif ( $recipient == 'customer' || $recipient == 'group' ) {
-                    if ( get_option( 'wbk_email_override_replyto', 'true' ) == 'true' ) {
-                        $item_header[] = 'Reply-To: ' . $service->get( 'name' ) . ' <' . $service->get( 'email' ) . '>';
+                    $email = ( $notification_service ? $notification_service->get_email() : get_option( "wbk_super_admin_email", get_option( "admin_email" ) ) );
+                } elseif ( $recipient == "customer" || $recipient == "group" ) {
+                    if ( get_option( "wbk_email_override_replyto", "true" ) == "true" ) {
+                        if ( $notification_service ) {
+                            $item_header[] = "Reply-To: " . $notification_service->get( "name" ) . " <" . $notification_service->get( "email" ) . ">";
+                        } else {
+                            $item_header[] = "Reply-To: " . $notification_unit->get( "name" ) . " <" . get_option( "wbk_super_admin_email", get_option( "admin_email" ) ) . ">";
+                        }
                     }
-                    $email = $booking->get( 'email' );
-                    if ( $trigger == 'booking_paid' ) {
+                    $email = $booking->get( "email" );
+                    if ( $trigger == "booking_paid" ) {
                         $attachments = apply_filters(
-                            'wbk_payment_notification_attachmets',
+                            "wbk_payment_notification_attachmets",
                             $attachments,
                             $bookings,
-                            $booking->get( 'email' )
+                            $booking->get( "email" )
                         );
                     }
                 }
-                $pdf_attachement = strip_tags( $et->get( 'pdf_attachment' ) );
-                if ( $pdf_attachement != '' && WBK_Feature_Gate::have_required_plan( 'premium' ) ) {
-                    $pdf_attachement = WBK_Translation_Processor::translate_string( 'webba_email_template_pdf_' . $id, $pdf_attachement );
+                $pdf_attachement = strip_tags( $et->get( "pdf_attachment" ) );
+                if ( $pdf_attachement != "" && WBK_Feature_Gate::have_required_plan( "premium" ) ) {
+                    $pdf_attachement = WBK_Translation_Processor::translate_string( "webba_email_template_pdf_" . $id, $pdf_attachement );
                     $pdf_file = WBK_Pdf_Processor::process( $pdf_attachement, $bookings );
                     if ( $pdf_file != false ) {
                         $attachments[] = $pdf_file;
                     }
                 }
                 $queue_item = [
-                    'address' => $email,
-                    'message' => $message,
-                    'subject' => $subject,
-                    'headers' => $item_header,
+                    "address" => $email,
+                    "message" => $message,
+                    "subject" => $subject,
+                    "headers" => $item_header,
                 ];
                 if ( count( $attachments ) > 0 ) {
-                    $queue_item['attachments'] = $attachments;
+                    $queue_item["attachments"] = $attachments;
                 }
                 $queue[] = $queue_item;
             }
         }
         foreach ( $queue as $notification ) {
-            if ( WBK_Validator::check_string_size( $notification['message'], 1, 50000 ) && WBK_Validator::check_string_size( $notification['subject'], 1, 200 ) ) {
-                add_filter( 'wp_mail_content_type', 'wbk_wp_mail_content_type' );
-                if ( isset( $notification['attachments'] ) && count( $notification['attachments'] ) > 0 ) {
+            if ( WBK_Validator::check_string_size( $notification["message"], 1, 50000 ) && WBK_Validator::check_string_size( $notification["subject"], 1, 200 ) ) {
+                add_filter( "wp_mail_content_type", "wbk_wp_mail_content_type" );
+                if ( isset( $notification["attachments"] ) && count( $notification["attachments"] ) > 0 ) {
                     wp_mail(
-                        $notification['address'],
-                        $notification['subject'],
-                        $notification['message'],
-                        array_merge( $headers, $notification['headers'] ),
-                        $notification['attachments']
+                        $notification["address"],
+                        $notification["subject"],
+                        $notification["message"],
+                        array_merge( $headers, $notification["headers"] ),
+                        $notification["attachments"]
                     );
                 } else {
                     wp_mail(
-                        $notification['address'],
-                        $notification['subject'],
-                        $notification['message'],
-                        array_merge( $headers, $notification['headers'] )
+                        $notification["address"],
+                        $notification["subject"],
+                        $notification["message"],
+                        array_merge( $headers, $notification["headers"] )
                     );
                 }
-                remove_filter( 'wp_mail_content_type', 'wbk_wp_mail_content_type' );
+                remove_filter( "wp_mail_content_type", "wbk_wp_mail_content_type" );
             }
         }
     }
@@ -123,26 +147,26 @@ class WBK_Email_Processor {
         if ( !$booking->is_loaded() ) {
             return;
         }
-        $delay = trim( get_option( 'wbk_email_customer_arrived_delay', '' ) );
-        if ( $delay == '' || intval( $delay ) == 0 ) {
-            self::send( [$booking_id], 'booking_finished' );
+        $delay = trim( get_option( "wbk_email_customer_arrived_delay", "" ) );
+        if ( $delay == "" || intval( $delay ) == 0 ) {
+            self::send( [$booking_id], "booking_finished" );
         } else {
             $delay = time() + $delay * 60 * 60;
-            $booking->set( 'arrival_email_time', $delay );
+            $booking->set( "arrival_email_time", $delay );
             $booking->save();
         }
     }
 
-    public static function send_late_notifications( $type = 'arrival' ) {
+    public static function send_late_notifications( $type = "arrival" ) {
         $booking_ids = WBK_Model_Utils::get_bookings_to_send_arrival_email();
         foreach ( $booking_ids as $booking_id ) {
             $booking = new WBK_Booking($booking_id);
             if ( !$booking->is_loaded() ) {
                 return;
             }
-            $booking->set( 'arrival_email_time', '4863950676' );
+            $booking->set( "arrival_email_time", "4863950676" );
             $booking->save();
-            self::send( [$booking_id], 'booking_finished' );
+            self::send( [$booking_id], "booking_finished" );
         }
     }
 
@@ -166,48 +190,48 @@ class WBK_Email_Processor {
         if ( !$template->is_loaded() ) {
             return;
         }
-        $headers[] = 'From: ' . stripslashes( get_option( 'wbk_from_name' ) ) . ' <' . get_option( 'wbk_from_email' ) . '>';
+        $headers[] = "From: " . stripslashes( get_option( "wbk_from_name" ) ) . " <" . get_option( "wbk_from_email" ) . ">";
         $attachments = [];
         $queue = [];
-        $message = $template->get( 'template' );
-        $subject = $template->get( 'subject' );
-        if ( function_exists( 'pll__' ) ) {
+        $message = $template->get( "template" );
+        $subject = $template->get( "subject" );
+        if ( function_exists( "pll__" ) ) {
             $subject = pll__( $subject );
             $message = pll__( $message );
         }
         $subject = apply_filters(
-            'wpml_translate_single_string',
+            "wpml_translate_single_string",
             $subject,
-            'webba-booking-lite',
-            'webba_email_template_subject_' . $template->get_id()
+            "webba-booking-lite",
+            "webba_email_template_subject_" . $template->get_id()
         );
         $message = apply_filters(
-            'wpml_translate_single_string',
+            "wpml_translate_single_string",
             $message,
-            'webba-booking-lite',
-            'webba_email_template_message_' . $template->get_id()
+            "webba-booking-lite",
+            "webba_email_template_message_" . $template->get_id()
         );
         $message = WBK_Placeholder_Processor::process( $message, $bookings );
         $subject = WBK_Placeholder_Processor::process( $subject, $bookings );
-        if ( $template->get( 'trigger' ) == 'admin_reminder' ) {
+        if ( $template->get( "trigger" ) == "admin_reminder" ) {
             $message = WBK_Placeholder_Processor::process_agenda_placehoder( $message, $bookings );
         }
-        $recipients = json_decode( $template->get( 'recipients' ) );
+        $recipients = json_decode( $template->get( "recipients" ) );
         foreach ( $recipients as $recipient ) {
             $attachments = [];
-            if ( $recipient == 'admin' ) {
-            } elseif ( $recipient == 'customer' || $recipient == 'group' ) {
+            if ( $recipient == "admin" ) {
+            } elseif ( $recipient == "customer" || $recipient == "group" ) {
             }
-            $pdf_attachement = strip_tags( $template->get( 'pdf_attachment' ) );
-            if ( $pdf_attachement != '' ) {
-                if ( function_exists( 'pll__' ) ) {
+            $pdf_attachement = strip_tags( $template->get( "pdf_attachment" ) );
+            if ( $pdf_attachement != "" ) {
+                if ( function_exists( "pll__" ) ) {
                     $pdf_attachement = pll__( $pdf_attachement );
                 }
                 $pdf_attachement = apply_filters(
-                    'wpml_translate_single_string',
+                    "wpml_translate_single_string",
                     $pdf_attachement,
-                    'webba-booking-lite',
-                    'webba_email_template_pdf_' . $template->get_id()
+                    "webba-booking-lite",
+                    "webba_email_template_pdf_" . $template->get_id()
                 );
                 $pdf_file = WBK_Pdf_Processor::process( $pdf_attachement, $bookings );
                 if ( $pdf_file != false ) {
@@ -215,35 +239,35 @@ class WBK_Email_Processor {
                 }
             }
             $queue_item = [
-                'address' => $email,
-                'message' => $message,
-                'subject' => $subject,
+                "address" => $email,
+                "message" => $message,
+                "subject" => $subject,
             ];
             if ( count( $attachments ) > 0 ) {
-                $queue_item['attachments'] = $attachments;
+                $queue_item["attachments"] = $attachments;
             }
             $queue[] = $queue_item;
         }
         foreach ( $queue as $notification ) {
-            if ( WBK_Validator::check_string_size( $notification['message'], 1, 50000 ) && WBK_Validator::check_string_size( $notification['subject'], 1, 200 ) ) {
-                add_filter( 'wp_mail_content_type', 'wbk_wp_mail_content_type' );
-                if ( isset( $notification['attachments'] ) && count( $notification['attachments'] ) > 0 ) {
+            if ( WBK_Validator::check_string_size( $notification["message"], 1, 50000 ) && WBK_Validator::check_string_size( $notification["subject"], 1, 200 ) ) {
+                add_filter( "wp_mail_content_type", "wbk_wp_mail_content_type" );
+                if ( isset( $notification["attachments"] ) && count( $notification["attachments"] ) > 0 ) {
                     wp_mail(
-                        $notification['address'],
-                        $notification['subject'],
-                        $notification['message'],
+                        $notification["address"],
+                        $notification["subject"],
+                        $notification["message"],
                         $headers,
-                        ${$notification}['attachments']
+                        ${$notification}["attachments"]
                     );
                 } else {
                     wp_mail(
-                        $notification['address'],
-                        $notification['subject'],
-                        $notification['message'],
+                        $notification["address"],
+                        $notification["subject"],
+                        $notification["message"],
                         $headers
                     );
                 }
-                remove_filter( 'wp_mail_content_type', 'wbk_wp_mail_content_type' );
+                remove_filter( "wp_mail_content_type", "wbk_wp_mail_content_type" );
             }
         }
     }
@@ -251,5 +275,5 @@ class WBK_Email_Processor {
 }
 
 function wbk_wp_mail_content_type() {
-    return 'text/html';
+    return "text/html";
 }

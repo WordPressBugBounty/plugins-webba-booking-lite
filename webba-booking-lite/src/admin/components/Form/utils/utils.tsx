@@ -32,6 +32,9 @@ import { createPasswordField } from '../Fields/PasswordField/PasswordField'
 import { createLimitationField } from '../Fields/LimitationField/LimitationField'
 import { createNoticeField } from '../Fields/NoticeField/NoticeField'
 import { createSelectCustomField } from '../Fields/SelectCustomField/SelectCustomField'
+import { createPriceVariantField } from '../Fields/PriceVariantField/PriceVariantField'
+import { createAvailabilityRangesField } from '../Fields/AvailabilityRangesField/AvailabilityRangesField'
+import { createUnitPeopleField } from '../Fields/UnitPeopleField/UnitPeopleField'
 
 interface CustomFieldConfig {
     title?: string
@@ -109,6 +112,12 @@ export const getFieldComponentFromType = ({
             return createNoticeField(constructorConfig)
         case inputType === 'select_custom':
             return createSelectCustomField(constructorConfig)
+        case inputType === 'price_variant':
+            return createPriceVariantField(constructorConfig)
+        case inputType === 'availability_ranges':
+            return createAvailabilityRangesField(constructorConfig)
+        case inputType === 'number_of_people':
+            return createUnitPeopleField(constructorConfig)
         default:
             return ({ name, label }) => {
                 const { value, setValue } = useField(field)

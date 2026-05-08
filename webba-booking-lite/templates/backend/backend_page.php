@@ -11,7 +11,43 @@ if (isset($_GET["wbk-activation"])) {
 }
 
 if (isset($_GET["test"])) {
-    wbk_daily();
+    update_option("wbk_quantity_fields", [
+        "type" => "quantity_fields",
+        "slug" => "quantity_fields",
+        "placeholder" => __("Quantity Fields", "webba-booking-lite"),
+        "fields" => [
+            [
+                "type" => "quantity",
+                "slug" => "standard_ticket",
+                "placeholder" => [
+                    "en" => __("Adult ticket", "webba-booking-lite"),
+                    "lt" => __("Suaugusiųjų bilietai", "webba-booking-lite"),
+                ],
+                "required" => false,
+                "defaultValue" => "1",
+                "width" => "full-width",
+            ],
+            [
+                "type" => "quantity",
+                "slug" => "preferential_ticket",
+                "placeholder" => [
+                    "en" => __(
+                        "Discounted tickets (For children, pupils, students, and seniors)",
+                        "webba-booking-lite",
+                    ),
+                    "lt" => __(
+                        "Lengvatiniai bilieta (Vaikams, moksleiviams, studentams ir senjorams)",
+                        "webba-booking-lite",
+                    ),
+                ],
+                "required" => false,
+                "defaultValue" => "0",
+                "width" => "full-width",
+            ],
+        ],
+    ]);
+
+    echo "done";
 }
 ?>
 
@@ -83,8 +119,8 @@ if (isset($_GET["test"])) {
 
         case "wbk-options":
             $services = WBK_Model_Utils::get_service_ids();
-            if (isset($_GET['wbk-activation'])) {
-                WBK_Renderer::load_template('backend/react_app', [], true);
+            if (isset($_GET["wbk-activation"])) {
+                WBK_Renderer::load_template("backend/react_app", [], true);
             } else {
                 WBK_Renderer::load_template("backend/react_app", [], true);
             }
@@ -107,11 +143,11 @@ if (isset($_GET["test"])) {
             );
             exit();
             break;
-        case 'wbk-locations':
-            WBK_Renderer::load_template('backend/react_app', [], true);
+        case "wbk-locations":
+            WBK_Renderer::load_template("backend/react_app", [], true);
             break;
-        case 'wbk-staff-members':
-            WBK_Renderer::load_template('backend/react_app', [], true);
+        case "wbk-staff-members":
+            WBK_Renderer::load_template("backend/react_app", [], true);
             break;
 
         default:

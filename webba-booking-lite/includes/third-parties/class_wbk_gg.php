@@ -5,9 +5,8 @@ if ( !defined( "ABSPATH" ) ) {
     exit;
 }
 // webba booking Google integration class [deprecated]
-if ( get_option( "wbk_gg_client_version", "2.5" ) == "2.13.0" ) {
-    require_once __DIR__ . DIRECTORY_SEPARATOR . "api" . DIRECTORY_SEPARATOR . "google_api" . DIRECTORY_SEPARATOR . "google-api-2.13.0" . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php";
-}
+$api_version = get_option( "wbk_gg_client_version", "2.5" );
+require_once __DIR__ . DIRECTORY_SEPARATOR . "api" . DIRECTORY_SEPARATOR . "google_api" . DIRECTORY_SEPARATOR . "google-api-{$api_version}" . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php";
 class WBK_Google {
     protected $client;
 

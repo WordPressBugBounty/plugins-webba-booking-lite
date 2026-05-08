@@ -11,6 +11,8 @@ export const useScenario = (scenarios: IScenario[]) => {
     const {
         formData,
         services,
+        units,
+        bookingMode,
         paymentMethods,
         preset,
         stripeObj,
@@ -45,12 +47,22 @@ export const useScenario = (scenarios: IScenario[]) => {
 
     const title =
         typeof currentScenario.title === 'string'
-            ? wording?.[currentScenario.title] || currentScenario.title
+            ? currentScenario.title === 'select_services' &&
+              bookingMode === 'units'
+                ? wording?.select_units ||
+                  wording?.[currentScenario.title] ||
+                  currentScenario.title
+                : wording?.[currentScenario.title] || currentScenario.title
             : currentScenario.title
     const description =
         typeof currentScenario.description === 'string'
-            ? wording?.[currentScenario.description] ||
-              currentScenario.description
+            ? currentScenario.description === 'choose_service_proceed' &&
+              bookingMode === 'units'
+                ? wording?.choose_unit_proceed ||
+                  wording?.[currentScenario.description] ||
+                  currentScenario.description
+                : wording?.[currentScenario.description] ||
+                  currentScenario.description
             : currentScenario.description
 
     const { canGoNext, nextStepError } = useMemo(() => {
@@ -240,11 +252,18 @@ export const useScenario = (scenarios: IScenario[]) => {
     }, [])
 
     useEffect(() => {
+        if (bookingMode === 'units') {
+            const selectedUnits = (units || []).filter((u) => u.selected)
+            if (!selectedUnits.length) {
+                setCurrentIndex(0)
+            }
+            return
+        }
         const selectedServices = services.filter((service) => service.selected)
         if (!selectedServices || selectedServices.length === 0) {
             setCurrentIndex(0)
         }
-    }, [services])
+    }, [services, units, bookingMode])
 
     return {
         ...currentScenario,

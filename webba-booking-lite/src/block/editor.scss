@@ -3,3 +3,38 @@
 .wbk-block-location-token-field label {
     display: none;
 }
+
+.wbk-gutenberg-booking-form__preview {
+    // max-height: 70vh;
+    // overflow: auto;
+    // border: 1px solid #dcdcde;
+    // border-radius: 4px;
+    background: transparent;
+    margin-top: 8px;
+}
+
+.wbk-gutenberg-style-lock {
+    opacity: 0.55;
+}
+
+.wbk-gutenberg-locked-field {
+    position: relative;
+
+    .wbk-lock-badge {
+        pointer-events: none;
+        position: absolute;
+        right: 6px;
+        top: 22px;
+        z-index: 5;
+        background-color: #0075ec;
+        padding: 4px;
+        border-radius: 4px;
+        color: #fff;
+    }
+}
+
+.wbk-gutenberg-style-lock__actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}

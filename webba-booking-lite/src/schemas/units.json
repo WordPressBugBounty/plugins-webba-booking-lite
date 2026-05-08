@@ -1,0 +1,361 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "unit_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Name",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Enter the unit name."
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_description": {
+            "type": "string",
+            "input_type": "editor",
+            "hidden": true,
+            "title": "Description",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Enter a description of the unit."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_image": {
+            "type": "string",
+            "input_type": "file",
+            "hidden": false,
+            "title": "Image",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Upload an image for this unit. Leave empty if you do not want to show an image."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_locations": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Locations",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Select the locations where this unit is available.",
+                "options": "locations",
+                "multiple": true
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "unit_form_id": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Booking form",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Choose which form customers will see when booking this unit. Keep the default Webba Form, or create one in Form Builder and select it here.",
+                "options": "forms",
+                "null_value": [
+                    "Default Form"
+                ]
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "0",
+            "editable": true
+        },
+        "unit_quantity": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Quantity",
+            "tab": "availability",
+            "misc": {
+                "tooltip": "How many units of this type are available at the selected location(s).",
+                "sub_type": "positive_integer"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "1",
+            "editable": true
+        },
+        "unit_capacity": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Capacity",
+            "tab": "availability",
+            "misc": {
+                "tooltip": "Maximum number of people allowed per unit. Leave empty if not applicable."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "1",
+            "editable": true
+        },
+        "unit_attendee_type_adult": {
+            "type": "string",
+            "input_type": "checkbox",
+            "hidden": true,
+            "title": "Adult",
+            "tab": "availability",
+            "misc": {
+                "yes": "Yes",
+                "tooltip": "Count adults separately for this unit.",
+                "at_least_one_checked_rule": {
+                    "threshold_field": "capacity",
+                    "threshold_operator": ">",
+                    "threshold_value": "0",
+                    "target_fields": [
+                        "attendee_type_adult",
+                        "attendee_type_child",
+                        "attendee_type_infant"
+                    ],
+                    "checked_value": "yes",
+                    "message": "Turn on at least one attendee type (Adult, Child, or Infant) when capacity is greater than 0."
+                }
+            },
+            "required": false,
+            "dependency": [
+                [
+                    "capacity",
+                    ">",
+                    "0"
+                ]
+            ],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_attendee_type_child": {
+            "type": "string",
+            "input_type": "checkbox",
+            "hidden": true,
+            "title": "Child",
+            "tab": "availability",
+            "misc": {
+                "yes": "Yes",
+                "tooltip": "Count children separately for this unit."
+            },
+            "required": false,
+            "dependency": [
+                [
+                    "capacity",
+                    ">",
+                    "0"
+                ]
+            ],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_attendee_type_infant": {
+            "type": "string",
+            "input_type": "checkbox",
+            "hidden": true,
+            "title": "Infant",
+            "tab": "availability",
+            "misc": {
+                "yes": "Yes",
+                "tooltip": "Count infants separately for this unit."
+            },
+            "required": false,
+            "dependency": [
+                [
+                    "capacity",
+                    ">",
+                    "0"
+                ]
+            ],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_availability_date_ranges": {
+            "type": "string",
+            "input_type": "availability_ranges",
+            "hidden": true,
+            "title": "Availability date ranges",
+            "tab": "availability",
+            "misc": {
+                "tooltip": "Describe when this unit is bookable (e.g. date ranges). Leave empty for year-round availability (360 days)."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_availability_recurring_annually": {
+            "type": "string",
+            "input_type": "checkbox",
+            "hidden": true,
+            "title": "Recurring annually",
+            "tab": "availability",
+            "misc": {
+                "yes": "Yes",
+                "tooltip": "When enabled, availability rules repeat each year on the same calendar dates."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_buffer_before": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Buffer before (days)",
+            "tab": "availability",
+            "misc": {
+                "tooltip": "Minimum number of days required between the booking date and the start of the stay (or rental period).",
+                "sub_type": "none_negative_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_buffer_after": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Buffer after (days)",
+            "tab": "availability",
+            "misc": {
+                "tooltip": "Minimum number of days required after the end of the stay before the unit can be booked again.",
+                "sub_type": "none_negative_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_min_booking_days": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Min booking days",
+            "tab": "availability",
+            "misc": {
+                "tooltip": "Minimum length of a booking in days.",
+                "sub_type": "positive_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_max_booking_days": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Max booking days",
+            "tab": "availability",
+            "misc": {
+                "tooltip": "Maximum length of a booking in days.",
+                "sub_type": "positive_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_price": {
+            "type": "string",
+            "input_type": "price_variant",
+            "hidden": false,
+            "title": "Price",
+            "tab": "price",
+            "misc": {
+                "tooltip": "Enter the price for this unit."
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "0",
+            "editable": true
+        },
+        "unit_charge_per_person": {
+            "type": "string",
+            "input_type": "checkbox",
+            "hidden": true,
+            "title": "Charge per person",
+            "tab": "price",
+            "misc": {
+                "yes": "Yes",
+                "tooltip": "Enable to charge this unit based on the number of people instead of charging one fixed unit price."
+            },
+            "required": false,
+            "dependency": [
+                [
+                    "capacity",
+                    ">",
+                    "1"
+                ]
+            ],
+            "default_value": "",
+            "editable": true
+        },
+        "unit_payment_methods": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Payment methods",
+            "tab": "price",
+            "misc": {
+                "tooltip": "Select the preferred payment method(s) for this unit.",
+                "multiple": true,
+                "options": "backend",
+                "description": "IMPORTANT! For Google Pay/Apple pay and Other Payment Methods to work you have to activate them in your Stripe account"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "unit_woo_product": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "WooCommerce product ID for unit",
+            "tab": "price",
+            "misc": {
+                "tooltip": "Set ID of the product associated with this unit. Set only if WooCommerce is used as payment method.",
+                "sub_type": "none_negative_integer",
+                "pro_version": true,
+                "required_plan": "standard",
+                "options": "backend"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "0",
+            "editable": true
+        },
+        "unit_connected_calendars": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Connected calendars",
+            "tab": "integrations",
+            "misc": {
+                "tooltip": "Select the connected calendar(s) that should sync with this unit's bookings. (Available after connecting your Google account.)",
+                "multiple": true,
+                "options": "connected_calendars"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        }
+    }
+}

@@ -83,10 +83,14 @@ export const BookingForm = () => {
         stripeExecutedResult?.status === 'success'
 
     // Use the same context and logic as Sidebar for total calculation
-    const { services, priceFormat, amountData } = useBookingContext()
+    const { services, units, bookingMode, priceFormat, amountData } =
+        useBookingContext()
     const items = useMemo(
-        () => services.filter((s: any) => s.selected),
-        [services]
+        () =>
+            bookingMode === 'units'
+                ? (units || []).filter((unit: any) => unit.selected)
+                : services.filter((s: any) => s.selected),
+        [services, units, bookingMode]
     )
     const sortedItems = useMemo(
         () =>
@@ -113,8 +117,9 @@ export const BookingForm = () => {
                 )
             } else {
                 const numericPrice = Number(service.price)
-                if (numericPrice > 0 && service.quantity > 0) {
-                    total += numericPrice * service.quantity
+                const itemQuantity = Math.max(1, Number(service.quantity) || 1)
+                if (numericPrice > 0 && itemQuantity > 0) {
+                    total += numericPrice * itemQuantity
                 }
             }
         })

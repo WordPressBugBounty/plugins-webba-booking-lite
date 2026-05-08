@@ -47,11 +47,133 @@ import { formatPrice } from '../../utils/currency'
 import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
 import noItemsImage from '../../../../public/images/bookings-empty.png'
 import { LocationNames } from '../../components/WebbaDataTable/cells/LocationNames/LocationNames'
+import { UnitName } from '../../components/WebbaDataTable/cells/UnitName/UnitName'
 
 export const bookingsModel = removePrefixesFromModelFields(
     BookingsModel,
     'appointment_'
 )
+
+const injectVirtualAppointmentFields = (model: any) => {
+    const baseProperties = model?.properties || {}
+    const nextProperties: Record<string, any> = {}
+
+    Object.entries(baseProperties).forEach(([key, value]) => {
+        nextProperties[key] = value
+
+        if (key === 'day') {
+            nextProperties.duration_virtual = {
+                type: 'string',
+                input_type: 'select',
+                hidden: false,
+                title: __('Duration', 'webba-booking-lite'),
+                tab: '',
+                misc: {
+                    tooltip: __(
+                        'Select duration for this unit booking.',
+                        'webba-booking-lite'
+                    ),
+                    options: 'backend',
+                    null_value: [__('Select...', 'webba-booking-lite')],
+                },
+                required: false,
+                dependency: [['unit_id', '!=', '']],
+                default_value: '',
+                editable: true,
+            }
+        } else if (key === 'number_of_people') {
+            nextProperties.available_offer_virtual = {
+                type: 'string',
+                input_type: 'select',
+                hidden: false,
+                title: __('Available offers', 'webba-booking-lite'),
+                tab: '',
+                misc: {
+                    tooltip: __(
+                        'Select one available offer for the chosen date and duration.',
+                        'webba-booking-lite'
+                    ),
+                    options: 'backend',
+                    null_value: [__('Select...', 'webba-booking-lite')],
+                },
+                required: false,
+                dependency: [
+                    ['unit_id', '!=', ''],
+                    ['day', '!=', ''],
+                    ['duration_virtual', '!=', ''],
+                ],
+                default_value: '',
+                editable: true,
+            }
+        }
+    })
+
+    return {
+        ...model,
+        properties: nextProperties,
+    } as any
+}
+
+const normalizeBookingPayload = (data: Record<string, any>) => {
+    const minutesPerDay = 24 * 60
+    const payload = { ...data }
+    const durationVirtual = payload.duration_virtual
+    const availableOfferVirtual = payload.available_offer_virtual
+
+    if (
+        payload.unit_id &&
+        (payload.duration === undefined || payload.duration === '') &&
+        durationVirtual
+    ) {
+        payload.duration = durationVirtual
+    }
+
+    if (
+        payload.unit_id &&
+        typeof availableOfferVirtual === 'string' &&
+        availableOfferVirtual.includes('|')
+    ) {
+        const [offerStart, offerEnd] = availableOfferVirtual.split('|')
+        if (offerStart) {
+            payload.day = offerStart
+        }
+        if (offerStart && offerEnd) {
+            const startDate = new Date(`${offerStart}T00:00:00`)
+            const endDate = new Date(`${offerEnd}T00:00:00`)
+            if (
+                !Number.isNaN(startDate.getTime()) &&
+                !Number.isNaN(endDate.getTime())
+            ) {
+                const durationInDays =
+                    Math.floor(
+                        (endDate.getTime() - startDate.getTime()) /
+                        (24 * 60 * 60 * 1000)
+                    ) + 1
+                if (durationInDays > 0) {
+                    payload.duration = String(durationInDays * minutesPerDay)
+                }
+            }
+        }
+    }
+
+    // In unit mode, time field is hidden. Send midnight timestamp from selected day.
+    if (
+        payload.unit_id &&
+        (payload.time === undefined || payload.time === '' || payload.time === null) &&
+        typeof payload.day === 'string' &&
+        payload.day !== ''
+    ) {
+        const selectedDayTimestamp = new Date(`${payload.day}T00:00:00`).getTime()
+        if (!Number.isNaN(selectedDayTimestamp)) {
+            payload.time = String(Math.floor(selectedDayTimestamp / 1000))
+        }
+    }
+
+    delete payload.duration_virtual
+    delete payload.available_offer_virtual
+
+    return payload
+}
 
 export const BookingsScreen = () => {
     const { deleteItems, addItem, setToastNotification } = useDispatch(store)
@@ -79,9 +201,10 @@ export const BookingsScreen = () => {
     )
     const [search, setSearch] = useState('')
     const formModel = useMemo(() => {
-        const model = JSON.parse(
+        let model: any = JSON.parse(
             JSON.stringify(bookingsModel)
-        ) as typeof bookingsModel
+        )
+        model = injectVirtualAppointmentFields(model)
         const servicesWithoutStaff = Array.isArray(services)
             ? services.filter(
                 (service: any) =>
@@ -93,17 +216,25 @@ export const BookingsScreen = () => {
         const staffField = model?.properties?.staff_member_id
         if (staffField) {
             staffField.required = true
+            const unitModeDependency: [string, string, string] = [
+                'unit_id',
+                '<=',
+                '0',
+            ]
             if (servicesWithoutStaff.length > 0) {
-                ; (staffField as any).dependency = servicesWithoutStaff.map(
-                    (service: any) =>
-                        [
-                            'service_id',
-                            '!=',
-                            String(service.id),
-                        ] as [string, string, string]
-                )
+                ; (staffField as any).dependency = [
+                    unitModeDependency,
+                    ...servicesWithoutStaff.map(
+                        (service: any) =>
+                            [
+                                'service_id',
+                                '!=',
+                                String(service.id),
+                            ] as [string, string, string]
+                    ),
+                ]
             } else {
-                ; (staffField as any).dependency = []
+                ; (staffField as any).dependency = [unitModeDependency]
             }
         }
 
@@ -157,6 +288,9 @@ export const BookingsScreen = () => {
                 },
                 location_id: {
                     cell: LocationNames
+                },
+                unit_id: {
+                    cell: UnitName
                 }
             },
             {
@@ -266,7 +400,7 @@ export const BookingsScreen = () => {
                                 form={form}
                                 sections={menuSections}
                                 onSubmit={async (data) => {
-                                    await onSubmit(data)
+                                    await onSubmit(normalizeBookingPayload(data))
                                     setToastNotification({
                                         type: 'success',
                                         message: __(
@@ -389,7 +523,7 @@ export const BookingsScreen = () => {
                             form={form}
                             sections={menuSections}
                             onSubmit={async (data) => {
-                                return await addBooking(data)
+                                return await addBooking(normalizeBookingPayload(data))
                             }}
                             defaultValue={
                                 {} as FormValueFromModel<typeof bookingsModel>

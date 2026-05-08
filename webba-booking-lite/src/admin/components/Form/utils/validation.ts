@@ -7,6 +7,7 @@ export type ValidatorFn<T> = (value: T) => string | null
 export type GetFn = (proxy: any) => any
 /** Validator that can read other state via get(proxy) for cross-field validation */
 export type CrossFieldValidatorFn<T> = (value: T, get?: GetFn) => string | null
+type PrimitiveLike<T = any> = { value: T }
 
 export const validate = function <T>(
     value: T,
@@ -84,6 +85,78 @@ export const Validators = {
 
         if (!isValid) {
             return __('Invalid date range', 'webba-booking-lite')
+        }
+
+        return null
+    },
+    availabilityRangesNoIntersection: (value: unknown) => {
+        if (!value) return null
+
+        let parsed: any = value
+        if (typeof value === 'string') {
+            const trimmed = value.trim()
+            if (!trimmed) return null
+            try {
+                parsed = JSON.parse(trimmed)
+                if (typeof parsed === 'string') {
+                    parsed = JSON.parse(parsed)
+                }
+            } catch {
+                return __('Invalid availability ranges format', 'webba-booking-lite')
+            }
+        }
+
+        const ranges = Array.isArray(parsed?.availability_ranges)
+            ? parsed.availability_ranges
+            : []
+
+        const normalized = ranges
+            .map((row: any) => {
+                const start = row?.start_date
+                const end = row?.end_date
+                if (
+                    typeof start !== 'string' ||
+                    typeof end !== 'string' ||
+                    !start ||
+                    !end
+                ) {
+                    return null
+                }
+                const startDate = /^\d{4}-\d{2}-\d{2}$/.test(start)
+                    ? new Date(`${start}T00:00:00`)
+                    : new Date(start)
+                const endDate = /^\d{4}-\d{2}-\d{2}$/.test(end)
+                    ? new Date(`${end}T00:00:00`)
+                    : new Date(end)
+
+                if (
+                    Number.isNaN(startDate.getTime()) ||
+                    Number.isNaN(endDate.getTime())
+                ) {
+                    return null
+                }
+
+                return { startDate, endDate }
+            })
+            .filter(Boolean) as { startDate: Date; endDate: Date }[]
+
+        if (normalized.length <= 1) {
+            return null
+        }
+
+        const sorted = [...normalized].sort(
+            (a, b) => a.startDate.getTime() - b.startDate.getTime()
+        )
+
+        for (let i = 1; i < sorted.length; i++) {
+            const prev = sorted[i - 1]
+            const current = sorted[i]
+            if (current.startDate.getTime() <= prev.endDate.getTime()) {
+                return __(
+                    'Availability ranges cannot overlap each other.',
+                    'webba-booking-lite'
+                )
+            }
         }
 
         return null
@@ -216,6 +289,84 @@ export const Validators = {
         }
         return null
     },
+    atLeastOneCheckedWhenThreshold:
+        ({
+            thresholdFieldPrimitive,
+            targetFieldPrimitives,
+            thresholdOperator = '>',
+            thresholdValue = 0,
+            checkedValue = 'yes',
+            message,
+        }: {
+            thresholdFieldPrimitive?: PrimitiveLike
+            targetFieldPrimitives: Array<PrimitiveLike | undefined>
+            thresholdOperator?: '>' | '>=' | '<' | '<=' | '=' | '==' | '!='
+            thresholdValue?: string | number
+            checkedValue?: string
+            message?: string
+        }) =>
+        (_currentValue: any, get?: GetFn) => {
+            if (!thresholdFieldPrimitive || !targetFieldPrimitives?.length) {
+                return null
+            }
+
+            const getPrimitiveValue = (primitive?: PrimitiveLike) => {
+                if (!primitive) {
+                    return undefined
+                }
+                return get ? get(primitive).value : primitive.value
+            }
+
+            const compareWithThreshold = (
+                actualRaw: any,
+                targetRaw: string | number,
+                operator: '>' | '>=' | '<' | '<=' | '=' | '==' | '!='
+            ) => {
+                const actual = Number(actualRaw ?? 0)
+                const target = Number(targetRaw ?? 0)
+                switch (operator) {
+                    case '>':
+                        return actual > target
+                    case '>=':
+                        return actual >= target
+                    case '<':
+                        return actual < target
+                    case '<=':
+                        return actual <= target
+                    case '=':
+                    case '==':
+                        return actual == target
+                    case '!=':
+                        return actual != target
+                    default:
+                        return false
+                }
+            }
+
+            const thresholdFieldValue = getPrimitiveValue(thresholdFieldPrimitive)
+            const shouldValidate = compareWithThreshold(
+                thresholdFieldValue,
+                thresholdValue,
+                thresholdOperator
+            )
+            if (!shouldValidate) {
+                return null
+            }
+
+            const hasAnyChecked = targetFieldPrimitives.some((fieldPrimitive) => {
+                const fieldValue = getPrimitiveValue(fieldPrimitive)
+                return fieldValue === checkedValue
+            })
+
+            if (hasAnyChecked) {
+                return null
+            }
+
+            return (
+                message ||
+                __('Turn on at least one option to continue.', 'webba-booking-lite')
+            )
+        },
 } as const satisfies Record<
     string,
     ValidatorFn<any> | ((...args: any) => ValidatorFn<any>)

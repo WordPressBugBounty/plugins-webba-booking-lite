@@ -4,7 +4,10 @@ import { SelectedItem } from './SelectedItem'
 import './SelectedServices.scss'
 
 export const SelectedServices = () => {
-    const { services } = useBookingContext()
+    const { bookingMode, services } = useBookingContext()
+    if (bookingMode === 'units') {
+        return null
+    }
     const selectedServices = useMemo(
         () =>
             services

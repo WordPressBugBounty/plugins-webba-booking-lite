@@ -146,6 +146,9 @@ export const formatOptions = (
   const formattedOptions: IOption[] = [];
 
   for (const key in options) {
+    if (key === "loading") {
+      continue;
+    }
     const raw = options[key];
     if (typeof raw === "string") {
       formattedOptions.push({ value: key, label: raw });
@@ -180,11 +183,50 @@ const createNullValues = (nullValues: string[]) =>
     label: nullValue,
   }));
 
-// static records
+const formHasId = (formData: Record<string, unknown>, keys: string[]) =>
+  keys.some((key) => {
+    const fieldValue = formData[key];
+    return (
+      fieldValue !== undefined &&
+      fieldValue !== null &&
+      fieldValue !== "" &&
+      String(fieldValue) !== "0" &&
+      fieldValue !== "wbk_null"
+    );
+  });
+
+// static records — include appointment_* form keys so change handlers match
 export const fieldConnection: Record<string, Record<string, string[]>> = {
   appointments: {
-    time: ["service_id", "day"],
-    quantity: ["service_id", "day", "time"],
+    time: ["service_id", "appointment_service_id", "day"],
+    quantity: ["service_id", "appointment_service_id", "day", "time"],
+    duration_virtual: ["unit_id", "appointment_unit_id", "day"],
+    available_offer_virtual: [
+      "unit_id",
+      "appointment_unit_id",
+      "day",
+      "duration_virtual",
+      "number_of_people",
+      "appointment_number_of_people",
+    ],
+    location_id: [
+      "staff_member_id",
+      "appointment_staff_member_id",
+      "service_id",
+      "appointment_service_id",
+      "unit_id",
+      "appointment_unit_id",
+    ],
+    appointment_location_id: [
+      "staff_member_id",
+      "appointment_staff_member_id",
+      "service_id",
+      "appointment_service_id",
+      "unit_id",
+      "appointment_unit_id",
+    ],
+    staff_member_id: ["service_id", "appointment_service_id"],
+    appointment_staff_member_id: ["service_id", "appointment_service_id"],
   },
   services: {
     google_meet_calendar: ["connected_calendars"],
@@ -256,13 +298,107 @@ export const isDependentField = (model: string, field: string) => {
   return fieldConnection[model] && fieldConnection[model][field];
 };
 
+const normalizeFormDataForRequest = (formData: Record<string, string>) => {
+  const normalizedFormData: Record<string, string> = { ...formData };
+  if (!normalizedFormData.service_id && normalizedFormData.appointment_service_id) {
+    normalizedFormData.service_id = String(normalizedFormData.appointment_service_id);
+  }
+  if (!normalizedFormData.staff_member_id && normalizedFormData.appointment_staff_member_id) {
+    normalizedFormData.staff_member_id = String(normalizedFormData.appointment_staff_member_id);
+  }
+  if (!normalizedFormData.unit_id && normalizedFormData.appointment_unit_id) {
+    normalizedFormData.unit_id = String(normalizedFormData.appointment_unit_id);
+  }
+  if (!normalizedFormData.location_id && normalizedFormData.appointment_location_id) {
+    normalizedFormData.location_id = String(normalizedFormData.appointment_location_id);
+  }
+  return normalizedFormData;
+};
+
+const mapRequestField = (formField: string) => {
+  if (formField === "appointment_service_id") {
+    return "service_id";
+  }
+  if (formField === "appointment_staff_member_id") {
+    return "staff_member_id";
+  }
+  if (formField === "appointment_unit_id") {
+    return "unit_id";
+  }
+  if (formField === "appointment_location_id") {
+    return "location_id";
+  }
+  return formField;
+};
+
+const resolveRequestField = (changedField: string, dependentField: string) => {
+  const mappedField = mapRequestField(changedField);
+
+  // Backend returns unit offers from the duration_virtual branch.
+  // When attendee counts change, refresh offers through that branch.
+  if (
+    dependentField === "available_offer_virtual" &&
+    (mappedField === "number_of_people" || mappedField === "appointment_number_of_people")
+  ) {
+    return "duration_virtual";
+  }
+
+  return mappedField;
+};
+
+const resolveDependencyMet = (model: string, dependentField: string, formData: Record<string, string>) => {
+  if (
+    model === "appointments" &&
+    (dependentField === "location_id" || dependentField === "appointment_location_id")
+  ) {
+    return (
+      formHasId(formData, ["service_id", "appointment_service_id"]) ||
+      formHasId(formData, ["unit_id", "appointment_unit_id"])
+    );
+  }
+  const required = fieldConnection[model][dependentField] || [];
+  for (const connectedField of required) {
+    if (connectedField === "service_id" || connectedField === "appointment_service_id") {
+      if (!formHasId(formData, ["service_id", "appointment_service_id"])) {
+        return false;
+      }
+      continue;
+    }
+    if (connectedField === "unit_id" || connectedField === "appointment_unit_id") {
+      if (!formHasId(formData, ["unit_id", "appointment_unit_id"])) {
+        return false;
+      }
+      continue;
+    }
+    if (connectedField === "staff_member_id" || connectedField === "appointment_staff_member_id") {
+      if (!formHasId(formData, ["staff_member_id", "appointment_staff_member_id"])) {
+        return false;
+      }
+      continue;
+    }
+    if (
+      connectedField === "number_of_people" ||
+      connectedField === "appointment_number_of_people"
+    ) {
+      if (!formHasId(formData, ["number_of_people", "appointment_number_of_people"])) {
+        return false;
+      }
+      continue;
+    }
+    if (!formData[connectedField]) {
+      return false;
+    }
+  }
+  return true;
+};
+
 export const fetchConnectedOptions = async (
   model: string,
   field: string,
   formData: Record<string, string>
 ) => {
-  const dependentFields = Object.keys(fieldConnection[model]).filter((parentFieldName: string) =>
-    fieldConnection[model][parentFieldName].includes(field)
+  const dependentFields = Object.keys(fieldConnection[model] || {}).filter((dependentField) =>
+    fieldConnection[model][dependentField].includes(field)
   );
 
   dependentFields.forEach((dependentField) => {
@@ -270,30 +406,31 @@ export const fetchConnectedOptions = async (
     dispatch(store_name).setFieldLoading(model, dependentField, true);
   });
 
-  dependentFields.forEach(async (dependentField) => {
-    let isValid = true;
+  for (const dependentField of dependentFields) {
+    const isValid = resolveDependencyMet(model, dependentField, formData);
+    const requestField = resolveRequestField(field, dependentField);
+    const formPayload = normalizeFormDataForRequest(formData);
 
-    fieldConnection[model][dependentField].forEach((connectedField) => {
-      if (!formData[connectedField]) {
-        isValid = false;
+    try {
+      if (isValid) {
+        const options = await apiFetch({
+          path: `/wbk/v2/get-field-options/`,
+          method: "POST",
+          data: {
+            model,
+            field: requestField,
+            form: formPayload,
+          },
+        });
+
+        // @ts-ignore
+        dispatch(store_name).setFieldOptions(model, requestField, options);
       }
-    });
-
-    if (isValid) {
-      const options = await apiFetch({
-        path: `/wbk/v2/get-field-options/`,
-        method: "POST",
-        data: {
-          model,
-          field,
-          form: formData,
-        },
-      });
-
+    } finally {
       // @ts-ignore
-      dispatch(store_name).setFieldOptions(model, field, options);
+      dispatch(store_name).setFieldLoading(model, dependentField, false);
     }
-  });
+  }
 };
 
 export const isModelOptions = (options: string | Record<string, string>) =>

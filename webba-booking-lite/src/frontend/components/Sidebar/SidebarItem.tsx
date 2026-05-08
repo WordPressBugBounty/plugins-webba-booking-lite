@@ -139,6 +139,7 @@ export const SidebarItem = ({
         const staff = list.find((s: { id: string }) => String(s.id) === String(sid))
         return staff?.label ?? wording.any_available ?? __('Any Available', 'webba-booking-lite')
     }, [places, staffId, formData?.staff, id, preset?.staff_members])
+    const hasStaffOrLocation = !!selectedLocation || !!preset?.staff_members?.length
 
     return (
         <>
@@ -174,7 +175,7 @@ export const SidebarItem = ({
                     </div>
                 )}
             </div>
-            {places && !!places.length && (
+            {(places && !!places.length) && (
                 <p className={'wbk_sidebar__items__item__subline'}>
                     <span>
                         {wording.duration ||
@@ -186,12 +187,13 @@ export const SidebarItem = ({
                             minutesToText(Number(duration), {
                                 h: wording.hour,
                                 min: wording.minute,
+                                d: wording.day,
                             })
                         )
                         : ''}
                 </p>
             )}
-            {places && !!places.length ? (
+            {(places && !!places.length) ? (
                 <p className={'wbk_sidebar__items__item__subline'}>
                     {places.map(({ timeslot }) => (
                         <div
@@ -232,7 +234,7 @@ export const SidebarItem = ({
                     </span>
                 </p>
             )}
-            {(selectedLocation || preset?.staff_members?.length) && (
+            {hasStaffOrLocation && (
                 <div className={'wbk_sidebar__items__item__meta'}>
                     {selectedLocation && (
                         <div className={'wbk_sidebar__items__item__meta-row'}>

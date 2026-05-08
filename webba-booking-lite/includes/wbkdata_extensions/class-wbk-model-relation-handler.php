@@ -120,6 +120,9 @@ class WBK_Model_Relation_Destroyer
             case 'services':
                 $this->cleanup_connected_fields('service_categories', 'list', $item->id, true);
                 break;
+            case 'units':
+                $this->cleanup_connected_fields('service_categories', 'units', $item->id, true);
+                break;
             case 'service_categories':
                 break;
             case 'pricing_rules':

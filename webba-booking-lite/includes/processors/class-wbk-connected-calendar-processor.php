@@ -258,6 +258,28 @@ abstract class WBK_Connected_Calendar_Processor {
     }
 
     /**
+     * Resolve connected calendar WordPress IDs for export: service calendars, or unit calendars
+     * when the booking is unit-only (service_id 0).
+     *
+     * @param WBK_Booking $booking Booking.
+     * @return array{0: ?WBK_Service, 1: ?WBK_Unit, 2: int[]} Service (or null), unit (or null), calendar ids.
+     */
+    public static function get_connected_calendar_ids_for_booking( $booking ) {
+        return [null, null, []];
+    }
+
+    /**
+     * Whether the booking has at least one connected calendar configured for export.
+     *
+     * @param WBK_Booking $booking Booking.
+     * @return bool
+     */
+    public static function booking_has_connected_calendars_for_export( $booking ) {
+        $resolved = self::get_connected_calendar_ids_for_booking( $booking );
+        return !empty( $resolved[2] );
+    }
+
+    /**
      * Common method: Create a calendar event based on a booking ID
      * Uses abstract create_calendar_event() for API-specific implementation
      *
@@ -318,6 +340,15 @@ abstract class WBK_Connected_Calendar_Processor {
      * @return void|WP_Error WP_Error on failure
      */
     public static abstract function process_adding_for_calendars( $booking, $service, $calendar_ids );
+
+    /**
+     * Add booking to external calendars for unit-based bookings (service_id 0).
+     *
+     * @param WBK_Booking $booking       Booking.
+     * @param array       $calendar_ids Connected calendar row IDs.
+     * @return void|WP_Error
+     */
+    public static abstract function process_adding_for_unit_booking( $booking, $calendar_ids );
 
     /**
      * Abstract method: Delete event from calendars (provider-specific implementation)
@@ -413,6 +444,82 @@ abstract class WBK_Connected_Calendar_Processor {
      */
     public static function get_processor_for_calendar( $connected_calendar ) {
         return null;
+    }
+
+    /**
+     * Fetch events from a connected calendar using its provider processor.
+     *
+     * @param int $calendar_id WordPress connected calendar ID.
+     * @param string $start_iso ISO 8601 start datetime.
+     * @param string $end_iso ISO 8601 end datetime.
+     * @param array $allowed_modes Allowed connected calendar modes.
+     * @return array|WP_Error
+     */
+    public static function fetch_events_for_calendar_id(
+        $calendar_id,
+        $start_iso,
+        $end_iso,
+        $allowed_modes = ["One-way-import", "Two-ways"]
+    ) {
+        if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+            return [];
+        }
+        $connected_calendar = new WBK_Connected_Calendar((int) $calendar_id);
+        if ( !$connected_calendar->is_loaded() ) {
+            return [];
+        }
+        if ( !is_array( $allowed_modes ) || empty( $allowed_modes ) ) {
+            $allowed_modes = ["One-way-import", "Two-ways"];
+        }
+        if ( !in_array( $connected_calendar->get_mode(), $allowed_modes, true ) ) {
+            return [];
+        }
+        $processor = self::get_processor_for_calendar( $connected_calendar );
+        if ( $processor === null ) {
+            return [];
+        }
+        return $processor->fetch_events_in_range( $start_iso, $end_iso );
+    }
+
+    /**
+     * Load blockers for explicitly provided connected calendars.
+     *
+     * @param int $start timestamp.
+     * @param int $end timestamp.
+     * @param array $calendar_ids connected calendar IDs.
+     * @param array $allowed_modes Allowed connected calendar modes.
+     * @return array
+     */
+    public static function load_events_in_range_by_calendar_ids(
+        $start,
+        $end,
+        $calendar_ids,
+        $allowed_modes = ["One-way-import", "Two-ways"]
+    ) {
+        if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+            return [];
+        }
+        if ( !is_array( $calendar_ids ) || empty( $calendar_ids ) ) {
+            return [];
+        }
+        $event_data_arr = [];
+        $start_iso = date( "c", $start );
+        $end_iso = date( "c", $end );
+        foreach ( $calendar_ids as $calendar_id ) {
+            $events_result = self::fetch_events_for_calendar_id(
+                $calendar_id,
+                $start_iso,
+                $end_iso,
+                $allowed_modes
+            );
+            if ( is_wp_error( $events_result ) ) {
+                continue;
+            }
+            if ( is_array( $events_result ) && !empty( $events_result ) ) {
+                $event_data_arr = array_merge( $event_data_arr, $events_result );
+            }
+        }
+        return $event_data_arr;
     }
 
 }

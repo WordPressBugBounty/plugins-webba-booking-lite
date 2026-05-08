@@ -2,10 +2,14 @@ import classNames from 'classnames'
 import './PaymentSelector.scss'
 import { IPaymentSelectorProps, TAllowedMethods } from './types'
 import { __ } from '@wordpress/i18n'
-import { useEffect, useState } from 'react'
-import { loadStripe } from '@stripe/stripe-js'
+import { useEffect, useMemo, useState } from 'react'
 import { useSelect } from '@wordpress/data'
 import { store } from '../../../store/frontend'
+
+const STRIPE_WALLET_METHOD_IDS: TAllowedMethods[] = [
+    'google_pay',
+    'apple_pay',
+]
 
 export const PaymentSelector = ({
     methods,
@@ -16,6 +20,14 @@ export const PaymentSelector = ({
     // @ts-ignore
     const preset = useSelect((select) => select(store).getPreset(), [])
 
+    const needsStripeWalletProbe = useMemo(
+        () =>
+            methods.some((method) =>
+                STRIPE_WALLET_METHOD_IDS.includes(method.id as TAllowedMethods)
+            ),
+        [methods]
+    )
+
     const [availableWallets, setAvailableWallets] = useState<{
         googlePay: boolean
         applePay: boolean
@@ -23,44 +35,64 @@ export const PaymentSelector = ({
         googlePay: false,
         applePay: false,
     })
-    const [walletsChecked, setWalletsChecked] = useState(false)
+    const [walletsChecked, setWalletsChecked] = useState(!needsStripeWalletProbe)
 
     useEffect(() => {
+        if (!needsStripeWalletProbe) {
+            setWalletsChecked(true)
+        }
+    }, [needsStripeWalletProbe])
+
+    useEffect(() => {
+        if (!needsStripeWalletProbe) {
+            return
+        }
+
+        let cancelled = false
+        setWalletsChecked(false)
+
         const checkWalletAvailability = async () => {
             const publishableKey = preset?.settings?.stripe_publishable_key
 
             if (!publishableKey) {
-                setWalletsChecked(true)
+                if (!cancelled) {
+                    setWalletsChecked(true)
+                }
                 return
             }
 
             try {
-                // Load Stripe directly
+                const { loadStripe } = await import(
+                    /* webpackMode: "eager" */ '@stripe/stripe-js'
+                )
                 const stripe = await loadStripe(publishableKey)
 
                 if (!stripe) {
-                    setWalletsChecked(true)
+                    if (!cancelled) {
+                        setWalletsChecked(true)
+                    }
                     return
                 }
 
-                // Get currency and country from preset
                 const currency = preset?.settings?.stripe_currency || 'usd'
                 const country = preset?.settings?.stripe_country || 'US'
 
-                // Check if payment request (for Google Pay/Apple Pay) is available
                 const paymentRequest = stripe.paymentRequest({
                     country: country,
                     currency: currency.toLowerCase(),
                     total: {
                         label: 'Availability Check',
-                        amount: 100, // Dummy amount for checking
+                        amount: 100,
                     },
                     requestPayerName: false,
                     requestPayerEmail: false,
                 })
 
-                // Check if browser supports Payment Request API
                 const canMakePayment = await paymentRequest.canMakePayment()
+
+                if (cancelled) {
+                    return
+                }
 
                 if (canMakePayment) {
                     setAvailableWallets({
@@ -72,12 +104,19 @@ export const PaymentSelector = ({
                 setWalletsChecked(true)
             } catch (error) {
                 console.error('Error checking wallet availability:', error)
-                setWalletsChecked(true)
+                if (!cancelled) {
+                    setWalletsChecked(true)
+                }
             }
         }
 
         checkWalletAvailability()
+
+        return () => {
+            cancelled = true
+        }
     }, [
+        needsStripeWalletProbe,
         preset?.settings?.stripe_publishable_key,
         preset?.settings?.stripe_currency,
         preset?.settings?.stripe_country,

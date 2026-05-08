@@ -155,11 +155,33 @@
             "type": "string",
             "input_type": "select",
             "hidden": true,
-            "title": "Services",
+            "title": "Hourly services",
             "tab": "general",
             "misc": {
                 "tooltip": "Select the services for which this notification is used.",
                 "options": "services",
+                "multiple": true
+            },
+            "required": false,
+            "dependency": [
+                [
+                    "use_for_all_services",
+                    "!=",
+                    "yes"
+                ]
+            ],
+            "default_value": null,
+            "editable": true
+        },
+        "units": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Daily services",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Select the services for which this notification is used.",
+                "options": "units",
                 "multiple": true
             },
             "required": false,

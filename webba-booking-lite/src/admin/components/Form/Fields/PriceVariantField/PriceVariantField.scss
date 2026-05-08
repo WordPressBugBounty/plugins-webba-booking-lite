@@ -1,0 +1,92 @@
+.wbk_priceVariantField {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wbk_priceVariantField__table {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wbk_priceVariantField__header,
+.wbk_priceVariantField__row {
+    display: grid;
+    gap: 8px;
+    align-items: center;
+    grid-template-columns: minmax(160px, 1fr) repeat(3, minmax(80px, 120px));
+}
+
+.wbk_priceVariantField__header {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.wbk_priceVariantField__headerSpacer {
+    min-height: 1px;
+}
+
+.wbk_priceVariantField__rowTitle {
+    font-size: 14px;
+    color: #111827;
+    font-weight: 500;
+}
+
+.wbk_priceVariantField__inputWrapper {
+    position: relative;
+}
+
+.wbk_priceVariantField__inputWrapper--single {
+    grid-column: 2 / 5;
+}
+
+.wbk_priceVariantField__input {
+    width: 100%;
+    min-height: 36px;
+    border-radius: 8px;
+    border: 1px solid #d4dde2;
+    padding: 8px 10px;
+    font-size: 14px;
+    outline: none;
+}
+
+.wbk_priceVariantField__input:focus {
+    border-color: #1f6763;
+}
+
+.wbk_priceVariantField__input--currencyBefore {
+    padding-left: 26px;
+}
+
+.wbk_priceVariantField__input--currencyAfter {
+    padding-right: 26px;
+}
+
+.wbk_priceVariantField__currency {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: #6b7280;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.wbk_priceVariantField__currency--before {
+    left: 10px;
+}
+
+.wbk_priceVariantField__currency--after {
+    right: 10px;
+}
+
+.wbk_priceVariantField__errorContainer {
+    margin-top: 4px;
+    color: #dc2626;
+    font-size: 12px;
+}
+
+.wbk_priceVariantField--invalid .wbk_priceVariantField__input {
+    border-color: #dc2626;
+}

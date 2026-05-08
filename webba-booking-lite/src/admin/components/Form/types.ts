@@ -24,6 +24,15 @@ export interface IHideCondition {
     conditions: ICondition[]
 }
 
+export interface IAtLeastOneCheckedRule {
+    threshold_field: string
+    threshold_operator?: '>' | '>=' | '<' | '<=' | '=' | '==' | '!='
+    threshold_value: string | number
+    target_fields: string[]
+    checked_value?: string
+    message?: string
+}
+
 export interface FormFieldMisc {
     tooltip?: string
     date_format?: string
@@ -58,6 +67,7 @@ export interface FormFieldMisc {
     hidden?: boolean
     radio_type?: 'generic' | 'icon' | 'dots'
     source_filter?: [string, string, string][]
+    at_least_one_checked_rule?: IAtLeastOneCheckedRule
 }
 
 export interface ResolvedFormField {

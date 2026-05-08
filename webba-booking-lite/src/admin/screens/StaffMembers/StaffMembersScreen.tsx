@@ -56,7 +56,7 @@ export const StaffMembersScreen = () => {
         (select) => select(store_name).getPreset(),
         []
     )
-    const isProPlan = plan_map && plan_map['pro'] && plan_map['pro'] === true
+    const isProPlan = plan_map && ['premium', 'pro'].some((plan) => plan_map[plan] === true)
 
     const table = useWbkTable({
         columns,

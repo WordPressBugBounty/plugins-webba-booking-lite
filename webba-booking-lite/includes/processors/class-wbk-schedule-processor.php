@@ -683,34 +683,17 @@ class WBK_Schedule_Processor {
         return apply_filters( "wbk_check_holiday", false );
     }
 
-    /**
-     * Fetch events from a connected calendar using the appropriate processor
-     *
-     * @param int $calendar_id WordPress DB ID of the calendar
-     * @param string $start_iso ISO 8601 formatted start datetime
-     * @param string $end_iso ISO 8601 formatted end datetime
-     * @return array|WP_Error Array of WBK_Time_Slot on success, WP_Error on failure
-     */
-    private static function fetch_connected_calendar_events( $calendar_id, $start_iso, $end_iso ) {
-        $connected_calendar = new WBK_Connected_Calendar($calendar_id);
-        if ( !$connected_calendar->is_loaded() ) {
-            return [];
-        }
-        $mode = $connected_calendar->get_mode();
-        if ( $mode !== "One-way-import" && $mode !== "Two-ways" ) {
-            return [];
-        }
-        $processor = WBK_Connected_Calendar_Processor::get_processor_for_calendar( $connected_calendar );
-        if ( $processor === null ) {
-            return [];
-        }
-        $result = $processor->fetch_events_in_range( $start_iso, $end_iso );
-        return $result;
-    }
-
     public function load_connected_events_in_range( $start, $end, $service ) {
-        $event_data_arr = [];
-        return $event_data_arr;
+        $calendar_ids = $service->get_connected_calendars_for_import();
+        if ( empty( $calendar_ids ) ) {
+            return [];
+        }
+        return $this->load_connected_events_in_range_by_calendar_ids(
+            $start,
+            $end,
+            $calendar_ids,
+            $service
+        );
     }
 
     /**
@@ -731,6 +714,25 @@ class WBK_Schedule_Processor {
         $event_data_arr = [];
         if ( !is_array( $calendar_ids ) || empty( $calendar_ids ) ) {
             return [];
+        }
+        $event_data_arr = WBK_Connected_Calendar_Processor::load_events_in_range_by_calendar_ids(
+            $start,
+            $end,
+            $calendar_ids,
+            ["One-way-import", "Two-ways"]
+        );
+        if ( WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+            $add_before_after = get_option( "wbk_appointments_lock_one_before_and_one_after", "" );
+        } else {
+            $add_before_after = "";
+        }
+        if ( is_array( $add_before_after ) ) {
+            if ( in_array( $service->get_id(), $add_before_after, true ) ) {
+                $correction = $service->get_duration() * 60;
+                foreach ( $event_data_arr as $item ) {
+                    $item->set( $item->getStart() - $correction, $item->getEnd() + $correction );
+                }
+            }
         }
         return $event_data_arr;
     }

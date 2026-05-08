@@ -789,6 +789,163 @@ class WBK_Price_Processor
         return $data;
     }
 
+    /**
+     * Build payment items for unit bookings.
+     *
+     * Expected row shape:
+     * [
+     *   "unit_id" => int,
+     *   "range" => ["start" => "Y-m-d", "end" => "Y-m-d"],
+     *   "number_of_people" => array|int|null,
+     *   "location_id" => int|null
+     * ]
+     *
+     * @param array      $unit_bookings Unit booking rows.
+     * @param array|null $coupon Coupon result array from WBK_Validator::check_coupon.
+     * @param bool       $pay_full_amount Kept for signature parity, not used for units.
+     * @return array|int
+     */
+    static function get_unit_payment_items($unit_bookings, $coupon = null, $pay_full_amount = false)
+    {
+        if (!is_array($unit_bookings)) {
+            return -4;
+        }
+
+        $subtotal = 0.0;
+        $tax_total = 0.0;
+        $discount_total = 0.0;
+        $to_pay_total = 0.0;
+        $woo_total = 0.0;
+
+        $item_names = [];
+        $prices = [];
+        $quantities = [];
+        $sku = [];
+        $item_nets = [];
+        $item_taxes = [];
+        $item_discounts = [];
+        $items = [];
+        $unit_breakdowns = [];
+        $unit_ids = [];
+
+        foreach ($unit_bookings as $unit_booking) {
+            if (!is_array($unit_booking)) {
+                return -4;
+            }
+            $unit_id = isset($unit_booking["unit_id"]) ? (int) $unit_booking["unit_id"] : 0;
+            if ($unit_id < 1) {
+                return -4;
+            }
+            $range = isset($unit_booking["range"]) && is_array($unit_booking["range"])
+                ? $unit_booking["range"]
+                : null;
+            if (!$range || !isset($range["start"], $range["end"])) {
+                return -4;
+            }
+
+            $number_of_people = array_key_exists("number_of_people", $unit_booking)
+                ? $unit_booking["number_of_people"]
+                : null;
+            $location_id = null;
+            if (isset($unit_booking["location_id"]) && is_numeric($unit_booking["location_id"])) {
+                $location_id = (int) $unit_booking["location_id"];
+            } elseif (isset($unit_booking["location"]) && is_numeric($unit_booking["location"])) {
+                $location_id = (int) $unit_booking["location"];
+            }
+
+            $availability_payload = WBK_Unit_Availability_Processor::get_availability_for_range(
+                $unit_id,
+                $range,
+                $number_of_people,
+                $location_id,
+            );
+            if ($availability_payload === false) {
+                return -4;
+            }
+
+            $availability = is_string($availability_payload)
+                ? json_decode($availability_payload, true)
+                : $availability_payload;
+            if (!is_array($availability)) {
+                return -4;
+            }
+
+            $line_subtotal = isset($availability["subtotal"]) ? (float) $availability["subtotal"] : 0.0;
+            $line_tax = isset($availability["tax"]) ? (float) $availability["tax"] : 0.0;
+            $line_total = isset($availability["total"]) ? (float) $availability["total"] : 0.0;
+
+            $subtotal += $line_subtotal;
+            $tax_total += $line_tax;
+            $to_pay_total += $line_total;
+            $woo_total += $line_total;
+            $unit_ids[] = $unit_id;
+            $unit_breakdowns[] = isset($availability["breakdown"]) && is_array($availability["breakdown"])
+                ? $availability["breakdown"]
+                : [];
+
+            $item_names[] = "";
+            $prices[] = self::format_price_number($line_subtotal);
+            $quantities[] = 1;
+            $sku[] = $unit_id;
+            $item_nets[] = self::format_price_number($line_subtotal);
+            $item_taxes[] = self::format_price_number($line_tax);
+            $item_discounts[] = self::format_price_number(0);
+            $items[] = [
+                "id" => $unit_id,
+                "price" => self::format_price_number($line_subtotal),
+                "item_to_pay" => self::format_price_number($line_total),
+                "booking_id" => null,
+                "have_deposit" => false,
+                "service_fee" => 0,
+                "staff_member" => null,
+            ];
+        }
+
+        // Coupon behavior aligned with service payment details output shape.
+        if (is_array($coupon)) {
+            if (isset($coupon[2]) && (float) $coupon[2] > 0) {
+                $discount_total = ($subtotal * (float) $coupon[2]) / 100;
+            } elseif (isset($coupon[1]) && (float) $coupon[1] > 0) {
+                $discount_total = (float) $coupon[1];
+            }
+        }
+
+        if ($discount_total > 0) {
+            $subtotal = max(0, $subtotal - $discount_total);
+            $tax_rate = self::get_tax_for_messages();
+            $tax_total = self::get_tax_amount($subtotal, $tax_rate);
+            $to_pay_total = $subtotal + $tax_total;
+        }
+
+        $total = $subtotal + $tax_total;
+        $left_to_pay = 0;
+        $effective_tax_rate = self::get_tax_for_messages();
+        $woo_total = $effective_tax_rate > 0
+            ? $to_pay_total / (1 + $effective_tax_rate / 100)
+            : $to_pay_total;
+
+        return [
+            "item_names" => $item_names,
+            "prices" => $prices,
+            "tax_to_pay" => self::format_price_number($tax_total),
+            "quantities" => $quantities,
+            "subtotal" => self::format_price_number($subtotal),
+            "total" => self::format_price_number($total),
+            "sku" => $sku,
+            "item_nets" => $item_nets,
+            "item_taxes" => $item_taxes,
+            "item_discounts" => $item_discounts,
+            "to_pay_total" => self::format_price_number($to_pay_total),
+            "left_to_pay" => self::format_price_number($left_to_pay),
+            "items" => $items,
+            "discount" => self::format_price_number($discount_total),
+            "service_fees" => self::format_price_number(0),
+            "woo_total" => self::format_price_number($woo_total),
+            "unit_breakdowns" => $unit_breakdowns,
+            "unit_ids" => array_values(array_unique($unit_ids)),
+        ];
+    }
+
     static function get_payment_items_post_booked($booking_ids)
     {
         if (!is_array($booking_ids) || count($booking_ids) == 0) {
@@ -810,5 +967,243 @@ class WBK_Price_Processor
         }
 
         return self::get_payment_items($booking_ids, $tax, $coupon_result);
+    }
+
+    static function get_unit_payment_items_post_booked($booking_ids)
+    {
+        if (!is_array($booking_ids) || count($booking_ids) == 0) {
+            return 0;
+        }
+
+        $first_booking = new WBK_Booking($booking_ids[0]);
+        if (!$first_booking->is_loaded()) {
+            return -4;
+        }
+
+        $coupon_id = $first_booking->get('coupon');
+        $coupon_result = false;
+        if (!is_null($coupon_id) && is_numeric($coupon_id) && $coupon_id > 0) {
+            $coupon = new WBK_Coupon($coupon_id);
+            if ($coupon->is_loaded()) {
+                $coupon_result = [
+                    $coupon_id,
+                    $coupon->get('amount_fixed'),
+                    $coupon->get('amount_percentage'),
+                ];
+            }
+        }
+
+        $unit_bookings = [];
+        foreach ($booking_ids as $booking_id) {
+            $booking = new WBK_Booking($booking_id);
+            if (!$booking->is_loaded()) {
+                continue;
+            }
+
+            $unit_id = (int) $booking->get('unit_id');
+            if ($unit_id < 1) {
+                continue;
+            }
+
+            $start_day = strtotime(date('Y-m-d', (int) $booking->get('time')));
+            $duration_minutes = (int) $booking->get('duration');
+            $duration_days = max(1, (int) ceil($duration_minutes / 1440));
+            $end_day = $start_day + (($duration_days - 1) * DAY_IN_SECONDS);
+
+            $number_of_people = null;
+            $people_raw = $booking->get('number_of_people');
+            if (is_string($people_raw) && $people_raw !== '') {
+                $decoded_people = json_decode($people_raw, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded_people)) {
+                    $number_of_people = $decoded_people;
+                } elseif (is_numeric($people_raw)) {
+                    $number_of_people = (int) $people_raw;
+                }
+            } elseif (is_numeric($people_raw)) {
+                $number_of_people = (int) $people_raw;
+            }
+
+            $location_id = null;
+            $location_raw = $booking->get('location_id');
+            if (is_numeric($location_raw) && (int) $location_raw > 0) {
+                $location_id = (int) $location_raw;
+            }
+
+            $unit_bookings[] = [
+                'unit_id' => $unit_id,
+                'range' => [
+                    'start' => date('Y-m-d', $start_day),
+                    'end' => date('Y-m-d', $end_day),
+                ],
+                'number_of_people' => $number_of_people,
+                'location_id' => $location_id,
+            ];
+        }
+
+        if (empty($unit_bookings)) {
+            return -4;
+        }
+
+        $payment_items = self::get_unit_payment_items($unit_bookings, $coupon_result, false);
+        if ($payment_items !== -4) {
+            return $payment_items;
+        }
+
+        // Fallback for post-booked unit rows: avoid availability-based failures
+        // caused by counting the just-created booking in the same range.
+        $subtotal = 0.0;
+        $tax_total = 0.0;
+        $to_pay_total = 0.0;
+        $item_names = [];
+        $prices = [];
+        $quantities = [];
+        $sku = [];
+        $item_nets = [];
+        $item_taxes = [];
+        $item_discounts = [];
+        $items = [];
+        $unit_breakdowns = [];
+        $unit_ids = [];
+
+        foreach ($unit_bookings as $unit_booking) {
+            $unit_id = (int) ($unit_booking['unit_id'] ?? 0);
+            $range = $unit_booking['range'] ?? null;
+            if ($unit_id < 1 || !is_array($range) || !isset($range['start'], $range['end'])) {
+                continue;
+            }
+            $unit = new WBK_Unit($unit_id);
+            if (!$unit->is_loaded()) {
+                continue;
+            }
+
+            $start_day = strtotime((string) $range['start']);
+            $end_day = strtotime((string) $range['end']);
+            if ($start_day === false || $end_day === false || $end_day < $start_day) {
+                continue;
+            }
+            $start_day = strtotime(date('Y-m-d', $start_day));
+            $end_day = strtotime(date('Y-m-d', $end_day));
+
+            $number_of_people = $unit_booking['number_of_people'] ?? null;
+            $unit_price = $unit->get_price();
+            $line_subtotal = 0.0;
+            $line_breakdown = [
+                'weekday' => ['days' => 0, 'subtotal' => 0.0],
+                'weekend' => ['days' => 0, 'subtotal' => 0.0],
+            ];
+
+            for ($day = $start_day; $day <= $end_day; $day += DAY_IN_SECONDS) {
+                $is_weekend = in_array((int) date('N', $day), [6, 7], true);
+                $pricing_key = $is_weekend ? 'weekend_holiday' : 'weekday';
+                $day_type = $is_weekend ? 'weekend' : 'weekday';
+                $day_total = 0.0;
+                $line_breakdown[$day_type]['days']++;
+
+                if ($unit->get_charge_per_person() && is_array($number_of_people)) {
+                    $pricing_data = [];
+                    if (
+                        is_array($unit_price) &&
+                        isset($unit_price['pricing']) &&
+                        is_array($unit_price['pricing']) &&
+                        isset($unit_price['pricing'][$pricing_key]) &&
+                        is_array($unit_price['pricing'][$pricing_key])
+                    ) {
+                        $pricing_data = $unit_price['pricing'][$pricing_key];
+                    }
+                    $adult_count = max(0, (int) ($number_of_people['adult'] ?? 0));
+                    $child_count = max(0, (int) ($number_of_people['child'] ?? 0));
+                    $infant_count = max(0, (int) ($number_of_people['infant'] ?? 0));
+                    $day_total =
+                        ((float) ($pricing_data['adult'] ?? 0) * $adult_count) +
+                        ((float) ($pricing_data['child'] ?? 0) * $child_count) +
+                        ((float) ($pricing_data['infant'] ?? 0) * $infant_count);
+                } else {
+                    if (
+                        isset($unit_price['pricing']) &&
+                        is_array($unit_price['pricing']) &&
+                        isset($unit_price['pricing'][$pricing_key])
+                    ) {
+                        $bucket = $unit_price['pricing'][$pricing_key];
+                        if (is_numeric($bucket)) {
+                            $day_total = (float) $bucket;
+                        } elseif (is_array($bucket)) {
+                            $day_total = (float) ($bucket['price'] ?? 0);
+                        }
+                    }
+                }
+
+                $line_breakdown[$day_type]['subtotal'] += $day_total;
+                $line_subtotal += $day_total;
+            }
+
+            $line_tax = self::get_tax_amount($line_subtotal, self::get_tax_for_messages());
+            $line_total = $line_subtotal + $line_tax;
+
+            $subtotal += $line_subtotal;
+            $tax_total += $line_tax;
+            $to_pay_total += $line_total;
+            $unit_ids[] = $unit_id;
+            $unit_breakdowns[] = $line_breakdown;
+            $item_names[] = '';
+            $prices[] = self::format_price_number($line_subtotal);
+            $quantities[] = 1;
+            $sku[] = $unit_id;
+            $item_nets[] = self::format_price_number($line_subtotal);
+            $item_taxes[] = self::format_price_number($line_tax);
+            $item_discounts[] = self::format_price_number(0);
+            $items[] = [
+                'id' => $unit_id,
+                'price' => self::format_price_number($line_subtotal),
+                'item_to_pay' => self::format_price_number($line_total),
+                'booking_id' => null,
+                'have_deposit' => false,
+                'service_fee' => 0,
+                'staff_member' => null,
+            ];
+        }
+
+        if (empty($unit_ids)) {
+            return -4;
+        }
+
+        $discount_total = 0.0;
+        if (is_array($coupon_result)) {
+            if (isset($coupon_result[2]) && (float) $coupon_result[2] > 0) {
+                $discount_total = ($subtotal * (float) $coupon_result[2]) / 100;
+            } elseif (isset($coupon_result[1]) && (float) $coupon_result[1] > 0) {
+                $discount_total = (float) $coupon_result[1];
+            }
+        }
+        if ($discount_total > 0) {
+            $subtotal = max(0, $subtotal - $discount_total);
+            $tax_total = self::get_tax_amount($subtotal, self::get_tax_for_messages());
+            $to_pay_total = $subtotal + $tax_total;
+        }
+
+        $total = $subtotal + $tax_total;
+        $woo_total = self::get_tax_for_messages() > 0
+            ? $to_pay_total / (1 + self::get_tax_for_messages() / 100)
+            : $to_pay_total;
+
+        return [
+            'item_names' => $item_names,
+            'prices' => $prices,
+            'tax_to_pay' => self::format_price_number($tax_total),
+            'quantities' => $quantities,
+            'subtotal' => self::format_price_number($subtotal),
+            'total' => self::format_price_number($total),
+            'sku' => $sku,
+            'item_nets' => $item_nets,
+            'item_taxes' => $item_taxes,
+            'item_discounts' => $item_discounts,
+            'to_pay_total' => self::format_price_number($to_pay_total),
+            'left_to_pay' => self::format_price_number(0),
+            'items' => $items,
+            'discount' => self::format_price_number($discount_total),
+            'service_fees' => self::format_price_number(0),
+            'woo_total' => self::format_price_number($woo_total),
+            'unit_breakdowns' => $unit_breakdowns,
+            'unit_ids' => array_values(array_unique($unit_ids)),
+        ];
     }
 }

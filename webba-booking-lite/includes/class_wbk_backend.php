@@ -13,8 +13,8 @@ class WBK_Backend
     private $components;
     public function __construct()
     {
-        add_action('admin_menu', [$this, 'createAdminMenu'], 9);
-        add_action('admin_menu', [$this, 'reorderAdminSubmenu'], 1000000000);
+        add_action("admin_menu", [$this, "createAdminMenu"], 9);
+        add_action("admin_menu", [$this, "reorderAdminSubmenu"], 1000000000);
         //set components of backend
         add_action("admin_notices", [$this, "admin_notices"]);
         add_action("admin_init", [$this, "handle_admin_redirects"]);
@@ -130,11 +130,10 @@ class WBK_Backend
             add_menu_page(
                 $root_name,
                 $root_name,
-                'read',
-                'wbk-main',
-                ['WBK_Renderer', 'render_backend_page'],
-                WP_WEBBA_BOOKING__PLUGIN_URL .
-                    '/public/images/webba.svg'
+                "read",
+                "wbk-main",
+                ["WBK_Renderer", "render_backend_page"],
+                WP_WEBBA_BOOKING__PLUGIN_URL . "/public/images/webba.svg",
             );
             add_submenu_page(
                 "wbk-main",
@@ -146,28 +145,29 @@ class WBK_Backend
             );
             add_submenu_page(
                 "wbk-main",
-                __("Services", "webba-booking-lite"),
-                __("Services", "webba-booking-lite"),
+                __("Services & Units", "webba-booking-lite"),
+                __("Services & Units", "webba-booking-lite"),
                 "read",
                 "wbk-services",
                 ["WBK_Renderer", "render_backend_page"],
             );
-            if($is_admin){
+
+            if ($is_admin) {
                 add_submenu_page(
-                    'wbk-main',
-                    __('Staff members', 'webba-booking-lite'),
-                    __('Staff members', 'webba-booking-lite'),
-                    'read',
-                    'wbk-staff-members',
-                    ['WBK_Renderer', 'render_backend_page']
+                    "wbk-main",
+                    __("Staff members", "webba-booking-lite"),
+                    __("Staff members", "webba-booking-lite"),
+                    "read",
+                    "wbk-staff-members",
+                    ["WBK_Renderer", "render_backend_page"],
                 );
                 add_submenu_page(
-                    'wbk-main',
-                    __('Locations', 'webba-booking-lite'),
-                    __('Locations', 'webba-booking-lite'),
-                    'read',
-                    'wbk-locations',
-                    ['WBK_Renderer', 'render_backend_page']
+                    "wbk-main",
+                    __("Locations", "webba-booking-lite"),
+                    __("Locations", "webba-booking-lite"),
+                    "read",
+                    "wbk-locations",
+                    ["WBK_Renderer", "render_backend_page"],
                 );
             }
             add_submenu_page(
@@ -179,55 +179,55 @@ class WBK_Backend
                 ["WBK_Renderer", "render_backend_page"],
             );
             add_submenu_page(
-                'wbk-main',
-                __('Schedule', 'webba-booking-lite'),
-                __('Schedule', 'webba-booking-lite'),
-                'read',
-                'wbk-calendar',
-                ['WBK_Renderer', 'render_backend_page']
+                "wbk-main",
+                __("Schedule", "webba-booking-lite"),
+                __("Schedule", "webba-booking-lite"),
+                "read",
+                "wbk-calendar",
+                ["WBK_Renderer", "render_backend_page"],
             );
 
             add_submenu_page(
-                'wbk-main',
-                __('Form Builder', 'webba-booking-lite'),
-                __('Form Builder', 'webba-booking-lite'),
-                'manage_options',
-                'wbk-form-builder',
-                ['WBK_Renderer', 'render_backend_page']
+                "wbk-main",
+                __("Form Builder", "webba-booking-lite"),
+                __("Form Builder", "webba-booking-lite"),
+                "manage_options",
+                "wbk-form-builder",
+                ["WBK_Renderer", "render_backend_page"],
             );
 
             add_submenu_page(
-                'wbk-main',
-                __('Form Styler', 'webba-booking-lite'),
-                __('Form Styler', 'webba-booking-lite'),
-                'manage_options',
-                'wbk-appearance',
-                ['WBK_Renderer', 'render_backend_page']
+                "wbk-main",
+                __("Form Styler", "webba-booking-lite"),
+                __("Form Styler", "webba-booking-lite"),
+                "manage_options",
+                "wbk-appearance",
+                ["WBK_Renderer", "render_backend_page"],
             );
             add_submenu_page(
-                'wbk-main',
-                __('Email Notifications', 'webba-booking-lite'),
-                __('Email Notifications', 'webba-booking-lite'),
-                'manage_options',
-                'wbk-email-templates',
-                ['WBK_Renderer', 'render_backend_page']
+                "wbk-main",
+                __("Email Notifications", "webba-booking-lite"),
+                __("Email Notifications", "webba-booking-lite"),
+                "manage_options",
+                "wbk-email-templates",
+                ["WBK_Renderer", "render_backend_page"],
             );
             add_submenu_page(
-                'wbk-main',
-                __('Pricing Rules', 'webba-booking-lite'),
-                __('Pricing Rules', 'webba-booking-lite'),
-                'manage_options',
-                'wbk-pricing-rules',
-                ['WBK_Renderer', 'render_backend_page']
+                "wbk-main",
+                __("Pricing Rules", "webba-booking-lite"),
+                __("Pricing Rules", "webba-booking-lite"),
+                "manage_options",
+                "wbk-pricing-rules",
+                ["WBK_Renderer", "render_backend_page"],
             );
 
             add_submenu_page(
-                'wbk-main',
-                __('Coupons', 'webba-booking-lite'),
-                __('Coupons', 'webba-booking-lite'),
-                'manage_options',
-                'wbk-coupons',
-                ['WBK_Renderer', 'render_backend_page']
+                "wbk-main",
+                __("Coupons", "webba-booking-lite"),
+                __("Coupons", "webba-booking-lite"),
+                "manage_options",
+                "wbk-coupons",
+                ["WBK_Renderer", "render_backend_page"],
             );
             add_submenu_page(
                 "wbk-main",
@@ -260,55 +260,63 @@ class WBK_Backend
     public function reorderAdminSubmenu(): void
     {
         global $submenu;
-        if (!isset($submenu['wbk-main']) || !is_array($submenu['wbk-main'])) {
+        if (!isset($submenu["wbk-main"]) || !is_array($submenu["wbk-main"])) {
             return;
         }
         $order = [
-            'wbk-dashboard',
-            'wbk-services',
-            'wbk-appointments',
-            'wbk-calendar',
-            'wbk-form-builder',
-            'wbk-appearance',
-            'wbk-email-templates',
-            'wbk-pricing-rules',
-            'wbk-coupons',
-            'wbk-gg-calendars',
+            "wbk-dashboard",
+            "wbk-services",
+            "wbk-appointments",
+            "wbk-calendar",
+            "wbk-form-builder",
+            "wbk-appearance",
+            "wbk-email-templates",
+            "wbk-pricing-rules",
+            "wbk-coupons",
+            "wbk-gg-calendars",
         ];
         $ordered = [];
         foreach ($order as $slug) {
-            foreach ($submenu['wbk-main'] as $item) {
+            foreach ($submenu["wbk-main"] as $item) {
                 if (isset($item[2]) && $item[2] === $slug) {
                     $ordered[] = $item;
                     break;
                 }
             }
         }
-        foreach ($submenu['wbk-main'] as $item) {
-            $slug = isset($item[2]) ? $item[2] : '';
-            if ($slug !== 'wbk-options' && !in_array($slug, $order, true)) {
+        foreach ($submenu["wbk-main"] as $item) {
+            $slug = isset($item[2]) ? $item[2] : "";
+            if ($slug !== "wbk-options" && !in_array($slug, $order, true)) {
                 $ordered[] = $item;
             }
         }
-        foreach ($submenu['wbk-main'] as $item) {
-            if (isset($item[2]) && $item[2] === 'wbk-options') {
+        foreach ($submenu["wbk-main"] as $item) {
+            if (isset($item[2]) && $item[2] === "wbk-options") {
                 $ordered[] = $item;
                 break;
             }
         }
-        $my_account = __('My Account', 'webba-booking-lite');
-        $support = __('Support', 'webba-booking-lite');
+        $my_account = __("My Account", "webba-booking-lite");
+        $support = __("Support", "webba-booking-lite");
         foreach ($ordered as $key => $item) {
-            $slug = isset($item[2]) ? $item[2] : '';
-            $title = isset($item[0]) ? $item[0] : '';
-            if ($slug === 'wbk-main-account' || $slug === 'account' || strip_tags($title) === 'Account') {
+            $slug = isset($item[2]) ? $item[2] : "";
+            $title = isset($item[0]) ? $item[0] : "";
+            if (
+                $slug === "wbk-main-account" ||
+                $slug === "account" ||
+                strip_tags($title) === "Account"
+            ) {
                 $ordered[$key][0] = $my_account;
             }
-            if ($slug === 'wbk-main-contact' || $slug === 'contact' || strip_tags($title) === 'Contact Us') {
+            if (
+                $slug === "wbk-main-contact" ||
+                $slug === "contact" ||
+                strip_tags($title) === "Contact Us"
+            ) {
                 $ordered[$key][0] = $support;
             }
         }
-        $submenu['wbk-main'] = array_values($ordered);
+        $submenu["wbk-main"] = array_values($ordered);
     }
 
     protected function is_edit_page($new_edit = null)
@@ -346,7 +354,10 @@ class WBK_Backend
         }
 
         // Handle Outlook Calendar revocation redirect
-        if (isset($_GET["revoke-outlook-calendar"]) && is_numeric($_GET["revoke-outlook-calendar"])) {
+        if (
+            isset($_GET["revoke-outlook-calendar"]) &&
+            is_numeric($_GET["revoke-outlook-calendar"])
+        ) {
             $calendar_id = intval($_GET["revoke-outlook-calendar"]);
             $outlook = new WBK_Outlook_Calendar_Processor($calendar_id);
             $outlook->clear_access_token();

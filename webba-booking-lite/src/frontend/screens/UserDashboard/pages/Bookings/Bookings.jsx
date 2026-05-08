@@ -49,14 +49,14 @@ export const Bookings = () => {
         () => [
             {
                 slug: 'upcoming',
-                label: wording?.label_upcoming_bookings_title || __('Upcoming', 'webba-booking-lite'),
+                label: preset?.wording?.label_upcoming_bookings_title || __('Upcoming', 'webba-booking-lite'),
             },
             {
                 slug: 'past',
-                label: wording?.label_past_bookings_title || __('Past', 'webba-booking-lite'),
+                label: preset?.wording?.label_past_bookings_title || __('Past', 'webba-booking-lite'),
             },
         ],
-        [wording]
+        [preset?.wording]
     )
 
     const {
@@ -148,7 +148,7 @@ export const Bookings = () => {
                                     {__('My Bookings', 'webba-booking-lite')}
                                 </h2>
                                 <p>
-                                    { wording?.label_manage_appointments_title || __(
+                                    {preset?.wording?.label_manage_appointments_title || __(
                                         'Manage your appointments and reservations',
                                         'webba-booking-lite'
                                     )}
@@ -158,7 +158,7 @@ export const Bookings = () => {
                                 onClick={renderBookingForm}
                                 classes={styles.headerAddButton}
                             >
-                                { wording?.label_new_booking_title || __('+ New Booking', 'webba-booking-lite')}
+                                {preset?.wording?.label_new_booking_title || __('+ New Booking', 'webba-booking-lite')}
                             </Button>
                         </div>
                         <div className={styles.tabWrapper}>

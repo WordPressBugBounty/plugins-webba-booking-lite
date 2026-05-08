@@ -23,7 +23,7 @@ export const LocationsScreen = () => {
         (select) => select(store_name).getPreset(),
         []
     )
-    const isProPlan = plan_map && plan_map['pro'] && plan_map['pro'] === true
+    const isProPlan = plan_map && ['premium', 'pro'].some((plan) => plan_map[plan] === true)
     const columns = generateColumnDefsFromModel(locationsModel, {}, {
         services: {
             header: __('Services', 'webba-booking-lite'),

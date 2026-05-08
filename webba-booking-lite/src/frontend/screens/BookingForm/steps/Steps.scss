@@ -127,6 +127,203 @@
         padding-right: 8px;
     }
 
+    &__unit_range_wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border: 1px solid #edeff2;
+        border-radius: 12px;
+        padding: 12px;
+        background: #ffffff;
+    }
+
+    &__unit_range_header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 4px 4px 8px;
+    }
+
+    &__unit_range_badge {
+        display: inline-block;
+        padding: 0;
+        font-size: 13px;
+        font-weight: 400;
+        line-height: 18px;
+        color: #8b9ba3;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        white-space: nowrap;
+    }
+
+    &__unit_range_calendar {
+        .wbk_booking_calendar {
+            padding: 0;
+        }
+    }
+
+    &__unit_flexibility {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 4px;
+
+        h4 {
+            margin: 0;
+            font-size: 18px;
+            line-height: 22px;
+            color: #22292f;
+        }
+    }
+
+    &__unit_flexibility_buttons {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    &__unit_flexibility_button {
+        border: 1.5px solid #d4dde2;
+        border-radius: 10px;
+        background: #ffffff;
+        color: #22292f;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+        padding: 8px 4px;
+        cursor: pointer;
+        text-align: center;
+        user-select: none;
+
+        &--active {
+            border-color: colors.$wbk-color-border-selected;
+            background: colors.$wbk-primary-50;
+            color: colors.$wbk-primary-text-50;
+        }
+    }
+
+    &__unit_range_loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 56px;
+    }
+
+    &__unit_range_loader_spinner {
+        width: 28px;
+        height: 28px;
+        border: 3px solid colors.$wbk-primary-500;
+        border-top: 3px solid #ffffff;
+        border-radius: 50%;
+        animation: wbkUnitRangeSpin 0.8s linear infinite;
+    }
+
+    &__unit_offers_empty {
+        margin: 0;
+        font-size: 14px;
+        line-height: 20px;
+        color: #6b7280;
+    }
+
+    &__unit_offers {
+        margin-top: 18px;
+        scroll-margin-top: 16px;
+    }
+
+    &__unit_offers_title {
+        margin: 0 0 12px;
+        font-size: 18px;
+        line-height: 22px;
+        color: #111827;
+    }
+
+    &__unit_offers_list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 1px;
+    }
+
+    &__unit_offers_item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1px solid #e6ebf0;
+        border-radius: 12px;
+        padding: 14px 16px;
+        background: #ffffff;
+        cursor: pointer;
+        transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease,
+            background 0.15s ease;
+
+        &:hover {
+            border-color: #cbd5e1;
+        }
+
+        &--selected {
+            border-color: colors.$wbk-color-border-selected;
+            box-shadow: 0 0 0 1px colors.$wbk-color-border-selected;
+            background: #f8fafc;
+        }
+    }
+
+    &__unit_offers_item_left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    &__unit_offers_item_icon {
+        width: 44px;
+        min-width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0f7ff;
+    }
+
+    &__unit_offers_item_title {
+        margin: 0!important;
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 22px;
+        color: #111827;
+    }
+
+    &__unit_offers_item_days {
+        margin: 2px 0 0!important;
+        font-size: 14px;
+        line-height: 20px;
+        color: #6b7280;
+    }
+
+    &__unit_offers_item_right {
+        text-align: right;
+    }
+
+    &__unit_offers_item_price {
+        margin: 0!important;
+        font-size: 20px;
+        line-height: 24px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    &__unit_offers_item_status {
+        margin: 2px 0 0!important;
+        font-size: 14px;
+        line-height: 18px;
+        font-weight: 400;
+        color: #16a34a;
+    }
+
     &__native-scroll-wrapper {
         overflow-y: auto;
         overflow-x: hidden;
@@ -153,6 +350,15 @@
         /* Slim custom scrollbar for Firefox */
         scrollbar-width: thin;
         scrollbar-color: #d1d5db transparent;
+    }
+}
+
+@keyframes wbkUnitRangeSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
     }
 }
 

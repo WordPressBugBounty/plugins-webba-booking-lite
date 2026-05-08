@@ -36,6 +36,7 @@ import iconAccordionArrow from '../../../../public/images/icon-accordion-arrow.s
 import { useWording } from '../../hooks/useWording'
 import { useLocale } from '../../hooks/useLocale'
 import * as locales from 'date-fns/locale'
+import { Value } from 'react-calendar/dist/esm/shared/types.js'
 
 export const SelectedItem = ({
     label,
@@ -315,8 +316,10 @@ export const SelectedItem = ({
     const effectiveStaffIdForApi = staffIdForApi
 
     const handleSetDate = useCallback(
-        (value: Date) => {
-            onUpdate({ selectedDate: value })
+        (value: Value) => {
+            if (value instanceof Date) {
+                onUpdate({ selectedDate: value })
+            }
         },
         [onUpdate]
     )
@@ -407,7 +410,10 @@ export const SelectedItem = ({
         if (!formData.places || Object.keys(formData.places).length === 0)
             return
 
-        fetchBookingAmounts(formData)
+        fetchBookingAmounts({
+            ...formData,
+            generate_stripe_intent: false,
+        })
     }, [formData.places])
 
     const handleSetTime = useCallback(

@@ -1,5 +1,6 @@
 import { FC, useMemo, useRef, useEffect, useState } from 'react'
 import { __ } from '@wordpress/i18n'
+import { differenceInCalendarDays, format } from 'date-fns'
 import { ISidebarProps } from './types'
 import ChevronLeftIcon from '../../../../public/images/chevron-left-icon.svg'
 import './Sidebar.scss'
@@ -13,6 +14,17 @@ import { ReactComponent as ArrowDownIcon } from '../../../../public/images/arrow
 import iconPhone from '../../../../public/images/icon-phone.svg'
 import iconEmail from '../../../../public/images/icon-email.svg'
 import { useWording } from '../../hooks/useWording'
+import calendarRangeIcon from '../../../../public/images/icon-calendar.svg'
+import dayCountIcon from '../../../../public/images/icon-clock.svg'
+
+const parseYmdLocal = (ymd: string): Date => {
+    const parts = ymd.split('-').map(Number)
+    if (parts.length !== 3 || parts.some((n) => Number.isNaN(n))) {
+        return new Date(ymd)
+    }
+    const [y, m, d] = parts
+    return new Date(y, m - 1, d)
+}
 
 export const Sidebar: FC<ISidebarProps> = ({
     onAddMore,
@@ -20,8 +32,16 @@ export const Sidebar: FC<ISidebarProps> = ({
     onToggle,
     title,
 }) => {
-    const { services, attrService, priceFormat, amountData, preset } =
-        useBookingContext()
+    const {
+        services,
+        units,
+        bookingMode,
+        attrService,
+        priceFormat,
+        amountData,
+        preset,
+        formData,
+    } = useBookingContext()
     const wording = useWording()
     const [animatedIds, setAnimatedIds] = useState<number[]>([])
     const [showSummary, setShowSummary] = useState(false)
@@ -36,8 +56,67 @@ export const Sidebar: FC<ISidebarProps> = ({
     }, [preset])
 
     const items = useMemo(() => {
-        return services.filter(({ selected }) => selected)
-    }, [services])
+        return bookingMode === 'units'
+            ? (units || []).filter(({ selected }) => selected)
+            : services.filter(({ selected }) => selected)
+    }, [services, units, bookingMode])
+
+    const unitStaySummary = useMemo(() => {
+        if (bookingMode !== 'units') {
+            return { dayCount: null as number | null, rangeLabel: null as string | null }
+        }
+        const range = (formData as Record<string, unknown>)?.range as
+            | { start?: string; end?: string }
+            | undefined
+
+        let dayCount: number | null = null
+        if (range?.start && range?.end) {
+            const startD = parseYmdLocal(range.start)
+            const endD = parseYmdLocal(range.end)
+            dayCount = differenceInCalendarDays(endD, startD) + 1
+        }
+
+        let rangeLabel: string | null = null
+        const selectedUnitId = (units || []).find((u) => u.selected)?.id
+        if (selectedUnitId != null) {
+            const placesMap = formData.places as Record<string, unknown> | undefined
+            const unitPlaces = placesMap?.[String(selectedUnitId)]
+            if (
+                Array.isArray(unitPlaces) &&
+                unitPlaces.length > 0 &&
+                range?.start &&
+                range?.end
+            ) {
+                const startD = parseYmdLocal(range.start)
+                const endD = parseYmdLocal(range.end)
+                rangeLabel = `${format(startD, 'MMM d')} – ${format(endD, 'MMM d, yyyy')}`
+            }
+        }
+
+        return { dayCount, rangeLabel }
+    }, [bookingMode, formData, units])
+
+    const selectedUnitId = useMemo(
+        () => (units || []).find((unit) => unit.selected)?.id ?? null,
+        [units]
+    )
+    const hasSelectedUnitOffer = useMemo(() => {
+        if (bookingMode !== 'units' || selectedUnitId == null) return false
+        const placesMap = formData.places as Record<string, unknown> | undefined
+        const unitPlaces = placesMap?.[String(selectedUnitId)]
+        return Array.isArray(unitPlaces) && unitPlaces.length > 0
+    }, [bookingMode, selectedUnitId, formData.places])
+    const hasUnitApiPrice = useMemo(() => {
+        if (bookingMode !== 'units' || selectedUnitId == null) return false
+        if (!Array.isArray(amountData?.items)) return false
+        return amountData.items.some(
+            (item: any) =>
+                Number(item?.id) === Number(selectedUnitId) &&
+                typeof item?.price === 'number' &&
+                !Number.isNaN(item.price)
+        )
+    }, [bookingMode, selectedUnitId, amountData?.items])
+    const canShowUnitPrice = bookingMode !== 'units' || (hasSelectedUnitOffer && hasUnitApiPrice)
 
     // Helper to get price for an item from amountData.items
     const getApiItemPrice = (itemId: number, index: number) => {
@@ -57,9 +136,9 @@ export const Sidebar: FC<ISidebarProps> = ({
     }
 
     // Always sort selected services by selectedAt before rendering
-    const sortedItems = items.sort(
-        (a, b) => (a.selectedAt || 0) - (b.selectedAt || 0)
-    )
+    const sortedItems = items
+        .slice()
+        .sort((a, b) => (a.selectedAt || 0) - (b.selectedAt || 0))
 
     useEffect(() => {
         const currentIds = sortedItems.map((item) => item.id)
@@ -171,9 +250,10 @@ export const Sidebar: FC<ISidebarProps> = ({
                 </div>
                 <h3 className={'wbk_sidebar__title'}>{title}</h3>
                 {!!sortedItems.length &&
-                    sortedItems.some(
-                        (item) => item.places && item.places.length > 0
-                    ) ? (
+                    (bookingMode === 'units' ||
+                        sortedItems.some(
+                            (item) => item.places && item.places.length > 0
+                        )) ? (
                     <>
                         <div className={'wbk_sidebar__items'}>
                             <div className={'wbk_sidebar__items__inner'}>
@@ -202,10 +282,113 @@ export const Sidebar: FC<ISidebarProps> = ({
                                                 }
                                             )}
                                         >
-                                            <SidebarItem
-                                                {...item}
-                                                price={String(price)}
-                                            />
+                                            {bookingMode === 'units' ? (
+                                                <>
+                                                    <div
+                                                        className={
+                                                            'wbk_sidebar__items__item__inner'
+                                                        }
+                                                    >
+                                                        <div
+                                                            className={
+                                                                'wbk_sidebar__items__item__info'
+                                                            }
+                                                        >
+                                                            <h4
+                                                                className={
+                                                                    'wbk_sidebar__items__item__title'
+                                                                }
+                                                            >
+                                                                {item.quantity &&
+                                                                Number(item.quantity) > 1
+                                                                    ? `${item.quantity}x `
+                                                                    : ''}
+                                                                {item.label}
+                                                            </h4>
+                                                        </div>
+                                                        {canShowUnitPrice && (
+                                                            <div
+                                                                className={
+                                                                    'wbk_sidebar__items__item__price'
+                                                                }
+                                                            >
+                                                                {(price > 0 &&
+                                                                    wbkFormatPrice(
+                                                                        price,
+                                                                        priceFormat
+                                                                    )) ||
+                                                                    wording.free ||
+                                                                    __(
+                                                                        'Free',
+                                                                        'webba-booking-lite'
+                                                                    )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div
+                                                        className={
+                                                            'wbk_sidebar__items__item__meta'
+                                                        }
+                                                    >
+                                                        <div
+                                                            className={
+                                                                'wbk_sidebar__items__item__meta-row'
+                                                            }
+                                                        >
+                                                            <span
+                                                                className={
+                                                                    'wbk_sidebar__items__item__meta-icon wbk_sidebar__items__item__meta-icon--img wbk_sidebar__items__item__meta-icon--muted'
+                                                                }
+                                                            >
+                                                                <img
+                                                                    src={dayCountIcon}
+                                                                    alt=""
+                                                                />
+                                                            </span>
+                                                            <span
+                                                                className={
+                                                                    'wbk_sidebar__items__item__meta-label'
+                                                                }
+                                                            >
+                                                                {unitStaySummary.dayCount !==
+                                                                null
+                                                                    ? `${unitStaySummary.dayCount} ${unitStaySummary.dayCount === 1 ? __('day', 'webba-booking-lite') : wording.unit_days || __('days', 'webba-booking-lite')}`
+                                                                    : `— ${wording.unit_days || __('days', 'webba-booking-lite')}`}
+                                                            </span>
+                                                        </div>
+                                                        <div
+                                                            className={
+                                                                'wbk_sidebar__items__item__meta-row'
+                                                            }
+                                                        >
+                                                            <span
+                                                                className={
+                                                                    'wbk_sidebar__items__item__meta-icon wbk_sidebar__items__item__meta-icon--img wbk_sidebar__items__item__meta-icon--muted'
+                                                                }
+                                                            >
+                                                                <img
+                                                                    src={calendarRangeIcon}
+                                                                    alt=""
+                                                                />
+                                                            </span>
+                                                            <span
+                                                                className={
+                                                                    'wbk_sidebar__items__item__meta-label'
+                                                                }
+                                                            >
+                                                                {unitStaySummary.rangeLabel ||
+                                                                    wording.unit_no_date_selected ||
+                                                                    __('No date selected', 'webba-booking-lite')}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <SidebarItem
+                                                    {...item}
+                                                    price={String(price)}
+                                                />
+                                            )}
                                         </div>
                                     )
                                 })}
@@ -313,17 +496,19 @@ export const Sidebar: FC<ISidebarProps> = ({
                                         }
                                     >
                                         <strong>
-                                            {(displayTotal &&
-                                                displayTotal > 0 &&
-                                                wbkFormatPrice(
-                                                    displayTotal,
-                                                    priceFormat
-                                                )) ||
-                                                wording.free ||
-                                                __('Free', 'webba-booking-lite')}
+                                            {canShowUnitPrice
+                                                ? (displayTotal &&
+                                                      displayTotal > 0 &&
+                                                      wbkFormatPrice(
+                                                          displayTotal,
+                                                          priceFormat
+                                                      )) ||
+                                                  wording.free ||
+                                                  __('Free', 'webba-booking-lite')
+                                                : ''}
                                         </strong>
                                     </p>
-                                    {displayTotal > 0 && (
+                                    {canShowUnitPrice && displayTotal > 0 && (
                                         <p
                                             className={
                                                 'wbk_sidebar__items__item__subline'
@@ -440,7 +625,12 @@ export const Sidebar: FC<ISidebarProps> = ({
                     </>
                 ) : (
                     <p className={'wbk_sidebar__empty'}>
-                        {wording.empty_summary ||
+                        {bookingMode === 'units'
+                            ? __(
+                                  'Please select a unit to see a summary here.',
+                                  'webba-booking-lite'
+                              )
+                            : wording.empty_summary ||
                             __(
                                 'Please select a service and slot to see a summary here.',
                                 'webba-booking-lite'

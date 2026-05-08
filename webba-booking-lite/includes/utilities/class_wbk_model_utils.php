@@ -84,6 +84,22 @@ class WBK_Model_Utils {
     }
 
     /**
+     * Get ids of all units.
+     *
+     * @return array
+     */
+    public static function get_unit_ids() {
+        global $wpdb;
+        $table = get_option( "wbk_db_prefix", "" ) . "wbk_units";
+        $query = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $table ) );
+        if ( !$wpdb->get_var( $query ) == $table ) {
+            return [];
+        }
+        $unit_ids = $wpdb->get_col( "SELECT id FROM " . $table );
+        return $unit_ids;
+    }
+
+    /**
      * get service IDs by location ID
      * @param int $location_id location ID
      * @return array array of service IDs that can be provided in the given location
@@ -239,6 +255,26 @@ class WBK_Model_Utils {
         return $result;
     }
 
+    /**
+     * Get pairs of unit id and names.
+     *
+     * @return array array of id-name pair
+     */
+    public static function get_units() {
+        global $wpdb;
+        $table = get_option( "wbk_db_prefix", "" ) . "wbk_units";
+        $query = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $table ) );
+        if ( !$wpdb->get_var( $query ) == $table ) {
+            return [];
+        }
+        $rows = $wpdb->get_results( "SELECT id, name FROM " . $table . " ORDER BY name ASC", ARRAY_A );
+        $result = [];
+        foreach ( $rows as $item ) {
+            $result[$item["id"]] = $item["name"];
+        }
+        return $result;
+    }
+
     public static function get_forms() {
         global $wpdb;
         $query = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( get_option( "wbk_db_prefix", "" ) . "wbk_forms" ) );
@@ -265,7 +301,12 @@ class WBK_Model_Utils {
         return $result;
     }
 
-    public static function get_email_templates( $only_active = false, $trigger = null, $service = null ) {
+    public static function get_email_templates(
+        $only_active = false,
+        $trigger = null,
+        $service = null,
+        $unit = null
+    ) {
         global $wpdb;
         $query = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( get_option( "wbk_db_prefix", "" ) . "wbk_email_templates" ) );
         if ( !$wpdb->get_var( $query ) == get_option( "wbk_db_prefix", "" ) . "wbk_email_templates" ) {
@@ -288,11 +329,21 @@ class WBK_Model_Utils {
         foreach ( $rows as $item ) {
             if ( isset( $item["use_for_all_services"] ) && $item["use_for_all_services"] == "yes" ) {
                 $result_converted[$item["id"]] = $item["name"];
-            } else {
+                continue;
+            }
+            if ( $service !== null ) {
                 $services = json_decode( ( isset( $item["services"] ) ? $item["services"] : "[]" ) );
                 if ( is_array( $services ) && in_array( $service, $services ) ) {
                     $result_converted[$item["id"]] = $item["name"];
                 }
+                continue;
+            }
+            if ( $unit !== null ) {
+                $units = json_decode( ( isset( $item["units"] ) ? $item["units"] : "[]" ) );
+                if ( is_array( $units ) && in_array( $unit, $units ) ) {
+                    $result_converted[$item["id"]] = $item["name"];
+                }
+                continue;
             }
         }
         return $result_converted;
@@ -548,6 +599,47 @@ class WBK_Model_Utils {
         $result = [];
         foreach ( $rows as $item ) {
             $result[] = $item["id"];
+        }
+        return $result;
+    }
+
+    /**
+     * Get service category IDs that include the given unit.
+     *
+     * @param int $unit_id Unit ID.
+     * @return int[] Category IDs.
+     */
+    public static function get_service_category_ids_for_unit( $unit_id ) {
+        global $wpdb;
+        $unit_id = (int) $unit_id;
+        if ( $unit_id <= 0 ) {
+            return [];
+        }
+        $table = get_option( "wbk_db_prefix", "" ) . "wbk_service_categories";
+        $query = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $table ) );
+        if ( !$wpdb->get_var( $query ) == $table ) {
+            return [];
+        }
+        $rows = $wpdb->get_results( "SELECT id, units FROM " . $table, ARRAY_A );
+        if ( !$rows ) {
+            return [];
+        }
+        $result = [];
+        foreach ( $rows as $row ) {
+            if ( empty( $row["units"] ) ) {
+                continue;
+            }
+            $unit_ids = json_decode( $row["units"], true );
+            if ( !is_array( $unit_ids ) ) {
+                $unit_ids = json_decode( $row["units"] );
+            }
+            if ( !is_array( $unit_ids ) ) {
+                continue;
+            }
+            $unit_ids = array_map( "intval", $unit_ids );
+            if ( in_array( $unit_id, $unit_ids, true ) ) {
+                $result[] = (int) $row["id"];
+            }
         }
         return $result;
     }
@@ -1847,6 +1939,54 @@ class WBK_Model_Utils {
             $products[$product->ID] = $product->post_title;
         }
         return $products;
+    }
+
+    /**
+     * @param int|string $date
+     * @param int        $unit_id
+     * @param int        $buffer_before_days Days the unit stays unavailable before each booking start.
+     * @param int        $buffer_after_days  Days the unit stays unavailable after each booking end.
+     * @param int|null   $location_id        When set, only appointments at this location (per-unit location pools).
+     */
+    public static function get_bookings_by_date_unit(
+        $date,
+        $unit_id,
+        $buffer_before_days = 0,
+        $buffer_after_days = 0,
+        $location_id = null
+    ) {
+        global $wpdb;
+        $day = $date;
+        if ( !is_int( $day ) ) {
+            $day = strtotime( (string) $day );
+        }
+        if ( $day === false ) {
+            return [];
+        }
+        $day_start = $day;
+        $day_end = $day_start + DAY_IN_SECONDS;
+        $table = get_option( "wbk_db_prefix", "" ) . "wbk_appointments";
+        $buffer_before_sec = max( 0, (int) $buffer_before_days ) * DAY_IN_SECONDS;
+        $buffer_after_sec = max( 0, (int) $buffer_after_days ) * DAY_IN_SECONDS;
+        // `day` on appointments is the start date only; long unit stays use duration/`end` for
+        // the full span. Count any active booking whose interval overlaps this calendar day.
+        // Buffers extend the blocked range (e.g. day before/after the stay counts as occupied).
+        $location_part = "";
+        if ( $location_id !== null && $location_id !== "" && (int) $location_id > 0 ) {
+            $location_part = " AND location_id = %d";
+        }
+        $sql = "SELECT id FROM " . $table . " WHERE unit_id = %d AND " . self::get_not_canclled_sql() . " AND time - %d < %d AND COALESCE(`end`, time + duration * 60) + %d > %d" . $location_part;
+        $args = [
+            (int) $unit_id,
+            $buffer_before_sec,
+            $day_end,
+            $buffer_after_sec,
+            $day_start
+        ];
+        if ( $location_part !== "" ) {
+            $args[] = (int) $location_id;
+        }
+        return $wpdb->get_results( $wpdb->prepare( $sql, ...$args ), ARRAY_A );
     }
 
 }

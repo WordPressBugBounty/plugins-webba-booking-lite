@@ -8,6 +8,7 @@ const DEFAULT_STATE = {
   locations: null,
   appointments: null,
   services: null,
+  units: null,
   cancelled_appointments: null,
   service_categories: null,
   email_templates: null,
@@ -470,15 +471,30 @@ const reducer = (state: State = DEFAULT_STATE, action: Action): State => {
       };
     }
     case "SET_FIELD_LOADING": {
+      const modelFields = state.fieldOptions[action.model] || {};
+      const previousFieldState = modelFields[action.field];
+      let updatedFieldState: Record<string, unknown> | unknown[] = { loading: action.loading };
+
+      if (Array.isArray(previousFieldState)) {
+        updatedFieldState = { options: previousFieldState, loading: action.loading };
+      } else if (
+        previousFieldState &&
+        typeof previousFieldState === "object" &&
+        !Array.isArray(previousFieldState)
+      ) {
+        const existingOptions = { ...(previousFieldState as Record<string, unknown>) };
+        delete existingOptions.loading;
+        delete existingOptions.options;
+        updatedFieldState = { ...existingOptions, loading: action.loading } as Record<string, unknown>;
+      }
+
       return {
         ...state,
         fieldOptions: {
           ...state.fieldOptions,
           [action.model]: {
-            ...state.fieldOptions[action.model],
-            [action.field]: {
-              loading: action.loading,
-            },
+            ...modelFields,
+            [action.field]: updatedFieldState,
           },
         },
       };
@@ -569,11 +585,54 @@ const selectors = {
   getPreset(state) {
     return state.preset;
   },
-  getFieldOptions: (state: any, model: string, field: string, formData: any) => {
-    return state.fieldOptions?.[model]?.[field] || [];
+  getFieldOptions: (state: any, model: string, field: string) => {
+    const fieldState = state.fieldOptions?.[model]?.[field];
+    if (fieldState === undefined || fieldState === null) {
+      return [];
+    }
+    if (Array.isArray(fieldState)) {
+      return fieldState;
+    }
+    if (typeof fieldState === "object") {
+      const fieldStateObject = fieldState as Record<string, unknown>;
+      if (Array.isArray(fieldStateObject.options)) {
+        return fieldStateObject.options;
+      }
+      const optionList = fieldStateObject.options;
+      const namedOptions = { ...fieldStateObject };
+      delete namedOptions.loading;
+      delete namedOptions.options;
+      if (Array.isArray(optionList)) {
+        return optionList;
+      }
+      const formattedOptions: Record<string, string | { label: string }> = {};
+      for (const optionKey of Object.keys(namedOptions)) {
+        if (optionKey === "loading") {
+          continue;
+        }
+        const optionValue = namedOptions[optionKey];
+        if (
+          typeof optionValue === "string" ||
+          (optionValue && typeof optionValue === "object" && "label" in (optionValue as object))
+        ) {
+          formattedOptions[optionKey] = optionValue as string | { label: string };
+        }
+      }
+      return formattedOptions;
+    }
+    return [];
   },
   getFieldLoading: (state: any, model: string, field: string) => {
-    return state.fieldOptions?.[model]?.[field]?.loading || false;
+    const fieldState = state.fieldOptions?.[model]?.[field];
+    if (
+      fieldState &&
+      typeof fieldState === "object" &&
+      !Array.isArray(fieldState) &&
+      "loading" in fieldState
+    ) {
+      return Boolean((fieldState as { loading?: boolean }).loading);
+    }
+    return false;
   },
   getModelFieldLoading: (state: any, model: string) => state[model] === null && state.isLoading,
   getGgAuthData(state, calendarId) {

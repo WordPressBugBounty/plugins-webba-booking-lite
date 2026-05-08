@@ -4037,6 +4037,237 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             ],
         );
         wbk_opt()->add_option(
+            "wbk_wording_select_units",
+            "text",
+            __("Select unit(s)", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Select unit(s)", "webba-booking-lite"),
+                "not_translated_title" => "Select units label",
+                "popup" => __("Label for selecting units.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_choose_unit_proceed",
+            "text",
+            __("Choose a unit to proceed", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Choose a unit to proceed", "webba-booking-lite"),
+                "not_translated_title" => "Choose unit to proceed label",
+                "popup" => __(
+                    "Label for prompting to choose a unit to proceed.",
+                    "webba-booking-lite",
+                ),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_please_select_location_units",
+            "text",
+            __("Please select a location first to choose units.", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __(
+                    "Please select a location first to choose units.",
+                    "webba-booking-lite",
+                ),
+                "not_translated_title" => "Please select location for units label",
+                "popup" => __(
+                    "Message shown when a location is required before choosing units.",
+                    "webba-booking-lite",
+                ),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_adult",
+            "text",
+            __("Adult", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Adult", "webba-booking-lite"),
+                "not_translated_title" => "Unit adult label",
+                "popup" => __("Label for unit adult attendee counter.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_child",
+            "text",
+            __("Child", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Child", "webba-booking-lite"),
+                "not_translated_title" => "Unit child label",
+                "popup" => __("Label for unit child attendee counter.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_infant",
+            "text",
+            __("Infant", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Infant", "webba-booking-lite"),
+                "not_translated_title" => "Unit infant label",
+                "popup" => __("Label for unit infant attendee counter.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_max_attendees",
+            "text",
+            __("Max attendees", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Max attendees", "webba-booking-lite"),
+                "not_translated_title" => "Unit max attendees label",
+                "popup" => __("Label for max attendees in unit card.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_select_suitable_range",
+            "text",
+            __("Select suitable range", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Select suitable range", "webba-booking-lite"),
+                "not_translated_title" => "Unit select suitable range label",
+                "popup" => __("Label shown above unit range calendar.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_date_flexibility",
+            "text",
+            __("Date Flexibility", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Date Flexibility", "webba-booking-lite"),
+                "not_translated_title" => "Unit date flexibility title",
+                "popup" => __("Title for date flexibility controls in unit mode.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_exact_match",
+            "text",
+            __("Exact match", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Exact match", "webba-booking-lite"),
+                "not_translated_title" => "Unit exact match option",
+                "popup" => __("Exact match option label for unit date flexibility.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_plus_minus_1_day",
+            "text",
+            __("+/- 1 day", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("+/- 1 day", "webba-booking-lite"),
+                "not_translated_title" => "Unit plus minus 1 day option",
+                "popup" => __("Label for +/- 1 day option in unit date flexibility.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_plus_minus_2_day",
+            "text",
+            __("+/- 2 days", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("+/- 2 days", "webba-booking-lite"),
+                "not_translated_title" => "Unit plus minus 2 days option",
+                "popup" => __("Label for +/- 2 days option in unit date flexibility.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_plus_minus_3_day",
+            "text",
+            __("+/- 3 days", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("+/- 3 days", "webba-booking-lite"),
+                "not_translated_title" => "Unit plus minus 3 days option",
+                "popup" => __("Label for +/- 3 days option in unit date flexibility.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_no_date_selected",
+            "text",
+            __("No date selected", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("No date selected", "webba-booking-lite"),
+                "not_translated_title" => "Unit no date selected label",
+                "popup" => __("Label shown when no unit offer date range is selected.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_days",
+            "text",
+            __("days", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("days", "webba-booking-lite"),
+                "not_translated_title" => "Unit days label",
+                "popup" => __("Label for day count in unit mode.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_available_date_ranges",
+            "text",
+            __("Available Date Ranges", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Available Date Ranges", "webba-booking-lite"),
+                "not_translated_title" => "Unit available date ranges label",
+                "popup" => __("Heading for available unit offers list.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_available",
+            "text",
+            __("Available", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Available", "webba-booking-lite"),
+                "not_translated_title" => "Unit available status label",
+                "popup" => __("Status label for available unit offers.", "webba-booking-lite"),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_unit_no_available_offers",
+            "text",
+            __("No available offers found for the selected range.", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __(
+                    "No available offers found for the selected range.",
+                    "webba-booking-lite",
+                ),
+                "not_translated_title" => "Unit no available offers message",
+                "popup" => __(
+                    "Message shown below date flexibility when no unit offers are found.",
+                    "webba-booking-lite",
+                ),
+                "tab" => "units",
+            ],
+        );
+        wbk_opt()->add_option(
             "wbk_wording_select_date_time_services",
             "text",
             __("Select date & time for services", "webba-booking-lite"),
@@ -4700,6 +4931,18 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "not_translated_title" => "No services found label",
                 "popup" => __("Error message when no services are found.", "webba-booking-lite"),
                 "tab" => "validation",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_no_units_found",
+            "text",
+            __("No units found!", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("No units found!", "webba-booking-lite"),
+                "not_translated_title" => "No units found label",
+                "popup" => __("Error message when no units are found.", "webba-booking-lite"),
+                "tab" => "units",
             ],
         );
         wbk_opt()->add_option(

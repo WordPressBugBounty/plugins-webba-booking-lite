@@ -1,17 +1,21 @@
 import { ICategory } from '../../components/Categories/types'
 import { IFieldConfig } from '../../components/Form/types'
 import { IPaymentMethod } from '../../components/PaymentSelector/types'
-import { IServiceProps } from '../../components/Services/types'
+import { IServiceProps, IUnitProps } from '../../components/Services/types'
 import { IStripeObj } from '../../screens/BookingForm/PaymentHandler/payments/Stripe/types'
 import { IAmountData, IFormData } from '../../screens/BookingForm/types'
 
 export interface IBookingFormObj {
     categories: ICategory[]
     services: IServiceProps[]
+    units: IUnitProps[]
+    bookingMode: 'services' | 'units'
     preset: any
     attrService: unknown
     attrCategory: unknown
     attrLocation: unknown
+    attrStaff?: unknown
+    attrUnits?: unknown
     dateFormat: string
     timeFormat: string
     priceFormat: string
@@ -26,10 +30,13 @@ export interface IBookingFormObj {
     extractedAttrLocations: string[]
     extractedAttrStaff: string[]
     stripeObj: IStripeObj
+    disableCustomScroll: boolean
+    attrHideCategory: 'yes' | 'no'
 }
 
 export interface IBookingFormContext extends IBookingFormObj {
     setFormData: (slug: string, value: any) => void
+    mergeFormData: (patch: Partial<IFormData>) => void
     setFormObj: (key: string, value: any) => void
     setFields: (fields: IFieldConfig[]) => void
     onLocationSelect: (id: string | number) => void
@@ -38,6 +45,7 @@ export interface IBookingFormContext extends IBookingFormObj {
         timeSlots: boolean
         serviceAvailability: { [serviceId: number]: boolean }
         serviceTimeslots: { [serviceId: number]: boolean }
+        unitAvailability: { [unitId: number]: boolean }
         bookingFields: boolean
         paymentMethods: boolean
         bookingAmounts: boolean
@@ -51,5 +59,8 @@ export interface IBookingFormProviderProps {
     attrCategory: unknown
     attrLocation?: unknown
     attrStaff?: unknown
+    attrUnits?: unknown
+    attrHideCategory?: 'yes' | 'no'
     preset?: any // Optional preset prop, type can be refined later
+    disableCustomScroll?: boolean
 }

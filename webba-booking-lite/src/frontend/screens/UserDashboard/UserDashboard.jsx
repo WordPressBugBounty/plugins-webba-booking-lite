@@ -24,7 +24,7 @@ export const UserDashboard = () => {
         (select) => select(store_name).getPreset(),
         [store_name]
     )
-
+    const { wording } = preset || {}
     const { setUserName } = dispatch(store_name)
 
     const handleSuccessLogin = (response) => {
@@ -45,12 +45,12 @@ export const UserDashboard = () => {
         () => [
             {
                 slug: 'my-bookings',
-                label: __('My Bookings', 'webba-booking-lite'),
+                label: wording?.bookings || __('My Bookings', 'webba-booking-lite'),
                 icon: iconBookings,
-                onClick: () => {},
+                onClick: () => { },
             },
         ],
-        []
+        [wording]
     )
 
     return (

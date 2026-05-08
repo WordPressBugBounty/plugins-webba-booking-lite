@@ -289,7 +289,7 @@ $transition: 0.3s all linear;
 
             &__meta-row {
                 display: flex;
-                align-items: flex-start;
+                align-items: center;
                 gap: 8px;
             }
 
@@ -303,6 +303,26 @@ $transition: 0.3s all linear;
                 svg {
                     width: 16px;
                     height: 16px;
+                }
+
+                &--img {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    img {
+                        width: 16px;
+                        height: 16px;
+                        object-fit: contain;
+                    }
+                }
+
+                &--muted {
+                    opacity: 0.55;
+
+                    img {
+                        filter: grayscale(0.25);
+                    }
                 }
             }
 
@@ -319,6 +339,9 @@ $transition: 0.3s all linear;
                 font-size: 14px;
                 line-height: 20px;
                 color: colors.$wbk-color-sidebar;
+                margin: 0;
+                display: inline-flex;
+                align-items: center;
             }
 
             &__meta-description {

@@ -12,22 +12,24 @@ import { Loading } from '../../../components/Loading/Loading'
 
 export const CheckoutStep = () => {
     const {
+        bookingMode,
         fields,
         formData,
         services = [],
+        units = [],
         setFormObj,
         setFormData,
         preset,
         loading,
     } = useBookingContext()
-    const selectedServiceIdsKey = useMemo(
+    const selectedItemIdsKey = useMemo(
         () =>
-            services
-                .filter((s) => s.selected)
-                .map((s) => s.id)
+            (bookingMode === 'units' ? units : services)
+                .filter((item) => item.selected)
+                .map((item) => item.id)
                 .sort((a, b) => a - b)
                 .join(','),
-        [services]
+        [services, units, bookingMode]
     )
     const { fetchBookingAmounts, fetchPaymentMethods, fetchBookingFields } =
         useDispatch(store_name)
@@ -38,12 +40,12 @@ export const CheckoutStep = () => {
     )
 
     useLayoutEffect(() => {
-        if (!selectedServiceIdsKey) return
-        if (fieldsFetchedForRef.current === selectedServiceIdsKey) return
-        const ids = selectedServiceIdsKey.split(',').map(Number)
+        if (!selectedItemIdsKey) return
+        if (fieldsFetchedForRef.current === selectedItemIdsKey) return
+        const ids = selectedItemIdsKey.split(',').map(Number)
         fetchBookingFields(ids)
-        fieldsFetchedForRef.current = selectedServiceIdsKey
-    }, [selectedServiceIdsKey, fetchBookingFields])
+        fieldsFetchedForRef.current = selectedItemIdsKey
+    }, [selectedItemIdsKey, fetchBookingFields])
 
     useLayoutEffect(() => {
         const enhancedFields =
@@ -84,11 +86,18 @@ export const CheckoutStep = () => {
         ) ?? []
 
     useLayoutEffect(() => {
-        if (paymentsFetchedRef.current || !selectedServiceIdsKey) return
-        const ids = selectedServiceIdsKey.split(',').map(Number)
-        fetchPaymentMethods(ids)
+        if (paymentsFetchedRef.current || !selectedItemIdsKey) return
+        const ids = selectedItemIdsKey.split(',').map(Number)
+        if (bookingMode === 'units') {
+            const selectedUnitId = ids[0]
+            if (selectedUnitId != null && Number.isFinite(selectedUnitId)) {
+                fetchPaymentMethods({ unit_id: selectedUnitId })
+            }
+        } else {
+            fetchPaymentMethods(ids)
+        }
         paymentsFetchedRef.current = true
-    }, [selectedServiceIdsKey, fetchPaymentMethods])
+    }, [selectedItemIdsKey, fetchPaymentMethods, bookingMode])
 
     const lastPaymentMethodsRef = useRef<unknown>(undefined)
     useLayoutEffect(() => {
@@ -174,7 +183,10 @@ export const CheckoutStep = () => {
                 }
             }
 
-            fetchBookingAmounts(updatedFormData)
+            fetchBookingAmounts({
+                ...updatedFormData,
+                generate_stripe_intent: false,
+            })
         }
     }, [fields, formData, fetchBookingAmounts])
 

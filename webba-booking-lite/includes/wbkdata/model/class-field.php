@@ -688,6 +688,15 @@ class Field
             case "limitation":
                 $arr_sql_parts = ["int", "unsigned NOT NULL", "", "%d"];
                 break;
+            case "price_variant":
+                $arr_sql_parts = ["text", "", "", "%s"];
+                break;
+            case "availability_ranges":
+                $arr_sql_parts = ["text", "", "", "%s"];
+                break;
+            case "number_of_people":
+                $arr_sql_parts = ["text", "", "", "%s"];
+                break;
             default:
                 break;
         }
