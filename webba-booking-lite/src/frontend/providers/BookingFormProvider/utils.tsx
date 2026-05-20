@@ -62,9 +62,88 @@ const serviceHasStaffMembers = (
             s.services.includes(String(serviceId))
     )
 
+export const buildServicesSlotIds = (selectedServices: IServiceProps[]) =>
+    selectedServices.flatMap(({ id, places }) =>
+        places && places.length > 0 ? Array(places.length).fill(id) : [id]
+    )
+
+/**
+ * JSON.stringify reorders numeric object keys; build places JSON in services order instead.
+ */
+export const serializePlacesForApi = (
+    places: Record<number, IFormPlace[]>,
+    servicesSlotOrder: number[]
+): string => {
+    const orderedServiceIds: number[] = []
+    const seen = new Set<number>()
+
+    for (const serviceId of servicesSlotOrder) {
+        if (seen.has(serviceId) || !places[serviceId]?.length) {
+            continue
+        }
+        seen.add(serviceId)
+        orderedServiceIds.push(serviceId)
+    }
+
+    const parts = orderedServiceIds.map(
+        (id) => `${JSON.stringify(String(id))}:${JSON.stringify(places[id])}`
+    )
+    return `{${parts.join(',')}}`
+}
+
+const mapServicePlacesToFormSlots = (
+    service: IServiceProps,
+    staffByService: Record<string, string | null>,
+    staffMembers: { services?: string[] }[] | undefined,
+    locationId: unknown
+): IFormPlace[] | null => {
+    const { id, places, quantity } = service
+    if (!places || places.length === 0) {
+        return null
+    }
+
+    const staffId = staffByService[String(id)] ?? null
+    const hasStaffValue = staffId != null && staffId !== ''
+    const includeStaff = serviceHasStaffMembers(staffMembers, id) && hasStaffValue
+
+    return places.map(({ timeslot, date, day, staff_member_id }) => {
+        const placeStaffId =
+            staff_member_id != null && staff_member_id !== ''
+                ? staff_member_id
+                : staffId
+        return {
+            date,
+            time: timeslot,
+            day: day,
+            quantity,
+            ...(locationId != null ? { location_id: locationId } : {}),
+            ...(includeStaff && placeStaffId != null
+                ? { staff_member_id: placeStaffId }
+                : {}),
+        }
+    })
+}
+
 export const constructFormData = (formObj: IBookingFormObj) => {
     const { fields, services, units, formData, userTimezone, preset, bookingMode } =
         formObj
+    const orderedExtras = Array.isArray((formData as Record<string, unknown>)?.extras)
+        ? ((formData as Record<string, unknown>).extras as Array<{
+              id: number
+              quantity: number
+          }>).reduce(
+              (acc: Record<string, number>, item) => {
+                  const extraId = Number(item?.id)
+                  const quantity = Math.max(1, Number(item?.quantity) || 1)
+                  if (!Number.isFinite(extraId)) {
+                      return acc
+                  }
+                  acc[String(extraId)] = quantity
+                  return acc
+              },
+              {}
+          )
+        : {}
 
     const staffByService =
         (typeof formData.staff === 'object' && formData.staff !== null
@@ -90,38 +169,21 @@ export const constructFormData = (formObj: IBookingFormObj) => {
     )
 
     const formPlaces: Record<number, IFormPlace[]> = {}
-    if (bookingMode === 'services') {
-        services
-            .filter((service) => service.selected)
-            .forEach(({ id, places, quantity }) => {
-                if (!places || places.length === 0) return
+    const servicesSlotIds =
+        bookingMode === 'services' ? buildServicesSlotIds(selectedServices) : []
 
-                const staffId = staffByService[String(id)] ?? null
-                const hasStaffValue = staffId != null && staffId !== ''
-                const includeStaff =
-                    serviceHasStaffMembers(staffMembers, id) && hasStaffValue
-                formPlaces[id] = places.map(
-                    ({ timeslot, date, day, staff_member_id }) => {
-                        const placeStaffId =
-                            staff_member_id != null &&
-                            staff_member_id !== ''
-                                ? staff_member_id
-                                : staffId
-                        return {
-                            date,
-                            time: timeslot,
-                            day: day,
-                            quantity,
-                            ...(formData?.location != null
-                                ? { location_id: formData.location }
-                                : {}),
-                            ...(includeStaff && placeStaffId != null
-                                ? { staff_member_id: placeStaffId }
-                                : {}),
-                        }
-                    }
-                )
-            })
+    if (bookingMode === 'services') {
+        selectedServices.forEach((service) => {
+            const mappedPlaces = mapServicePlacesToFormSlots(
+                service,
+                staffByService,
+                staffMembers,
+                formData?.location
+            )
+            if (mappedPlaces) {
+                formPlaces[service.id] = mappedPlaces
+            }
+        })
     }
 
     const fieldValues = fields.reduce(
@@ -219,6 +281,7 @@ export const constructFormData = (formObj: IBookingFormObj) => {
             ...fieldValues,
             booking_mode: 'units' as const,
             extra: serializedExtra as any,
+            ordered_extras: orderedExtras,
             places:
                 existingUnitPlaces && Object.keys(existingUnitPlaces).length > 0
                     ? existingUnitPlaces
@@ -268,10 +331,9 @@ export const constructFormData = (formObj: IBookingFormObj) => {
         ...(Object.keys(payloadStaff).length > 0 ? { staff: payloadStaff } : {}),
         ...fieldValues,
         extra: serializedExtra as any,
+        ordered_extras: orderedExtras,
         places: formPlaces,
-        services: selectedServices.flatMap(({ id, places }) =>
-            places && places.length > 0 ? Array(places.length).fill(id) : [id]
-        ),
+        services: servicesSlotIds,
         payment_method,
         coupon,
         attachments,

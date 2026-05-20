@@ -151,7 +151,7 @@ class WBK_Backend
                 "wbk-services",
                 ["WBK_Renderer", "render_backend_page"],
             );
-
+            
             if ($is_admin) {
                 add_submenu_page(
                     "wbk-main",

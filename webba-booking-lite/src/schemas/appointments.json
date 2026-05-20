@@ -107,7 +107,7 @@
             "misc": {
                 "tooltip": "Select the booking date.",
                 "date_format": "F j, Y",
-                "time_zone": "Asia/Dhaka"
+                "time_zone": "Europe/Warsaw"
             },
             "required": true,
             "dependency": [],
@@ -229,6 +229,20 @@
             "tab": "",
             "misc": {
                 "tooltip": "Add any additional comments related to the booking."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "appointment_booking_extra": {
+            "type": "string",
+            "input_type": "extras_selector",
+            "hidden": true,
+            "title": "Booking extra",
+            "tab": "",
+            "misc": {
+                "tooltip": "Extras for this booking"
             },
             "required": false,
             "dependency": [],

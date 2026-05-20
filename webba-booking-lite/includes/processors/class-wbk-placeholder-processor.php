@@ -42,6 +42,8 @@ class WBK_Placeholder_Processor
                     return self::process_placeholders_unit($message, $bookings);
                 }
             }
+            $booking_ids_int = array_values(array_map("intval", $bookings));
+            $extras_aggregate_text = self::format_bookings_extras_placeholder($booking_ids_int);
             $price_format = WBK_Format_Utils::get_price_format();
             $total_amount = WBK_Price_Processor::get_total_tax_fees($bookings);
             $total_amount = str_replace(
@@ -82,6 +84,10 @@ class WBK_Placeholder_Processor
                         $looped,
                         $booking_id,
                         $booking->get_service(),
+                        null,
+                        null,
+                        null,
+                        $extras_aggregate_text,
                     );
                 }
             } else {
@@ -94,6 +100,10 @@ class WBK_Placeholder_Processor
                         $message,
                         $bookings[0],
                         $booking->get_service(),
+                        null,
+                        null,
+                        null,
+                        $extras_aggregate_text,
                     );
                 } else {
                     return $message;
@@ -135,6 +145,7 @@ class WBK_Placeholder_Processor
                 $payment_details,
                 $token,
                 $admin_token,
+                $extras_aggregate_text,
             );
         }
         return stripslashes($message);
@@ -160,6 +171,10 @@ class WBK_Placeholder_Processor
             $payment_details = null;
         }
 
+        $extras_aggregate_text = self::format_bookings_extras_placeholder(
+            array_values(array_map("intval", $bookings)),
+        );
+
         if (WBK_Validator::check_email_loop($message)) {
             $looped = self::get_string_between(
                 $message,
@@ -170,6 +185,10 @@ class WBK_Placeholder_Processor
                 $looped,
                 $booking_id,
                 $booking->get_unit_id(),
+                null,
+                null,
+                null,
+                $extras_aggregate_text,
             );
             $search_tag = "[appointment_loop_start]" . $looped . "[appointment_loop_end]";
             $message = str_replace($search_tag, $looped_html, $message);
@@ -180,6 +199,9 @@ class WBK_Placeholder_Processor
             $booking_id,
             $booking->get_unit_id(),
             $payment_details,
+            null,
+            null,
+            $extras_aggregate_text,
         );
 
         return stripslashes($message);
@@ -197,7 +219,8 @@ class WBK_Placeholder_Processor
         $unit_id,
         $payment_details = null,
         $multi_token = null,
-        $multi_token_admin = null
+        $multi_token_admin = null,
+        $extras_aggregate_text = null
     ) {
         $booking = new WBK_Booking($booking_id);
         if (!$booking->is_loaded()) {
@@ -411,6 +434,12 @@ class WBK_Placeholder_Processor
 
         $message = str_replace("#attachment", $attachment, $message);
         $message = str_replace("#coupon", $coupon_name, $message);
+        if ($extras_aggregate_text !== null) {
+            $extras_placeholder_value = $extras_aggregate_text;
+        } else {
+            $extras_placeholder_value = self::format_bookings_extras_placeholder([(int) $booking_id]);
+        }
+        $message = str_replace("#extras", $extras_placeholder_value, $message);
 
         // Unit-specific placeholders
         $unit_name = $unit->get("name");
@@ -838,13 +867,85 @@ class WBK_Placeholder_Processor
         return substr($string, $ini, $len);
     }
 
+    /**
+     * Aggregate quantities per extra id from booking_extra JSON across bookings.
+     *
+     * @param array<int> $booking_ids
+     * @return array<int, int>
+     */
+    private static function aggregate_booking_extras_quantities(array $booking_ids)
+    {
+        $totals = [];
+        foreach ($booking_ids as $booking_id) {
+            $booking = new WBK_Booking((int) $booking_id);
+            if (!$booking->is_loaded()) {
+                continue;
+            }
+            $raw = $booking->get("booking_extra");
+            if ($raw === "" || $raw === null || $raw === false) {
+                continue;
+            }
+            $decoded = json_decode((string) $raw, true);
+            if (!is_array($decoded)) {
+                continue;
+            }
+            foreach ($decoded as $extra_id_key => $qty) {
+                $eid = (int) $extra_id_key;
+                $q = (int) $qty;
+                if ($eid < 1 || $q < 1) {
+                    continue;
+                }
+                if (!isset($totals[$eid])) {
+                    $totals[$eid] = 0;
+                }
+                $totals[$eid] += $q;
+            }
+        }
+        return $totals;
+    }
+
+    /**
+     * Text for #extras: one line per extra "{name}: {qty}", summed across bookings.
+     * Uses line breaks suitable for HTML email bodies (TinyMCE strips bare newlines).
+     *
+     * @param array<int> $booking_ids
+     * @return string
+     */
+    private static function format_bookings_extras_placeholder(array $booking_ids)
+    {
+        $totals = self::aggregate_booking_extras_quantities($booking_ids);
+        if ($totals === []) {
+            return "";
+        }
+        ksort($totals, SORT_NUMERIC);
+        $lines = [];
+        foreach ($totals as $extra_id => $qty) {
+            $extra = new WBK_Extra((int) $extra_id);
+            if ($extra->is_loaded()) {
+                $name = $extra->get_name();
+                if (function_exists("pll__")) {
+                    $name = pll__($name);
+                }
+            } else {
+                $name = sprintf(
+                    /* translators: %d: extra id when the record is missing */
+                    __("Extra #%d", "webba-booking-lite"),
+                    $extra_id,
+                );
+            }
+            $lines[] = esc_html($name) . ": " . (int) $qty;
+        }
+        return implode("<br/>", $lines);
+    }
+
     public static function message_placeholder_processing_old(
         $message,
         $booking_id,
         $service_id,
         $payment_details = null,
         $multi_token = null,
-        $multi_token_admin = null
+        $multi_token_admin = null,
+        $extras_aggregate_text = null
     ) {
         $booking = new WBK_Booking($booking_id);
         if (!$booking->is_loaded()) {
@@ -1079,6 +1180,12 @@ class WBK_Placeholder_Processor
 
         $message = str_replace("#attachment", $attachment, $message);
         $message = str_replace("#coupon", $coupon_name, $message);
+        if ($extras_aggregate_text !== null) {
+            $extras_placeholder_value = $extras_aggregate_text;
+        } else {
+            $extras_placeholder_value = self::format_bookings_extras_placeholder([(int) $booking_id]);
+        }
+        $message = str_replace("#extras", $extras_placeholder_value, $message);
 
         $message = str_replace("#service_description", $service->get_description(), $message);
         $message = str_replace(

@@ -42,7 +42,7 @@
                 "tooltip": "Select the units to be included in this category.",
                 "options": "units",
                 "multiple": true,
-                "required_plan": "pro"
+                "required_plan": "premium"
             },
             "required": false,
             "dependency": [],

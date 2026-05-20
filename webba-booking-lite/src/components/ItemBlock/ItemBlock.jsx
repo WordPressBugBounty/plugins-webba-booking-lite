@@ -10,6 +10,7 @@ import iconTime from '../../../public/images/icon-ud-time.svg'
 import iconCurrency from '../../../public/images/icon-ud-currency.svg'
 import { wbkFormatPrice } from '../../frontend/providers/BookingFormProvider/utils'
 import { __ } from '@wordpress/i18n'
+import { getBookingLocalUnixTime, wbkFormat } from '../../admin/components/Form/utils/dateTime'
 
 export default function ItemBlock({
     data,
@@ -42,13 +43,13 @@ export default function ItemBlock({
 
     const {
         wording,
-        settings: { timezone, price_format, price_separator, price_fractional },
+        settings: { timezone, time_format, price_format, price_separator, price_fractional },
     } = select(store_name).getPreset()
     const allStatus = useMemo(
         () => bookingsSchema.properties.appointment_status.misc.options,
         []
     )
-    const { status, price, date, time_formated, amount_paid } = data
+    const { status, price, date, time, timezone_offset, amount_paid } = data
 
     let fieldName = ''
     let title = '-'
@@ -72,6 +73,10 @@ export default function ItemBlock({
             break
     }
 
+    const displayUnixTime = useMemo(() => {
+        return getBookingLocalUnixTime(time, timezone_offset, timezone)
+    }, [time, timezone_offset, timezone])
+
     return (
         <li className={styles.wrapper}>
             <label>
@@ -90,7 +95,7 @@ export default function ItemBlock({
                         </div>
                         <div className={styles.itemInfo}>
                             <img src={iconTime} />
-                            {time_formated}
+                            {wbkFormat(displayUnixTime, time_format, timezone)}
                         </div>
                         {amount_paid && (
                             <div className={styles.itemInfo}>

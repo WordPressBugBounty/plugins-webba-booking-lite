@@ -42,6 +42,8 @@ export interface IUnitDateOffer {
 export interface IFormData {
     services: number[]
     units?: number[]
+    extras?: Array<{ id: number; quantity: number }>
+    ordered_extras?: Record<string, number>
     booking_mode?: 'services' | 'units'
     unit_attendees?: Record<number, { adult: number; child: number; infant: number }>
     unit_quantity?: Record<number, number>

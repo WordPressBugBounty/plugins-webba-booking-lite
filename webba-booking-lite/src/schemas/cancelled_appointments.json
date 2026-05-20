@@ -92,6 +92,18 @@
             "default_value": "",
             "editable": true
         },
+        "appointment_booking_extra": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Booking extra",
+            "tab": "",
+            "misc": null,
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
         "appointment_moment_price": {
             "type": "string",
             "input_type": "text",

@@ -697,6 +697,9 @@ class Field
             case "number_of_people":
                 $arr_sql_parts = ["text", "", "", "%s"];
                 break;
+            case "extras_selector":
+                $arr_sql_parts = ["text", "", "", "%s"];
+                break;
             default:
                 break;
         }

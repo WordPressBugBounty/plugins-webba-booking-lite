@@ -78,6 +78,23 @@
             "default_value": "0",
             "editable": true
         },
+        "unit_extras": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Extras",
+            "tab": "general",
+            "misc": {
+                "tooltip": "Select which extras customers can add when booking this unit.",
+                "options": "extras",
+                "multiple": true,
+                "required_plan": "premium"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
         "unit_quantity": {
             "type": "string",
             "input_type": "text",

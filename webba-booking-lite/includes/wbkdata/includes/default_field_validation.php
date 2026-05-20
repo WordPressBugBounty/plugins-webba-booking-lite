@@ -663,4 +663,16 @@ function validate_number_of_people($input, $value, $slug, $field)
 {
     return [true, $value];
 }
+
+// extras selector
+add_filter(
+    'wbkdata_property_field_validation_extras_selector',
+    'validate_extras_selector',
+    10,
+    4
+);
+function validate_extras_selector($input, $value, $slug, $field)
+{
+    return [true, $value];
+}
 ?>

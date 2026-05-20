@@ -252,11 +252,21 @@ class WBK_Model_Relation_Destroyer
         switch ($model_name) {
             case 'services':
                 $this->sync_array_columns('service_categories', 'list', $item->categories, $item->id);
+                $this->sync_array_columns('extras', 'services', $item->extras, $item->id);
 
                 break;
             case 'service_categories':
-
                 $this->sync_array_columns('services', 'categories', $item->list, $item->id);
+
+                break;
+            case 'extras':
+                $this->sync_array_columns('services', 'extras', $item->services, $item->id);
+                $this->sync_array_columns('units', 'extras', $item->units, $item->id);
+
+                break;
+            case 'units':
+                $this->sync_array_columns('extras', 'units', $item->extras, $item->id);
+
                 break;
             default: break;
         }

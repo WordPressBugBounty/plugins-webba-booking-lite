@@ -1,0 +1,132 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "extra_image": {
+            "type": "string",
+            "input_type": "file",
+            "hidden": false,
+            "title": "Photo",
+            "tab": "details",
+            "misc": {
+                "tooltip": "Upload main service image which will show up in the booking form. Leave empty if you don't want to show any image.",
+                "required_plan": "premium"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "extra_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Extra name",
+            "tab": "details",
+            "misc": {
+                "required_plan": "premium"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "extra_description": {
+            "type": "string",
+            "input_type": "editor",
+            "hidden": true,
+            "title": "Description",
+            "tab": "details",
+            "misc": {
+                "tooltip": "Enter a description of the extra.",
+                "required_plan": "premium"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "extra_min_quantity": {
+            "type": "string",
+            "input_type": "limitation",
+            "hidden": true,
+            "title": "Min / max items per booking",
+            "tab": "details",
+            "misc": {
+                "tooltip": "Set the minimum and maximum number of this extra a customer can add in one booking. For example, enter 2 in the minimum if they must take at least two, or set maximum to cap how many they may select.",
+                "min_field": "min_quantity",
+                "max_field": "max_quantity",
+                "required_plan": "premium"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "1",
+            "editable": true
+        },
+        "extra_max_quantity": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Maximum quantity of this extra",
+            "tab": "details",
+            "misc": {
+                "tooltip": "Upper limit on how many of this extra a customer can choose in a single booking.",
+                "sub_type": "positive_integer",
+                "hidden": true,
+                "required_plan": "premium"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "1",
+            "editable": true
+        },
+        "extra_services": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Hourly Services / Rentals",
+            "tab": "details",
+            "misc": {
+                "tooltip": "Select the services where this extra is available.",
+                "options": "services",
+                "multiple": true
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "extra_units": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Daily Services / Rentals",
+            "tab": "details",
+            "misc": {
+                "tooltip": "Select the services where this extra is available.",
+                "options": "units",
+                "multiple": true
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "extra_price": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Price per item",
+            "tab": "pricing",
+            "misc": {
+                "tooltip": "Set the price per item. Leaving it as 0, will show price as \"Free\" in the booking form.",
+                "sub_type": "none_negative_float",
+                "required_plan": "premium"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "0",
+            "editable": true
+        }
+    }
+}

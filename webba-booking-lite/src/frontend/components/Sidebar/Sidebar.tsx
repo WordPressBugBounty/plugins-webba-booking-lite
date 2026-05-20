@@ -1,4 +1,4 @@
-import { FC, useMemo, useRef, useEffect, useState } from 'react'
+import { FC, useCallback, useMemo, useRef, useEffect, useState } from 'react'
 import { __ } from '@wordpress/i18n'
 import { differenceInCalendarDays, format } from 'date-fns'
 import { ISidebarProps } from './types'
@@ -16,6 +16,7 @@ import iconEmail from '../../../../public/images/icon-email.svg'
 import { useWording } from '../../hooks/useWording'
 import calendarRangeIcon from '../../../../public/images/icon-calendar.svg'
 import dayCountIcon from '../../../../public/images/icon-clock.svg'
+import { IExtraProps } from '../Extras/types'
 
 const parseYmdLocal = (ymd: string): Date => {
     const parts = ymd.split('-').map(Number)
@@ -34,6 +35,7 @@ export const Sidebar: FC<ISidebarProps> = ({
 }) => {
     const {
         services,
+        extras,
         units,
         bookingMode,
         attrService,
@@ -45,6 +47,7 @@ export const Sidebar: FC<ISidebarProps> = ({
     const wording = useWording()
     const [animatedIds, setAnimatedIds] = useState<number[]>([])
     const [showSummary, setShowSummary] = useState(false)
+    const [extrasExpanded, setExtrasExpanded] = useState(true)
     const prevIdsRef = useRef<number[]>([])
 
     const { help_title, help_phone, help_email } = useMemo(() => {
@@ -139,6 +142,53 @@ export const Sidebar: FC<ISidebarProps> = ({
     const sortedItems = items
         .slice()
         .sort((a, b) => (a.selectedAt || 0) - (b.selectedAt || 0))
+
+    const selectedExtras = useMemo(() => {
+        return (extras || [])
+            .filter((extra: IExtraProps) => extra.selected)
+            .slice()
+            .sort((a, b) => (a.selectedAt || 0) - (b.selectedAt || 0))
+    }, [extras])
+
+    const getExtraLinePrice = useCallback(
+        (extra: IExtraProps) => {
+            const quantity = Math.max(1, Number(extra.quantity) || 1)
+            const amountPayload = amountData as unknown as Record<string, unknown>
+            const orderedFromApi = amountPayload?.ordered_extras
+            if (Array.isArray(orderedFromApi)) {
+                const row = orderedFromApi.find(
+                    (entry: { id?: number }) => Number(entry?.id) === Number(extra.id)
+                ) as { line_net?: number | string } | undefined
+                if (row != null && row.line_net !== undefined && row.line_net !== '') {
+                    const parsed = Number(row.line_net)
+                    if (!Number.isNaN(parsed)) {
+                        return parsed
+                    }
+                }
+            }
+            const itemsList = amountData?.items as
+                | Array<{ id?: unknown; price?: number }>
+                | undefined
+            if (Array.isArray(itemsList)) {
+                const extraKey = `extra:${extra.id}`
+                const matched = itemsList.filter(
+                    (entry) => String(entry?.id) === extraKey
+                )
+                if (matched.length > 0) {
+                    return matched.reduce(
+                        (sum, entry) => sum + Number(entry.price || 0),
+                        0
+                    )
+                }
+            }
+            const unitPrice = Number(extra.price)
+            if (unitPrice > 0 && quantity > 0) {
+                return unitPrice * quantity
+            }
+            return 0
+        },
+        [amountData]
+    )
 
     useEffect(() => {
         const currentIds = sortedItems.map((item) => item.id)
@@ -300,7 +350,7 @@ export const Sidebar: FC<ISidebarProps> = ({
                                                                 }
                                                             >
                                                                 {item.quantity &&
-                                                                Number(item.quantity) > 1
+                                                                    Number(item.quantity) > 1
                                                                     ? `${item.quantity}x `
                                                                     : ''}
                                                                 {item.label}
@@ -351,7 +401,7 @@ export const Sidebar: FC<ISidebarProps> = ({
                                                                 }
                                                             >
                                                                 {unitStaySummary.dayCount !==
-                                                                null
+                                                                    null
                                                                     ? `${unitStaySummary.dayCount} ${unitStaySummary.dayCount === 1 ? __('day', 'webba-booking-lite') : wording.unit_days || __('days', 'webba-booking-lite')}`
                                                                     : `— ${wording.unit_days || __('days', 'webba-booking-lite')}`}
                                                             </span>
@@ -479,6 +529,94 @@ export const Sidebar: FC<ISidebarProps> = ({
                                 </div>
                             )} */}
                             {/* tax end */}
+                            {selectedExtras.length > 0 && (
+                                <div className={'wbk_sidebar__extras-toggle'}>
+                                    <div
+                                        role="button"
+                                        tabIndex={0}
+                                        className={classNames(
+                                            'wbk_sidebar__extras-toggle__btn',
+                                            {
+                                                ['wbk_sidebar__extras-toggle__btn--expanded']:
+                                                    extrasExpanded,
+                                            }
+                                        )}
+                                        onClick={() =>
+                                            setExtrasExpanded((expanded) => !expanded)
+                                        }
+                                        onKeyDown={(e) =>
+                                            (e.key === 'Enter' || e.key === ' ') &&
+                                            setExtrasExpanded((expanded) => !expanded)
+                                        }
+                                    >
+                                        <span>
+                                            {wording.additional_items ||
+                                                __('Additional items', 'webba-booking-lite')}
+                                        </span>
+                                        <ArrowDownIcon
+                                            className={classNames(
+                                                'wbk_sidebar__extras-toggle__icon',
+                                                {
+                                                    ['wbk_sidebar__extras-toggle__icon--expanded']:
+                                                        extrasExpanded,
+                                                }
+                                            )}
+                                        />
+                                    </div>
+                                    {extrasExpanded && (
+                                        <div className={'wbk_sidebar__extras-toggle__list'}>
+                                            {selectedExtras.map((extra) => {
+                                                const quantity = Math.max(
+                                                    1,
+                                                    Number(extra.quantity) || 1
+                                                )
+                                                const linePrice = getExtraLinePrice(extra)
+                                                const titlePrefix =
+                                                    quantity > 1 ? `${quantity}x ` : ''
+                                                return (
+                                                    <div
+                                                        key={extra.id}
+                                                        className={
+                                                            'wbk_sidebar__items__item__inner'
+                                                        }
+                                                    >
+                                                        <div
+                                                            className={
+                                                                'wbk_sidebar__items__item__info'
+                                                            }
+                                                        >
+                                                            <h4
+                                                                className={
+                                                                    'wbk_sidebar__items__item__title'
+                                                                }
+                                                            >
+                                                                {titlePrefix}
+                                                                {extra.label}
+                                                            </h4>
+                                                        </div>
+                                                        <div
+                                                            className={
+                                                                'wbk_sidebar__items__item__price'
+                                                            }
+                                                        >
+                                                            {(linePrice > 0 &&
+                                                                wbkFormatPrice(
+                                                                    linePrice,
+                                                                    priceFormat
+                                                                )) ||
+                                                                wording.free ||
+                                                                __(
+                                                                    'Free',
+                                                                    'webba-booking-lite'
+                                                                )}
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                             {/* total */}
                             <div className={'wbk_sidebar__items__item'}>
                                 <h4
@@ -498,13 +636,13 @@ export const Sidebar: FC<ISidebarProps> = ({
                                         <strong>
                                             {canShowUnitPrice
                                                 ? (displayTotal &&
-                                                      displayTotal > 0 &&
-                                                      wbkFormatPrice(
-                                                          displayTotal,
-                                                          priceFormat
-                                                      )) ||
-                                                  wording.free ||
-                                                  __('Free', 'webba-booking-lite')
+                                                    displayTotal > 0 &&
+                                                    wbkFormatPrice(
+                                                        displayTotal,
+                                                        priceFormat
+                                                    )) ||
+                                                wording.free ||
+                                                __('Free', 'webba-booking-lite')
                                                 : ''}
                                         </strong>
                                     </p>
@@ -627,9 +765,9 @@ export const Sidebar: FC<ISidebarProps> = ({
                     <p className={'wbk_sidebar__empty'}>
                         {bookingMode === 'units'
                             ? __(
-                                  'Please select a unit to see a summary here.',
-                                  'webba-booking-lite'
-                              )
+                                'Please select a unit to see a summary here.',
+                                'webba-booking-lite'
+                            )
                             : wording.empty_summary ||
                             __(
                                 'Please select a service and slot to see a summary here.',

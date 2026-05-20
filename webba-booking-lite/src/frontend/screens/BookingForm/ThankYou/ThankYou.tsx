@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n'
 import { useBookingContext } from '../../../providers/BookingFormProvider/BookingFormProvider'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import './ThankYou.scss'
 import { ReactComponent as IconCheck } from '../../../../../public/images/icon-check.svg'
 import { BookingBlock } from '../../../components/BookingBlock/BookingBlock'
@@ -18,6 +18,7 @@ import { AddToCalendar } from './AddToCalendar/AddToCalendar'
 import type { FirstEventFallback } from './AddToCalendar/types'
 import { ReactComponent as PersonIcon } from '../../../../../public/images/icon-person.svg'
 import { ReactComponent as MapPinIcon } from '../../../../../public/images/icon-map-pin.svg'
+import type { IThankYouExtraRow } from './types'
 
 interface ThankYouProps {
     bookingDetails?: any
@@ -28,6 +29,7 @@ export const ThankYou = ({
 }: ThankYouProps = {}) => {
     const {
         services,
+        extras,
         priceFormat,
         amountData: contextAmountData,
         preset,
@@ -126,6 +128,176 @@ export const ThankYou = ({
 
         return bookingData?.payment_details
     }, [contextAmountData, bookingData, bookingDataFromStore])
+
+    const getThankYouExtraLinePrice = useCallback(
+        (
+            extraId: number,
+            quantity: number,
+            presetUnitPrice: number
+        ): number => {
+            const qty = Math.max(1, quantity)
+            const amountPayload = amountData as unknown as Record<
+                string,
+                unknown
+            >
+            const orderedFromApi = amountPayload?.ordered_extras
+            if (Array.isArray(orderedFromApi)) {
+                const row = orderedFromApi.find(
+                    (entry: { id?: number }) =>
+                        Number(entry?.id) === Number(extraId)
+                ) as { line_net?: number | string } | undefined
+                if (
+                    row != null &&
+                    row.line_net !== undefined &&
+                    row.line_net !== ''
+                ) {
+                    const parsed = Number(row.line_net)
+                    if (!Number.isNaN(parsed)) {
+                        return parsed
+                    }
+                }
+            }
+            const itemsList = amountData?.items as
+                | Array<{ id?: unknown; price?: number }>
+                | undefined
+            if (Array.isArray(itemsList)) {
+                const extraKey = `extra:${extraId}`
+                const matched = itemsList.filter(
+                    (entry) => String(entry?.id) === extraKey
+                )
+                if (matched.length > 0) {
+                    return matched.reduce(
+                        (sum, entry) => sum + Number(entry.price || 0),
+                        0
+                    )
+                }
+            }
+            const unitPrice = Number(presetUnitPrice)
+            if (unitPrice > 0 && qty > 0) {
+                return unitPrice * qty
+            }
+            return 0
+        },
+        [amountData]
+    )
+
+    const thankYouExtraRows = useMemo((): IThankYouExtraRow[] => {
+        const presetExtras = Array.isArray(preset?.extras) ? preset.extras : []
+        const presetById = (id: number) =>
+            presetExtras.find(
+                (e: { id?: number }) => Number(e.id) === Number(id)
+            )
+
+        const fromSelectedState = (extras || [])
+            .filter((e) => e.selected)
+            .slice()
+            .sort((a, b) => (a.selectedAt || 0) - (b.selectedAt || 0))
+        if (fromSelectedState.length > 0) {
+            return fromSelectedState.map((e) => ({
+                id: e.id,
+                label: e.label,
+                quantity: Math.max(1, Number(e.quantity) || 1),
+                presetUnitPrice: Number(e.price) || 0,
+            }))
+        }
+
+        const fdExtras = formData?.extras
+        if (Array.isArray(fdExtras) && fdExtras.length > 0) {
+            return fdExtras.map(({ id, quantity }) => {
+                const def = presetById(Number(id))
+                return {
+                    id: Number(id),
+                    label: def?.label ?? String(id),
+                    quantity: Math.max(1, Number(quantity) || 1),
+                    presetUnitPrice: Number(def?.price) || 0,
+                }
+            })
+        }
+
+        const amountPayload = amountData as unknown as Record<
+            string,
+            unknown
+        >
+        const orderedFromApi = amountPayload?.ordered_extras
+        if (Array.isArray(orderedFromApi) && orderedFromApi.length > 0) {
+            const rows: IThankYouExtraRow[] = []
+            for (const raw of orderedFromApi) {
+                const row = raw as {
+                    id?: number
+                    quantity?: number
+                    qty?: number
+                }
+                const id = Number(row?.id)
+                if (!Number.isFinite(id)) continue
+                const qty = Math.max(
+                    1,
+                    Number(row.quantity ?? row.qty ?? 1) || 1
+                )
+                const def = presetById(id)
+                rows.push({
+                    id,
+                    label: def?.label ?? String(id),
+                    quantity: qty,
+                    presetUnitPrice: Number(def?.price) || 0,
+                })
+            }
+            return rows
+        }
+
+        const fdOrdered = formData?.ordered_extras
+        if (
+            fdOrdered &&
+            typeof fdOrdered === 'object' &&
+            !Array.isArray(fdOrdered)
+        ) {
+            const entries = Object.entries(fdOrdered as Record<string, number>)
+            if (entries.length > 0) {
+                return entries.map(([key, qty]) => {
+                    const id = Number(key)
+                    const def = presetById(id)
+                    const quantity = Math.max(1, Number(qty) || 1)
+                    return {
+                        id,
+                        label: def?.label ?? String(id),
+                        quantity,
+                        presetUnitPrice: Number(def?.price) || 0,
+                    }
+                })
+            }
+        }
+
+        const itemsList = amountData?.items as
+            | Array<{ id?: unknown }>
+            | undefined
+        if (Array.isArray(itemsList)) {
+            const seen = new Set<number>()
+            const rows: IThankYouExtraRow[] = []
+            for (const entry of itemsList) {
+                const sid = String(entry?.id ?? '')
+                const m = /^extra:(\d+)$/.exec(sid)
+                if (!m) continue
+                const id = Number(m[1])
+                if (seen.has(id)) continue
+                seen.add(id)
+                const def = presetById(id)
+                rows.push({
+                    id,
+                    label: def?.label ?? String(id),
+                    quantity: 1,
+                    presetUnitPrice: Number(def?.price) || 0,
+                })
+            }
+            if (rows.length > 0) return rows
+        }
+
+        return []
+    }, [
+        amountData,
+        extras,
+        formData?.extras,
+        formData?.ordered_extras,
+        preset?.extras,
+    ])
 
     const depositTotal = useMemo(() => {
         if (!amountData?.items || !Array.isArray(amountData.items)) return 0
@@ -394,6 +566,42 @@ export const ThankYou = ({
                                 </div>
                             )}
                             {/* service fees end */}
+                            {thankYouExtraRows.map((row) => {
+                                const linePrice = getThankYouExtraLinePrice(
+                                    row.id,
+                                    row.quantity,
+                                    row.presetUnitPrice
+                                )
+                                const titlePrefix =
+                                    row.quantity > 1
+                                        ? `${row.quantity}x `
+                                        : ''
+                                return (
+                                    <div
+                                        className={
+                                            'wbk_thank_you__cart-items__item'
+                                        }
+                                        key={row.id}
+                                    >
+                                        <p>
+                                            {titlePrefix}
+                                            {row.label}
+                                        </p>
+                                        <strong>
+                                            {(linePrice > 0 &&
+                                                wbkFormatPrice(
+                                                    linePrice,
+                                                    priceFormat
+                                                )) ||
+                                                wording.free ||
+                                                __(
+                                                    'Free',
+                                                    'webba-booking-lite'
+                                                )}
+                                        </strong>
+                                    </div>
+                                )
+                            })}
                             {/* deposits */}
                             {depositTotal > 0 && (
                                 <div

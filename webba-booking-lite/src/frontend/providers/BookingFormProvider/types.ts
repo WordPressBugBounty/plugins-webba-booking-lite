@@ -1,4 +1,5 @@
 import { ICategory } from '../../components/Categories/types'
+import { IExtraProps } from '../../components/Extras/types'
 import { IFieldConfig } from '../../components/Form/types'
 import { IPaymentMethod } from '../../components/PaymentSelector/types'
 import { IServiceProps, IUnitProps } from '../../components/Services/types'
@@ -8,6 +9,7 @@ import { IAmountData, IFormData } from '../../screens/BookingForm/types'
 export interface IBookingFormObj {
     categories: ICategory[]
     services: IServiceProps[]
+    extras: IExtraProps[]
     units: IUnitProps[]
     bookingMode: 'services' | 'units'
     preset: any

@@ -27,6 +27,7 @@ import noItemsImage from '../../../../public/images/bookings-empty.png'
 import { UnitPrices } from '../../components/WebbaDataTable/cells/UnitPrices/UnitPrices'
 import './ServicesScreen.scss'
 import { ProFeatuerWrapper } from '../../components/ProFeatuerWrapper/ProFeatuerWrapper'
+import { ExtrasScreen } from '../Extras/ExtrasScreen'
 
 export const ServicesScreen = () => {
     const formService = createFormFromModel(servicesModel)
@@ -381,6 +382,16 @@ export const ServicesScreen = () => {
                 'list'
             )
 
+            const serviceExtras = response?.extras ?? response?.service_extras
+            if (serviceExtras !== undefined) {
+                await syncConnectedTables(
+                    response.id,
+                    serviceExtras,
+                    'extras',
+                    'services'
+                )
+            }
+
             return response
         } catch (e) {
             console.error('failed to add service', e)
@@ -389,6 +400,16 @@ export const ServicesScreen = () => {
     const addModelItemUnit = async (data: any) => {
         try {
             const response = await addItem('units', data)
+
+            const unitExtras = response?.extras ?? response?.unit_extras
+            if (unitExtras !== undefined) {
+                await syncConnectedTables(
+                    response.id,
+                    unitExtras,
+                    'extras',
+                    'units'
+                )
+            }
 
             return response
         } catch (e) {
@@ -501,6 +522,7 @@ export const ServicesScreen = () => {
                 search={catSearchField}
                 isItemsForbidden={isForbidden(serviceCategories)}
             />
+            <ExtrasScreen />
             <SuccessMessage />
             <FailedMessage />
         </>

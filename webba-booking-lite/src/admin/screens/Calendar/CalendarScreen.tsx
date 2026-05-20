@@ -23,6 +23,7 @@ import { store_name } from '../../../store/backend'
 import { createFormMenuSectionsFromModel } from '../../components/Form/utils/utils'
 import { removePrefixesFromModelFields } from '../../components/WebbaDataTable/utils'
 import BookingsModel from '../../../schemas/appointments.json'
+import { stripIncompleteBookingExtrasForSubmit } from '../../components/Form/Fields/ExtrasSelectorField/ExtrasSelectorField'
 import { FilterForm } from '../../components/Filter/FilterForm'
 import { filterFields } from './FilterConfigs'
 import { __ } from '@wordpress/i18n'
@@ -41,6 +42,15 @@ const bookingsModel = removePrefixesFromModelFields(
 )
 
 const form = createFormFromModel(bookingsModel)
+
+const sanitizeBookingFormPayload = (data: Record<string, unknown>) => {
+    const payload = { ...data }
+    if (typeof payload.booking_extra === 'string') {
+        payload.booking_extra =
+            stripIncompleteBookingExtrasForSubmit(payload.booking_extra)
+    }
+    return payload
+}
 
 const menuSections = createFormMenuSectionsFromModel({
     model: bookingsModel,
@@ -156,7 +166,8 @@ export const CalendarScreen = () => {
     }, [])
 
     const onSubmit = useCallback(async (update: any, id: number) => {
-        await setItem('appointments', { ...update, id })
+        const cleaned = sanitizeBookingFormPayload(update)
+        await setItem('appointments', { ...cleaned, id })
     }, [])
 
     const onDuplicate = useCallback(async (data: any) => {
@@ -202,7 +213,7 @@ export const CalendarScreen = () => {
                 form={form}
                 sections={menuSections}
                 onSubmit={async (data) => {
-                    return await addBooking(data)
+                    return await addBooking(sanitizeBookingFormPayload(data))
                 }}
             />
         )

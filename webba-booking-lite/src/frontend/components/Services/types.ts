@@ -44,6 +44,7 @@ export interface IServiceProps {
     limited_timeslot: boolean
     first_available: string | null
     hide_price: boolean
+    extra_ids?: number[]
 }
 
 export interface IUnitAttendees {
@@ -77,4 +78,5 @@ export interface IUnitProps {
     selectedDate?: Date
     selectedMonth?: Date
     attendees?: IUnitAttendees
+    extra_ids?: number[]
 }

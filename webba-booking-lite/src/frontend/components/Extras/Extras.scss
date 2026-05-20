@@ -1,0 +1,40 @@
+.wbk_extras_wrapper {
+    width: 100%;
+}
+
+.wbk_extra_item {
+    .wbk_service_item__heading-content {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    &__select-checkbox-wrap {
+        flex-shrink: 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        align-self: flex-start;
+        padding-top: 4px;
+    }
+
+    &__select-checkbox {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        cursor: pointer;
+        accent-color: colors.$wbk-primary-500;
+    }
+
+    .wbk_service_item__heading-wrapper__price-row {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 10px;
+    }
+
+    &__quantity-below-price {
+        display: flex;
+        justify-content: flex-end;
+    }
+}

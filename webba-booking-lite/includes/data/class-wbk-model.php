@@ -46,6 +46,31 @@ class WBK_Model
 	        COLLATE = utf8_general_ci",
         );
     }
+
+    /**
+     * Extras keyed by id (integer string or int per DB driver) => name.
+     *
+     * @return array<string|int, string>
+     */
+    public static function get_extras()
+    {
+        global $wpdb;
+        $table = get_option("wbk_db_prefix", "") . "wbk_extras";
+        $query = $wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($table));
+        if (!$wpdb->get_var($query) == $table) {
+            return [];
+        }
+        $rows = $wpdb->get_results(
+            "SELECT id, name FROM " . $table . " ORDER BY name ASC",
+            ARRAY_A,
+        );
+        $result = [];
+        foreach ($rows as $item) {
+            $result[$item["id"]] = $item["name"];
+        }
+        return $result;
+    }
+
     public function initalize_model()
     {
         global $wpdb;
@@ -445,7 +470,6 @@ class WBK_Model
             "checkbox",
             "availability",
             [
-                "checkbox_value" => "yes",
                 "yes" => __("Yes", "webba-booking-lite"),
                 "tooltip" => __(
                     "Choose dates where this service should follow a different schedule than normal. Perfect for holidays, special events, or temporary changes.",
@@ -738,6 +762,28 @@ class WBK_Model
                 "options" => "locations",
                 "multiple" => true,
                 "required_plan" => "premium", // TIER 3
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __(
+            "Select which extras customers can add when booking this service.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "service_extras",
+            "extras",
+            __("Extras", "webba-booking-lite"),
+            "select",
+            "details",
+            [
+                "tooltip" => $tooltip,
+                "options" => "extras",
+                "multiple" => true,
+                "required_plan" => "premium",
             ],
             null,
             true,
@@ -1321,7 +1367,7 @@ class WBK_Model
                 "items" => WBK_Model_Utils::get_units(),
                 "options" => "units",
                 "multiple" => true,
-                'required_plan' => 'pro', // TIER 2
+                "required_plan" => "premium", // TIER 3
             ],
             null,
             true,
@@ -1569,7 +1615,7 @@ class WBK_Model
             "service_id",
             "unit_id",
             "staff_member_id",
-            "phone",
+            "phone"
         ]);
 
         $table = new WbkData\Model($db_prefix . "wbk_appointments");
@@ -1863,6 +1909,20 @@ class WBK_Model
             "",
             true,
             in_array("description", $allowed_fields),
+            false,
+        );
+
+        $tooltip = __("Extras for this booking", "webba-booking-lite");
+        $table->add_field(
+            "appointment_booking_extra",
+            "booking_extra",
+            __("Booking extra", "webba-booking-lite"),
+            "extras_selector",
+            "",
+            ["tooltip" => $tooltip],
+            "",
+            true,
+            in_array("booking_extra", $allowed_fields),
             false,
         );
 
@@ -2411,6 +2471,18 @@ class WBK_Model
             "",
             true,
             in_array("description", $allowed_fields),
+            false,
+        );
+        $table->add_field(
+            "appointment_booking_extra",
+            "booking_extra",
+            __("Booking extra", "webba-booking-lite"),
+            "text",
+            "",
+            null,
+            "",
+            true,
+            in_array("booking_extra", $allowed_fields),
             false,
         );
         $table->add_field(
@@ -3363,6 +3435,153 @@ class WBK_Model
         $table->sync_structure();
         WbkData()->models->add($table, $db_prefix . "wbk_locations");
 
+        // Extras
+        $table = new WbkData\Model($db_prefix . "wbk_extras");
+        $table->set_single_item_name(__("Extra", "webba-booking-lite"));
+        $table->set_multiple_item_name(__("Extras", "webba-booking-lite"));
+        $table->sections["details"] = __("Details", "webba-booking-lite");
+        $table->sections["pricing"] = __("Pricing", "webba-booking-lite");
+
+        $table->add_field(
+            "extra_image",
+            "image",
+            __("Photo", "webba-booking-lite"),
+            "file",
+            "details",
+            [
+                "tooltip" => __(
+                    'Upload main service image which will show up in the booking form. Leave empty if you don\'t want to show any image.',
+                    "webba-booking-lite",
+                ),
+                "required_plan" => "premium",
+            ],
+            "",
+            true,
+            true,
+            false,
+        );
+        $table->add_field(
+            "extra_name",
+            "name",
+            __("Extra name", "webba-booking-lite"),
+            "text",
+            "details",
+            [
+                "required_plan" => "premium",
+            ],
+        );
+        $table->add_field(
+            "extra_description",
+            "description",
+            __("Description", "webba-booking-lite"),
+            "editor",
+            "details",
+            [
+                "tooltip" => __("Enter a description of the extra.", "webba-booking-lite"),
+                "required_plan" => "premium",
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+        $table->add_field(
+            "extra_min_quantity",
+            "min_quantity",
+            __("Min / max items per booking", "webba-booking-lite"),
+            "limitation",
+            "details",
+            [
+                "tooltip" => __(
+                    "Set the minimum and maximum number of this extra a customer can add in one booking. For example, enter 2 in the minimum if they must take at least two, or set maximum to cap how many they may select.",
+                    "webba-booking-lite",
+                ),
+                "min_field" => "min_quantity",
+                "max_field" => "max_quantity",
+                "required_plan" => "premium",
+            ],
+            "1",
+            true,
+            false,
+        );
+        $table->add_field(
+            "extra_max_quantity",
+            "max_quantity",
+            __("Maximum quantity of this extra", "webba-booking-lite"),
+            "text",
+            "details",
+            [
+                "tooltip" => __(
+                    "Upper limit on how many of this extra a customer can choose in a single booking.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+                "hidden" => true,
+                "required_plan" => "premium",
+            ],
+            "1",
+            true,
+            false,
+        );
+
+        $table->add_field(
+            'extra_services',
+            'services',
+            __('Hourly Services / Rentals', 'webba-booking-lite'),
+            'select',
+            'details',
+            [
+                'tooltip' => __('Select the services where this extra is available.', 'webba-booking-lite'),
+                'options' => 'services',
+                'multiple' => true,
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+
+        $table->add_field(
+            'extra_units',
+            'units',
+            __('Daily Services / Rentals', 'webba-booking-lite'),
+            'select',
+            'details',
+            [
+                'tooltip' => __('Select the services where this extra is available.', 'webba-booking-lite'),
+                'options' => 'units',
+                'multiple' => true,
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+        
+        $tooltip = __(
+            'Set the price per item. Leaving it as 0, will show price as "Free" in the booking form.',
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "extra_price",
+            "price",
+            __("Price per item", "webba-booking-lite"),
+            "text",
+            "pricing",
+            [
+                "tooltip" => $tooltip,
+                "sub_type" => "none_negative_float",
+                "required_plan" => "premium",
+            ],
+            "0",
+            true,
+            true,
+            false,
+        );
+
+        $table->sync_structure();
+        WbkData()->models->add($table, $db_prefix . "wbk_extras");
+
         // Units
         $table = new WbkData\Model($db_prefix . "wbk_units");
         $table->set_single_item_name(__("Unit", "webba-booking-lite"));
@@ -3449,6 +3668,28 @@ class WBK_Model
                 ],
             ],
             "0",
+            true,
+            false,
+            false,
+        );
+
+        $tooltip = __(
+            "Select which extras customers can add when booking this unit.",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "unit_extras",
+            "extras",
+            __("Extras", "webba-booking-lite"),
+            "select",
+            "general",
+            [
+                "tooltip" => $tooltip,
+                "options" => "extras",
+                "multiple" => true,
+                "required_plan" => "premium",
+            ],
+            null,
             true,
             false,
             false,

@@ -10,6 +10,7 @@ import { IFormData } from '../../frontend/screens/BookingForm/types'
 import { IField } from '../../frontend/components/Form/types'
 import { IPaymentMethod } from '../../frontend/components/PaymentSelector/types'
 import { wbkDecodeString } from '../../frontend/lib/stringSanitizer'
+import { serializePlacesForApi } from '../../frontend/providers/BookingFormProvider/utils'
 
 interface Booking {
     id: string | number
@@ -124,6 +125,16 @@ const normalizeUnitPeoplePayload = (
         child: 0,
         infant: 0,
     }
+}
+
+/**
+ * Booking REST payloads use `ordered_extras` only; the `extras` array is UI state.
+ */
+const omitExtrasArrayForBookingApi = <T extends Record<string, unknown>>(
+    payload: T
+): Omit<T, 'extras'> => {
+    const { extras: _omitExtrasArray, ...rest } = payload
+    return rest as Omit<T, 'extras'>
 }
 
 const buildUnitBookingsPayload = (formData: IFormData) => {
@@ -493,14 +504,46 @@ const actions = {
             dispatch.setLoading('bookingAmounts', true)
             try {
                 const unitBookings = buildUnitBookingsPayload(formData)
+                const orderedExtras =
+                    formData?.ordered_extras &&
+                    typeof formData.ordered_extras === 'object' &&
+                    !Array.isArray(formData.ordered_extras)
+                        ? (formData.ordered_extras as Record<string, number>)
+                        : Array.isArray(formData?.extras)
+                          ? formData.extras.reduce(
+                                (
+                                    acc: Record<string, number>,
+                                    item: { id: number; quantity: number }
+                                ) => {
+                                    const extraId = Number(item?.id)
+                                    const quantity = Math.max(
+                                        1,
+                                        Number(item?.quantity) || 1
+                                    )
+                                    if (!Number.isFinite(extraId)) {
+                                        return acc
+                                    }
+                                    acc[String(extraId)] = quantity
+                                    return acc
+                                },
+                                {}
+                            )
+                          : {}
+                const formDataForApi = omitExtrasArrayForBookingApi(
+                    formData as unknown as Record<string, unknown>
+                ) as unknown as IFormData
                 const requestPayload =
                     formData?.booking_mode === 'units'
                         ? {
-                              ...formData,
+                              ...formDataForApi,
                               places: {},
                               unit_bookings: unitBookings || [],
+                              ordered_extras: orderedExtras,
                           }
-                        : formData
+                        : {
+                              ...formDataForApi,
+                              ordered_extras: orderedExtras,
+                          }
                 const response = await apiFetch({
                     path: 'webba-booking/v1/calculate-amounts',
                     method: 'POST',
@@ -594,6 +637,9 @@ const actions = {
                 }
 
                 Object.keys(formData).forEach((key) => {
+                    if (key === 'extras') {
+                        return
+                    }
                     const value = formData[key]
 
                     if (key === 'attachments' && value != null) {
@@ -604,7 +650,18 @@ const actions = {
                         return
                     }
 
-                    if (typeof value === 'object') {
+                    if (key === 'places' && value && typeof value === 'object') {
+                        const servicesOrder = Array.isArray(formData.services)
+                            ? (formData.services as number[])
+                            : []
+                        formDataModified.append(
+                            key,
+                            serializePlacesForApi(
+                                value as Record<number, unknown[]>,
+                                servicesOrder
+                            )
+                        )
+                    } else if (typeof value === 'object') {
                         formDataModified.append(key, JSON.stringify(value))
                     } else {
                         formDataModified.append(key, value as any)

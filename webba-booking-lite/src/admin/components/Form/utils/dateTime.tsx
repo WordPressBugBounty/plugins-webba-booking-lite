@@ -1,7 +1,17 @@
 import * as dateFns from 'date-fns'
+import type { FormatOptions } from 'date-fns'
 import { toZonedTime, getTimezoneOffset } from 'date-fns-tz'
 import { format } from 'date-fns'
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns'
+import { getDateFnsLocale } from '../../../../utilities/timezones'
+
+const getDocumentLocaleCode = (): string => {
+    if (typeof document === 'undefined') {
+        return 'en-US'
+    }
+    const lang = document.documentElement?.lang?.trim()
+    return lang && lang.length > 0 ? lang : 'en-US'
+}
 
 export const daysOfWeek: { [key: string]: string } = {
     '0': 'Sunday',
@@ -77,7 +87,7 @@ export const wbkFormat = (
     timestamp: number | Date,
     timeFormat: string = 'dd/mm/yyyy HH:mm',
     timezone: string = '',
-    options?: any
+    options?: FormatOptions
 ) => {
     const dateTime = Number(
         typeof timestamp === 'number'
@@ -93,8 +103,10 @@ export const wbkFormat = (
 
     const zonedDate = toZonedTime(dateTime, timezone)
     const jsFormat = convertToJSFormat(timeFormat || 'dd/mm/yyyy HH:mm')
+    const locale =
+        options?.locale ?? getDateFnsLocale(getDocumentLocaleCode())
 
-    return format(zonedDate, jsFormat, options)
+    return format(zonedDate, jsFormat, { ...options, locale })
 }
 
 export const formatWbkDate = (date: Date) => format(date, 'M/d/y')
@@ -109,6 +121,38 @@ export const wbkGetTimezoneOffset = (timezone: string) => {
     const minutes = rawOffset / (1000 * 60)
 
     return minutes * -1
+}
+
+/**
+ * Converts a stored booking unix timestamp to customer-local time.
+ * Mirrors WBK_Booking::get_local_time() in PHP.
+ *
+ * @param unixTime Booking start time (unix seconds)
+ * @param timeOffsetMinutes Customer offset from booking (Date.getTimezoneOffset() minutes)
+ * @param businessTimezone Site timezone (wbk_timezone)
+ */
+export const getBookingLocalUnixTime = (
+    unixTime: number | string,
+    timeOffsetMinutes: number | string,
+    businessTimezone: string
+): number => {
+    const time = Number(unixTime)
+    const offsetMinutes = Number(timeOffsetMinutes)
+
+    if (!Number.isFinite(time)) {
+        return 0
+    }
+
+    if (!Number.isFinite(offsetMinutes) || !businessTimezone) {
+        return time
+    }
+
+    const bookingDate = dateFns.fromUnixTime(time)
+    const businessOffsetSeconds =
+        getTimezoneOffset(businessTimezone, bookingDate) / 1000
+    const adjustmentSeconds = offsetMinutes * -60 - businessOffsetSeconds
+
+    return time + adjustmentSeconds
 }
 
 export const getNamedTimezoneFromOffset = (

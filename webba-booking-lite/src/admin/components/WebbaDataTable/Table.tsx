@@ -19,6 +19,7 @@ import { Loading } from '../Loading/Loading'
 interface Props {
     table: TanstackTable<any>
     title: string
+    description?: string
     addButtonTitle?: string
     className?: string
     loading?: boolean
@@ -37,6 +38,7 @@ interface Props {
 export const Table = ({
     table,
     title,
+    description,
     addButtonTitle,
     className = '',
     loading = false,
@@ -64,7 +66,10 @@ export const Table = ({
         <TableProvider table={table}>
             <div className="wbk_table__container">
                 <div className="wbk_table__titleContainer">
-                    <h2 className="wbk_table__title">{title}</h2>
+                    <div className='wbk_table__titleDescription'>
+                        <h2 className="wbk_table__title">{title}</h2>
+                        {description && <p className="wbk_table__description">{description}</p>}
+                    </div>
                     <div className="wbk_table__toolPanel">
                         {exportButton && settings?.is_admin && exportButton}
                         {search && search}
@@ -226,12 +231,12 @@ export const Table = ({
                                                                     {header.isPlaceholder
                                                                         ? null
                                                                         : flexRender(
-                                                                              header
-                                                                                  .column
-                                                                                  .columnDef
-                                                                                  .footer,
-                                                                              header.getContext()
-                                                                          )}
+                                                                            header
+                                                                                .column
+                                                                                .columnDef
+                                                                                .footer,
+                                                                            header.getContext()
+                                                                        )}
                                                                 </th>
                                                             )
                                                         )}

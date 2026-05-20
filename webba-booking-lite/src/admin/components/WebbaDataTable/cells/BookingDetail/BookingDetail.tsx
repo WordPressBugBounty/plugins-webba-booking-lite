@@ -33,6 +33,42 @@ function formatCreatedAt(
     }
 }
 
+function parseBookingExtras(
+    bookingExtraRaw: unknown
+): Array<{ extraId: string; quantity: string }> {
+    if (!bookingExtraRaw) return []
+    let parsed: unknown = bookingExtraRaw
+    if (typeof bookingExtraRaw === 'string') {
+        const trimmed = bookingExtraRaw.trim()
+        if (!trimmed) return []
+        try {
+            parsed = JSON.parse(trimmed)
+        } catch {
+            return []
+        }
+    }
+
+    if (Array.isArray(parsed)) {
+        return parsed
+            .map((row: Record<string, unknown>) => ({
+                extraId: String(row?.extra_id ?? row?.id ?? ''),
+                quantity: String(row?.quantity ?? ''),
+            }))
+            .filter((row) => row.extraId !== '' && row.quantity !== '')
+    }
+
+    if (parsed && typeof parsed === 'object') {
+        return Object.entries(parsed as Record<string, unknown>)
+            .map(([extraId, quantity]) => ({
+                extraId: String(extraId),
+                quantity: String(quantity ?? ''),
+            }))
+            .filter((row) => row.extraId !== '' && row.quantity !== '')
+    }
+
+    return []
+}
+
 export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
     const {
         id,
@@ -46,7 +82,9 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
         extra,
         description,
         created_on,
+        booking_extra,
     } = cell.row.original
+
     const wording = useWording()
     const [emailType, setEmailType] = useState<string>(
         'booking_created_by_customer'
@@ -74,13 +112,30 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
     )
 
     const { setItem } = useDispatch(store_name)
-    const { settings, categories } = useSelect(
+    const { settings, categories, extras } = useSelect(
         // @ts-ignore
         (select) => select(store_name).getPreset(),
         []
     )
     const associatedCategories = mapServiceCategories(service_id, categories)
     const visibleCells = row.getVisibleCells()
+    const parsedBookingExtras = useMemo(
+        () => parseBookingExtras(booking_extra),
+        [booking_extra]
+    )
+    const extraNameById = useMemo(() => {
+        const map = new Map<string, string>()
+        if (!Array.isArray(extras)) {
+            return map
+        }
+        extras.forEach((extra: Record<string, unknown>) => {
+            const id = String(extra.id ?? extra.value ?? '')
+            if (!id) return
+            const label = String(extra.label ?? extra.name ?? '')
+            map.set(id, label || id)
+        })
+        return map
+    }, [extras])
 
     return (
         <div className="wbk_bookingDetail__wrapper">
@@ -175,21 +230,21 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                                     <p>
                                         {created_by === 'admin'
                                             ? __(
-                                                  'Administrator',
-                                                  'webba-booking-lite'
-                                              )
+                                                'Administrator',
+                                                'webba-booking-lite'
+                                            )
                                             : __(
-                                                  'Customer',
-                                                  'webba-booking-lite'
-                                              )}
+                                                'Customer',
+                                                'webba-booking-lite'
+                                            )}
                                     </p>
                                 </div>
                                 <div
-className={classNames(
-                                            'wbk_bookingDetail__columnItem',
-                                            'wbk_bookingDetail__columnItem--wrapMobile'
-                                        )}
-                                    >
+                                    className={classNames(
+                                        'wbk_bookingDetail__columnItem',
+                                        'wbk_bookingDetail__columnItem--wrapMobile'
+                                    )}
+                                >
                                     <span>
                                         {__('Created at', 'webba-booking-lite')}
                                     </span>
@@ -208,12 +263,12 @@ className={classNames(
                                             'wbk_bookingDetail__columnItem--wrapMobile'
                                         )}
                                     >
-                                    <span>
-                                        {__(
-                                            'Payment method',
-                                            'webba-booking-lite'
-                                        )}
-                                    </span>
+                                        <span>
+                                            {__(
+                                                'Payment method',
+                                                'webba-booking-lite'
+                                            )}
+                                        </span>
                                         <p>
                                             {paymentMethods[payment_method] ||
                                                 payment_method}
@@ -232,13 +287,13 @@ className={classNames(
                                     <p>
                                         {moment_price && moment_price > 0
                                             ? formatPrice(
-                                                  moment_price,
-                                                  settings?.price_format,
-                                                  settings?.price_separator,
-                                                  settings?.price_fractional
-                                              )
+                                                moment_price,
+                                                settings?.price_format,
+                                                settings?.price_separator,
+                                                settings?.price_fractional
+                                            )
                                             : wording.free ||
-                                              __('Free', 'webba-booking-lite')}
+                                            __('Free', 'webba-booking-lite')}
                                     </p>
                                 </div>
                                 <div
@@ -255,15 +310,15 @@ className={classNames(
                                     </span>
                                     <p>
                                         {(amount_paid && amount_paid > 0) ||
-                                        moment_price > 0
+                                            moment_price > 0
                                             ? formatPrice(
-                                                  amount_paid || 0,
-                                                  settings?.price_format,
-                                                  settings?.price_separator,
-                                                  settings?.price_fractional
-                                              )
+                                                amount_paid || 0,
+                                                settings?.price_format,
+                                                settings?.price_separator,
+                                                settings?.price_fractional
+                                            )
                                             : wording.free ||
-                                              __('Free', 'webba-booking-lite')}
+                                            __('Free', 'webba-booking-lite')}
                                     </p>
                                 </div>
                             </div>
@@ -356,6 +411,32 @@ className={classNames(
                                                     {decodeHtmlEntities(
                                                         field[2]
                                                     )}
+                                                </p>
+                                            )
+                                        )}
+                                    </div>
+                                </div>
+                            </td>
+                        )}
+                        {parsedBookingExtras.length > 0 && (
+                            <td className="wbk_bookingDetail__customDetailWrapper">
+                                <div className="wbk_bookingDetail__column">
+                                    <div className="wbk_bookingDetail__columnItem">
+                                        <span>
+                                            {__(
+                                                'Additional items',
+                                                'webba-booking-lite'
+                                            )}
+                                        </span>
+                                        {parsedBookingExtras.map(
+                                            ({ extraId, quantity }) => (
+                                                <p key={`${extraId}-${quantity}`}>
+                                                    {decodeHtmlEntities(
+                                                        extraNameById.get(extraId) ||
+                                                        extraId
+                                                    )}
+                                                    {': '}
+                                                    {decodeHtmlEntities(quantity)}
                                                 </p>
                                             )
                                         )}

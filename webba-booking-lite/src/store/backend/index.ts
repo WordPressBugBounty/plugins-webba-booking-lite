@@ -9,6 +9,7 @@ const DEFAULT_STATE = {
   appointments: null,
   services: null,
   units: null,
+  extras: null,
   cancelled_appointments: null,
   service_categories: null,
   email_templates: null,
@@ -68,20 +69,23 @@ const actions = {
     (model, data) =>
     async ({ dispatch }) => {
       dispatch.toggleBusy();
-      const response: any = await apiFetch({
-        path: `/wbkdata/v1/save-item/`,
-        method: "POST",
-        data: {
-          model,
-          data,
-        },
-      });
-      dispatch({
-        type: "SET_ITEM",
-        model: model,
-        data: { ...data, ...response.data, id: response?.id },
-      });
-      dispatch.toggleBusy();
+      try {
+        const response: any = await apiFetch({
+          path: `/wbkdata/v1/save-item/`,
+          method: "POST",
+          data: {
+            model,
+            data,
+          },
+        });
+        dispatch({
+          type: "SET_ITEM",
+          model: model,
+          data: { ...data, ...response.data, id: response?.id },
+        });
+      } finally {
+        dispatch.toggleBusy();
+      }
     },
   updateUserCalendar:
     (data: Record<string, any>) =>
@@ -106,23 +110,26 @@ const actions = {
     (model, data) =>
     async ({ dispatch }) => {
       dispatch.toggleBusy();
-      const update = { ...data };
-      delete update.id;
-      const response: any = await apiFetch({
-        path: `/wbkdata/v1/save-item/`,
-        method: "POST",
-        data: {
+      try {
+        const update = { ...data };
+        delete update.id;
+        const response: any = await apiFetch({
+          path: `/wbkdata/v1/save-item/`,
+          method: "POST",
+          data: {
+            model: model,
+            data: update,
+          },
+        });
+        dispatch({
+          type: "ADD_ITEM",
           model: model,
-          data: update,
-        },
-      });
-      dispatch({
-        type: "ADD_ITEM",
-        model: model,
-        data: { ...update, ...response.data, id: response.id },
-      });
-      dispatch.toggleBusy();
-      return { ...update, ...response.data, id: response.id };
+          data: { ...update, ...response.data, id: response.id },
+        });
+        return { ...update, ...response.data, id: response.id };
+      } finally {
+        dispatch.toggleBusy();
+      }
     },
   deleteItems:
     (model, ids) =>

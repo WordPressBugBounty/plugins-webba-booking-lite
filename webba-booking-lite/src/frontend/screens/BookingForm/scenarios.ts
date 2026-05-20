@@ -7,6 +7,7 @@ import { useBookingContext } from '../../providers/BookingFormProvider/BookingFo
 import { validateField } from '../../components/Form/validation'
 import { IField } from '../../components/Form/types'
 import { stripeMethods } from './PaymentHandler/payments/Stripe/StripeMethods'
+import { ExtrasStep } from './steps/ExtrasStep'
 
 // Allow validationRules to return true (valid) or a string (error message)
 type ValidationResult = true | string
@@ -137,6 +138,32 @@ export const bookingScenarios: IScenario[] = [
 
                 return true
             },
+        },
+    },
+    {
+        title: 'select_extras',
+        description: 'choose_additional_services',
+        Screen: ExtrasStep,
+        validationRules: {
+
+        },
+        isVisible: () => {
+            const { services, units, bookingMode } = useBookingContext()
+
+            if (bookingMode === 'units') {
+                const selectedUnits = (units || []).filter(({ selected }) => selected)
+                return selectedUnits.some(
+                    (unit) =>
+                        Array.isArray(unit.extra_ids) && unit.extra_ids.length > 0
+                )
+            }
+
+            const selectedServices = services.filter(({ selected }) => selected)
+            return selectedServices.some(
+                (service) =>
+                    Array.isArray(service.extra_ids) &&
+                    service.extra_ids.length > 0
+            )
         },
     },
     {

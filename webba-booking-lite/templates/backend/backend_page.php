@@ -61,6 +61,9 @@ if (isset($_GET["test"])) {
         case "wbk-services":
             WBK_Renderer::load_template("backend/react_app", [], true);
             break;
+        case "wbk-extras":
+            WBK_Renderer::load_template("backend/react_app", [], true);
+            break;
         case "wbk-service-categories":
             WBK_Renderer::load_template("backend/react_app", [], true);
             break;

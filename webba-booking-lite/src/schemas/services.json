@@ -348,7 +348,7 @@
                     ]
                 ],
                 "date_format": "F j, Y",
-                "time_zone": "Asia/Dhaka",
+                "time_zone": "Europe/Warsaw",
                 "required_plan": "standard"
             },
             "required": false,
@@ -365,7 +365,7 @@
             "misc": {
                 "tooltip": "Specify a date range if the service is only valid for a specific period of time.",
                 "date_format": "F j, Y",
-                "time_zone": "Asia/Dhaka",
+                "time_zone": "Europe/Warsaw",
                 "required_plan": "start",
                 "available_in_old_free": true
             },
@@ -595,6 +595,23 @@
             "misc": {
                 "tooltip": "Select the locations where this service is available.",
                 "options": "locations",
+                "multiple": true,
+                "required_plan": "premium"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "service_extras": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Extras",
+            "tab": "details",
+            "misc": {
+                "tooltip": "Select which extras customers can add when booking this service.",
+                "options": "extras",
                 "multiple": true,
                 "required_plan": "premium"
             },

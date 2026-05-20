@@ -13,6 +13,7 @@ import {
     removePrefixesFromModelFields,
 } from '../../components/WebbaDataTable/utils'
 import BookingsModel from '../../../schemas/appointments.json'
+import { stripIncompleteBookingExtrasForSubmit } from '../../components/Form/Fields/ExtrasSelectorField/ExtrasSelectorField'
 import { getCellActions } from '../../components/WebbaDataTable/helpers/getCellActions'
 import { createFormFromModel } from '../../components/Form/lib/createForm'
 import { __ } from '@wordpress/i18n'
@@ -41,6 +42,15 @@ const menuSections = createFormMenuSectionsFromModel({
     form,
     modelName: 'appointments',
 })
+
+const sanitizeBookingFormPayload = (data: Record<string, unknown>) => {
+    const payload = { ...data }
+    if (typeof payload.booking_extra === 'string') {
+        payload.booking_extra =
+            stripIncompleteBookingExtrasForSubmit(payload.booking_extra)
+    }
+    return payload
+}
 
 export const RecentBookings = () => {
     const { deleteItems, addItem } = useDispatch(store)
@@ -149,7 +159,7 @@ export const RecentBookings = () => {
                                 form={form}
                                 sections={menuSections}
                                 onSubmit={async (data) => {
-                                    await onSubmit(data)
+                                    await onSubmit(sanitizeBookingFormPayload(data))
                                 }}
                                 onDelete={async () => {
                                     await onDelete()

@@ -14,7 +14,8 @@ export const ROUTES = [
     'appearance',
     'locations',
     'staff-members',
-    'options'
+    'options',
+    'extras'
 ] as const
 export const PAGES = [
     'wbk-dashboard',
@@ -32,7 +33,7 @@ export const PAGES = [
     'wbk-appearance',
     'wbk-locations',
     'wbk-staff-members',
-    'wbk-options'
+    'wbk-options',
 ] as const
 
 export type Routes = typeof ROUTES

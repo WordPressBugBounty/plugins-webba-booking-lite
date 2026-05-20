@@ -472,8 +472,7 @@ class Model
             }
         }
 
-        // todo: remove this after testing
-        if ($model_updated || true) {
+        if ($model_updated) {
             $this->generate_frontend_model();
         }
     }
@@ -578,6 +577,10 @@ class Model
                 case "number_of_people":
                     $type = "string";
                     $input_type = "number_of_people";
+                    break;
+                case 'extras_selector':
+                    $type = "string";
+                    $input_type = "extras_selector";
                     break;
                 default:
                     $type = "not_defined";

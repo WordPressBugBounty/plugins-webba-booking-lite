@@ -198,6 +198,11 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "get_unit_availability_date_ranges"],
                 "permission_callback" => [$this, "get_unit_availability_date_ranges_permission"],
             ] );
+            register_rest_route( 'wbk/v2', '/get-time-slots', [
+                'methods'             => 'GET',
+                'callback'            => [$this, 'get_time_slots'],
+                'permission_callback' => [$this, 'get_time_slots_permission'],
+            ] );
         } );
         add_action( "wp_ajax_wbk_cancel_appointment", [$this, "cancel_booking"] );
         add_action( "wp_ajax_nopriv_wbk_cancel_appointment", [$this, "cancel_booking"] );
@@ -465,6 +470,12 @@ class WBK_Request_Manager {
      * Unit responses also include `unit_breakdowns`: an array of `breakdown` objects from
      * get_availability_for_range, in the same order as `unit_bookings`.
      *
+     * Optional `ordered_extras`: map of extra ID => quantity (order-level, not per timeslot).
+     * Do not send a separate `extras` array; it is ignored. Use `ordered_extras` only.
+     * Each extra must be allowed on every service or unit in the quote (intersection of configured extras).
+     * Extra line amounts increase `subtotal` and are taxed like other items. Response may include
+     * `ordered_extras` and `ordered_extras_subtotal` when any extras apply.
+     *
      * @param WP_REST_Request $request Request object
      * @return WP_REST_Response Response object
      */
@@ -502,6 +513,7 @@ class WBK_Request_Manager {
             ], 400);
         }
         $pay_full_amount = isset( $params["pay_full_amount"] ) && ($params["pay_full_amount"] === true || $params["pay_full_amount"] === "true" || $params["pay_full_amount"] === 1);
+        $service_ids = [];
         if ( $has_units ) {
             if ( count( $unit_bookings ) > 60 ) {
                 return new WP_REST_Response([
@@ -627,6 +639,25 @@ class WBK_Request_Manager {
             }
             $stripe_scope_ids = $service_ids;
             $stripe_init_service_id = $params["service_id"];
+        }
+        $ordered_extras_param = ( isset( $params["ordered_extras"] ) ? $params["ordered_extras"] : null );
+        if ( $ordered_extras_param !== null && $ordered_extras_param !== "" && $ordered_extras_param !== [] ) {
+            if ( $has_units ) {
+                $allowed_extra_ids = WBK_Price_Processor::collect_allowed_extra_ids_for_units( $unit_bookings );
+                $extras_tax_mode = "units";
+            } else {
+                $allowed_extra_ids = WBK_Price_Processor::collect_allowed_extra_ids_for_services( $service_ids );
+                $extras_tax_mode = "services";
+            }
+            $extras_parse = WBK_Price_Processor::parse_ordered_extras_for_quote( $ordered_extras_param, $allowed_extra_ids );
+            if ( !empty( $extras_parse["error"] ) ) {
+                return new WP_REST_Response([
+                    "error" => $extras_parse["error"],
+                ], 400);
+            }
+            if ( !empty( $extras_parse["lines"] ) ) {
+                WBK_Price_Processor::apply_ordered_extras_to_payment_data( $payment_data, $extras_parse["lines"], $extras_tax_mode );
+            }
         }
         $stripe_payment_methods = [
             "stripe",
@@ -1194,6 +1225,26 @@ class WBK_Request_Manager {
                     $locations_array = $locations_decoded;
                 }
             }
+            $service_extras_raw = $service->get( "extras" );
+            $service_extra_ids = [];
+            if ( !empty( $service_extras_raw ) ) {
+                $service_extras_decoded = json_decode( $service_extras_raw );
+                if ( !is_array( $service_extras_decoded ) ) {
+                    $service_extras_decoded = json_decode( stripslashes( $service_extras_raw ) );
+                }
+                if ( is_array( $service_extras_decoded ) ) {
+                    foreach ( $service_extras_decoded as $extra_id_item ) {
+                        if ( $extra_id_item === null || $extra_id_item === "" ) {
+                            continue;
+                        }
+                        $extra_id_int = (int) $extra_id_item;
+                        if ( $extra_id_int > 0 ) {
+                            $service_extra_ids[] = $extra_id_int;
+                        }
+                    }
+                    $service_extra_ids = array_values( array_unique( $service_extra_ids ) );
+                }
+            }
             $service_data = [
                 "id"                    => $id,
                 "value"                 => $id,
@@ -1213,6 +1264,7 @@ class WBK_Request_Manager {
                 "group_booking"         => $service->get( "group_booking" ) === "yes",
                 "limited_timeslot"      => $service->get( "limited_timeslot" ) === "yes",
                 "locations"             => $locations_array,
+                "extra_ids"             => $service_extra_ids,
                 "staff_members"         => WBK_Model_Utils::get_staff_member_ids_by_service( $id ),
                 "hide_price"            => $service->get_hide_price(),
             ];
@@ -1302,6 +1354,26 @@ class WBK_Request_Manager {
             $description = WBK_Translation_Processor::translate_string( "webba_unit_description_" . $unit_id, $unit->get_description() );
             $has_description = strip_tags( $unit->get_description() ) !== "";
             $image = $unit->get_image();
+            $unit_extras_raw = $unit->get( "extras" );
+            $unit_extra_ids = [];
+            if ( !empty( $unit_extras_raw ) ) {
+                $unit_extras_decoded = json_decode( $unit_extras_raw );
+                if ( !is_array( $unit_extras_decoded ) ) {
+                    $unit_extras_decoded = json_decode( stripslashes( $unit_extras_raw ) );
+                }
+                if ( is_array( $unit_extras_decoded ) ) {
+                    foreach ( $unit_extras_decoded as $extra_id_item ) {
+                        if ( $extra_id_item === null || $extra_id_item === "" ) {
+                            continue;
+                        }
+                        $extra_id_int = (int) $extra_id_item;
+                        if ( $extra_id_int > 0 ) {
+                            $unit_extra_ids[] = $extra_id_int;
+                        }
+                    }
+                    $unit_extra_ids = array_values( array_unique( $unit_extra_ids ) );
+                }
+            }
             $units_arr[] = [
                 "id"                              => (int) $unit_id,
                 "value"                           => (int) $unit_id,
@@ -1326,6 +1398,30 @@ class WBK_Request_Manager {
                 "attendee_type_adult"             => $unit->get( "attendee_type_adult" ),
                 "attendee_type_child"             => $unit->get( "attendee_type_child" ),
                 "attendee_type_infant"            => $unit->get( "attendee_type_infant" ),
+                "extra_ids"                       => $unit_extra_ids,
+            ];
+        }
+        $extras_catalog = WBK_Model::get_extras();
+        $extras_arr = [];
+        foreach ( $extras_catalog as $extra_id => $extra_name ) {
+            $extra = new WBK_Extra($extra_id);
+            if ( !$extra->is_loaded() ) {
+                continue;
+            }
+            $extra_label = WBK_Translation_Processor::translate_string( "webba_extra_" . $extra_id, $extra_name );
+            $extra_description = $extra->get_description();
+            $extra_has_description = strip_tags( $extra_description ) !== "";
+            $extra_image = $extra->get_image();
+            $extras_arr[] = [
+                "id"              => (int) $extra_id,
+                "value"           => (int) $extra_id,
+                "label"           => $extra_label,
+                "description"     => $extra_description,
+                "has_description" => $extra_has_description,
+                "image"           => ( !empty( $extra_image ) && $extra_image ? wp_get_attachment_url( $extra_image ) : false ),
+                "price"           => $extra->get_price(),
+                "min_quantity"    => $extra->get_min_quantity(),
+                "max_quantity"    => $extra->get_max_quantity(),
             ];
         }
         $data = [
@@ -1334,6 +1430,7 @@ class WBK_Request_Manager {
             "locations"                   => $locations_arr,
             "staff_members"               => $staff_members_arr,
             "units"                       => $units_arr,
+            "extras"                      => $extras_arr,
             "has_services_with_locations" => WBK_Model_Utils::has_services_with_locations(),
             "plugin_url"                  => WP_WEBBA_BOOKING__PLUGIN_URL,
             "site_url"                    => get_site_url(),
@@ -1517,6 +1614,9 @@ class WBK_Request_Manager {
                 "select_staff_member"                     => get_option( "wbk_wording_select_staff_member", __( "SELECT STAFF MEMBER", "webba-booking-lite" ) ),
                 "any_available"                           => get_option( "wbk_wording_any_available", __( "Any Available", "webba-booking-lite" ) ),
                 "best_available_time"                     => get_option( "wbk_wording_best_available_time", __( "Best available time.", "webba-booking-lite" ) ),
+                "select_extras"                           => get_option( "wbk_wording_select_extras", __( "Select extras", "webba-booking-lite" ) ),
+                "choose_additional_services"              => get_option( "wbk_wording_choose_additional_services", __( "Choose additional items", "webba-booking-lite" ) ),
+                "additional_items"                        => get_option( "wbk_wording_additional_items", __( "Additional items", "webba-booking-lite" ) ),
             ],
             "appearance"                  => WBK_Model_Utils::get_appearance_data(),
             "appearance_options"          => get_option( "wbk_appearance_options", [] ),
@@ -2959,6 +3059,7 @@ class WBK_Request_Manager {
      * @apiParam {string} [attachment] File attachment URL or ID
      * @apiParam {number[]} [quantities] Array of quantities for each booking (defaults to 1)
      * @apiParam {string} [coupon] Coupon code to apply
+     * @apiParam {Object|string} [ordered_extras] Order-level map extra ID => quantity (JSON string or object), e.g. {"1":1}. Do not send a separate `extras` array; it is ignored.
      *
      * @apiSuccess {boolean} success Whether the booking was successful
      * @apiSuccess {number[]} booking_ids Array of created booking IDs
@@ -2997,6 +3098,67 @@ class WBK_Request_Manager {
             return false;
         }
         return is_numeric( $params["unit_id"] );
+    }
+
+    /**
+     * Normalize `ordered_extras` from create-booking (JSON string or decoded map) and validate against allowed IDs.
+     *
+     * @param mixed $raw Raw request value (e.g. '{"1":1}' or array).
+     * @param int[] $allowed_extra_ids Union of extras allowed on any service or unit in the order.
+     * @return array{lines?: array<int, array<string, mixed>>, error?: string}
+     */
+    private function resolve_create_booking_ordered_extras_lines( $raw, array $allowed_extra_ids ) {
+        if ( $raw === null || $raw === "" || $raw === [] ) {
+            return [
+                "lines" => [],
+            ];
+        }
+        $ordered_extras_param = $raw;
+        if ( is_string( $ordered_extras_param ) ) {
+            $decoded = json_decode( stripslashes( $ordered_extras_param ), true );
+            if ( json_last_error() !== JSON_ERROR_NONE ) {
+                return [
+                    "error" => __( "Invalid ordered_extras", "webba-booking-lite" ),
+                ];
+            }
+            $ordered_extras_param = $decoded;
+        }
+        if ( $ordered_extras_param !== null && $ordered_extras_param !== "" && $ordered_extras_param !== [] ) {
+            $extras_parse = WBK_Price_Processor::parse_ordered_extras_for_quote( $ordered_extras_param, $allowed_extra_ids );
+            if ( !empty( $extras_parse["error"] ) ) {
+                return [
+                    "error" => $extras_parse["error"],
+                ];
+            }
+            return [
+                "lines" => ( !empty( $extras_parse["lines"] ) ? $extras_parse["lines"] : [] ),
+            ];
+        }
+        return [
+            "lines" => [],
+        ];
+    }
+
+    /**
+     * Persist ordered extras on wbk_appointments.booking_extra as JSON map extra_id => quantity (e.g. {"1":1}).
+     *
+     * @param array<int, array<string, mixed>> $lines Lines from parse_ordered_extras_for_quote.
+     * @return string JSON payload.
+     */
+    private function encode_booking_extra_field_from_ordered_lines( array $lines ) {
+        $map = [];
+        foreach ( $lines as $line ) {
+            $eid = ( isset( $line["id"] ) ? (int) $line["id"] : 0 );
+            $qty = ( isset( $line["quantity"] ) ? (int) $line["quantity"] : 0 );
+            if ( $eid < 1 || $qty < 1 ) {
+                continue;
+            }
+            $map[(string) $eid] = $qty;
+        }
+        if ( $map === [] ) {
+            return "";
+        }
+        return wp_json_encode( $map, JSON_UNESCAPED_UNICODE );
     }
 
     /**
@@ -3044,29 +3206,46 @@ class WBK_Request_Manager {
                 "message" => "Places must be an object with service IDs as keys",
             ], 400);
         }
-        // Extract times from places
+        // Extract times in the same order as the services array (one entry per slot).
         $times = [];
         $quantities = [];
         $days = [];
-        foreach ( $params["places"] as $service_id => $slots ) {
-            foreach ( $slots as $slot ) {
-                // Support both new (time) and old (timeslot) formats
-                $slot_time = null;
-                if ( isset( $slot["timeslot"] ) && is_numeric( $slot["timeslot"] ) ) {
-                    $slot_time = intval( $slot["timeslot"] );
-                } elseif ( isset( $slot["time"] ) && is_numeric( $slot["time"] ) ) {
-                    $slot_time = intval( $slot["time"] );
-                }
-                if ( $slot_time === null ) {
-                    return new WP_REST_Response([
-                        "success" => false,
-                        "message" => "Invalid timeslot for service {$service_id}",
-                    ], 400);
-                }
-                $times[] = $slot_time;
-                $quantities[] = ( isset( $slot["quantity"] ) && is_numeric( $slot["quantity"] ) ? $slot["quantity"] : 1 );
-                $days[] = strtotime( "today midnight", intval( $slot["day"] ) );
+        $slot_counters = [];
+        foreach ( $params["services"] as $service_id ) {
+            $service_id = intval( $service_id );
+            if ( !isset( $params["places"][$service_id] ) || !is_array( $params["places"][$service_id] ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => "Missing places for service {$service_id}",
+                ], 400);
             }
+            if ( !isset( $slot_counters[$service_id] ) ) {
+                $slot_counters[$service_id] = 0;
+            }
+            $slot_index = $slot_counters[$service_id];
+            if ( !isset( $params["places"][$service_id][$slot_index] ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => "Missing timeslot for service {$service_id}",
+                ], 400);
+            }
+            $slot = $params["places"][$service_id][$slot_index];
+            $slot_counters[$service_id]++;
+            $slot_time = null;
+            if ( isset( $slot["timeslot"] ) && is_numeric( $slot["timeslot"] ) ) {
+                $slot_time = intval( $slot["timeslot"] );
+            } elseif ( isset( $slot["time"] ) && is_numeric( $slot["time"] ) ) {
+                $slot_time = intval( $slot["time"] );
+            }
+            if ( $slot_time === null ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => "Invalid timeslot for service {$service_id}",
+                ], 400);
+            }
+            $times[] = $slot_time;
+            $quantities[] = ( isset( $slot["quantity"] ) && is_numeric( $slot["quantity"] ) ? $slot["quantity"] : 1 );
+            $days[] = strtotime( "today midnight", intval( $slot["day"] ) );
         }
         // Validate services
         foreach ( $params["services"] as $service_id ) {
@@ -3088,6 +3267,16 @@ class WBK_Request_Manager {
                 $coupon_status = "valid";
             }
         }
+        $service_ids_unique = array_values( array_unique( array_map( "intval", $params["services"] ) ) );
+        $allowed_extra_ids = WBK_Price_Processor::collect_allowed_extra_ids_for_services( $service_ids_unique );
+        $extras_resolve = $this->resolve_create_booking_ordered_extras_lines( ( isset( $params["ordered_extras"] ) ? $params["ordered_extras"] : null ), $allowed_extra_ids );
+        if ( isset( $extras_resolve["error"] ) ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => $extras_resolve["error"],
+            ], 400);
+        }
+        $ordered_extras_lines = $extras_resolve["lines"];
         $arr_uploaded_urls = [];
         $files = $request->get_file_params();
         if ( isset( $files["attachments"] ) && is_array( $files["attachments"] ) && count( $files["attachments"] ) > 0 ) {
@@ -3187,6 +3376,9 @@ class WBK_Request_Manager {
             if ( $params["location"] !== null ) {
                 $booking_data["location_id"] = $params["location"];
             }
+            if ( !empty( $ordered_extras_lines ) ) {
+                $booking_data["booking_extra"] = $this->encode_booking_extra_field_from_ordered_lines( $ordered_extras_lines );
+            }
             // Validate time slot availability
             $day = $days[$i];
             if ( $sp->get_day_status( $day, $service_id, $staff_member_id ) != 1 ) {
@@ -3269,6 +3461,9 @@ class WBK_Request_Manager {
         if ( $coupon_result !== false && is_array( $coupon_result ) ) {
             $tax = WBK_Options_Utils::get_tax();
             $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );
+            if ( !empty( $ordered_extras_lines ) ) {
+                WBK_Price_Processor::apply_ordered_extras_to_payment_data( $payment_details, $ordered_extras_lines, "services" );
+            }
             if ( $coupon_result[2] == 100 || $payment_details["subtotal"] <= 0 ) {
                 $booking_factory->set_as_paid( $booking_ids, "coupon", 0 );
             }
@@ -3302,6 +3497,9 @@ class WBK_Request_Manager {
                 true,
                 $pay_full_amount
             );
+            if ( !empty( $ordered_extras_lines ) ) {
+                WBK_Price_Processor::apply_ordered_extras_to_payment_data( $payment_details, $ordered_extras_lines, "services" );
+            }
             $payable = true;
             // Use the reusable payment method processor
             $payment_response = $this->process_payment_method(
@@ -3321,6 +3519,9 @@ class WBK_Request_Manager {
                 true,
                 $pay_full_amount
             );
+            if ( !empty( $ordered_extras_lines ) ) {
+                WBK_Price_Processor::apply_ordered_extras_to_payment_data( $payment_details, $ordered_extras_lines, "services" );
+            }
             $response_data = array_merge( $response_data, [
                 "payment_details" => $payment_details,
             ] );
@@ -3478,6 +3679,22 @@ class WBK_Request_Manager {
                 "message" => __( "Invalid booking data", "webba-booking-lite" ),
             ], 400);
         }
+        $allowed_unit_extra_ids = WBK_Price_Processor::collect_allowed_extra_ids_for_units( [[
+            "unit_id"          => $unit_id,
+            "range"            => $range,
+            "number_of_people" => $number_of_people,
+            "location_id"      => $resolved_location,
+        ]] );
+        $extras_resolve_units = $this->resolve_create_booking_ordered_extras_lines( ( isset( $params["ordered_extras"] ) ? $params["ordered_extras"] : null ), $allowed_unit_extra_ids );
+        if ( isset( $extras_resolve_units["error"] ) ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => $extras_resolve_units["error"],
+            ], 400);
+        }
+        if ( !empty( $extras_resolve_units["lines"] ) ) {
+            WBK_Price_Processor::apply_ordered_extras_to_payment_data( $pre_booking_payment_details, $extras_resolve_units["lines"], "units" );
+        }
         $arr_uploaded_urls = [];
         $files = $request->get_file_params();
         if ( isset( $files["attachments"] ) && is_array( $files["attachments"] ) && count( $files["attachments"] ) > 0 ) {
@@ -3563,6 +3780,9 @@ class WBK_Request_Manager {
         }
         if ( $params["location"] !== null ) {
             $booking_data["location_id"] = $params["location"];
+        }
+        if ( !empty( $extras_resolve_units["lines"] ) ) {
+            $booking_data["booking_extra"] = $this->encode_booking_extra_field_from_ordered_lines( $extras_resolve_units["lines"] );
         }
         $booking_factory = new WBK_Booking_Factory();
         $booking_data = apply_filters( "before_booking_added", $booking_data );
@@ -4750,6 +4970,59 @@ class WBK_Request_Manager {
         } finally {
             date_default_timezone_set( $prev_time_zone );
         }
+    }
+
+    public function get_time_slots_permission( $request ) {
+        return is_user_logged_in();
+    }
+
+    public function get_time_slots( $request ) {
+        WBK_Translation_Processor::switch_to_locale_from_get_param();
+        $day = explode( '00:00:00', $request['date'] );
+        $day = $day[0];
+        if ( !WBK_Validator::is_date( $day ) ) {
+            return $this->response_error( 'Wrong date.' );
+        }
+        date_default_timezone_set( 'UTC' );
+        $day = date( 'd-m-Y', strtotime( $day ) - $request['offset'] * 60 );
+        date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
+        $day = strtotime( $day . ' 00:00:00' );
+        $services = [];
+        if ( isset( $request['services'] ) && $request['services'] != '' ) {
+            $services = explode( ',', $request['services'] );
+        }
+        if ( isset( $request['booking'] ) ) {
+            if ( ctype_digit( $request['booking'] ) ) {
+                $booking = new WBK_Booking($request['booking']);
+                if ( $booking->is_loaded() ) {
+                    $services = [$booking->get_service()];
+                }
+            }
+        }
+        if ( count( $services ) == 0 ) {
+            return $this->response_error( 'No valid services found.' );
+        }
+        foreach ( $services as $service_id ) {
+            if ( !WBK_Validator::is_service_exists( $service_id ) ) {
+                return $this->response_error( 'Wrong service ID.' );
+            }
+            $sp = new WBK_Schedule_Processor();
+            $timeslots = $sp->get_time_slots_by_day( $day, $service_id, [
+                'skip_gg_calendar'       => false,
+                'ignore_preparation'     => false,
+                'calculate_availability' => true,
+                'filter_availability'    => false,
+            ] );
+            if ( $booking->is_loaded() ) {
+                $filtered = array_values( array_filter( $timeslots, fn( $obj ) => $obj->get_free_places() >= $booking->get_quantity() ) );
+            } else {
+                $filtered = $timeslots;
+            }
+        }
+        return new \WP_REST_Response([
+            'status'    => 'success',
+            'timeslots' => $filtered,
+        ], 200);
     }
 
 }

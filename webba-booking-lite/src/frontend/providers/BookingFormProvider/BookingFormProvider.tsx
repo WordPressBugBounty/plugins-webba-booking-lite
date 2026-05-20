@@ -11,13 +11,14 @@ import {
     IBookingFormObj,
     IBookingFormProviderProps,
 } from './types'
-import { useSelect } from '@wordpress/data'
+import { useDispatch, useSelect } from '@wordpress/data'
 import { store, store_name } from '../../../store/frontend'
 import {
     IServiceProps,
     IUnitAttendees,
     IUnitProps,
 } from '../../components/Services/types'
+import { IExtraProps as IExtraStateProps } from '../../components/Extras/types'
 import { IFormData } from '../../screens/BookingForm/types'
 import { ICategory } from '../../components/Categories/types'
 import { IFieldConfig } from '../../components/Form/types'
@@ -49,6 +50,7 @@ export const BookingFormProvider = ({
     disableCustomScroll = false,
     children,
 }: PropsWithChildren<IBookingFormProviderProps>) => {
+    const { fetchBookingAmounts } = useDispatch(store_name)
     // Separate customPreset logic from useSelect
     const storePreset = useSelect(
         (select: any) => select(store_name).getPreset(),
@@ -59,6 +61,7 @@ export const BookingFormProvider = ({
 
     const {
         services: allServices = [],
+        extras: allExtras = [],
         units: allUnits = [],
         categories: allCategories = [],
         settings = {},
@@ -143,6 +146,7 @@ export const BookingFormProvider = ({
     const [formObj, setFormObj] = useState<IBookingFormObj>({
         categories: [] as ICategory[],
         services: [] as IServiceProps[],
+        extras: [] as IExtraStateProps[],
         units: [] as IUnitProps[],
         bookingMode: 'services',
         preset: {},
@@ -160,6 +164,7 @@ export const BookingFormProvider = ({
             places: {},
             payment_method: '' as any,
             extra: {},
+            ordered_extras: {},
             coupon: '',
             attachments: [],
         } as IFormData,
@@ -287,9 +292,46 @@ export const BookingFormProvider = ({
                         nextStaff[serviceKey] = '0'
                     })
 
+                const allowedExtraIds = new Set<number>(
+                    updatedServices
+                        .filter((service: IServiceProps) => service.selected)
+                        .flatMap((service: any) =>
+                            Array.isArray(service.extra_ids)
+                                ? service.extra_ids.map((extraId: unknown) =>
+                                      Number(extraId)
+                                  )
+                                : []
+                        )
+                )
+
+                const updatedExtras = (prev.extras || []).map(
+                    (extra: IExtraStateProps) =>
+                        allowedExtraIds.has(Number(extra.id))
+                            ? extra
+                            : {
+                                  ...extra,
+                                  selected: false,
+                                  selectedAt: null,
+                              }
+                )
+                const selectedExtras = updatedExtras
+                    .filter((extra: IExtraStateProps) => extra.selected)
+                    .map((extra: IExtraStateProps) => ({
+                        id: extra.id,
+                        quantity: Math.max(1, Number(extra.quantity) || 1),
+                    }))
+                const orderedExtras = selectedExtras.reduce(
+                    (acc: Record<string, number>, item) => {
+                        acc[String(item.id)] = item.quantity
+                        return acc
+                    },
+                    {}
+                )
+
                 return {
                     ...prev,
                     services: updatedServices,
+                    extras: updatedExtras,
                     formData: {
                         ...prev.formData,
                         staff: nextStaff,
@@ -298,11 +340,67 @@ export const BookingFormProvider = ({
                                 (service: IServiceProps) => service.selected
                             )
                             .map((service: IServiceProps) => service.id),
+                        extras: selectedExtras,
+                        ordered_extras: orderedExtras,
                     },
                 }
             })
         },
         [preset]
+    )
+
+    const onExtraUpdate = useCallback(
+        (id: number, extraProps: Partial<IExtraStateProps>) => {
+            setFormObj((prev) => {
+                const updatedExtras = (prev.extras || []).map(
+                    (extra: IExtraStateProps) => {
+                        if (extra.id !== id) {
+                            return extra
+                        }
+
+                        if ('selected' in extraProps) {
+                            const isSelecting = extraProps.selected === true
+                            return {
+                                ...extra,
+                                ...extraProps,
+                                selectedAt: isSelecting
+                                    ? extra.selectedAt || Date.now()
+                                    : null,
+                            }
+                        }
+
+                        return {
+                            ...extra,
+                            ...extraProps,
+                        }
+                    }
+                )
+                const selectedExtras = updatedExtras
+                    .filter((extra: IExtraStateProps) => extra.selected)
+                    .map((extra: IExtraStateProps) => ({
+                        id: extra.id,
+                        quantity: Math.max(1, Number(extra.quantity) || 1),
+                    }))
+                const orderedExtras = selectedExtras.reduce(
+                    (acc: Record<string, number>, item) => {
+                        acc[String(item.id)] = item.quantity
+                        return acc
+                    },
+                    {}
+                )
+
+                return {
+                    ...prev,
+                    extras: updatedExtras,
+                    formData: {
+                        ...prev.formData,
+                        extras: selectedExtras,
+                        ordered_extras: orderedExtras,
+                    },
+                }
+            })
+        },
+        []
     )
 
     const onUnitUpdate = useCallback(
@@ -353,14 +451,51 @@ export const BookingFormProvider = ({
                     }
                 })
 
+                const allowedExtraIds = new Set<number>(
+                    updatedUnits
+                        .filter((unit: IUnitProps) => unit.selected)
+                        .flatMap((unit: IUnitProps) =>
+                            Array.isArray(unit.extra_ids)
+                                ? unit.extra_ids.map((extraId) => Number(extraId))
+                                : []
+                        )
+                )
+
+                const updatedExtras = (prev.extras || []).map(
+                    (extra: IExtraStateProps) =>
+                        allowedExtraIds.has(Number(extra.id))
+                            ? extra
+                            : {
+                                  ...extra,
+                                  selected: false,
+                                  selectedAt: null,
+                              }
+                )
+                const selectedExtras = updatedExtras
+                    .filter((extra: IExtraStateProps) => extra.selected)
+                    .map((extra: IExtraStateProps) => ({
+                        id: extra.id,
+                        quantity: Math.max(1, Number(extra.quantity) || 1),
+                    }))
+                const orderedExtras = selectedExtras.reduce(
+                    (acc: Record<string, number>, item) => {
+                        acc[String(item.id)] = item.quantity
+                        return acc
+                    },
+                    {}
+                )
+
                 return {
                     ...prev,
                     units: updatedUnits,
+                    extras: updatedExtras,
                     formData: {
                         ...prev.formData,
                         units: updatedUnits
                             .filter((unit: IUnitProps) => unit.selected)
                             .map((unit: IUnitProps) => unit.id),
+                        extras: selectedExtras,
+                        ordered_extras: orderedExtras,
                     },
                 }
             })
@@ -382,6 +517,11 @@ export const BookingFormProvider = ({
                 .join(',')
             const newUnitIds = allUnits.map((u: any) => u.id).join(',')
 
+            const prevExtraIds = (prev.extras || [])
+                .map((e: any) => e.id)
+                .join(',')
+            const newExtraIds = allExtras.map((e: any) => e.id).join(',')
+
             const prevCategoryIds = (prev.categories || [])
                 .map((c: any) => c.id)
                 .join(',')
@@ -390,6 +530,7 @@ export const BookingFormProvider = ({
             if (
                 prevServiceIds === newServiceIds &&
                 prevUnitIds === newUnitIds &&
+                prevExtraIds === newExtraIds &&
                 prevCategoryIds === newCategoryIds &&
                 prev.bookingMode === bookingMode
             ) {
@@ -434,6 +575,15 @@ export const BookingFormProvider = ({
                 }
             })
 
+            const extras = allExtras.map((extra: IExtraStateProps) => ({
+                ...extra,
+                selected: false,
+                selectedAt: null,
+                quantity: Math.max(1, Number(extra.min_quantity) || 1),
+                onUpdate: (extraProps: Partial<IExtraStateProps>) =>
+                    onExtraUpdate(extra.id, extraProps),
+            }))
+
             const categories = allCategories.map((category: any) => {
                 return {
                     ...category,
@@ -445,6 +595,7 @@ export const BookingFormProvider = ({
             return {
                 ...prev,
                 services,
+                extras,
                 units,
                 categories,
                 bookingMode,
@@ -467,11 +618,14 @@ export const BookingFormProvider = ({
                                 .filter((unit: IUnitProps) => unit.selected)
                                 .map((unit: IUnitProps) => unit.id)
                             : [],
+                    extras: [],
+                    ordered_extras: {},
                 },
             }
         })
     }, [
         allServices?.length,
+        allExtras?.length,
         allUnits?.length,
         allCategories?.length,
         date_format,
@@ -482,6 +636,7 @@ export const BookingFormProvider = ({
         attrService,
         bookingMode,
         onServiceUpdate,
+        onExtraUpdate,
         onUnitUpdate,
     ])
 
@@ -666,6 +821,25 @@ export const BookingFormProvider = ({
             formData: constructFormData(prev),
         }))
     }, [formObj.services, formObj.units, formObj.bookingMode, formObj.fields])
+
+    useEffect(() => {
+        const selectedExtras = Array.isArray(formObj.formData?.extras)
+            ? (formObj.formData.extras as Array<{ id: number; quantity: number }>)
+            : []
+        const hasSelectedExtras = selectedExtras.length > 0
+        const hasSelectedPlaces =
+            formObj.formData?.places &&
+            Object.keys(formObj.formData.places as Record<string, unknown>).length > 0
+
+        if (!hasSelectedPlaces && !hasSelectedExtras) {
+            return
+        }
+
+        fetchBookingAmounts({
+            ...formObj.formData,
+            generate_stripe_intent: false,
+        } as IFormData)
+    }, [formObj.formData?.extras, fetchBookingAmounts])
 
     const amountData = useSelect(
         (select: any) => select(store_name).getBookingAmounts(),

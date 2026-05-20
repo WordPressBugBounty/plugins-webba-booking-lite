@@ -5346,6 +5346,45 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             ],
         );
 
+
+        // extras settings
+        wbk_opt()->add_option(
+            "wbk_wording_select_extras",
+            "text",
+            __("Select extras", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Select extras", "webba-booking-lite"),
+                "not_translated_title" => "Select extras",
+                "popup" => __("Label for Select extras.", "webba-booking-lite"),
+                "tab" => "extras",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_choose_additional_services",
+            "text",
+            __("Choose additional items", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Choose additional items", "webba-booking-lite"),
+                "not_translated_title" => "Choose additional items",
+                "popup" => __("Label for Choose additional items.", "webba-booking-lite"),
+                "tab" => "extras",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_additional_items",
+            "text",
+            __("Additional items", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Additional items", "webba-booking-lite"),
+                "not_translated_title" => "Additional items",
+                "popup" => __("Label for Additional items.", "webba-booking-lite"),
+                "tab" => "extras",
+            ],
+        );
+
         do_action("wbk_options_after");
     }
 

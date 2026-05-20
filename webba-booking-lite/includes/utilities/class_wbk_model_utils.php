@@ -1510,17 +1510,18 @@ class WBK_Model_Utils {
             $price = WBK_Format_Utils::format_price( $booking->get_price() );
         }
         return [
-            "id"            => $booking_id,
-            "service_id"    => $service->get_id(),
-            "service_name"  => $service->get_name(),
-            "quantity"      => $booking->get_quantity(),
-            "date"          => WBK_Format_Utils::format_booking_time( $booking, "date" ),
-            "time_formated" => WBK_Format_Utils::format_booking_time( $booking ),
-            "time"          => $booking->get_start(),
-            "duration"      => $service->get_duration(),
-            "price"         => $price,
-            "status"        => $booking->get_status(),
-            "amount_paid"   => $booking->get( "amount_paid" ),
+            "id"              => $booking_id,
+            "service_id"      => $service->get_id(),
+            "service_name"    => $service->get_name(),
+            "quantity"        => $booking->get_quantity(),
+            "date"            => WBK_Format_Utils::format_booking_time( $booking, "date" ),
+            "time_formated"   => WBK_Format_Utils::format_booking_time( $booking ),
+            "time"            => $booking->get_start(),
+            "timezone_offset" => $booking->get( "time_offset" ),
+            "duration"        => $service->get_duration(),
+            "price"           => $price,
+            "status"          => $booking->get_status(),
+            "amount_paid"     => $booking->get( "amount_paid" ),
         ];
     }
 

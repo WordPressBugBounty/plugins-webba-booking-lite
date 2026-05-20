@@ -1206,4 +1206,318 @@ class WBK_Price_Processor
             'unit_ids' => array_values(array_unique($unit_ids)),
         ];
     }
+
+    /**
+     * Decode extra IDs from a service/unit "extras" JSON field.
+     *
+     * @param mixed $raw
+     * @return int[]
+     */
+    private static function decode_extra_ids_from_entity_field($raw)
+    {
+        if ($raw === null || $raw === '' || $raw === false) {
+            return [];
+        }
+        if (is_array($raw)) {
+            $decoded = $raw;
+        } else {
+            $decoded = json_decode((string) $raw);
+            if (!is_array($decoded)) {
+                $decoded = json_decode(stripslashes((string) $raw));
+            }
+        }
+        if (!is_array($decoded)) {
+            return [];
+        }
+        $ids = [];
+        foreach ($decoded as $extra_id_item) {
+            if ($extra_id_item === null || $extra_id_item === '') {
+                continue;
+            }
+            $extra_id_int = (int) $extra_id_item;
+            if ($extra_id_int > 0) {
+                $ids[] = $extra_id_int;
+            }
+        }
+        return array_values(array_unique($ids));
+    }
+
+    /**
+     * @param int $service_id
+     * @return int[]
+     */
+    public static function get_allowed_extra_ids_for_service($service_id)
+    {
+        $service_id = (int) $service_id;
+        if ($service_id < 1) {
+            return [];
+        }
+        $service = new WBK_Service($service_id);
+        if (!$service->is_loaded()) {
+            return [];
+        }
+        return self::decode_extra_ids_from_entity_field($service->get('extras'));
+    }
+
+    /**
+     * @param int $unit_id
+     * @return int[]
+     */
+    public static function get_allowed_extra_ids_for_unit($unit_id)
+    {
+        $unit_id = (int) $unit_id;
+        if ($unit_id < 1) {
+            return [];
+        }
+        $unit = new WBK_Unit($unit_id);
+        if (!$unit->is_loaded()) {
+            return [];
+        }
+        return self::decode_extra_ids_from_entity_field($unit->get('extras'));
+    }
+
+    /**
+     * @param array<int, int[]> $lists
+     * @return int[]
+     */
+    public static function union_allowed_extra_id_lists(array $lists)
+    {
+        $seen = [];
+        foreach ($lists as $list) {
+            foreach ($list as $id) {
+                $id = (int) $id;
+                if ($id > 0) {
+                    $seen[$id] = true;
+                }
+            }
+        }
+        ksort($seen, SORT_NUMERIC);
+        return array_map('intval', array_keys($seen));
+    }
+
+    /**
+     * Extra IDs quotable on the order if any booked service allows them (union per service).
+     *
+     * @param int[] $service_ids
+     * @return int[]
+     */
+    public static function collect_allowed_extra_ids_for_services(array $service_ids)
+    {
+        $service_ids = array_values(array_unique(array_map('intval', $service_ids)));
+        $lists = [];
+        foreach ($service_ids as $sid) {
+            if ($sid > 0) {
+                $lists[] = self::get_allowed_extra_ids_for_service($sid);
+            }
+        }
+        return self::union_allowed_extra_id_lists($lists);
+    }
+
+    /**
+     * Extra IDs quotable on the order if any booked unit allows them (union per unit type in the quote).
+     *
+     * @param array[] $unit_bookings
+     * @return int[]
+     */
+    public static function collect_allowed_extra_ids_for_units(array $unit_bookings)
+    {
+        $unit_ids = [];
+        foreach ($unit_bookings as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $uid = isset($row['unit_id']) ? (int) $row['unit_id'] : 0;
+            if ($uid > 0) {
+                $unit_ids[] = $uid;
+            }
+        }
+        $unit_ids = array_values(array_unique($unit_ids));
+        $lists = [];
+        foreach ($unit_ids as $uid) {
+            $lists[] = self::get_allowed_extra_ids_for_unit($uid);
+        }
+        return self::union_allowed_extra_id_lists($lists);
+    }
+
+    /**
+     * Validate ordered extras (entire order, not per timeslot) and build line totals.
+     *
+     * @param mixed $ordered_extras id => quantity map from REST
+     * @param int[] $allowed_ids ids allowed for this quote
+     * @return array{lines: array<int, array<string, mixed>>, error?: string}
+     */
+    public static function parse_ordered_extras_for_quote($ordered_extras, array $allowed_ids)
+    {
+        if ($ordered_extras === null || $ordered_extras === '' || $ordered_extras === []) {
+            return ['lines' => []];
+        }
+        if (is_object($ordered_extras)) {
+            $ordered_extras = json_decode(json_encode($ordered_extras), true);
+        }
+        if (!is_array($ordered_extras)) {
+            return ['lines' => [], 'error' => __('Invalid ordered_extras', 'webba-booking-lite')];
+        }
+
+        $allowed_lookup = array_fill_keys($allowed_ids, true);
+        $lines = [];
+
+        foreach ($ordered_extras as $id_key => $qty_val) {
+            $extra_id = is_int($id_key) ? $id_key : (int) $id_key;
+            $qty = (int) $qty_val;
+            if ($extra_id < 1 || $qty < 1) {
+                return [
+                    'lines' => [],
+                    'error' => __('Invalid extra id or quantity in ordered_extras', 'webba-booking-lite'),
+                ];
+            }
+            if (!isset($allowed_lookup[$extra_id])) {
+                return [
+                    'lines' => [],
+                    'error' => __('Extra is not available for this booking', 'webba-booking-lite'),
+                ];
+            }
+            if (isset($lines[$extra_id])) {
+                return [
+                    'lines' => [],
+                    'error' => __('Duplicate extra id in ordered_extras', 'webba-booking-lite'),
+                ];
+            }
+
+            $extra_obj = new WBK_Extra($extra_id);
+            if (!$extra_obj->is_loaded()) {
+                return ['lines' => [], 'error' => __('Invalid extra', 'webba-booking-lite')];
+            }
+            $min_q = $extra_obj->get_min_quantity();
+            $max_q = $extra_obj->get_max_quantity();
+            if ($qty < $min_q || $qty > $max_q) {
+                return [
+                    'lines' => [],
+                    'error' => __('Extra quantity out of range', 'webba-booking-lite'),
+                ];
+            }
+
+            $unit_price = $extra_obj->get_price();
+            if (!is_numeric($unit_price)) {
+                return ['lines' => [], 'error' => __('Invalid extra price', 'webba-booking-lite')];
+            }
+            $unit_price = (float) $unit_price;
+
+            $catalog = WBK_Model::get_extras();
+            $base_name = isset($catalog[$extra_id]) ? $catalog[$extra_id] : '';
+            $name = WBK_Translation_Processor::translate_string(
+                'webba_extra_' . $extra_id,
+                $base_name,
+            );
+
+            $lines[$extra_id] = [
+                'id' => $extra_id,
+                'quantity' => $qty,
+                'name' => $name,
+                'unit_price' => $unit_price,
+                'line_net' => $unit_price * $qty,
+            ];
+        }
+
+        return ['lines' => array_values($lines)];
+    }
+
+    /**
+     * Add order-level extras to a payment quote: increases subtotal and tax.
+     *
+     * @param array      $payment_data from get_payment_items / get_unit_payment_items (modified in place)
+     * @param array      $lines        from parse_ordered_extras_for_quote
+     * @param string     $tax_mode     services|units — units recap tax on whole subtotal after extras
+     */
+    public static function apply_ordered_extras_to_payment_data(
+        array &$payment_data,
+        array $lines,
+        $tax_mode = 'services'
+    ) {
+        if (empty($lines)) {
+            return;
+        }
+
+        $tax_rate = self::get_tax_for_messages();
+        $extras_subtotal_add = 0.0;
+
+        foreach ($lines as $line) {
+            $net = (float) $line['line_net'];
+            $extras_subtotal_add += $net;
+            $extra_id = (int) $line['id'];
+            $name = (string) $line['name'];
+            $qty = (int) $line['quantity'];
+            $line_tax = self::get_tax_amount($net, $tax_rate);
+            $line_to_pay = $net + $line_tax;
+
+            $payment_data['item_names'][] = $name;
+            $payment_data['prices'][] = self::format_price_number($net);
+            $payment_data['quantities'][] = $qty;
+            $payment_data['sku'][] = 'extra:' . $extra_id;
+            $payment_data['item_nets'][] = self::format_price_number($net);
+            $payment_data['item_taxes'][] = self::format_price_number($line_tax);
+            $payment_data['item_discounts'][] = self::format_price_number(0);
+            $payment_data['items'][] = [
+                'id' => 'extra:' . $extra_id,
+                'price' => self::format_price_number($net),
+                'item_to_pay' => self::format_price_number($line_to_pay),
+                'booking_id' => null,
+                'have_deposit' => false,
+                'service_fee' => 0,
+                'staff_member' => null,
+            ];
+        }
+
+        $new_subtotal = floatval($payment_data['subtotal']) + $extras_subtotal_add;
+
+        if ($tax_mode === 'units') {
+            $new_tax = self::get_tax_amount($new_subtotal, $tax_rate);
+            $new_total = $new_subtotal + $new_tax;
+            $payment_data['subtotal'] = self::format_price_number($new_subtotal);
+            $payment_data['tax_to_pay'] = self::format_price_number($new_tax);
+            $payment_data['total'] = self::format_price_number($new_total);
+            $payment_data['to_pay_total'] = self::format_price_number($new_total);
+            $payment_data['left_to_pay'] = self::format_price_number(0);
+        } else {
+            $extras_tax_add = 0.0;
+            foreach ($lines as $line) {
+                $extras_tax_add += self::get_tax_amount((float) $line['line_net'], $tax_rate);
+            }
+            $payment_data['subtotal'] = self::format_price_number($new_subtotal);
+            $payment_data['tax_to_pay'] = self::format_price_number(
+                floatval($payment_data['tax_to_pay']) + $extras_tax_add
+            );
+            $payment_data['total'] = self::format_price_number(
+                floatval($payment_data['subtotal']) + floatval($payment_data['tax_to_pay'])
+            );
+            $extras_to_pay_add = 0.0;
+            foreach ($lines as $line) {
+                $net = (float) $line['line_net'];
+                $extras_to_pay_add += $net + self::get_tax_amount($net, $tax_rate);
+            }
+            $payment_data['to_pay_total'] = self::format_price_number(
+                floatval($payment_data['to_pay_total']) + $extras_to_pay_add
+            );
+            $payment_data['left_to_pay'] = self::format_price_number(
+                floatval($payment_data['total']) - floatval($payment_data['to_pay_total'])
+            );
+        }
+
+        $effective_tax_rate = self::get_tax_for_messages();
+        $payment_data['woo_total'] = self::format_price_number(
+            $effective_tax_rate > 0
+                ? floatval($payment_data['to_pay_total']) / (1 + $effective_tax_rate / 100)
+                : floatval($payment_data['to_pay_total'])
+        );
+
+        $ordered_payload = [];
+        foreach ($lines as $line) {
+            $ordered_payload[] = [
+                'id' => (int) $line['id'],
+                'quantity' => (int) $line['quantity'],
+                'line_net' => self::format_price_number((float) $line['line_net']),
+            ];
+        }
+        $payment_data['ordered_extras'] = $ordered_payload;
+        $payment_data['ordered_extras_subtotal'] = self::format_price_number($extras_subtotal_add);
+    }
 }

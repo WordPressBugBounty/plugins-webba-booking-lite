@@ -19,6 +19,7 @@ import {
 } from '../../components/WebbaDataTable/utils'
 import './Bookings.scss'
 import BookingsModel from '../../../schemas/appointments.json'
+import { stripIncompleteBookingExtrasForSubmit } from '../../components/Form/Fields/ExtrasSelectorField/ExtrasSelectorField'
 import { getCellActions } from '../../components/WebbaDataTable/helpers/getCellActions'
 import { createFormFromModel } from '../../components/Form/lib/createForm'
 import { __ } from '@wordpress/i18n'
@@ -171,6 +172,11 @@ const normalizeBookingPayload = (data: Record<string, any>) => {
 
     delete payload.duration_virtual
     delete payload.available_offer_virtual
+
+    if (typeof payload.booking_extra === 'string') {
+        payload.booking_extra =
+            stripIncompleteBookingExtrasForSubmit(payload.booking_extra)
+    }
 
     return payload
 }

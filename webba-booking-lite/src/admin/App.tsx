@@ -25,9 +25,11 @@ import { SetupWizard } from "./screens/SetupWizard/SetupWizard";
 import { CalendarScreen } from "./screens/Calendar/CalendarScreen";
 import { StaffMembersScreen } from "./screens/StaffMembers/StaffMembersScreen";
 import { LocationsScreen } from "./screens/Locations/LocationsScreen";
+import { ExtrasScreen } from "./screens/Extras/ExtrasScreen";
 
 const tabToScreenMap: RouterConfig = {
   services: <ServicesScreen />,
+  extras: <ExtrasScreen />,
   "service-categories": <ServicesScreen />,
   locations: <LocationsScreen />,
   'staff-members': <StaffMembersScreen />,

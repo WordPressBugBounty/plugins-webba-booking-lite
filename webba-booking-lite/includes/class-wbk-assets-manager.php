@@ -203,6 +203,7 @@ class WBK_Assets_Manager
     {
         $admin_pages = [
             'wbk-services',
+            'wbk-extras',
             'wbk-email-templates',
             'wbk-service-categories',
             'wbk-appointments',

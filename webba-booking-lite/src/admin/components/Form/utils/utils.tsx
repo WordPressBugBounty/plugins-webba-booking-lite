@@ -35,6 +35,7 @@ import { createSelectCustomField } from '../Fields/SelectCustomField/SelectCusto
 import { createPriceVariantField } from '../Fields/PriceVariantField/PriceVariantField'
 import { createAvailabilityRangesField } from '../Fields/AvailabilityRangesField/AvailabilityRangesField'
 import { createUnitPeopleField } from '../Fields/UnitPeopleField/UnitPeopleField'
+import { createExtrasSelectorField } from '../Fields/ExtrasSelectorField/ExtrasSelectorField'
 
 interface CustomFieldConfig {
     title?: string
@@ -118,6 +119,8 @@ export const getFieldComponentFromType = ({
             return createAvailabilityRangesField(constructorConfig)
         case inputType === 'number_of_people':
             return createUnitPeopleField(constructorConfig)
+        case inputType === 'extras_selector':
+            return createExtrasSelectorField(constructorConfig)
         default:
             return ({ name, label }) => {
                 const { value, setValue } = useField(field)
@@ -173,15 +176,31 @@ export const createFormMenuSectionsFromModel = function <T extends Model>({
             : model.properties[fieldName]?.misc?.hide?.length
               ? model.properties[fieldName].misc.hide
               : []
-        const component = (
-            <InputWrapper field={formField} fieldConfig={modelField}>
+        const fieldBody =
+            modelField.input_type === 'extras_selector' ? (
                 <Component
                     name={fieldName}
                     label={label}
                     misc={modelField?.misc}
                 />
-            </InputWrapper>
-        )
+            ) : (
+                <InputWrapper field={formField} fieldConfig={modelField}>
+                    <Component
+                        name={fieldName}
+                        label={label}
+                        misc={modelField?.misc}
+                    />
+                </InputWrapper>
+            )
+
+        const component =
+            dependencies?.length ? (
+                <DependencyValidator field={formField} misc={modelField.misc}>
+                    {fieldBody}
+                </DependencyValidator>
+            ) : (
+                fieldBody
+            )
 
         const field: ResolvedFormField = {
             tab: modelField.tab,
@@ -189,13 +208,7 @@ export const createFormMenuSectionsFromModel = function <T extends Model>({
             label,
             subsection: modelField.misc?.subsection || null,
             required_plan: modelField.misc?.required_plan,
-            element: dependencies?.length ? (
-                <DependencyValidator field={formField} misc={modelField.misc}>
-                    {component}
-                </DependencyValidator>
-            ) : (
-                component
-            ),
+            element: component,
         }
 
         if (field.tab) {

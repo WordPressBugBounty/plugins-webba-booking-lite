@@ -41,12 +41,56 @@ export const getCellActions = ({ cell, collectionName }: CellActionsParams) => {
             )
         }
 
+        const serviceExtras =
+            update.extras !== undefined ? update.extras : update.service_extras
+        if (collectionName === 'services' && serviceExtras !== undefined) {
+            await syncConnectedTables(
+                cell.row.original.id,
+                serviceExtras,
+                'extras',
+                'services'
+            )
+        }
+
         if (collectionName === 'service_categories' && update.list !== undefined) {
             await syncConnectedTables(
                 cell.row.original.id,
                 update.list,
                 'services',
                 'categories'
+            )
+        }
+
+        const extraServiceIds =
+            update.services !== undefined ? update.services : update.extra_services
+        if (collectionName === 'extras' && extraServiceIds !== undefined) {
+            await syncConnectedTables(
+                cell.row.original.id,
+                extraServiceIds,
+                'services',
+                'extras'
+            )
+        }
+
+        const extraUnitIds =
+            update.units !== undefined ? update.units : update.extra_units
+        if (collectionName === 'extras' && extraUnitIds !== undefined) {
+            await syncConnectedTables(
+                cell.row.original.id,
+                extraUnitIds,
+                'units',
+                'extras'
+            )
+        }
+
+        const unitExtras =
+            update.extras !== undefined ? update.extras : update.unit_extras
+        if (collectionName === 'units' && unitExtras !== undefined) {
+            await syncConnectedTables(
+                cell.row.original.id,
+                unitExtras,
+                'extras',
+                'units'
             )
         }
     }
