@@ -15,6 +15,19 @@
 }
 
 .wbk_booking_form {
+    &__popup-portal {
+        position: absolute;
+        inset: 0;
+        z-index: 999;
+        pointer-events: none;
+        border-radius: inherit;
+        overflow: hidden;
+
+        &--active {
+            pointer-events: auto;
+        }
+    }
+
     &__wrapper {
         position: relative;
         width: calc(100vw - 32px);

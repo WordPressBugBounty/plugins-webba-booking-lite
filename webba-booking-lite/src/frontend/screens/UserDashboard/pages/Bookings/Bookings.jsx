@@ -246,7 +246,10 @@ export const Bookings = () => {
                 )}
                 {rescheduling && (
                     <div className={styles.reschedulePanel}>
-                        <ServiceCalendar onChange={handleSetDate} />
+                        <ServiceCalendar
+                            onChange={handleSetDate}
+                            serviceId={formData?.services?.[0]}
+                        />
                         {timeSlotsLoading ? (
                             <div className="mt-10-wbk">
                                 <Skeleton

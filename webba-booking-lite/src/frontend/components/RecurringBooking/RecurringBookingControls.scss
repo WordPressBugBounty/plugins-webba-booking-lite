@@ -1,0 +1,43 @@
+.wbk_recurring_controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    &__row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: flex-end;
+    }
+
+    &__interval {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+        min-width: 120px;
+    }
+
+    &__interval-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #22292f;
+    }
+
+    &__interval-select {
+        height: 40px;
+        padding: 0 12px;
+        border: 1.5px solid #edeff2;
+        border-radius: 8px;
+        font-size: 14px;
+        background: #fff;
+        cursor: pointer;
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+            color: #8c97a1;
+            background: #f8f9fa;
+        }
+    }
+}

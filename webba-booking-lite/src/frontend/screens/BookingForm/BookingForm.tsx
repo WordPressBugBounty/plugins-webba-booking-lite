@@ -2,7 +2,7 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './BookingForm.scss'
 import { ToastContainer } from 'react-toastify'
-import { useEffect, useRef, useState, useMemo } from 'react'
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import { bookingScenarios } from './scenarios'
 import { Progressbar } from '../../components/Progressbar/Progressbar'
 import classNames from 'classnames'
@@ -35,7 +35,14 @@ export const BookingForm = () => {
         stepInto,
         nextStepError,
     } = useScenario(bookingScenarios)
-    const { fields, setFields, formData, preset } = useBookingContext()
+    const { fields, setFields, formData, preset, setPopupPortalElement } =
+        useBookingContext()
+    const handlePopupPortalRef = useCallback(
+        (node: HTMLDivElement | null) => {
+            setPopupPortalElement(node)
+        },
+        [setPopupPortalElement]
+    )
     const wording = useWording()
     const wrapperRef = useRef<HTMLDivElement>(null)
 
@@ -267,6 +274,10 @@ export const BookingForm = () => {
                         showThankYou ||
                         isNoPaymentMethodThankYou ||
                         showThankYouFromStripeWallets) && <ThankYou />)}
+                <div
+                    ref={handlePopupPortalRef}
+                    className="wbk_booking_form__popup-portal"
+                />
             </div>
         </FormProvider>
     )

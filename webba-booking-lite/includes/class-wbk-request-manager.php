@@ -113,6 +113,11 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "get_service_time_slots"],
                 "permission_callback" => [$this, "get_service_time_slots_permission"],
             ] );
+            register_rest_route( "webba-booking/v1", "/get-recurring-booking-time-slots/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_recurring_booking_time_slots"],
+                "permission_callback" => [$this, "get_recurring_booking_time_slots_permission"],
+            ] );
             register_rest_route( "webba-booking/v1", "/get-unit-availability-for-range/", [
                 "methods"             => "POST",
                 "callback"            => [$this, "get_unit_availability_for_range"],
@@ -1245,28 +1250,52 @@ class WBK_Request_Manager {
                     $service_extra_ids = array_values( array_unique( $service_extra_ids ) );
                 }
             }
+            $recurring_intervals_raw = $service->get( "recurring_intervals" );
+            $recurring_intervals = ["day", "week", "month"];
+            if ( !empty( $recurring_intervals_raw ) ) {
+                $recurring_intervals_decoded = json_decode( $recurring_intervals_raw );
+                if ( !is_array( $recurring_intervals_decoded ) ) {
+                    $recurring_intervals_decoded = json_decode( stripslashes( $recurring_intervals_raw ) );
+                }
+                if ( is_array( $recurring_intervals_decoded ) ) {
+                    $recurring_intervals = array_values( array_filter( $recurring_intervals_decoded ) );
+                }
+            }
+            $recurring_min_count = (int) $service->get( "recurring_min_appointments" );
+            if ( $recurring_min_count < 1 ) {
+                $recurring_min_count = 2;
+            }
+            $recurring_max_count = (int) $service->get( "recurring_max_appointments" );
+            if ( $recurring_max_count < 1 ) {
+                $recurring_max_count = 12;
+            }
             $service_data = [
-                "id"                    => $id,
-                "value"                 => $id,
-                "label"                 => $name,
-                "payable"               => $service->is_payable(),
-                "description"           => $description,
-                "has_description"       => $has_description,
-                "business_days"         => $business_days,
-                "duration"              => $service->get_duration(),
-                "image"                 => ( !empty( $service->get( "image" ) ) && $service->get( "image" ) ? wp_get_attachment_url( $service->get( "image" ) ) : false ),
-                "price"                 => $service->get( "price" ),
-                "min_quantity"          => $service->get_min_quantity(),
-                "max_quantity"          => $service->get_max_quantity(),
-                "min_slots"             => $service->get( "multi_mode_low_limit" ),
-                "max_slots"             => $service->get( "multi_mode_limit" ),
-                "consecutive_timeslots" => $service->get( "consecutive_timeslots" ) === "yes",
-                "group_booking"         => $service->get( "group_booking" ) === "yes",
-                "limited_timeslot"      => $service->get( "limited_timeslot" ) === "yes",
-                "locations"             => $locations_array,
-                "extra_ids"             => $service_extra_ids,
-                "staff_members"         => WBK_Model_Utils::get_staff_member_ids_by_service( $id ),
-                "hide_price"            => $service->get_hide_price(),
+                "id"                        => $id,
+                "value"                     => $id,
+                "label"                     => $name,
+                "payable"                   => $service->is_payable(),
+                "description"               => $description,
+                "has_description"           => $has_description,
+                "business_days"             => $business_days,
+                "duration"                  => $service->get_duration(),
+                "image"                     => ( !empty( $service->get( "image" ) ) && $service->get( "image" ) ? wp_get_attachment_url( $service->get( "image" ) ) : false ),
+                "price"                     => $service->get( "price" ),
+                "min_quantity"              => $service->get_min_quantity(),
+                "max_quantity"              => $service->get_max_quantity(),
+                "min_slots"                 => $service->get( "multi_mode_low_limit" ),
+                "max_slots"                 => $service->get( "multi_mode_limit" ),
+                "consecutive_timeslots"     => $service->get( "consecutive_timeslots" ) === "yes",
+                "group_booking"             => $service->get( "group_booking" ) === "yes",
+                "limited_timeslot"          => $service->get( "limited_timeslot" ) === "yes",
+                "locations"                 => $locations_array,
+                "extra_ids"                 => $service_extra_ids,
+                "staff_members"             => WBK_Model_Utils::get_staff_member_ids_by_service( $id ),
+                "hide_price"                => $service->get_hide_price(),
+                "recurring_booking_enabled" => $service->get( "recurring_booking_enabled" ) === "yes",
+                "recurring_intervals"       => $recurring_intervals,
+                "recurring_min_count"       => $recurring_min_count,
+                "recurring_max_count"       => $recurring_max_count,
+                "recurring_payment_mode"    => ( $service->get( "recurring_payment_mode" ) ?: "all" ),
             ];
             $services_arr[] = $service_data;
         }
@@ -1277,14 +1306,14 @@ class WBK_Request_Manager {
         $categories_arr = [];
         foreach ( $service_categories as $id => $name ) {
             $name = WBK_Translation_Processor::translate_string( "webba_service_category_" . $id, $name );
+            $category_services = WBK_Model_Utils::get_services_in_category( $id );
+            $category_units = WBK_Model_Utils::get_units_in_category( $id );
             $category_data = [
                 "id"       => $id,
                 "name"     => $name,
-                "services" => WBK_Model_Utils::get_services_in_category( $id ),
+                "services" => ( $category_services == false ? [] : array_map( "strval", $category_services ) ),
+                "units"    => ( $category_units == false ? [] : array_map( "strval", $category_units ) ),
             ];
-            if ( $category_data["services"] == false ) {
-                $category_data["services"] = [];
-            }
             $categories_arr[] = $category_data;
         }
         $user = false;
@@ -1294,7 +1323,7 @@ class WBK_Request_Manager {
             $current_user_email = $current_user->user_email;
         } else {
             $user = false;
-            $current_user_email = '';
+            $current_user_email = "";
         }
         $coupons_enabled = get_option( "wbk_allow_coupons", "yes" ) === "yes";
         if ( !WBK_Feature_Gate::have_required_plan( "premium" ) ) {
@@ -1450,7 +1479,7 @@ class WBK_Request_Manager {
                 "price_fractional"                   => get_option( "wbk_price_fractional", "2" ),
                 "price_separator"                    => get_option( "wbk_price_separator", "." ),
                 "stripe_publishable_key"             => WBK_Options_Utils::get_stripe_credentials()[0] ?? null,
-                "show_booked_slots"                  => get_option( "wbk_show_booked_slots", "" ) === "enabled",
+                "show_booked_slots"                  => get_option( "wbk_show_booked_slots", "" ) === "yes",
                 "allowed_multiple_service_selection" => get_option( "wbk_allow_multiple_services", "yes" ) === "yes",
                 "coupons_enabled"                    => $coupons_enabled,
                 "tax"                                => WBK_Options_Utils::get_tax(),
@@ -2022,7 +2051,7 @@ class WBK_Request_Manager {
                     }
                     $data[$model]["location_id"] = $location_options;
                     break;
-                case 'duration_virtual':
+                case "duration_virtual":
                     $minutes_per_day = 24 * 60;
                     $unit_id = ( isset( $form["unit_id"] ) ? (int) $form["unit_id"] : 0 );
                     $selected_day = ( isset( $form["day"] ) ? sanitize_text_field( $form["day"] ) : "" );
@@ -2450,6 +2479,10 @@ class WBK_Request_Manager {
         // Public endpoint, no special permissions needed
     }
 
+    public function get_recurring_booking_time_slots_permission( $request ) : bool {
+        return true;
+    }
+
     /**
      * Get unit availability for range permission check.
      *
@@ -2810,6 +2843,393 @@ class WBK_Request_Manager {
         } finally {
             date_default_timezone_set( "UTC" );
         }
+    }
+
+    /**
+     * Build recurring booking time slots for a selected slot and repeat pattern.
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response
+     */
+    public function get_recurring_booking_time_slots( WP_REST_Request $request ) : WP_REST_Response {
+        try {
+            WBK_Translation_Processor::switch_to_locale_from_get_param();
+            date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+            $service_id = $request->get_param( "service_id" );
+            $time_slot = $request->get_param( "time_slot" );
+            $repeats = $request->get_param( "repeats" );
+            $number_of_timeslots = $request->get_param( "number_of_timeslots" );
+            $repeat_interval = $request->get_param( "repeat_interval" );
+            $offset = $request->get_param( "offset" ) ?? 0;
+            $staff_member_id = $request->get_param( "staff_member_id" );
+            if ( !is_numeric( $service_id ) ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid service ID",
+                ], 400);
+            }
+            $service = new WBK_Service($service_id);
+            if ( !$service->is_loaded() ) {
+                return new WP_REST_Response([
+                    "error" => "Service not found",
+                ], 404);
+            }
+            if ( $time_slot === null || $time_slot === "" || !is_numeric( $time_slot ) ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid time slot",
+                ], 400);
+            }
+            $time_slot = (int) $time_slot;
+            if ( $repeats === null || $repeats === "" || !is_numeric( $repeats ) ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid repeats",
+                ], 400);
+            }
+            $repeats = (int) $repeats;
+            if ( $repeats < 1 ) {
+                return new WP_REST_Response([
+                    "error" => "Repeats must be at least 1",
+                ], 400);
+            }
+            if ( $number_of_timeslots === null || $number_of_timeslots === "" || !is_numeric( $number_of_timeslots ) ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid number of time slots",
+                ], 400);
+            }
+            $number_of_timeslots = (int) $number_of_timeslots;
+            if ( $number_of_timeslots < 1 ) {
+                return new WP_REST_Response([
+                    "error" => "Number of time slots must be at least 1",
+                ], 400);
+            }
+            $allowed_intervals = ["day", "week", "month"];
+            if ( !in_array( $repeat_interval, $allowed_intervals, true ) ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid repeat_interval. Use day, week, or month.",
+                ], 400);
+            }
+            if ( $service->get( "recurring_booking_enabled" ) === "yes" ) {
+                $recurring_intervals_raw = $service->get( "recurring_intervals" );
+                $recurring_intervals = ["day", "week", "month"];
+                if ( !empty( $recurring_intervals_raw ) ) {
+                    $recurring_intervals_decoded = json_decode( $recurring_intervals_raw );
+                    if ( !is_array( $recurring_intervals_decoded ) ) {
+                        $recurring_intervals_decoded = json_decode( stripslashes( $recurring_intervals_raw ) );
+                    }
+                    if ( is_array( $recurring_intervals_decoded ) ) {
+                        $recurring_intervals = array_values( array_filter( $recurring_intervals_decoded ) );
+                    }
+                }
+                if ( !in_array( $repeat_interval, $recurring_intervals, true ) ) {
+                    return new WP_REST_Response([
+                        "error" => "Repeat interval is not allowed for this service.",
+                    ], 400);
+                }
+                $recurring_min_count = (int) $service->get( "recurring_min_appointments" );
+                if ( $recurring_min_count < 1 ) {
+                    $recurring_min_count = 2;
+                }
+                $recurring_max_count = (int) $service->get( "recurring_max_appointments" );
+                if ( $recurring_max_count < 1 ) {
+                    $recurring_max_count = 12;
+                }
+                if ( $number_of_timeslots < $recurring_min_count || $number_of_timeslots > $recurring_max_count ) {
+                    return new WP_REST_Response([
+                        "error" => sprintf( "Number of time slots must be between %d and %d for this service.", $recurring_min_count, $recurring_max_count ),
+                    ], 400);
+                }
+            }
+            if ( isset( $staff_member_id ) && $staff_member_id !== "" ) {
+                if ( !ctype_digit( (string) $staff_member_id ) ) {
+                    return new WP_REST_Response([
+                        "error" => "Wrong staff member ID.",
+                    ], 400);
+                }
+                $staff_member_id = (int) $staff_member_id;
+                if ( $staff_member_id !== 0 ) {
+                    $staff_member = new WBK_Staff_Member($staff_member_id);
+                    if ( !$staff_member->is_loaded() ) {
+                        return new WP_REST_Response([
+                            "error" => "Staff member not found.",
+                        ], 404);
+                    }
+                    $staff_services = $staff_member->get_services();
+                    if ( !in_array( (int) $service_id, array_map( "intval", (array) $staff_services ), true ) ) {
+                        return new WP_REST_Response([
+                            "error" => "Staff member does not provide this service.",
+                        ], 400);
+                    }
+                }
+            } else {
+                $staff_member_id = null;
+            }
+            $base_day = strtotime( "today midnight", $time_slot );
+            if ( $base_day === false ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid time slot",
+                ], 400);
+            }
+            $time_offset = $time_slot - $base_day;
+            $slot_duration = $service->get_duration() * 60;
+            $sp = new WBK_Schedule_Processor();
+            $options = [
+                "skip_gg_calendar"       => false,
+                "ignore_preparation"     => false,
+                "calculate_availability" => true,
+                "filter_availability"    => false,
+                "offset"                 => $offset,
+            ];
+            $recurring_slots = [];
+            $last_resolved_start = null;
+            $used_start_times = [];
+            $occurrence_index = 0;
+            $max_occurrences = ($number_of_timeslots + 14) * max( 1, $repeats ) * (( $repeat_interval === "day" ? 7 : 1 ));
+            while ( count( $recurring_slots ) < $number_of_timeslots && $occurrence_index < $max_occurrences ) {
+                $target_day = $this->get_recurring_booking_target_day( $base_day, $occurrence_index * $repeats, $repeat_interval );
+                $occurrence_index++;
+                if ( $sp->get_day_status( $target_day, (int) $service_id, $staff_member_id ) != 1 ) {
+                    continue;
+                }
+                $expected_start = strtotime( "today midnight", $target_day ) + $time_offset;
+                $resolved = $this->find_recurring_booking_slot(
+                    $sp,
+                    (int) $service_id,
+                    $target_day,
+                    $expected_start,
+                    $options,
+                    $staff_member_id,
+                    $last_resolved_start,
+                    $used_start_times
+                );
+                if ( $resolved["slot"] !== null ) {
+                    $slot = $resolved["slot"];
+                    $timeslot_payload = $this->format_recurring_booking_timeslot( $slot, $staff_member_id );
+                } else {
+                    $timeslot_payload = [
+                        "start_time"           => $expected_start,
+                        "end_time"             => $expected_start + $slot_duration,
+                        "free_places"          => 0,
+                        "formatted_time"       => wp_date( WBK_Date_Time_Utils::get_time_format(), $expected_start ),
+                        "formatted_time_local" => wp_date( WBK_Date_Time_Utils::get_time_format(), $expected_start ),
+                    ];
+                    if ( $staff_member_id !== null ) {
+                        $timeslot_payload["staff_member_ids"] = ( $staff_member_id === 0 ? [] : [$staff_member_id] );
+                    }
+                }
+                $recurring_slots[] = [
+                    "timeslot" => $timeslot_payload,
+                    "status"   => ( $resolved["slot"] === null ? "unavailable" : (( $resolved["status"] === "time_adjusted" ? "adjusted" : "available" )) ),
+                ];
+                if ( $resolved["slot"] !== null ) {
+                    $last_resolved_start = (int) $resolved["slot"]->get_start();
+                    $used_start_times[] = $last_resolved_start;
+                }
+            }
+            return new WP_REST_Response([
+                "service_id"          => (int) $service_id,
+                "repeat_interval"     => $repeat_interval,
+                "repeats"             => $repeats,
+                "number_of_timeslots" => $number_of_timeslots,
+                "time_slots"          => $recurring_slots,
+            ], 200);
+        } catch ( \Exception $e ) {
+            return new WP_REST_Response([
+                "error" => "Internal server error",
+            ], 500);
+        } finally {
+            date_default_timezone_set( "UTC" );
+        }
+    }
+
+    /**
+     * Target day (midnight timestamp) for a recurring occurrence.
+     *
+     * @param int    $base_day        Midnight timestamp of the original booking day.
+     * @param int    $repeat_index    Zero-based occurrence index.
+     * @param string $repeat_interval day|week|month.
+     * @return int
+     */
+    private function get_recurring_booking_target_day( int $base_day, int $repeat_index, string $repeat_interval ) : int {
+        if ( $repeat_index === 0 ) {
+            return $base_day;
+        }
+        $timezone = new \DateTimeZone(get_option( "wbk_timezone", "UTC" ));
+        $base_date = new \DateTime("@" . $base_day);
+        $base_date->setTimezone( $timezone );
+        if ( $repeat_interval === "day" ) {
+            $target_date = clone $base_date;
+            $target_date->modify( "+{$repeat_index} day" );
+        } elseif ( $repeat_interval === "week" ) {
+            $target_date = clone $base_date;
+            $target_date->modify( "+{$repeat_index} week" );
+        } else {
+            $target_date = clone $base_date;
+            $target_date->modify( "+{$repeat_index} month" );
+        }
+        return strtotime( "today midnight", $target_date->getTimestamp() );
+    }
+
+    /**
+     * Fetch time slots for a day (mirrors get_service_time_slots aggregation).
+     *
+     * @return WBK_Time_Slot[]
+     */
+    private function fetch_service_time_slots_by_day(
+        WBK_Schedule_Processor $sp,
+        int $day,
+        int $service_id,
+        array $options,
+        $staff_member_id
+    ) : array {
+        if ( $staff_member_id !== null && $staff_member_id === 0 ) {
+            $staff_member_ids = WBK_Model_Utils::get_staff_member_ids_by_service( $service_id );
+            $slots_by_start = [];
+            foreach ( $staff_member_ids as $staff_id ) {
+                $timeslots = $sp->get_time_slots_by_day(
+                    $day,
+                    $service_id,
+                    $options,
+                    null,
+                    true,
+                    $staff_id
+                );
+                if ( !is_array( $timeslots ) ) {
+                    continue;
+                }
+                foreach ( $timeslots as $slot ) {
+                    $start = $slot->get_start();
+                    if ( !isset( $slots_by_start[$start] ) ) {
+                        $slots_by_start[$start] = $slot;
+                        $slots_by_start[$start]->set_free_places( 0 );
+                    }
+                    $slots_by_start[$start]->set_free_places( $slots_by_start[$start]->get_free_places() + $slot->get_free_places() );
+                }
+            }
+            ksort( $slots_by_start );
+            return array_values( $slots_by_start );
+        }
+        $timeslots = $sp->get_time_slots_by_day(
+            $day,
+            $service_id,
+            $options,
+            null,
+            true,
+            $staff_member_id
+        );
+        return ( is_array( $timeslots ) ? $timeslots : [] );
+    }
+
+    /**
+     * Resolve one recurring occurrence to an available slot.
+     *
+     * @return array{slot: ?WBK_Time_Slot, status: string}
+     */
+    private function find_recurring_booking_slot(
+        WBK_Schedule_Processor $sp,
+        int $service_id,
+        int $target_day,
+        int $expected_start,
+        array $options,
+        $staff_member_id,
+        ?int $last_resolved_start = null,
+        array $used_start_times = []
+    ) : array {
+        $search_day = $target_day;
+        if ( $last_resolved_start !== null ) {
+            $day_after_last = strtotime( "+1 day", strtotime( "today midnight", $last_resolved_start ) );
+            if ( $day_after_last !== false && $search_day < $day_after_last ) {
+                $search_day = $day_after_last;
+            }
+        }
+        $time_offset = $expected_start - strtotime( "today midnight", $expected_start );
+        $used_start_times = array_map( "intval", $used_start_times );
+        $expected_on_day = strtotime( "today midnight", $search_day ) + $time_offset;
+        $timeslots = $this->fetch_service_time_slots_by_day(
+            $sp,
+            $search_day,
+            $service_id,
+            $options,
+            $staff_member_id
+        );
+        if ( !empty( $timeslots ) ) {
+            foreach ( $timeslots as $slot ) {
+                $start = (int) $slot->get_start();
+                if ( in_array( $start, $used_start_times, true ) ) {
+                    continue;
+                }
+                if ( $start === $expected_on_day && $slot->get_free_places() > 0 ) {
+                    return [
+                        "slot"   => $slot,
+                        "status" => "exact",
+                    ];
+                }
+            }
+            $fallback_slot = $this->find_immediate_next_available_slot( $timeslots, $expected_on_day, $used_start_times );
+            if ( $fallback_slot !== null ) {
+                return [
+                    "slot"   => $fallback_slot,
+                    "status" => "time_adjusted",
+                ];
+            }
+        }
+        return [
+            "slot"   => null,
+            "status" => "unavailable",
+        ];
+    }
+
+    /**
+     * Next timeslot in the day's schedule right after the expected start (not any later slot).
+     *
+     * @param WBK_Time_Slot[] $timeslots
+     * @param int             $expected_on_day
+     * @param int[]           $used_start_times
+     * @return WBK_Time_Slot|null
+     */
+    private function find_immediate_next_available_slot( array $timeslots, int $expected_on_day, array $used_start_times ) : ?WBK_Time_Slot {
+        if ( empty( $timeslots ) ) {
+            return null;
+        }
+        usort( $timeslots, function ( $a, $b ) {
+            return $a->get_start() - $b->get_start();
+        } );
+        $expected_index = null;
+        foreach ( $timeslots as $index => $slot ) {
+            if ( (int) $slot->get_start() === $expected_on_day ) {
+                $expected_index = $index;
+                break;
+            }
+        }
+        if ( $expected_index === null ) {
+            return null;
+        }
+        $next_index = $expected_index + 1;
+        if ( !isset( $timeslots[$next_index] ) ) {
+            return null;
+        }
+        $next_slot = $timeslots[$next_index];
+        $next_start = (int) $next_slot->get_start();
+        if ( in_array( $next_start, $used_start_times, true ) || $next_slot->get_free_places() <= 0 ) {
+            return null;
+        }
+        return $next_slot;
+    }
+
+    /**
+     * @param WBK_Time_Slot $slot
+     * @return array<string, mixed>
+     */
+    private function format_recurring_booking_timeslot( $slot, $staff_member_id ) : array {
+        $result = [
+            "start_time"           => $slot->get_start(),
+            "end_time"             => $slot->get_end(),
+            "free_places"          => $slot->get_free_places(),
+            "formatted_time"       => $slot->get_formated_time(),
+            "formatted_time_local" => $slot->get_formated_time_local(),
+        ];
+        if ( $staff_member_id !== null ) {
+            $result["staff_member_ids"] = ( $staff_member_id === 0 ? [] : [$staff_member_id] );
+        }
+        return $result;
     }
 
     public function get_form_fields_permission( $request ) : bool {
@@ -3994,7 +4414,7 @@ class WBK_Request_Manager {
             ], 404);
         }
         $first_booking = new WBK_Booking($booking_ids[0]);
-        if ( $first_booking->is_loaded() && $first_booking->get( 'unit_id' ) > 0 ) {
+        if ( $first_booking->is_loaded() && $first_booking->get( "unit_id" ) > 0 ) {
             $payment_details = WBK_Price_Processor::get_unit_payment_items_post_booked( $booking_ids );
         } else {
             $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );

@@ -253,7 +253,7 @@ export const CalendarScreen = () => {
                 )
             }
             return {
-                id: booking.id.toString(),
+                id: booking?.id.toString(),
                 title: booking?.extra_data?.dynamic_title || booking.name,
                 start: toZonedTime(
                     fromUnixTime(booking.time),
@@ -265,10 +265,10 @@ export const CalendarScreen = () => {
                     settings?.timezone ||
                         Intl.DateTimeFormat().resolvedOptions().timeZone
                 ),
-                status: booking.status,
+                status: booking?.status,
                 color:
                     services.find(
-                        (service: any) => service.id == booking.service_id
+                        (service: any) => service?.id == booking?.service_id
                     )?.color || 'transparent',
             }
         })

@@ -28,6 +28,7 @@ import { UnitPrices } from '../../components/WebbaDataTable/cells/UnitPrices/Uni
 import './ServicesScreen.scss'
 import { ProFeatuerWrapper } from '../../components/ProFeatuerWrapper/ProFeatuerWrapper'
 import { ExtrasScreen } from '../Extras/ExtrasScreen'
+import { UnitNames } from '../../components/WebbaDataTable/cells/UnitNames/UnitNames'
 
 export const ServicesScreen = () => {
     const formService = createFormFromModel(servicesModel)
@@ -43,6 +44,9 @@ export const ServicesScreen = () => {
         {
             list: {
                 cell: ServiceNames,
+            },
+            units: {
+                cell: UnitNames,
             },
         },
         {
@@ -186,7 +190,10 @@ export const ServicesScreen = () => {
                                     sidebar.close()
                                 }}
                                 tooltipMode="description"
-                            />
+                            />,
+                            {
+                                width: 'medium'
+                            }
                         )
                     }}
                 />
@@ -450,7 +457,10 @@ export const ServicesScreen = () => {
                             onSubmit={async (data) => {
                                 return await addModelItemService(data)
                             }}
-                        />
+                        />,
+                        {
+                            width: 'medium'
+                        }
                     )
                 }}
                 noItemsImageUrl={

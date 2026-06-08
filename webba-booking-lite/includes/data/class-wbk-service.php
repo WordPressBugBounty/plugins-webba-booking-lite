@@ -286,6 +286,20 @@ class WBK_Service extends WBK_Model_Object
     }
 
     /**
+     * Get per-service availability exceptions (date ranges with custom time slots).
+     *
+     * @return string
+     */
+    public function get_availability_exceptions(): string
+    {
+        if (!isset($this->fields['availability_exceptions'])) {
+            return '';
+        }
+
+        return (string) $this->fields['availability_exceptions'];
+    }
+
+    /**
      * get date_range
      * @return array date_range
      */

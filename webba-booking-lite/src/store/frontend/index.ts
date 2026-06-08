@@ -350,6 +350,42 @@ const actions = {
             }
         }
     },
+    fetchRecurringBookingTimeSlots: (params: {
+        serviceId: number
+        timeSlot: number
+        repeats: number
+        numberOfTimeslots: number
+        repeatInterval: string
+        staffMemberId?: string | null
+        offset?: number
+    }) => {
+        return async () => {
+            const queryParams: Record<string, string | number> = {
+                service_id: params.serviceId,
+                time_slot: params.timeSlot,
+                repeats: params.repeats,
+                number_of_timeslots: params.numberOfTimeslots,
+                repeat_interval: params.repeatInterval,
+            }
+            if (
+                params.staffMemberId != null &&
+                params.staffMemberId !== ''
+            ) {
+                queryParams.staff_member_id = params.staffMemberId
+            }
+            if (params.offset != null) {
+                queryParams.offset = params.offset
+            }
+            const response = (await apiFetch({
+                path: addLangToQueryArgs(
+                    '/webba-booking/v1/get-recurring-booking-time-slots/',
+                    queryParams
+                ),
+                method: 'GET',
+            })) as Record<string, unknown>
+            return response
+        }
+    },
     fetchUnitAvailabilityForRange: (
         unitId: number,
         range: { start: string; end: string },
@@ -651,14 +687,17 @@ const actions = {
                     }
 
                     if (key === 'places' && value && typeof value === 'object') {
-                        const servicesOrder = Array.isArray(formData.services)
-                            ? (formData.services as number[])
-                            : []
+                        const placesOrder =
+                            formData?.booking_mode === 'units'
+                                ? Object.keys(value as Record<string, unknown>).map(Number)
+                                : Array.isArray(formData.services)
+                                  ? (formData.services as number[])
+                                  : []
                         formDataModified.append(
                             key,
                             serializePlacesForApi(
                                 value as Record<number, unknown[]>,
-                                servicesOrder
+                                placesOrder
                             )
                         )
                     } else if (typeof value === 'object') {

@@ -574,11 +574,15 @@ class Model
                     $type = "string";
                     $input_type = "availability_ranges";
                     break;
+                case "date_time_ranges":
+                    $type = "string";
+                    $input_type = "date_time_ranges";
+                    break;
                 case "number_of_people":
                     $type = "string";
                     $input_type = "number_of_people";
                     break;
-                case 'extras_selector':
+                case "extras_selector":
                     $type = "string";
                     $input_type = "extras_selector";
                     break;

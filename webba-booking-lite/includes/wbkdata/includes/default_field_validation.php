@@ -229,6 +229,16 @@ function wbkdata_property_field_multicheckbox_validator(
         ];
     }
 
+    if ($field->get_required() && count($value) === 0) {
+        return [
+            false,
+            sprintf(
+                wbkdata_translate_string('%s is required'),
+                $field->get_title()
+            ),
+        ];
+    }
+
     foreach ($value as $key) {
         if (!in_array($key, array_keys($options))) {
             $valid = false;
@@ -648,6 +658,18 @@ add_filter(
     4
 );
 function validate_availability_ranges($input, $value, $slug, $field)
+{
+    return [true, $value];
+}
+
+// date time ranges
+add_filter(
+    'wbkdata_property_field_validation_date_time_ranges',
+    'validate_date_time_ranges',
+    10,
+    4
+);
+function validate_date_time_ranges($input, $value, $slug, $field)
 {
     return [true, $value];
 }

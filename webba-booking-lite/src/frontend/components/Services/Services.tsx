@@ -74,16 +74,45 @@ export const Services = ({ emptyStateText }: IServicesProps) => {
     }, [selectedCategory, services, locationId, categories, extractedAttrCats])
 
     const unitsToView = useMemo(() => {
-        if (!units) {
-            return []
+        let list = units || []
+
+        if (locationId) {
+            list = list.filter((unit: IUnitProps) =>
+                entityBelongsToLocation(unit, locationId)
+            )
         }
-        if (!locationId) {
-            return units
+
+        if (extractedAttrCats.length === 0 && !selectedCategory) {
+            return list
         }
-        return units.filter((unit: IUnitProps) =>
-            entityBelongsToLocation(unit, locationId)
-        )
-    }, [units, locationId])
+
+        const getCategoryUnitIds = (category: { units?: string[] }) =>
+            (category.units || []).map(String)
+
+        if (selectedCategory) {
+            return list.filter(({ id }) =>
+                getCategoryUnitIds(selectedCategory).includes(String(id))
+            )
+        }
+
+        if (extractedAttrCats.length > 0 && !selectedCategory) {
+            const unitIdsInCategories = categories
+                .filter((category) => extractedAttrCats.includes(Number(category.id)))
+                .flatMap((category) => getCategoryUnitIds(category))
+
+            return list.filter(({ id }) =>
+                unitIdsInCategories.includes(String(id))
+            )
+        }
+
+        return list
+    }, [
+        units,
+        locationId,
+        selectedCategory,
+        categories,
+        extractedAttrCats,
+    ])
 
     if (
         !preset ||

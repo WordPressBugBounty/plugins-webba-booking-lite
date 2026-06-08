@@ -111,6 +111,55 @@ export const wbkFormat = (
 
 export const formatWbkDate = (date: Date) => format(date, 'M/d/y')
 
+const CALENDAR_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
+
+export const isCalendarDateString = (value: string): boolean =>
+    CALENDAR_DATE_PATTERN.test(value.trim())
+
+/**
+ * Parse YYYY-MM-DD as a local calendar date (no timezone shift).
+ */
+export const parseCalendarDateString = (dateStr: string): Date | null => {
+    const trimmed = dateStr.trim()
+    if (!isCalendarDateString(trimmed)) {
+        return null
+    }
+    const [year, month, day] = trimmed.split('-').map(Number)
+    if (!year || !month || !day) {
+        return null
+    }
+    const date = new Date(year, month - 1, day, 12, 0, 0, 0)
+    return Number.isNaN(date.getTime()) ? null : date
+}
+
+/**
+ * Format a Date as YYYY-MM-DD using local calendar components.
+ */
+export const formatCalendarDateString = (date: Date): string => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+}
+
+/**
+ * Normalize any valid Date to a local calendar date at noon (avoids DST edges).
+ */
+export const toLocalCalendarDate = (date: Date): Date | null => {
+    if (Number.isNaN(date.getTime())) {
+        return null
+    }
+    return new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        12,
+        0,
+        0,
+        0
+    )
+}
+
 export const getCalendarMonthRange = (date: Date) => [
     startOfWeek(startOfMonth(date), { weekStartsOn: 0 }),
     endOfWeek(endOfMonth(date), { weekStartsOn: 0 }),

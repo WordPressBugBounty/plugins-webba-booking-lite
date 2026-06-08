@@ -322,7 +322,6 @@
             "title": "Override global availability for specific days only",
             "tab": "availability",
             "misc": {
-                "checkbox_value": "yes",
                 "yes": "Yes",
                 "tooltip": "Choose dates where this service should follow a different schedule than normal. Perfect for holidays, special events, or temporary changes.",
                 "required_plan": "standard"
@@ -334,7 +333,7 @@
         },
         "service_availability_exceptions": {
             "type": "string",
-            "input_type": "date_range",
+            "input_type": "date_time_ranges",
             "hidden": true,
             "title": "Set availability exceptions",
             "tab": "availability",
@@ -348,7 +347,7 @@
                     ]
                 ],
                 "date_format": "F j, Y",
-                "time_zone": "Europe/Warsaw",
+                "time_zone": "Asia/Dhaka",
                 "required_plan": "standard"
             },
             "required": false,
@@ -365,7 +364,7 @@
             "misc": {
                 "tooltip": "Specify a date range if the service is only valid for a specific period of time.",
                 "date_format": "F j, Y",
-                "time_zone": "Europe/Warsaw",
+                "time_zone": "Asia/Dhaka",
                 "required_plan": "start",
                 "available_in_old_free": true
             },
@@ -870,6 +869,110 @@
             "required": false,
             "dependency": [],
             "default_value": "",
+            "editable": true
+        },
+        "service_recurring_booking_enabled": {
+            "type": "string",
+            "input_type": "checkbox",
+            "hidden": true,
+            "title": "Enable recurring booking",
+            "tab": "recurring_booking",
+            "misc": {
+                "yes": "Yes",
+                "tooltip": "When enabled, customers can book this service as a repeating series according to the options below.",
+                "required_plan": "premium"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "service_recurring_intervals": {
+            "type": "string",
+            "input_type": "multicheckbox",
+            "hidden": true,
+            "title": "Allowed repeat intervals",
+            "tab": "recurring_booking",
+            "misc": {
+                "tooltip": "Select which intervals customers can choose for a recurring booking.",
+                "options": {
+                    "day": "Days",
+                    "week": "Weeks",
+                    "month": "Months"
+                },
+                "hide": [
+                    [
+                        "recurring_booking_enabled",
+                        "=",
+                        "yes"
+                    ]
+                ]
+            },
+            "required": true,
+            "dependency": [
+                [
+                    "recurring_booking_enabled",
+                    "=",
+                    "yes"
+                ]
+            ],
+            "default_value": "[\"day\",\"week\",\"month\"]",
+            "editable": true
+        },
+        "service_recurring_min_appointments": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Minimum appointments",
+            "tab": "recurring_booking",
+            "misc": {
+                "sub_type": "positive_integer",
+                "tooltip": "Minimum number of appointments in a recurring series.",
+                "hide": [
+                    [
+                        "recurring_booking_enabled",
+                        "=",
+                        "yes"
+                    ]
+                ]
+            },
+            "required": true,
+            "dependency": [
+                [
+                    "recurring_booking_enabled",
+                    "=",
+                    "yes"
+                ]
+            ],
+            "default_value": "2",
+            "editable": true
+        },
+        "service_recurring_max_appointments": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Maximum appointments",
+            "tab": "recurring_booking",
+            "misc": {
+                "sub_type": "positive_integer",
+                "tooltip": "Maximum number of appointments in a recurring series.",
+                "hide": [
+                    [
+                        "recurring_booking_enabled",
+                        "=",
+                        "yes"
+                    ]
+                ]
+            },
+            "required": true,
+            "dependency": [
+                [
+                    "recurring_booking_enabled",
+                    "=",
+                    "yes"
+                ]
+            ],
+            "default_value": "12",
             "editable": true
         },
         "service_color": {

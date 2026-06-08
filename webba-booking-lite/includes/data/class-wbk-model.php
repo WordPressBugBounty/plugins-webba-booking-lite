@@ -120,6 +120,7 @@ class WBK_Model
         $table->sections["availability"] = __("Availability", "webba-booking-lite");
         $table->sections["pricing"] = __("Pricing", "webba-booking-lite");
         $table->sections["integrations"] = __("Integrations", "webba-booking-lite");
+        $table->sections["recurring_booking"] = __("Recurring booking", "webba-booking-lite");
         $table->sections["settings"] = __("Settings", "webba-booking-lite");
 
         // ========== DETAILS TAB ==========
@@ -489,7 +490,7 @@ class WBK_Model
             "service_availability_exceptions",
             "availability_exceptions",
             __("Set availability exceptions", "webba-booking-lite"),
-            "date_range",
+            "date_time_ranges",
             "availability",
             [
                 "tooltip" => __(
@@ -1225,6 +1226,111 @@ class WBK_Model
             false,
         );
 
+        // ========== RECURRING BOOKING TAB ==========
+        $table->add_field(
+            "service_recurring_booking_enabled",
+            "recurring_booking_enabled",
+            __("Enable recurring booking", "webba-booking-lite"),
+            "checkbox",
+            "recurring_booking",
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => __(
+                    "When enabled, customers can book this service as a repeating series according to the options below.",
+                    "webba-booking-lite",
+                ),
+                "required_plan" => "premium", // TIER 3
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+        $table->add_field(
+            "service_recurring_intervals",
+            "recurring_intervals",
+            __("Allowed repeat intervals", "webba-booking-lite"),
+            "multicheckbox",
+            "recurring_booking",
+            [
+                "tooltip" => __(
+                    "Select which intervals customers can choose for a recurring booking.",
+                    "webba-booking-lite",
+                ),
+                "options" => [
+                    "day" => __("Days", "webba-booking-lite"),
+                    "week" => __("Weeks", "webba-booking-lite"),
+                    "month" => __("Months", "webba-booking-lite"),
+                ],
+                "hide" => [["recurring_booking_enabled", "=", "yes"]],
+            ],
+            wp_json_encode(["day", "week", "month"]),
+            true,
+            false,
+            true,
+        );
+        $table->add_field(
+            "service_recurring_min_appointments",
+            "recurring_min_appointments",
+            __("Minimum appointments", "webba-booking-lite"),
+            "text",
+            "recurring_booking",
+            [
+                "sub_type" => "positive_integer",
+                "tooltip" => __(
+                    "Minimum number of appointments in a recurring series.",
+                    "webba-booking-lite",
+                ),
+                "hide" => [["recurring_booking_enabled", "=", "yes"]],
+            ],
+            "2",
+            true,
+            false,
+            true,
+        );
+        $table->add_field(
+            "service_recurring_max_appointments",
+            "recurring_max_appointments",
+            __("Maximum appointments", "webba-booking-lite"),
+            "text",
+            "recurring_booking",
+            [
+                "sub_type" => "positive_integer",
+                "tooltip" => __(
+                    "Maximum number of appointments in a recurring series.",
+                    "webba-booking-lite",
+                ),
+                "hide" => [["recurring_booking_enabled", "=", "yes"]],
+            ],
+            "12",
+            true,
+            false,
+            true,
+        );
+        /*
+        $table->add_field(
+            "service_recurring_payment_mode",
+            "recurring_payment_mode",
+            __("Payments", "webba-booking-lite"),
+            "radio",
+            "recurring_booking",
+            [
+                "tooltip" => __(
+                    "Choose whether payment applies to every appointment or only the first one in the series.",
+                    "webba-booking-lite",
+                ),
+                "options" => [
+                    "all" => __("Pay for all booking", "webba-booking-lite"),
+                    "first" => __("Pay only for the first booking", "webba-booking-lite"),
+                ],
+                "hide" => [["recurring_booking_enabled", "=", "yes"]],
+            ],
+            "all",
+            true,
+            false,
+            true,
+        );
+        */
         // ========== SETTINGS TAB ==========
         // Calendar color
         $table->add_field(
@@ -1314,6 +1420,19 @@ class WBK_Model
             $table->fields
                 ->get_element_at("service_extcalendar_group_mode")
                 ->set_dependency([["quantity", ">", "1"], ["extcalendar", "!=", ""]]);
+        }
+        $recurring_dep = [["recurring_booking_enabled", "=", "yes"]];
+        if ($table->fields->get_element_at("service_recurring_intervals") != false) {
+            $table->fields
+                ->get_element_at("service_recurring_intervals")
+                ->set_dependency($recurring_dep);
+            $table->fields
+                ->get_element_at("service_recurring_min_appointments")
+                ->set_dependency($recurring_dep);
+            $table->fields
+                ->get_element_at("service_recurring_max_appointments")
+                ->set_dependency($recurring_dep);
+            // $table->fields->get_element_at("service_recurring_payment_mode")->set_dependency($recurring_dep);
         }
 
         $table->sync_structure();
@@ -1615,7 +1734,7 @@ class WBK_Model
             "service_id",
             "unit_id",
             "staff_member_id",
-            "phone"
+            "phone",
         ]);
 
         $table = new WbkData\Model($db_prefix . "wbk_appointments");
@@ -3525,15 +3644,18 @@ class WBK_Model
         );
 
         $table->add_field(
-            'extra_services',
-            'services',
-            __('Hourly Services / Rentals', 'webba-booking-lite'),
-            'select',
-            'details',
+            "extra_services",
+            "services",
+            __("Hourly Services / Rentals", "webba-booking-lite"),
+            "select",
+            "details",
             [
-                'tooltip' => __('Select the services where this extra is available.', 'webba-booking-lite'),
-                'options' => 'services',
-                'multiple' => true,
+                "tooltip" => __(
+                    "Select the services where this extra is available.",
+                    "webba-booking-lite",
+                ),
+                "options" => "services",
+                "multiple" => true,
             ],
             null,
             true,
@@ -3542,22 +3664,25 @@ class WBK_Model
         );
 
         $table->add_field(
-            'extra_units',
-            'units',
-            __('Daily Services / Rentals', 'webba-booking-lite'),
-            'select',
-            'details',
+            "extra_units",
+            "units",
+            __("Daily Services / Rentals", "webba-booking-lite"),
+            "select",
+            "details",
             [
-                'tooltip' => __('Select the services where this extra is available.', 'webba-booking-lite'),
-                'options' => 'units',
-                'multiple' => true,
+                "tooltip" => __(
+                    "Select the services where this extra is available.",
+                    "webba-booking-lite",
+                ),
+                "options" => "units",
+                "multiple" => true,
             ],
             null,
             true,
             false,
             false,
         );
-        
+
         $tooltip = __(
             'Set the price per item. Leaving it as 0, will show price as "Free" in the booking form.',
             "webba-booking-lite",

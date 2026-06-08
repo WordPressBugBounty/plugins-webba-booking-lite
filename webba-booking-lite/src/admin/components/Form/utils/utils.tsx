@@ -34,6 +34,7 @@ import { createNoticeField } from '../Fields/NoticeField/NoticeField'
 import { createSelectCustomField } from '../Fields/SelectCustomField/SelectCustomField'
 import { createPriceVariantField } from '../Fields/PriceVariantField/PriceVariantField'
 import { createAvailabilityRangesField } from '../Fields/AvailabilityRangesField/AvailabilityRangesField'
+import { createDateTimeRangesField } from '../Fields/DateTimeRangesField/DateTimeRangesField'
 import { createUnitPeopleField } from '../Fields/UnitPeopleField/UnitPeopleField'
 import { createExtrasSelectorField } from '../Fields/ExtrasSelectorField/ExtrasSelectorField'
 
@@ -117,6 +118,8 @@ export const getFieldComponentFromType = ({
             return createPriceVariantField(constructorConfig)
         case inputType === 'availability_ranges':
             return createAvailabilityRangesField(constructorConfig)
+        case inputType === 'date_time_ranges':
+            return createDateTimeRangesField(constructorConfig)
         case inputType === 'number_of_people':
             return createUnitPeopleField(constructorConfig)
         case inputType === 'extras_selector':

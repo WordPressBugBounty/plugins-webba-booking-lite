@@ -1,0 +1,45 @@
+.wbk_recurring_counter {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #22292f;
+    }
+
+    &__button--disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
+    &--disabled {
+        opacity: 0.7;
+
+        .wbk_recurring_counter__label {
+            color: #8c97a1;
+        }
+
+        .wbk_service_item__counter-input {
+            background-color: #f8f9fa;
+            color: #8c97a1;
+        }
+    }
+
+    &--inline {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+
+        .wbk_recurring_counter__label {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .wbk_service_item__counter-input-wrapper {
+            flex-shrink: 0;
+        }
+    }
+}

@@ -175,51 +175,56 @@ class WBK_Schedule_Processor {
             $preparation_time = $service->get_prepare_time();
         }
         $intervals = $this->get_business_hours_intervals_by_dow( date( "N", $day ), $service_id, $staff_member_id );
-        $min_quantity = $service->get_min_quantity();
-        // special business hours
-        $data = trim( get_option( "wbk_appointments_special_hours", "" ) );
-        $intervals_overriden = [];
-        if ( !$is_staff_member_flow && $data != "" && WBK_Feature_Gate::have_required_plan( "standard", "only_old_users" ) ) {
-            $data = explode( PHP_EOL, $data );
-            foreach ( $data as $line ) {
-                $parts = explode( " ", $line );
-                if ( count( $parts ) != 2 && count( $parts ) != 3 ) {
-                    continue;
-                }
-                if ( count( $parts ) == 3 ) {
-                    if ( $service_id != $parts[0] ) {
+        $exception_intervals = WBK_Availability_Exceptions_Utils::resolve_day_exception( $service, $day, $staff_member_id );
+        if ( $exception_intervals !== null ) {
+            $intervals = $exception_intervals;
+        } else {
+            // special business hours
+            $data = trim( get_option( "wbk_appointments_special_hours", "" ) );
+            $intervals_overriden = [];
+            if ( !$is_staff_member_flow && $data != "" && WBK_Feature_Gate::have_required_plan( "standard", "only_old_users" ) ) {
+                $data = explode( PHP_EOL, $data );
+                foreach ( $data as $line ) {
+                    $parts = explode( " ", $line );
+                    if ( count( $parts ) != 2 && count( $parts ) != 3 ) {
                         continue;
                     }
-                } else {
-                    array_unshift( $parts, "x" );
-                }
-                $date_this = strtotime( $parts[1] );
-                if ( $date_this == $day ) {
-                    $intervals_this = explode( ",", $parts[2] );
-                    foreach ( $intervals_this as $interval ) {
-                        $times = explode( "-", $interval );
-                        $time = $times[0];
-                        $splitted_time = explode( ":", $time );
-                        $seconds = $splitted_time[0] * 60 * 60 + $splitted_time[1] * 60;
-                        $start = $seconds;
-                        $time = $times[1];
-                        $splitted_time = explode( ":", $time );
-                        $seconds = $splitted_time[0] * 60 * 60 + $splitted_time[1] * 60;
-                        $end = $seconds;
-                        $interval_data = new stdClass();
-                        $interval_data->start = $start;
-                        $interval_data->end = $end;
-                        $interval_data->day_of_week = date( "N", $day );
-                        $interval_data->status = "active";
-                        $intervals_overriden[] = $interval_data;
+                    if ( count( $parts ) == 3 ) {
+                        if ( $service_id != $parts[0] ) {
+                            continue;
+                        }
+                    } else {
+                        array_unshift( $parts, "x" );
+                    }
+                    $date_this = strtotime( $parts[1] );
+                    if ( $date_this == $day ) {
+                        $intervals_this = explode( ",", $parts[2] );
+                        foreach ( $intervals_this as $interval ) {
+                            $times = explode( "-", $interval );
+                            $time = $times[0];
+                            $splitted_time = explode( ":", $time );
+                            $seconds = $splitted_time[0] * 60 * 60 + $splitted_time[1] * 60;
+                            $start = $seconds;
+                            $time = $times[1];
+                            $splitted_time = explode( ":", $time );
+                            $seconds = $splitted_time[0] * 60 * 60 + $splitted_time[1] * 60;
+                            $end = $seconds;
+                            $interval_data = new stdClass();
+                            $interval_data->start = $start;
+                            $interval_data->end = $end;
+                            $interval_data->day_of_week = date( "N", $day );
+                            $interval_data->status = "active";
+                            $intervals_overriden[] = $interval_data;
+                        }
                     }
                 }
             }
-        }
-        if ( count( $intervals_overriden ) > 0 ) {
-            $intervals = $intervals_overriden;
+            if ( count( $intervals_overriden ) > 0 ) {
+                $intervals = $intervals_overriden;
+            }
         }
         // special business hours end
+        $min_quantity = $service->get_min_quantity();
         if ( WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
             $wbk_disallow_after = get_option( "wbk_disallow_after", "0" );
         } else {
@@ -793,6 +798,13 @@ class WBK_Schedule_Processor {
     public function is_working_day( $day, $service_id, $staff_member_id = null ) {
         $service_id = (int) $service_id;
         $has_staff_member = !is_null( $staff_member_id ) && is_numeric( $staff_member_id );
+        if ( !$has_staff_member ) {
+            $service = new WBK_Service($service_id);
+            $exception_intervals = WBK_Availability_Exceptions_Utils::resolve_day_exception( $service, $day, $staff_member_id );
+            if ( $exception_intervals !== null ) {
+                return count( $exception_intervals ) > 0;
+            }
+        }
         if ( $has_staff_member ) {
             $staff_member = new WBK_Staff_Member((int) $staff_member_id);
             if ( !$staff_member->is_loaded() ) {

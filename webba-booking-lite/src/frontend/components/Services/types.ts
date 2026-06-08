@@ -45,6 +45,11 @@ export interface IServiceProps {
     first_available: string | null
     hide_price: boolean
     extra_ids?: number[]
+    recurring_booking_enabled?: boolean
+    recurring_intervals?: ('day' | 'week' | 'month')[]
+    recurring_min_count?: number
+    recurring_max_count?: number
+    recurring_payment_mode?: 'all' | 'first'
 }
 
 export interface IUnitAttendees {

@@ -37,6 +37,8 @@ export interface IBookingFormObj {
 }
 
 export interface IBookingFormContext extends IBookingFormObj {
+    popupPortalElement: HTMLElement | null
+    setPopupPortalElement: (element: HTMLElement | null) => void
     setFormData: (slug: string, value: any) => void
     mergeFormData: (patch: Partial<IFormData>) => void
     setFormObj: (key: string, value: any) => void

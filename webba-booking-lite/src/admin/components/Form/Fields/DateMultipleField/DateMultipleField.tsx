@@ -13,14 +13,37 @@ import {
 } from '../GenericSelectField/utils'
 import { getFormState } from '../../lib/utils'
 import { useForm } from '../../lib/FormProvider'
-import { toZonedTime } from 'date-fns-tz'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
 import classNames from 'classnames'
-import { convertToJSFormat } from '../../utils/dateTime'
+import {
+    convertToJSFormat,
+    formatCalendarDateString,
+    isCalendarDateString,
+    parseCalendarDateString,
+    toLocalCalendarDate,
+} from '../../utils/dateTime'
 import calendarIcon from '../../../../../../public/images/icon-calendar.svg'
 import trashIcon from '../../../../../../public/images/icon-trash.svg'
 import plusIcon from '../../../../../../public/images/icon-plus-green.svg'
+
+const parseDateMultipleToken = (token: string): Date | null => {
+    const trimmed = token.trim()
+    if (!trimmed) {
+        return null
+    }
+    if (isCalendarDateString(trimmed)) {
+        return parseCalendarDateString(trimmed)
+    }
+    if (!isNaN(Number(trimmed))) {
+        return toLocalCalendarDate(fromUnixTime(Number(trimmed)))
+    }
+    const parsed = new Date(trimmed)
+    return toLocalCalendarDate(parsed)
+}
+
+const serializeDateMultipleValue = (dates: Date[]): string =>
+    dates.map((date) => formatCalendarDateString(date)).join(',')
 
 export const createDateMultipleField: FormComponentConstructor<any> = ({
     field,
@@ -53,90 +76,30 @@ export const createDateMultipleField: FormComponentConstructor<any> = ({
                     let dates: Date[] = []
                     
                     if (value && typeof value === 'string' && value.trim() !== '') {
-                        // Handle comma-separated dates (e.g., '2025-07-17,2025-07-18,2025-07-19')
                         if (value.includes(',')) {
                             dates = value
                                 .split(',')
-                                .map((dateStr) => {
-                                    const trimmed = dateStr.trim()
-                                    if (!trimmed) return null
-                                    // Handle YYYY-MM-DD format
-                                    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
-                                        return toZonedTime(
-                                            new Date(trimmed + 'T00:00:00'),
-                                            settings?.timezone
-                                        )
-                                    }
-                                    // Try parsing as timestamp
-                                    if (!isNaN(Number(trimmed))) {
-                                        return toZonedTime(
-                                            fromUnixTime(Number(trimmed)),
-                                            settings?.timezone
-                                        )
-                                    }
-                                    // Try parsing as date string
-                                    return toZonedTime(
-                                        new Date(trimmed),
-                                        settings?.timezone
-                                    )
-                                })
-                                .filter((d: Date | null) => d !== null && !isNaN(d.getTime())) as Date[]
-                        }
-                        // Try parsing as JSON array
-                        else if (value.trim().startsWith('[')) {
+                                .map((dateStr) => parseDateMultipleToken(dateStr))
+                                .filter(
+                                    (d: Date | null): d is Date =>
+                                        d !== null && !isNaN(d.getTime())
+                                )
+                        } else if (value.trim().startsWith('[')) {
                             const parsed = JSON.parse(value)
                             if (Array.isArray(parsed)) {
                                 dates = parsed
-                                    .map((dateStr: string) => {
-                                        if (!dateStr) return null
-                                        // Handle YYYY-MM-DD format
-                                        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-                                            return toZonedTime(
-                                                new Date(dateStr + 'T00:00:00'),
-                                                settings?.timezone
-                                            )
-                                        }
-                                        // Try parsing as timestamp
-                                        if (!isNaN(Number(dateStr))) {
-                                            return toZonedTime(
-                                                fromUnixTime(Number(dateStr)),
-                                                settings?.timezone
-                                            )
-                                        }
-                                        // Try parsing as date string
-                                        return toZonedTime(
-                                            new Date(dateStr),
-                                            settings?.timezone
-                                        )
-                                    })
-                                    .filter((d: Date | null) => d !== null && !isNaN(d.getTime())) as Date[]
+                                    .map((dateStr: string) =>
+                                        parseDateMultipleToken(String(dateStr))
+                                    )
+                                    .filter(
+                                        (d: Date | null): d is Date =>
+                                            d !== null && !isNaN(d.getTime())
+                                    )
                             }
-                        }
-                        // Single value
-                        else {
-                            const dateStr = String(value)
-                            // Handle YYYY-MM-DD format
-                            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-                                dates = [
-                                    toZonedTime(
-                                        new Date(dateStr + 'T00:00:00'),
-                                        settings?.timezone
-                                    ),
-                                ]
-                            } else if (!isNaN(Number(dateStr))) {
-                                dates = [
-                                    toZonedTime(
-                                        fromUnixTime(Number(dateStr)),
-                                        settings?.timezone
-                                    ),
-                                ]
-                            } else {
-                                dates = [
-                                    toZonedTime(
-                                        new Date(dateStr),
-                                        settings?.timezone
-                                    ),
-                                ]
+                        } else {
+                            const parsed = parseDateMultipleToken(String(value))
+                            if (parsed) {
+                                dates = [parsed]
                             }
                         }
                     }
@@ -151,39 +114,41 @@ export const createDateMultipleField: FormComponentConstructor<any> = ({
                     setInitialized(true)
                 }
             }
-        }, [value, initialized, settings?.timezone])
+        }, [value, initialized])
 
-        // Update value when selectedDates changes
         useEffect(() => {
-            if (initialized) {
-                if (selectedDates.length === 0) {
-                    setValue('')
-                } else {
-                    // Store as comma-separated YYYY-MM-DD format
-                    const formattedDates = selectedDates
-                        .map((date) => format(date, 'yyyy-MM-dd'))
-                        .join(',')
-                    setValue(formattedDates)
-                }
-
-                if (isConnectedField(fieldConfig?.modelName as string, name)) {
-                    fetchConnectedOptions(
-                        fieldConfig?.modelName as string,
-                        name,
-                        {
-                            ...getFormState(form).values,
-                            id: form.defaultValue.id,
-                        }
-                    )
-                }
+            if (!initialized) {
+                return
             }
-        }, [selectedDates, initialized])
+
+            const nextValue =
+                selectedDates.length === 0
+                    ? ''
+                    : serializeDateMultipleValue(selectedDates)
+            const currentValue =
+                typeof value === 'string' ? value.trim() : String(value ?? '').trim()
+
+            if (nextValue !== currentValue) {
+                setValue(nextValue)
+            }
+
+            if (isConnectedField(fieldConfig?.modelName as string, name)) {
+                fetchConnectedOptions(
+                    fieldConfig?.modelName as string,
+                    name,
+                    {
+                        ...getFormState(form).values,
+                        id: form.defaultValue.id,
+                    }
+                )
+            }
+        }, [selectedDates, initialized, value, setValue, name, fieldConfig, form])
 
         const isDateSelected = (date: Date) => {
+            const dateKey = formatCalendarDateString(date)
             return selectedDates.some(
                 (selectedDate) =>
-                    format(selectedDate, 'yyyy-MM-dd') ===
-                    format(date, 'yyyy-MM-dd')
+                    formatCalendarDateString(selectedDate) === dateKey
             )
         }
 
@@ -191,29 +156,29 @@ export const createDateMultipleField: FormComponentConstructor<any> = ({
             if (!date) return
 
             if (editingIndex !== null) {
-                // Update existing date
+                const calendarDate = toLocalCalendarDate(date) ?? date
                 setSelectedDates((prev) => {
                     const newDates = [...prev]
-                    newDates[editingIndex] = date
+                    newDates[editingIndex] = calendarDate
                     return newDates
                 })
                 setEditingIndex(null)
             } else {
                 // Add new date or toggle selection
                 setSelectedDates((prev) => {
-                    const dateStr = format(date, 'yyyy-MM-dd')
+                    const calendarDate =
+                        toLocalCalendarDate(date) ?? date
+                    const dateStr = formatCalendarDateString(calendarDate)
                     const isSelected = prev.some(
-                        (d) => format(d, 'yyyy-MM-dd') === dateStr
+                        (d) => formatCalendarDateString(d) === dateStr
                     )
 
                     if (isSelected) {
-                        // Remove date
                         return prev.filter(
-                            (d) => format(d, 'yyyy-MM-dd') !== dateStr
+                            (d) => formatCalendarDateString(d) !== dateStr
                         )
                     } else {
-                        // Add date (maintain order of addition)
-                        return [...prev, date]
+                        return [...prev, calendarDate]
                     }
                 })
             }
@@ -227,7 +192,7 @@ export const createDateMultipleField: FormComponentConstructor<any> = ({
         }
 
         const handleAddHolidayClick = () => {
-            const today = new Date()
+            const today = toLocalCalendarDate(new Date()) ?? new Date()
             setSelectedDates((prev) => {
                 const newDates = [...prev, today]
                 const newIndex = newDates.length - 1
@@ -343,7 +308,7 @@ export const createDateMultipleField: FormComponentConstructor<any> = ({
                                                     dayClassName={(date: Date) => {
                                                         const baseClass = 'wbk_dateMultipleField__day'
                                                         const isSelected = editingIndex !== null
-                                                            ? format(selectedDates[editingIndex], 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+                                                            ? formatCalendarDateString(selectedDates[editingIndex]) === formatCalendarDateString(date)
                                                             : isDateSelected(date)
                                                         const selectedClass = isSelected
                                                             ? ' wbk_dateMultipleField__day--daySelected'
@@ -406,7 +371,7 @@ export const createDateMultipleField: FormComponentConstructor<any> = ({
                                         dayClassName={(date: Date) => {
                                             const baseClass = 'wbk_dateMultipleField__day'
                                             const isSelected = editingIndex !== null
-                                                ? format(selectedDates[editingIndex], 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
+                                                ? formatCalendarDateString(selectedDates[editingIndex]) === formatCalendarDateString(date)
                                                 : isDateSelected(date)
                                             const selectedClass = isSelected
                                                 ? ' wbk_dateMultipleField__day--daySelected'

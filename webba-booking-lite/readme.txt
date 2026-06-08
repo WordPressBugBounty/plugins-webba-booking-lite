@@ -3,8 +3,8 @@ Contributors: Webba agency, freemius
 Donate link: https://webba-booking.com/
 Tags:  appointment, booking, booking calendar, scheduling, reservation
 Requires at least: 5.6
-Tested up to: 6.9.4
-Stable tag: 6.4.8
+Tested up to: 6.9
+Stable tag: 6.4.10
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -179,13 +179,29 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 
 == Changelog ==
+02/06/2026
 
-20/05/2026
+6.4.10
+
+- Improvement: filter daily services based on category
+- Bug fix: showing unavailable timeslots in booking form
+- Bug fix: attachments being dropped from emails in certain configurations
+- Bug fix: override specific days not working for hourly services
+
+26/05/2026
+
+6.4.9
+
+- Improvement: new feature - recurring bookings
+- Bug fix: calendar availability in user dashboard
+- Bug fix: holidays input issue
+
+19/05/2026
 
 6.4.8
 
 - Bug fix: reschedule in user dashboard not working
-- Bug fix: service override fixed for certain configurations
+- Bug fix: override specific days value resets automatically
 - Bug fix: other minor fixes
 
 14/05/2026

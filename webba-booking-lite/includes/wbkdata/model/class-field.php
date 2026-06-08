@@ -694,6 +694,9 @@ class Field
             case "availability_ranges":
                 $arr_sql_parts = ["text", "", "", "%s"];
                 break;
+            case "date_time_ranges":
+                $arr_sql_parts = ["text", "", "", "%s"];
+                break;
             case "number_of_people":
                 $arr_sql_parts = ["text", "", "", "%s"];
                 break;

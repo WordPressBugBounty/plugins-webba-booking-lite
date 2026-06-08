@@ -24,6 +24,8 @@ export const Timeslots = ({
     selectedDate,
     limited_timeslot,
     showStaffSelector,
+    recurringBookingEnabled,
+    onBookRecurring,
 }: ITimeslotsProps) => {
     const { loading, preset, timeFormat, userTimezone } = useBookingContext()
     const { locale } = useLocale()
@@ -204,9 +206,29 @@ export const Timeslots = ({
                                     : undefined
                             }
                         >
-                            {wbkFormat(start_time, timeFormat, userTimezone, {
-                                locale: dateFnsLocale,
-                            })}
+                            <span className="wbk_timeslots__time-label">
+                                {wbkFormat(start_time, timeFormat, userTimezone, {
+                                    locale: dateFnsLocale,
+                                })}
+                            </span>
+                            {recurringBookingEnabled &&
+                                isSelected &&
+                                onBookRecurring && (
+                                    <button
+                                        type="button"
+                                        className="wbk_timeslots__book-recurring"
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            e.stopPropagation()
+                                            onBookRecurring(slotNum)
+                                        }}
+                                    >
+                                        {__(
+                                            'Book recurring',
+                                            'webba-booking-lite'
+                                        )}
+                                    </button>
+                                )}
                             {max_quantity > 1 && (
                                 <div className={'wbk_timeslots__free-places'}>
                                     {free_places}{' '}

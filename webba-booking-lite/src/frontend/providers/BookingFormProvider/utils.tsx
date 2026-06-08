@@ -70,6 +70,36 @@ export const buildServicesSlotIds = (selectedServices: IServiceProps[]) =>
 /**
  * JSON.stringify reorders numeric object keys; build places JSON in services order instead.
  */
+const resolveAttachments = (
+    fieldValues: Record<string, unknown>,
+    formData: Record<string, unknown>
+): Record<string, File[]> | File[] => {
+    const fromFields = fieldValues.attachments
+    if (fromFields != null) {
+        if (Array.isArray(fromFields)) {
+            const files = fromFields.filter((item): item is File => item instanceof File)
+            if (files.length > 0) {
+                return files
+            }
+        } else if (typeof fromFields === 'object') {
+            const record = fromFields as Record<string, unknown>
+            if (Object.keys(record).length > 0) {
+                return record as Record<string, File[]>
+            }
+        }
+    }
+
+    const fromFormData = formData.attachments
+    if (Array.isArray(fromFormData)) {
+        return fromFormData.filter((item): item is File => item instanceof File)
+    }
+    if (fromFormData != null && typeof fromFormData === 'object') {
+        return fromFormData as Record<string, File[]>
+    }
+
+    return []
+}
+
 export const serializePlacesForApi = (
     places: Record<number, IFormPlace[]>,
     servicesSlotOrder: number[]
@@ -245,6 +275,13 @@ export const constructFormData = (formObj: IBookingFormObj) => {
             )) ||
         ''
 
+    const { attachments: _fieldAttachments, ...fieldValuesWithoutAttachments } =
+        fieldValues as Record<string, unknown>
+    const attachments = resolveAttachments(
+        fieldValues as Record<string, unknown>,
+        formData as Record<string, unknown>
+    )
+
     if (bookingMode === 'units') {
         const selectedUnit = selectedUnits[0] as IUnitProps | undefined
         const unitRange =
@@ -254,8 +291,6 @@ export const constructFormData = (formObj: IBookingFormObj) => {
         const payment_method =
             (formData as Record<string, any>)?.payment_method ?? ('' as any)
         const coupon = (formData as Record<string, any>)?.coupon ?? ''
-        const attachments =
-            (formData as Record<string, any>)?.attachments ?? []
 
         const unitPeoplePayload = (() => {
             const attendees = selectedUnit?.attendees
@@ -278,7 +313,7 @@ export const constructFormData = (formObj: IBookingFormObj) => {
 
         return {
             ...formDataWithoutStaff,
-            ...fieldValues,
+            ...fieldValuesWithoutAttachments,
             booking_mode: 'units' as const,
             extra: serializedExtra as any,
             ordered_extras: orderedExtras,
@@ -324,12 +359,11 @@ export const constructFormData = (formObj: IBookingFormObj) => {
     const payment_method =
         (formData as Record<string, any>)?.payment_method ?? ('' as any)
     const coupon = (formData as Record<string, any>)?.coupon ?? ''
-    const attachments = (formData as Record<string, any>)?.attachments ?? []
 
     return {
         ...formDataWithoutStaff,
         ...(Object.keys(payloadStaff).length > 0 ? { staff: payloadStaff } : {}),
-        ...fieldValues,
+        ...fieldValuesWithoutAttachments,
         extra: serializedExtra as any,
         ordered_extras: orderedExtras,
         places: formPlaces,

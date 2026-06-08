@@ -212,6 +212,7 @@ $transition: 0.3s all linear;
                 display: flex;
                 align-items: center;
                 gap: 4px;
+                justify-content: space-between;
 
                 &:hover {
                     .wbk_sidebar__items__item__slot-wrapper__remove-button {
@@ -220,7 +221,7 @@ $transition: 0.3s all linear;
                 }
 
                 &__remove-button {
-                    border: 1px solid colors.$wbk-color-sidebar;
+                    border: 1px solid red;
                     border-radius: 50%;
                     min-width: 14px;
                     width: 14px;
@@ -235,7 +236,7 @@ $transition: 0.3s all linear;
 
                     svg {
                         path {
-                            fill: colors.$wbk-color-sidebar;
+                            fill: red;
                         }
                     }
 
@@ -277,6 +278,7 @@ $transition: 0.3s all linear;
                 // opacity: 0.8;
                 margin: 0;
                 margin-bottom: 0 !important;
+                width: 100%;
             }
 
             &__meta {

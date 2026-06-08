@@ -26,4 +26,6 @@ export interface ITimeslotsProps {
     group_booking: boolean
     limited_timeslot: boolean
     showStaffSelector: boolean
+    recurringBookingEnabled?: boolean
+    onBookRecurring?: (time: number) => void
 }

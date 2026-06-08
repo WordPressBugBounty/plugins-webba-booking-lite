@@ -39,7 +39,29 @@ export const Validators = {
     },
     required: (value: any) => {
         // Treat 0 and '0' as valid so numeric fields (e.g. duration, limitation min/max) can have 0 and pass required
-        const isEmpty = value === undefined || value === null || value === ''
+        let isEmpty =
+            value === undefined || value === null || value === ''
+
+        if (Array.isArray(value)) {
+            isEmpty = value.length === 0
+        } else if (typeof value === 'string') {
+            const trimmed = value.trim()
+            if (trimmed === '') {
+                isEmpty = true
+            } else if (trimmed === '[]') {
+                isEmpty = true
+            } else if (trimmed.startsWith('[')) {
+                try {
+                    const parsed = JSON.parse(trimmed)
+                    if (Array.isArray(parsed) && parsed.length === 0) {
+                        isEmpty = true
+                    }
+                } catch {
+                    // ignore parse errors — other validators may apply
+                }
+            }
+        }
+
         const isZero = value === 0 || value === '0'
         const isValid = !isEmpty || isZero
 

@@ -2,7 +2,7 @@ import { IPlace } from '../Services/types'
 import { IServicePropsWithIndex } from './types'
 import { __ } from '@wordpress/i18n'
 import { BookingCalendar } from '../BookingCalendar/BookingCalendar'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
     convertToJSFormat,
     wbkFormat,
@@ -37,6 +37,9 @@ import { useWording } from '../../hooks/useWording'
 import { useLocale } from '../../hooks/useLocale'
 import * as locales from 'date-fns/locale'
 import { Value } from 'react-calendar/dist/esm/shared/types.js'
+import { RecurringBookingPopup } from '../RecurringBooking/RecurringBookingPopup'
+import { IPendingRecurringSlot } from '../RecurringBooking/types'
+import { mergeRecurringPlaces } from '../RecurringBooking/utils'
 
 export const SelectedItem = ({
     label,
@@ -57,13 +60,36 @@ export const SelectedItem = ({
     group_booking,
     limited_timeslot,
     first_available,
-    staffId
+    staffId,
+    recurring_booking_enabled,
+    recurring_intervals,
+    recurring_min_count,
+    recurring_max_count,
 }: IServicePropsWithIndex) => {
     const wording = useWording()
-    const { loading, preset } = useBookingContext()
+    const { loading, preset, timezone, timeFormat, userTimezone } =
+        useBookingContext()
+    const { locale } = useLocale()
+    const [recurringPopupOpen, setRecurringPopupOpen] = useState(false)
+    const [pendingRecurringSlot, setPendingRecurringSlot] =
+        useState<IPendingRecurringSlot | null>(null)
+
+    const recurringServiceConfig = useMemo(
+        () => ({
+            recurring_booking_enabled,
+            recurring_intervals,
+            recurring_min_count,
+            recurring_max_count,
+        }),
+        [
+            recurring_booking_enabled,
+            recurring_intervals,
+            recurring_min_count,
+            recurring_max_count,
+        ]
+    )
     const isTimeslotsLoading =
         id !== undefined && loading?.serviceTimeslots?.[id]
-    const { locale } = useLocale()
     const initialized = useRef(false)
 
     const dateFnsLocale = useMemo(() => {
@@ -191,9 +217,6 @@ export const SelectedItem = ({
     const {
         formData,
         dateFormat,
-        timeFormat,
-        timezone,
-        userTimezone,
         attrService,
         extractedAttrStaff,
     } = useBookingContext()
@@ -416,27 +439,9 @@ export const SelectedItem = ({
         })
     }, [formData.places])
 
-    const handleSetTime = useCallback(
-        (time: number) => {
+    const addPlacesFromSelection = useCallback(
+        (time: number, singleSlotMode: boolean) => {
             if (!actualSelectedDate) return
-            const minSlotsLimit = min_slots && min_slots > 0 ? min_slots : 1
-            const maxSlotsLimit =
-                max_slots && max_slots > 0 ? max_slots : Infinity
-            const singleSlotMode = minSlotsLimit === 1 && maxSlotsLimit === 1
-            const exists = places?.find(
-                ({ timeslot, date }) =>
-                    date.getDate() === actualSelectedDate.getDate() &&
-                    date.getMonth() === actualSelectedDate.getMonth() &&
-                    date.getFullYear() === actualSelectedDate.getFullYear() &&
-                    timeslot === time
-            )
-
-            if (exists !== undefined) {
-                onUpdate({
-                    places: places?.filter(({ timeslot }) => timeslot !== time),
-                })
-                return
-            }
 
             if (singleSlotMode) {
                 const selectedSlot = timeslots?.find(
@@ -483,7 +488,95 @@ export const SelectedItem = ({
                 })
             }
         },
-        [timeslots, actualSelectedDate, places, min_slots, max_slots]
+        [timeslots, actualSelectedDate, places, onUpdate, timezone]
+    )
+
+    const handleRecurringConfirm = useCallback(
+        (newPlaces: IPlace[]) => {
+            const minSlotsLimit = min_slots && min_slots > 0 ? min_slots : 1
+            const maxSlotsLimit =
+                max_slots && max_slots > 0 ? max_slots : Infinity
+            const singleSlotMode =
+                minSlotsLimit === 1 && maxSlotsLimit === 1
+
+            const basePlaces = (places as IPlace[]) || []
+
+            if (singleSlotMode) {
+                onUpdate({ places: mergeRecurringPlaces([], newPlaces) })
+            } else {
+                onUpdate({
+                    places: mergeRecurringPlaces(basePlaces, newPlaces),
+                })
+            }
+            setRecurringPopupOpen(false)
+            setPendingRecurringSlot(null)
+        },
+        [places, min_slots, max_slots, onUpdate]
+    )
+
+    const handleRecurringClose = useCallback(() => {
+        setRecurringPopupOpen(false)
+        setPendingRecurringSlot(null)
+    }, [])
+
+    const handleSetTime = useCallback(
+        (time: number) => {
+            if (!actualSelectedDate) return
+            const minSlotsLimit = min_slots && min_slots > 0 ? min_slots : 1
+            const maxSlotsLimit =
+                max_slots && max_slots > 0 ? max_slots : Infinity
+            const singleSlotMode = minSlotsLimit === 1 && maxSlotsLimit === 1
+            const exists = places?.find(
+                ({ timeslot, date }) =>
+                    date.getDate() === actualSelectedDate.getDate() &&
+                    date.getMonth() === actualSelectedDate.getMonth() &&
+                    date.getFullYear() === actualSelectedDate.getFullYear() &&
+                    timeslot === time
+            )
+
+            if (exists !== undefined) {
+                if (pendingRecurringSlot?.time === time) {
+                    setRecurringPopupOpen(false)
+                    setPendingRecurringSlot(null)
+                }
+                onUpdate({
+                    places: places?.filter(({ timeslot }) => timeslot !== time),
+                })
+                return
+            }
+
+            addPlacesFromSelection(time, singleSlotMode)
+        },
+        [
+            actualSelectedDate,
+            places,
+            min_slots,
+            max_slots,
+            onUpdate,
+            addPlacesFromSelection,
+            pendingRecurringSlot,
+        ]
+    )
+
+    const handleBookRecurring = useCallback(
+        (time: number) => {
+            if (!actualSelectedDate) return
+            const selectedSlot = timeslots?.find(
+                (slot) => Number(slot.start_time) === time
+            )
+            const defaultStaffId =
+                selectedSlot?.staff_member_ids &&
+                selectedSlot.staff_member_ids.length > 0
+                    ? String(selectedSlot.staff_member_ids[0])
+                    : undefined
+            setPendingRecurringSlot({
+                time,
+                date: actualSelectedDate as Date,
+                defaultStaffId,
+            })
+            setRecurringPopupOpen(true)
+        },
+        [actualSelectedDate, timeslots]
     )
 
     const handleSetPlaceStaff = useCallback(
@@ -732,6 +825,10 @@ export const SelectedItem = ({
                             group_booking={group_booking}
                             limited_timeslot={limited_timeslot}
                             showStaffSelector={showTimeslotStaffSelector}
+                            recurringBookingEnabled={
+                                !!recurring_booking_enabled
+                            }
+                            onBookRecurring={handleBookRecurring}
                         />
                     </div>
                 )}
@@ -754,6 +851,30 @@ export const SelectedItem = ({
                         </div>
                     )}
             </div>
+            <RecurringBookingPopup
+                isOpen={recurringPopupOpen}
+                serviceId={id}
+                serviceLabel={label}
+                pendingSlot={pendingRecurringSlot}
+                serviceConfig={recurringServiceConfig}
+                staffMemberId={effectiveStaffIdForApi}
+                locationId={
+                    formData?.location != null
+                        ? String(formData.location)
+                        : null
+                }
+                offset={wbkGetTimezoneOffset(userTimezone)}
+                timezone={timezone}
+                dateFormat={dateFormat}
+                timeFormat={timeFormat}
+                userTimezone={userTimezone}
+                locale={locale || 'en'}
+                existingPlacesCount={(places as IPlace[])?.length || 0}
+                minSlots={min_slots}
+                maxSlots={max_slots}
+                onConfirm={handleRecurringConfirm}
+                onClose={handleRecurringClose}
+            />
         </div>
     )
 }

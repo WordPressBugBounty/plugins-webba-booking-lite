@@ -604,6 +604,33 @@ class WBK_Model_Utils {
     }
 
     /**
+     * Get units in category.
+     *
+     * @param int $category_id Category ID.
+     * @return array|false Unit IDs or false when empty.
+     */
+    static function get_units_in_category( $category_id ) {
+        global $wpdb;
+        $units_json = $wpdb->get_var( $wpdb->prepare( "SELECT units FROM " . get_option( "wbk_db_prefix", "" ) . "wbk_service_categories WHERE id = %d", $category_id ) );
+        if ( $units_json == "" ) {
+            return false;
+        }
+        $unit_ids_temp = json_decode( $units_json );
+        if ( !is_array( $unit_ids_temp ) ) {
+            return false;
+        }
+        $unit_ids = [];
+        foreach ( $unit_ids_temp as $id ) {
+            $unit = new WBK_Unit($id);
+            if ( !$unit->is_loaded() ) {
+                continue;
+            }
+            $unit_ids[] = (int) $id;
+        }
+        return $unit_ids;
+    }
+
+    /**
      * Get service category IDs that include the given unit.
      *
      * @param int $unit_id Unit ID.

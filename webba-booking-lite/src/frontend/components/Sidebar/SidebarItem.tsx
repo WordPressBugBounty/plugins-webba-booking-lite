@@ -199,6 +199,15 @@ export const SidebarItem = ({
                         <div
                             className={'wbk_sidebar__items__item__slot-wrapper'}
                         >
+                            <div>
+                                {wbkFormat(timeslot, dateFormat, userTimezone, {
+                                    locale: dateFnsLocale,
+                                })}
+                                ,{' '}
+                                {wbkFormat(timeslot, timeFormat, userTimezone, {
+                                    locale: dateFnsLocale,
+                                })}
+                            </div>
                             <div
                                 className={
                                     'wbk_sidebar__items__item__slot-wrapper__remove-button'
@@ -213,15 +222,6 @@ export const SidebarItem = ({
                                 }
                             >
                                 <CloseIcon />
-                            </div>
-                            <div>
-                                {wbkFormat(timeslot, dateFormat, userTimezone, {
-                                    locale: dateFnsLocale,
-                                })}
-                                ,{' '}
-                                {wbkFormat(timeslot, timeFormat, userTimezone, {
-                                    locale: dateFnsLocale,
-                                })}
                             </div>
                         </div>
                     ))}

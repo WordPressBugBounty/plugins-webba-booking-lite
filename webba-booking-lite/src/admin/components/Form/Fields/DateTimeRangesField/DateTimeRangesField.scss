@@ -1,0 +1,237 @@
+.wbk_dateTimeRangesField__fieldWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+}
+
+.wbk_dateTimeRangesField__description {
+    font-size: 14px;
+    color: #8a9393;
+    font-family: typography.$font-primary;
+    margin-top: -8px;
+}
+
+.wbk_dateTimeRangesField__rangesList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.wbk_dateTimeRangesField__rangeBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.wbk_dateTimeRangesField__rangeHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.wbk_dateTimeRangesField__dateRow {
+    flex: 1;
+    position: relative;
+}
+
+.wbk_dateTimeRangesField__inputContainer {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    gap: 8px;
+}
+
+.wbk_dateTimeRangesField__inputWrapper {
+    position: relative;
+    flex: 1;
+}
+
+.wbk_dateTimeRangesField__dateInput {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    height: 50px;
+    padding: 0 50px 0 20px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: #212121;
+    width: 100%;
+    background: #fff;
+
+    &::placeholder {
+        color: #8a9393;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: #1f6763;
+    }
+}
+
+.wbk_dateTimeRangesField__calendarButton {
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wbk_dateTimeRangesField__calendarIcon {
+    width: 20px;
+    height: 20px;
+}
+
+.wbk_dateTimeRangesField__deleteRangeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wbk_dateTimeRangesField__deleteIcon {
+    width: 20px;
+    height: 20px;
+}
+
+.wbk_dateTimeRangesField__inputWrapper {
+    .wbk_dateTimeRangesField__calendarWrapper {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        z-index: 100;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+}
+
+.wbk_dateTimeRangesField__calendar {
+    border: none;
+    font-family: typography.$font-primary;
+
+    .react-datepicker__header {
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .react-datepicker__day--in-range,
+    .react-datepicker__day--in-selecting-range {
+        background: #e8f5f4;
+        color: #212121;
+    }
+
+    .react-datepicker__day--range-start,
+    .react-datepicker__day--range-end,
+    .react-datepicker__day--selected {
+        background: #1f6763 !important;
+        color: #fff !important;
+    }
+}
+
+.wbk_dateTimeRangesField__day {
+    border-radius: 4px;
+}
+
+.wbk_dateTimeRangesField__timesSection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 4px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.wbk_dateTimeRangesField__timesHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.wbk_dateTimeRangesField__timesLabel {
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    font-weight: 500;
+    color: #212121;
+}
+
+.wbk_dateTimeRangesField__addTimeSlotButton {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: #1f6763;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: none;
+
+    &:hover {
+        color: #155350;
+    }
+}
+
+.wbk_dateTimeRangesField__plusIcon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.wbk_dateTimeRangesField__timeSlotsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wbk_dateTimeRangesField__noTimeSlots {
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    color: #8a9393;
+    padding: 8px 0;
+}
+
+.wbk_dateTimeRangesField__overlapError {
+    font-family: typography.$font-primary;
+    font-size: 13px;
+    color: #dc2626;
+}
+
+.wbk_dateTimeRangesField__addButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: #1f6763;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    align-self: flex-start;
+
+    &:hover {
+        color: #155350;
+    }
+}
+
+.wbk_dateTimeRangesField__error {
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    color: #dc2626;
+}

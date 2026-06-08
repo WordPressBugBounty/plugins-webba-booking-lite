@@ -56,43 +56,84 @@ export const ServicesStep = () => {
 
         let filtered = locations as ILocationOption[]
 
-        if (bookingMode === 'services' && hasPredefinedCategory && !hasPredefinedService) {
-            const categoryServiceIds = new Set<string>()
-                ; (
-                    presetCategories as Array<{
-                        id: string | number
-                        services?: Array<string | number>
-                    }>
-                )
-                    .filter((category) =>
-                        extractedAttrCats.includes(Number(category.id))
+        if (hasPredefinedCategory && !hasPredefinedService) {
+            if (bookingMode === 'services') {
+                const categoryServiceIds = new Set<string>()
+                    ; (
+                        presetCategories as Array<{
+                            id: string | number
+                            services?: Array<string | number>
+                        }>
                     )
-                    .forEach((category) => {
-                        ; (category.services || []).forEach((serviceId) =>
-                            categoryServiceIds.add(String(serviceId))
+                        .filter((category) =>
+                            extractedAttrCats.includes(Number(category.id))
                         )
-                    })
+                        .forEach((category) => {
+                            ; (category.services || []).forEach((serviceId) =>
+                                categoryServiceIds.add(String(serviceId))
+                            )
+                        })
 
-            const locationIds = new Set<string>()
-                ; (
-                    presetServices as Array<{
-                        id: string | number
-                        locations?: Array<string | number>
-                    }>
+                const locationIds = new Set<string>()
+                    ; (
+                        presetServices as Array<{
+                            id: string | number
+                            locations?: Array<string | number>
+                        }>
+                    )
+                        .filter((service) =>
+                            categoryServiceIds.has(String(service.id))
+                        )
+                        .forEach((service) => {
+                            ; (service.locations || []).forEach((locationId) =>
+                                locationIds.add(String(locationId))
+                            )
+                        })
+
+                filtered = filtered.filter(
+                    (location) =>
+                        locationIds.has(String(location.id)) ||
+                        (location.value != null &&
+                            locationIds.has(String(location.value)))
                 )
-                    .filter((service) => categoryServiceIds.has(String(service.id)))
-                    .forEach((service) => {
-                        ; (service.locations || []).forEach((locationId) =>
-                            locationIds.add(String(locationId))
+            } else if (bookingMode === 'units') {
+                const categoryUnitIds = new Set<string>()
+                    ; (
+                        presetCategories as Array<{
+                            id: string | number
+                            units?: Array<string | number>
+                        }>
+                    )
+                        .filter((category) =>
+                            extractedAttrCats.includes(Number(category.id))
                         )
-                    })
+                        .forEach((category) => {
+                            ; (category.units || []).forEach((unitId) =>
+                                categoryUnitIds.add(String(unitId))
+                            )
+                        })
 
-            filtered = filtered.filter(
-                (location) =>
-                    locationIds.has(String(location.id)) ||
-                    (location.value != null &&
-                        locationIds.has(String(location.value)))
-            )
+                const locationIds = new Set<string>()
+                    ; (
+                        presetServices as Array<{
+                            id: string | number
+                            locations?: Array<string | number>
+                        }>
+                    )
+                        .filter((unit) => categoryUnitIds.has(String(unit.id)))
+                        .forEach((unit) => {
+                            ; (unit.locations || []).forEach((locationId) =>
+                                locationIds.add(String(locationId))
+                            )
+                        })
+
+                filtered = filtered.filter(
+                    (location) =>
+                        locationIds.has(String(location.id)) ||
+                        (location.value != null &&
+                            locationIds.has(String(location.value)))
+                )
+            }
         }
 
         if (extractedAttrStaff.length > 0) {
@@ -126,6 +167,7 @@ export const ServicesStep = () => {
 
         return hasAnyFilter ? filtered : null
     }, [
+        bookingMode,
         extractedAttrCats,
         extractedAttrStaff,
         attrService,

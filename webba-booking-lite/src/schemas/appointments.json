@@ -122,7 +122,7 @@
             "tab": "",
             "misc": {
                 "tooltip": "Select the booking time.",
-                "time_format": "g:i a",
+                "time_format": "H:i",
                 "options": "backend"
             },
             "required": true,

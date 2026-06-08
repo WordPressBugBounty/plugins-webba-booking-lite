@@ -143,6 +143,8 @@ export const BookingFormProvider = ({
         return updated
     }
 
+    const [popupPortalElement, setPopupPortalElement] =
+        useState<HTMLElement | null>(null)
     const [formObj, setFormObj] = useState<IBookingFormObj>({
         categories: [] as ICategory[],
         services: [] as IServiceProps[],
@@ -884,6 +886,8 @@ export const BookingFormProvider = ({
         <BookingContext.Provider
             value={{
                 ...formObj,
+                popupPortalElement,
+                setPopupPortalElement,
                 setFormData,
                 mergeFormData,
                 setFields,
