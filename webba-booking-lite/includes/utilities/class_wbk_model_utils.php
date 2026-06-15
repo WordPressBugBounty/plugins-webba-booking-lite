@@ -797,7 +797,7 @@ class WBK_Model_Utils {
     }
 
     public static function auto_set_arrived_satus() {
-        if ( !is_numeric( get_option( "wbk_set_arrived_after", "" ) ) || WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+        if ( !is_numeric( get_option( "wbk_set_arrived_after", "" ) ) || !WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
             return;
         }
         $ids = self::get_booking_ids_for_last_week_not_arrived();
@@ -1042,15 +1042,15 @@ class WBK_Model_Utils {
                 }
             }
             if ( WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
-                $wbk_disallow_after = get_option( "wbk_disallow_after", "0" );
+                $wbk_allow_book_days_in_advance = get_option( "wbk_allow_book_days_in_advance", "0" );
             } else {
-                $wbk_disallow_after = "0";
+                $wbk_allow_book_days_in_advance = "0";
             }
-            if ( trim( $wbk_disallow_after ) == "" ) {
-                $wbk_disallow_after = "0";
+            if ( trim( $wbk_allow_book_days_in_advance ) == "" ) {
+                $wbk_allow_book_days_in_advance = "0";
             }
-            if ( $wbk_disallow_after != "0" ) {
-                $limit2 = time() + $wbk_disallow_after * 60 * 60;
+            if ( $wbk_allow_book_days_in_advance != "0" ) {
+                $limit2 = time() + $wbk_allow_book_days_in_advance * 24 * 60 * 60;
                 if ( $day_to_render > $limit2 ) {
                     $day_to_render = strtotime( "tomorrow", $day_to_render );
                     continue;

@@ -21,3 +21,8 @@ export interface FirstEventFallback {
     duration: number
     service: string
 }
+
+export interface UnitDateRange {
+    start: string
+    end: string
+}

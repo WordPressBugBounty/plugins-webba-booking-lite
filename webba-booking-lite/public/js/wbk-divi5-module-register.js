@@ -305,7 +305,70 @@
         })
     }
 
+    var isUnitsMode = function (selection) {
+        return selection.serviceType === 'daily'
+    }
+
+    var getCategoryBookableIds = function (category, selection) {
+        return isUnitsMode(selection)
+            ? ensureArray(category.units)
+            : ensureArray(category.services)
+    }
+
+    var getBookableItems = function (selection) {
+        return isUnitsMode(selection) ? pickerData.units : pickerData.services
+    }
+
+    var getVisibleUnitIds = function (selection, ignore) {
+        if (!pickerData) {
+            return new Set()
+        }
+        var ids = new Set(
+            ensureArray(pickerData.units).map(function (unit) {
+                return String(unit.id)
+            })
+        )
+
+        if (selection.serviceId && ignore !== 'service') {
+            ids = ids.has(selection.serviceId) ? new Set([selection.serviceId]) : new Set()
+        }
+
+        if (selection.categoryIds.length > 0 && ignore !== 'category') {
+            var fromCategories = new Set()
+            ensureArray(pickerData.categories)
+                .filter(function (category) {
+                    return selection.categoryIds.indexOf(String(category.id)) !== -1
+                })
+                .forEach(function (category) {
+                    getCategoryBookableIds(category, selection).forEach(function (unitId) {
+                        fromCategories.add(String(unitId))
+                    })
+                })
+            ids = intersectSets(ids, fromCategories)
+        }
+
+        if (selection.locationIds.length > 0 && ignore !== 'location') {
+            var fromLocations = new Set()
+            ensureArray(pickerData.units).forEach(function (unit) {
+                if (
+                    selection.locationIds.some(function (locationId) {
+                        return serviceBelongsToLocation(unit, locationId)
+                    })
+                ) {
+                    fromLocations.add(String(unit.id))
+                }
+            })
+            ids = intersectSets(ids, fromLocations)
+        }
+
+        return ids
+    }
+
     var getVisibleServiceIds = function (selection, ignore) {
+        if (isUnitsMode(selection)) {
+            return getVisibleUnitIds(selection, ignore)
+        }
+
         if (!pickerData) {
             return new Set()
         }
@@ -326,7 +389,7 @@
                     return selection.categoryIds.indexOf(String(category.id)) !== -1
                 })
                 .forEach(function (category) {
-                    ensureArray(category.services).forEach(function (serviceId) {
+                    getCategoryBookableIds(category, selection).forEach(function (serviceId) {
                         fromCategories.add(String(serviceId))
                     })
                 })
@@ -364,20 +427,20 @@
         return ids
     }
 
-    var getUnionLocationIdsForServices = function (serviceIds) {
+    var getUnionLocationIdsForBookables = function (bookableIds, selection) {
         var output = new Set()
-        ensureArray(pickerData.services).forEach(function (service) {
-            if (!serviceIds.has(String(service.id))) {
+        ensureArray(getBookableItems(selection)).forEach(function (bookable) {
+            if (!bookableIds.has(String(bookable.id))) {
                 return
             }
-            ensureArray(service.locations).forEach(function (locationId) {
+            ensureArray(bookable.locations).forEach(function (locationId) {
                 output.add(String(locationId))
             })
         })
         return output
     }
 
-    var getAllowedLocationIdsForPicker = function (visibleServiceIds, selection) {
+    var getAllowedLocationIdsForPicker = function (visibleBookableIds, selection) {
         var allLocationIds = new Set(
             ensureArray(pickerData.locations).map(function (location) {
                 return String(location.id)
@@ -386,14 +449,14 @@
         var noNarrowing =
             !selection.serviceId &&
             selection.categoryIds.length === 0 &&
-            selection.staffIds.length === 0
+            (!isUnitsMode(selection) ? selection.staffIds.length === 0 : true)
 
         if (noNarrowing) {
             return allLocationIds
         }
 
-        var fromServices = getUnionLocationIdsForServices(visibleServiceIds)
-        if (selection.staffIds.length > 0) {
+        var fromBookables = getUnionLocationIdsForBookables(visibleBookableIds, selection)
+        if (!isUnitsMode(selection) && selection.staffIds.length > 0) {
             var selectedStaff = ensureArray(pickerData.staff_members).filter(function (staffMember) {
                 return selection.staffIds.indexOf(String(staffMember.id)) !== -1
             })
@@ -410,14 +473,14 @@
                           )
                 staffLocationIntersect = intersectSets(staffLocationIntersect, forStaff)
             })
-            var serviceLocationsOrPreset = fromServices.size > 0 ? fromServices : allLocationIds
-            return intersectSets(serviceLocationsOrPreset, staffLocationIntersect)
+            var bookableLocationsOrPreset = fromBookables.size > 0 ? fromBookables : allLocationIds
+            return intersectSets(bookableLocationsOrPreset, staffLocationIntersect)
         }
 
-        if (fromServices.size === 0) {
+        if (fromBookables.size === 0) {
             return allLocationIds
         }
-        return fromServices
+        return fromBookables
     }
 
     var staffMatchesFilters = function (staffMember, visibleServiceIds, locationIds, selection) {
@@ -440,28 +503,32 @@
         return staffMatchesSelectedLocations(staffMember, locationIds)
     }
 
-    var setServiceOptions = function (visibleServiceIds) {
+    var setServiceOptions = function (visibleServiceIds, selection) {
+        var isDaily = isUnitsMode(selection)
         var options = {
-            '0': { label: 'All Services' },
+            '0': { label: isDaily ? 'All Daily Services' : 'All Services' },
         }
-        ensureArray(pickerData.services).forEach(function (service) {
-            var id = String(service.id)
+        var items = isDaily ? pickerData.units : pickerData.services
+        ensureArray(items).forEach(function (item) {
+            var id = String(item.id)
             if (!visibleServiceIds.has(id)) {
                 return
             }
-            options[id] = { label: String(service.label || '') }
+            options[id] = { label: String(item.label || '') }
         })
         metadata.attributes.content.settings.advanced.service.item.component.props.options = options
     }
 
-    var setCategoryOptions = function (visibleForCategory) {
+    var setCategoryOptions = function (visibleForCategory, selection) {
         var options = []
         ensureArray(pickerData.categories).forEach(function (category) {
             var id = String(category.id)
-            var hasVisibleService = ensureArray(category.services).some(function (serviceId) {
-                return visibleForCategory.has(String(serviceId))
-            })
-            if (!hasVisibleService) {
+            var hasVisibleBookable = getCategoryBookableIds(category, selection).some(
+                function (bookableId) {
+                    return visibleForCategory.has(String(bookableId))
+                }
+            )
+            if (!hasVisibleBookable) {
                 return
             }
             options.push({
@@ -506,23 +573,41 @@
         metadata.attributes.content.settings.advanced.staff.item.component.props.options = options
     }
 
+    var toggleStaffFieldVisibility = function (isDaily) {
+        if (!metadata || !metadata.attributes || !metadata.attributes.content) {
+            return
+        }
+        var advanced = metadata.attributes.content.settings.advanced
+        if (advanced.staff && advanced.staff.item) {
+            advanced.staff.item.render = !isDaily
+        }
+    }
+
     var applyFilteredOptions = function (selection) {
         if (!pickerData || !metadata || !metadata.attributes || !metadata.attributes.content) {
             return
         }
+        var isDaily = isUnitsMode(selection)
+        toggleStaffFieldVisibility(isDaily)
+
         var visibleForService = getVisibleServiceIds(selection, 'service')
         var visibleForCategory = getVisibleServiceIds(selection, 'category')
         var visibleForLocation = getVisibleServiceIds(selection, 'location')
-        var visibleForStaff = getVisibleServiceIds(selection, 'staff')
-        var allowedLocationIds = getAllowedLocationIdsForPicker(visibleForLocation, {
-            serviceId: selection.serviceId,
-            categoryIds: selection.categoryIds,
-            staffIds: selection.staffIds,
-        })
 
-        setServiceOptions(visibleForService)
-        setCategoryOptions(visibleForCategory)
+        setServiceOptions(visibleForService, selection)
+        setCategoryOptions(visibleForCategory, selection)
+
+        var allowedLocationIds = getAllowedLocationIdsForPicker(visibleForLocation, selection)
         setLocationOptions(allowedLocationIds)
+
+        if (isDaily) {
+            if (metadata.attributes.content.settings.advanced.staff) {
+                metadata.attributes.content.settings.advanced.staff.item.component.props.options = []
+            }
+            return
+        }
+
+        var visibleForStaff = getVisibleServiceIds(selection, 'staff')
         setStaffOptions(visibleForStaff, selection)
     }
 
@@ -536,6 +621,12 @@
 
         var editRenderer = function (props) {
             var attrs = props && props.attrs ? props.attrs : {}
+            var serviceTypeValue = unwrapDiviValue(
+                getNested(attrs, ['content', 'advanced', 'serviceType'])
+            )
+            var serviceType = serviceTypeValue === 'daily' ? 'daily' : 'hourly'
+            var isDaily = serviceType === 'daily'
+
             var service = unwrapDiviValue(getNested(attrs, ['content', 'advanced', 'service']))
             if (Array.isArray(service)) {
                 service = service.length > 0 ? String(service[0]) : '0'
@@ -551,12 +642,15 @@
             var categoryList = categoryListToggle === 'on' ? 'yes' : 'no'
             var categoryIds = normalizeIds(getNested(attrs, ['content', 'advanced', 'category']))
             var locationIds = normalizeIds(getNested(attrs, ['content', 'advanced', 'location']))
-            var staffIds = normalizeIds(getNested(attrs, ['content', 'advanced', 'staff']))
+            var staffIds = isDaily
+                ? []
+                : normalizeIds(getNested(attrs, ['content', 'advanced', 'staff']))
             var category = categoryIds.join(',')
             var location = locationIds.join(',')
             var staff = staffIds.join(',')
 
             applyFilteredOptions({
+                serviceType: serviceType,
                 serviceId: service !== '0' ? service : null,
                 categoryIds: categoryIds,
                 locationIds: locationIds,
@@ -576,6 +670,7 @@
                     'data-category': category || '0',
                     'data-location': location || '0',
                     'data-staff': staff || '0',
+                    'data-units': isDaily ? 'yes' : 'no',
                 })
             )
         }

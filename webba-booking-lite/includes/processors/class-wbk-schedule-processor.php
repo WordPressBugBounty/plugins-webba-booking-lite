@@ -120,6 +120,10 @@ class WBK_Schedule_Processor {
             $night_hours_addon = 0;
         }
         $timeslots = [];
+        $this->appointments = [];
+        $this->breakers = [];
+        $this->connected_breakers = [];
+        $this->ext_breakers = [];
         if ( $preload_data ) {
             $this->load_locked_days();
             $this->load_unlocked_days();
@@ -140,13 +144,6 @@ class WBK_Schedule_Processor {
         $date_format = WBK_Format_Utils::get_date_format();
         $date = new DateTime();
         $this->day = $day;
-        $this->breakers = [];
-        if ( !isset( $this->connected_breakers ) ) {
-            $this->connected_breakers = [];
-        }
-        if ( !isset( $this->ext_breakers ) ) {
-            $this->ext_breakers = [];
-        }
         if ( get_option( "wbk_allow_cross_midnight", "" ) == "true" && WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
             $start_all = WBK_Time_Math_Utils::adjust_times( $day, $service->get_duration() * -60, get_option( "wbk_timezone", "UTC" ) );
             $end_all = WBK_Time_Math_Utils::adjust_times( $day, 86400 + $service->get_duration() * 60, get_option( "wbk_timezone", "UTC" ) );
@@ -226,12 +223,12 @@ class WBK_Schedule_Processor {
         // special business hours end
         $min_quantity = $service->get_min_quantity();
         if ( WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
-            $wbk_disallow_after = get_option( "wbk_disallow_after", "0" );
+            $wbk_allow_book_days_in_advance = get_option( "wbk_allow_book_days_in_advance", "0" );
         } else {
-            $wbk_disallow_after = "0";
+            $wbk_allow_book_days_in_advance = "0";
         }
-        if ( trim( $wbk_disallow_after ) == "" ) {
-            $wbk_disallow_after = "0";
+        if ( trim( $wbk_allow_book_days_in_advance ) == "" ) {
+            $wbk_allow_book_days_in_advance = "0";
         }
         $wbk_allow_ongoing_time_slot = get_option( "wbk_allow_ongoing_time_slot", "disallow" );
         $wbk_allow_cross_midnight = get_option( "wbk_allow_cross_midnight", "" );
@@ -247,11 +244,8 @@ class WBK_Schedule_Processor {
                 get_option( "wbk_timezone", "UTC" ),
                 true
             )) {
-                if ( trim( $wbk_disallow_after ) == "" ) {
-                    $wbk_disallow_after = "0";
-                }
-                if ( $wbk_disallow_after != "0" ) {
-                    if ( $time > time() + $wbk_disallow_after * 60 * 60 ) {
+                if ( $wbk_allow_book_days_in_advance != "0" ) {
+                    if ( $time > time() + $wbk_allow_book_days_in_advance * 24 * 60 * 60 ) {
                         continue;
                     }
                 }

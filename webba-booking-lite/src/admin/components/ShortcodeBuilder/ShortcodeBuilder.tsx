@@ -12,6 +12,8 @@ import {
     IShortcodePresetLocation,
     IShortcodePresetService,
     IShortcodePresetStaff,
+    IShortcodePresetUnit,
+    TShortcodeServiceType,
 } from './types'
 import {
     getAllowedLocationIdsForPicker,
@@ -29,19 +31,46 @@ const sameIdSet = (a: string[], b: string[]) => {
     return b.every((id) => sa.has(id))
 }
 
+const serviceTypeOptions: TOption[] = [
+    {
+        value: 'hourly',
+        label: __('Hourly services', 'webba-booking-lite'),
+    },
+    {
+        value: 'daily',
+        label: __('Daily services', 'webba-booking-lite'),
+    },
+]
+
 export const ShortcodeBuilder = () => {
     const sidebar = useSidebar()
     const preset = usePreset()
     const services = (preset?.services || []) as IShortcodePresetService[]
+    const units = (preset?.units || []) as IShortcodePresetUnit[]
     const categories = (preset?.categories || []) as IShortcodePresetCategory[]
     const locations = (preset?.locations || []) as IShortcodePresetLocation[]
     const staffMembers = (preset?.staff_members || []) as IShortcodePresetStaff[]
 
+    const [serviceType, setServiceType] =
+        useState<TShortcodeServiceType>('hourly')
     const [serviceId, setServiceId] = useState<string | null>(null)
     const [categoryIds, setCategoryIds] = useState<string[]>([])
     const [locationIds, setLocationIds] = useState<string[]>([])
     const [staffIds, setStaffIds] = useState<string[]>([])
     const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle')
+
+    const isDailyServiceType = serviceType === 'daily'
+
+    const selections = useMemo(
+        () => ({
+            serviceType,
+            serviceId,
+            categoryIds,
+            locationIds,
+            staffIds,
+        }),
+        [serviceType, serviceId, categoryIds, locationIds, staffIds]
+    )
 
     useEffect(() => {
         const pruned = pruneSelections(
@@ -49,7 +78,8 @@ export const ShortcodeBuilder = () => {
             categories,
             locations,
             staffMembers,
-            { serviceId, categoryIds, locationIds, staffIds }
+            selections,
+            units
         )
         if (pruned.serviceId !== serviceId) setServiceId(pruned.serviceId)
         if (!sameIdSet(pruned.categoryIds, categoryIds)) {
@@ -62,14 +92,16 @@ export const ShortcodeBuilder = () => {
             setStaffIds(pruned.staffIds)
         }
     }, [
-        serviceId,
-        categoryIds,
-        locationIds,
-        staffIds,
+        selections,
         services,
         categories,
         locations,
         staffMembers,
+        units,
+        serviceId,
+        categoryIds,
+        locationIds,
+        staffIds,
     ])
 
     const visibleForServiceDropdown = useMemo(
@@ -78,10 +110,11 @@ export const ShortcodeBuilder = () => {
                 services,
                 categories,
                 staffMembers,
-                { serviceId, categoryIds, locationIds, staffIds },
-                'service'
+                selections,
+                'service',
+                units
             ),
-        [services, categories, staffMembers, serviceId, categoryIds, locationIds, staffIds]
+        [services, categories, staffMembers, selections, units]
     )
 
     const visibleForCategoryDropdown = useMemo(
@@ -90,10 +123,11 @@ export const ShortcodeBuilder = () => {
                 services,
                 categories,
                 staffMembers,
-                { serviceId, categoryIds, locationIds, staffIds },
-                'category'
+                selections,
+                'category',
+                units
             ),
-        [services, categories, staffMembers, serviceId, categoryIds, locationIds, staffIds]
+        [services, categories, staffMembers, selections, units]
     )
 
     const visibleForLocationDropdown = useMemo(
@@ -102,10 +136,11 @@ export const ShortcodeBuilder = () => {
                 services,
                 categories,
                 staffMembers,
-                { serviceId, categoryIds, locationIds, staffIds },
-                'location'
+                selections,
+                'location',
+                units
             ),
-        [services, categories, staffMembers, serviceId, categoryIds, locationIds, staffIds]
+        [services, categories, staffMembers, selections, units]
     )
 
     const visibleForStaffDropdown = useMemo(
@@ -114,10 +149,11 @@ export const ShortcodeBuilder = () => {
                 services,
                 categories,
                 staffMembers,
-                { serviceId, categoryIds, locationIds, staffIds },
-                'staff'
+                selections,
+                'staff',
+                units
             ),
-        [services, categories, staffMembers, serviceId, categoryIds, locationIds, staffIds]
+        [services, categories, staffMembers, selections, units]
     )
 
     const allowedLocationIds = useMemo(
@@ -126,44 +162,47 @@ export const ShortcodeBuilder = () => {
                 locations,
                 services,
                 visibleForLocationDropdown,
-                { serviceId, categoryIds, staffIds },
-                staffMembers
+                selections,
+                staffMembers,
+                units
             ),
         [
             locations,
             services,
             visibleForLocationDropdown,
-            serviceId,
-            categoryIds,
-            staffIds,
+            selections,
             staffMembers,
+            units,
         ]
     )
 
+    const bookableItems = isDailyServiceType ? units : services
+
     const serviceOptions: TOption[] = useMemo(
         () =>
-            services
-                .filter((s) => visibleForServiceDropdown.has(String(s.id)))
-                .map((s) => ({
-                    value: String(s.id),
-                    label: s.label,
+            bookableItems
+                .filter((item) => visibleForServiceDropdown.has(String(item.id)))
+                .map((item) => ({
+                    value: String(item.id),
+                    label: item.label,
                 })),
-        [services, visibleForServiceDropdown]
+        [bookableItems, visibleForServiceDropdown]
     )
 
     const categoryOptions: TOption[] = useMemo(
         () =>
             categories
                 .filter((c) =>
-                    (c.services || []).some((sid) =>
-                        visibleForCategoryDropdown.has(String(sid))
+                    (isDailyServiceType ? c.units || [] : c.services || []).some(
+                        (bookableId) =>
+                            visibleForCategoryDropdown.has(String(bookableId))
                     )
                 )
                 .map((c) => ({
                     value: String(c.id),
                     label: `${c.name} (ID: ${c.id})`,
                 })),
-        [categories, visibleForCategoryDropdown]
+        [categories, visibleForCategoryDropdown, isDailyServiceType]
     )
 
     const locationOptions: TOption[] = useMemo(
@@ -203,6 +242,9 @@ export const ShortcodeBuilder = () => {
 
     const shortcode = useMemo(() => {
         const args: string[] = []
+        if (isDailyServiceType) {
+            args.push('units=yes')
+        }
         if (serviceId != null && serviceId !== '') {
             args.push(`service=${serviceId}`)
         }
@@ -212,11 +254,17 @@ export const ShortcodeBuilder = () => {
         if (locationIds.length > 0) {
             args.push(`location=${locationIds.join(',')}`)
         }
-        if (staffIds.length > 0) {
+        if (!isDailyServiceType && staffIds.length > 0) {
             args.push(`staff=${staffIds.join(',')}`)
         }
         return `[webbabooking ${args.join(' ')}]`
-    }, [serviceId, categoryIds.join(','), locationIds.join(','), staffIds.join(',')])
+    }, [
+        isDailyServiceType,
+        serviceId,
+        categoryIds.join(','),
+        locationIds.join(','),
+        staffIds.join(','),
+    ])
 
     const copyToClipboard = async () => {
         try {
@@ -230,6 +278,12 @@ export const ShortcodeBuilder = () => {
         const t = window.setTimeout(() => setCopyState('idle'), 1200)
         return () => window.clearTimeout(t)
     }, [copyState])
+
+    const handleServiceTypeChange = (nextType: TShortcodeServiceType) => {
+        setServiceType(nextType)
+        setServiceId(null)
+        setStaffIds([])
+    }
 
     return (
         <div className="wbk_shortcode_builder">
@@ -258,18 +312,47 @@ export const ShortcodeBuilder = () => {
             <div className="wbk_shortcode_builder__body">
                 <div className="wbk_shortcode_builder__grid">
                     <div className="wbk_shortcode_builder__field">
-                        <label>{__('Service', 'webba-booking-lite')}</label>
+                        <label>{__('Service type', 'webba-booking-lite')}</label>
                         <Select
                             classNamePrefix="wbk_select"
-                            placeholder={__('Select Service...', 'webba-booking-lite')}
+                            options={serviceTypeOptions}
+                            value={
+                                serviceTypeOptions.find(
+                                    (option) => option.value === serviceType
+                                ) || serviceTypeOptions[0]
+                            }
+                            onChange={(opt: TOption | null) =>
+                                handleServiceTypeChange(
+                                    (opt?.value as TShortcodeServiceType) ||
+                                        'hourly'
+                                )
+                            }
+                            isClearable={false}
+                        />
+                    </div>
+
+                    <div className="wbk_shortcode_builder__field">
+                        <label>
+                            {isDailyServiceType
+                                ? __('Daily service', 'webba-booking-lite')
+                                : __('Service', 'webba-booking-lite')}
+                        </label>
+                        <Select
+                            classNamePrefix="wbk_select"
+                            placeholder={
+                                isDailyServiceType
+                                    ? __('Select daily service...', 'webba-booking-lite')
+                                    : __('Select Service...', 'webba-booking-lite')
+                            }
                             options={serviceOptions}
                             value={
                                 serviceId
-                                    ? serviceOptions.find((o) => o.value === serviceId) ||
-                                      null
+                                    ? serviceOptions.find(
+                                          (o) => o.value === serviceId
+                                      ) || null
                                     : null
                             }
-                            onChange={(opt: any) =>
+                            onChange={(opt: TOption | null) =>
                                 setServiceId(opt?.value ?? null)
                             }
                             isClearable={true}
@@ -286,12 +369,8 @@ export const ShortcodeBuilder = () => {
                             value={categoryOptions.filter((o) =>
                                 categoryIds.includes(o.value)
                             )}
-                            onChange={(opts: any) =>
-                                setCategoryIds(
-                                    Array.isArray(opts)
-                                        ? opts.map((o) => o.value)
-                                        : []
-                                )
+                            onChange={(opts: readonly TOption[]) =>
+                                setCategoryIds(opts.map((o) => o.value))
                             }
                         />
                     </div>
@@ -306,35 +385,29 @@ export const ShortcodeBuilder = () => {
                             value={locationOptions.filter((o) =>
                                 locationIds.includes(o.value)
                             )}
-                            onChange={(opts: any) =>
-                                setLocationIds(
-                                    Array.isArray(opts)
-                                        ? opts.map((o) => o.value)
-                                        : []
-                                )
+                            onChange={(opts: readonly TOption[]) =>
+                                setLocationIds(opts.map((o) => o.value))
                             }
                         />
                     </div>
 
-                    <div className="wbk_shortcode_builder__field">
-                        <label>{__('Staff', 'webba-booking-lite')}</label>
-                        <Select
-                            isMulti
-                            classNamePrefix="wbk_select"
-                            placeholder={__('Select Staff...', 'webba-booking-lite')}
-                            options={staffOptions}
-                            value={staffOptions.filter((o) =>
-                                staffIds.includes(o.value)
-                            )}
-                            onChange={(opts: any) =>
-                                setStaffIds(
-                                    Array.isArray(opts)
-                                        ? opts.map((o) => o.value)
-                                        : []
-                                )
-                            }
-                        />
-                    </div>
+                    {!isDailyServiceType && (
+                        <div className="wbk_shortcode_builder__field">
+                            <label>{__('Staff', 'webba-booking-lite')}</label>
+                            <Select
+                                isMulti
+                                classNamePrefix="wbk_select"
+                                placeholder={__('Select Staff...', 'webba-booking-lite')}
+                                options={staffOptions}
+                                value={staffOptions.filter((o) =>
+                                    staffIds.includes(o.value)
+                                )}
+                                onChange={(opts: readonly TOption[]) =>
+                                    setStaffIds(opts.map((o) => o.value))
+                                }
+                            />
+                        </div>
+                    )}
                 </div>
 
                 <div className="wbk_shortcode_builder__output">

@@ -106,6 +106,10 @@ class WBK_Divi5_Booking_Module
     {
         self::enqueue_front_assets();
 
+        $service_type_value = self::get_attr_value($attrs, ["content", "advanced", "serviceType"], "hourly");
+        $service_type = $service_type_value === "daily" ? "daily" : "hourly";
+        $units = $service_type === "daily" ? "yes" : "no";
+
         $service_value = self::get_attr_value($attrs, ["content", "advanced", "service"], "0");
         $service = is_array($service_value) ? "0" : strval($service_value ?: "0");
 
@@ -115,9 +119,11 @@ class WBK_Divi5_Booking_Module
         $location_ids = self::normalize_id_list(
             self::get_attr_value($attrs, ["content", "advanced", "location"], [])
         );
-        $staff_ids = self::normalize_id_list(
-            self::get_attr_value($attrs, ["content", "advanced", "staff"], [])
-        );
+        $staff_ids = $service_type === "daily"
+            ? []
+            : self::normalize_id_list(
+                self::get_attr_value($attrs, ["content", "advanced", "staff"], [])
+            );
         $category_list_toggle = self::get_attr_value($attrs, ["content", "advanced", "categoryList"], "off");
         $category_list = $category_list_toggle === "on" ? "yes" : "no";
         $hide_category = $category_list_toggle === "on" ? "no" : "yes";
@@ -136,7 +142,7 @@ class WBK_Divi5_Booking_Module
         $output = '<div class="wbk_divi_booking_form_scope"' . $style_attr . '>';
         $output .= WBK_Renderer::load_template(
             "frontend_v6/booking_form",
-            [$service, $category_list, $category, $location, $staff, "no", $hide_category],
+            [$service, $category_list, $category, $location, $staff, $units, $hide_category],
             false
         );
         $output .= "</div>";
@@ -637,6 +643,7 @@ class WBK_Divi5_Booking_Module
                     if (is_array($preset_data)) {
                         return [
                             "services" => $preset_data["services"] ?? [],
+                            "units" => $preset_data["units"] ?? [],
                             "categories" => $preset_data["categories"] ?? [],
                             "locations" => $preset_data["locations"] ?? [],
                             "staff_members" => $preset_data["staff_members"] ?? [],
@@ -661,6 +668,7 @@ class WBK_Divi5_Booking_Module
                     if (is_array($preset_data)) {
                         return [
                             "services" => $preset_data["services"] ?? [],
+                            "units" => $preset_data["units"] ?? [],
                             "categories" => $preset_data["categories"] ?? [],
                             "locations" => $preset_data["locations"] ?? [],
                             "staff_members" => $preset_data["staff_members"] ?? [],
@@ -673,6 +681,7 @@ class WBK_Divi5_Booking_Module
 
         return [
             "services" => [],
+            "units" => [],
             "categories" => [],
             "locations" => [],
             "staff_members" => [],
@@ -708,6 +717,26 @@ class WBK_Divi5_Booking_Module
             ];
         }
 
+        $units = [];
+        foreach ($picker_data["units"] as $unit) {
+            $id = isset($unit["id"]) ? strval($unit["id"]) : "";
+            if ($id === "") {
+                continue;
+            }
+            $units[] = [
+                "id" => $id,
+                "label" => isset($unit["label"]) ? strval($unit["label"]) : "",
+                "locations" => array_values(
+                    array_map(
+                        "strval",
+                        array_filter((array) ($unit["locations"] ?? []), function ($value) {
+                            return $value !== null && $value !== "";
+                        })
+                    )
+                ),
+            ];
+        }
+
         $categories = [];
         foreach ($picker_data["categories"] as $category) {
             $id = isset($category["id"]) ? strval($category["id"]) : "";
@@ -721,6 +750,14 @@ class WBK_Divi5_Booking_Module
                     array_map(
                         "strval",
                         array_filter((array) ($category["services"] ?? []), function ($value) {
+                            return $value !== null && $value !== "";
+                        })
+                    )
+                ),
+                "units" => array_values(
+                    array_map(
+                        "strval",
+                        array_filter((array) ($category["units"] ?? []), function ($value) {
                             return $value !== null && $value !== "";
                         })
                     )
@@ -770,6 +807,7 @@ class WBK_Divi5_Booking_Module
 
         return [
             "services" => $services,
+            "units" => $units,
             "categories" => $categories,
             "locations" => $locations,
             "staff_members" => $staff_members,

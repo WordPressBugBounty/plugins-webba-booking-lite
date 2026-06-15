@@ -34,8 +34,18 @@ const intersectSets = (a, b) => {
     return out
 }
 
-const serviceBelongsToLocation = (service, locationId) => {
-    const locations = ensureArray(service.locations)
+const isUnitsMode = (selection) => selection.serviceType === 'daily'
+
+const getCategoryBookableIds = (category, selection) =>
+    isUnitsMode(selection)
+        ? ensureArray(category.units)
+        : ensureArray(category.services)
+
+const getBookableItems = (preset, selection) =>
+    isUnitsMode(selection) ? preset.units : preset.services
+
+const bookableBelongsToLocation = (bookable, locationId) => {
+    const locations = ensureArray(bookable.locations)
     return locations.some((lid) => toId(lid) === toId(locationId))
 }
 
@@ -46,7 +56,47 @@ const staffMatchesSelectedLocations = (staff, locationIds) => {
     )
 }
 
+const getVisibleUnitIds = (preset, selection, ignore) => {
+    let ids = new Set(preset.units.map((unit) => toId(unit.id)))
+
+    if (selection.serviceId && ignore !== 'service') {
+        ids = ids.has(selection.serviceId) ? new Set([selection.serviceId]) : new Set()
+    }
+
+    if (selection.categoryIds.length > 0 && ignore !== 'category') {
+        const fromCategories = new Set()
+        preset.categories
+            .filter((category) => selection.categoryIds.includes(toId(category.id)))
+            .forEach((category) => {
+                getCategoryBookableIds(category, selection).forEach((unitId) =>
+                    fromCategories.add(toId(unitId))
+                )
+            })
+        ids = intersectSets(ids, fromCategories)
+    }
+
+    if (selection.locationIds.length > 0 && ignore !== 'location') {
+        const fromLocations = new Set()
+        preset.units.forEach((unit) => {
+            if (
+                selection.locationIds.some((locationId) =>
+                    bookableBelongsToLocation(unit, locationId)
+                )
+            ) {
+                fromLocations.add(toId(unit.id))
+            }
+        })
+        ids = intersectSets(ids, fromLocations)
+    }
+
+    return ids
+}
+
 export const getVisibleServiceIds = (preset, selection, ignore) => {
+    if (isUnitsMode(selection)) {
+        return getVisibleUnitIds(preset, selection, ignore)
+    }
+
     let ids = new Set(preset.services.map((service) => toId(service.id)))
 
     if (selection.serviceId && ignore !== 'service') {
@@ -58,7 +108,7 @@ export const getVisibleServiceIds = (preset, selection, ignore) => {
         preset.categories
             .filter((category) => selection.categoryIds.includes(toId(category.id)))
             .forEach((category) => {
-                ensureArray(category.services).forEach((serviceId) =>
+                getCategoryBookableIds(category, selection).forEach((serviceId) =>
                     fromCategories.add(toId(serviceId))
                 )
             })
@@ -70,7 +120,7 @@ export const getVisibleServiceIds = (preset, selection, ignore) => {
         preset.services.forEach((service) => {
             if (
                 selection.locationIds.some((locationId) =>
-                    serviceBelongsToLocation(service, locationId)
+                    bookableBelongsToLocation(service, locationId)
                 )
             ) {
                 fromLocations.add(toId(service.id))
@@ -94,36 +144,34 @@ export const getVisibleServiceIds = (preset, selection, ignore) => {
     return ids
 }
 
-const getUnionLocationIdsForServices = (services, serviceIds) => {
+const getUnionLocationIdsForBookables = (bookables, bookableIds) => {
     const output = new Set()
-    services.forEach((service) => {
-        if (!serviceIds.has(toId(service.id))) {
+    bookables.forEach((bookable) => {
+        if (!bookableIds.has(toId(bookable.id))) {
             return
         }
-        ensureArray(service.locations).forEach((locationId) =>
+        ensureArray(bookable.locations).forEach((locationId) =>
             output.add(toId(locationId))
         )
     })
     return output
 }
 
-const getAllowedLocationIdsForPicker = (preset, visibleServiceIds, selection) => {
+const getAllowedLocationIdsForPicker = (preset, visibleBookableIds, selection) => {
     const allLocationIds = new Set(preset.locations.map((location) => toId(location.id)))
     const noNarrowing =
         !selection.serviceId &&
         selection.categoryIds.length === 0 &&
-        selection.staffIds.length === 0
+        (!isUnitsMode(selection) ? selection.staffIds.length === 0 : true)
 
     if (noNarrowing) {
         return allLocationIds
     }
 
-    const fromServices = getUnionLocationIdsForServices(
-        preset.services,
-        visibleServiceIds
-    )
+    const bookables = getBookableItems(preset, selection)
+    const fromBookables = getUnionLocationIdsForBookables(bookables, visibleBookableIds)
 
-    if (selection.staffIds.length > 0) {
+    if (!isUnitsMode(selection) && selection.staffIds.length > 0) {
         const selectedStaff = preset.staffMembers.filter((staffMember) =>
             selection.staffIds.includes(toId(staffMember.id))
         )
@@ -137,15 +185,15 @@ const getAllowedLocationIdsForPicker = (preset, visibleServiceIds, selection) =>
             staffLocationIntersect = intersectSets(staffLocationIntersect, forStaff)
         })
 
-        const serviceLocationsOrPreset =
-            fromServices.size > 0 ? fromServices : allLocationIds
-        return intersectSets(serviceLocationsOrPreset, staffLocationIntersect)
+        const bookableLocationsOrPreset =
+            fromBookables.size > 0 ? fromBookables : allLocationIds
+        return intersectSets(bookableLocationsOrPreset, staffLocationIntersect)
     }
 
-    if (fromServices.size === 0) {
+    if (fromBookables.size === 0) {
         return allLocationIds
     }
-    return fromServices
+    return fromBookables
 }
 
 const staffMatchesFilters = (staffMember, visibleServiceIds, locationIds, selection) => {
@@ -169,6 +217,9 @@ const staffMatchesFilters = (staffMember, visibleServiceIds, locationIds, select
 }
 
 const equalSelections = (a, b) => {
+    if (a.serviceType !== b.serviceType) {
+        return false
+    }
     if (a.serviceId !== b.serviceId) {
         return false
     }
@@ -188,17 +239,20 @@ const equalSelections = (a, b) => {
 }
 
 export const pruneSelections = (preset, inputSelection) => {
+    const serviceType = inputSelection.serviceType || 'hourly'
     let current = {
+        serviceType,
         serviceId: inputSelection.serviceId,
         categoryIds: [...inputSelection.categoryIds],
         locationIds: [...inputSelection.locationIds],
-        staffIds: [...inputSelection.staffIds],
+        staffIds: isUnitsMode({ serviceType }) ? [] : [...inputSelection.staffIds],
     }
 
     for (let i = 0; i < 6; i++) {
-        const { serviceId, categoryIds, locationIds, staffIds } = current
+        let { serviceId, categoryIds, locationIds, staffIds } = current
 
         const visibleAll = getVisibleServiceIds(preset, {
+            serviceType,
             serviceId,
             categoryIds,
             locationIds,
@@ -211,15 +265,15 @@ export const pruneSelections = (preset, inputSelection) => {
 
         const visibleNoCategory = getVisibleServiceIds(
             preset,
-            { serviceId: nextServiceId, categoryIds, locationIds, staffIds },
+            { serviceType, serviceId: nextServiceId, categoryIds, locationIds, staffIds },
             'category'
         )
         const nextCategoryIds = categoryIds.filter((categoryId) =>
             preset.categories.some(
                 (category) =>
                     toId(category.id) === categoryId &&
-                    ensureArray(category.services).some((sid) =>
-                        visibleNoCategory.has(toId(sid))
+                    getCategoryBookableIds(category, { serviceType }).some((bookableId) =>
+                        visibleNoCategory.has(toId(bookableId))
                     )
             )
         )
@@ -227,6 +281,7 @@ export const pruneSelections = (preset, inputSelection) => {
         const visibleNoLocation = getVisibleServiceIds(
             preset,
             {
+                serviceType,
                 serviceId: nextServiceId,
                 categoryIds: nextCategoryIds,
                 locationIds,
@@ -238,6 +293,7 @@ export const pruneSelections = (preset, inputSelection) => {
             preset,
             visibleNoLocation,
             {
+                serviceType,
                 serviceId: nextServiceId,
                 categoryIds: nextCategoryIds,
                 staffIds,
@@ -247,32 +303,37 @@ export const pruneSelections = (preset, inputSelection) => {
             allowedLocationIds.has(locationId)
         )
 
-        const visibleNoStaff = getVisibleServiceIds(
-            preset,
-            {
-                serviceId: nextServiceId,
-                categoryIds: nextCategoryIds,
-                locationIds: nextLocationIds,
-                staffIds,
-            },
-            'staff'
-        )
-        const nextStaffIds = staffIds.filter((staffId) => {
-            const staffMember = preset.staffMembers.find(
-                (staff) => toId(staff.id) === staffId
+        let nextStaffIds = []
+        if (!isUnitsMode({ serviceType })) {
+            const visibleNoStaff = getVisibleServiceIds(
+                preset,
+                {
+                    serviceType,
+                    serviceId: nextServiceId,
+                    categoryIds: nextCategoryIds,
+                    locationIds: nextLocationIds,
+                    staffIds,
+                },
+                'staff'
             )
-            if (!staffMember) {
-                return false
-            }
-            return staffMatchesFilters(
-                staffMember,
-                visibleNoStaff,
-                nextLocationIds,
-                { serviceId: nextServiceId, categoryIds: nextCategoryIds }
-            )
-        })
+            nextStaffIds = staffIds.filter((staffId) => {
+                const staffMember = preset.staffMembers.find(
+                    (staff) => toId(staff.id) === staffId
+                )
+                if (!staffMember) {
+                    return false
+                }
+                return staffMatchesFilters(
+                    staffMember,
+                    visibleNoStaff,
+                    nextLocationIds,
+                    { serviceId: nextServiceId, categoryIds: nextCategoryIds }
+                )
+            })
+        }
 
         const next = {
+            serviceType,
             serviceId: nextServiceId,
             categoryIds: nextCategoryIds,
             locationIds: nextLocationIds,
@@ -291,11 +352,18 @@ export const normalizePresetForFilters = (presetData) => {
     return {
         services: ensureArray(presetData.services).map((service) => ({
             id: service.id,
+            label: service.label,
             locations: ensureArray(service.locations).map(toId),
+        })),
+        units: ensureArray(presetData.units).map((unit) => ({
+            id: unit.id,
+            label: unit.label,
+            locations: ensureArray(unit.locations).map(toId),
         })),
         categories: ensureArray(presetData.categories).map((category) => ({
             id: category.id,
             services: ensureArray(category.services).map(toId),
+            units: ensureArray(category.units).map(toId),
         })),
         locations: ensureArray(presetData.locations).map((location) => ({
             id: location.id,
@@ -313,6 +381,8 @@ export const normalizePresetForFilters = (presetData) => {
 }
 
 export const blockAttributesToSelection = (attributes) => ({
+    serviceType:
+        attributes.serviceType === 'daily' ? 'daily' : 'hourly',
     serviceId:
         attributes.service && String(attributes.service) !== '0'
             ? toId(attributes.service)
@@ -323,6 +393,7 @@ export const blockAttributesToSelection = (attributes) => ({
 })
 
 export const selectionToBlockAttributes = (selection) => ({
+    serviceType: selection.serviceType || 'hourly',
     service: selection.serviceId ? selection.serviceId : '',
     category: selection.categoryIds,
     location: selection.locationIds,
@@ -335,42 +406,46 @@ export const getPickerAllowedSets = (preset, selection) => {
     const visibleForCategory = getVisibleServiceIds(preset, pruned, 'category')
     const visibleForLocation = getVisibleServiceIds(preset, pruned, 'location')
     const visibleForStaff = getVisibleServiceIds(preset, pruned, 'staff')
+
+    const allowedCategoryIds = []
+    preset.categories.forEach((category) => {
+        const hasVisibleBookable = getCategoryBookableIds(category, pruned).some(
+            (bookableId) => visibleForCategory.has(toId(bookableId))
+        )
+        if (hasVisibleBookable) {
+            allowedCategoryIds.push(toId(category.id))
+        }
+    })
+
     const allowedLocationIds = getAllowedLocationIdsForPicker(
         preset,
         visibleForLocation,
         {
+            serviceType: pruned.serviceType,
             serviceId: pruned.serviceId,
             categoryIds: pruned.categoryIds,
             staffIds: pruned.staffIds,
         }
     )
 
-    const allowedCategoryIds = []
-    preset.categories.forEach((category) => {
-        const hasVisibleService = ensureArray(category.services).some((serviceId) =>
-            visibleForCategory.has(toId(serviceId))
-        )
-        if (hasVisibleService) {
-            allowedCategoryIds.push(toId(category.id))
-        }
-    })
-
     const allowedStaffIds = []
-    preset.staffMembers.forEach((staffMember) => {
-        if (
-            staffMatchesFilters(
-                staffMember,
-                visibleForStaff,
-                pruned.locationIds,
-                {
-                    serviceId: pruned.serviceId,
-                    categoryIds: pruned.categoryIds,
-                }
-            )
-        ) {
-            allowedStaffIds.push(toId(staffMember.id))
-        }
-    })
+    if (!isUnitsMode(pruned)) {
+        preset.staffMembers.forEach((staffMember) => {
+            if (
+                staffMatchesFilters(
+                    staffMember,
+                    visibleForStaff,
+                    pruned.locationIds,
+                    {
+                        serviceId: pruned.serviceId,
+                        categoryIds: pruned.categoryIds,
+                    }
+                )
+            ) {
+                allowedStaffIds.push(toId(staffMember.id))
+            }
+        })
+    }
 
     return {
         selection: pruned,

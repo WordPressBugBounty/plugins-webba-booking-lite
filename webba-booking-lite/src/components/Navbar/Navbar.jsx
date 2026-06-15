@@ -10,7 +10,7 @@ import iconEmail from '../../../public/images/icon-email.svg'
 
 const Navbar = ({ setMenu, currentMenu, menuItems }) => {
     const {
-        wording: { help_title, help_phone, help_email },
+        wording: { help_title, help_phone, help_email, label_logout },
     } = useSelect((select) => select(store_name).getPreset())
 
     const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false)
@@ -69,7 +69,7 @@ const Navbar = ({ setMenu, currentMenu, menuItems }) => {
                         onClick={() => setShowLogoutConfirmation(true)}
                     >
                         <img src={logoutIcon} />
-                        <span>{__('Logout', 'webba-booking-lite')}</span>
+                        <span>{label_logout || __('Logout', 'webba-booking-lite')}</span>
                     </div>
                 </div>
             </div>

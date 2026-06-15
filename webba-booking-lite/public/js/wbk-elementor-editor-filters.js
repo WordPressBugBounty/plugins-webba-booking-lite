@@ -5,6 +5,7 @@
 
     let presetPromise = null
     let isApplying = false
+    let filterApplyTimer = null
     let upgradeModalNode = null
     let globalLockAttached = false
     let runtimeAdvancedLock =
@@ -60,19 +61,32 @@
         return ids
     }
 
+    const isUnitsMode = (selection) => selection.serviceType === 'daily'
+
+    const getCategoryBookableIds = (category, selection) =>
+        isUnitsMode(selection)
+            ? ensureArray(category.units)
+            : ensureArray(category.services)
+
+    const getBookableItems = (preset, selection) =>
+        isUnitsMode(selection) ? preset.units : preset.services
+
     const getSelection = (panelView) => {
+        const serviceTypeValue = panelView.$el.find('[data-setting="service_type"]').val()
         const serviceValue = panelView.$el.find('[data-setting="service"]').val()
         const categoryValue = panelView.$el.find('[data-setting="category"]').val()
         const locationValue = panelView.$el.find('[data-setting="location"]').val()
         const staffValue = panelView.$el.find('[data-setting="staff"]').val()
 
         const serviceIds = uniqueIds(serviceValue)
+        const serviceType = serviceTypeValue === 'daily' ? 'daily' : 'hourly'
 
         return {
+            serviceType,
             serviceId: serviceIds.length > 0 ? serviceIds[0] : null,
             categoryIds: uniqueIds(categoryValue),
             locationIds: uniqueIds(locationValue),
-            staffIds: uniqueIds(staffValue),
+            staffIds: isUnitsMode({ serviceType }) ? [] : uniqueIds(staffValue),
         }
     }
 
@@ -86,8 +100,8 @@
         return out
     }
 
-    const serviceBelongsToLocation = (service, locationId) => {
-        const locations = ensureArray(service.locations)
+    const bookableBelongsToLocation = (bookable, locationId) => {
+        const locations = ensureArray(bookable.locations)
         return locations.some((lid) => toId(lid) === toId(locationId))
     }
 
@@ -98,7 +112,47 @@
         )
     }
 
+    const getVisibleUnitIds = (preset, selection, ignore) => {
+        let ids = new Set(preset.units.map((unit) => toId(unit.id)))
+
+        if (selection.serviceId && ignore !== 'service') {
+            ids = ids.has(selection.serviceId) ? new Set([selection.serviceId]) : new Set()
+        }
+
+        if (selection.categoryIds.length > 0 && ignore !== 'category') {
+            const fromCategories = new Set()
+            preset.categories
+                .filter((category) => selection.categoryIds.includes(toId(category.id)))
+                .forEach((category) => {
+                    getCategoryBookableIds(category, selection).forEach((unitId) =>
+                        fromCategories.add(toId(unitId))
+                    )
+                })
+            ids = intersectSets(ids, fromCategories)
+        }
+
+        if (selection.locationIds.length > 0 && ignore !== 'location') {
+            const fromLocations = new Set()
+            preset.units.forEach((unit) => {
+                if (
+                    selection.locationIds.some((locationId) =>
+                        bookableBelongsToLocation(unit, locationId)
+                    )
+                ) {
+                    fromLocations.add(toId(unit.id))
+                }
+            })
+            ids = intersectSets(ids, fromLocations)
+        }
+
+        return ids
+    }
+
     const getVisibleServiceIds = (preset, selection, ignore) => {
+        if (isUnitsMode(selection)) {
+            return getVisibleUnitIds(preset, selection, ignore)
+        }
+
         let ids = new Set(preset.services.map((service) => toId(service.id)))
 
         if (selection.serviceId && ignore !== 'service') {
@@ -110,7 +164,7 @@
             preset.categories
                 .filter((category) => selection.categoryIds.includes(toId(category.id)))
                 .forEach((category) => {
-                    ensureArray(category.services).forEach((serviceId) =>
+                    getCategoryBookableIds(category, selection).forEach((serviceId) =>
                         fromCategories.add(toId(serviceId))
                     )
                 })
@@ -122,7 +176,7 @@
             preset.services.forEach((service) => {
                 if (
                     selection.locationIds.some((locationId) =>
-                        serviceBelongsToLocation(service, locationId)
+                        bookableBelongsToLocation(service, locationId)
                     )
                 ) {
                     fromLocations.add(toId(service.id))
@@ -146,36 +200,34 @@
         return ids
     }
 
-    const getUnionLocationIdsForServices = (services, serviceIds) => {
+    const getUnionLocationIdsForBookables = (bookables, bookableIds) => {
         const output = new Set()
-        services.forEach((service) => {
-            if (!serviceIds.has(toId(service.id))) {
+        bookables.forEach((bookable) => {
+            if (!bookableIds.has(toId(bookable.id))) {
                 return
             }
-            ensureArray(service.locations).forEach((locationId) =>
+            ensureArray(bookable.locations).forEach((locationId) =>
                 output.add(toId(locationId))
             )
         })
         return output
     }
 
-    const getAllowedLocationIdsForPicker = (preset, visibleServiceIds, selection) => {
+    const getAllowedLocationIdsForPicker = (preset, visibleBookableIds, selection) => {
         const allLocationIds = new Set(preset.locations.map((location) => toId(location.id)))
         const noNarrowing =
             !selection.serviceId &&
             selection.categoryIds.length === 0 &&
-            selection.staffIds.length === 0
+            (!isUnitsMode(selection) ? selection.staffIds.length === 0 : true)
 
         if (noNarrowing) {
             return allLocationIds
         }
 
-        const fromServices = getUnionLocationIdsForServices(
-            preset.services,
-            visibleServiceIds
-        )
+        const bookables = getBookableItems(preset, selection)
+        const fromBookables = getUnionLocationIdsForBookables(bookables, visibleBookableIds)
 
-        if (selection.staffIds.length > 0) {
+        if (!isUnitsMode(selection) && selection.staffIds.length > 0) {
             const selectedStaff = preset.staffMembers.filter((staffMember) =>
                 selection.staffIds.includes(toId(staffMember.id))
             )
@@ -189,15 +241,15 @@
                 staffLocationIntersect = intersectSets(staffLocationIntersect, forStaff)
             })
 
-            const serviceLocationsOrPreset =
-                fromServices.size > 0 ? fromServices : allLocationIds
-            return intersectSets(serviceLocationsOrPreset, staffLocationIntersect)
+            const bookableLocationsOrPreset =
+                fromBookables.size > 0 ? fromBookables : allLocationIds
+            return intersectSets(bookableLocationsOrPreset, staffLocationIntersect)
         }
 
-        if (fromServices.size === 0) {
+        if (fromBookables.size === 0) {
             return allLocationIds
         }
-        return fromServices
+        return fromBookables
     }
 
     const staffMatchesFilters = (staffMember, visibleServiceIds, locationIds, selection) => {
@@ -221,6 +273,9 @@
     }
 
     const equalSelections = (a, b) => {
+        if (a.serviceType !== b.serviceType) {
+            return false
+        }
         if (a.serviceId !== b.serviceId) {
             return false
         }
@@ -240,17 +295,20 @@
     }
 
     const pruneSelections = (preset, inputSelection) => {
+        const serviceType = inputSelection.serviceType || 'hourly'
         let current = {
+            serviceType,
             serviceId: inputSelection.serviceId,
             categoryIds: [...inputSelection.categoryIds],
             locationIds: [...inputSelection.locationIds],
-            staffIds: [...inputSelection.staffIds],
+            staffIds: isUnitsMode({ serviceType }) ? [] : [...inputSelection.staffIds],
         }
 
         for (let i = 0; i < 6; i++) {
             let { serviceId, categoryIds, locationIds, staffIds } = current
 
             const visibleAll = getVisibleServiceIds(preset, {
+                serviceType,
                 serviceId,
                 categoryIds,
                 locationIds,
@@ -262,54 +320,58 @@
 
             const visibleNoCategory = getVisibleServiceIds(
                 preset,
-                { serviceId, categoryIds, locationIds, staffIds },
+                { serviceType, serviceId, categoryIds, locationIds, staffIds },
                 'category'
             )
             categoryIds = categoryIds.filter((categoryId) =>
                 preset.categories.some(
                     (category) =>
                         toId(category.id) === categoryId &&
-                        ensureArray(category.services).some((serviceId) =>
-                            visibleNoCategory.has(toId(serviceId))
+                        getCategoryBookableIds(category, { serviceType }).some((bookableId) =>
+                            visibleNoCategory.has(toId(bookableId))
                         )
                 )
             )
 
             const visibleNoLocation = getVisibleServiceIds(
                 preset,
-                { serviceId, categoryIds, locationIds, staffIds },
+                { serviceType, serviceId, categoryIds, locationIds, staffIds },
                 'location'
             )
             const allowedLocationIds = getAllowedLocationIdsForPicker(
                 preset,
                 visibleNoLocation,
-                { serviceId, categoryIds, staffIds }
+                { serviceType, serviceId, categoryIds, staffIds }
             )
             locationIds = locationIds.filter((locationId) =>
                 allowedLocationIds.has(locationId)
             )
 
-            const visibleNoStaff = getVisibleServiceIds(
-                preset,
-                { serviceId, categoryIds, locationIds, staffIds },
-                'staff'
-            )
-            staffIds = staffIds.filter((staffId) => {
-                const staffMember = preset.staffMembers.find(
-                    (staff) => toId(staff.id) === staffId
+            if (!isUnitsMode({ serviceType })) {
+                const visibleNoStaff = getVisibleServiceIds(
+                    preset,
+                    { serviceType, serviceId, categoryIds, locationIds, staffIds },
+                    'staff'
                 )
-                if (!staffMember) {
-                    return false
-                }
-                return staffMatchesFilters(
-                    staffMember,
-                    visibleNoStaff,
-                    locationIds,
-                    { serviceId, categoryIds }
-                )
-            })
+                staffIds = staffIds.filter((staffId) => {
+                    const staffMember = preset.staffMembers.find(
+                        (staff) => toId(staff.id) === staffId
+                    )
+                    if (!staffMember) {
+                        return false
+                    }
+                    return staffMatchesFilters(
+                        staffMember,
+                        visibleNoStaff,
+                        locationIds,
+                        { serviceId, categoryIds }
+                    )
+                })
+            } else {
+                staffIds = []
+            }
 
-            const next = { serviceId, categoryIds, locationIds, staffIds }
+            const next = { serviceType, serviceId, categoryIds, locationIds, staffIds }
             if (equalSelections(next, current)) {
                 return next
             }
@@ -338,6 +400,69 @@
         })
         panelView.__wbkBaseOptions = cache
         return cache
+    }
+
+    const getServiceBaseOptions = (preset, serviceType) => {
+        const isDaily = serviceType === 'daily'
+        const items = isDaily ? preset.units : preset.services
+        const options = [
+            {
+                value: '',
+                label: isDaily ? 'All Daily Services' : 'All Services',
+            },
+        ]
+        ensureArray(items).forEach((item) => {
+            options.push({
+                value: toId(item.id),
+                label: item.label || toId(item.id),
+            })
+        })
+        return options
+    }
+
+    const syncServiceOptionsCache = (panelView, preset, serviceType) => {
+        const cache = ensureBaseOptionsCache(panelView)
+        cache.service = getServiceBaseOptions(preset, serviceType)
+    }
+
+    const toggleStaffControl = (panelView, isDaily) => {
+        panelView.$el
+            .find('[data-setting="staff"]')
+            .closest('.elementor-control')
+            .each(function () {
+                const $control = $(this)
+                const shouldShow = !isDaily
+                const isVisible = $control.is(':visible')
+                if (shouldShow !== isVisible) {
+                    $control.toggle(shouldShow)
+                }
+            })
+    }
+
+    const clearStaffControlValues = (panelView) => {
+        const $select = panelView.$el.find('[data-setting="staff"]')
+        if ($select.length === 0) {
+            return
+        }
+        const currentValue = ensureArray($select.val())
+        if (currentValue.length === 0) {
+            return
+        }
+        $select.val([])
+        if ($select.data('select2')) {
+            $select.trigger('change.select2')
+        }
+    }
+
+    const valuesMatch = ($select, nextValue, isService) => {
+        const currentValue = $select.val()
+        if (isService) {
+            return toId(currentValue || '') === toId(nextValue || '')
+        }
+        return ensureArray(currentValue)
+            .map((value) => toId(value))
+            .sort()
+            .join(',') === ensureArray(nextValue).map((value) => toId(value)).sort().join(',')
     }
 
     const applyOptionsToControl = (panelView, settingName, allowedIds) => {
@@ -377,19 +502,23 @@
             )
             .join('')
 
-        $select.html(optionsHtml)
+        const nextValue = isService ? filteredSelection[0] || '' : filteredSelection
+        const currentHtml = $select.html()
 
-        if (selectedValues.join(',') !== filteredSelection.join(',')) {
-            isApplying = true
-            $select.val(isService ? filteredSelection[0] || '' : filteredSelection)
-            $select.trigger('change')
-            isApplying = false
-        } else {
-            $select.val(isService ? filteredSelection[0] || '' : filteredSelection)
+        if (currentHtml !== optionsHtml) {
+            $select.html(optionsHtml)
+            $select.val(nextValue)
+            if ($select.data('select2')) {
+                $select.trigger('change.select2')
+            }
+            return
         }
 
-        if ($select.data('select2')) {
-            $select.trigger('change.select2')
+        if (!valuesMatch($select, nextValue, isService)) {
+            $select.val(nextValue)
+            if ($select.data('select2')) {
+                $select.trigger('change.select2')
+            }
         }
     }
 
@@ -398,65 +527,112 @@
             return
         }
 
-        const rawSelection = getSelection(panelView)
-        const selection = pruneSelections(preset, rawSelection)
+        isApplying = true
 
-        const visibleForService = getVisibleServiceIds(preset, selection, 'service')
-        const visibleForCategory = getVisibleServiceIds(preset, selection, 'category')
-        const visibleForLocation = getVisibleServiceIds(preset, selection, 'location')
-        const visibleForStaff = getVisibleServiceIds(preset, selection, 'staff')
-        const allowedLocationIds = getAllowedLocationIdsForPicker(
-            preset,
-            visibleForLocation,
-            {
-                serviceId: selection.serviceId,
-                categoryIds: selection.categoryIds,
-                staffIds: selection.staffIds,
-            }
-        )
+        try {
+            const rawSelection = getSelection(panelView)
+            const selection = pruneSelections(preset, rawSelection)
+            const isDaily = isUnitsMode(selection)
+            const previousServiceType = panelView.__wbkLastAppliedServiceType
 
-        const allowedCategoryIds = []
-        preset.categories.forEach((category) => {
-            const hasVisibleService = ensureArray(category.services).some((serviceId) =>
-                visibleForCategory.has(toId(serviceId))
-            )
-            if (hasVisibleService) {
-                allowedCategoryIds.push(toId(category.id))
-            }
-        })
-
-        const allowedStaffIds = []
-        preset.staffMembers.forEach((staffMember) => {
             if (
-                staffMatchesFilters(
-                    staffMember,
-                    visibleForStaff,
-                    selection.locationIds,
-                    {
-                        serviceId: selection.serviceId,
-                        categoryIds: selection.categoryIds,
-                    }
-                )
+                previousServiceType !== null &&
+                previousServiceType !== undefined &&
+                previousServiceType !== selection.serviceType
             ) {
-                allowedStaffIds.push(toId(staffMember.id))
+                const $service = panelView.$el.find('[data-setting="service"]')
+                if ($service.length > 0 && toId($service.val() || '') !== '') {
+                    $service.val('')
+                    if ($service.data('select2')) {
+                        $service.trigger('change.select2')
+                    }
+                }
+                selection.serviceId = null
+                if (panelView.__wbkBaseOptions) {
+                    delete panelView.__wbkBaseOptions
+                }
             }
-        })
 
-        applyOptionsToControl(panelView, 'service', Array.from(visibleForService))
-        applyOptionsToControl(panelView, 'category', allowedCategoryIds)
-        applyOptionsToControl(panelView, 'location', Array.from(allowedLocationIds))
-        applyOptionsToControl(panelView, 'staff', allowedStaffIds)
+            panelView.__wbkLastAppliedServiceType = selection.serviceType
+
+            syncServiceOptionsCache(panelView, preset, selection.serviceType)
+            toggleStaffControl(panelView, isDaily)
+
+            const visibleForService = getVisibleServiceIds(preset, selection, 'service')
+            const visibleForCategory = getVisibleServiceIds(preset, selection, 'category')
+            const visibleForLocation = getVisibleServiceIds(preset, selection, 'location')
+
+            const allowedCategoryIds = []
+            preset.categories.forEach((category) => {
+                const hasVisibleBookable = getCategoryBookableIds(category, selection).some(
+                    (bookableId) => visibleForCategory.has(toId(bookableId))
+                )
+                if (hasVisibleBookable) {
+                    allowedCategoryIds.push(toId(category.id))
+                }
+            })
+
+            applyOptionsToControl(panelView, 'service', Array.from(visibleForService))
+            applyOptionsToControl(panelView, 'category', allowedCategoryIds)
+
+            const allowedLocationIds = getAllowedLocationIdsForPicker(
+                preset,
+                visibleForLocation,
+                {
+                    serviceType: selection.serviceType,
+                    serviceId: selection.serviceId,
+                    categoryIds: selection.categoryIds,
+                    staffIds: selection.staffIds,
+                }
+            )
+            applyOptionsToControl(panelView, 'location', Array.from(allowedLocationIds))
+
+            if (isDaily) {
+                clearStaffControlValues(panelView)
+                return
+            }
+
+            const visibleForStaff = getVisibleServiceIds(preset, selection, 'staff')
+
+            const allowedStaffIds = []
+            preset.staffMembers.forEach((staffMember) => {
+                if (
+                    staffMatchesFilters(
+                        staffMember,
+                        visibleForStaff,
+                        selection.locationIds,
+                        {
+                            serviceId: selection.serviceId,
+                            categoryIds: selection.categoryIds,
+                        }
+                    )
+                ) {
+                    allowedStaffIds.push(toId(staffMember.id))
+                }
+            })
+
+            applyOptionsToControl(panelView, 'staff', allowedStaffIds)
+        } finally {
+            isApplying = false
+        }
     }
 
     const normalizePreset = (presetData) => {
         return {
             services: ensureArray(presetData.services).map((service) => ({
                 id: service.id,
+                label: service.label,
                 locations: ensureArray(service.locations).map(toId),
+            })),
+            units: ensureArray(presetData.units).map((unit) => ({
+                id: unit.id,
+                label: unit.label,
+                locations: ensureArray(unit.locations).map(toId),
             })),
             categories: ensureArray(presetData.categories).map((category) => ({
                 id: category.id,
                 services: ensureArray(category.services).map(toId),
+                units: ensureArray(category.units).map(toId),
             })),
             locations: ensureArray(presetData.locations).map((location) => ({
                 id: location.id,
@@ -499,6 +675,7 @@
             })
             .catch(() => ({
                 services: [],
+                units: [],
                 categories: [],
                 locations: [],
                 staffMembers: [],
@@ -507,14 +684,35 @@
         return presetPromise
     }
 
+    const scheduleApplyFilters = (panelView, preset) => {
+        if (filterApplyTimer) {
+            clearTimeout(filterApplyTimer)
+        }
+        filterApplyTimer = setTimeout(function () {
+            filterApplyTimer = null
+            applyFilters(panelView, preset)
+        }, 0)
+    }
+
     const attachPanelHandlers = (panelView) => {
         const namespace = '.wbkElementorFilter'
         panelView.$el.off(namespace)
         panelView.$el.on(
             'change' + namespace + ' select2:select' + namespace + ' select2:unselect' + namespace,
-            '[data-setting="service"], [data-setting="category"], [data-setting="location"], [data-setting="staff"]',
-            () => {
-                getPresetData().then((preset) => applyFilters(panelView, preset))
+            '[data-setting="service_type"], [data-setting="service"], [data-setting="category"], [data-setting="location"], [data-setting="staff"]',
+            function (event) {
+                if (isApplying) {
+                    return
+                }
+
+                const settingName = $(event.target).attr('data-setting') || ''
+                if (settingName === 'service_type' && panelView.__wbkBaseOptions) {
+                    delete panelView.__wbkBaseOptions
+                }
+
+                getPresetData().then(function (preset) {
+                    scheduleApplyFilters(panelView, preset)
+                })
             }
         )
     }
@@ -535,6 +733,7 @@
         }
         getPresetData().then((preset) => {
             attachPanelHandlers(panelView)
+            panelView.__wbkLastAppliedServiceType = null
             setTimeout(() => {
                 ensureBaseOptionsCache(panelView)
                 applyFilters(panelView, preset)

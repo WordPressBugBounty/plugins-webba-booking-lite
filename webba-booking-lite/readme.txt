@@ -3,8 +3,8 @@ Contributors: Webba agency, freemius
 Donate link: https://webba-booking.com/
 Tags:  appointment, booking, booking calendar, scheduling, reservation
 Requires at least: 5.6
-Tested up to: 6.9
-Stable tag: 6.4.10
+Tested up to: 7.0
+Stable tag: 6.4.11
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -179,6 +179,17 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 
 == Changelog ==
+15/06/2026
+
+6.4.11
+
+- Improvement: added daily bookings support in widgets and shortcode builder
+- Improvement: translation improvements
+- Bug fix: missing add to calendar provider in daily bookings
+- Bug fix: timezone selector overlapping in mobile view
+- Bug fix: allow to book only these days option not working
+- Bug fix: other minor fixes and improvements
+
 02/06/2026
 
 6.4.10

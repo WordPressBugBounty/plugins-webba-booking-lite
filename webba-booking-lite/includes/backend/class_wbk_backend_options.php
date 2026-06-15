@@ -3806,6 +3806,26 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
         );
 
         wbk_opt()->add_option(
+            "wbk_wording_label_login_description",
+            "text",
+            __("Access your booking dashboard", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Access your booking dashboard", "webba-booking-lite"),
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_label_logout",
+            "text",
+            __("Logout", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Logout", "webba-booking-lite"),
+            ],
+        );
+
+        wbk_opt()->add_option(
             "wbk_user_dashboard_manage_appointments_title",
             "text",
             __("Manage your appointments and reservations", "webba-booking-lite"),

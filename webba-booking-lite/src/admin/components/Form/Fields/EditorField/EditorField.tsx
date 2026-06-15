@@ -76,6 +76,11 @@ const placeHolders: Record<"name" | "text" | "content", string | ((editor: any) 
     content: "#customer_custom",
   },
   {
+    name: 'wbk_staff_member',
+    text: __("Staff member", "webba-booking-lite"),
+    content: "#staff_member",
+  },
+  {
     name: "wbk_items_count",
     text: __("Items count", "webba-booking-lite"),
     content: "#items_count",

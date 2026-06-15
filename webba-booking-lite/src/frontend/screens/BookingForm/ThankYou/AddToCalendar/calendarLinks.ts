@@ -1,9 +1,51 @@
-import { formatInTimeZone } from 'date-fns-tz'
+import { differenceInCalendarDays, parse } from 'date-fns'
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz'
 import type {
     BookingDataForCalendar,
     CalendarLinks,
     FirstEventFallback,
+    UnitDateRange,
 } from './types'
+
+function normalizeEventStartSeconds(raw: number): number {
+    if (!Number.isFinite(raw) || raw <= 0) {
+        return raw
+    }
+    if (raw > 1e11) {
+        return Math.floor(raw / 1000)
+    }
+    return raw
+}
+
+export function buildFirstEventFromUnitRange(
+    range: UnitDateRange | null | undefined,
+    unitLabel: string,
+    userTimezone: string
+): FirstEventFallback | null {
+    if (!range?.start || !range?.end) {
+        return null
+    }
+
+    const startDay = parse(range.start, 'yyyy-MM-dd', new Date())
+    const endDay = parse(range.end, 'yyyy-MM-dd', new Date())
+    if (Number.isNaN(startDay.getTime()) || Number.isNaN(endDay.getTime())) {
+        return null
+    }
+
+    const startSeconds = Math.floor(
+        fromZonedTime(`${range.start}T00:00:00`, userTimezone).getTime() / 1000
+    )
+    const inclusiveDays = Math.max(
+        1,
+        differenceInCalendarDays(endDay, startDay) + 1
+    )
+
+    return {
+        time: startSeconds,
+        duration: inclusiveDays * 1440,
+        service: unitLabel || 'Booking',
+    }
+}
 
 function toGoogleDate(seconds: number): string {
     const iso = new Date(seconds * 1000).toISOString()
@@ -90,7 +132,7 @@ function getFirstEventFromBookingData(
     const items = Object.values(bookingData.booking_data)
     const first = items[0]
     if (!first) return null
-    const startSeconds = Number(first.time)
+    const startSeconds = normalizeEventStartSeconds(Number(first.time))
     const durationMinutes = Number(first.duration)
     if (!Number.isFinite(startSeconds) || !Number.isFinite(durationMinutes)) {
         return null

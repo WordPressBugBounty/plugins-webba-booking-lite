@@ -44,6 +44,42 @@
       "type": "object",
       "settings": {
         "advanced": {
+          "serviceType": {
+            "groupType": "group-item",
+            "item": {
+              "groupSlug": "contentMain",
+              "attrName": "content.advanced.serviceType",
+              "label": "Service Type",
+              "description": "Choose hourly or daily booking mode.",
+              "priority": 5,
+              "render": true,
+              "defaultAttr": {
+                "desktop": {
+                  "value": "hourly"
+                }
+              },
+              "features": {
+                "responsive": false,
+                "hover": false,
+                "sticky": false,
+                "preset": "content"
+              },
+              "component": {
+                "type": "field",
+                "name": "divi/select",
+                "props": {
+                  "options": {
+                    "hourly": {
+                      "label": "Hourly services"
+                    },
+                    "daily": {
+                      "label": "Daily services"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "service": {
             "groupType": "group-item",
             "item": {

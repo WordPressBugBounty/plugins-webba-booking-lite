@@ -536,6 +536,19 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
         );
 
         $this->add_control(
+            'service_type',
+            [
+                'label' => __('Service Type', 'webba-booking-lite'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => [
+                    'hourly' => __('Hourly services', 'webba-booking-lite'),
+                    'daily' => __('Daily services', 'webba-booking-lite'),
+                ],
+                'default' => 'hourly',
+            ]
+        );
+
+        $this->add_control(
             'service',
             [
                 'label' => __('Service', 'webba-booking-lite'),
@@ -933,10 +946,16 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
     protected function render()
     {
         $settings = $this->get_settings_for_display();
+        $service_type = !empty($settings['service_type']) && $settings['service_type'] === 'daily'
+            ? 'daily'
+            : 'hourly';
+        $units = $service_type === 'daily' ? 'yes' : 'no';
         $service = $this->get_attribute_value($settings['service'] ?? '0', false);
         $category = $this->get_attribute_value($settings['category'] ?? [], true);
         $location = $this->get_attribute_value($settings['location'] ?? [], true);
-        $staff = $this->get_attribute_value($settings['staff'] ?? [], true);
+        $staff = $service_type === 'daily'
+            ? '0'
+            : $this->get_attribute_value($settings['staff'] ?? [], true);
         $category_list = !empty($settings['category_list']) ? 'yes' : 'no';
         $hide_category = !empty($settings['category_list']) ? 'no' : 'yes';
 
@@ -948,7 +967,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
 
         echo WBK_Renderer::load_template(
             'frontend_v6/booking_form',
-            [$service, $category_list, $category, $location, $staff, 'no', $hide_category],
+            [$service, $category_list, $category, $location, $staff, $units, $hide_category],
             false
         );
 

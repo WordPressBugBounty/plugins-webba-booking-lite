@@ -22,11 +22,17 @@ class WBK_Gutenberg_Booking_Form_Block
         self::enqueue_frontend_assets();
 
         $service = self::get_single_id_string($attributes['service'] ?? '');
+        $service_type = isset($attributes['serviceType']) && $attributes['serviceType'] === 'daily'
+            ? 'daily'
+            : 'hourly';
+        $units = $service_type === 'daily' ? 'yes' : 'no';
         $category_list = !empty($attributes['categoryList']) ? 'yes' : 'no';
         $hide_category = !empty($attributes['categoryList']) ? 'no' : 'yes';
         $category = self::format_id_csv($attributes['category'] ?? []);
         $location = self::format_id_csv($attributes['location'] ?? []);
-        $staff = self::format_id_csv($attributes['staff'] ?? []);
+        $staff = $service_type === 'daily'
+            ? '0'
+            : self::format_id_csv($attributes['staff'] ?? []);
 
         $appearance = self::resolve_appearance_from_attributes(is_array($attributes) ? $attributes : []);
         $inline_style = self::build_scope_inline_style($appearance);
@@ -39,7 +45,7 @@ class WBK_Gutenberg_Booking_Form_Block
         $html = '<div class="wbk_elementor_booking_form_scope"' . $style_attr . '>';
         $html .= WBK_Renderer::load_template(
             'frontend_v6/booking_form',
-            [$service, $category_list, $category, $location, $staff, 'no', $hide_category],
+            [$service, $category_list, $category, $location, $staff, $units, $hide_category],
             false
         );
         $html .= '</div>';

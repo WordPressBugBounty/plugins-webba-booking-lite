@@ -76,7 +76,7 @@ const LoginForm = ({ onSuccess }) => {
                 </div>
                 <h2>{wording.label_login_title}</h2>
                 <p>
-                    {__('Access your booking dashboard', 'webba-booking-lite')}
+                    { wording.label_login_description || __('Access your booking dashboard', 'webba-booking-lite')}
                 </p>
             </div>
 

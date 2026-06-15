@@ -1513,6 +1513,8 @@ class WBK_Request_Manager {
                 "label_login_button"                      => get_option( "wbk_wording_label_login_button", __( "Login", "webba-booking-lite" ) ),
                 "no_booking"                              => get_option( "wbk_user_dashboard_no_bookings_available", __( "No bookings available", "webba-booking-lite" ) ),
                 "label_login_title"                       => get_option( "wbk_user_dashboard_login_title", __( "Login to your booking manager", "webba-booking-lite" ) ),
+                'label_login_description'                 => get_option( "wbk_wording_label_login_description", __( "Access your booking dashboard", "webba-booking-lite" ) ),
+                "label_logout"                            => get_option( "wbk_wording_label_logout", __( "Logout", "webba-booking-lite" ) ),
                 "label_manage_appointments_title"         => get_option( "wbk_user_dashboard_manage_appointments_title", __( "Manage your appointments and reservations", "webba-booking-lite" ) ),
                 "label_upcoming_bookings_title"           => get_option( "wbk_user_dashboard_upcoming_bookings_title", __( "Upcoming", "webba-booking-lite" ) ),
                 "label_past_bookings_title"               => get_option( "wbk_user_dashboard_past_bookings_title", __( "Past", "webba-booking-lite" ) ),
@@ -4422,11 +4424,20 @@ class WBK_Request_Manager {
         $booking_data = [];
         foreach ( $booking_ids as $booking_id ) {
             $booking = new WBK_Booking($booking_id);
-            $service = new WBK_Service($booking->get_service());
-            $booking_data[$booking_id]["duration"] = $service->get_duration();
-            $booking_data[$booking_id]["service"] = $service->get_name();
-            $booking_data[$booking_id]["service_id"] = $service->get_id();
-            $booking_data[$booking_id]["time"] = $booking->get_start() / 1000;
+            $unit_id = (int) $booking->get( "unit_id" );
+            if ( $unit_id > 0 ) {
+                $unit = new WBK_Unit($unit_id);
+                $booking_data[$booking_id]["duration"] = (int) $booking->get( "duration" );
+                $booking_data[$booking_id]["service"] = ( $unit->is_loaded() ? (string) $unit->get( "name" ) : __( "Booking", "webba-booking-lite" ) );
+                $booking_data[$booking_id]["service_id"] = 0;
+                $booking_data[$booking_id]["unit_id"] = $unit_id;
+            } else {
+                $service = new WBK_Service($booking->get_service());
+                $booking_data[$booking_id]["duration"] = $service->get_duration();
+                $booking_data[$booking_id]["service"] = $service->get_name();
+                $booking_data[$booking_id]["service_id"] = $service->get_id();
+            }
+            $booking_data[$booking_id]["time"] = (int) $booking->get_start();
             $booking_data[$booking_id]["quantity"] = $booking->get_quantity();
             $booking_data[$booking_id]["price"] = $booking->get_price();
             $booking_data[$booking_id]["offset"] = $booking->get( "time_offset" );

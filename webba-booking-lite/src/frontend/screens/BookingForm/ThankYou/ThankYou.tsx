@@ -15,7 +15,8 @@ import { fromUnixTime } from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
 import { IAmountItem } from '../types'
 import { AddToCalendar } from './AddToCalendar/AddToCalendar'
-import type { FirstEventFallback } from './AddToCalendar/types'
+import { buildFirstEventFromUnitRange } from './AddToCalendar/calendarLinks'
+import type { FirstEventFallback, UnitDateRange } from './AddToCalendar/types'
 import { ReactComponent as PersonIcon } from '../../../../../public/images/icon-person.svg'
 import { ReactComponent as MapPinIcon } from '../../../../../public/images/icon-map-pin.svg'
 import type { IThankYouExtraRow } from './types'
@@ -29,6 +30,8 @@ export const ThankYou = ({
 }: ThankYouProps = {}) => {
     const {
         services,
+        units,
+        bookingMode,
         extras,
         priceFormat,
         amountData: contextAmountData,
@@ -42,6 +45,10 @@ export const ThankYou = ({
         () => services.filter(({ selected }) => selected),
         [services]
     )
+    const selectedUnits = useMemo(
+        () => units.filter(({ selected }) => selected),
+        [units]
+    )
 
     const iCalRequiredPlans = ['pro', 'premium']
     const isIcalAvailable = useMemo(() => {
@@ -50,25 +57,48 @@ export const ThankYou = ({
         return iCalRequiredPlans.some((plan) => preset.plan_map[plan] === true)
     }, [preset?.plan_map, iCalRequiredPlans])
 
-    const cartItems = useMemo(
-        () =>
-            selectedServices.flatMap(
-                ({ places, label }) =>
-                    places?.map(({ timeslot }) => {
-                        return {
-                            time:
-                                Number(
-                                    toZonedTime(
-                                        fromUnixTime(Number(timeslot)),
-                                        userTimezone
-                                    )
-                                ) / 1000,
-                            serviceName: String(label),
-                        }
-                    }) || []
-            ),
-        [selectedServices]
-    )
+    const cartItems = useMemo(() => {
+        if (bookingMode === 'units') {
+            const selectedUnit = selectedUnits[0]
+            const unitRange = (formData as { range?: UnitDateRange })?.range
+            const unitEvent = buildFirstEventFromUnitRange(
+                unitRange,
+                String(selectedUnit?.label || ''),
+                userTimezone
+            )
+            if (!unitEvent) {
+                return []
+            }
+            return [
+                {
+                    time: unitEvent.time,
+                    serviceName: unitEvent.service,
+                },
+            ]
+        }
+
+        return selectedServices.flatMap(
+            ({ places, label }) =>
+                places?.map(({ timeslot }) => {
+                    return {
+                        time:
+                            Number(
+                                toZonedTime(
+                                    fromUnixTime(Number(timeslot)),
+                                    userTimezone
+                                )
+                            ) / 1000,
+                        serviceName: String(label),
+                    }
+                }) || []
+        )
+    }, [
+        bookingMode,
+        formData,
+        selectedServices,
+        selectedUnits,
+        userTimezone,
+    ])
     // Get bookingData from store
     const bookingDataFromStore = useSelect(
         (select: any) => select(store_name).getBookingData(),
@@ -94,6 +124,17 @@ export const ThankYou = ({
             typeof bookingData.booking_data === 'object' &&
             Object.keys(bookingData.booking_data).length > 0
         if (hasBookingDataFirst) return null
+
+        if (bookingMode === 'units') {
+            const selectedUnit = selectedUnits[0]
+            const unitRange = (formData as { range?: UnitDateRange })?.range
+            return buildFirstEventFromUnitRange(
+                unitRange,
+                String(selectedUnit?.label || ''),
+                userTimezone
+            )
+        }
+
         const firstCart = cartItems[0]
         const firstService = selectedServices[0]
         if (
@@ -110,7 +151,15 @@ export const ThankYou = ({
             duration: durationMinutes,
             service: String(firstCart.serviceName || 'Appointment'),
         }
-    }, [bookingData?.booking_data, cartItems, selectedServices])
+    }, [
+        bookingData?.booking_data,
+        bookingMode,
+        cartItems,
+        formData,
+        selectedServices,
+        selectedUnits,
+        userTimezone,
+    ])
 
     const message = bookingData?.message
     const amountData = useMemo(() => {

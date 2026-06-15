@@ -1,6 +1,14 @@
 export type TShortcodeId = string | number
 
+export type TShortcodeServiceType = 'hourly' | 'daily'
+
 export interface IShortcodePresetService {
+    id: TShortcodeId
+    label: string
+    locations?: string[]
+}
+
+export interface IShortcodePresetUnit {
     id: TShortcodeId
     label: string
     locations?: string[]
@@ -10,6 +18,7 @@ export interface IShortcodePresetCategory {
     id: TShortcodeId
     name: string
     services: string[]
+    units?: string[]
 }
 
 export interface IShortcodePresetLocation {
@@ -32,6 +41,7 @@ export type TShortcodeFilterIgnore =
     | 'staff'
 
 export interface IShortcodeSelections {
+    serviceType: TShortcodeServiceType
     serviceId: string | null
     categoryIds: string[]
     locationIds: string[]

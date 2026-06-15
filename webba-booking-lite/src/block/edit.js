@@ -104,11 +104,18 @@ export default function Edit({ attributes, setAttributes }) {
     )
 
     const normalizedPreset = useMemo(() => {
-        if (!data || !data.services || data.services.length === 0) {
+        if (!data) {
+            return null
+        }
+        const hasServices = data.services && data.services.length > 0
+        const hasUnits = data.units && data.units.length > 0
+        if (!hasServices && !hasUnits) {
             return null
         }
         return normalizePresetForFilters(data)
     }, [data])
+
+    const isDailyServiceType = attributes.serviceType === 'daily'
 
     const categoryPairs = useMemo(() => {
         return (data?.categories || []).map((c) => ({
@@ -142,6 +149,7 @@ export default function Edit({ attributes, setAttributes }) {
     }, [
         normalizedPreset,
         attributes.service,
+        attributes.serviceType,
         (attributes.category || []).join(','),
         (attributes.location || []).join(','),
         (attributes.staff || []).join(','),
@@ -186,22 +194,29 @@ export default function Edit({ attributes, setAttributes }) {
     }, [normalizedPreset])
 
     const serviceSelectOptions = useMemo(() => {
+        const isDaily = attributes.serviceType === 'daily'
         const opts = [
-            { label: __('All services', 'webba-booking-lite'), value: '' },
+            {
+                label: isDaily
+                    ? __('All daily services', 'webba-booking-lite')
+                    : __('All services', 'webba-booking-lite'),
+                value: '',
+            },
         ]
-        if (!data?.services || !picker) {
+        if (!picker) {
             return opts
         }
         const allowed = new Set(picker.allowedServiceIds.map(String))
-        data.services.forEach((s) => {
-            const id = String(s.id ?? s.value)
+        const items = isDaily ? data?.units || [] : data?.services || []
+        items.forEach((item) => {
+            const id = String(item.id ?? item.value)
             if (!allowed.has(id)) {
                 return
             }
-            opts.push({ label: s.label || id, value: id })
+            opts.push({ label: item.label || id, value: id })
         })
         return opts
-    }, [data, picker])
+    }, [data, picker, attributes.serviceType])
 
     const categorySuggestions = useMemo(() => {
         if (!picker) {
@@ -266,6 +281,7 @@ export default function Edit({ attributes, setAttributes }) {
     const upgradeUrl = `${data?.admin_url || '/wp-admin/'}admin.php?page=wbk-main-pricing`
 
     const previewKey = [
+        attributes.serviceType || 'hourly',
         attributes.service || '0',
         (attributes.category || []).join(','),
         (attributes.location || []).join(','),
@@ -280,14 +296,45 @@ export default function Edit({ attributes, setAttributes }) {
     return (
         <div {...blockProps}>
             <InspectorControls>
-                {data?.services && (
+                {(data?.services || data?.units) && (
                     <>
                         <PanelBody
                             title={__('Booking context', 'webba-booking-lite')}
                             initialOpen={true}
                         >
                             <SelectControl
-                                label={__('Service', 'webba-booking-lite')}
+                                label={__('Service type', 'webba-booking-lite')}
+                                value={attributes.serviceType || 'hourly'}
+                                options={[
+                                    {
+                                        label: __(
+                                            'Hourly services',
+                                            'webba-booking-lite'
+                                        ),
+                                        value: 'hourly',
+                                    },
+                                    {
+                                        label: __(
+                                            'Daily services',
+                                            'webba-booking-lite'
+                                        ),
+                                        value: 'daily',
+                                    },
+                                ]}
+                                onChange={(serviceType) => {
+                                    applyPrunedSelection({
+                                        serviceType,
+                                        service: '',
+                                        staff: [],
+                                    })
+                                }}
+                            />
+                            <SelectControl
+                                label={
+                                    isDailyServiceType
+                                        ? __('Daily service', 'webba-booking-lite')
+                                        : __('Service', 'webba-booking-lite')
+                                }
                                 value={attributes.service || ''}
                                 options={serviceSelectOptions}
                                 onChange={(value) =>
@@ -350,7 +397,8 @@ export default function Edit({ attributes, setAttributes }) {
                                     </div>
                                 </BaseControl>
                             )}
-                            {(data.staff_members || []).length > 0 && (
+                            {!isDailyServiceType &&
+                                (data.staff_members || []).length > 0 && (
                                 <BaseControl
                                     label={__('Staff', 'webba-booking-lite')}
                                     help={__(
@@ -527,10 +575,12 @@ export default function Edit({ attributes, setAttributes }) {
                                 : '0'
                         }
                         attrStaff={
+                            !isDailyServiceType &&
                             (attributes.staff || []).length > 0
                                 ? (attributes.staff || []).join(',')
                                 : '0'
                         }
+                        attrUnits={isDailyServiceType ? 'yes' : 'no'}
                     >
                         <BookingForm />
                     </BookingFormProvider>

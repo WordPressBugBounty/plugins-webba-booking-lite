@@ -157,15 +157,18 @@ export const Header = () => {
                     className="wbk_header__quickLinksSeparator"
                     aria-hidden="true"
                 />
-                <a
-                    href={
-                        admin_url +
-                        'admin.php?page=wbk-options&wbk-activation=true'
-                    }
-                    rel="noopener"
-                >
-                    {__('Setup Wizard', 'webba-booking-lite')}
-                </a>
+                {
+                    admin_url &&
+                    (<a
+                        href={
+                            admin_url +
+                            'admin.php?page=wbk-options&wbk-activation=true'
+                        }
+                        rel="noopener"
+                    >
+                        {__('Setup Wizard', 'webba-booking-lite')}
+                    </a>)
+                }
                 {ROUTE_TO_SETTINGS_SECTION[route] ? (
                     <button
                         type="button"
