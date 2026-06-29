@@ -349,6 +349,15 @@ class WBK_Backend
                 wp_die("You are not authorized to revoke Google Calendar tokens.");
             }
             $calendar_id = intval($_GET["revoke-gg-calendar"]);
+            if (
+                !isset($_GET["_wpnonce"]) ||
+                !wp_verify_nonce(
+                    sanitize_text_field(wp_unslash($_GET["_wpnonce"])),
+                    "wbk_revoke_gg_calendar_" . $calendar_id,
+                )
+            ) {
+                wp_die("Security check failed. Please try again.");
+            }
             $google = new WBK_Google_Calendar_Processor($calendar_id);
             $google->clear_access_token();
 
@@ -365,6 +374,15 @@ class WBK_Backend
                 wp_die("You are not authorized to revoke Outlook Calendar tokens.");
             }
             $calendar_id = intval($_GET["revoke-outlook-calendar"]);
+            if (
+                !isset($_GET["_wpnonce"]) ||
+                !wp_verify_nonce(
+                    sanitize_text_field(wp_unslash($_GET["_wpnonce"])),
+                    "wbk_revoke_outlook_calendar_" . $calendar_id,
+                )
+            ) {
+                wp_die("Security check failed. Please try again.");
+            }
             $outlook = new WBK_Outlook_Calendar_Processor($calendar_id);
             $outlook->clear_access_token();
 

@@ -4,7 +4,7 @@ Donate link: https://webba-booking.com/
 Tags:  appointment, booking, booking calendar, scheduling, reservation
 Requires at least: 5.6
 Tested up to: 7.0
-Stable tag: 6.4.13
+Stable tag: 6.4.14
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html

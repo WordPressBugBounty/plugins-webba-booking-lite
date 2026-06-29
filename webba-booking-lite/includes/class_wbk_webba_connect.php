@@ -219,7 +219,10 @@ class WBK_Webba_Connect
     public function get_google_revoke_url($calendar_id = "")
     {
         $return_path =
-            "/wp-admin/admin.php?page=wbk-connected-calendars&revoke-gg-calendar=" . $calendar_id;
+            "/wp-admin/admin.php?page=wbk-connected-calendars&revoke-gg-calendar=" .
+            $calendar_id .
+            "&_wpnonce=" .
+            wp_create_nonce("wbk_revoke_gg_calendar_" . $calendar_id);
 
         // Prepare authentication parameters including HMAC validation
         $query = $this->prepare_auth_parameters($return_path, "revoke-token", $calendar_id);
@@ -372,7 +375,9 @@ class WBK_Webba_Connect
     {
         $return_path =
             "/wp-admin/admin.php?page=wbk-connected-calendars&revoke-outlook-calendar=" .
-            $calendar_id;
+            $calendar_id .
+            "&_wpnonce=" .
+            wp_create_nonce("wbk_revoke_outlook_calendar_" . $calendar_id);
 
         // Prepare authentication parameters including HMAC validation
         $query = $this->prepare_auth_parameters($return_path, "revoke-token", $calendar_id);
