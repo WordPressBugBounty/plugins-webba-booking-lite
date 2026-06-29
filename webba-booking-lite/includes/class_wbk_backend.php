@@ -151,7 +151,7 @@ class WBK_Backend
                 "wbk-services",
                 ["WBK_Renderer", "render_backend_page"],
             );
-            
+
             if ($is_admin) {
                 add_submenu_page(
                     "wbk-main",
@@ -345,6 +345,9 @@ class WBK_Backend
     {
         // Handle Google Calendar revocation redirect
         if (isset($_GET["revoke-gg-calendar"]) && is_numeric($_GET["revoke-gg-calendar"])) {
+            if (!current_user_can("manage_options")) {
+                wp_die("You are not authorized to revoke Google Calendar tokens.");
+            }
             $calendar_id = intval($_GET["revoke-gg-calendar"]);
             $google = new WBK_Google_Calendar_Processor($calendar_id);
             $google->clear_access_token();
@@ -358,6 +361,9 @@ class WBK_Backend
             isset($_GET["revoke-outlook-calendar"]) &&
             is_numeric($_GET["revoke-outlook-calendar"])
         ) {
+            if (!current_user_can("manage_options")) {
+                wp_die("You are not authorized to revoke Outlook Calendar tokens.");
+            }
             $calendar_id = intval($_GET["revoke-outlook-calendar"]);
             $outlook = new WBK_Outlook_Calendar_Processor($calendar_id);
             $outlook->clear_access_token();

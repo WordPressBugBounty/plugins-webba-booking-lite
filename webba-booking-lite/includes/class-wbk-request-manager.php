@@ -3286,16 +3286,10 @@ class WBK_Request_Manager {
                     if ( is_array( $fields ) ) {
                         $found_forms = true;
                         foreach ( $fields as $field ) {
-                            // Only add the field if it has a slug and we haven't seen this slug before
-                            if ( isset( $field["slug"] ) && !isset( $all_fields[$field["slug"]] ) && isset( $field["placeholder"] ) ) {
-                                $all_fields[$field["slug"]] = $field;
-                                $all_fields[$field["slug"]]["placeholder"] = WBK_Translation_Processor::translate_string( "webba_form_field_" . $form_id . "_" . $field["slug"], $field["placeholder"] );
-                            } elseif ( isset( $field["slug"] ) && !isset( $all_fields[$field["slug"]] ) && isset( $field["checkboxText"] ) ) {
-                                $all_fields[$field["slug"]] = $field;
-                                $all_fields[$field["slug"]]["checkboxText"] = WBK_Translation_Processor::translate_string( "webba_form_field_" . $form_id . "_" . $field["slug"], $field["checkboxText"] );
-                            } else {
-                                $all_fields[$field["slug"]] = $field;
+                            if ( !isset( $field["slug"] ) || isset( $all_fields[$field["slug"]] ) ) {
+                                continue;
                             }
+                            $all_fields[$field["slug"]] = WBK_Translation_Processor::translate_form_field( $field, $form_id );
                         }
                     }
                 }
@@ -3304,14 +3298,8 @@ class WBK_Request_Manager {
                 // user is free, so we return the default fields
                 $found_forms = true;
                 $all_fields = WBK_Form_Builder_Utils::get_default_fields();
-                // translate default fields
                 $all_fields = array_map( function ( $field ) {
-                    if ( isset( $field["type"] ) && $field["type"] === "checkbox" ) {
-                        $field["checkboxText"] = WBK_Translation_Processor::translate_string( "webba_form_field_default_" . $field["slug"], get_option( "webba_form_field_" . $field["slug"], $field["checkboxText"] ) );
-                    } else {
-                        $field["placeholder"] = WBK_Translation_Processor::translate_string( "webba_form_field_default_" . $field["slug"], $field["placeholder"], get_option( "webba_form_field_" . $field["slug"], $field["placeholder"] ) );
-                    }
-                    return $field;
+                    return WBK_Translation_Processor::translate_form_field( $field, "default" );
                 }, $all_fields );
             }
             if ( !$found_forms ) {

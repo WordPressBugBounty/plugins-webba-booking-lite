@@ -20,6 +20,7 @@ import type { FirstEventFallback, UnitDateRange } from './AddToCalendar/types'
 import { ReactComponent as PersonIcon } from '../../../../../public/images/icon-person.svg'
 import { ReactComponent as MapPinIcon } from '../../../../../public/images/icon-map-pin.svg'
 import type { IThankYouExtraRow } from './types'
+import { normalizeToUnixSeconds } from '../../../lib/utils'
 
 interface ThankYouProps {
     bookingDetails?: any
@@ -433,9 +434,9 @@ export const ThankYou = ({
         bookingData.booking_data &&
         bookingData.payment_details
     ) {
-        const bookingItems = Object.values(bookingData.booking_data).map(
+        bookingItems = Object.values(bookingData.booking_data).map(
             (item: any) => ({
-                time: new Date(Number(item.time) * 1000),
+                time: normalizeToUnixSeconds(Number(item.time)),
                 serviceName: String(item.service),
             })
         )
@@ -515,7 +516,7 @@ export const ThankYou = ({
                                 // costItems[idx]?.price > 0 && (
                                 <BookingBlock
                                     key={idx}
-                                    time={Number(time)}
+                                    time={normalizeToUnixSeconds(Number(time))}
                                     serviceName={serviceName}
                                 />
                             )

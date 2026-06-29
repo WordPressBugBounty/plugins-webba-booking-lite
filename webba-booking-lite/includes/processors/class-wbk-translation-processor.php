@@ -81,30 +81,112 @@ class WBK_Translation_Processor
 
             $fields = $props['fields'];
             foreach ($fields as $field) {
+                if (!isset($field['slug'])) {
+                    continue;
+                }
+
                 if (isset($field['placeholder'])) {
                     $this->register_strings(
-                        'webba_form_field_' . $id . '_' . $field['slug'],
+                        self::get_form_field_string_name($id, $field['slug']),
                         $field['placeholder']
                     );
                 }
                 if (isset($field['defaultValue'])) {
                     $this->register_strings(
-                        'webba_form_field_' . $id . '_' . $field['slug'] . '_default',
+                        self::get_form_field_string_name(
+                            $id,
+                            $field['slug'],
+                            'defaultValue'
+                        ),
                         $field['defaultValue']
                     );
                 }
                 if (isset($field['checkboxText'])) {
                     $this->register_strings(
-                        'webba_form_field_' .
-                            $id .
-                            '_' .
-                            $field['slug'] .
-                            '_checkbox',
+                        self::get_form_field_string_name(
+                            $id,
+                            $field['slug'],
+                            'checkbox'
+                        ),
                         $field['checkboxText']
                     );
                 }
             }
         }
+    }
+
+        /**
+     * Build the WPML/Polylang string name for a form field property.
+     *
+     * @param string|int|null $form_id
+     * @param string $slug
+     * @param string $property
+     * @return string
+     */
+    public static function get_form_field_string_name(
+        $form_id,
+        $slug,
+        $property = 'placeholder'
+    ) {
+        $form_key =
+            !$form_id || $form_id === '0' || $form_id === 0
+                ? 'default'
+                : (string) $form_id;
+
+        if ($property === 'checkbox') {
+            return 'webba_form_field_' . $form_key . '_' . $slug . '_checkbox';
+        }
+
+        if ($property === 'defaultValue') {
+            return 'webba_form_field_' . $form_key . '_' . $slug . '_default';
+        }
+
+        return 'webba_form_field_' . $form_key . '_' . $slug;
+    }
+
+    /**
+     * Translate translatable properties on a single form field.
+     *
+     * @param array $field
+     * @param string|int|null $form_id
+     * @return array
+     */
+    public static function translate_form_field($field, $form_id)
+    {
+        if (!isset($field['slug'])) {
+            return $field;
+        }
+
+        if (isset($field['placeholder'])) {
+            $field['placeholder'] = self::translate_string(
+                self::get_form_field_string_name($form_id, $field['slug']),
+                $field['placeholder']
+            );
+        }
+
+        if (isset($field['defaultValue']) && $field['defaultValue'] !== '') {
+            $field['defaultValue'] = self::translate_string(
+                self::get_form_field_string_name(
+                    $form_id,
+                    $field['slug'],
+                    'defaultValue'
+                ),
+                $field['defaultValue']
+            );
+        }
+
+        if (isset($field['checkboxText'])) {
+            $field['checkboxText'] = self::translate_string(
+                self::get_form_field_string_name(
+                    $form_id,
+                    $field['slug'],
+                    'checkbox'
+                ),
+                $field['checkboxText']
+            );
+        }
+
+        return $field;
     }
 
     public function register_strings($name, $value)

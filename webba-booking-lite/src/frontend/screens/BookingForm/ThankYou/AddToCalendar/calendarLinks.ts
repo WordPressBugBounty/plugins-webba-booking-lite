@@ -1,21 +1,12 @@
 import { differenceInCalendarDays, parse } from 'date-fns'
 import { formatInTimeZone, fromZonedTime } from 'date-fns-tz'
+import { normalizeToUnixSeconds } from '../../../../lib/utils'
 import type {
     BookingDataForCalendar,
     CalendarLinks,
     FirstEventFallback,
     UnitDateRange,
 } from './types'
-
-function normalizeEventStartSeconds(raw: number): number {
-    if (!Number.isFinite(raw) || raw <= 0) {
-        return raw
-    }
-    if (raw > 1e11) {
-        return Math.floor(raw / 1000)
-    }
-    return raw
-}
 
 export function buildFirstEventFromUnitRange(
     range: UnitDateRange | null | undefined,
@@ -132,7 +123,7 @@ function getFirstEventFromBookingData(
     const items = Object.values(bookingData.booking_data)
     const first = items[0]
     if (!first) return null
-    const startSeconds = normalizeEventStartSeconds(Number(first.time))
+    const startSeconds = normalizeToUnixSeconds(Number(first.time))
     const durationMinutes = Number(first.duration)
     if (!Number.isFinite(startSeconds) || !Number.isFinite(durationMinutes)) {
         return null

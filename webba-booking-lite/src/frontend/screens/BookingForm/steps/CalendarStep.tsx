@@ -130,6 +130,26 @@ export const CalendarStep = () => {
             value: selectedZone,
         }
     }, [timezoneData])
+    const localTimezone = useMemo(
+        () => Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+        []
+    )
+    const shouldShowTimezoneSelector = useMemo(() => {
+        if (bookingMode === 'units' || !settings?.timezone_picker_enabled) {
+            return false
+        }
+
+        const normalizedLocalTimezone = localTimezone.trim().toLowerCase()
+        const normalizedSettingsTimezone = String(settings?.timezone || '')
+            .trim()
+            .toLowerCase()
+
+        if (!normalizedSettingsTimezone) {
+            return true
+        }
+
+        return normalizedLocalTimezone !== normalizedSettingsTimezone
+    }, [bookingMode, settings?.timezone_picker_enabled, settings?.timezone, localTimezone])
     const selectedUnits = useMemo(
         () =>
             (units || [])
@@ -639,7 +659,7 @@ export const CalendarStep = () => {
 
     const content = (
         <>
-            {bookingMode !== 'units' && settings?.timezone_picker_enabled && (
+            {shouldShowTimezoneSelector && (
                 <div className={'wbk_timezone_selector__wrapper'}>
                     <label className="wbk_timezone_selector__label">
                         {__('Time zone:', 'webba-booking-lite')}
