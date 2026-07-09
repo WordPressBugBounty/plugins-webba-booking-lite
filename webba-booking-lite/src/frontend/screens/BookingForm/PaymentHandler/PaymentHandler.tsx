@@ -39,7 +39,7 @@ export const PaymentHandler: React.FC<{
     const bookingTimes = bookingData.times
 
     const paymentMethods = propPaymentMethods || contextPaymentMethods
-    const iCalRequiredPlans = ['pro', 'premium']
+    const iCalRequiredPlans = ['pro', 'premium', 'proextended']
     const isIcalAvailable = useMemo(() => {
         if (!preset?.plan_map) return false
 

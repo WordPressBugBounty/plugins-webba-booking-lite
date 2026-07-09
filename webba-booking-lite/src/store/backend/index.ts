@@ -36,6 +36,11 @@ const DEFAULT_STATE = {
   enableData: {},
   options: {},
   sourcedOptions: {},
+  setupChecklist: null,
+  setupChecklistLoading: false,
+  setupChecklistExpandRequest: 0,
+  featureTour: null,
+  featureTourLoading: false,
   loadingStates: {
     locations: false,
     staff_members: false,
@@ -370,6 +375,144 @@ const actions = {
       return response;
     };
   },
+  setSetupChecklist: (checklist: Record<string, unknown> | null) => ({
+    type: "SET_SETUP_CHECKLIST",
+    checklist,
+  }),
+  setSetupChecklistLoading: (loading: boolean) => ({
+    type: "SET_SETUP_CHECKLIST_LOADING",
+    loading,
+  }),
+  fetchSetupChecklist: () => async ({ dispatch }: { dispatch: any }) => {
+    dispatch.setSetupChecklistLoading(true);
+    try {
+      const response = await apiFetch({
+        path: "/webba-booking/v1/setup-checklist",
+      });
+      dispatch.setSetupChecklist(response);
+      return response;
+    } finally {
+      dispatch.setSetupChecklistLoading(false);
+    }
+  },
+  dismissSetupChecklist: () => async ({ dispatch }: { dispatch: any }) => {
+    const response: { status?: string; state?: Record<string, unknown> } =
+      await apiFetch({
+        path: "/webba-booking/v1/setup-checklist/dismiss",
+        method: "POST",
+      });
+    if (response?.state) {
+      dispatch.setSetupChecklist(response.state);
+    }
+    return response;
+  },
+  completeSetupChecklistStep: (stepId: string) =>
+    async ({ dispatch }: { dispatch: any }) => {
+      const response: { status?: string; state?: Record<string, unknown> } =
+        await apiFetch({
+          path: "/webba-booking/v1/setup-checklist/complete-step",
+          method: "POST",
+          data: { step_id: stepId },
+        });
+      if (response?.state) {
+        dispatch.setSetupChecklist(response.state);
+      }
+      return response;
+    },
+  saveSetupChecklistEmailNotifications: (
+    templates: { id: number; enabled: boolean }[]
+  ) => async ({ dispatch }: { dispatch: any }) => {
+    const response: { status?: string; state?: Record<string, unknown> } =
+      await apiFetch({
+        path: "/webba-booking/v1/setup-checklist/save-email-notifications",
+        method: "POST",
+        data: { templates },
+      });
+    if (response?.state) {
+      dispatch.setSetupChecklist(response.state);
+    }
+    return response;
+  },
+  skipSetupChecklistStep: (stepId: string) =>
+    async ({ dispatch }: { dispatch: any }) => {
+      const response: { status?: string; state?: Record<string, unknown> } =
+        await apiFetch({
+          path: "/webba-booking/v1/setup-checklist/skip-step",
+          method: "POST",
+          data: { step_id: stepId },
+        });
+      if (response?.state) {
+        dispatch.setSetupChecklist(response.state);
+      }
+      return response;
+    },
+  setFeatureTour: (tour: Record<string, unknown> | null) => ({
+    type: "SET_FEATURE_TOUR",
+    tour,
+  }),
+  setFeatureTourLoading: (loading: boolean) => ({
+    type: "SET_FEATURE_TOUR_LOADING",
+    loading,
+  }),
+  fetchFeatureTour: () => async ({ dispatch }: { dispatch: any }) => {
+    dispatch.setFeatureTourLoading(true);
+    try {
+      const response = await apiFetch({
+        path: "/webba-booking/v1/feature-tour",
+      });
+      dispatch.setFeatureTour(response);
+      return response;
+    } finally {
+      dispatch.setFeatureTourLoading(false);
+    }
+  },
+  completeFeatureTourStep: (stepId: string) =>
+    async ({ dispatch }: { dispatch: any }) => {
+      const response: { status?: string; state?: Record<string, unknown> } =
+        await apiFetch({
+          path: "/webba-booking/v1/feature-tour/complete-step",
+          method: "POST",
+          data: { step_id: stepId },
+        });
+      if (response?.state) {
+        dispatch.setFeatureTour(response.state);
+      }
+      return response;
+    },
+  dismissFeatureTour: () => async ({ dispatch }: { dispatch: any }) => {
+    const response: { status?: string; state?: Record<string, unknown> } =
+      await apiFetch({
+        path: "/webba-booking/v1/feature-tour/dismiss",
+        method: "POST",
+      });
+    if (response?.state) {
+      dispatch.setFeatureTour(response.state);
+    }
+    return response;
+  },
+  relaunchOnboarding: () => async ({ dispatch }: { dispatch: any }) => {
+    const response: {
+      status?: string;
+      checklist?: Record<string, unknown>;
+    } = await apiFetch({
+      path: "/webba-booking/v1/onboarding/relaunch",
+      method: "POST",
+    });
+
+    if (response?.checklist) {
+      dispatch.setSetupChecklist(response.checklist);
+    }
+
+    dispatch.requestSetupChecklistExpand();
+
+    return response;
+  },
+  requestSetupChecklistExpand: () => ({
+    type: "REQUEST_SETUP_CHECKLIST_EXPAND",
+  }),
+  clearSetupChecklistExpandRequest: () => ({
+    type: "CLEAR_SETUP_CHECKLIST_EXPAND_REQUEST",
+  }),
 };
 
 interface BaseItem {
@@ -436,6 +579,42 @@ const reducer = (state: State = DEFAULT_STATE, action: Action): State => {
       return {
         ...state,
         preset: action.preset,
+      };
+    }
+    case "SET_SETUP_CHECKLIST": {
+      return {
+        ...state,
+        setupChecklist: action.checklist,
+      };
+    }
+    case "SET_SETUP_CHECKLIST_LOADING": {
+      return {
+        ...state,
+        setupChecklistLoading: action.loading,
+      };
+    }
+    case "REQUEST_SETUP_CHECKLIST_EXPAND": {
+      return {
+        ...state,
+        setupChecklistExpandRequest: state.setupChecklistExpandRequest + 1,
+      };
+    }
+    case "CLEAR_SETUP_CHECKLIST_EXPAND_REQUEST": {
+      return {
+        ...state,
+        setupChecklistExpandRequest: 0,
+      };
+    }
+    case "SET_FEATURE_TOUR": {
+      return {
+        ...state,
+        featureTour: action.tour,
+      };
+    }
+    case "SET_FEATURE_TOUR_LOADING": {
+      return {
+        ...state,
+        featureTourLoading: action.loading,
       };
     }
     case "SET_GG_AUTH_DATA": {
@@ -663,6 +842,12 @@ const selectors = {
   getLoadingState: (state: any, model: string) => {
     return state.loadingStates?.[model] || false;
   },
+  getSetupChecklist: (state: any) => state.setupChecklist,
+  isSetupChecklistLoading: (state: any) => state.setupChecklistLoading,
+  getSetupChecklistExpandRequest: (state: any) =>
+    state.setupChecklistExpandRequest,
+  getFeatureTour: (state: any) => state.featureTour,
+  isFeatureTourLoading: (state: any) => state.featureTourLoading,
 };
 
 export const store = createReduxStore("webba_booking/data_store", {

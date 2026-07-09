@@ -21,6 +21,7 @@ import { useSelect } from '@wordpress/data'
 import { store } from '../../../store/backend'
 import { __, sprintf } from '@wordpress/i18n'
 import { ProFeatuerWrapper } from '../ProFeatuerWrapper/ProFeatuerWrapper'
+import { useFeatureDisplayConfig } from '../../hooks/useFeatureDisplayConfig'
 
 const constructAppearanceField = ({
     fields,
@@ -66,10 +67,21 @@ export const constructSections = ({
         (select) => select(store).getPreset(),
         []
     )
+    const featureDisplayConfig = useFeatureDisplayConfig()
     const [activeSection, setActiveSection] = useState(sections[0].id)
     const upgradeLink = sprintf('%sadmin.php?page=wbk-main-pricing', admin_url)
 
-    return sections.map(({ id, title, fields, subsections, requiredPlans }) => (
+    return sections.map(({ id, title, fields, subsections, requiredPlans }) => {
+        const isSectionLocked =
+            Boolean(plan_map) &&
+            Boolean(requiredPlans) &&
+            !requiredPlans?.some((plan) => plan_map[plan] === true)
+
+        if (isSectionLocked && featureDisplayConfig.hide_fields) {
+            return null
+        }
+
+        return (
         <div
             className={"wbk_appearanceEditor__section"}
             key={id}
@@ -106,7 +118,8 @@ export const constructSections = ({
                 {subsections && constructAppearanceSubsection({ subsections })}
             </div>
         </div>
-    ))
+        )
+    })
 }
 
 export const extractOptionValues = (sections: IAppearanceSection[]) => {

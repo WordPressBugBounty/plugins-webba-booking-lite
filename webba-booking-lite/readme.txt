@@ -4,7 +4,7 @@ Donate link: https://webba-booking.com/
 Tags:  appointment, booking, booking calendar, scheduling, reservation
 Requires at least: 5.6
 Tested up to: 7.0
-Stable tag: 6.4.14
+Stable tag: 6.4.16
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -180,11 +180,28 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+08/07/2026
+
+6.4.16
+
+- Bug fix: PHP errors on certain configurations
+
+08/07/2026
+
+6.4.15
+
+- Improvement: AI assistance for setup
+- Improvement: guided setup and minor improvements
+
 29/06/2026
 
-- bug fix: minor bug fixes
+6.4.13
+
+- Bug fix: minor bug fixes
 
 26/06/2026
+
+6.4.12
 
 - Bug fix: WPML translation not working on certain configurations
 - Bug fix: wrong date format on booking confirmation screen
@@ -209,7 +226,6 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 - Bug fix: showing unavailable timeslots in booking form
 - Bug fix: attachments being dropped from emails in certain configurations
 - Bug fix: override specific days not working for hourly services
-
 26/05/2026
 
 6.4.9

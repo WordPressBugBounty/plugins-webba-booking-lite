@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import { UserDashboard } from './screens/UserDashboard/UserDashboard'
-import { BookingForm } from './screens/BookingForm/BookingForm'
+import App from './App'
 import { extractDataAttrs } from './lib/utils'
 import { BookingFormProvider } from './providers/BookingFormProvider/BookingFormProvider'
 import { LandingPage } from './screens/BookingForm/LandingPages/LandingPage'
@@ -148,7 +148,7 @@ const mountBookingForms = (root = document) => {
                     attrUnits={units || null}
                     attrHideCategory={hide_category || null}
                 >
-                    <BookingForm />
+                    <App />
                 </BookingFormProvider>,
                 bookingFormContainer
             )

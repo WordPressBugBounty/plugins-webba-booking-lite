@@ -903,36 +903,34 @@ class Model
                     if (3 !== count($dependency_rule)) {
                         continue;
                     }
-                    switch ($dependency_rule[1]) {
+
+                    $field_key = $dependency_rule[0];
+                    $operator = $dependency_rule[1];
+                    $expected = $dependency_rule[2];
+                    $actual = $post_data[$field_key] ?? "";
+
+                    switch ($operator) {
                         case "=":
-                            if (isset($post_data[$dependency_rule[0]])) {
-                                if ($post_data[$dependency_rule[0]] != $dependency_rule[2]) {
-                                    $rules_passed = false;
-                                }
+                            if ((string) $actual !== (string) $expected) {
+                                $rules_passed = false;
                             }
 
                             break;
                         case "<":
-                            if (isset($post_data[$dependency_rule[0]])) {
-                                if ($post_data[$dependency_rule[0]] >= $dependency_rule[2]) {
-                                    $rules_passed = false;
-                                }
+                            if (!isset($post_data[$field_key]) || $post_data[$field_key] >= $expected) {
+                                $rules_passed = false;
                             }
 
                             break;
                         case ">":
-                            if (isset($post_data[$dependency_rule[0]])) {
-                                if ($post_data[$dependency_rule[0]] <= $dependency_rule[2]) {
-                                    $rules_passed = false;
-                                }
+                            if (!isset($post_data[$field_key]) || $post_data[$field_key] <= $expected) {
+                                $rules_passed = false;
                             }
 
                             break;
                         case "!=":
-                            if (isset($post_data[$dependency_rule[0]])) {
-                                if ($post_data[$dependency_rule[0]] == $dependency_rule[2]) {
-                                    $rules_passed = false;
-                                }
+                            if ((string) $actual === (string) $expected) {
+                                $rules_passed = false;
                             }
 
                             break;

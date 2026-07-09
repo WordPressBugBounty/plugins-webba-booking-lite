@@ -1,0 +1,213 @@
+.wbk_proFeatureBanner {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 32px;
+    border: 1px solid #e8e8e8;
+    border-radius: 16px;
+    background: #fff;
+    overflow: hidden;
+    margin: 20px;
+}
+
+.wbk_proFeatureBanner__content {
+    flex: 1;
+    min-width: 0;
+    max-width: 560px;
+}
+
+.wbk_proFeatureBanner__header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.wbk_proFeatureBanner__titleGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wbk_proFeatureBanner__iconWrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f4f4f6;
+
+    img {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.wbk_proFeatureBanner__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.wbk_proFeatureBanner__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.wbk_proFeatureBanner__badge {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.wbk_proFeatureBanner__badge--minimum {
+    color: colors.$primary;
+    background: rgba(colors.$primary, 0.14);
+}
+
+.wbk_proFeatureBanner__headline {
+    margin: 0 0 12px;
+    font-size: 28px;
+    line-height: 1.25;
+    font-weight: 700;
+    color: #111;
+}
+
+.wbk_proFeatureBanner__description {
+    margin: 0 0 20px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #6b7280;
+}
+
+.wbk_proFeatureBanner__features {
+    margin: 0 0 28px;
+    padding: 0;
+    list-style: none;
+
+    li {
+        position: relative;
+        padding-left: 28px;
+        margin-bottom: 10px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #374151;
+
+        &::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 3px;
+            width: 16px;
+            height: 16px;
+            background-image: url('../../../../public/images/icon-checkmark.svg');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+    }
+}
+
+.wbk_proFeatureBanner__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wbk_proFeatureBanner__upgradeButton,
+.wbk_proFeatureBanner__learnMoreButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.wbk_proFeatureBanner__upgradeButton {
+    color: #fff;
+    background: colors.$primary;
+
+    &:hover {
+        color: #fff;
+        background: darken(colors.$primary, 10%);
+    }
+}
+
+.wbk_proFeatureBanner__learnMoreButton {
+    color: #374151;
+    background: #f3f4f6;
+
+    &:hover {
+        color: #111;
+        background: #e5e7eb;
+    }
+}
+
+.wbk_proFeatureBanner__preview {
+    flex: 0 1 420px;
+    min-width: 280px;
+}
+
+@media (max-width: 1100px) {
+    .wbk_proFeatureBanner {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .wbk_proFeatureBanner__content {
+        max-width: none;
+    }
+
+    .wbk_proFeatureBanner__preview {
+        width: 100%;
+        flex: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .wbk_proFeatureBanner {
+        padding: 20px;
+    }
+
+    .wbk_proFeatureBanner__header {
+        flex-direction: column;
+    }
+
+    .wbk_proFeatureBanner__badges {
+        justify-content: flex-start;
+    }
+
+    .wbk_proFeatureBanner__headline {
+        font-size: 22px;
+    }
+}
+
+.wbk_proFeatureBanner--compact {
+    margin: 20px;
+    padding: 24px;
+    gap: 0;
+
+    .wbk_proFeatureBanner__content {
+        max-width: none;
+    }
+
+    .wbk_proFeatureBanner__headline {
+        font-size: 22px;
+    }
+
+    .wbk_proFeatureBanner__features {
+        margin-bottom: 20px;
+    }
+}

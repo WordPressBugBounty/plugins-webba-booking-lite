@@ -11,6 +11,7 @@ import openSettingsIcon from '../../../../../public/images/icon-arrow-open.svg'
 import { createFormMenuSectionsFromModel } from '../../Form/utils/utils'
 import { createFormFromModel } from '../../Form/lib/createForm'
 import { ProFeatuerWrapper } from '../../ProFeatuerWrapper/ProFeatuerWrapper'
+import { useFeatureDisplayConfig } from '../../../hooks/useFeatureDisplayConfig'
 import { useConfirmationPopup } from '../../ConfirmationPopup/ConfirmationPopupContext'
 
 const openSettingsSectionInModal = (
@@ -123,6 +124,7 @@ export const buildSettingsSections = () => {
     const formattedSections = Object.values(sections)
     const { setOptions, setToastNotification } = useDispatch(store)
     const { plugin_url } = usePreset()
+    const featureDisplayConfig = useFeatureDisplayConfig()
     const sidebar = useSidebar()
     const { show: showConfirmation } = useConfirmationPopup()
 
@@ -140,7 +142,15 @@ export const buildSettingsSections = () => {
         )
     }
 
-    return formattedSections.map(
+    return formattedSections
+        .filter(({ required_plan }) => {
+            if (!required_plan) {
+                return true
+            }
+
+            return !featureDisplayConfig.hide_fields
+        })
+        .map(
         ({ id, icon, title, description, required_plan }) => {
             return (
                 <div

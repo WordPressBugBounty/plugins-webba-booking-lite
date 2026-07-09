@@ -47,6 +47,7 @@ class WBK_Assets_Manager
             'wbk-connected-calendars',
             'wbk-pricing-rules',
             'wbk-dashboard',
+            ...(wbk_is_assistance_lab_available() ? ['wbk-assistance-lab'] : []),
             'wbk-spa',
             'wbk-locations',
             'wbk-staff-members',
@@ -91,6 +92,21 @@ class WBK_Assets_Manager
                             $item[5],
                             true
                         );
+
+                        if (
+                            $item[2] === 'wbk-react-assistance-lab' &&
+                            wbk_is_assistance_lab_available()
+                        ) {
+                            wp_localize_script(
+                                'wbk-react-assistance-lab',
+                                'wbkAssistanceLabConfig',
+                                [
+                                    'resetAllowed' =>
+                                        class_exists('WBK_Reset_All_Data') &&
+                                        WBK_Reset_All_Data::current_user_can_reset(),
+                                ]
+                            );
+                        }
                     }
                 }
             }
@@ -216,11 +232,16 @@ class WBK_Assets_Manager
             'wbk-locations',
             'wbk-staff-members',
             'wbk-options',
+            ...(wbk_is_assistance_lab_available() ? ['wbk-assistance-lab'] : []),
         ];
 
         if (isset($_GET['page']) && in_array($_GET['page'], $admin_pages)) {
+            $script_handle = $_GET['page'] === 'wbk-assistance-lab'
+                ? 'wbk-react-assistance-lab'
+                : 'wbk-react-admin';
+
             $res = wp_set_script_translations(
-                'wbk-react-admin',
+                $script_handle,
                 'webba-booking-lite',
                 WP_WEBBA_BOOKING__PLUGIN_DIR . '/' . 'languages/'
             );

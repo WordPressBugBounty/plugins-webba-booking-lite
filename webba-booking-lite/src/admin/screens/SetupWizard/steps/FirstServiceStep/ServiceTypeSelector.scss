@@ -1,0 +1,96 @@
+.wbk_serviceTypeSelector {
+    margin-bottom: 24px;
+}
+
+.wbk_serviceTypeSelector__label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin: 0 0 12px;
+}
+
+.wbk_serviceTypeSelector__options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.wbk_serviceTypeSelector__option {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s ease, background 0.2s ease;
+
+    &:hover:not(:disabled) {
+        border-color: #14b8a9;
+        background: #f0fdfc;
+    }
+
+    &--active {
+        border-color: #14b8a9;
+        background: #f0fdfc;
+        box-shadow: 0 0 0 1px #14b8a9;
+    }
+
+    &--locked {
+        cursor: not-allowed;
+        background: #f9fafb;
+
+        &:hover {
+            border-color: #d1d5db;
+            background: #f9fafb;
+        }
+    }
+}
+
+.wbk_serviceTypeSelector__optionHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+}
+
+.wbk_serviceTypeSelector__proBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #6b7280;
+    text-decoration: none;
+    border-radius: 4px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+
+    &:hover {
+        color: #14b8a9;
+        border-color: #14b8a9;
+    }
+}
+
+.wbk_serviceTypeSelector__proBadgeIcon {
+    width: 12px;
+    height: 12px;
+}
+
+.wbk_serviceTypeSelector__optionTitle {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.wbk_serviceTypeSelector__optionDescription {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #6b7280;
+}

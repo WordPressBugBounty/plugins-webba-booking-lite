@@ -77,6 +77,10 @@ export interface ResolvedFormField {
     label?: string
     subsection?: string | null
     required_plan?: string
+    available_in_old_free?: boolean
+    dependency?: string[][]
+    hide?: string[][]
+    description?: string
 }
 
 export type FormSections = {

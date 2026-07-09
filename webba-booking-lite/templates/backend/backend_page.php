@@ -9,6 +9,9 @@ $container_extra_class = "";
 if (isset($_GET["wbk-activation"])) {
     $container_extra_class = " mail-block-wb-wizard ";
 }
+if (isset($_GET["Assistance"]) && $_GET["Assistance"] === "true") {
+    $container_extra_class = " mail-block-wb-assistance ";
+}
 
 if (isset($_GET["test"])) {
     update_option("wbk_quantity_fields", [
@@ -121,13 +124,15 @@ if (isset($_GET["test"])) {
             break;
 
         case "wbk-options":
-            $services = WBK_Model_Utils::get_service_ids();
-            if (isset($_GET["wbk-activation"])) {
-                WBK_Renderer::load_template("backend/react_app", [], true);
-            } else {
-                WBK_Renderer::load_template("backend/react_app", [], true);
+            if (
+                isset($_GET["Assistance"]) &&
+                $_GET["Assistance"] === "true" &&
+                !wbk_is_assistance_available()
+            ) {
+                wp_safe_redirect(admin_url("admin.php?page=wbk-dashboard"));
+                exit();
             }
-
+            WBK_Renderer::load_template("backend/react_app", [], true);
             break;
         case "wbk-form-builder":
             WBK_Renderer::load_template("backend/react_app", [], true);
@@ -152,7 +157,13 @@ if (isset($_GET["test"])) {
         case "wbk-staff-members":
             WBK_Renderer::load_template("backend/react_app", [], true);
             break;
-
+        case "wbk-assistance-lab":
+            if (!wbk_is_assistance_lab_available()) {
+                wp_safe_redirect(admin_url("admin.php?page=wbk-dashboard"));
+                exit();
+            }
+            WBK_Renderer::load_template("backend/react_app", [], true);
+            break;
         default:
             break;
     }

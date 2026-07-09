@@ -40,7 +40,7 @@ const LandingPageInner = ({ token, token_type, action }: ILandingPageProps) => {
     const [buttonError, setButtonError] = useState<string | null>(null)
     const { preset, timezone, userTimezone, priceFormat } = useBookingContext()
     const settings = preset?.settings
-    const iCalRequiredPlans = ['pro', 'premium']
+    const iCalRequiredPlans = ['pro', 'premium', 'proextended']
     const isIcalAvailable = useMemo(() => {
         if (!preset?.plan_map) return false
 

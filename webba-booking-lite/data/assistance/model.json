@@ -1,0 +1,2300 @@
+{
+  "source": "webba-booking",
+  "description": "Aggregated WbkData models (11 tables, 155 fields)",
+  "sourceFile": "../source/site/wp-content/plugins/webba-booking/includes/data/class-wbk-model.php",
+  "generatedAt": "2026-06-09T13:55:31.797Z",
+  "models": [
+    {
+      "table": "wbk_connected_calendars",
+      "singleName": "Connected calendar",
+      "multipleName": "Connected calendars",
+      "sections": {
+        "general": "General",
+        "advanced": "Advanced"
+      },
+      "fields": [
+        {
+          "name": "provider",
+          "title": "Calendar provider",
+          "type": "radio",
+          "extra": {
+            "tooltip": "Select the calendar provider to connect (Google Calendar or Microsoft Outlook).",
+            "options": [
+              {
+                "value": "google",
+                "title": "Google Calendar",
+                "icon": "icon-google.svg",
+                "required_plan": "start"
+              },
+              {
+                "value": "outlook",
+                "title": "Microsoft/Outlook",
+                "icon": "icon-microsoft.svg",
+                "required_plan": "premium"
+              }
+            ],
+            "radio_type": "icon"
+          },
+          "defaultValue": "google",
+          "required": true
+        },
+        {
+          "name": "name",
+          "title": "Calendar name (internal use only)",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter a name to identify the calendar."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "easy_auth",
+          "title": "Automatic authorization (recommended)",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Enabled",
+            "tooltip": "Enable easy authorization for this calendar (recommended)",
+            "hidden": true
+          },
+          "defaultValue": "yes",
+          "required": false
+        },
+        {
+          "name": "user_id",
+          "title": "User",
+          "type": "select",
+          "extra": {
+            "tooltip": "Enter a name to identify the calendar.",
+            "items": [],
+            "options": "backend"
+          },
+          "defaultValue": 0,
+          "required": false
+        },
+        {
+          "name": "in_provider_id",
+          "title": "Calendar in Provider Account",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select calendar from the auhtorized account.",
+            "enable": {
+              "endpoint": "get-calendar-auth-data",
+              "data": {
+                "calendar_id": "id"
+              },
+              "conditions": [
+                {
+                  "operator": "=",
+                  "value": true,
+                  "field": "isAuthenticated"
+                }
+              ]
+            },
+            "hide": [
+              [
+                "id",
+                ">",
+                "0"
+              ]
+            ],
+            "options": "backend"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "mode",
+          "title": "Mode",
+          "type": "radio",
+          "extra": {
+            "tooltip": "Choose the calendar connection mode",
+            "items": "WBK_Model_Utils::get_connected_calendar_modes()",
+            "options": "WBK_Model_Utils::get_connected_calendar_modes()",
+            "default_value": "Two-ways",
+            "description": "__(\n                    '<strong>One-way (import):</strong> This mode will import all unavailable times from your Connected Calendar to Webba Calendar. No meeting data is imported, only the time slots.<br><br>\n                    <strong>One-way (export):</strong> This mode will automatically add Webba bookings to your Connected Calendar, but will not check availability of your Connected Calendar (risk of double-booking).<br><br>\n                    <strong>Two-ways (recommended):</strong> This mode will both import unavailable times from Connected Calendar to Webba Calendar and add Webba bookings to your Connected Calendar.<br><br>',\n                    \"webba-booking-lite\",\n                )",
+            "radio_type": "dots"
+          },
+          "defaultValue": "Two-ways",
+          "required": true
+        },
+        {
+          "name": "access_token",
+          "title": "Authorization",
+          "type": "wbk_google_access_token",
+          "extra": {
+            "tooltip": "Authorization status for the connected calendar account.",
+            "hidden": true
+          },
+          "defaultValue": "general",
+          "required": false
+        }
+      ]
+    },
+    {
+      "table": "wbk_coupons",
+      "singleName": "Coupon",
+      "multipleName": "Coupons",
+      "sections": {},
+      "fields": [
+        {
+          "name": "name",
+          "title": "Coupon",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter a coupon code."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "date_range",
+          "title": "Available on",
+          "type": "date_range",
+          "extra": {
+            "tooltip": "Enter a coupon code.",
+            "time_zone": "get_option(\"wbk_timezone\", \"UTC\")"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "services",
+          "title": "Services",
+          "type": "select",
+          "extra": {
+            "tooltip": "Enter a coupon code.",
+            "items": "WBK_Model_Utils::get_services()",
+            "multiple": true,
+            "options": "services"
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "maximum",
+          "title": "Usage limit",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter a coupon code.",
+            "sub_type": "none_negative_integer"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "used",
+          "title": "Used",
+          "type": "text",
+          "extra": {
+            "tooltip": "Number of times this coupon has been used.",
+            "sub_type": "positive_integer"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "amount_fixed",
+          "title": "Discount (fixed)",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter a coupon code.",
+            "sub_type": "none_negative_float"
+          },
+          "defaultValue": "0",
+          "required": true
+        },
+        {
+          "name": "amount_percentage",
+          "title": "Discount (percentage)",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter a coupon code.",
+            "sub_type": "none_negative_float"
+          },
+          "defaultValue": "100",
+          "required": true
+        }
+      ]
+    },
+    {
+      "table": "wbk_email_templates",
+      "singleName": "Email notification",
+      "multipleName": "Email notifications",
+      "sections": {},
+      "fields": [
+        {
+          "name": "name",
+          "title": "Name (internal use)",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter a name to identify the email template.",
+            "disable_condition": {
+              "is_default": "yes"
+            }
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "enabled",
+          "title": "Enabled",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Enter a name to identify the email template."
+          },
+          "defaultValue": "yes",
+          "required": false
+        },
+        {
+          "name": "is_default",
+          "title": "Default",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Enter a name to identify the email template."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "type",
+          "title": "Trigger",
+          "type": "select",
+          "extra": {
+            "tooltip": "Choose a trigger when email template is sent.",
+            "multiple": false,
+            "options": "backend",
+            "items": "WBK_Model_Utils::get_notification_types()",
+            "disable_condition": {
+              "is_default": "yes"
+            }
+          },
+          "defaultValue": null,
+          "required": true
+        },
+        {
+          "name": "recipients",
+          "title": "Recipients",
+          "type": "multicheckbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Set who receive this email",
+            "options": {
+              "admin": "Administrator(s)",
+              "customer": "Customer",
+              "group": "Group Users"
+            }
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "subject",
+          "title": "Email subject line",
+          "type": "text",
+          "extra": {
+            "tooltip": "Subject of the email"
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "template",
+          "title": "Email Body",
+          "type": "editor",
+          "extra": {
+            "tooltip": "Subject of the email",
+            "placeholders": true
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "pdf_attachment",
+          "title": "PDF Attachment",
+          "type": "editor",
+          "extra": {
+            "tooltip": "Subject of the email",
+            "placeholders": true,
+            "pro_version": true,
+            "required_plan": "premium"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "calendar_event",
+          "title": "Attach iCal file",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Use the text editor to prepare the email template.",
+            "pro_version": true,
+            "required_plan": "premium"
+          },
+          "defaultValue": "yes",
+          "required": false
+        },
+        {
+          "name": "use_for_all_services",
+          "title": "Use this template for all services",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Use the text editor to prepare the email template."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "services",
+          "title": "Hourly services",
+          "type": "select",
+          "extra": {
+            "tooltip": "Use the text editor to prepare the email template.",
+            "items": "WBK_Model_Utils::get_services()",
+            "options": "services",
+            "multiple": true
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "units",
+          "title": "Daily services",
+          "type": "select",
+          "extra": {
+            "tooltip": "Use the text editor to prepare the email template.",
+            "items": "WBK_Model_Utils::get_units()",
+            "options": "units",
+            "multiple": true
+          },
+          "defaultValue": null,
+          "required": false
+        }
+      ]
+    },
+    {
+      "table": "wbk_extras",
+      "singleName": "Extra",
+      "multipleName": "Extras",
+      "sections": {
+        "details": "Details",
+        "pricing": "Pricing"
+      },
+      "fields": [
+        {
+          "name": "image",
+          "title": "Photo",
+          "type": "file",
+          "extra": {
+            "tooltip": "__(\n                    'Upload main service image which will show up in the booking form. Leave empty if you don\\'t want to show any image.',\n                    \"webba-booking-lite\",\n                )",
+            "required_plan": "premium"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "name",
+          "title": "Extra name",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter a name for this extra.",
+            "required_plan": "premium"
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "description",
+          "title": "Description",
+          "type": "editor",
+          "extra": {
+            "tooltip": "Enter a description of the extra.",
+            "required_plan": "premium"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "min_quantity",
+          "title": "Min / max items per booking",
+          "type": "limitation",
+          "extra": {
+            "tooltip": "Set the minimum and maximum number of this extra a customer can add in one booking. For example, enter 2 in the minimum if they must take at least two, or set maximum to cap how many they may select.",
+            "min_field": "min_quantity",
+            "max_field": "max_quantity",
+            "required_plan": "premium"
+          },
+          "defaultValue": "1",
+          "required": true
+        },
+        {
+          "name": "max_quantity",
+          "title": "Maximum quantity of this extra",
+          "type": "text",
+          "extra": {
+            "tooltip": "Upper limit on how many of this extra a customer can choose in a single booking.",
+            "sub_type": "positive_integer",
+            "hidden": true,
+            "required_plan": "premium"
+          },
+          "defaultValue": "1",
+          "required": true
+        },
+        {
+          "name": "services",
+          "title": "Hourly Services / Rentals",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select the services where this extra is available.",
+            "options": "services",
+            "multiple": true
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "units",
+          "title": "Daily Services / Rentals",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select the services where this extra is available.",
+            "options": "units",
+            "multiple": true
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "price",
+          "title": "Price per item",
+          "type": "text",
+          "extra": {
+            "tooltip": "$tooltip",
+            "sub_type": "none_negative_float",
+            "required_plan": "premium"
+          },
+          "defaultValue": "0",
+          "required": false
+        }
+      ]
+    },
+    {
+      "table": "wbk_forms",
+      "singleName": "Form",
+      "multipleName": "Forms",
+      "sections": {
+        "general": "General"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "title": "Form name",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter form name."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "fields",
+          "title": "Fields",
+          "type": "wbk_form_fields",
+          "extra": {
+            "tooltip": "Configure the custom fields that customers fill out during booking."
+          },
+          "defaultValue": [],
+          "required": false
+        }
+      ]
+    },
+    {
+      "table": "wbk_locations",
+      "singleName": "Location",
+      "multipleName": "Locations",
+      "sections": {
+        "general": "General"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "title": "Name",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter location name."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "description",
+          "title": "Description",
+          "type": "editor",
+          "extra": {
+            "tooltip": "Enter a description of the location."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "address",
+          "title": "Address",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter address."
+          },
+          "defaultValue": "",
+          "required": false
+        }
+      ]
+    },
+    {
+      "table": "wbk_pricing_rules",
+      "singleName": "Pricing rule",
+      "multipleName": "Pricing rules",
+      "sections": {},
+      "fields": [
+        {
+          "name": "name",
+          "title": "Name",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter a name to identify the pricing rule."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "priority",
+          "title": "Priority",
+          "type": "select",
+          "extra": {
+            "tooltip": "Enter a name to identify the pricing rule.",
+            "options": {
+              "1": "low",
+              "10": "medium",
+              "20": "high"
+            }
+          },
+          "defaultValue": 1,
+          "required": true
+        },
+        {
+          "name": "type",
+          "title": "Type",
+          "type": "select",
+          "extra": {
+            "tooltip": "Enter a name to identify the pricing rule.",
+            "options": {
+              "date_range": "Price for date range",
+              "early_booking": "Price for early booking",
+              "custom_field": "Price based on custom field value",
+              "day_of_week_and_time": "Price for day of week and time range",
+              "number_of_seats": "Price based on number of seats booked",
+              "number_of_timeslots": "Price based on number of timeslots booked"
+            }
+          },
+          "defaultValue": null,
+          "required": true
+        },
+        {
+          "name": "date_range",
+          "title": "Date range",
+          "type": "date_range",
+          "extra": {
+            "tooltip": "Define the date range during which this pricing rule applies.",
+            "time_zone": "get_option(\"wbk_timezone\", \"UTC\")"
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "days_number",
+          "title": "Minimum number of days before the booked date",
+          "type": "text",
+          "extra": {
+            "tooltip": "Minimum number of days before the booked date required for early booking discount.",
+            "sub_type": "positive_integer"
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "custom_field_id",
+          "title": "Custom field ID",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter the ID of the custom form field to match."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "custom_field_operator",
+          "title": "Operator",
+          "type": "radio",
+          "extra": {
+            "tooltip": "Choose how to compare the custom field value.",
+            "options": {
+              "equals": "equals",
+              "more_than": "more than",
+              "less_than": "less than"
+            }
+          },
+          "defaultValue": "equals",
+          "required": true
+        },
+        {
+          "name": "custom_field_value",
+          "title": "Custom field value",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter the value to compare against the custom field."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "number_of_seats_operator",
+          "title": "Operator",
+          "type": "radio",
+          "extra": {
+            "tooltip": "Choose how to compare the number of seats booked.",
+            "options": {
+              "equals": "equals",
+              "more_than": "more than",
+              "less_than": "less than"
+            }
+          },
+          "defaultValue": "equals",
+          "required": true
+        },
+        {
+          "name": "number_of_seats_value",
+          "title": "Number of seats",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter the number of seats to compare against."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "number_of_timeslots_operator",
+          "title": "Operator",
+          "type": "radio",
+          "extra": {
+            "tooltip": "Choose how to compare the number of timeslots booked.",
+            "options": {
+              "equals": "equals",
+              "more_than": "more than",
+              "less_than": "less than"
+            }
+          },
+          "defaultValue": "equals",
+          "required": true
+        },
+        {
+          "name": "number_of_timeslots_value",
+          "title": "Number of timeslots",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter the number of timeslots to compare against."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "only_same_service",
+          "title": "Only timeslots in the same service",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Enter a name to identify the pricing rule."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "day_time",
+          "title": "Day of week and time range",
+          "type": "wbk_business_hours",
+          "extra": {
+            "tooltip": "Select the days of the week and time range for this pricing rule."
+          },
+          "defaultValue": [],
+          "required": false
+        },
+        {
+          "name": "action",
+          "title": "Action",
+          "type": "radio",
+          "extra": {
+            "tooltip": "Choose whether to increase, reduce, or replace the service price.",
+            "options": {
+              "increase": "increase",
+              "reduce": "reduce",
+              "replace": "replace"
+            }
+          },
+          "defaultValue": "increase",
+          "required": true
+        },
+        {
+          "name": "amount",
+          "title": "Amount",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter a name to identify the pricing rule.",
+            "sub_type": "none_negative_float"
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "fixed_percent",
+          "title": "Fixed / percent",
+          "type": "radio",
+          "extra": {
+            "tooltip": "Choose whether the amount is a fixed value or a percentage.",
+            "options": {
+              "fixed": "fixed",
+              "percent": "percent"
+            }
+          },
+          "defaultValue": "fixed",
+          "required": true
+        },
+        {
+          "name": "multiply_amount",
+          "title": "Multiply amount by the field value",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Multiply the rule amount by the custom field value."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "related_to_seats_number",
+          "title": "The field is related to the number of seats booked",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Enable if the custom field value represents the number of seats booked."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "is_for_entire_order",
+          "title": "Apply the pricing rule to the entire order instead of individual time slots.",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Apply the pricing rule to the entire order instead of individual time slots."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "name",
+          "title": "Name",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter form name."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "fields",
+          "title": "Fields",
+          "type": "text",
+          "extra": {
+            "tooltip": "Configure the custom fields that customers fill out during booking."
+          },
+          "defaultValue": "",
+          "required": false
+        }
+      ]
+    },
+    {
+      "table": "wbk_service_categories",
+      "singleName": "Category",
+      "multipleName": "Categories",
+      "sections": {
+        "name": "Category name",
+        "category_list": "Services",
+        "category_units": "Units"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "title": "Category name",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter category name."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "list",
+          "title": "Services",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select the services to be included in this category.",
+            "items": "WBK_Model_Utils::get_services()",
+            "options": "services",
+            "multiple": true
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "units",
+          "title": "Units",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select the units to be included in this category.",
+            "items": "WBK_Model_Utils::get_units()",
+            "options": "units",
+            "multiple": true,
+            "required_plan": "premium"
+          },
+          "defaultValue": null,
+          "required": false
+        }
+      ]
+    },
+    {
+      "table": "wbk_services",
+      "singleName": "Service",
+      "multipleName": "Services",
+      "sections": {
+        "details": "Details",
+        "availability": "Availability",
+        "pricing": "Pricing",
+        "integrations": "Integrations",
+        "recurring_booking": "Recurring booking",
+        "settings": "Settings"
+      },
+      "fields": [
+        {
+          "name": "image",
+          "title": "Service image",
+          "type": "file",
+          "extra": {
+            "tooltip": "__(\n                    'Upload main service image which will show up in the booking form. Leave empty if you don\\'t want to show any image.',\n                    \"webba-booking-lite\",\n                )",
+            "required_plan": "start"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "name",
+          "title": "Service name",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter service name."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "categories",
+          "title": "Categories (optional)",
+          "type": "select",
+          "extra": {
+            "tooltip": "Assign categories",
+            "options": "service_categories",
+            "multiple": true
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "description",
+          "title": "Description",
+          "type": "editor",
+          "extra": {
+            "tooltip": "Enter a description of the service."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "override_email",
+          "title": "Override main notifications email(s)",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Override if you want to use different notification email addresses for this service compared to global setting, set in Notifications Settings."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "email",
+          "title": "Email address(es)",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter the email address, use comma to add multiple.",
+            "sub_type": "email",
+            "hide": [
+              [
+                "override_email",
+                "=",
+                "yes"
+              ]
+            ],
+            "dependent_value": {
+              "condition": [
+                "override_email",
+                "!=",
+                "yes"
+              ],
+              "value": ""
+            }
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "form_builder",
+          "title": "Booking form",
+          "type": "select",
+          "extra": {
+            "tooltip": "__(\n                    'Choose which form customers will see when booking this service. Keep the default Webba Form, or create one in \\'Form Builder\\' and select it here.',\n                    \"webba-booking-lite\",\n                )",
+            "options": "forms",
+            "required_plan": "standard",
+            "// TIER 2\n                \"null_value\"": {
+              "0": "Default Form"
+            }
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "duration",
+          "title": "Duration",
+          "type": "duration",
+          "extra": {
+            "tooltip": "Enter the duration of each booking.",
+            "sub_type": "duration"
+          },
+          "defaultValue": "30",
+          "required": true
+        },
+        {
+          "name": "interval_between",
+          "title": "Buffer time",
+          "type": "duration",
+          "extra": {
+            "tooltip": "__(\n                    'Time automatically added between bookings to avoid back-to-back sessions. Use it in case you need time for preparation, cleaning etc. Note: old setting name \"Gap\".',\n                    \"webba-booking-lite\",\n                )",
+            "sub_type": "duration"
+          },
+          "defaultValue": "0",
+          "required": true
+        },
+        {
+          "name": "prepare_time",
+          "title": "Notice time before booking",
+          "type": "duration",
+          "extra": {
+            "tooltip": "__(\n                    'Minimum time before the start of a slot that a customer must book (e.g., \"must book at least 3 hours in advance\"). Used to be called Preparation time.',\n                    \"webba-booking-lite\",\n                )",
+            "sub_type": "duration"
+          },
+          "defaultValue": "0",
+          "required": true
+        },
+        {
+          "name": "min_quantity",
+          "title": "Group Size Limits",
+          "type": "limitation",
+          "extra": {
+            "tooltip": "__(\n                    'Set the minimum and maximum number of spots a single customer can reserve in one transaction. E.g. if you require minimum 4 spots for a slot to be booked, enter 4 in the \"min\" field.',\n                    \"webba-booking-lite\",\n                )",
+            "min_field": "min_quantity",
+            "max_field": "max_quantity",
+            "required_plan": "standard"
+          },
+          "defaultValue": "1",
+          "required": true
+        },
+        {
+          "name": "max_quantity",
+          "title": "Maximum Capacity Per Slot",
+          "type": "text",
+          "extra": {
+            "tooltip": "Set the maximum number of spots available for this service per time slot. Once this limit is reached, the slot will close for everyone.",
+            "sub_type": "positive_integer",
+            "hidden": true,
+            "required_plan": "standard"
+          },
+          "defaultValue": "1",
+          "required": true
+        },
+        {
+          "name": "quantity",
+          "title": "Total Slot Capacity",
+          "type": "text",
+          "extra": {
+            "tooltip": "Set the maximum number of spots available for this service per time slot. Once this limit is reached, the slot will close for everyone.",
+            "sub_type": "positive_integer",
+            "required_plan": "standard"
+          },
+          "defaultValue": "1",
+          "required": true
+        },
+        {
+          "name": "override_availability",
+          "title": "Override global availability",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Enable this only if the service needs its own working hours. Otherwise, it will use your global working hours set in Global Availability settings."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "business_hours",
+          "title": "Set custom availability",
+          "type": "wbk_business_hours",
+          "extra": {
+            "tooltip": "$tooltip",
+            "hide": [
+              [
+                "override_availability",
+                "=",
+                "yes"
+              ]
+            ]
+          },
+          "defaultValue": [
+            {
+              "start": 32400,
+              "end": 46800,
+              "day_of_week": "1",
+              "status": "active"
+            },
+            {
+              "start": 50400,
+              "end": 64800,
+              "day_of_week": "1",
+              "status": "active"
+            },
+            {
+              "start": 32400,
+              "end": 46800,
+              "day_of_week": "2",
+              "status": "active"
+            },
+            {
+              "start": 50400,
+              "end": 64800,
+              "day_of_week": "2",
+              "status": "active"
+            },
+            {
+              "start": 32400,
+              "end": 46800,
+              "day_of_week": "3",
+              "status": "active"
+            },
+            {
+              "start": 50400,
+              "end": 64800,
+              "day_of_week": "3",
+              "status": "active"
+            },
+            {
+              "start": 32400,
+              "end": 46800,
+              "day_of_week": "4",
+              "status": "active"
+            },
+            {
+              "start": 50400,
+              "end": 64800,
+              "day_of_week": "4",
+              "status": "active"
+            },
+            {
+              "start": 32400,
+              "end": 46800,
+              "day_of_week": "5",
+              "status": "active"
+            },
+            {
+              "start": 50400,
+              "end": 64800,
+              "day_of_week": "5",
+              "status": "active"
+            }
+          ],
+          "required": false
+        },
+        {
+          "name": "override_specific_days",
+          "title": "Override global availability for specific days only",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Choose dates where this service should follow a different schedule than normal. Perfect for holidays, special events, or temporary changes.",
+            "required_plan": "standard"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "availability_exceptions",
+          "title": "Set availability exceptions",
+          "type": "date_range",
+          "extra": {
+            "tooltip": "__(\n                    'Choose dates where this service should follow a different schedule than normal. Perfect for holidays, special events, or temporary changes. Moved from Booking Rules, used to be \"Special Hours\".',\n                    \"webba-booking-lite\",\n                )",
+            "hide": [
+              [
+                "override_specific_days",
+                "=",
+                "yes"
+              ]
+            ],
+            "date_format": "$date_format",
+            "time_zone": "get_option(\"wbk_timezone\", \"UTC\")",
+            "required_plan": "standard"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "date_range",
+          "title": "Limit availability to specific date range",
+          "type": "date_range",
+          "extra": {
+            "tooltip": "$tooltip",
+            "date_format": "$date_format",
+            "time_zone": "get_option(\"wbk_timezone\", \"UTC\")",
+            "required_plan": "start",
+            "// TIER 1\n                \"available_in_old_free\"": true
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "override_step",
+          "title": "Override global timeslot intervals (step)",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Enable this to override the global time slot interval setting for this service."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "step",
+          "title": "Time slot interval (step)",
+          "type": "select_custom",
+          "extra": {
+            "tooltip": "$tooltip",
+            "options": "WBK_Date_Time_Utils::get_supported_step_formats()",
+            "hide": [
+              [
+                "override_step",
+                "=",
+                "yes"
+              ]
+            ]
+          },
+          "defaultValue": "duration",
+          "required": false
+        },
+        {
+          "name": "limited_timeslot",
+          "title": "Require customers to book several time slots",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "When enabled, customers will be required to book more than 1 time slot",
+            "required_plan": "standard",
+            "// TIER 2\n                \"available_in_old_free\"": true
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "multi_mode_low_limit",
+          "title": "Minimum Slots Per Booking",
+          "type": "limitation",
+          "extra": {
+            "sub_type": "none_negative_integer",
+            "tooltip": "Minimum number of time slots required to make a booking.",
+            "hide": [
+              [
+                "limited_timeslot",
+                "=",
+                "yes"
+              ]
+            ],
+            "min_field": "multi_mode_low_limit",
+            "max_field": "multi_mode_limit",
+            "required_plan": "standard"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "multi_mode_limit",
+          "title": "Maximum Slots Per Booking",
+          "type": "text",
+          "extra": {
+            "sub_type": "none_negative_integer",
+            "tooltip": "Maximum number of time slots allowed to make a booking.",
+            "hide": [
+              [
+                "limited_timeslot",
+                "=",
+                "yes"
+              ]
+            ],
+            "hidden": true,
+            "required_plan": "standard"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "consecutive_timeslots",
+          "title": "Require consecutive time slots",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Customers must book continuous back-to-back time slots for longer sessions.",
+            "hide": [
+              [
+                "limited_timeslot",
+                "=",
+                "yes"
+              ]
+            ],
+            "required_plan": "standard"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "price",
+          "title": "Price",
+          "type": "text",
+          "extra": {
+            "tooltip": "$tooltip",
+            "sub_type": "none_negative_float"
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "hide_price",
+          "title": "Do not show price",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "__(\n                    'If you don\\'t want to show price, turn this on.',\n                    \"webba-booking-lite\",\n                )",
+            "required_plan": "start"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "enable_deposit",
+          "title": "Take deposit instead of full payment",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Let customers pay only part of the price now and the rest later.",
+            "required_plan": "premium",
+            "// TIER 3\n                \"available_in_old_free\"": false
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "deposit_amount",
+          "title": "Deposit amount",
+          "type": "text",
+          "extra": {
+            "tooltip": "__(\n                    'How much the customer pays now when booking. You\\'ll collect the remaining amount manually.',\n                    \"webba-booking-lite\",\n                )",
+            "sub_type": "none_negative_float",
+            "hide": [
+              [
+                "enable_deposit",
+                "=",
+                "yes"
+              ]
+            ],
+            "dependent_value": {
+              "condition": [
+                "enable_deposit",
+                "!=",
+                "yes"
+              ],
+              "value": "0"
+            },
+            "required_plan": "premium",
+            "// TIER 3\n                \"available_in_old_free\"": false
+          },
+          "defaultValue": "0",
+          "required": true
+        },
+        {
+          "name": "locations",
+          "title": "Locations",
+          "type": "select",
+          "extra": {
+            "tooltip": "$tooltip",
+            "options": "locations",
+            "multiple": true,
+            "required_plan": "premium"
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "extras",
+          "title": "Extras",
+          "type": "select",
+          "extra": {
+            "tooltip": "$tooltip",
+            "options": "extras",
+            "multiple": true,
+            "required_plan": "premium"
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "duration",
+          "title": "Duration",
+          "type": "text",
+          "extra": {
+            "sub_type": "positive_integer",
+            "tooltip": "Select the days and time intervals when this service is available for booking."
+          },
+          "defaultValue": "30",
+          "required": true
+        },
+        {
+          "name": "prepare_time",
+          "title": "Preparation time (minutes)",
+          "type": "text",
+          "extra": {
+            "sub_type": "none_negative_integer",
+            "tooltip": "Select the days and time intervals when this service is available for booking."
+          },
+          "defaultValue": "0",
+          "required": true
+        },
+        {
+          "name": "interval_between",
+          "title": "Gap (minutes)",
+          "type": "text",
+          "extra": {
+            "tooltip": "Select the days and time intervals when this service is available for booking.",
+            "sub_type": "none_negative_integer"
+          },
+          "defaultValue": "0",
+          "required": true
+        },
+        {
+          "name": "step",
+          "title": "Step (minutes)",
+          "type": "text",
+          "extra": {
+            "tooltip": "Select the days and time intervals when this service is available for booking.",
+            "sub_type": "positive_integer"
+          },
+          "defaultValue": "30",
+          "required": true
+        },
+        {
+          "name": "notification_template",
+          "title": "__('\\'On Booking\\' notification template (customer)', \"webba-booking-lite\")",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select the days and time intervals when this service is available for booking.",
+            "options": "email_templates",
+            "null_value": {
+              "0": "Default"
+            }
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "reminder_template",
+          "title": "Reminder notification template",
+          "type": "select",
+          "extra": {
+            "tooltip": "webba-booking-lite",
+            "items": "WBK_Model_Utils::get_email_templates()",
+            "null_value": {
+              "0": "Default"
+            },
+            "options": "email_templates"
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "invoice_template",
+          "title": "Invoice notification template",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select a template for invoices.",
+            "items": "WBK_Model_Utils::get_email_templates()",
+            "null_value": {
+              "0": "Default"
+            },
+            "options": "email_templates"
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "booking_changed_template",
+          "title": "Booking changes template",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select a template for booking changes notifications.",
+            "items": "WBK_Model_Utils::get_email_templates()",
+            "null_value": {
+              "0": "Default"
+            },
+            "options": "email_templates"
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "arrived_template",
+          "title": "__('Status \"arrived\" template', \"webba-booking-lite\")",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select a template for booking changes notifications.",
+            "items": "WBK_Model_Utils::get_email_templates()",
+            "null_value": {
+              "0": "Default"
+            },
+            "options": "email_templates"
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "payment_methods",
+          "title": "Payment methods",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select a template for booking changes notifications.",
+            "multiple": true,
+            "options": "backend",
+            "items": "$payment_methods",
+            "description": "IMPORTANT! For Google Pay/Apple pay and Other Payment Methods to work you have to activate them in your Stripe account"
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "show_from_label",
+          "title": "__('Show \"from\" label next to the price', \"webba-booking-lite\")",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "__(\n                    'Add label \"from\" if the final price depends on different pricing rules and choices in the later steps.',\n                    \"webba-booking-lite\",\n                )",
+            "required_plan": "premium"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "enable_service_fee",
+          "title": "Enable service fee",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Select a template for booking changes notifications.",
+            "required_plan": "premium"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "service_fee",
+          "title": "Service fee amount",
+          "type": "text",
+          "extra": {
+            "tooltip": "The extra fee that will be added to every booking for this service.",
+            "sub_type": "none_negative_float",
+            "hide": [
+              [
+                "enable_service_fee",
+                "=",
+                "yes"
+              ]
+            ],
+            "dependent_value": {
+              "condition": [
+                "enable_service_fee",
+                "!=",
+                "yes"
+              ],
+              "value": "0"
+            },
+            "required_plan": "premium"
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "pricing_rules",
+          "title": "Apply pricing rules (advanced)",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select a template for booking changes notifications.",
+            "items": "WBK_Model_Utils::get_pricing_rules()",
+            "options": "pricing_rules",
+            "multiple": true,
+            "required_plan": "premium",
+            "// TIER 3\n                \"available_in_old_free\"": true
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "woo_product",
+          "title": "WooCommerce product ID",
+          "type": "select",
+          "extra": {
+            "tooltip": "Set ID of the product associated with this service. Set only if WooCommerce is used as payment method.",
+            "sub_type": "none_negative_integer",
+            "pro_version": true,
+            "required_plan": "standard",
+            "// TIER 2\n                \"options\"": "backend"
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "connected_calendars",
+          "title": "Connect calendar",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select a template for booking changes notifications.",
+            "multiple": true,
+            "options": "connected_calendars",
+            "required_plan": "start"
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "extcalendar",
+          "title": "External Calendar (ICS)",
+          "type": "textarea",
+          "extra": {
+            "tooltip": "Select a template for booking changes notifications.",
+            "pro_version": true,
+            "required_plan": "premium"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "extcalendar_group_mode",
+          "title": "External calendar for group services",
+          "type": "select",
+          "extra": {
+            "tooltip": "__(\n                    'Choose how external calendar events affect group service availability: reduce the number of available places or lock the entire time slot.',\n                    \"webba-booking-lite\",\n                )",
+            "items": {
+              "reduce": "Reduce availability",
+              "lock": "Lock time slot"
+            },
+            "pro_version": true,
+            "required_plan": "premium",
+            "// TIER 3\n                \"hide\"": [
+              [
+                "quantity",
+                ">",
+                "1"
+              ],
+              [
+                "extcalendar",
+                "=",
+                ""
+              ]
+            ]
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "zoom",
+          "title": "Create Zoom meetings",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Select a template for booking changes notifications.",
+            "pro_version": true,
+            "required_plan": "premium"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "google_meet_enabled",
+          "title": "Create Google Meet meetings",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Select a template for booking changes notifications.",
+            "pro_version": true,
+            "required_plan": "premium"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "google_meet_calendar",
+          "title": "Select calendar for Google Meet events",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select a template for booking changes notifications.",
+            "options": "source:connected_calendars:connected_calendars",
+            "source_filter": [
+              [
+                "provider",
+                "=",
+                "google"
+              ]
+            ],
+            "hide": [
+              [
+                "google_meet_enabled",
+                "=",
+                "yes"
+              ]
+            ],
+            "pro_version": true,
+            "required_plan": "premium"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "recurring_booking_enabled",
+          "title": "Enable recurring booking",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "When enabled, customers can book this service as a repeating series according to the options below.",
+            "required_plan": "premium"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "recurring_intervals",
+          "title": "Allowed repeat intervals",
+          "type": "multicheckbox",
+          "extra": {
+            "tooltip": "Select which intervals customers can choose for a recurring booking.",
+            "options": {
+              "day": "Days",
+              "week": "Weeks",
+              "month": "Months"
+            },
+            "hide": [
+              [
+                "recurring_booking_enabled",
+                "=",
+                "yes"
+              ]
+            ]
+          },
+          "defaultValue": "[\"day\",\"week\",\"month\"]",
+          "required": true
+        },
+        {
+          "name": "recurring_min_appointments",
+          "title": "Minimum appointments",
+          "type": "text",
+          "extra": {
+            "sub_type": "positive_integer",
+            "tooltip": "Minimum number of appointments in a recurring series.",
+            "hide": [
+              [
+                "recurring_booking_enabled",
+                "=",
+                "yes"
+              ]
+            ]
+          },
+          "defaultValue": "2",
+          "required": true
+        },
+        {
+          "name": "recurring_max_appointments",
+          "title": "Maximum appointments",
+          "type": "text",
+          "extra": {
+            "sub_type": "positive_integer",
+            "tooltip": "Maximum number of appointments in a recurring series.",
+            "hide": [
+              [
+                "recurring_booking_enabled",
+                "=",
+                "yes"
+              ]
+            ]
+          },
+          "defaultValue": "12",
+          "required": true
+        },
+        {
+          "name": "recurring_payment_mode",
+          "title": "Payments",
+          "type": "radio",
+          "extra": {
+            "tooltip": "Choose whether payment applies to every appointment or only the first one in the series.",
+            "options": {
+              "all": "Pay for all booking",
+              "first": "Pay only for the first booking"
+            },
+            "hide": [
+              [
+                "recurring_booking_enabled",
+                "=",
+                "yes"
+              ]
+            ]
+          },
+          "defaultValue": "all",
+          "required": true
+        },
+        {
+          "name": "color",
+          "title": "Calendar color",
+          "type": "color",
+          "extra": {
+            "tooltip": "Pick a color to represent this service on Webba Calendar.",
+            "generate_random": true,
+            "generate_key": [
+              "services",
+              "color"
+            ]
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "priority",
+          "title": "Service priority",
+          "type": "text",
+          "extra": {
+            "sub_type": "none_negative_integer",
+            "tooltip": "Control the order in which this service appears in your booking form. Lower numbers appear first."
+          },
+          "defaultValue": "0",
+          "required": true
+        },
+        {
+          "name": "users",
+          "title": "Allow Staff to view and manage bookings",
+          "type": "select",
+          "extra": {
+            "items": [],
+            "multiple": true,
+            "tooltip": "Select a template for booking changes notifications.",
+            "options": "backend",
+            "required_plan": "premium"
+          },
+          "defaultValue": 0,
+          "required": false
+        },
+        {
+          "name": "users_allow_edit",
+          "title": "Allow Staff to edit service settings",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "__(\n                    'When enabled, assigned users can edit this service\\'s settings. If turned off, only admins can make changes.',\n                    \"webba-booking-lite\",\n                )",
+            "hide": [
+              [
+                "users",
+                ">",
+                "0"
+              ]
+            ],
+            "required_plan": "premium"
+          },
+          "defaultValue": "",
+          "required": false
+        }
+      ]
+    },
+    {
+      "table": "wbk_staff_members",
+      "singleName": "Staff member",
+      "multipleName": "Staff members",
+      "sections": {
+        "general": "General",
+        "hours": "Schedule"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "title": "Name",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter staff member name."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "email",
+          "title": "Email",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter staff member email address.",
+            "sub_type": "email"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "wordpress_user",
+          "title": "WordPress user",
+          "type": "select",
+          "extra": {
+            "tooltip": "Enter staff member email address.",
+            "options": "backend"
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "photo",
+          "title": "Photo",
+          "type": "file",
+          "extra": {
+            "tooltip": "Select the WordPress user associated with this staff member."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "services",
+          "title": "Services",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select the WordPress user associated with this staff member.",
+            "items": "WBK_Model_Utils::get_services()",
+            "options": "services",
+            "multiple": true
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "locations",
+          "title": "Locations",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select the services that this staff member can provide.",
+            "options": "locations",
+            "multiple": true
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "connected_calendars",
+          "title": "Connected calendars",
+          "type": "select",
+          "extra": {
+            "tooltip": "Select the services that this staff member can provide.",
+            "options": "connected_calendars",
+            "multiple": true
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "business_hours",
+          "title": "Business hours",
+          "type": "wbk_business_hours",
+          "extra": {
+            "tooltip": "Select the services that this staff member can provide."
+          },
+          "defaultValue": [
+            {
+              "start": 32400,
+              "end": 46800,
+              "day_of_week": "1",
+              "status": "active"
+            },
+            {
+              "start": 50400,
+              "end": 64800,
+              "day_of_week": "1",
+              "status": "active"
+            },
+            {
+              "start": 32400,
+              "end": 46800,
+              "day_of_week": "2",
+              "status": "active"
+            },
+            {
+              "start": 50400,
+              "end": 64800,
+              "day_of_week": "2",
+              "status": "active"
+            },
+            {
+              "start": 32400,
+              "end": 46800,
+              "day_of_week": "3",
+              "status": "active"
+            },
+            {
+              "start": 50400,
+              "end": 64800,
+              "day_of_week": "3",
+              "status": "active"
+            },
+            {
+              "start": 32400,
+              "end": 46800,
+              "day_of_week": "4",
+              "status": "active"
+            },
+            {
+              "start": 50400,
+              "end": 64800,
+              "day_of_week": "4",
+              "status": "active"
+            },
+            {
+              "start": 32400,
+              "end": 46800,
+              "day_of_week": "5",
+              "status": "active"
+            },
+            {
+              "start": 50400,
+              "end": 64800,
+              "day_of_week": "5",
+              "status": "active"
+            }
+          ],
+          "required": false
+        }
+      ]
+    },
+    {
+      "table": "wbk_units",
+      "singleName": "Unit",
+      "multipleName": "Units",
+      "sections": {
+        "general": "General",
+        "availability": "Availability",
+        "price": "Price",
+        "integrations": "Integrations"
+      },
+      "fields": [
+        {
+          "name": "name",
+          "title": "Name",
+          "type": "text",
+          "extra": {
+            "tooltip": "Enter the unit name."
+          },
+          "defaultValue": "",
+          "required": true
+        },
+        {
+          "name": "description",
+          "title": "Description",
+          "type": "editor",
+          "extra": {
+            "tooltip": "Enter a description of the unit."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "image",
+          "title": "Image",
+          "type": "file",
+          "extra": {
+            "tooltip": "Enter a description of the unit."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "locations",
+          "title": "Locations",
+          "type": "select",
+          "extra": {
+            "tooltip": "Upload an image for this unit. Leave empty if you do not want to show an image.",
+            "options": "locations",
+            "multiple": true
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "form_id",
+          "title": "Booking form",
+          "type": "select",
+          "extra": {
+            "tooltip": "Upload an image for this unit. Leave empty if you do not want to show an image.",
+            "options": "forms",
+            "null_value": {
+              "0": "Default Form"
+            }
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "extras",
+          "title": "Extras",
+          "type": "select",
+          "extra": {
+            "tooltip": "Upload an image for this unit. Leave empty if you do not want to show an image.",
+            "options": "extras",
+            "multiple": true,
+            "required_plan": "premium"
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "similar_units",
+          "title": "Similar units",
+          "type": "select",
+          "extra": {
+            "tooltip": "Upload an image for this unit. Leave empty if you do not want to show an image.",
+            "options": "units",
+            "multiple": true
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "quantity",
+          "title": "Quantity",
+          "type": "text",
+          "extra": {
+            "tooltip": "Upload an image for this unit. Leave empty if you do not want to show an image.",
+            "sub_type": "positive_integer"
+          },
+          "defaultValue": "1",
+          "required": true
+        },
+        {
+          "name": "capacity",
+          "title": "Capacity",
+          "type": "text",
+          "extra": {
+            "tooltip": "Upload an image for this unit. Leave empty if you do not want to show an image."
+          },
+          "defaultValue": "1",
+          "required": false
+        },
+        {
+          "name": "attendee_type_adult",
+          "title": "Adult",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Choose which form customers will see when booking this unit. Keep the default Webba Form, or create one in Form Builder and select it here.",
+            "at_least_one_checked_rule": {
+              "threshold_field": "capacity",
+              "threshold_operator": ">",
+              "threshold_value": "0",
+              "target_fields": [
+                "attendee_type_adult",
+                "attendee_type_child",
+                "attendee_type_infant"
+              ],
+              "checked_value": "yes",
+              "message": "Turn on at least one attendee type (Adult, Child, or Infant) when capacity is greater than 0."
+            }
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "attendee_type_child",
+          "title": "Child",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Count children separately for this unit."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "attendee_type_infant",
+          "title": "Infant",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Count infants separately for this unit."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "availability_date_ranges",
+          "title": "Availability date ranges",
+          "type": "availability_ranges",
+          "extra": {
+            "tooltip": "Count infants separately for this unit."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "availability_recurring_annually",
+          "title": "Recurring annually",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Count infants separately for this unit."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "buffer_before",
+          "title": "Buffer before (days)",
+          "type": "text",
+          "extra": {
+            "tooltip": "Count infants separately for this unit.",
+            "sub_type": "none_negative_integer"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "buffer_after",
+          "title": "Buffer after (days)",
+          "type": "text",
+          "extra": {
+            "tooltip": "Count infants separately for this unit.",
+            "sub_type": "none_negative_integer"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "min_booking_days",
+          "title": "Min booking days",
+          "type": "text",
+          "extra": {
+            "tooltip": "Describe when this unit is bookable (e.g. date ranges). Leave empty for year-round availability (360 days).",
+            "sub_type": "positive_integer"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "max_booking_days",
+          "title": "Max booking days",
+          "type": "text",
+          "extra": {
+            "tooltip": "Maximum length of a booking in days.",
+            "sub_type": "positive_integer"
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "price",
+          "title": "Price",
+          "type": "price_variant",
+          "extra": {
+            "tooltip": "Enter the price for this unit."
+          },
+          "defaultValue": "0",
+          "required": true
+        },
+        {
+          "name": "charge_per_person",
+          "title": "Charge per person",
+          "type": "checkbox",
+          "extra": {
+            "yes": "Yes",
+            "tooltip": "Enter the price for this unit."
+          },
+          "defaultValue": "",
+          "required": false
+        },
+        {
+          "name": "payment_methods",
+          "title": "Payment methods",
+          "type": "select",
+          "extra": {
+            "tooltip": "Enter the price for this unit.",
+            "multiple": true,
+            "options": "backend",
+            "items": "$payment_methods",
+            "description": "IMPORTANT! For Google Pay/Apple pay and Other Payment Methods to work you have to activate them in your Stripe account"
+          },
+          "defaultValue": null,
+          "required": false
+        },
+        {
+          "name": "woo_product",
+          "title": "WooCommerce product ID for unit",
+          "type": "select",
+          "extra": {
+            "tooltip": "Set ID of the product associated with this unit. Set only if WooCommerce is used as payment method.",
+            "sub_type": "none_negative_integer",
+            "pro_version": true,
+            "required_plan": "standard",
+            "// TIER 2\n                \"options\"": "backend"
+          },
+          "defaultValue": "0",
+          "required": false
+        },
+        {
+          "name": "connected_calendars",
+          "title": "Connected calendars",
+          "type": "select",
+          "extra": {
+            "tooltip": "Enter the price for this unit.",
+            "multiple": true,
+            "options": "connected_calendars"
+          },
+          "defaultValue": null,
+          "required": false
+        }
+      ]
+    }
+  ]
+}

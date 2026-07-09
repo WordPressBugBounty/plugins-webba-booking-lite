@@ -8,6 +8,7 @@ import unlockIcon from '../../../../../../public/images/icon-lock-open.png'
 import classNames from 'classnames'
 import { processUpgradeMessage } from '../../../../../utilities/planHelper'
 import { Toggle } from '../../../Toggle/Toggle'
+import { useFeatureDisplayConfig } from '../../../../hooks/useFeatureDisplayConfig'
 
 export const InputWrapper = ({
     field,
@@ -28,6 +29,8 @@ export const InputWrapper = ({
     const wrapperRef = useRef<HTMLDivElement>(null)
     const [overlayStyle, setOverlayStyle] = useState<React.CSSProperties>({})
     
+    const featureDisplayConfig = useFeatureDisplayConfig()
+
     const proLabelApplicable = useMemo(() => {
         if (skipProLabel) {
             return false
@@ -50,6 +53,10 @@ export const InputWrapper = ({
             ] !== true
         )
     }, [requiredPlan, plan_map, fieldConfig?.misc?.available_in_old_free, skipProLabel])
+
+    if (proLabelApplicable && featureDisplayConfig.hide_fields) {
+        return null
+    }
 
     if (proLabelApplicable) {
         field.resetValidators()

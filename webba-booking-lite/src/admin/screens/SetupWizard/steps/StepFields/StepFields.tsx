@@ -11,10 +11,16 @@ interface StepFieldsProps {
     form: FormFromModel<Model>
     stepId: WizardStepId
     modelProperties: Record<string, any>
+    fieldNames?: readonly string[]
 }
 
-export const StepFields = ({ form, stepId, modelProperties }: StepFieldsProps) => {
-    const fieldNames = STEP_FIELDS[stepId] || []
+export const StepFields = ({
+    form,
+    stepId,
+    modelProperties,
+    fieldNames: fieldNamesOverride,
+}: StepFieldsProps) => {
+    const fieldNames = fieldNamesOverride ?? STEP_FIELDS[stepId] ?? []
 
     return (
         <div className="wbk_stepFields__fieldsWrapper">

@@ -138,7 +138,7 @@ export const sections = [
     {
         id: 'advanced',
         title: __('Advanced Appearance Settings', 'webba-booking-lite'),
-        requiredPlans: ['standard', 'premium', 'pro'],
+        requiredPlans: ['standard', 'premium', 'pro', 'proextended'],
         subsections: [
             {
                 id: 'button_radius',

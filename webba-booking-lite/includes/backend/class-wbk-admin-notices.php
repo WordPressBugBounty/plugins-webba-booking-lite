@@ -103,24 +103,7 @@ class WBK_Admin_Notices2
     protected function get_notices(): array
     {
         $notices = [
-            'inform_email_duplication_v_5118' => [
-                'message' => sprintf(__('IMPORTANT: please double check your <a href="%s/">Email Notifications</a> page for any template duplication to avoid multiple emails. Also make sure that the templates have at least 1 or all services assigned. Read more in our <a href="%s" target="_blank">documentation</a>.', 'webba-booking-lite'), admin_url('admin.php?page=wbk-email-templates&tab=email-templates'), 'https://webba-booking.com/documentation/email-notifications/'),
-                'type' => 'info',
-                'condition' => function () {
-                    return isset($_GET['page']) && 0 === strpos($_GET['page'], 'wbk-');
-                }
-            ]
         ];
-
-        if (wbk_fs()->is_free_plan()) {
-            $notices['new_changes_v_606'] = [
-                'message' => sprintf(__('IMPORTANT! Webba Booking v6 is here and it may affect your current configuration. <a href="%s" target="_blank">Please read more about it here</a>', 'webba-booking-lite') , 'https://webba-booking.com/blog/webba-6-0/'),
-                'type' => 'info',
-                'condition' => function () {
-                    return isset($_GET['page']) && 0 === strpos($_GET['page'], 'wbk-');
-                }
-            ];
-        }
 
         return array_filter($notices, function ($props, $id) {
             return $this->should_show($id);

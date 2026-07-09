@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n'
+import { trackWizardStepAction } from '../../wizardAnalytics'
 import './ChoosePlanStep.scss'
 
 const PRICING_URL = 'https://webba-booking.com/pricing/'
@@ -58,6 +59,11 @@ export const ChoosePlanStep = ({ onContinue }: ChoosePlanStepProps) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="wbk_choosePlanStep__planButton"
+                        onClick={() => {
+                            trackWizardStepAction('choosePlan', 'view_plan', {
+                                plan: 'start',
+                            })
+                        }}
                     >
                         {__('Choose Start', 'webba-booking-lite')}
                     </a>
@@ -119,6 +125,11 @@ export const ChoosePlanStep = ({ onContinue }: ChoosePlanStepProps) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="wbk_choosePlanStep__planButton"
+                        onClick={() => {
+                            trackWizardStepAction('choosePlan', 'view_plan', {
+                                plan: 'standard',
+                            })
+                        }}
                     >
                         {__('Choose Standard', 'webba-booking-lite')}
                     </a>
@@ -183,6 +194,11 @@ export const ChoosePlanStep = ({ onContinue }: ChoosePlanStepProps) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="wbk_choosePlanStep__planButton"
+                        onClick={() => {
+                            trackWizardStepAction('choosePlan', 'view_plan', {
+                                plan: 'premium',
+                            })
+                        }}
                     >
                         {__('Choose Premium', 'webba-booking-lite')}
                     </a>
@@ -193,7 +209,10 @@ export const ChoosePlanStep = ({ onContinue }: ChoosePlanStepProps) => {
                     <button
                         type="button"
                         className="wbk_choosePlanStep__skipPlanButton"
-                        onClick={onContinue}
+                        onClick={() => {
+                            trackWizardStepAction('choosePlan', 'continue_free')
+                            onContinue?.()
+                        }}
                     >
                         {__(
                             'Continue with free version for now',

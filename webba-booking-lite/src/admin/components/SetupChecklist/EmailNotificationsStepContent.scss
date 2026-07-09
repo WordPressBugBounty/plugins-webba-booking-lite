@@ -1,0 +1,128 @@
+.wbk_emailNotificationsStep {
+    margin-top: 16px;
+}
+
+.wbk_emailNotificationsStep__list {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.wbk_emailNotificationsStep__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    border-top: 1px solid #f3f4f6;
+
+    &:first-child {
+        border-top: none;
+    }
+}
+
+.wbk_emailNotificationsStep__itemInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.wbk_emailNotificationsStep__itemName {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+}
+
+.wbk_emailNotificationsStep__itemTrigger {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.wbk_emailNotificationsStep__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.wbk_emailNotificationsStep__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+
+    &--customer {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    &--admin {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    &--default {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+}
+
+.wbk_emailNotificationsStep__actionRow {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.wbk_emailNotificationsStep__primaryButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background: #14b8a9;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+        background: #0d9488;
+        color: #fff;
+    }
+
+    &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+}
+
+.wbk_emailNotificationsStep__secondaryLink {
+    font-size: 14px;
+    color: #14b8a9;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.wbk_emailNotificationsStep__hint {
+    margin: 12px 0 0;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.wbk_emailNotificationsStep__empty {
+    margin: 0 0 16px;
+    font-size: 14px;
+    color: #6b7280;
+}

@@ -1,0 +1,19 @@
+.wbk_skipStepButton {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    padding: 10px 18px;
+    font-size: 14px;
+    color: #6b7280;
+    cursor: pointer;
+
+    &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+        border-color: #d1d5db;
+        color: #374151;
+    }
+}

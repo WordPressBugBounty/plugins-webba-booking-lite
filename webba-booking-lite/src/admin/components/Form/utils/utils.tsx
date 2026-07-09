@@ -211,6 +211,11 @@ export const createFormMenuSectionsFromModel = function <T extends Model>({
             label,
             subsection: modelField.misc?.subsection || null,
             required_plan: modelField.misc?.required_plan,
+            available_in_old_free: modelField.misc?.available_in_old_free,
+            dependency: modelField.dependency,
+            hide: modelField.misc?.hide,
+            description:
+                modelField.misc?.tooltip || modelField.misc?.description,
             element: component,
         }
 

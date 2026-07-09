@@ -618,7 +618,6 @@ class WBK_Backend_Options
                 ),
                 "default" => "yes",
                 "checkbox_value" => "yes",
-                "required_plan" => "start",
                 "available_in_old_free" => true,
                 "tab" => "general",
             ],

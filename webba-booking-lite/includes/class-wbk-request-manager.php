@@ -48,6 +48,23 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "get_preset"],
                 "permission_callback" => [$this, "get_preset_permission"],
             ] );
+            if ( wbk_is_assistance_available() ) {
+                register_rest_route( "wbk/v2", "/assistance/", [
+                    "methods"             => "POST",
+                    "callback"            => [$this, "assistance"],
+                    "permission_callback" => [$this, "assistance_permission"],
+                ] );
+                register_rest_route( "wbk/v2", "/assistance/task/(?P<task_id>\\d+)", [
+                    "methods"             => "GET",
+                    "callback"            => [$this, "assistance_task_status"],
+                    "permission_callback" => [$this, "assistance_permission"],
+                ] );
+                register_rest_route( "wbk/v2", "/assistance/apply/", [
+                    "methods"             => "POST",
+                    "callback"            => [$this, "assistance_apply"],
+                    "permission_callback" => [$this, "assistance_apply_permission"],
+                ] );
+            }
             register_rest_route( "wbk/v2", "/login", [
                 "methods"             => "POST",
                 "callback"            => [$this, "login"],
@@ -203,10 +220,20 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "get_unit_availability_date_ranges"],
                 "permission_callback" => [$this, "get_unit_availability_date_ranges_permission"],
             ] );
-            register_rest_route( 'wbk/v2', '/get-time-slots', [
-                'methods'             => 'GET',
-                'callback'            => [$this, 'get_time_slots'],
-                'permission_callback' => [$this, 'get_time_slots_permission'],
+            register_rest_route( "wbk/v2", "/get-time-slots", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_time_slots"],
+                "permission_callback" => [$this, "get_time_slots_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/reset-all-data/", [
+                "methods"             => "POST",
+                "callback"            => ["WBK_Reset_All_Data", "handle_rest_reset"],
+                "permission_callback" => ["WBK_Reset_All_Data", "rest_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/assistance/reset/", [
+                "methods"             => "POST",
+                "callback"            => ["WBK_Reset_All_Data", "handle_rest_reset"],
+                "permission_callback" => ["WBK_Reset_All_Data", "rest_permission"],
             ] );
         } );
         add_action( "wp_ajax_wbk_cancel_appointment", [$this, "cancel_booking"] );
@@ -1465,6 +1492,10 @@ class WBK_Request_Manager {
             "site_url"                    => get_site_url(),
             "admin_url"                   => admin_url(),
             "plan_map"                    => WBK_Feature_Gate::get_plan_map(),
+            "is_pro"                      => !wbk_fs()->is_free_plan(),
+            "current_plan"                => WBK_Feature_Gate::get_current_plan(),
+            "feature_display_config"      => WBK_Remote_Config::get_config(),
+            "assistance_available"        => wbk_is_assistance_available(),
             "multiservice"                => WBK_Feature_Gate::have_required_plan( "start", "only_old_users" ),
             "settings"                    => [
                 "narrow_form"                        => get_option( "wbk_form_layout", "yes" ) !== "yes",
@@ -1513,7 +1544,7 @@ class WBK_Request_Manager {
                 "label_login_button"                      => get_option( "wbk_wording_label_login_button", __( "Login", "webba-booking-lite" ) ),
                 "no_booking"                              => get_option( "wbk_user_dashboard_no_bookings_available", __( "No bookings available", "webba-booking-lite" ) ),
                 "label_login_title"                       => get_option( "wbk_user_dashboard_login_title", __( "Login to your booking manager", "webba-booking-lite" ) ),
-                'label_login_description'                 => get_option( "wbk_wording_label_login_description", __( "Access your booking dashboard", "webba-booking-lite" ) ),
+                "label_login_description"                 => get_option( "wbk_wording_label_login_description", __( "Access your booking dashboard", "webba-booking-lite" ) ),
                 "label_logout"                            => get_option( "wbk_wording_label_logout", __( "Logout", "webba-booking-lite" ) ),
                 "label_manage_appointments_title"         => get_option( "wbk_user_dashboard_manage_appointments_title", __( "Manage your appointments and reservations", "webba-booking-lite" ) ),
                 "label_upcoming_bookings_title"           => get_option( "wbk_user_dashboard_upcoming_bookings_title", __( "Upcoming", "webba-booking-lite" ) ),
@@ -1661,6 +1692,7 @@ class WBK_Request_Manager {
                 "phone"      => ( isset( $current_user ) ? get_user_meta( $current_user->ID, "billing_phone", true ) : "" ),
             ],
             "current_user_id"             => get_current_user_id(),
+            "reset_all_data_allowed"      => WBK_Reset_All_Data::current_user_can_reset(),
         ];
         $response = new \WP_REST_Response($data);
         $response->set_status( 200 );
@@ -1927,6 +1959,7 @@ class WBK_Request_Manager {
         } elseif ( $model === "units" ) {
             switch ( $field ) {
                 case "payment_methods":
+                case "unit_payment_methods":
                     $data[$model][$field] = WBK_Model_Utils::get_available_payment_methods();
                     break;
                 case "woo_product":
@@ -5137,7 +5170,12 @@ class WBK_Request_Manager {
             "border_radius",
             "shadow"
         ];
-        $required_plans = ["standard", "premium", "pro"];
+        $required_plans = [
+            "standard",
+            "premium",
+            "pro",
+            "proextended"
+        ];
         $have_required_plan = false;
         foreach ( $required_plans as $required_plan ) {
             if ( WBK_Feature_Gate::have_required_plan( $required_plan, null ) ) {
@@ -5397,40 +5435,40 @@ class WBK_Request_Manager {
 
     public function get_time_slots( $request ) {
         WBK_Translation_Processor::switch_to_locale_from_get_param();
-        $day = explode( '00:00:00', $request['date'] );
+        $day = explode( "00:00:00", $request["date"] );
         $day = $day[0];
         if ( !WBK_Validator::is_date( $day ) ) {
-            return $this->response_error( 'Wrong date.' );
+            return $this->response_error( "Wrong date." );
         }
-        date_default_timezone_set( 'UTC' );
-        $day = date( 'd-m-Y', strtotime( $day ) - $request['offset'] * 60 );
-        date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
-        $day = strtotime( $day . ' 00:00:00' );
+        date_default_timezone_set( "UTC" );
+        $day = date( "d-m-Y", strtotime( $day ) - $request["offset"] * 60 );
+        date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+        $day = strtotime( $day . " 00:00:00" );
         $services = [];
-        if ( isset( $request['services'] ) && $request['services'] != '' ) {
-            $services = explode( ',', $request['services'] );
+        if ( isset( $request["services"] ) && $request["services"] != "" ) {
+            $services = explode( ",", $request["services"] );
         }
-        if ( isset( $request['booking'] ) ) {
-            if ( ctype_digit( $request['booking'] ) ) {
-                $booking = new WBK_Booking($request['booking']);
+        if ( isset( $request["booking"] ) ) {
+            if ( ctype_digit( $request["booking"] ) ) {
+                $booking = new WBK_Booking($request["booking"]);
                 if ( $booking->is_loaded() ) {
                     $services = [$booking->get_service()];
                 }
             }
         }
         if ( count( $services ) == 0 ) {
-            return $this->response_error( 'No valid services found.' );
+            return $this->response_error( "No valid services found." );
         }
         foreach ( $services as $service_id ) {
             if ( !WBK_Validator::is_service_exists( $service_id ) ) {
-                return $this->response_error( 'Wrong service ID.' );
+                return $this->response_error( "Wrong service ID." );
             }
             $sp = new WBK_Schedule_Processor();
             $timeslots = $sp->get_time_slots_by_day( $day, $service_id, [
-                'skip_gg_calendar'       => false,
-                'ignore_preparation'     => false,
-                'calculate_availability' => true,
-                'filter_availability'    => false,
+                "skip_gg_calendar"       => false,
+                "ignore_preparation"     => false,
+                "calculate_availability" => true,
+                "filter_availability"    => false,
             ] );
             if ( $booking->is_loaded() ) {
                 $filtered = array_values( array_filter( $timeslots, fn( $obj ) => $obj->get_free_places() >= $booking->get_quantity() ) );
@@ -5439,9 +5477,222 @@ class WBK_Request_Manager {
             }
         }
         return new \WP_REST_Response([
-            'status'    => 'success',
-            'timeslots' => $filtered,
+            "status"    => "success",
+            "timeslots" => $filtered,
         ], 200);
+    }
+
+    public function assistance_permission( $request ) {
+        return wbk_is_assistance_available() && current_user_can( "manage_options" );
+    }
+
+    public function assistance_apply_permission( $request ) {
+        return wbk_is_assistance_available() && current_user_can( "manage_options" );
+    }
+
+    public function assistance_apply( WP_REST_Request $request ) {
+        error_log( "[WBK Assistance Apply] REST assistance_apply called" );
+        try {
+            $params = $request->get_json_params();
+            $actions = [];
+            if ( is_array( $params ) && isset( $params["actions"] ) && is_array( $params["actions"] ) ) {
+                $actions = $params["actions"];
+            }
+            $timezone = "";
+            if ( is_array( $params ) && isset( $params["timezone"] ) ) {
+                $timezone = sanitize_text_field( (string) $params["timezone"] );
+            }
+            $session_id = "";
+            if ( is_array( $params ) && isset( $params["session_id"] ) ) {
+                $session_id = WBK_Assistance_Connect::normalize_session_id( (string) $params["session_id"] );
+            }
+            error_log( "[WBK Assistance Apply] REST payload received " . wp_json_encode( [
+                "action_count"       => count( $actions ),
+                "timezone"           => $timezone,
+                "session_id_present" => $session_id !== "",
+                "actions_summary"    => $this->summarize_assistance_actions_for_log( $actions ),
+            ] ) );
+            error_log( "[WBK Assistance Apply] calling WBK_Assistance::apply_actions " . wp_json_encode( WBK_Assistance::get_apply_debug_context() ) );
+            $result = WBK_Assistance::apply_actions( $actions, [
+                "timezone" => $timezone,
+            ] );
+            error_log( "[WBK Assistance Apply] apply_actions returned " . wp_json_encode( [
+                "success"       => !empty( $result["success"] ),
+                "error_count"   => ( is_array( $result["errors"] ?? null ) ? count( $result["errors"] ) : 0 ),
+                "result_count"  => ( is_array( $result["results"] ?? null ) ? count( $result["results"] ) : 0 ),
+                "warning_count" => ( is_array( $result["warnings"] ?? null ) ? count( $result["warnings"] ) : 0 ),
+                "phase"         => WBK_Assistance::get_last_apply_phase(),
+                "errors"        => $result["errors"] ?? [],
+            ] ) );
+            if ( !empty( $result["success"] ) ) {
+                try {
+                    WBK_Assistance_Connect::report_assistance_chat_completion( $session_id, $actions, $result );
+                } catch ( \Throwable $report_error ) {
+                    error_log( "[WBK Assistance Apply] report_assistance_chat_completion failed " . wp_json_encode( [
+                        "message"         => $report_error->getMessage(),
+                        "exception_class" => get_class( $report_error ),
+                        "file"            => $report_error->getFile(),
+                        "line"            => $report_error->getLine(),
+                    ] ) );
+                }
+            }
+            return new \WP_REST_Response([
+                "success"      => !empty( $result["success"] ),
+                "results"      => $result["results"] ?? [],
+                "errors"       => $result["errors"] ?? [],
+                "refs"         => $result["refs"] ?? [],
+                "summary"      => $result["summary"] ?? [],
+                "warnings"     => $result["warnings"] ?? [],
+                "booking_page" => $result["booking_page"] ?? null,
+                "debug"        => $result["debug"] ?? null,
+            ], 200);
+        } catch ( \Throwable $throwable ) {
+            error_log( "[WBK Assistance Apply] REST assistance_apply uncaught exception " . wp_json_encode( [
+                "message"         => $throwable->getMessage(),
+                "exception_class" => get_class( $throwable ),
+                "file"            => $throwable->getFile(),
+                "line"            => $throwable->getLine(),
+                "phase"           => ( class_exists( "WBK_Assistance" ) ? WBK_Assistance::get_last_apply_phase() : "unknown" ),
+                "apply_context"   => ( class_exists( "WBK_Assistance" ) ? WBK_Assistance::get_apply_debug_context() : null ),
+                "trace"           => $throwable->getTraceAsString(),
+            ] ) );
+            $debug = null;
+            if ( defined( "WP_DEBUG" ) && WP_DEBUG ) {
+                $debug = [
+                    "source"          => "rest_uncaught_exception",
+                    "exception_class" => get_class( $throwable ),
+                    "file"            => $throwable->getFile(),
+                    "line"            => $throwable->getLine(),
+                    "phase"           => ( class_exists( "WBK_Assistance" ) ? WBK_Assistance::get_last_apply_phase() : "unknown" ),
+                    "apply_context"   => ( class_exists( "WBK_Assistance" ) ? WBK_Assistance::get_apply_debug_context() : null ),
+                    "trace"           => explode( "\n", $throwable->getTraceAsString() ),
+                ];
+            }
+            return new \WP_REST_Response([
+                "success"      => false,
+                "results"      => [],
+                "errors"       => [$throwable->getMessage()],
+                "refs"         => [],
+                "summary"      => [],
+                "warnings"     => [],
+                "booking_page" => null,
+                "debug"        => $debug,
+            ], 500);
+        }
+    }
+
+    /**
+     * @param array<int, mixed> $actions
+     * @return array<int, array<string, mixed>>
+     */
+    private function summarize_assistance_actions_for_log( array $actions ) : array {
+        $summary = [];
+        foreach ( $actions as $index => $action ) {
+            if ( !is_array( $action ) ) {
+                $summary[] = [
+                    "index"   => $index,
+                    "invalid" => true,
+                ];
+                continue;
+            }
+            $entry = [
+                "index"  => $index,
+                "action" => ( isset( $action["action"] ) ? (string) $action["action"] : "" ),
+            ];
+            if ( isset( $action["table"] ) ) {
+                $entry["table"] = (string) $action["table"];
+            }
+            if ( isset( $action["slug"] ) ) {
+                $entry["slug"] = (string) $action["slug"];
+            }
+            if ( isset( $action["ref"] ) ) {
+                $entry["ref"] = (string) $action["ref"];
+            }
+            if ( isset( $action["fields"] ) && is_array( $action["fields"] ) ) {
+                $entry["field_keys"] = array_slice( array_keys( $action["fields"] ), 0, 20 );
+            }
+            $summary[] = $entry;
+        }
+        return $summary;
+    }
+
+    public function assistance( $request ) {
+        $params = $request->get_json_params();
+        $prompt = "";
+        if ( is_array( $params ) && isset( $params["request"] ) ) {
+            $prompt = trim( (string) $params["request"] );
+        }
+        if ( $prompt === "" ) {
+            return new \WP_REST_Response([
+                "success" => false,
+                "message" => __( "Request text is required.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $messages = WBK_Assistance_Connect::parse_assistance_messages( ( is_array( $params ) ? $params["messages"] ?? null : null ) );
+        $config_information = null;
+        if ( is_array( $params ) && isset( $params["config_information"] ) && is_array( $params["config_information"] ) ) {
+            $config_information = $params["config_information"];
+        }
+        $session_id = "";
+        if ( is_array( $params ) && isset( $params["session_id"] ) ) {
+            $session_id = WBK_Assistance_Connect::normalize_session_id( (string) $params["session_id"] );
+        }
+        $result = WBK_Assistance_Connect::submit_assistance_task(
+            $prompt,
+            [],
+            $messages,
+            $config_information,
+            true,
+            true,
+            $session_id
+        );
+        if ( is_wp_error( $result ) ) {
+            $status = $result->get_error_data()["status"] ?? 500;
+            if ( !is_numeric( $status ) || $status < 400 ) {
+                $status = 500;
+            }
+            $error_data = $result->get_error_data();
+            $response = [
+                "success" => false,
+                "message" => $result->get_error_message(),
+            ];
+            if ( is_array( $error_data ) && !empty( $error_data["moderation"] ) ) {
+                $response["moderation"] = $error_data["moderation"];
+            }
+            return new \WP_REST_Response($response, (int) $status);
+        }
+        return new \WP_REST_Response([
+            "success" => true,
+            "task_id" => $result["task_id"] ?? null,
+            "status"  => $result["status"] ?? "processing",
+        ], 202);
+    }
+
+    public function assistance_task_status( $request ) {
+        $task_id = (int) $request->get_param( "task_id" );
+        if ( $task_id <= 0 ) {
+            return new \WP_REST_Response([
+                "success" => false,
+                "message" => __( "Task id is required.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $result = WBK_Assistance_Connect::get_assistance_task_status( $task_id );
+        if ( is_wp_error( $result ) ) {
+            $status = $result->get_error_data()["status"] ?? 500;
+            if ( !is_numeric( $status ) || $status < 400 ) {
+                $status = 500;
+            }
+            $error_data = $result->get_error_data();
+            $response = [
+                "success" => false,
+                "message" => $result->get_error_message(),
+            ];
+            if ( is_array( $error_data ) && !empty( $error_data["moderation"] ) ) {
+                $response["moderation"] = $error_data["moderation"];
+            }
+            return new \WP_REST_Response($response, (int) $status);
+        }
+        return new \WP_REST_Response($result, 200);
     }
 
 }

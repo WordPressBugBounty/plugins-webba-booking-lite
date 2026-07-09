@@ -153,7 +153,6 @@
     align-items: flex-start;
     justify-content: center;
     height: 100%;
-    max-height: calc(100% - 112px);
     background-color: #f9fafb;
     padding: 48px 24px;
     overflow: auto;
@@ -162,6 +161,68 @@
     &.wbk_setupWizard__content--contentWelcome {
         background-color: #ffffff;
     }
+
+    &.wbk_setupWizard__content--ai {
+        flex: 1;
+        min-height: 0;
+        height: auto;
+        align-items: stretch;
+        justify-content: stretch;
+        padding: 32px 24px 24px;
+    }
+}
+
+.wbk_setupWizard__footer {
+    height: 56px;
+    border-top: 1px solid #e5e7eb;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 32px;
+    flex-shrink: 0;
+}
+
+.wbk_setupWizard__skipLink__WelcomeScreen,
+.wbk_setupWizard__skipLink__AISetup,
+.wbk_setupWizard__skipLink__wizardBottom {
+    text-decoration: none;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    white-space: nowrap;
+
+    &:hover {
+        text-decoration: underline;
+        color: #4b5563;
+    }
+}
+
+.wbk_setupWizard__manualSetupLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    background: none;
+    padding: 0;
+    color: #4b5563;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+
+    &:hover {
+        color: #135e96;
+    }
+}
+
+.wbk_setupWizard__manualSetupLinkIcon {
+    width: 16px;
+    height: 16px;
+    display: block;
 }
 
 .wbk_setupWizard__stepTransition {
@@ -177,6 +238,7 @@
         transform: translateX(20%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -188,6 +250,7 @@
         transform: translateX(-20%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -210,20 +273,18 @@
     background-color: #ffffff;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 32px;
 }
 
 .wbk_setupWizard__buttonsBlock {
-    max-width: 960px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin: 0;
-    padding: 0 16px;
     margin-left: auto;
-    margin-right: auto;
-    width: 100%;
+    flex-shrink: 0;
 }
 
 .wbk_setupWizard__buttonPrimary {
@@ -276,4 +337,9 @@
         border-color: #d1d5db;
         background-color: #f9fafb;
     }
+}
+
+.wbk_setupWizard__wrapper--loading {
+    min-height: 100vh;
+    background-color: #f9fafb;
 }

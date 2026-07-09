@@ -54,9 +54,12 @@
     flex-flow: column;
     align-items: center;
     justify-content: center;
+    gap: 12px;
 }
 
-.wbk_welcomeStep__launchButton {
+.wbk_welcomeStep__launchButton,
+.wbk_welcomeStep__manualButton {
+    min-width: 240px;
     border-radius: 6px;
     padding: 12px 24px;
     font-weight: 400;
@@ -65,16 +68,30 @@
     letter-spacing: 0%;
     text-align: center;
     border: 1px solid transparent;
-    background-color: #14b8a9;
-    border-color: #14b8a9;
-    color: #ffffff;
     transition: 0.3s all ease;
     cursor: pointer;
     font-family: inherit;
+}
+
+.wbk_welcomeStep__launchButton {
+    background-color: #14b8a9;
+    border-color: #14b8a9;
+    color: #ffffff;
 
     &:hover {
         background-color: #0e9482;
         border-color: #0e9482;
+    }
+}
+
+.wbk_welcomeStep__manualButton {
+    background-color: #ffffff;
+    border-color: #d1d5db;
+    color: #374151;
+
+    &:hover {
+        background-color: #f9fafb;
+        border-color: #9ca3af;
     }
 }
 

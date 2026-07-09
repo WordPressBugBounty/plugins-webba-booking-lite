@@ -51,7 +51,7 @@ export const ThankYou = ({
         [units]
     )
 
-    const iCalRequiredPlans = ['pro', 'premium']
+    const iCalRequiredPlans = ['pro', 'premium', 'proextended']
     const isIcalAvailable = useMemo(() => {
         if (!preset?.plan_map) return false
 

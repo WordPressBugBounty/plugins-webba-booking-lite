@@ -30,9 +30,13 @@ import duplicateIcon from '../../../../public/images/duplicate-icon.svg'
 import resetIcon from '../../../../public/images/icon-reset.svg'
 import arrowLeftIcon from '../../../../public/images/icon-navigation-prev.svg'
 import arrowRightIcon from '../../../../public/images/icon-navigation-next.svg'
+import lockedTabIcon from '../../../../public/images/icon-pro-locked.svg'
 import { capitalize } from '../../utils/capitalize'
 import { Accordion } from './Accordion'
 import { ProFeatuerWrapper } from '../ProFeatuerWrapper/ProFeatuerWrapper'
+import { ProFeatureFormTabBanner } from '../ProFeatureBanner/ProFeatureFormTabBanner'
+import { useFeatureDisplayConfig } from '../../hooks/useFeatureDisplayConfig'
+import { getLockedFormTabInfo } from '../../utils/formTabLockHelper'
 import { ReactComponent as ErrorIcon } from '../../../../public/images/icon-error-circle.svg'
 import { usePreset } from '../../hooks/usePreset'
 import { TabularForm } from '../TabularForm/TabularForm'
@@ -103,6 +107,7 @@ export const Form = function <T extends Model>({
     const startedInAddModeRef = useRef<boolean>(!defaultValue?.id)
     const collectionNameRef = useRef<string | null>(null)
     const { plan_map } = usePreset()
+    const featureDisplayConfig = useFeatureDisplayConfig()
 
     const getCollectionNameFromFormId = (formId: string): string | null => {
         const collectionNameMap: Record<string, string> = {
@@ -410,6 +415,22 @@ export const Form = function <T extends Model>({
         }
     }, [handleClose])
 
+    const lockedTabMap = useMemo(() => {
+        const map: Record<string, boolean> = {}
+
+        Object.keys(sections).forEach((sectionKey) => {
+            const tabInfo = getLockedFormTabInfo(
+                sections[sectionKey] || [],
+                plan_map,
+                tabs?.[sectionKey]?.required_plan
+            )
+            map[sectionKey] =
+                featureDisplayConfig.hide_fields && tabInfo.isFullyLocked
+        })
+
+        return map
+    }, [sections, plan_map, tabs, featureDisplayConfig.hide_fields])
+
     const sectionNavigation = (
         <div className="wbk_form__sectionNavigationWrapper">
             {canScrollLeft && (
@@ -445,6 +466,13 @@ export const Form = function <T extends Model>({
                                 <span
                                     className="wbk_form__sectionNavigationBtnText"
                                 >
+                                    {lockedTabMap[section] && (
+                                        <img
+                                            className="wbk_form__sectionNavigationLockedIcon"
+                                            src={lockedTabIcon}
+                                            alt={__('Locked', 'webba-booking-lite')}
+                                        />
+                                    )}
                                     {tabs?.[section]?.title ||
                                         capitalize(section)}
                                 </span>
@@ -521,6 +549,19 @@ export const Form = function <T extends Model>({
 
         return firstRequiredPlan
     }, [sections, activeSection, plan_map])
+
+    const lockedTabInfo = useMemo(
+        () =>
+            getLockedFormTabInfo(
+                sections[activeSection] || [],
+                plan_map,
+                tabs?.[activeSection]?.required_plan
+            ),
+        [sections, activeSection, plan_map, tabs]
+    )
+
+    const shouldShowLockedTabBanner =
+        featureDisplayConfig.hide_fields && lockedTabInfo.isFullyLocked
 
     const cloneElementWithSkipProLabel = useCallback(
         (element: React.ReactElement, skipProLabel: boolean): React.ReactElement => {
@@ -607,7 +648,22 @@ export const Form = function <T extends Model>({
                 >
                     {editorView === 'form' && (
                         <>
-                            {fieldsWithSubsections ? (
+                            {shouldShowLockedTabBanner ? (
+                                <div className="wbk_form__lockedTabBanner">
+                                    <ProFeatureFormTabBanner
+                                        tabTitle={
+                                            tabs?.[activeSection]?.title ||
+                                            capitalize(activeSection)
+                                        }
+                                        requiredPlans={
+                                            lockedTabInfo.requiredPlans
+                                        }
+                                        lockedFields={
+                                            lockedTabInfo.lockedPlanFields
+                                        }
+                                    />
+                                </div>
+                            ) : fieldsWithSubsections ? (
                                 <div className="wbk_form__fieldsWithSubsections">
                                     {checkTabRequiredPlan && (
                                         <ProFeatuerWrapper

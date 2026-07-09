@@ -3,8 +3,8 @@ import { useRoute } from '../Router/useRoute'
 import './Header.scss'
 import { usePage } from '../Router/usePage'
 import { __ } from '@wordpress/i18n'
-import { useMemo } from 'react'
-import { useSelect } from '@wordpress/data'
+import { useMemo, useCallback, useState } from 'react'
+import { useDispatch, useSelect } from '@wordpress/data'
 import { store_name } from '../../../store/backend'
 import webbaLogo from '../../../../public/images/webba_booking_logo_hq.png'
 import { useOpenSettingsSection } from '../Settings/utils/utils'
@@ -34,6 +34,23 @@ export const Header = () => {
         (select) => select(store_name).getPreset(),
         []
     )
+    const { relaunchOnboarding } = useDispatch(store_name) as {
+        relaunchOnboarding: () => Promise<void>
+    }
+    const [isRelaunchingOnboarding, setIsRelaunchingOnboarding] = useState(false)
+
+    const handleQuickSetupGuide = useCallback(async () => {
+        if (isRelaunchingOnboarding) {
+            return
+        }
+
+        setIsRelaunchingOnboarding(true)
+        try {
+            await relaunchOnboarding()
+        } finally {
+            setIsRelaunchingOnboarding(false)
+        }
+    }, [isRelaunchingOnboarding, relaunchOnboarding])
 
     const dataAssetsTabs: TabConfig[] = useMemo(
         () => [
@@ -113,10 +130,9 @@ export const Header = () => {
     //     }
     // }, [dataAssetsTabs])
 
-    const pageTitle = useMemo(
-        () => dataAssetsTabs.find((tab) => tab.route === route)?.label,
-        [page, dataAssetsTabs]
-    )
+    const pageTitle = useMemo(() => {
+        return dataAssetsTabs.find((tab) => tab.route === route)?.label
+    }, [route, dataAssetsTabs])
 
     return (
         <header className="wbk_header">
@@ -137,6 +153,7 @@ export const Header = () => {
                 <button
                     type="button"
                     className="wbk_header__iconButton"
+                    data-feature-tour="shortcode-builder"
                     title={__('Open shortcode builder', 'webba-booking-lite')}
                     aria-label={__('Open shortcode builder', 'webba-booking-lite')}
                     onClick={() =>
@@ -158,21 +175,26 @@ export const Header = () => {
                     aria-hidden="true"
                 />
                 {
-                    admin_url &&
-                    (<a
-                        href={
-                            admin_url +
-                            'admin.php?page=wbk-options&wbk-activation=true'
-                        }
-                        rel="noopener"
-                    >
-                        {__('Setup Wizard', 'webba-booking-lite')}
-                    </a>)
+                    admin_url && (
+                        <button
+                            type="button"
+                            className="wbk_header__quickSetupGuideLink"
+                            data-feature-tour="quick-setup-guide"
+                            disabled={isRelaunchingOnboarding}
+                            onClick={handleQuickSetupGuide}
+                        >
+                            {__(
+                                'Quick Setup Guide',
+                                'webba-booking-lite'
+                            )}
+                        </button>
+                    )
                 }
                 {ROUTE_TO_SETTINGS_SECTION[route] ? (
                     <button
                         type="button"
                         className="wbk_header__settingsLink"
+                        data-feature-tour="header-settings"
                         onClick={() =>
                             openSettingsSection(
                                 ROUTE_TO_SETTINGS_SECTION[route]!
@@ -185,6 +207,7 @@ export const Header = () => {
                     <a
                         href={admin_url + 'admin.php?page=wbk-options'}
                         rel="noopener"
+                        data-feature-tour="header-settings"
                     >
                         {__('Settings', 'webba-booking-lite')}
                     </a>

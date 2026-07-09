@@ -1,6 +1,7 @@
 import './Settings.scss'
 import { buildSettingsSections } from './utils/utils'
 import { SettingSupportCard } from './SettingSupportCard'
+import { SettingResetAllCard } from './SettingResetAllCard'
 import { useSelect } from '@wordpress/data'
 import { store } from '../../../store/backend'
 import { Loading } from '../Loading/Loading'
@@ -22,6 +23,7 @@ export const Settings = () => {
         <>
             <div className="wbk_settings__wrapper">
                 {sections}
+                <SettingResetAllCard />
                 <SettingSupportCard />
             </div>
             <SuccessMessage />

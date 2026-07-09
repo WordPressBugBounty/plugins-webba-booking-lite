@@ -30,7 +30,7 @@ class WBK_Feature_Gate
     /**
      * Check if a feature is available based on plan and free logic
      *
-     * @param string $minimal_plan The plan level required (e.g., 'free', 'pro')
+     * @param string $minimal_plan The plan level required (e.g., 'free', 'pro', 'proextended')
      * @param string|null $free_logic string or null for free logic handling
      * @return bool True if feature is available
      */
@@ -89,6 +89,9 @@ class WBK_Feature_Gate
         if (wbk_fs()->is_plan_or_trial('pro', true)) {
             return true;
         }
+        if (wbk_fs()->is_plan_or_trial('proextended', true)) {
+            return true;
+        }
         if (wbk_fs()->is_plan_or_trial('exchangeplan', true)) {
             return true;
         }
@@ -97,7 +100,7 @@ class WBK_Feature_Gate
         }
 
         // Define plan hierarchy (lower index = lower tier)
-        $plan_hierarchy = ['start', 'standard', 'premium'];
+        $plan_hierarchy = ['start', 'standard', 'premium', 'proextended'];
 
         // Validate minimal plan
         $minimal_index = array_search($minimal_plan, $plan_hierarchy);
@@ -148,6 +151,7 @@ class WBK_Feature_Gate
             'premium',
             'standard',
             'start',
+            'proextended',
         ];
     }
 
@@ -198,7 +202,7 @@ class WBK_Feature_Gate
      * Get plan display name based on plan slug
      *
      * @param string $plan_slug The plan slug (e.g., 'start', 'standard', 'premium')
-     * @return string The plan display name (e.g., 'Start', 'Plus', 'Pro')
+     * @return string The plan display name (e.g., 'Start', 'Plus', 'Pro', 'Pro Extended')
      */
     public static function get_plan_display_name($plan_slug)
     {
@@ -206,6 +210,7 @@ class WBK_Feature_Gate
             'start' => 'Start',
             'standard' => 'Plus',
             'premium' => 'Pro',
+            'proextended' => 'Pro Extended',
         ];
 
         return strtoupper(

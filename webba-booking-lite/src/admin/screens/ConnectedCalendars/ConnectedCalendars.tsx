@@ -20,7 +20,7 @@ import { CalendarName } from '../../components/WebbaDataTable/cells/CalendarName
 import { CalendarProvider } from '../../components/WebbaDataTable/cells/CalendarProvider/CalendarProvider'
 import { UserName } from '../../components/WebbaDataTable/cells/UserName/UserName'
 import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
-import { ProFeatuerWrapper } from '../../components/ProFeatuerWrapper/ProFeatuerWrapper'
+import { LockedTableSection } from '../../components/LockedTableSection/LockedTableSection'
 import { UserCalendars } from './UserCalendars/UserCalendars'
 import noItemsImage from '../../../../public/images/bookings-empty.png'
 import { ReactComponent as ConnectIcon } from '../../../../public/images/icon-connect.svg'
@@ -186,49 +186,55 @@ export const ConnectedCalendarsScreen = () => {
     }
 
     return (
-        <div className="wbk_connectedCalendars__wrapper">
-            {!isStartPlan && <ProFeatuerWrapper requiredPlans={['start']} />}
-            <Table
-                title={__('Connected Calendars', 'webba-booking-lite')}
-                addButtonTitle={__(
-                    'Add Calendar',
-                    'webba-booking-lite'
-                )}
-                table={table}
-                loading={isLoading}
-                onDeleteSelected={onDeleteSelected}
-                onAdd={() =>
-                    sidebar.open(
-                        <Form
-                            name={__(
-                                'Add Calendar',
-                                'webba-booking-lite'
-                            )}
-                            id="add-connected-calendar-form"
-                            form={form}
-                            sections={formSections}
-                            onSubmit={async (data) => {
-                                return await addModelItem(data)
-                            }}
-                            submitButtonText={__(
-                                'Connect Calendar',
-                                'webba-booking-lite'
-                            )}
-                            submitButtonIcon={<ConnectIcon />}
-                            tooltipMode='description'
-                        />
-                    )
-                }
-                noItemsImageUrl={
-                    noItemsImage
-                }
-                className="wbk_connectedCalendars__table"
-            />
+        <>
+            <LockedTableSection
+                isLocked={!isStartPlan}
+                requiredPlans={['start']}
+                featureKey="connected_calendars"
+                className="wbk_connectedCalendars__wrapper"
+            >
+                <Table
+                    title={__('Connected Calendars', 'webba-booking-lite')}
+                    addButtonTitle={__(
+                        'Add Calendar',
+                        'webba-booking-lite'
+                    )}
+                    table={table}
+                    loading={isLoading}
+                    onDeleteSelected={onDeleteSelected}
+                    onAdd={() =>
+                        sidebar.open(
+                            <Form
+                                name={__(
+                                    'Add Calendar',
+                                    'webba-booking-lite'
+                                )}
+                                id="add-connected-calendar-form"
+                                form={form}
+                                sections={formSections}
+                                onSubmit={async (data) => {
+                                    return await addModelItem(data)
+                                }}
+                                submitButtonText={__(
+                                    'Connect Calendar',
+                                    'webba-booking-lite'
+                                )}
+                                submitButtonIcon={<ConnectIcon />}
+                                tooltipMode='description'
+                            />
+                        )
+                    }
+                    noItemsImageUrl={
+                        noItemsImage
+                    }
+                    className="wbk_connectedCalendars__table"
+                />
+            </LockedTableSection>
 
             {currentAuth && (
                 <AuthPopup data={currentAuth} setData={setCurrentAuth} />
             )}
             <SuccessMessage />
-        </div>
+        </>
     )
 }

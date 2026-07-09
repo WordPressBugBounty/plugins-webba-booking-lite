@@ -12,10 +12,12 @@ export const ProFeatuerWrapper = ({
     requiredPlans,
     additionalClasses,
     additionalButtonClasses,
+    variant = 'overlay',
 }: {
     requiredPlans: string[]
     additionalClasses?: string
     additionalButtonClasses?: string
+    variant?: 'overlay' | 'badge'
 }) => {
     const { wording, admin_url, plan_map } = useSelect(
         (select) => select(store).getPreset(),
@@ -24,6 +26,34 @@ export const ProFeatuerWrapper = ({
 
     if (!plan_map) {
         return null
+    }
+
+    const upgradeMessage = processUpgradeMessage(
+        requiredPlans,
+        plan_map,
+        String(
+            wording?.plan_required_message ||
+                __('Available in #plan', 'webba-booking-lite')
+        )
+    )
+
+    if (variant === 'badge') {
+        return (
+            <a
+                className={classNames(
+                    'wbk_inputWrapper__proBadge',
+                    additionalClasses
+                )}
+                href={sprintf('%sadmin.php?page=wbk-main-pricing', admin_url)}
+            >
+                <img
+                    className="wbk_inputWrapper__badgeLocked"
+                    src={lockedIcon}
+                    alt={__('Locked Icon', 'webba-booking-lite')}
+                />
+                {upgradeMessage}
+            </a>
+        )
     }
 
     return (
@@ -46,15 +76,7 @@ export const ProFeatuerWrapper = ({
                     src={unlockIcon}
                     alt={__('Unlock Icon', 'webba-booking-lite')}
                 />
-                {
-                    processUpgradeMessage(requiredPlans, plan_map, String(
-                        wording?.plan_required_message ||
-                        __(
-                            'Available in #plan',
-                            'webba-booking-lite'
-                        )
-                    ))
-                }
+                {upgradeMessage}
             </a>
         </div>
     )

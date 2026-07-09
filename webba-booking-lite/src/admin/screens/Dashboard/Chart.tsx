@@ -35,7 +35,7 @@ export const Chart = ({ data, priceFormat }: any) => {
         (select) => select(store_name).getPreset(),
         []
     )
-    const requiredPlans = ['standard', 'premium', 'pro']
+    const requiredPlans = ['standard', 'premium', 'pro', 'proextended']
     const isChartAvailable = useMemo(() => {
         return plan_map && requiredPlans.some((plan) => plan_map[plan] === true)
     }, [requiredPlans, plan_map])

@@ -16,7 +16,7 @@ import { Form } from '../../components/Form/Form'
 import { __ } from '@wordpress/i18n'
 import { Table } from '../../components/WebbaDataTable/Table'
 import { useMemo } from 'react'
-import { ProFeatuerWrapper } from '../../components/ProFeatuerWrapper/ProFeatuerWrapper'
+import { LockedTableSection } from '../../components/LockedTableSection/LockedTableSection'
 import './FormBuilderScreen.scss'
 import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
 import noItemsImage from '../../../../public/images/bookings-empty.png'
@@ -163,7 +163,7 @@ export const FormBuilderScreen = () => {
     }
 
     const { plan_map } = useSelect((select) => select(store).getPreset(), [])
-    const requiredPlans = ['pro', 'standard', 'premium']
+    const requiredPlans = ['standard', 'premium', 'pro', 'proextended']
     const isFormBuilderAvailable = useMemo(
         () => plan_map && requiredPlans.some((plan) => plan_map[plan]),
         [plan_map, requiredPlans]
@@ -171,12 +171,12 @@ export const FormBuilderScreen = () => {
 
     return (
         <>
-            <div className="wbk_formBuilderScreen__wrapper">
-                {!isFormBuilderAvailable && (
-                    <ProFeatuerWrapper
-                        requiredPlans={['standard', 'premium', 'pro']}
-                    />
-                )}
+            <LockedTableSection
+                isLocked={!isFormBuilderAvailable}
+                requiredPlans={requiredPlans}
+                featureKey="forms"
+                className="wbk_formBuilderScreen__wrapper"
+            >
                 <Table
                     title={__('Booking forms', 'webba-booking-lite')}
                     addButtonTitle={__('Add Form', 'webba-booking-lite')}
@@ -198,7 +198,7 @@ export const FormBuilderScreen = () => {
                         noItemsImage
                     }
                 />
-            </div>
+            </LockedTableSection>
             <SuccessMessage />
         </>
     )

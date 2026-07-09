@@ -1,19 +1,27 @@
 import { __ } from '@wordpress/i18n'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
+import type { WelcomeStepProps } from '../../types'
+import {
+    trackWizardSkipLinkClick,
+    trackWizardStepAction,
+} from '../../wizardAnalytics'
 import './WelcomeStep.scss'
 
-interface WelcomeStepProps {
-    onLaunch: () => void
-    skipUrl: string
-}
-
-export const WelcomeStep = ({ onLaunch, skipUrl }: WelcomeStepProps) => {
-    const { plugin_url } = useSelect(
+export const WelcomeStep = ({
+    onLaunchManual,
+    onLaunchAi,
+    skipUrl,
+}: WelcomeStepProps) => {
+    const { plugin_url, assistance_available } = useSelect(
         (select: any) => select(store_name).getPreset(),
         []
-    ) as { plugin_url?: string }
+    ) as {
+        plugin_url?: string
+        assistance_available?: boolean
+    }
     const logoSrc = plugin_url ? `${plugin_url}/public/images/logo-main.svg` : ''
+    const showAiSetup = assistance_available === true && typeof onLaunchAi === 'function'
 
     return (
         <div className="wbk_welcomeStep__wrapper">
@@ -35,15 +43,51 @@ export const WelcomeStep = ({ onLaunch, skipUrl }: WelcomeStepProps) => {
                     )}
                 </p>
                 <div className="wbk_welcomeStep__actions">
-                    <button
-                        type="button"
-                        className="wbk_welcomeStep__launchButton"
-                        onClick={onLaunch}
-                    >
-                        {__('Launch wizard', 'webba-booking-lite')}
-                    </button>
+                    {showAiSetup ? (
+                        <>
+                            <button
+                                type="button"
+                                className="wbk_welcomeStep__launchButton"
+                                onClick={() => {
+                                    trackWizardStepAction('welcome', 'launch_ai')
+                                    onLaunchAi()
+                                }}
+                            >
+                                {__('AI-assisted setup', 'webba-booking-lite')}
+                            </button>
+                            <button
+                                type="button"
+                                className="wbk_welcomeStep__manualButton"
+                                onClick={() => {
+                                    trackWizardStepAction('welcome', 'launch_manual')
+                                    onLaunchManual()
+                                }}
+                            >
+                                {__('Regular Setup Wizard', 'webba-booking-lite')}
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            type="button"
+                            className="wbk_welcomeStep__launchButton"
+                            onClick={() => {
+                                trackWizardStepAction('welcome', 'launch_manual')
+                                onLaunchManual()
+                            }}
+                        >
+                            {__('Launch wizard', 'webba-booking-lite')}
+                        </button>
+                    )}
                     <div className="wbk_welcomeStep__skipLinkWrapper">
-                        <a href={skipUrl}>
+                        <a
+                            href={skipUrl}
+                            onClick={() => {
+                                trackWizardSkipLinkClick(
+                                    'wbk_setupWizard__skipLink__WelcomeScreen'
+                                )
+                            }}
+                            className='wbk_setupWizard__skipLink__WelcomeScreen'
+                        >
                             {__(
                                 "Skip wizard, I'll configure later",
                                 'webba-booking-lite'

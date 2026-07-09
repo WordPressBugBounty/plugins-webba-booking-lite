@@ -26,7 +26,7 @@ import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
 import noItemsImage from '../../../../public/images/bookings-empty.png'
 import { UnitPrices } from '../../components/WebbaDataTable/cells/UnitPrices/UnitPrices'
 import './ServicesScreen.scss'
-import { ProFeatuerWrapper } from '../../components/ProFeatuerWrapper/ProFeatuerWrapper'
+import { LockedTableSection } from '../../components/LockedTableSection/LockedTableSection'
 import { ExtrasScreen } from '../Extras/ExtrasScreen'
 import { UnitNames } from '../../components/WebbaDataTable/cells/UnitNames/UnitNames'
 
@@ -434,7 +434,7 @@ export const ServicesScreen = () => {
         <SearchField name="search" onChange={setUnitSearch} label="Search" />
     )
 
-    const unitsRequiredPlans = ['premium', 'pro']
+    const unitsRequiredPlans = ['premium', 'pro', 'proextended']
     const isUnitsAvailable = plan_map && unitsRequiredPlans.some((plan) => plan_map[plan] === true)
 
 
@@ -469,10 +469,12 @@ export const ServicesScreen = () => {
                 search={searchField}
                 isItemsForbidden={isForbidden(services)}
             />
-            <div className="wbk_servicesScreen__units">
-                {!isUnitsAvailable && (
-                    <ProFeatuerWrapper requiredPlans={['premium', 'pro']} />
-                )}
+            <LockedTableSection
+                isLocked={!isUnitsAvailable}
+                requiredPlans={unitsRequiredPlans}
+                featureKey="daily_services"
+                className="wbk_servicesScreen__units"
+            >
                 <Table
                     title={__('Daily Services / Rentals', 'webba-booking-lite')}
                     addButtonTitle={__('Add daily service', 'webba-booking-lite')}
@@ -499,7 +501,7 @@ export const ServicesScreen = () => {
                     search={unitSearchField}
                     isItemsForbidden={isForbidden(units)}
                 />
-            </div>
+            </LockedTableSection>
             <Table
                 title={__('Categories', 'webba-booking-lite')}
                 addButtonTitle={__(

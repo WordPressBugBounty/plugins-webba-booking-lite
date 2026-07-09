@@ -128,7 +128,8 @@
     }
 
     a,
-    .wbk_header__settingsLink {
+    .wbk_header__settingsLink,
+    .wbk_header__quickSetupGuideLink {
         color: #000;
         font-size: 14px;
         line-height: 20px;
@@ -153,6 +154,12 @@
 
         &:hover {
             text-decoration: underline;
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: wait;
+            text-decoration: none;
         }
     }
 

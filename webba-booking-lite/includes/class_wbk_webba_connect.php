@@ -22,7 +22,7 @@ class WBK_Webba_Connect
      * Uses WBK_CONNECT_API_URL constant if defined, otherwise defaults to production URL
      * If WordPress is running in Docker and URL contains localhost, converts to host.docker.internal
      *
-     * @return string The backend server URL
+     * @return string The backe nd server URL
      */
     private static function get_backend_url()
     {
@@ -43,6 +43,14 @@ class WBK_Webba_Connect
         }
 
         return $url;
+    }
+
+    /**
+     * Public base URL for Webba Connect API calls (no trailing slash).
+     */
+    public static function get_connect_api_url(): string
+    {
+        return rtrim(self::get_backend_url(), "/");
     }
 
     /**
@@ -101,6 +109,29 @@ class WBK_Webba_Connect
      */
     private function prepare_auth_parameters($return_path = "", $endpoint = "", $calendar_id = "")
     {
+        return $this->prepare_signed_auth_parameters(
+            "GET",
+            $endpoint,
+            $return_path,
+            $calendar_id,
+        );
+    }
+
+    /**
+     * Prepare signed auth query string for Webba Connect API requests.
+     *
+     * @param string $method HTTP method used in the canonical string (GET or POST)
+     * @param string $endpoint Endpoint path without leading slash (e.g. assistance/tasks)
+     * @param string $return_path Optional return path
+     * @param string $calendar_id Optional calendar id
+     * @return string|false
+     */
+    private function prepare_signed_auth_parameters(
+        $method = "GET",
+        $endpoint = "",
+        $return_path = "",
+        $calendar_id = ""
+    ) {
         // Get Freemius instance
         $fs = wbk_fs();
 
@@ -154,7 +185,7 @@ class WBK_Webba_Connect
 
         // Create canonical string for HMAC
         $canonical = implode("\n", [
-            "GET",
+            strtoupper((string) $method),
             "/" . $endpoint,
             $site,
             $return_path,
@@ -185,6 +216,235 @@ class WBK_Webba_Connect
         );
 
         return http_build_query($query_params);
+    }
+
+    /**
+     * Stable per-site install id for Assistance API (no Freemius).
+     */
+    public static function get_connect_install_id(): string
+    {
+        $id = get_option("wbk_connect_install_id", "");
+        if (!is_string($id) || $id === "") {
+            if (function_exists("wp_generate_uuid4")) {
+                $id = wp_generate_uuid4();
+            } else {
+                $id = (string) wp_hash(
+                    home_url("/") . (defined("ABSPATH") ? ABSPATH : ""),
+                );
+            }
+            update_option("wbk_connect_install_id", $id, true);
+        }
+
+        return $id;
+    }
+
+    /**
+     * Per-site HMAC secret for Assistance API (generated locally, registered on Webba Connect).
+     */
+    public static function get_connect_install_secret(): string
+    {
+        $secret = get_option("wbk_connect_install_secret", "");
+        if (!is_string($secret) || strlen($secret) < 32) {
+            $secret = bin2hex(random_bytes(32));
+            update_option("wbk_connect_install_secret", $secret, true);
+        }
+
+        return $secret;
+    }
+
+    /**
+     * Prepare signed auth for Assistance API requests.
+     *
+     * Uses a stable local install id + per-site secret (wbk_connect_install_* options).
+     *
+     * @param string $method HTTP method used in the canonical string (GET or POST)
+     * @param string $endpoint Endpoint path without leading slash (e.g. assistance/tasks)
+     * @return string|false
+     */
+    private function prepare_assistance_auth_parameters(
+        $method = "GET",
+        $endpoint = ""
+    ) {
+        $site_url = get_site_url();
+
+        if (!filter_var($site_url, FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        $website_id = self::get_connect_install_id();
+        if ($website_id === "") {
+            return false;
+        }
+
+        $auth_secret = self::get_connect_install_secret();
+        if ($auth_secret === "") {
+            return false;
+        }
+
+        $nonce = bin2hex(random_bytes(16));
+        $ts = time();
+
+        if (!preg_match('/^[a-f0-9]{32}$/', $nonce)) {
+            return false;
+        }
+
+        if (!is_numeric($ts) || $ts <= 0) {
+            return false;
+        }
+
+        $canonical = implode("\n", [
+            strtoupper((string) $method),
+            "/" . $endpoint,
+            $site_url,
+            "",
+            "",
+            $nonce,
+            (string) $ts,
+            $website_id,
+        ]);
+
+        $state = $this->hmac_b64url($canonical, $auth_secret);
+
+        $query_params = [
+            "site" => $site_url,
+            "website_id" => $website_id,
+            "nonce" => $nonce,
+            "ts" => (string) $ts,
+            "v" => "1",
+            "state" => $state,
+        ];
+
+        return http_build_query($query_params);
+    }
+
+    /**
+     * Register this WordPress site's Assistance credentials on Webba Connect (one-time per install).
+     */
+    private function register_assistance_install(): bool
+    {
+        $backend_url = apply_filters(
+            "wbk_assistance_connect_api_url",
+            self::get_connect_api_url(),
+        );
+        if ($backend_url && substr($backend_url, -1) !== "/") {
+            $backend_url .= "/";
+        }
+
+        $website_id = self::get_connect_install_id();
+        $site_url = get_site_url();
+        $install_secret = self::get_connect_install_secret();
+
+        if ($website_id === "" || $install_secret === "" || !filter_var($site_url, FILTER_VALIDATE_URL)) {
+            return false;
+        }
+
+        $response = wp_remote_post($backend_url . "assistance/register", [
+            "timeout" => 30,
+            "headers" => [
+                "Content-Type" => "application/json",
+            ],
+            "body" => wp_json_encode([
+                "website_id" => $website_id,
+                "site" => $site_url,
+                "install_secret" => $install_secret,
+            ]),
+            "sslverify" => strpos($backend_url, "https://") === 0,
+        ]);
+
+        if (is_wp_error($response)) {
+            return false;
+        }
+
+        $response_code = (int) wp_remote_retrieve_response_code($response);
+        return $response_code >= 200 && $response_code < 300;
+    }
+
+    /**
+     * Ensure the local install is registered on Webba Connect before authenticated calls.
+     */
+    private function ensure_assistance_install_registered(): bool
+    {
+        if (get_option("wbk_connect_install_registered", "") === "1") {
+            return true;
+        }
+
+        if (!$this->register_assistance_install()) {
+            return false;
+        }
+
+        update_option("wbk_connect_install_registered", "1", true);
+        return true;
+    }
+
+    /**
+     * @param array<string, mixed>|null $payload
+     * @return array<string, mixed>|false
+     */
+    private function execute_assistance_api_request(
+        string $method,
+        string $endpoint,
+        string $backend_url,
+        ?array $payload = null
+    ) {
+        $query = $this->prepare_assistance_auth_parameters($method, $endpoint);
+        if (!$query) {
+            return [
+                "success" => false,
+                "message" => __(
+                    "Could not authenticate with Webba Connect.",
+                    "webba-booking-lite",
+                ),
+            ];
+        }
+
+        $url = $backend_url . $endpoint . "?" . $query;
+        $args = [
+            "method" => strtoupper($method),
+            "timeout" => 30,
+            "headers" => [
+                "Content-Type" => "application/json",
+            ],
+            "sslverify" => strpos($backend_url, "https://") === 0,
+        ];
+
+        if ($payload !== null && strtoupper($method) === "POST") {
+            $args["body"] = wp_json_encode($payload);
+        }
+
+        $response = wp_remote_request($url, $args);
+
+        if (is_wp_error($response)) {
+            return [
+                "success" => false,
+                "message" => $response->get_error_message(),
+            ];
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+
+        if (!is_array($data)) {
+            return [
+                "success" => false,
+                "message" => sprintf(
+                    /* translators: 1: HTTP status code, 2: assistance API base URL */
+                    __(
+                        'Invalid response from Webba Connect (HTTP %1$d). Check that the server is running at %2$s.',
+                        "webba-booking-lite",
+                    ),
+                    (int) $response_code,
+                    $backend_url,
+                ),
+            ];
+        }
+
+        if ($response_code < 200 || $response_code >= 300) {
+            $data["http_status"] = (int) $response_code;
+            return $data;
+        }
+
+        return $data;
     }
 
     /**
@@ -219,10 +479,7 @@ class WBK_Webba_Connect
     public function get_google_revoke_url($calendar_id = "")
     {
         $return_path =
-            "/wp-admin/admin.php?page=wbk-connected-calendars&revoke-gg-calendar=" .
-            $calendar_id .
-            "&_wpnonce=" .
-            wp_create_nonce("wbk_revoke_gg_calendar_" . $calendar_id);
+            "/wp-admin/admin.php?page=wbk-connected-calendars&revoke-gg-calendar=" . $calendar_id;
 
         // Prepare authentication parameters including HMAC validation
         $query = $this->prepare_auth_parameters($return_path, "revoke-token", $calendar_id);
@@ -375,9 +632,7 @@ class WBK_Webba_Connect
     {
         $return_path =
             "/wp-admin/admin.php?page=wbk-connected-calendars&revoke-outlook-calendar=" .
-            $calendar_id .
-            "&_wpnonce=" .
-            wp_create_nonce("wbk_revoke_outlook_calendar_" . $calendar_id);
+            $calendar_id;
 
         // Prepare authentication parameters including HMAC validation
         $query = $this->prepare_auth_parameters($return_path, "revoke-token", $calendar_id);
@@ -523,5 +778,112 @@ class WBK_Webba_Connect
     public function get_google_access_token($calendar_id = "")
     {
         return $this->fetch_access_token_from_webba_connect($calendar_id, "google");
+    }
+
+    /**
+     * Create an async assistance task on Webba Connect.
+     *
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>|false
+     */
+    public function create_assistance_task(array $payload)
+    {
+        return $this->request_assistance_api("POST", "assistance/tasks", $payload);
+    }
+
+    /**
+     * Fetch assistance task status/result from Webba Connect.
+     *
+     * @return array<string, mixed>|false
+     */
+    public function get_assistance_task(string $task_id)
+    {
+        $task_id = trim($task_id);
+        if ($task_id === "") {
+            return false;
+        }
+
+        return $this->request_assistance_api(
+            "GET",
+            "assistance/tasks/" . rawurlencode($task_id),
+        );
+    }
+
+    /**
+     * Report a completed assistance setup (booking page created) to Webba Connect.
+     *
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>|false
+     */
+    public function complete_assistance_chat_history(array $payload)
+    {
+        return $this->request_assistance_api(
+            "POST",
+            "assistance/chat-history/complete",
+            $payload,
+        );
+    }
+
+    /**
+     * Fetch plugin remote configuration from Webba Connect.
+     *
+     * @return array<string, mixed>|false
+     */
+    public function get_remote_config()
+    {
+        return $this->request_assistance_api("GET", "plugin/config");
+    }
+
+    /**
+     * @param array<string, mixed>|null $payload
+     * @return array<string, mixed>|false
+     */
+    private function request_assistance_api(
+        string $method,
+        string $endpoint,
+        ?array $payload = null
+    ) {
+        if (!$this->ensure_assistance_install_registered()) {
+            return [
+                "success" => false,
+                "message" => __(
+                    "Could not register this site with Webba Connect.",
+                    "webba-booking-lite",
+                ),
+            ];
+        }
+
+        $backend_url = apply_filters(
+            "wbk_assistance_connect_api_url",
+            self::get_connect_api_url(),
+        );
+        if ($backend_url && substr($backend_url, -1) !== "/") {
+            $backend_url .= "/";
+        }
+
+        $response = $this->execute_assistance_api_request(
+            $method,
+            $endpoint,
+            $backend_url,
+            $payload,
+        );
+
+        if (
+            is_array($response) &&
+            (int) ($response["http_status"] ?? 0) === 401 &&
+            ($response["code"] ?? "") === "install_not_registered"
+        ) {
+            delete_option("wbk_connect_install_registered");
+            if ($this->ensure_assistance_install_registered()) {
+                $response = $this->execute_assistance_api_request(
+                    $method,
+                    $endpoint,
+                    $backend_url,
+                    $payload,
+                );
+            }
+        }
+
+        return $response;
     }
 }

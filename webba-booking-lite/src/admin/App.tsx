@@ -26,6 +26,10 @@ import { CalendarScreen } from "./screens/Calendar/CalendarScreen";
 import { StaffMembersScreen } from "./screens/StaffMembers/StaffMembersScreen";
 import { LocationsScreen } from "./screens/Locations/LocationsScreen";
 import { ExtrasScreen } from "./screens/Extras/ExtrasScreen";
+import { SetupChecklist } from "./components/SetupChecklist/SetupChecklist";
+import { FeatureTour } from "./components/FeatureTour/FeatureTour";
+import { AssistanceScreen } from "./screens/Assistance/AssistanceScreen";
+import { useAnalytics } from "./hooks/useAnalytics";
 
 const tabToScreenMap: RouterConfig = {
   services: <ServicesScreen />,
@@ -45,6 +49,7 @@ const tabToScreenMap: RouterConfig = {
   appearance: <AppearanceEditorScreen />,
   options: <OptionsScreen />,
   "connected-calendars": <ConnectedCalendarsScreen />,
+  assistance: <AssistanceScreen />,
 };
 
 const pageToRoutesMap: Record<Page, RouterConfig> = {
@@ -115,11 +120,19 @@ const pageToRoutesMap: Record<Page, RouterConfig> = {
 };
 
 export const App = () => {
+  useAnalytics();
   const { page } = usePage();
   const [params] = useSearchParams();
-  const isActivationPage = params.get('wbk-activation') === 'true'
+  const isActivationPage = params.get("wbk-activation") === "true";
+  const isAssistancePage =
+    page === "wbk-options" && params.get("Assistance") === "true";
+
   if (isActivationPage) {
     return <SetupWizard />;
+  }
+
+  if (isAssistancePage) {
+    return <AssistanceScreen />;
   }
   const { settings } = useSelect(
     // @ts-ignore
@@ -135,6 +148,8 @@ export const App = () => {
           {!isActivationPage && <Router config={pageToRoutesMap[page]} />}
           {!isActivationPage && <Sidebar />}
           {!isActivationPage && <ConfirmationPopup />}
+          {!isActivationPage && <SetupChecklist />}
+          {!isActivationPage && <FeatureTour />}
         </SettingsProvider>
       </ConfirmationPopupProvider>
     </SidebarProvider>

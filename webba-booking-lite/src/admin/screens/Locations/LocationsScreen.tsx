@@ -15,7 +15,7 @@ import './LocationsScreen.scss'
 import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
 import { FailedMessage } from '../../components/FailedMessage/FailedMessage'
 import { isForbidden } from '../../utils/errors'
-import { ProFeatuerWrapper } from '../../components/ProFeatuerWrapper/ProFeatuerWrapper'
+import { LockedTableSection } from '../../components/LockedTableSection/LockedTableSection'
 
 export const LocationsScreen = () => {
     const { plugin_url, settings, staff_members, services, plan_map } = useSelect(
@@ -23,7 +23,7 @@ export const LocationsScreen = () => {
         (select) => select(store_name).getPreset(),
         []
     )
-    const isProPlan = plan_map && ['premium', 'pro'].some((plan) => plan_map[plan] === true)
+    const isProPlan = plan_map && ['premium', 'pro', 'proextended'].some((plan) => plan_map[plan] === true)
     const columns = generateColumnDefsFromModel(locationsModel, {}, {
         services: {
             header: __('Services', 'webba-booking-lite'),
@@ -126,8 +126,12 @@ export const LocationsScreen = () => {
 
     return (
         <>
-            <div className="wbk_locations_screen">
-                {!isProPlan && <ProFeatuerWrapper requiredPlans={['pro']} />}
+            <LockedTableSection
+                isLocked={!isProPlan}
+                requiredPlans={['pro', 'proextended']}
+                featureKey="locations"
+                className="wbk_locations_screen"
+            >
                 <Table
                     title={__('Locations', 'webba-booking-lite')}
                     addButtonTitle={__('Add location', 'webba-booking-lite')}
@@ -154,7 +158,7 @@ export const LocationsScreen = () => {
                     }
                     isItemsForbidden={isForbidden(locations)}
                 />
-            </div>
+            </LockedTableSection>
             <SuccessMessage />
             <FailedMessage />
         </>

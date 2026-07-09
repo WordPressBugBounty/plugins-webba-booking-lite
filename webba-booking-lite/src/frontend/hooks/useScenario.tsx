@@ -6,6 +6,7 @@ import { useWording } from './useWording'
 import { useDispatch } from '@wordpress/data'
 import { store_name } from '../../store/frontend'
 import { stripeMethods } from '../screens/BookingForm/PaymentHandler/payments/Stripe/StripeMethods'
+import { trackBookingFormSubmitted } from '../utils/frontendAnalytics'
 
 export const useScenario = (scenarios: IScenario[]) => {
     const {
@@ -144,9 +145,22 @@ export const useScenario = (scenarios: IScenario[]) => {
     }, [jumpToTop])
 
     const processBooking = useCallback(async () => {
+        const submittedFormData = formDataRef.current
+        const itemsCount =
+            bookingMode === 'units'
+                ? submittedFormData.units?.length ?? 0
+                : submittedFormData.services?.length ?? 0
+        const baseTrackingProperties = {
+            booking_mode: bookingMode,
+            items_count: itemsCount,
+            payment_method: submittedFormData.payment_method,
+            has_coupon: Boolean(submittedFormData.coupon?.trim()),
+            total_amount: amountData?.to_pay_total,
+        }
+
         let response: any
         try {
-            response = await placeBooking(formDataRef.current)
+            response = await placeBooking(submittedFormData)
         } catch (e: any) {
             const message =
                 e?.message ??
@@ -154,9 +168,22 @@ export const useScenario = (scenarios: IScenario[]) => {
                 (typeof e?.data === 'string' ? e.data : null) ??
                 (e?.code ? String(e.code) : null) ??
                 'Booking failed'
+
+            trackBookingFormSubmitted({
+                ...baseTrackingProperties,
+                success: false,
+                error_message: message,
+            })
+
             toast.error(message)
             throw e
         }
+
+        trackBookingFormSubmitted({
+            ...baseTrackingProperties,
+            success: true,
+            payment_required: response?.payment_required,
+        })
 
         if (!stripeObj) return response
 
@@ -228,7 +255,17 @@ export const useScenario = (scenarios: IScenario[]) => {
         }
 
         return response
-    }, [stripeObj, placeBooking, stripeMethods, formDataRef])
+    }, [
+        stripeObj,
+        placeBooking,
+        stripeMethods,
+        formDataRef,
+        bookingMode,
+        amountData,
+        setLoading,
+        submitStripePayment,
+        setBookingData,
+    ])
 
     const goNext = useCallback(async () => {
         if (!canGoNextRef.current) return

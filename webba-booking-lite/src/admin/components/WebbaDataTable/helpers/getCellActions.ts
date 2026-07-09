@@ -19,6 +19,13 @@ export const getCellActions = ({ cell, collectionName }: CellActionsParams) => {
             ...cell.row.original,
             name: `Copy of ${cell.row.original.name}`,
         }
+
+        Object.keys(update).forEach((key) => {
+            if (update[key] === null) {
+                update[key] = ''
+            }
+        })
+
         await addItem(collectionName, update)
     }
 

@@ -45,6 +45,12 @@ class WBK_Model
 	        DEFAULT CHARACTER SET = utf8
 	        COLLATE = utf8_general_ci",
         );
+
+        if (!class_exists("WBK_Migration_Ai_Tasks")) {
+            require_once WP_WEBBA_BOOKING__PLUGIN_DIR .
+                "/includes/migrations/class-wbk-migration-ai-tasks.php";
+        }
+        WBK_Migration_Ai_Tasks::run();
     }
 
     /**
@@ -101,7 +107,12 @@ class WBK_Model
             __("Fields", "webba-booking-lite"),
             "wbk_form_fields",
             "general",
-            ["tooltip" => __("", "")],
+            [
+                "tooltip" => __(
+                    "Configure the custom fields that customers fill out during booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             [],
             true,
             false,
@@ -150,6 +161,7 @@ class WBK_Model
             __("Service name", "webba-booking-lite"),
             "text",
             "details",
+            ["tooltip" => __("Enter service name.", "webba-booking-lite")],
         );
         // Category (optional) - NEW FIELD
         $table->add_field(
@@ -1144,6 +1156,10 @@ class WBK_Model
             "select",
             "integrations",
             [
+                "tooltip" => __(
+                    'Choose how external calendar events affect group service availability: reduce the number of available places or lock the entire time slot.',
+                    "webba-booking-lite",
+                ),
                 "items" => [
                     "reduce" => __("Reduce availability", "webba-booking-lite"),
                     "lock" => __("Lock time slot", "webba-booking-lite"),
@@ -1897,7 +1913,12 @@ class WBK_Model
             "token",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Unique token for customer access to this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -1909,7 +1930,12 @@ class WBK_Model
             "canceled_by",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Who cancelled the booking, if applicable.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -1971,7 +1997,13 @@ class WBK_Model
             __("Duration", "webba-booking-lite"),
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Duration of the booking in minutes.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             false,
             true,
@@ -1983,7 +2015,13 @@ class WBK_Model
             __("Created on", "webba-booking-lite"),
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Date and time when the booking was created.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             false,
             in_array("created_on", $allowed_fields),
@@ -2051,7 +2089,12 @@ class WBK_Model
             __("Custom fields", "webba-booking-lite"),
             "wbk_app_custom_data",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Custom field values submitted with this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             true,
             in_array("extra", $allowed_fields),
@@ -2063,7 +2106,13 @@ class WBK_Model
             __("Coupon", "webba-booking-lite"),
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Coupon applied to this booking, if any.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             false,
             in_array("coupon", $allowed_fields),
@@ -2075,7 +2124,12 @@ class WBK_Model
             __("Payment method", "webba-booking-lite"),
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Payment method used for this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             in_array("payment_method", $allowed_fields),
@@ -2124,7 +2178,12 @@ class WBK_Model
             __("User IP", "webba-booking-lite"),
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "IP address of the customer when the booking was made.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             in_array("ip", $allowed_fields),
@@ -2158,6 +2217,10 @@ class WBK_Model
             "select",
             "",
             [
+                "tooltip" => __(
+                    "Whether the booking was created by the customer or an administrator.",
+                    "webba-booking-lite",
+                ),
                 "items" => [
                     "na" => __("N/A", "webba-booking-lite"),
                     "customer" => __("Customer", "webba-booking-lite"),
@@ -2174,7 +2237,12 @@ class WBK_Model
             __("Service category", "webba-booking-lite"),
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Service category at the time of booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2186,7 +2254,12 @@ class WBK_Model
             "lang",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Language used when the booking was made.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2198,7 +2271,13 @@ class WBK_Model
             "end",
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "End time of the booking (Unix timestamp).",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             false,
             false,
@@ -2210,7 +2289,12 @@ class WBK_Model
             "attachment",
             "textarea",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "File attachments submitted with this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2222,7 +2306,12 @@ class WBK_Model
             "payment_id",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Payment transaction identifier.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2234,7 +2323,12 @@ class WBK_Model
             "token",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Unique token for customer access to this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2246,7 +2340,12 @@ class WBK_Model
             "admin_token",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Unique token for administrator access to this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2258,7 +2357,12 @@ class WBK_Model
             "payment_cancel_token",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Token used to cancel the payment.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2270,7 +2374,13 @@ class WBK_Model
             "expiration_time",
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Time when an unpaid booking expires.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             false,
             false,
@@ -2282,7 +2392,13 @@ class WBK_Model
             "arrival_email_time",
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Time when the arrival reminder email was sent.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             false,
             false,
@@ -2294,7 +2410,13 @@ class WBK_Model
             "time_offset",
             "text",
             "",
-            ["sub_type" => "integer"],
+            [
+                "tooltip" => __(
+                    "Time offset applied to this booking.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "integer",
+            ],
             "",
             false,
             false,
@@ -2306,7 +2428,12 @@ class WBK_Model
             "gg_event_id",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Google Calendar event ID linked to this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2318,7 +2445,12 @@ class WBK_Model
             "outlook_event_id",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Outlook Calendar event ID linked to this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2330,7 +2462,12 @@ class WBK_Model
             "prev_status",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Previous booking status before the last change.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2342,7 +2479,12 @@ class WBK_Model
             "amount_details",
             "textarea",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Detailed breakdown of the booking amount.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2354,7 +2496,12 @@ class WBK_Model
             "zoom_meeting_id",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Zoom meeting ID for this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2366,7 +2513,12 @@ class WBK_Model
             "zoom_meeting_url",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Zoom meeting URL for this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2378,7 +2530,12 @@ class WBK_Model
             "zoom_meeting_pwd",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Zoom meeting password for this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2391,7 +2548,12 @@ class WBK_Model
             "google_meet_link",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Google Meet link for this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2403,7 +2565,12 @@ class WBK_Model
             "paid_with_coupon",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Whether this booking was paid using a coupon.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2460,7 +2627,13 @@ class WBK_Model
             __("ID of cancelled appointment", "webba-booking-lite"),
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Original booking ID before cancellation.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             false,
             true,
@@ -2473,6 +2646,7 @@ class WBK_Model
             "select",
             "",
             [
+                "tooltip" => __("Select the booking time.", "webba-booking-lite"),
                 "time_format" => $time_format,
                 "time_zone" => get_option("wbk_timezone", "UTC"),
                 "options" => "backend",
@@ -2487,7 +2661,12 @@ class WBK_Model
             __("Cancelled by", "webba-booking-lite"),
             "textarea",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Who cancelled this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             true,
@@ -2500,6 +2679,10 @@ class WBK_Model
             "select",
             "",
             [
+                "tooltip" => __(
+                    "Select the service for which the booking is being made.",
+                    "webba-booking-lite",
+                ),
                 "items" => WBK_Model_Utils::get_services(),
                 "sub_type" => "positive_integer",
             ],
@@ -2514,7 +2697,13 @@ class WBK_Model
             "created_on",
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Date and time when the booking was created.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             true,
             true, //in_array('created_on', $allowed_fields),
@@ -2527,6 +2716,7 @@ class WBK_Model
             "wbk_date",
             "",
             [
+                "tooltip" => __("Select the booking date.", "webba-booking-lite"),
                 "date_format" => $date_format,
                 "time_zone" => get_option("wbk_timezone", "UTC"),
             ],
@@ -2540,7 +2730,14 @@ class WBK_Model
             __("Places booked", "webba-booking-lite"),
             "select",
             "",
-            ["sub_type" => "positive_integer", "items" => []],
+            [
+                "tooltip" => __(
+                    "Specify the number of places being booked for this appointment.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+                "items" => [],
+            ],
             null,
             false,
             in_array("quantity", $allowed_fields),
@@ -2552,7 +2749,12 @@ class WBK_Model
             __("Name", "webba-booking-lite"),
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Enter the name of the customer.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             true,
             in_array("name", $allowed_fields),
@@ -2563,7 +2765,10 @@ class WBK_Model
             __("Email", "webba-booking-lite"),
             "text",
             "",
-            ["sub_type" => "email"],
+            [
+                "tooltip" => __('Enter the customer\'s email address.', "webba-booking-lite"),
+                "sub_type" => "email",
+            ],
             "",
             false,
             in_array("email", $allowed_fields),
@@ -2574,7 +2779,9 @@ class WBK_Model
             __("Phone", "webba-booking-lite"),
             "text",
             "",
-            null,
+            [
+                "tooltip" => __('Enter the customer\'s phone number.', "webba-booking-lite"),
+            ],
             "",
             false,
             in_array("phone", $allowed_fields),
@@ -2586,7 +2793,12 @@ class WBK_Model
             __("Comment", "webba-booking-lite"),
             "textarea",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Add any additional comments related to the booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             true,
             in_array("description", $allowed_fields),
@@ -2598,7 +2810,9 @@ class WBK_Model
             __("Booking extra", "webba-booking-lite"),
             "text",
             "",
-            null,
+            [
+                "tooltip" => __("Extras for this booking", "webba-booking-lite"),
+            ],
             "",
             true,
             in_array("booking_extra", $allowed_fields),
@@ -2610,7 +2824,12 @@ class WBK_Model
             __("Custom fields", "webba-booking-lite"),
             "wbk_app_custom_data",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Custom field values submitted with this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             in_array("extra", $allowed_fields),
@@ -2622,7 +2841,13 @@ class WBK_Model
             "coupon",
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Coupon applied to this booking, if any.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             false,
             in_array("coupon", $allowed_fields),
@@ -2634,7 +2859,12 @@ class WBK_Model
             __("Payment method", "webba-booking-lite"),
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Payment method used for this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             in_array("payment_method", $allowed_fields),
@@ -2646,7 +2876,12 @@ class WBK_Model
             __("Price", "webba-booking-lite"),
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "If the payment has already been made, enter the payment amount paid for 1 person.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             in_array("moment_price", $allowed_fields),
@@ -2659,8 +2894,12 @@ class WBK_Model
             __("User IP", "webba-booking-lite"),
             "text",
             "",
-            true,
-            null,
+            [
+                "tooltip" => __(
+                    "IP address of the customer when the booking was made.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             in_array("ip", $allowed_fields),
@@ -2672,6 +2911,10 @@ class WBK_Model
             "select",
             "",
             [
+                "tooltip" => __(
+                    "Choose the appropriate booking status from the options available.",
+                    "webba-booking-lite",
+                ),
                 "items" => WBK_Model_Utils::get_booking_status_list(),
                 "options" => WBK_Model_Utils::get_booking_status_list(),
             ],
@@ -2686,7 +2929,12 @@ class WBK_Model
             "service_category",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Service category at the time of booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2698,7 +2946,12 @@ class WBK_Model
             "lang",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Language used when the booking was made.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2710,7 +2963,13 @@ class WBK_Model
             __("Duration", "webba-booking-lite"),
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Duration of the booking in minutes.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             false,
             true,
@@ -2722,7 +2981,12 @@ class WBK_Model
             "attachment",
             "textarea",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "File attachments submitted with this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2734,7 +2998,12 @@ class WBK_Model
             "payment_id",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Payment transaction identifier.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2746,7 +3015,12 @@ class WBK_Model
             "token",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Unique token for customer access to this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2758,7 +3032,12 @@ class WBK_Model
             "admin_token",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Unique token for administrator access to this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2770,7 +3049,12 @@ class WBK_Model
             "payment_cancel_token",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Token used to cancel the payment.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2782,7 +3066,13 @@ class WBK_Model
             "expiration_time",
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Time when an unpaid booking expires.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             false,
             false,
@@ -2794,7 +3084,13 @@ class WBK_Model
             "time_offset",
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Time offset applied to this booking.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             false,
             false,
@@ -2806,7 +3102,12 @@ class WBK_Model
             "gg_event_id",
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Google Calendar event ID linked to this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             false,
             false,
@@ -2837,6 +3138,10 @@ class WBK_Model
             "radio",
             "",
             [
+                "tooltip" => __(
+                    "Select the calendar provider to connect (Google Calendar or Microsoft Outlook).",
+                    "webba-booking-lite",
+                ),
                 "options" => [
                     [
                         "value" => "google",
@@ -2970,6 +3275,10 @@ class WBK_Model
             "wbk_google_access_token",
             null,
             [
+                "tooltip" => __(
+                    "Authorization status for the connected calendar account.",
+                    "webba-booking-lite",
+                ),
                 "hidden" => true,
             ],
             "general",
@@ -3064,7 +3373,13 @@ class WBK_Model
             __("Used", "webba-booking-lite"),
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Number of times this coupon has been used.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             false,
             true,
@@ -3193,7 +3508,13 @@ class WBK_Model
             __("Date range", "webba-booking-lite"),
             "date_range",
             "",
-            ["time_zone" => get_option("wbk_timezone", "UTC")],
+            [
+                "tooltip" => __(
+                    "Define the date range during which this pricing rule applies.",
+                    "webba-booking-lite",
+                ),
+                "time_zone" => get_option("wbk_timezone", "UTC"),
+            ],
             "",
             true,
             false,
@@ -3204,7 +3525,13 @@ class WBK_Model
             __("Minimum number of days before the booked date", "webba-booking-lite"),
             "text",
             "",
-            ["sub_type" => "positive_integer"],
+            [
+                "tooltip" => __(
+                    "Minimum number of days before the booked date required for early booking discount.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
             "",
             true,
             false,
@@ -3215,7 +3542,12 @@ class WBK_Model
             __("Custom field ID", "webba-booking-lite"),
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Enter the ID of the custom form field to match.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             true,
             false,
@@ -3228,6 +3560,10 @@ class WBK_Model
             "radio",
             "",
             [
+                "tooltip" => __(
+                    "Choose how to compare the custom field value.",
+                    "webba-booking-lite",
+                ),
                 "options" => [
                     "equals" => __("equals", "webba-booking-lite"),
                     "more_than" => __("more than", "webba-booking-lite"),
@@ -3244,7 +3580,12 @@ class WBK_Model
             __("Custom field value", "webba-booking-lite"),
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Enter the value to compare against the custom field.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             true,
             false,
@@ -3257,6 +3598,10 @@ class WBK_Model
             "radio",
             "",
             [
+                "tooltip" => __(
+                    "Choose how to compare the number of seats booked.",
+                    "webba-booking-lite",
+                ),
                 "options" => [
                     "equals" => __("equals", "webba-booking-lite"),
                     "more_than" => __("more than", "webba-booking-lite"),
@@ -3273,7 +3618,12 @@ class WBK_Model
             __("Number of seats", "webba-booking-lite"),
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Enter the number of seats to compare against.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             true,
             false,
@@ -3286,6 +3636,10 @@ class WBK_Model
             "radio",
             "",
             [
+                "tooltip" => __(
+                    "Choose how to compare the number of timeslots booked.",
+                    "webba-booking-lite",
+                ),
                 "options" => [
                     "equals" => __("equals", "webba-booking-lite"),
                     "more_than" => __("more than", "webba-booking-lite"),
@@ -3302,7 +3656,12 @@ class WBK_Model
             __("Number of timeslots", "webba-booking-lite"),
             "text",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Enter the number of timeslots to compare against.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             true,
             false,
@@ -3329,7 +3688,12 @@ class WBK_Model
             __("Day of week and time range", "webba-booking-lite"),
             "wbk_business_hours",
             "",
-            null,
+            [
+                "tooltip" => __(
+                    "Select the days of the week and time range for this pricing rule.",
+                    "webba-booking-lite",
+                ),
+            ],
             $day_time_default,
             true,
             false,
@@ -3343,6 +3707,10 @@ class WBK_Model
             "radio",
             "",
             [
+                "tooltip" => __(
+                    "Choose whether to increase, reduce, or replace the service price.",
+                    "webba-booking-lite",
+                ),
                 "options" => [
                     "increase" => __("increase", "webba-booking-lite"),
                     "reduce" => __("reduce", "webba-booking-lite"),
@@ -3378,6 +3746,10 @@ class WBK_Model
             "radio",
             "",
             [
+                "tooltip" => __(
+                    "Choose whether the amount is a fixed value or a percentage.",
+                    "webba-booking-lite",
+                ),
                 "options" => [
                     "fixed" => __("fixed", "webba-booking-lite"),
                     "percent" => __("percent", "webba-booking-lite"),
@@ -3391,7 +3763,13 @@ class WBK_Model
             __("Multiply amount by the field value", "webba-booking-lite"),
             "checkbox",
             "",
-            ["yes" => __("Yes", "webba-booking-lite")],
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => __(
+                    "Multiply the rule amount by the custom field value.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             true,
             false,
@@ -3404,7 +3782,13 @@ class WBK_Model
             __("The field is related to the number of seats booked", "webba-booking-lite"),
             "checkbox",
             "",
-            ["yes" => __("Yes", "webba-booking-lite")],
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => __(
+                    "Enable if the custom field value represents the number of seats booked.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             true,
             false,
@@ -3420,7 +3804,13 @@ class WBK_Model
             ),
             "checkbox",
             "",
-            ["yes" => __("Yes", "webba-booking-lite")],
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => __(
+                    "Apply the pricing rule to the entire order instead of individual time slots.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             true,
             false,
@@ -3484,7 +3874,7 @@ class WBK_Model
             __("Name", "webba-booking-lite"),
             "text",
             "",
-            [],
+            ["tooltip" => __("Enter form name.", "webba-booking-lite")],
             "",
             true,
             true,
@@ -3496,7 +3886,12 @@ class WBK_Model
             __("Fields", "webba-booking-lite"),
             "text",
             "",
-            [],
+            [
+                "tooltip" => __(
+                    "Configure the custom fields that customers fill out during booking.",
+                    "webba-booking-lite",
+                ),
+            ],
             "",
             true,
             false,
@@ -3586,6 +3981,7 @@ class WBK_Model
             "text",
             "details",
             [
+                "tooltip" => __("Enter a name for this extra.", "webba-booking-lite"),
                 "required_plan" => "premium",
             ],
         );

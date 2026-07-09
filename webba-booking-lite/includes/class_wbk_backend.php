@@ -56,6 +56,7 @@ class WBK_Backend
             "wbk-service-categories",
             "wbk-email-templates",
             "wbk-dashboard",
+            ...(wbk_is_assistance_lab_available() ? ["wbk-assistance-lab"] : []),
             "wbk-spa",
             "wbk-locations",
         ];
@@ -238,6 +239,17 @@ class WBK_Backend
                 ["WBK_Renderer", "render_backend_page"],
             );
 
+            if (wbk_is_assistance_lab_available()) {
+                add_submenu_page(
+                    "wbk-main",
+                    __("Assistance Lab", "webba-booking-lite"),
+                    __("Assistance Lab", "webba-booking-lite"),
+                    "manage_options",
+                    "wbk-assistance-lab",
+                    ["WBK_Renderer", "render_backend_page"],
+                );
+            }
+
             $hook = add_submenu_page(
                 "wbk-main",
                 __("Settings", "webba-booking-lite"),
@@ -274,6 +286,7 @@ class WBK_Backend
             "wbk-pricing-rules",
             "wbk-coupons",
             "wbk-gg-calendars",
+            ...(wbk_is_assistance_lab_available() ? ["wbk-assistance-lab"] : []),
         ];
         $ordered = [];
         foreach ($order as $slug) {
@@ -349,15 +362,6 @@ class WBK_Backend
                 wp_die("You are not authorized to revoke Google Calendar tokens.");
             }
             $calendar_id = intval($_GET["revoke-gg-calendar"]);
-            if (
-                !isset($_GET["_wpnonce"]) ||
-                !wp_verify_nonce(
-                    sanitize_text_field(wp_unslash($_GET["_wpnonce"])),
-                    "wbk_revoke_gg_calendar_" . $calendar_id,
-                )
-            ) {
-                wp_die("Security check failed. Please try again.");
-            }
             $google = new WBK_Google_Calendar_Processor($calendar_id);
             $google->clear_access_token();
 
@@ -374,15 +378,6 @@ class WBK_Backend
                 wp_die("You are not authorized to revoke Outlook Calendar tokens.");
             }
             $calendar_id = intval($_GET["revoke-outlook-calendar"]);
-            if (
-                !isset($_GET["_wpnonce"]) ||
-                !wp_verify_nonce(
-                    sanitize_text_field(wp_unslash($_GET["_wpnonce"])),
-                    "wbk_revoke_outlook_calendar_" . $calendar_id,
-                )
-            ) {
-                wp_die("Security check failed. Please try again.");
-            }
             $outlook = new WBK_Outlook_Calendar_Processor($calendar_id);
             $outlook->clear_access_token();
 

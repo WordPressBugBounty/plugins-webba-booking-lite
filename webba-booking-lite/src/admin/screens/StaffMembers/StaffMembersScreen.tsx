@@ -18,7 +18,7 @@ import { isForbidden } from '../../utils/errors'
 import { ServiceNames } from '../../components/WebbaDataTable/cells/ServiceNames/ServiceNames'
 import { LocationNames } from '../../components/WebbaDataTable/cells/LocationNames/LocationNames'
 import { ServiceImageCell } from '../../components/WebbaDataTable/cells/ServiceImageCell/ServiceImageCell'
-import { ProFeatuerWrapper } from '../../components/ProFeatuerWrapper/ProFeatuerWrapper'
+import { LockedTableSection } from '../../components/LockedTableSection/LockedTableSection'
 
 
 export const StaffMembersScreen = () => {
@@ -56,7 +56,7 @@ export const StaffMembersScreen = () => {
         (select) => select(store_name).getPreset(),
         []
     )
-    const isProPlan = plan_map && ['premium', 'pro'].some((plan) => plan_map[plan] === true)
+    const isProPlan = plan_map && ['premium', 'pro', 'proextended'].some((plan) => plan_map[plan] === true)
 
     const table = useWbkTable({
         columns,
@@ -131,8 +131,12 @@ export const StaffMembersScreen = () => {
 
     return (
         <>
-            <div className="wbk_staff_members_screen">
-                {!isProPlan && <ProFeatuerWrapper requiredPlans={['pro']} />}
+            <LockedTableSection
+                isLocked={!isProPlan}
+                requiredPlans={['pro', 'proextended']}
+                featureKey="staff_members"
+                className="wbk_staff_members_screen"
+            >
                 <Table
                     title={__('Staff Members', 'webba-booking-lite')}
                     addButtonTitle={__('Add staff member', 'webba-booking-lite')}
@@ -159,7 +163,7 @@ export const StaffMembersScreen = () => {
                     }
                     isItemsForbidden={isForbidden(staffMembers)}
                 />
-            </div>
+            </LockedTableSection>
             <SuccessMessage />
             <FailedMessage />
         </>

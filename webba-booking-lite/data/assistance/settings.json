@@ -1,0 +1,4271 @@
+{
+  "source": "webba-booking",
+  "description": "Aggregated plugin settings (7 sections, 315 options)",
+  "sourceFile": "../source/site/wp-content/plugins/webba-booking/includes/backend/class_wbk_backend_options.php",
+  "generatedAt": "2026-05-29T18:47:14.450Z",
+  "settings": {
+    "sections": [
+      {
+        "id": "wbk_general_settings_section",
+        "title": "General Settings",
+        "page": "wbk-options",
+        "extra": {
+          "icon": "general",
+          "description": "Configure basic plugin settings, time zones, date formats, and admin interface preferences."
+        }
+      },
+      {
+        "id": "wbk_global_availability_settings_section",
+        "title": "Global Availability & Holidays",
+        "page": "wbk-options",
+        "extra": {
+          "icon": "global-availability",
+          "description": "Set global working hours and manage holidays/days-off."
+        }
+      },
+      {
+        "id": "wbk_advanced_booking_rules_section",
+        "title": "Advanced Booking Rules",
+        "page": "wbk-options",
+        "extra": {
+          "icon": "booking-rules",
+          "description": "Configure booking rules, restrictions, booking form behavior, and advanced options."
+        }
+      },
+      {
+        "id": "wbk_notifications_settings_section",
+        "title": "Notifications",
+        "page": "wbk-options",
+        "extra": {
+          "icon": "notifications",
+          "description": "Configure email and SMS notification settings."
+        }
+      },
+      {
+        "id": "wbk_translation_settings_section",
+        "title": "Wording / Translation",
+        "page": "wbk-options",
+        "extra": {
+          "icon": "wording-translations",
+          "description": "Customize labels, messages, and translate the plugin text.",
+          "editor_view": "tabular"
+        }
+      },
+      {
+        "id": "wbk_payment_settings_section",
+        "title": "Payments",
+        "page": "wbk-options",
+        "extra": {
+          "icon": "payments",
+          "pro": true,
+          "minimal_plan": "standard",
+          "description": "Configure payment settings, currency, tax, and payment gateway integrations (PayPal, Stripe, WooCommerce)."
+        }
+      },
+      {
+        "id": "wbk_integrations_settings_section",
+        "title": "Integrations",
+        "page": "wbk-options",
+        "extra": {
+          "icon": "integrations",
+          "pro": true,
+          "minimal_plan": "start",
+          "description": "Configure integrations with Google Calendar and Zoom."
+        }
+      }
+    ],
+    "options": [
+      {
+        "slug": "wbk_timezone",
+        "type": "select",
+        "title": "Default Time Zone",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "extra": "array_combine(timezone_identifiers_list(), timezone_identifiers_list())",
+          "default": "Europe/London",
+          "not_translated_title": "Default Time Zone",
+          "popup": "Select the time zone your business operates in. All booking times will follow this time zone. Your customer will be able to see timeslots in the timezone they select during booking.",
+          "tab": "general",
+          "searchable": true
+        }
+      },
+      {
+        "slug": "wbk_date_format_new",
+        "type": "select",
+        "title": "Date Format",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "default": "inherit",
+          "not_translated_title": "Date Format",
+          "popup": "Choose how dates are displayed to customers in your booking form and notifications.",
+          "extra": "WBK_Date_Time_Utils::get_supported_date_formats()",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_time_format_new",
+        "type": "select",
+        "title": "Time Format",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "default": "inherit",
+          "not_translated_title": "Time Format",
+          "popup": "Choose the time format for displaying times.",
+          "extra": "WBK_Date_Time_Utils::get_supported_time_formats()",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_start_of_week_new",
+        "type": "select",
+        "title": "Week starts on",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "default": "inherit",
+          "not_translated_title": "Week starts on",
+          "popup": "Choose which day the week starts on.",
+          "extra": {
+            "0": "Sunday",
+            "1": "Monday",
+            "6": "Saturday",
+            "inherit": "Inherit from WP Settings"
+          },
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_sidebar_help_email",
+        "type": "text",
+        "title": "Public Support Email",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "not_translated_title": "Public Support Email",
+          "popup": "This email will be shown on the booking form sidebar so customers know how to contact you for help.",
+          "default": "",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_sidebar_help_phone",
+        "type": "text",
+        "title": "Public Support Phone Number",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "not_translated_title": "Public Support Phone Number",
+          "popup": "This phone number will be shown on the booking form sidebar as your public support contact.",
+          "default": "",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_check_short_code",
+        "type": "checkbox",
+        "title": "Load Webba assets only on Booking pages",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "not_translated_title": "Load Webba assets only on Booking pages",
+          "popup": "Load Webba scripts and styles only on pages containing the booking form. Improves site performance.",
+          "checkbox_value": "yes",
+          "default": "yes",
+          "tab": "technical"
+        }
+      },
+      {
+        "slug": "wbk_load_js_in_footer",
+        "type": "checkbox",
+        "title": "Load javascript files in the footer",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "checkbox_value": "true",
+          "not_translated_title": "Load javascript files in the footer",
+          "popup": "Move Webba JavaScript files to the page footer. Can improve speed, but may affect older themes.",
+          "default": "true",
+          "tab": "technical"
+        }
+      },
+      {
+        "slug": "wbk_date_format_backend",
+        "type": "select",
+        "title": "Date format (backend)",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "default": "inherit",
+          "extra": "WBK_Date_Time_Utils::get_supported_date_formats()",
+          "not_translated_title": "Date format (backend)",
+          "popup": "Choose how dates are displayed in your admin bookings list and calendar.",
+          "tab": "admin-interface"
+        }
+      },
+      {
+        "slug": "wbk_customer_name_output",
+        "type": "text",
+        "title": "Customer name format (backend)",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "default": "#name",
+          "not_translated_title": "Customer name format (backend)",
+          "popup": "__(\n                    'Choose how the customer\\'s name appears in your appointment list. Use placeholders like #name or custom field IDs.',\n                    \"webba-booking-lite\",\n                )",
+          "tab": "admin-interface"
+        }
+      },
+      {
+        "slug": "wbk_backend_calendar_booking_text",
+        "type": "text",
+        "title": "Text details in Schedule calendar",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "default": "#customer_name [#service_name]",
+          "not_translated_title": "Text details in Schedule calendar",
+          "popup": "Text shown inside each booking block in the Schedule page. You can use any placeholders you would like",
+          "tab": "admin-interface"
+        }
+      },
+      {
+        "slug": "wbk_date_format_time_slot_schedule",
+        "type": "select",
+        "title": "Time Slot display format",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "not_translated_title": "Time Slot display format",
+          "popup": "__(\n                    'Choose how time slots appear in the admin calendar (e.g., \"10:00–11:00\").',\n                    \"webba-booking-lite\",\n                )",
+          "default": "start-end",
+          "extra": {
+            "start": "Start",
+            "start-end": "Start - End"
+          },
+          "tab": "admin-interface"
+        }
+      },
+      {
+        "slug": "wbk_custom_fields_columns",
+        "type": "select_multiple",
+        "title": "Custom fields in Bookings table",
+        "section": "wbk_general_settings_section",
+        "extra": {
+          "not_translated_title": "Custom fields in Bookings table",
+          "popup": "Choose which custom fields to display in the Custom Fields column in Bookings table.",
+          "default": {},
+          "tab": "admin-interface",
+          "extra": "backend"
+        }
+      },
+      {
+        "slug": "wbk_allow_coupons",
+        "type": "checkbox",
+        "title": "Enable Coupons",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Enable Coupons",
+          "popup": "Turn on to activate the coupon feature in the booking system. Read more about Coupons setup.",
+          "checkbox_value": "yes",
+          "default": "yes",
+          "required_plan": "premium",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_create_user_on_booking",
+        "type": "checkbox",
+        "title": "Create user account on booking",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "default": false,
+          "checkbox_value": "yes",
+          "not_translated_title": "Create user account on booking",
+          "popup": "Turn on to automatically create a user account for the customer when they book an appointment. User account allows them to manage their booking from the user interface.",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_page_link_new",
+        "type": "select",
+        "title": "User account login page",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "User account login page",
+          "popup": "Specify the user dashboard page URL to manage bookings. This page should include the [webba_user_dashboard] shortcode.",
+          "tab": "general",
+          "extra": "backend"
+        }
+      },
+      {
+        "slug": "wbk_appointments_default_status",
+        "type": "select",
+        "title": "Set default booking status",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Set default booking status",
+          "popup": "Specify the default status assigned to newly created bookings.",
+          "default": "pending",
+          "extra": {
+            "pending": "Pending",
+            "approved": "Approved"
+          },
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_set_arrived_after",
+        "type": "number",
+        "title": "__(\n                'Set the status to \"Arrived\" X minutes after the end of the booking',\n                \"webba-booking-lite\",\n            )",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "'Set the status to \"Arrived\" X minutes after the end of the booking'",
+          "popup": "This is useful if you are sending thank-you/feedback emails after the appointment.",
+          "default": "30",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_appointments_delete_not_paid_mode",
+        "type": "select",
+        "title": "Delete unpaid bookings",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "default": "disabled",
+          "extra": {
+            "disabled": "Disabled",
+            "on_booking": "Set expiration time on booking",
+            "on_approve": "Set expiration time on approve"
+          },
+          "not_translated_title": "Delete unpaid bookings",
+          "popup": "Turn on to automatically delete unpaid bookings.",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_appointments_expiration_time",
+        "type": "duration",
+        "title": "Delete pending bookings",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "default": "0",
+          "not_translated_title": "Delete pending bookings",
+          "popup": "__(\n                    'Specify the minutes (X) after which \"Pending\" bookings will be automatically deleted. To disable automatic deletion, set the value to 0.',\n                    \"webba-booking-lite\",\n                )",
+          "dependency": {
+            "0": "[\"wbk_appointments_delete_not_paid_mode\", \"!=\", \"disabled\"]"
+          },
+          "dependent_value": {
+            "condition": {
+              "0": "wbk_appointments_delete_not_paid_mode",
+              "1": "=",
+              "2": "disabled"
+            },
+            "value": "0"
+          },
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_cancellation_buffer",
+        "type": "duration",
+        "title": "Cancellation buffer",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Cancellation buffer",
+          "popup": "Set the cutoff time (in minutes) before the scheduled booking when customers cannot cancel or modify their bookings.",
+          "default": "120",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_appointments_allow_cancel_paid_new",
+        "type": "checkbox",
+        "title": "Allow cancellation of paid bookings",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "default": "",
+          "checkbox_value": "yes",
+          "not_translated_title": "Allow cancellation of paid bookings",
+          "popup": "Turn on to allow customers to cancel their paid bookings.",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_allow_multiple_services",
+        "type": "checkbox",
+        "title": "Allow multiple service selection",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Allow multiple service selection",
+          "popup": "Turn on to allow customers to select multiple services.",
+          "default": "yes",
+          "checkbox_value": "yes",
+          "required_plan": "start",
+          "available_in_old_free": true,
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_allow_book_days_in_advance",
+        "type": "number",
+        "title": "Allow to book only these many days in advance",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "default": "0",
+          "not_translated_title": "Allow to book only these many days in advance",
+          "popup": "Set how many days in advance people can book your services",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_gdrp",
+        "type": "checkbox",
+        "title": "Make Webba EU GDPR Compliant",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Make Webba EU GDPR Compliant",
+          "popup": "Turn on to align the booking system with GDPR guidelines, providing enhanced data protection and privacy for customer information. It erases all personal booking information after the appointment is finished and prevents IP address of the user to be stored.",
+          "checkbox_value": "yes",
+          "default": "",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_appointments_auto_lock",
+        "type": "checkbox",
+        "title": "Autolock bookings",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Autolock bookings",
+          "popup": "__(\n                    'NEW: Enable autolock settings that will automatically lock services/slots/whole day if certain booking is made.\n\nOLD: When one service is booked, it will automatically lock another one on the same time in the same category, preventing conflicting bookings.',\n                    \"webba-booking-lite\",\n                )",
+          "checkbox_value": "enabled",
+          "default": "enabled",
+          "required_plan": "standard",
+          "available_in_old_free": true,
+          "tab": "restrictions"
+        }
+      },
+      {
+        "slug": "wbk_appointments_auto_lock_mode",
+        "type": "select",
+        "title": "Perform autolock on",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Perform autolock on",
+          "popup": "Choose whether the autolock feature applies to all services or only services within the same category.",
+          "default": "categories",
+          "extra": {
+            "all": "All Services",
+            "categories": "Services in the same category"
+          },
+          "dependency": {
+            "0": "[\"wbk_appointments_auto_lock\", \"=\", \"enabled\"]"
+          },
+          "dependent_value": {
+            "condition": {
+              "0": "wbk_appointments_auto_lock",
+              "1": "!=",
+              "2": "enabled"
+            },
+            "value": "categories"
+          },
+          "tab": "restrictions"
+        }
+      },
+      {
+        "slug": "wbk_appointments_auto_lock_group",
+        "type": "select",
+        "title": "Autolock for group booking services",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "default": "lock",
+          "not_translated_title": "Autolock for group booking services",
+          "popup": "__(\n                    'Choose to either \"Lock time slot\" or \"Reduce count of available places\" when a group booking is turned on.',\n                    \"webba-booking-lite\",\n                )",
+          "extra": {
+            "lock": "Lock time slot",
+            "reduce": "Reduce count of available spaces"
+          },
+          "dependency": {
+            "0": "[\"wbk_appointments_auto_lock\", \"=\", \"enabled\"]"
+          },
+          "dependent_value": {
+            "condition": {
+              "0": "wbk_appointments_auto_lock",
+              "1": "!=",
+              "2": "enabled"
+            },
+            "value": "lock"
+          },
+          "tab": "restrictions"
+        }
+      },
+      {
+        "slug": "wbk_appointments_lock_timeslot_if_parital_booked",
+        "type": "select_multiple",
+        "title": "Lock time slot if at least one place is booked",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "extra": "WBK_Model_Utils::get_services()",
+          "not_translated_title": "Lock time slot if at least one place is booked",
+          "popup": "Select the services for which a time slot will be automatically locked once at least one place is booked. Note: With autolock turned on, connected service bookings are considered when locking time slots.",
+          "tab": "restrictions"
+        }
+      },
+      {
+        "slug": "wbk_appointments_lock_day_if_timeslot_booked",
+        "type": "select_multiple",
+        "title": "Lock whole day if at least one time slot is booked",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "extra": "WBK_Model_Utils::get_services()",
+          "not_translated_title": "Lock whole day if at least one time slot is booked",
+          "popup": "Select the services for which a whole day will be automatically locked once at least one time slot is booked. Note: With autolock turned on, connected service bookings are considered when locking a day.",
+          "tab": "restrictions"
+        }
+      },
+      {
+        "slug": "wbk_appointments_lock_one_before_and_one_after",
+        "type": "select_multiple",
+        "title": "Lock one time slot before and after booking",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "extra": "WBK_Model_Utils::get_services()",
+          "not_translated_title": "Lock one time slot before and after booking",
+          "popup": "Select the services for which time slots before and after the booking will be automatically locked. Note: With autolock turned on, connected service bookings are considered when locking time slots.",
+          "tab": "restrictions"
+        }
+      },
+      {
+        "slug": "wbk_enable_global_limits",
+        "type": "checkbox",
+        "title": "Enable Global Limits",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Enable Global Limits",
+          "checkbox_value": "yes",
+          "default": "",
+          "tab": "restrictions"
+        }
+      },
+      {
+        "slug": "wbk_appointments_autolock_avail_limit",
+        "type": "number",
+        "title": "For the same time slot",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "For the same time slot",
+          "popup": "Set the system-wide maximum number of bookings allowed at any given time for all services. Leave it empty for no restrictions. E.g. if you have 10 services, but just 5 workers, put 5.",
+          "default": "",
+          "dependency": {
+            "0": "[\"wbk_enable_global_limits\", \"=\", \"yes\"]"
+          },
+          "dependent_value": {
+            "condition": {
+              "0": "wbk_enable_global_limits",
+              "1": "!=",
+              "2": "yes"
+            },
+            "value": ""
+          },
+          "tab": "restrictions",
+          "sub_type": "positive_integer"
+        }
+      },
+      {
+        "slug": "wbk_appointments_limit_by_day",
+        "type": "number",
+        "title": "For the same day",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "For the same day",
+          "popup": "Set the limit for the maximum number of bookings across all services in a day. Leave it empty for no restrictions.",
+          "default": "",
+          "dependency": {
+            "0": "[\"wbk_enable_global_limits\", \"=\", \"yes\"]"
+          },
+          "dependent_value": {
+            "condition": {
+              "0": "wbk_enable_global_limits",
+              "1": "!=",
+              "2": "yes"
+            },
+            "value": ""
+          },
+          "tab": "restrictions",
+          "sub_type": "positive_integer"
+        }
+      },
+      {
+        "slug": "wbk_enable_customer_limits",
+        "type": "checkbox",
+        "title": "Enable Customer Limits",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Enable Customer Limits",
+          "checkbox_value": "yes",
+          "default": "",
+          "tab": "restrictions"
+        }
+      },
+      {
+        "slug": "wbk_appointments_only_one_per_slot",
+        "type": "checkbox",
+        "title": "Per time slot",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Per time slot",
+          "popup": "Turn on to restrict same customer from making multiple bookings for the same time slot using the same email address.",
+          "checkbox_value": "enabled",
+          "default": "",
+          "dependency": {
+            "0": "[\"wbk_enable_customer_limits\", \"=\", \"yes\"]"
+          },
+          "dependent_value": {
+            "condition": {
+              "0": "wbk_enable_customer_limits",
+              "1": "!=",
+              "2": "yes"
+            },
+            "value": ""
+          },
+          "tab": "restrictions"
+        }
+      },
+      {
+        "slug": "wbk_appointments_only_one_per_day",
+        "type": "checkbox",
+        "title": "Per day",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Per day",
+          "popup": "Turn on to restrict same customer from making multiple bookings for the same day using the same email address.",
+          "checkbox_value": "enabled",
+          "default": "",
+          "dependency": {
+            "0": "[\"wbk_enable_customer_limits\", \"=\", \"yes\"]"
+          },
+          "dependent_value": {
+            "condition": {
+              "0": "wbk_enable_customer_limits",
+              "1": "!=",
+              "2": "yes"
+            },
+            "value": ""
+          },
+          "tab": "restrictions"
+        }
+      },
+      {
+        "slug": "wbk_appointments_only_one_per_service",
+        "type": "checkbox",
+        "title": "Per service",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Per service",
+          "popup": "Turn on to restrict same customers from making multiple bookings for the same service using the same email address.",
+          "checkbox_value": "enabled",
+          "default": "",
+          "dependency": {
+            "0": "[\"wbk_enable_customer_limits\", \"=\", \"yes\"]"
+          },
+          "dependent_value": {
+            "condition": {
+              "0": "wbk_enable_customer_limits",
+              "1": "!=",
+              "2": "yes"
+            },
+            "value": ""
+          },
+          "tab": "restrictions"
+        }
+      },
+      {
+        "slug": "wbk_form_layout",
+        "type": "checkbox",
+        "title": "Show summary sidebar by default",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "default": "yes",
+          "checkbox_value": "yes",
+          "not_translated_title": "Show summary sidebar by default",
+          "popup": "Turn on to show the summary sidebar in the booking form by default.",
+          "tab": "booking-form"
+        }
+      },
+      {
+        "slug": "wbk_global_timeslot_interval",
+        "type": "select",
+        "title": "Global timeslot interval (step)",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "default": "duration",
+          "not_translated_title": "Global timeslot interval (step)",
+          "popup": "__(\n                    'In what time intervals time slots should appear on the booking form. For example: \"30 minutes\" creates slots at 9:00, 9:30, 10:00, etc.',\n                    \"webba-booking-lite\",\n                )",
+          "extra": {
+            "15": "15 min",
+            "30": "30 min",
+            "60": "60 min",
+            "90": "90 min",
+            "duration": "duration of service"
+          },
+          "tab": "booking-form"
+        }
+      },
+      {
+        "slug": "wbk_show_booked_slots",
+        "type": "checkbox",
+        "title": "Show unavailable time slots",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Show unavailable time slots",
+          "popup": "Turn on to show booked time slots. If enabled, unavailable time slots will be greyed out.",
+          "checkbox_value": "yes",
+          "default": "yes",
+          "tab": "booking-form"
+        }
+      },
+      {
+        "slug": "wbk_enable_timezone_picker",
+        "type": "checkbox",
+        "title": "Enable Timezone picker in the booking form",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Enable Timezone picker in the booking form",
+          "popup": "Enable timezone picker in the booking form.",
+          "checkbox_value": "yes",
+          "default": "yes",
+          "tab": "booking-form"
+        }
+      },
+      {
+        "slug": "wbk_enable_booking_instructions",
+        "type": "checkbox",
+        "title": "Enable Booking Instructions in confirmation step",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Enable Booking Instructions in confirmation step",
+          "popup": "Enable booking instructions shown at the bottom of the confirmation step",
+          "checkbox_value": "yes",
+          "default": "",
+          "tab": "booking-form"
+        }
+      },
+      {
+        "slug": "wbk_after_booking_instructions",
+        "type": "editor",
+        "title": "Booking Instructions text",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Booking Instructions text",
+          "popup": "A message to show on the Thank-You step after booking is placed.",
+          "default": "<h4>Important Information</h4><ul><li>Please arrive 10 minutes before your scheduled appointment time</li><li>Cancellations must be made at least 24 hours in advance</li><li>Bring valid ID for verification at check-in</li></ul>",
+          "dependency": {
+            "0": "[\"wbk_enable_booking_instructions\", \"=\", \"yes\"]"
+          },
+          "tab": "booking-form"
+        }
+      },
+      {
+        "slug": "wbk_order_service_by",
+        "type": "select",
+        "title": "Order services by",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "not_translated_title": "Order services by",
+          "popup": "Choose between alphabetical order (A–Z) or order by priority for displaying services on the booking form.",
+          "default": "priority_a",
+          "extra": {
+            "a-z": "A–Z",
+            "priority_a": "Priority ascending",
+            "priority": "Priority descending"
+          },
+          "tab": "booking-form"
+        }
+      },
+      {
+        "slug": "wbk_allow_cross_midnight",
+        "type": "checkbox",
+        "title": "Allow time slots to cross midnight",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "checkbox_value": "true",
+          "not_translated_title": "Allow time slots to cross midnight",
+          "popup": "Turn on to allow time slots that extend beyond midnight.",
+          "default": "",
+          "tab": "advanced"
+        }
+      },
+      {
+        "slug": "wbk_night_hours",
+        "type": "text",
+        "title": "Show night hours time slots in previous day",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "default": "0",
+          "not_translated_title": "Show night hours time slots in previous day",
+          "popup": "__(\n                    'Specify the number of hours after midnight to display on the next day\\'s calendar.',\n                    \"webba-booking-lite\",\n                )",
+          "tab": "advanced",
+          "sub_type": "none_negative_integer"
+        }
+      },
+      {
+        "slug": "wbk_mode_overlapping_availabiliy",
+        "type": "checkbox",
+        "title": "Consider the availability of overlapping time intervals",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "default": "true",
+          "checkbox_value": "true",
+          "not_translated_title": "Consider the availability of overlapping time intervals",
+          "popup": "Turn on this option to control the availability of time slots for the same service when they overlap. When turned on, the system will automatically adjust the availability to avoid double booking.",
+          "tab": "advanced"
+        }
+      },
+      {
+        "slug": "wbk_allow_ongoing_time_slot",
+        "type": "checkbox",
+        "title": "Allow booking of the current time slot",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "checkbox_value": "yes",
+          "default": "",
+          "not_translated_title": "Allow booking of the current time slot",
+          "popup": "Turn on to prevent customers from making bookings for the current time slot.",
+          "tab": "advanced"
+        }
+      },
+      {
+        "slug": "wbk_show_locked_as_booked",
+        "type": "checkbox",
+        "title": "__('Show locked time slots as booked', 'webba-booking-lite')",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "'not_translated_title'": "'Show locked time slots as booked'",
+          "'popup'": "__(\n                    'Turn on to show locked time slots as \"Booked\".',\n                    'webba-booking-lite'\n                )",
+          "'checkbox_value'": "'yes'",
+          "'dependency'": {
+            "'wbk_show_booked_slots'": "':checked'"
+          }
+        },
+        "subsection": "advanced"
+      },
+      {
+        "slug": "wbk_global_working_hours",
+        "type": "business_hours",
+        "title": "Set global working hours",
+        "section": "wbk_global_availability_settings_section",
+        "extra": {
+          "not_translated_title": "Set global working hours",
+          "popup": "Set global working hours that will be used for all services. You can override it in the specific service.",
+          "default": "json_encode(WBK_Options_Utils::get_default_business_hours())",
+          "tab": "global-availability"
+        }
+      },
+      {
+        "slug": "wbk_holydays",
+        "type": "date_multiple",
+        "title": "Holidays/Days-Off",
+        "section": "wbk_global_availability_settings_section",
+        "extra": {
+          "not_translated_title": "Holidays/Days-Off",
+          "popup": "Set dates when your business is closed, and no new bookings will be accepted.",
+          "default": "",
+          "tab": "holidays"
+        }
+      },
+      {
+        "slug": "wbk_recurring_holidays",
+        "type": "checkbox",
+        "title": "Make it recurring yearly",
+        "section": "wbk_global_availability_settings_section",
+        "extra": {
+          "checkbox_value": "true",
+          "not_translated_title": "Make it recurring yearly",
+          "popup": "Turn on to set holidays as recurring yearly.",
+          "default": "",
+          "tab": "holidays"
+        }
+      },
+      {
+        "slug": "wbk_email_admin_daily_time",
+        "type": "select",
+        "title": "Reminder sending time (for both Email and SMS)",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "default": "43200",
+          "extra": "$data_time",
+          "not_translated_title": "Reminder sending time (for both Email and SMS)",
+          "popup": "Set the preferred hour for email reminders sent to customers and admins, based on your local timezone.",
+          "required_plan": "start",
+          "available_in_old_free": true,
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_email_notice",
+        "type": "notice",
+        "title": "Read more on Email Notifications",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "not_translated_title": "Read more on Email Notifications",
+          "popup": "__(\n                    '<a href=\"https://webba-booking.com/documentation/email-notifications/\" target=\"_blank\">Read more on Email Notifications</a>',\n                    \"webba-booking-lite\",\n                )",
+          "tab": "email"
+        }
+      },
+      {
+        "slug": "wbk_super_admin_email",
+        "type": "text",
+        "title": "Global Admin Notifications Email(s)",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "not_translated_title": "Global Admin Notifications Email(s)",
+          "popup": "Set the main admin notification email address(es) of staff who needs to receive bookings related notifications. Use comma to add multiple. (It can be overriden at service level)",
+          "default": "get_option(\"admin_email\")",
+          "tab": "email",
+          "sub_type": "email"
+        }
+      },
+      {
+        "slug": "wbk_from_name",
+        "type": "text",
+        "title": "From: name",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "not_translated_title": "From: name",
+          "popup": "Enter the name that will be displayed as the sender in the email notifications.",
+          "default": "Webba Booking Demo",
+          "tab": "email"
+        }
+      },
+      {
+        "slug": "wbk_from_email",
+        "type": "text",
+        "title": "From: email",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "not_translated_title": "From: email",
+          "popup": "Enter the email that will be displayed as the sender in the email notifications.",
+          "default": "demo@webba-booking.com",
+          "tab": "email",
+          "sub_type": "email"
+        }
+      },
+      {
+        "slug": "wbk_email_override_replyto",
+        "type": "checkbox",
+        "title": "Override default reply-to headers with booking-related data",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "checkbox_value": "yes",
+          "not_translated_title": "Override default reply-to headers with booking-related data",
+          "popup": "__(\n                    'When Enabled:\nCustomer Notifications: The reply-to email address is set to the email specified in the service settings.\nAdmin Notifications: The reply-to email address is set to the customer\\'s email address.\nWhen Disabled: The \\'From email\\' value is used as the reply-to address for notifications.',\n                    \"webba-booking-lite\",\n                )",
+          "default": "",
+          "tab": "email"
+        }
+      },
+      {
+        "slug": "wbk_email_reminder_days",
+        "type": "select",
+        "title": "How many days in advance to send email booking reminder",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "default": "1",
+          "not_translated_title": "How many days in advance to send email booking reminder",
+          "popup": "Select the timing for the reminder notification. For instance, set the value to 0 for the day of booking, 1 for one day before the booking, 2 for two days before, and so on.",
+          "required_plan": "start",
+          "tab": "email",
+          "extra": {
+            "0": "On the day of booking",
+            "1": "One day before booking",
+            "2": "Two days before booking",
+            "3": "Three days before booking",
+            "4": "Four days before booking",
+            "5": "Five days before booking",
+            "6": "Six days before booking",
+            "7": "Seven days before booking"
+          }
+        }
+      },
+      {
+        "slug": "wbk_email_customer_arrived_delay",
+        "type": "number",
+        "title": "__('Set email delay for booking status \"Arrived\"', \"webba-booking-lite\")",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "default": "",
+          "not_translated_title": "'Set email delay for booking status \"Arrived\"'",
+          "popup": "__(\n                    'Specify the delay (in hours) for the \"Arrived\" email notification. Alternatively, leave this field empty to send the notification immediately after the status is changed to \"Arrived\". Useful for asking reviews on services.',\n                    \"webba-booking-lite\",\n                )",
+          "tab": "email",
+          "sub_type": "positive_integer"
+        }
+      },
+      {
+        "slug": "wbk_email_landing_new",
+        "type": "select",
+        "title": "Page used for Payment, Cancelation and Approval links",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "not_translated_title": "Page used for Payment, Cancelation and Approval links",
+          "popup": "Specify the landing page URL for payment or cancelation. This page should include the [webbabooking] shortcode.",
+          "default": "https://webba-booking.com/booking-form-landing-page",
+          "tab": "email",
+          "extra": "backend"
+        }
+      },
+      {
+        "slug": "wbk_payment_price_format_new",
+        "type": "text",
+        "title": "Currency Symbol",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Currency Symbol",
+          "popup": "__(\n                    'Enter a symbol or text for your main currency (e.g. $ or USD)',\n                    \"webba-booking-lite\",\n                )",
+          "default": "'$'",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_currency_symbol_position",
+        "type": "select",
+        "title": "Show currency symbol before/after",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Show currency symbol before/after",
+          "popup": "Choose to show currency symbol/text before or after the price",
+          "default": "before",
+          "extra": {
+            "before": "Before the price",
+            "after": "After the price"
+          },
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_price_separator",
+        "type": "text",
+        "title": "Fraction separator in prices",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "default": ".",
+          "not_translated_title": "Fraction separator in prices",
+          "popup": "Choose the symbol or character to separate decimals in prices. E.g. Use either a period (.) or a comma (,).",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_price_fractional",
+        "type": "text",
+        "title": "Number of digits after separator",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "default": "2",
+          "not_translated_title": "Number of digits after separator",
+          "popup": "Write the number of decimal places to show for prices. E.g. Write 1 for prices to appear as 25.1 or 2 for prices to appear as 25.10.",
+          "tab": "general",
+          "sub_type": "positive_integer"
+        }
+      },
+      {
+        "slug": "wbk_bank_transfer_details",
+        "type": "textarea",
+        "title": "Bank transfer details",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Bank transfer details",
+          "popup": "if you offer manual bank transfer, enter your Bank Transfer details here",
+          "default": "",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_add_tax_on_top",
+        "type": "checkbox",
+        "title": "Add Tax on top of the service price",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Add Tax on top of the service price",
+          "popup": "__(\n                    'If tax is not included in the service price, enable adding it on top. If disabled, it will show \"Tax included\" under the payment summary.',\n                    \"webba-booking-lite\",\n                )",
+          "checkbox_value": "yes",
+          "default": "",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_general_tax",
+        "type": "number",
+        "title": "Tax amount in %",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Tax amount in %",
+          "popup": "Tax used for online payments.",
+          "default": "0",
+          "dependency": {
+            "0": "[\"wbk_add_tax_on_top\", \"=\", \"yes\"]"
+          },
+          "dependent_value": {
+            "condition": {
+              "0": "wbk_add_tax_on_top",
+              "1": "!=",
+              "2": "yes"
+            },
+            "value": "0"
+          },
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_do_not_tax_deposit",
+        "type": "checkbox",
+        "title": "Do not tax the service fee",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "checkbox_value": "yes",
+          "not_translated_title": "Do not tax the service fee",
+          "popup": "Turn on to avoid adding tax to the service fees. Important: when this is turned on, do not use subtotal and tax placeholders.",
+          "default": "",
+          "dependency": {
+            "0": "[\"wbk_add_tax_on_top\", \"=\", \"yes\"]"
+          },
+          "dependent_value": {
+            "condition": {
+              "0": "wbk_add_tax_on_top",
+              "1": "!=",
+              "2": "yes"
+            },
+            "value": ""
+          },
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_appointments_allow_payments",
+        "type": "checkbox",
+        "title": "Allow payments only for approved bookings",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Allow payments only for approved bookings",
+          "popup": "Turn on to restrict payment functionality to approved bookings only.",
+          "checkbox_value": "yes",
+          "default": "",
+          "tab": "general"
+        }
+      },
+      {
+        "slug": "wbk_category_label",
+        "type": "text",
+        "title": "Category label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Select category",
+          "not_translated_title": "Category label",
+          "popup": "Category label on the booking form.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_date_basic_label",
+        "type": "text",
+        "title": "Date label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Book an appointment on",
+          "not_translated_title": "Date label",
+          "popup": "Date label on the booking form.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_date_input_placeholder",
+        "type": "text_alfa_numeric",
+        "title": "Select date input placeholder",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "date",
+          "not_translated_title": "Select date input placeholder",
+          "popup": "Select date input placeholder on the booking form.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_email_label",
+        "type": "text",
+        "title": "Email label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Email",
+          "not_translated_title": "Email label",
+          "popup": "Email label on the booking form.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_phone_label",
+        "type": "text",
+        "title": "Phone label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Phone",
+          "not_translated_title": "Phone label",
+          "popup": "Phone label on the booking form.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_payment_pay_with_paypal_btn_text",
+        "type": "text_alfa_numeric",
+        "title": "PayPal option label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "PayPal",
+          "not_translated_title": "PayPal option label",
+          "popup": "Label for PayPal payment method",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_paypal_message",
+        "type": "text",
+        "title": "PayPal message",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "You will be redirected to PayPal in the next screen.",
+          "not_translated_title": "PayPal message",
+          "popup": "Message that appears when the user selects PayPal as the payment method.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_stripe_button_text",
+        "type": "text_alfa_numeric",
+        "title": "Credit Card option label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Credit Card",
+          "not_translated_title": "Credit card option label",
+          "popup": "Label for Stripe payment method",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_stripe_api_error_message",
+        "type": "text",
+        "title": "Stripe API error message",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Payment failed: #response",
+          "not_translated_title": "Stripe API error message",
+          "popup": "Stripe API error message during payment processing. Placeholders: #response.",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_pay_on_arrival_button_text",
+        "type": "text_alfa_numeric",
+        "title": "Pay on arrival option label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "On Arrival",
+          "not_translated_title": "Pay on arrival option label",
+          "popup": "Label for Pay on arrival payment method.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_pay_on_arrival_message",
+        "type": "text",
+        "title": "Message for Pay on arrival payment method",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "You will be able to pay by cash or credit card once you arrive.",
+          "not_translated_title": "Message for Pay on arrival payment method",
+          "popup": "Message for Pay on arrival payment method.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_bank_transfer_button_text",
+        "type": "text_alfa_numeric",
+        "title": "Bank transfer option label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Bank Transfer",
+          "not_translated_title": "Bank transfer option label",
+          "popup": "Label for Bank transfer payment method.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_bank_transfer_message",
+        "type": "text",
+        "title": "Message for Bank transfer payment method",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Pay by the bank transfer.",
+          "not_translated_title": "Message for Bank transfer payment method",
+          "popup": "Message for Bank transfer payment method.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_google_pay_button_text",
+        "type": "text",
+        "title": "Google Pay button text",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Google Pay",
+          "not_translated_title": "Google Pay button text",
+          "popup": "Google Pay button text.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_apple_pay_button_text",
+        "type": "text",
+        "title": "Apple Pay button text",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Apple Pay",
+          "not_translated_title": "Apple Pay button text",
+          "popup": "Apple Pay button text.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_stripe_other_button_text",
+        "type": "text",
+        "title": "Stripe Other button text",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Other payment methods",
+          "not_translated_title": "Stripe Other button text",
+          "popup": "Stripe Other button text.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_product_meta_key",
+        "type": "text",
+        "title": "Meta key for WooCommerce product",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Booking",
+          "not_translated_title": "Meta key for WooCommerce product",
+          "popup": "Label for services in WooCommerce.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_woo_button_text",
+        "type": "text_alfa_numeric",
+        "title": "WooCommerce option label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "WooCommerce",
+          "not_translated_title": "WooCommerce option label",
+          "popup": "User in the cart item",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_woo_message",
+        "type": "text",
+        "title": "WooCommerce message",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "You will be able to checkout in the next screen.",
+          "not_translated_title": "WooCommerce message",
+          "popup": "Message that appears when the user selects WooCommerce as the payment method.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_payment_item_name",
+        "type": "text",
+        "title": "Payment item text",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "#service_name on #appointment_day at #appointment_time",
+          "not_translated_title": "Payment item text",
+          "popup": "List of available placeholders",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_tax_label",
+        "type": "text",
+        "title": "Tax label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Tax",
+          "not_translated_title": "Tax label",
+          "popup": "Label for the tax in payment details",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_payment_discount_item",
+        "type": "text",
+        "title": "Discount label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Discount (-)",
+          "not_translated_title": "Discount label",
+          "popup": "Label for the discount",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_payment_total_title",
+        "type": "text",
+        "title": "Total title",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "TOTAL TODAY",
+          "not_translated_title": "Total title",
+          "popup": "Label for the total amount in payment details",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_nothing_to_pay_message",
+        "type": "text",
+        "title": "No bookings for payment message",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "There are no bookings available for payment.",
+          "not_translated_title": "No bookings for payment message",
+          "popup": "Message shown when there are no bookings available for payment",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_booking_cancel_error_message",
+        "type": "text",
+        "title": "Cancellation error message",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "__(\n                    'Unable to cancel booking, please check the email you\\'ve entered.',\n                    \"webba-booking-lite\",\n                )",
+          "not_translated_title": "Cancellation error message",
+          "popup": "Message shown when an error occurs on cancelation",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_email_landing_text",
+        "type": "text",
+        "title": "Text of the payment link sent to a customer",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Click here to pay for your booking.",
+          "not_translated_title": "Text of the payment link sent to a customer",
+          "popup": "Text of the payment link sent to a customer in the email notification.",
+          "extra": "backend",
+          "tab": "integrations"
+        }
+      },
+      {
+        "slug": "webba_form_field_",
+        "type": "text",
+        "title": "__(\n                    $field[\"placeholder__not_translated\"] ??\n                        ($field[\"checkboxText__not_translated\"] ?? \"\"),\n                    \"webba-booking-lite\",\n                )",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "$field[\"placeholder\"] ?? ($field[\"checkboxText\"] ?? \"\")",
+          "not_translated_title": "Text of the form field ",
+          "popup": "Text of the form field ",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_email_landing_text_cancel",
+        "type": "text",
+        "title": "Text of the cancelation link sent to a customer",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Click here to cancel your booking.",
+          "not_translated_title": "Text of the cancelation link sent to a customer",
+          "popup": "Text of the booking cancelation link sent to a customer in the email notification.",
+          "tab": "integrations"
+        }
+      },
+      {
+        "slug": "wbk_email_landing_text_cancel_admin",
+        "type": "text",
+        "title": "Text of the cancellation link sent to an admin",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Click here to cancel this booking.",
+          "not_translated_title": "Text of the cancellation link sent to an admin",
+          "popup": "Text of the booking cancelation link sent to the admin in the email notification.",
+          "tab": "integrations"
+        }
+      },
+      {
+        "slug": "wbk_email_landing_text_approve_admin",
+        "type": "text",
+        "title": "Text of the approval link sent to an admin",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Click here to approve this booking.",
+          "not_translated_title": "Text of the approval link sent to an admin",
+          "popup": "Text of the booking approval link sent to the admin in the email notification.",
+          "tab": "integrations"
+        }
+      },
+      {
+        "slug": "wbk_email_landing_text_gg_event_add",
+        "type": "text",
+        "title": "__(\n                'Text of the link for adding event to customer\\'s Google Calendar',\n                \"webba-booking-lite\",\n            )",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Click here to add this event to your Google Calendar.",
+          "not_translated_title": "Text of the link for adding event to customers Google Calendar",
+          "popup": "Text of the link to add a booking to Google Calendar. Sent to a customer in the email notification.",
+          "tab": "integrations"
+        }
+      },
+      {
+        "slug": "wbk_gg_calendar_event_title",
+        "type": "text",
+        "title": "Google calendar event / iCal summary (for admin)",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "#customer_name",
+          "not_translated_title": "Google calendar event / iCal summary (for admin)",
+          "popup": "Available placeholders:",
+          "tab": "integrations"
+        }
+      },
+      {
+        "slug": "wbk_gg_calendar_event_description",
+        "type": "text",
+        "title": "Google calendar event / iCal description (for admin)",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "#customer_name #customer_phone",
+          "not_translated_title": "Google calendar event / iCal description (for admin)",
+          "popup": "List of available placeholders",
+          "tab": "integrations"
+        }
+      },
+      {
+        "slug": "wbk_gg_calendar_event_title_customer",
+        "type": "text",
+        "title": "Google calendar event / iCal summary (for customer)",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "#service_name",
+          "not_translated_title": "Google calendar event / iCal summary (for customer)",
+          "popup": "List of available placeholders",
+          "tab": "integrations"
+        }
+      },
+      {
+        "slug": "wbk_gg_calendar_event_description_customer",
+        "type": "text",
+        "title": "Google calendar event / iCal description (for customer)",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Your appointment id is #appointment_id",
+          "not_translated_title": "Google calendar event / iCal description (for customer)",
+          "popup": "List of available placeholders",
+          "tab": "integrations"
+        }
+      },
+      {
+        "slug": "wbk_daily_limit_reached_message",
+        "type": "text",
+        "title": "Daily limit message",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Daily booking limit is reached, please select another date.",
+          "not_translated_title": "Daily limit message",
+          "popup": "Message shown when daily booking limit reached. Adjust the daily booking limits in the Settings -> Booking Rules.",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_paypal_notice",
+        "type": "notice",
+        "title": "PayPal Integration Documentation ->",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "PayPal Integration Documentation ->",
+          "popup": "__(\n                    '<a href=\"https://webba-booking.com/documentation/paypal-integration/\" target=\"_blank\">PayPal Integration Documentation -></a>',\n                    \"webba-booking-lite\",\n                )",
+          "required_plan": "standard",
+          "tab": "paypal"
+        }
+      },
+      {
+        "slug": "wbk_paypal_test_mode",
+        "type": "checkbox",
+        "title": "TEST Mode",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "default": "",
+          "not_translated_title": "TEST Mode",
+          "checkbox_value": "yes",
+          "popup": "__(\n                    'Select \"Sandbox\" to test the integration, and \"Live\" for actual payment processing.',\n                    \"webba-booking-lite\",\n                )",
+          "required_plan": "standard",
+          "tab": "paypal"
+        }
+      },
+      {
+        "slug": "wbk_paypal_sandbox_clientid",
+        "type": "text",
+        "title": "PayPal Sandbox ClientID",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "PayPal Sandbox ClientID",
+          "popup": "__(\n                    'Enter the Client ID provided by PayPal for the Sandbox mode integration. <a href=\"https://www.paypal.com/us/cshelp/article/how-do-i-create-rest-api-credentials-ts1949\" rel=\"noopener\" target=\"_blank\">Read more on how to set up PayPal integration.</a>',\n                    \"webba-booking-lite\",\n                )",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "paypal"
+        }
+      },
+      {
+        "slug": "wbk_paypal_sandbox_secret",
+        "type": "password",
+        "title": "PayPal Sandbox Secret",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "PayPal Sandbox Secret",
+          "popup": "'Enter the Client ID provided by PayPal for the Sandbox mode integration. <a href=\"https://www.paypal.com/us/cshelp/article/how-do-i-create-rest-api-credentials-ts1949\" rel=\"noopener\" target=\"_blank\">Read more on how to set up PayPal integration.</a>'",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "paypal"
+        }
+      },
+      {
+        "slug": "wbk_paypal_live_clientid",
+        "type": "text",
+        "title": "PayPal Live ClientID",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "PayPal Live ClientID",
+          "popup": "'Enter the Client ID provided by PayPal for the Sandbox mode integration. <a href=\"https://www.paypal.com/us/cshelp/article/how-do-i-create-rest-api-credentials-ts1949\" rel=\"noopener\" target=\"_blank\">Read more on how to set up PayPal integration.</a>'",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "paypal"
+        }
+      },
+      {
+        "slug": "wbk_paypal_live_secret",
+        "type": "password",
+        "title": "PayPal Live Secret",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "PayPal Live Secret",
+          "popup": "'Enter the Client ID provided by PayPal for the Sandbox mode integration. <a href=\"https://www.paypal.com/us/cshelp/article/how-do-i-create-rest-api-credentials-ts1949\" rel=\"noopener\" target=\"_blank\">Read more on how to set up PayPal integration.</a>'",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "paypal"
+        }
+      },
+      {
+        "slug": "wbk_paypal_currency",
+        "type": "select",
+        "title": "PayPal currency",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "PayPal currency",
+          "popup": "Select the currency to use for PayPal payments.",
+          "default": "USD",
+          "extra": {
+            "AUD": "Australian Dollar",
+            "BRL": "Brazilian Real",
+            "CAD": "Canadian Dollar",
+            "CZK": "Czech Koruna",
+            "DKK": "Danish Krone",
+            "EUR": "Euro",
+            "HKD": "Hong Kong Dollar",
+            "HUF": "Hungarian Forint",
+            "ILS": "Israeli New Sheqel",
+            "JPY": "Japanese Yen",
+            "MYR": "Malaysian Ringgit",
+            "MXN": "Mexican Peso",
+            "NOK": "Norwegian Krone",
+            "NZD": "New Zealand Dollar",
+            "PHP": "Philippine Peso",
+            "PLN": "Polish Zloty",
+            "GBP": "Pound Sterling",
+            "SGD": "Singapore Dollar",
+            "SEK": "Swedish Krona",
+            "CHF": "Swiss Franc",
+            "TWD": "Taiwan New Dollar",
+            "THB": "Thai Baht",
+            "USD": "U.S. Dollar"
+          },
+          "required_plan": "standard",
+          "tab": "paypal"
+        }
+      },
+      {
+        "slug": "wbk_paypal_redirect_url_new",
+        "type": "select",
+        "title": "Redirect to page when payment is successful",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Redirect to page when payment is successful",
+          "popup": "Enter the URL where customers should be redirected after a successful payment. If left empty, customers will stay on the booking form page after completing the payment.",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "paypal",
+          "extra": "backend"
+        }
+      },
+      {
+        "slug": "wbk_paypal_hide_address",
+        "type": "checkbox",
+        "title": "Hide address",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Hide address",
+          "popup": "Turn on to hide address on PayPal checkout.",
+          "checkbox_value": "enabled",
+          "default": "enabled",
+          "required_plan": "standard",
+          "tab": "paypal"
+        }
+      },
+      {
+        "slug": "wbk_paypal_multiplier",
+        "type": "text",
+        "title": "Currency multiplier",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Currency multiplier",
+          "popup": "Add the currency multiplier to update the price before it is sent to PayPal. It is helpful when your service price is set in a currency not supported by PayPal, and you need to convert it to a PayPal-supported currency before checkout. If you do not require currency conversion, leave this field empty.",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "paypal",
+          "sub_type": "none_negative_float"
+        }
+      },
+      {
+        "slug": "wbk_zoom_link_text",
+        "type": "text",
+        "title": "Text of the Zoom meeting URL",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Click here to open your meeting in Zoom",
+          "not_translated_title": "Text of the Zoom meeting URL",
+          "popup": "Text displayed as the link to the Zoom meeting.",
+          "tab": "integrations"
+        }
+      },
+      {
+        "slug": "wbk_stripe_notice",
+        "type": "notice",
+        "title": "Stripe Integration Documentation ->",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Stripe Integration Documentation ->",
+          "popup": "__(\n                    '<a href=\"https://webba-booking.com/documentation/stripe-integration/\" target=\"_blank\">Stripe Integration Documentation -></a>',\n                    \"webba-booking-lite\",\n                )",
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_stripe_test_mode",
+        "type": "checkbox",
+        "title": "TEST Mode",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "TEST Mode",
+          "popup": "__(\n                    'Select \"Sandbox\" to test the integration, and \"Live\" for actual payment processing.',\n                    \"webba-booking-lite\",\n                )",
+          "checkbox_value": "yes",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_stripe_sandbox_publishable_key",
+        "type": "text",
+        "title": "Stripe Sandbox Publishable Key",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Stripe Sandbox Publishable Key",
+          "popup": "Enter the SANDBOX publishable API key provided by Stripe for your integration. Read more on how to set up Stripe integration.",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_stripe_sandbox_secret_key",
+        "type": "password",
+        "title": "Stripe Sandbox Secret Key",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Stripe Sandbox Secret Key",
+          "popup": "Enter the SANDBOX Secret API key provided by Stripe for your integration. Read more on how to set up Stripe integration.",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_stripe_publishable_key",
+        "type": "text",
+        "title": "Stripe Live Publishable key",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Stripe Live Publishable key",
+          "popup": "Enter the publishable API key provided by Stripe for your integration. Read more on how to set up Stripe integration.",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_stripe_secret_key",
+        "type": "password",
+        "title": "Secret key",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Secret key",
+          "popup": "Enter the Secret API key provided by Stripe for your integration. Read more on how to set up Stripe integration.",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_stripe_currency",
+        "type": "select",
+        "title": "Stripe currency",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "default": "USD",
+          "not_translated_title": "Stripe currency",
+          "popup": "Select the currency to use for Stripe payments.",
+          "extra": "array_combine(\n                    WBK_Stripe::get_currencies(),\n                    WBK_Stripe::get_currencies(),\n                )",
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_stripe_additional_fields",
+        "type": "select_multiple",
+        "title": "Select payment fields to show",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "default": "",
+          "extra": "WBK_Model_Utils::get_payment_fields()",
+          "not_translated_title": "Select payment fields to show",
+          "popup": "Select the additional fields that you wish to include in the Stripe payment process.",
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_stripe_redirect_url_new",
+        "type": "select",
+        "title": "Redirect to page when payment is successful",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Redirect to page when payment is successful",
+          "popup": "Enter the URL where customers should be redirected after successful payment. If left empty, customers will stay on the booking form page after completing the payment.",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "stripe",
+          "extra": "backend"
+        }
+      },
+      {
+        "slug": "wbk_stripe_hide_postal_code",
+        "type": "checkbox",
+        "title": "Hide the postal code field",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Hide the postal code field",
+          "popup": "Turn on to hide the postal code field in the Stripe checkout.",
+          "checkbox_value": "yes",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_stripe_card_font_size_mobile",
+        "type": "text",
+        "title": "Font size for card element on mobile devices",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Font size for card element on mobile devices",
+          "popup": "Set the card element font size on mobile devices. Leave empty for the default input field font size.",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_stripe_override_error_messages",
+        "type": "checkbox",
+        "title": "Override Stripe card element error messages",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Override Stripe card element error messages",
+          "popup": "__(\n                    'Turn on to override the default error message displayed for Stripe card elements. To customize the error message, navigate to Wording/Translation → Advanced Settings and modify the \"Stripe card element error message\" according to your preferences.',\n                    \"webba-booking-lite\",\n                )",
+          "checkbox_value": "yes",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_stripe_load_js",
+        "type": "select",
+        "title": "Load Stripe javascript",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Load Stripe javascript",
+          "popup": "Select how the Stripe Javascript needs to be loaded.",
+          "default": "yes",
+          "extra": {
+            "yes": "Yes",
+            "no": "No"
+          },
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_stripe_api_version",
+        "type": "select",
+        "title": "Load Stripe API",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Load Stripe API",
+          "popup": "__(\n                    'Select how to load Stripe API. Set \\'no\\' or 6.21.1 only if there is a conflict with another plugin that uses Stripe.',\n                    \"webba-booking-lite\",\n                )",
+          "default": "7.26.0",
+          "extra": {
+            "7.26.0": "Yes, load version 7.26.0",
+            "6.21.1": "Load version 6.21.1",
+            "no": "No"
+          },
+          "required_plan": "standard",
+          "tab": "stripe"
+        }
+      },
+      {
+        "slug": "wbk_connected_calendars_when_add",
+        "type": "select",
+        "title": "Admin calendar event creation for connected calendars",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "default": "onbooking",
+          "not_translated_title": "Admin calendar event creation for connected calendars',",
+          "popup": "__(\n                    'Specify when the event should be added to the admin\\'s calendar when creating bookings. ',\n                    \"webba-booking-lite\",\n                )",
+          "extra": {
+            "onbooking": "On booking",
+            "onpaymentorapproval": "On payment or approval"
+          },
+          "required_plan": "start",
+          "tab": "General"
+        }
+      },
+      {
+        "slug": "wbk_gg_notice",
+        "type": "notice",
+        "title": "Google Calendar Integration Documentation ->",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "not_translated_title": "Google Calendar Integration Documentation ->",
+          "popup": "__(\n                    '<a href=\"https://webba-booking.com/documentation/google-calendar-integration/\" target=\"_blank\">Google Calendar Integration Documentation -></a>',\n                    \"webba-booking-lite\",\n                )",
+          "required_plan": "start",
+          "tab": "google-calendar"
+        }
+      },
+      {
+        "slug": "wbk_gg_created_by",
+        "type": "text",
+        "title": "__('\"Created by\" property for the events', \"webba-booking-lite\")",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "default": "webba_booking",
+          "not_translated_title": "Created by property for the events",
+          "popup": "Do not change this option if you do not plan to use the same Google calendars on different websites with Webba Booking.",
+          "required_plan": "start",
+          "tab": "google-calendar"
+        }
+      },
+      {
+        "slug": "wbk_gg_customers_time_zone",
+        "type": "select",
+        "title": "__('Customer\\'s time zone', 'webba-booking-lite')",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "'default'": "'webba'",
+          "'not_translated_title'": "'Customers time zone'",
+          "'popup'": "__(\n                        'Choose the time zone to be used for events added to the customer\\'s calendar.',\n                        'webba-booking-lite'\n                    )",
+          "'extra'": {
+            "'webba'": "__(\n                            'Use Webba Booking time zone',\n                            'webba-booking-lite'\n                        )",
+            "'customer'": "__(\n                            'Use customer\\'s calendar time zone',\n                            'webba-booking-lite'\n                        )"
+          }
+        },
+        "subsection": "advanced"
+      },
+      {
+        "slug": "wbk_gg_2way_group",
+        "type": "select",
+        "title": "Group services synchronization",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "default": "lock",
+          "not_translated_title": "Group services synchronization",
+          "popup": "Choose how group services are integrated with the events in Google calendar.",
+          "extra": {
+            "lock": "Lock time slot",
+            "reduce": "Reduce count of available slots"
+          },
+          "required_plan": "start",
+          "tab": "google-calendar"
+        }
+      },
+      {
+        "slug": "wbk_gg_ignore_free",
+        "type": "checkbox",
+        "title": "Ignore free events",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "checkbox_value": "yes",
+          "not_translated_title": "Ignore free events",
+          "popup": "Turn on if free Google Calendar events should not be considered in 2-ways synchronization.",
+          "default": "",
+          "required_plan": "start",
+          "tab": "google-calendar"
+        }
+      },
+      {
+        "slug": "wbk_ignore_webba_events",
+        "type": "checkbox",
+        "title": "Ignore events added by Webba Booking",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "checkbox_value": "yes",
+          "not_translated_title": "Ignore events added by Webba Booking",
+          "popup": "Turn on if Webba Booking events should not be considered in 2-ways synchronization.",
+          "default": "yes",
+          "required_plan": "start",
+          "tab": "google-calendar"
+        }
+      },
+      {
+        "slug": "wbk_gg_group_service_export",
+        "type": "select",
+        "title": "Export for group services",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "default": "event_foreach_appointment",
+          "not_translated_title": "Export for group services",
+          "popup": "Select the method of exporting group services.",
+          "extra": {
+            "event_foreach_appointment": "Add event for each appointment",
+            "one_event": "Add one event"
+          },
+          "required_plan": "start",
+          "tab": "google-calendar"
+        }
+      },
+      {
+        "slug": "wbk_gg_show_legacy_keys",
+        "type": "checkbox",
+        "title": "Keep Legacy Calendars active",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "not_translated_title": "Keep Legacy Calendars active",
+          "popup": "__('It\\'s for Webba Versions below 6.x.x', \"webba-booking-lite\")",
+          "checkbox_value": "yes",
+          "default": "",
+          "required_plan": "start",
+          "tab": "google-calendar"
+        }
+      },
+      {
+        "slug": "wbk_gg_client_version",
+        "type": "select",
+        "title": "Version of Google Client API",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "default": "2.9.1",
+          "extra": "$version_list",
+          "not_translated_title": "Version of Google Client API",
+          "popup": "Modify this setting only if you have other plugins in your WordPress that utilize a different version of the Google API and conflicts have arisen.",
+          "required_plan": "start",
+          "tab": "google-calendar",
+          "dependency": {
+            "0": "[\"wbk_gg_show_legacy_keys\", \"=\", \"yes\"]"
+          }
+        }
+      },
+      {
+        "slug": "wbk_gg_clientid",
+        "type": "text",
+        "title": "Google API Client ID (deprecated)",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "not_translated_title": "Google API Client ID (deprecated)",
+          "popup": "__(\n                    'Enter the Google API Client ID. <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/google-calendar/\">Read more on how to set up Google Calendar integration.</a>.',\n                    \"webba-booking-lite\",\n                )",
+          "default": "",
+          "dependency": {
+            "0": "[\"wbk_gg_show_legacy_keys\", \"=\", \"yes\"]"
+          },
+          "required_plan": "start",
+          "tab": "google-calendar"
+        }
+      },
+      {
+        "slug": "wbk_gg_secret",
+        "type": "password",
+        "title": "Google API Client Secret (deprecated)",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "not_translated_title": "Google API Client Secret (deprecated)",
+          "popup": "__(\n                    'Enter the Google API Client Secret. <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/google-calendar/\">Read more on how to set up Google Calendar integration.</a>.',\n                    \"webba-booking-lite\",\n                )",
+          "default": "",
+          "dependency": {
+            "0": "[\"wbk_gg_show_legacy_keys\", \"=\", \"yes\"]"
+          },
+          "required_plan": "start",
+          "tab": "google-calendar"
+        }
+      },
+      {
+        "slug": "wbk_skip_on_arrival_payment_method",
+        "type": "checkbox",
+        "title": "__(\n                'Skip payment method selection for \"Pay on arrival\"',\n                'webba-booking-lite'\n            )",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "'default'": "'true'",
+          "'checkbox_value'": "'true'",
+          "'not_translated_title'": "'Skip payment method selection for Pay on arrival'",
+          "'popup'": "__(\n                    'Skip payment method selection for \"Pay on arrival\" method if there is only one method available',\n                    'webba-booking-lite'\n                )"
+        },
+        "subsection": "advanced"
+      },
+      {
+        "slug": "wbk_woo_notice",
+        "type": "notice",
+        "title": "WooCommerce Integration Documentation ->",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "WooCommerce Integration Documentation ->",
+          "popup": "__(\n                    '<a href=\"https://webba-booking.com/documentation/woocommerce-integration/\" target=\"_blank\">WooCommerce Integration Documentation -></a>',\n                    \"webba-booking-lite\",\n                )",
+          "required_plan": "standard",
+          "tab": "woocommerce"
+        }
+      },
+      {
+        "slug": "wbk_woo_update_status",
+        "type": "select",
+        "title": "Status of the booking paid with WooCommerce",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Status of the booking paid with WooCommerce",
+          "popup": "Choose the desired status update after a booking has been paid through WooCommerce.",
+          "default": "disabled",
+          "extra": {
+            "pending": "Pending",
+            "approved": "Approved",
+            "disabled": "Disabled (do not update status)"
+          },
+          "required_plan": "standard",
+          "tab": "woocommerce"
+        }
+      },
+      {
+        "slug": "wbk_woo_check_coupons_inwebba",
+        "type": "checkbox",
+        "title": "Validate WooCommerce coupons as Webba Coupons",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "not_translated_title": "Validate WooCommerce coupons as Webba Coupons",
+          "popup": "Enable this option if you need to validate wooCommerce coupons as Webba coupons.",
+          "checkbox_value": "yes",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "woocommerce"
+        }
+      },
+      {
+        "slug": "wbk_woo_prefil_fields",
+        "type": "checkbox",
+        "title": "Prefill fields in WooCommerce checkout with data used in the booking form",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "default": "true",
+          "checkbox_value": "true",
+          "not_translated_title": "Prefill fields in WooCommerce checkout with data used in the booking form",
+          "popup": "Turn on to prefill fields in the WooCommerce checkout with the data entered in the Webba booking form.",
+          "required_plan": "standard",
+          "tab": "woocommerce"
+        }
+      },
+      {
+        "slug": "wbk_woo_auto_add_to_cart",
+        "type": "checkbox",
+        "title": "Automatically add to cart",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "default": "",
+          "checkbox_value": "true",
+          "not_translated_title": "Automatically add to cart",
+          "popup": "If this option is enabled, the user will be redirected to the shopping cart page after submitting the booking form.",
+          "required_plan": "standard",
+          "tab": "woocommerce"
+        }
+      },
+      {
+        "slug": "wbk_woo_complete_action",
+        "type": "select_multiple",
+        "title": "__('Action for \\'Paid\\' booking status', \"webba-booking-lite\")",
+        "section": "wbk_payment_settings_section",
+        "extra": {
+          "extra": {
+            "complete_status": "Complete status set",
+            "thankyou_message": "Thank you message shown",
+            "complete_payment": "Payment completed in WooCommerce"
+          },
+          "not_translated_title": "Action for Paid booking status",
+          "popup": "__(\n                    'Select which action will set the booking status as \\'Paid\\'',\n                    \"webba-booking-lite\",\n                )",
+          "default": "",
+          "required_plan": "standard",
+          "tab": "woocommerce"
+        }
+      },
+      {
+        "slug": "wbk_zoom_notice",
+        "type": "notice",
+        "title": "Zoom Integration Documentation ->",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "not_translated_title": "Zoom Integration Documentation ->",
+          "popup": "__(\n                    '<a href=\"https://webba-booking.com/documentation/zoom-integration/\" target=\"_blank\">Zoom Integration Documentation -></a>',\n                    \"webba-booking-lite\",\n                )",
+          "required_plan": "premium",
+          "tab": "zoom"
+        }
+      },
+      {
+        "slug": "wbk_zoom_client_id",
+        "type": "text",
+        "title": "Client ID",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "not_translated_title": "Client ID",
+          "popup": "'Enter the Zoom Client ID. <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/zoom-integration/\">Read more on how to set up Zoom integration.</a>'",
+          "default": "",
+          "required_plan": "premium",
+          "tab": "zoom"
+        }
+      },
+      {
+        "slug": "wbk_zoom_client_secret",
+        "type": "password",
+        "title": "Client secret",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "not_translated_title": "Client secret",
+          "popup": "'Enter the Zoom Client secret. <a rel=\"noopener\" target=\"_blank\" href=\"https://webba-booking.com/documentation/zoom-integration/\">Read more on how to set up Zoom integration.</a>'",
+          "default": "",
+          "required_plan": "premium",
+          "tab": "zoom"
+        }
+      },
+      {
+        "slug": "wbk_zoom_auth_stat",
+        "type": "zoom_auth",
+        "title": "Authorization",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "not_translated_title": "Authorization",
+          "required_plan": "premium",
+          "tab": "zoom"
+        }
+      },
+      {
+        "slug": "wbk_zoom_when_add",
+        "type": "select",
+        "title": "Zoom meeting creation",
+        "section": "wbk_integrations_settings_section",
+        "extra": {
+          "not_translated_title": "Zoom meeting creation",
+          "popup": "Select when to create the meeting in Zoom - on booking or on payment or booking approval.",
+          "default": "onbooking",
+          "extra": {
+            "onbooking": "On booking",
+            "onpaymentorapproval": "On payment or approval"
+          },
+          "required_plan": "premium",
+          "tab": "zoom"
+        }
+      },
+      {
+        "slug": "wbk_sms_notice",
+        "type": "notice",
+        "title": "Read more on Twilio integration",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "not_translated_title": "Read more on Twilio integration",
+          "popup": "__(\n                    '<a href=\"https://webba-booking.com/documentation/sms-notifications/\" target=\"_blank\">Read more on Twilio integration</a>',\n                    \"webba-booking-lite\",\n                )",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_twilio_account_sid",
+        "type": "text",
+        "title": "Twilio ACCOUNT SID",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "not_translated_title": "Twilio ACCOUNT SID",
+          "popup": "'Enter the Twilio ACCOUNT SID. <a rel=\"noopener\" target=\"_blank\" href=\"https://support.twilio.com/hc/en-us/articles/14726256820123-What-is-a-Twilio-Account-SID-and-where-can-I-find-it-\">Read more.</a>'",
+          "default": "",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_twilio_auth_token",
+        "type": "password",
+        "title": "Twilio AUTH TOKEN",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "not_translated_title": "Twilio AUTH TOKEN",
+          "popup": "'Enter the Twilio AUTH TOKEN. <a rel=\"noopener\" target=\"_blank\" href=\"https://support.twilio.com/hc/en-us/articles/223136027-Auth-Tokens-and-How-to-Change-Them\">Read more.</a>'",
+          "default": "",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_twilio_phone_number",
+        "type": "text",
+        "title": "Twilio phone number or Messaging Service SID",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "not_translated_title": "Twilio phone number or Messaging Service SID",
+          "popup": "The phone number must start with a + sign.",
+          "default": "",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_sms_send_on_booking",
+        "type": "checkbox",
+        "title": "Send SMS after customer makes a booking",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "checkbox_value": "true",
+          "not_translated_title": "Send SMS after customer makes a booking",
+          "popup": "Turn on to send booking SMS notifications to customers when they make a booking.",
+          "default": "true",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_sms_send_on_manual_booking",
+        "type": "checkbox",
+        "title": "Send SMS after admin adds a booking manually",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "checkbox_value": "true",
+          "dependency": {
+            "0": "[\"wbk_sms_send_on_booking\", \"=\", \"true\"]"
+          },
+          "dependent_value": {
+            "condition": {
+              "0": "wbk_sms_send_on_booking",
+              "1": "!=",
+              "2": "true"
+            },
+            "value": ""
+          },
+          "not_translated_title": "Send SMS after admin adds a booking manually",
+          "popup": "Turn on to send booking SMS notifications to customers when the booking was done by an admin.",
+          "default": "",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_sms_message_on_booking",
+        "type": "textarea",
+        "title": "Booking SMS Template",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "dependency": {
+            "0": "[\"wbk_sms_send_on_booking\", \"=\", \"true\"]"
+          },
+          "default": "Dear #customer_name, You have successfully booked #service_name on #appointment_day at #appointment_time.",
+          "not_translated_title": "Booking SMS Template",
+          "popup": "List of available placeholders",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_sms_send_reminder",
+        "type": "checkbox",
+        "title": "Send booking reminder SMS",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "checkbox_value": "true",
+          "not_translated_title": "Send booking reminder SMS",
+          "popup": "Turn on to send booking reminder SMS notifications to customers.",
+          "default": "true",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_sms_reminder_days",
+        "type": "select",
+        "title": "Send reminder to customer X days before booking",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "dependency": {
+            "0": "[\"wbk_sms_send_reminder\", \"=\", \"yes\"]"
+          },
+          "dependent_value": {
+            "condition": {
+              "0": "wbk_sms_send_reminder",
+              "1": "!=",
+              "2": "yes"
+            },
+            "value": "1"
+          },
+          "default": "1",
+          "not_translated_title": "Send reminder to customer X days before booking",
+          "popup": "Select the timing for the booking reminder SMS. For instance, set the value to 0 for the day of booking, 1 for one day before the booking, 2 for two days before, and so on.",
+          "extra": "array_combine(range(0, 30), range(0, 30))",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_sms_message_reminder",
+        "type": "textarea",
+        "title": "Reminder message Template",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "dependency": {
+            "0": "[\"wbk_sms_send_reminder\", \"=\", \"true\"]"
+          },
+          "default": "Dear #customer_name, we would like to remind that you have booked the #service_name tomorrow at #appointment_time.",
+          "not_translated_title": "Reminder message Template",
+          "popup": "List of available placeholders",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_sms_send_on_payment",
+        "type": "checkbox",
+        "title": "Send payment received SMS",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "checkbox_value": "true",
+          "default": "true",
+          "not_translated_title": "Send payment received SMS",
+          "popup": "Turn on to send payment received SMS notifications to customers once their booking has been paid.",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_sms_message_on_payment",
+        "type": "textarea",
+        "title": "Payment received SMS Template",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "dependency": {
+            "0": "[\"wbk_sms_send_on_payment\", \"=\", \"true\"]"
+          },
+          "default": "Dear #customer_name, your booking on #appointment_day at #appointment_time has been paid.",
+          "not_translated_title": "Payment received SMS Template",
+          "popup": "List of available placeholders",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_sms_send_on_approval",
+        "type": "checkbox",
+        "title": "Send booking approval SMS",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "checkbox_value": "true",
+          "not_translated_title": "Send booking approval SMS",
+          "popup": "Turn on to send booking approval SMS notifications to customers once their booking has been approved.",
+          "default": "true",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_sms_message_on_approval",
+        "type": "textarea",
+        "title": "Booking approval SMS Template",
+        "section": "wbk_notifications_settings_section",
+        "extra": {
+          "dependency": {
+            "0": "[\"wbk_sms_send_on_approval\", \"=\", \"true\"]"
+          },
+          "default": "Dear #customer_name, your booking on #appointment_day at #appointment_time has been approved.",
+          "not_translated_title": "Booking approval SMS Template",
+          "popup": "List of available placeholders",
+          "required_plan": "premium",
+          "tab": "SMS"
+        }
+      },
+      {
+        "slug": "wbk_payment_step_title",
+        "type": "text",
+        "title": "Payment step title",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Payment",
+          "not_translated_title": "Payment step title",
+          "popup": "Payment title in the booking form sidebar.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_next_button_text",
+        "type": "text",
+        "title": "Continue button text",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Next",
+          "not_translated_title": "Continue button text",
+          "popup": "Text on the Continue button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_back_button_text",
+        "type": "text",
+        "title": "Back button text",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Back",
+          "not_translated_title": "Back button text",
+          "popup": "Text on the Back button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_label_login_button",
+        "type": "text",
+        "title": "Login",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Login",
+          "not_translated_title": "Login",
+          "popup": "Label for the login button in the login form.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_submit",
+        "type": "text",
+        "title": "Submit",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Submit",
+          "not_translated_title": "Submit",
+          "popup": "Label for the submit button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_pay",
+        "type": "text",
+        "title": "Pay",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Pay",
+          "not_translated_title": "Pay",
+          "popup": "Label for pay button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_pay_with",
+        "type": "text",
+        "title": "Pay with",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Pay with",
+          "not_translated_title": "Pay with",
+          "popup": "Label for pay with message.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_approve_appointment",
+        "type": "text",
+        "title": "Approve Appointment",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Approve Appointment",
+          "not_translated_title": "Approve Appointment",
+          "popup": "Label for approve appointment button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_cancel_button_text",
+        "type": "text_alfa_numeric",
+        "title": "Cancellation button text",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Cancel booking",
+          "not_translated_title": "Cancellation button text",
+          "popup": "Text of the cancelation button",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_apply",
+        "type": "text",
+        "title": "Apply",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Apply",
+          "not_translated_title": "Apply",
+          "popup": "Apply button text",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_show_more",
+        "type": "text",
+        "title": "Show more",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Show more",
+          "not_translated_title": "Show more",
+          "popup": "Label for show more button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_show_less",
+        "type": "text",
+        "title": "Show less",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Show less",
+          "not_translated_title": "Show less",
+          "popup": "Label for show less button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_toggle_description",
+        "type": "text",
+        "title": "Toggle description",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Toggle description",
+          "not_translated_title": "Toggle description",
+          "popup": "Label for toggle description button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_select",
+        "type": "text",
+        "title": "__('\"+ Select\"', \"webba-booking-lite\")",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "+ Select",
+          "not_translated_title": "'\"+ Select\"'",
+          "popup": "Label for + Select button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_add_more",
+        "type": "text",
+        "title": "__('\"+ Add more\"', \"webba-booking-lite\")",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "+ Add more",
+          "not_translated_title": "'\"+ Add more\"'",
+          "popup": "Label + Add more button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_add_to_calendar",
+        "type": "text",
+        "title": "__('\"+ Add to Calendar\"', \"webba-booking-lite\")",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "+ Add to Calendar",
+          "not_translated_title": "'\"+ Add to Calendar\"'",
+          "popup": "Label for add to calendar button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_selected",
+        "type": "text",
+        "title": "Selected",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Selected",
+          "not_translated_title": "Selected",
+          "popup": "Label for Selected.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_reduce_item",
+        "type": "text",
+        "title": "Reduce item",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Reduce item",
+          "not_translated_title": "Reduce item",
+          "popup": "Label for reduce item button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_increase_item",
+        "type": "text",
+        "title": "Increase item",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Increase item",
+          "not_translated_title": "Increase item",
+          "popup": "Label for increase item button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_remove_item",
+        "type": "text",
+        "title": "Remove item",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Remove item",
+          "not_translated_title": "Remove item",
+          "popup": "Label for remove item button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_empty_summary",
+        "type": "text",
+        "title": "Please select a service and slot to see a summary here.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please select a service and slot to see a summary here.",
+          "not_translated_title": "Please select a service and slot to see a summary here.",
+          "popup": "Label for empty summary message.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_show_summary",
+        "type": "text",
+        "title": "Show summary",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Show summary",
+          "not_translated_title": "Show summary",
+          "popup": "Label for show summary button.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_sidebar_help_title",
+        "type": "text",
+        "title": "Booking form sidebar support title",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "not_translated_title": "Booking form sidebar support title",
+          "popup": "Type the title to be displayed above the support links.",
+          "default": "Need help?",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_please_wait_state",
+        "type": "text",
+        "title": "Button text in loading state",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please wait…",
+          "not_translated_title": "Button text in loading state",
+          "popup": "Set the text to display on the button while loading.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_for_group_bookings_only",
+        "type": "text",
+        "title": "For group bookings only:",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Make multiple bookings:",
+          "not_translated_title": "For group bookings only:",
+          "popup": "Label for for group bookings only message.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_number_of_people",
+        "type": "text",
+        "title": "Number of people:",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Number of people:",
+          "not_translated_title": "Number of people:",
+          "popup": "Label for number of people message.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_choosing_timeslot_for",
+        "type": "text",
+        "title": "Choosing time slot for",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Choosing time slot for",
+          "not_translated_title": "Choosing time slot for",
+          "popup": "Label in Choosing time slot for.",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_available",
+        "type": "text",
+        "title": "Available",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Available",
+          "not_translated_title": "Available",
+          "popup": "Label in Calendar - Available",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_booked",
+        "type": "text",
+        "title": "Booked",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Booked",
+          "not_translated_title": "Booked",
+          "popup": "Label in Calendar - Booked",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_today",
+        "type": "text",
+        "title": "Today",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Today",
+          "not_translated_title": "Today",
+          "popup": "Label in Calendar - Today",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_wording_slots",
+        "type": "text",
+        "title": "Slots",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "slots",
+          "not_translated_title": "Slots",
+          "popup": "Label in timeslots",
+          "tab": "buttons-ui"
+        }
+      },
+      {
+        "slug": "wbk_payment_methods_title",
+        "type": "text",
+        "title": "Payment methods title",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Payment method",
+          "not_translated_title": "Payment methods title",
+          "popup": "Label shown above the payment methods",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_enter_coupon_code",
+        "type": "text",
+        "title": "Enter coupon code",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Enter coupon code",
+          "not_translated_title": "Enter coupon code",
+          "popup": "Placeholder Enter coupon code",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_link_label",
+        "type": "text",
+        "title": "User dashboard link text",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "User Dashboard",
+          "not_translated_title": "User dashboard link text",
+          "popup": "Label for the user dashboard link.",
+          "tab": "user-dashboard"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_section_bookings_label",
+        "type": "text",
+        "title": "Title for bookings section of the User dashboard",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "My Bookings",
+          "not_translated_title": "Title for bookings section of the User dashboard",
+          "popup": "__(\n                    'A title for bookings section of the user dashboard, it\\'ll be used in navigation and other places inside user dashboard.',\n                    \"webba-booking-lite\",\n                )",
+          "tab": "user-dashboard"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_section_past_bookings_label",
+        "type": "text",
+        "title": "Title for previous bookings section of the user dashboard",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "History",
+          "not_translated_title": "Title for previous bookings section of the user dashboard",
+          "popup": "__(\n                    'A title for previous bookings section of the user dashboard, it\\'ll be used in navigation and other places inside user dashboard.',\n                    \"webba-booking-lite\",\n                )",
+          "tab": "user-dashboard"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_link_text_reschedule",
+        "type": "text",
+        "title": "Title for the reschedule link text in user dashboard",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Reschedule",
+          "not_translated_title": "Title for the reschedule link text in user dashboard",
+          "popup": "This title will be used to display the reschedule link in user dashboard.",
+          "tab": "user-dashboard"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_link_text_cancel",
+        "type": "text",
+        "title": "Title for the cancel link text in user dashboard",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Cancel booking",
+          "not_translated_title": "Title for the cancel link text in user dashboard",
+          "popup": "This title will be used to display the cancel link in user dashboard.",
+          "tab": "user-dashboard"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_link_text_confirm_cancellation",
+        "type": "text",
+        "title": "Title for the confirm cancellation link text in user dashboard",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Confirm cancellation",
+          "not_translated_title": "Title for the confirm cancellation link text in user dashboard",
+          "popup": "This title will be used to display the confirm cancellation link in user dashboard.",
+          "tab": "user-dashboard"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_no_bookings_available",
+        "type": "text",
+        "title": "No bookings message",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "No bookings available",
+          "not_translated_title": "No bookings message",
+          "popup": "Specify the message to display when no bookings are available in the Users dashboard.",
+          "tab": "user-dashboard"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_login_title",
+        "type": "text",
+        "title": "User login form title",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Login to your booking manager",
+          "not_translated_title": "User login form title",
+          "popup": "Specify the message to display at the top of the user login form",
+          "tab": "user-dashboard"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_manage_appointments_title",
+        "type": "text",
+        "title": "Manage your appointments and reservations",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Manage your appointments and reservations",
+          "not_translated_title": "Manage your appointments and reservations",
+          "popup": "Specify the message to display at the top of the manage your appointments and reservations form",
+          "tab": "user-dashboard"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_upcoming_bookings_title",
+        "type": "text",
+        "title": "Upcoming bookings title",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Upcoming",
+          "not_translated_title": "Upcoming bookings title",
+          "popup": "Specify the title for the upcoming bookings section",
+          "tab": "user-dashboard"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_past_bookings_title",
+        "type": "text",
+        "title": "Past bookings title",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Past",
+          "not_translated_title": "Past bookings title",
+          "popup": "Specify the title for the past bookings section",
+          "tab": "user-dashboard"
+        }
+      },
+      {
+        "slug": "wbk_user_dashboard_new_booking_title",
+        "type": "text",
+        "title": "+ New Booking title",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "+ New Booking",
+          "not_translated_title": "+ New Booking title",
+          "popup": "Specify the title for the + New Booking button",
+          "tab": "user-dashboard"
+        }
+      },
+      {
+        "slug": "wbk_places_selection_mode",
+        "type": "select",
+        "title": "__('Multiple seat selection mode', 'webba-booking-lite')",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "'not_translated_title'": "'Multiple seat selection mode'",
+          "'popup'": "__(\n                    'Choose how many places customer can select in the group service booking.',\n                    'webba-booking-lite'\n                )",
+          "'default'": "'normal'",
+          "'extra'": {
+            "'normal'": "__(\n                        'Let users select count',\n                        'webba-booking-lite'\n                    )",
+            "'normal_no_default'": "__(\n                        'Let users select count (no default value)',\n                        'webba-booking-lite'\n                    )",
+            "'1'": "__(\n                        'Allow select only one place',\n                        'webba-booking-lite'\n                    )",
+            "'max'": "__(\n                        'Allow select only maximum places',\n                        'webba-booking-lite'\n                    )"
+          }
+        },
+        "subsection": "user-dashboard",
+        "page": "advanced"
+      },
+      {
+        "slug": "wbk_show_details_of_previous_bookings",
+        "type": "checkbox",
+        "title": "__('Show who booked the time slot', 'webba-booking-lite')",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "'default'": "''",
+          "'checkbox_value'": "'true'",
+          "'not_translated_title'": "'Show who booked the time slot'",
+          "'popup'": "__(\n                    'If enabled, each time slot will display the names of users who have already booked that time slot. Applicable for group services.',\n                    'webba-booking-lite'\n                )"
+        },
+        "subsection": "user-dashboard",
+        "page": "advanced"
+      },
+      {
+        "slug": "wbk_show_local_time_by_default",
+        "type": "checkbox",
+        "title": "__('Show local time by default', 'webba-booking-lite')",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "'default'": "''",
+          "'checkbox_value'": "'true'",
+          "'not_translated_title'": "'Show local time by default'",
+          "'popup'": "__(\n                    'If enabled, the booking form will automatically default to the local time of the customer.',\n                    'webba-booking-lite'\n                )"
+        },
+        "subsection": "user-dashboard",
+        "page": "advanced"
+      },
+      {
+        "slug": "wbk_automatically_select_today",
+        "type": "checkbox",
+        "title": "__('Auto select nearest date', 'webba-booking-lite')",
+        "section": "wbk_advanced_booking_rules_section",
+        "extra": {
+          "'default'": "''",
+          "'checkbox_value'": "'true'",
+          "'not_translated_title'": "'Auto select nearest date'",
+          "'popup'": "__(\n                    'If enabled, today or the next available date will be chosen automatically.',\n                    'webba-booking-lite'\n                )"
+        },
+        "subsection": "user-dashboard",
+        "page": "advanced"
+      },
+      {
+        "slug": "wbk_wording_label_login_user",
+        "type": "text",
+        "title": "Username or Email Address",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Username or Email Address",
+          "not_translated_title": "Login form username/email label",
+          "popup": "Label for the username/email field in the login form.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_label_login_password",
+        "type": "text",
+        "title": "Password",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Password",
+          "not_translated_title": "Login form password label",
+          "popup": "Label for the password field in the login form.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_summary",
+        "type": "text",
+        "title": "Summary",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Summary",
+          "not_translated_title": "Summary label",
+          "popup": "Label for the summary section.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_select_services",
+        "type": "text",
+        "title": "Select service(s)",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Select service(s)",
+          "not_translated_title": "Select services label",
+          "popup": "Label for selecting services.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_choose_service_proceed",
+        "type": "text",
+        "title": "Choose a service to proceed",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Choose a service to proceed",
+          "not_translated_title": "Choose service to proceed label",
+          "popup": "Label for prompting to choose a service to proceed.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_select_units",
+        "type": "text",
+        "title": "Select unit(s)",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Select unit(s)",
+          "not_translated_title": "Select units label",
+          "popup": "Label for selecting units.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_choose_unit_proceed",
+        "type": "text",
+        "title": "Choose a unit to proceed",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Choose a unit to proceed",
+          "not_translated_title": "Choose unit to proceed label",
+          "popup": "Label for prompting to choose a unit to proceed.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_please_select_location_units",
+        "type": "text",
+        "title": "Please select a location first to choose units.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please select a location first to choose units.",
+          "not_translated_title": "Please select location for units label",
+          "popup": "Message shown when a location is required before choosing units.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_adult",
+        "type": "text",
+        "title": "Adult",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Adult",
+          "not_translated_title": "Unit adult label",
+          "popup": "Label for unit adult attendee counter.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_child",
+        "type": "text",
+        "title": "Child",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Child",
+          "not_translated_title": "Unit child label",
+          "popup": "Label for unit child attendee counter.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_infant",
+        "type": "text",
+        "title": "Infant",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Infant",
+          "not_translated_title": "Unit infant label",
+          "popup": "Label for unit infant attendee counter.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_max_attendees",
+        "type": "text",
+        "title": "Max attendees",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Max attendees",
+          "not_translated_title": "Unit max attendees label",
+          "popup": "Label for max attendees in unit card.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_select_suitable_range",
+        "type": "text",
+        "title": "Select suitable range",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Select suitable range",
+          "not_translated_title": "Unit select suitable range label",
+          "popup": "Label shown above unit range calendar.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_date_flexibility",
+        "type": "text",
+        "title": "Date Flexibility",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Date Flexibility",
+          "not_translated_title": "Unit date flexibility title",
+          "popup": "Title for date flexibility controls in unit mode.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_exact_match",
+        "type": "text",
+        "title": "Exact match",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Exact match",
+          "not_translated_title": "Unit exact match option",
+          "popup": "Exact match option label for unit date flexibility.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_plus_minus_1_day",
+        "type": "text",
+        "title": "+/- 1 day",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "+/- 1 day",
+          "not_translated_title": "Unit plus minus 1 day option",
+          "popup": "Label for +/- 1 day option in unit date flexibility.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_plus_minus_2_day",
+        "type": "text",
+        "title": "+/- 2 days",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "+/- 2 days",
+          "not_translated_title": "Unit plus minus 2 days option",
+          "popup": "Label for +/- 2 days option in unit date flexibility.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_plus_minus_3_day",
+        "type": "text",
+        "title": "+/- 3 days",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "+/- 3 days",
+          "not_translated_title": "Unit plus minus 3 days option",
+          "popup": "Label for +/- 3 days option in unit date flexibility.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_no_date_selected",
+        "type": "text",
+        "title": "No date selected",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "No date selected",
+          "not_translated_title": "Unit no date selected label",
+          "popup": "Label shown when no unit offer date range is selected.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_days",
+        "type": "text",
+        "title": "days",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "days",
+          "not_translated_title": "Unit days label",
+          "popup": "Label for day count in unit mode.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_available_date_ranges",
+        "type": "text",
+        "title": "Available Date Ranges",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Available Date Ranges",
+          "not_translated_title": "Unit available date ranges label",
+          "popup": "Heading for available unit offers list.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_available",
+        "type": "text",
+        "title": "Available",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Available",
+          "not_translated_title": "Unit available status label",
+          "popup": "Status label for available unit offers.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_unit_no_available_offers",
+        "type": "text",
+        "title": "No available offers found for the selected range.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "No available offers found for the selected range.",
+          "not_translated_title": "Unit no available offers message",
+          "popup": "Message shown below date flexibility when no unit offers are found.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_select_date_time_services",
+        "type": "text",
+        "title": "Select date & time for services",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Select date & time for services",
+          "not_translated_title": "Select date & time for services label",
+          "popup": "Label for selecting date and time for services.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_choose_preferred_appointment_slot",
+        "type": "text",
+        "title": "Choose your preferred appointment slot",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Choose your preferred appointment slot",
+          "not_translated_title": "Choose preferred appointment slot label",
+          "popup": "Label for choosing preferred appointment slot.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_personal_details",
+        "type": "text",
+        "title": "Personal details",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Personal details",
+          "not_translated_title": "Personal details label",
+          "popup": "Label for personal details section.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_fill_contact_information",
+        "type": "text",
+        "title": "Please fill in your contact information",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please fill in your contact information",
+          "not_translated_title": "Fill contact information label",
+          "popup": "Prompt to fill in contact information.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_this_field_is_required",
+        "type": "text",
+        "title": "This field is required",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "This field is required",
+          "not_translated_title": "This field is required label",
+          "popup": "This field is required in error message",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_the_entered_email_is_invalid",
+        "type": "text",
+        "title": "The entered email is invalid",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "The entered email is invalid",
+          "not_translated_title": "The entered email is invalid",
+          "popup": "The entered email is invalid in error message",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_please_enter_a_valid_phone_number",
+        "type": "text",
+        "title": "Please enter a valid phone number",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please enter a valid phone number",
+          "not_translated_title": "Please enter a valid phone number",
+          "popup": "Please enter a valid phone number in error message",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_the_entered_number_is_invalid",
+        "type": "text",
+        "title": "The entered number is invalid",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "The entered number is invalid",
+          "not_translated_title": "The entered number is invalid",
+          "popup": "The entered number is invalid in error message",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_select_preferred_payment_method",
+        "type": "text",
+        "title": "Select your preferred payment method",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Select your preferred payment method",
+          "not_translated_title": "Select preferred payment method label",
+          "popup": "Prompt to select preferred payment method.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_select_date_time",
+        "type": "text",
+        "title": "Select date & time",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Select date & time",
+          "not_translated_title": "Select date & time",
+          "popup": "__(\n                    'Label above calendar when date and time isn\\'t selected.',\n                    \"webba-booking-lite\",\n                )",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_no_available_timeslots",
+        "type": "text",
+        "title": "No available time slots",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "No available time slots",
+          "not_translated_title": "No available time slots",
+          "popup": "Label in No available time slots.",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_no_time_selected",
+        "type": "text",
+        "title": "No time selected",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "No time selected",
+          "not_translated_title": "No time selected",
+          "popup": "Error message when no time slot is selected.",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_appointment_confirmed",
+        "type": "text",
+        "title": "Thank you for your booking!",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Thank you for your booking!",
+          "not_translated_title": "Thank you for your booking!",
+          "popup": "Thank you message shown after successful booking.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_look_forward_seeing_you",
+        "type": "text",
+        "title": "We look forward to seeing you.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "We look forward to seeing you.",
+          "not_translated_title": "We look forward to seeing you.",
+          "popup": "Follow-up message shown after booking.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_booking_success",
+        "type": "text",
+        "title": "Booking success",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Booking success",
+          "not_translated_title": "Booking success",
+          "popup": "Label for booking success message.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_booking_approved",
+        "type": "text",
+        "title": "Booking approved",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Booking approved",
+          "not_translated_title": "Booking approved",
+          "popup": "Label for booking approved message.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_booking_cancelled",
+        "type": "text",
+        "title": "Booking cancelled",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Booking cancelled",
+          "not_translated_title": "Booking cancelled",
+          "popup": "Label for booking cancelled message.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_loading_booking_details",
+        "type": "text",
+        "title": "Loading booking details…",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Loading booking details...",
+          "not_translated_title": "Loading booking details…",
+          "popup": "Label for loading booking details message.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_appointment_approved",
+        "type": "text",
+        "title": "Appointment Approved",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Appointment Approved",
+          "not_translated_title": "Appointment Approved",
+          "popup": "Label for appointment approved message.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_appointment_approved_message",
+        "type": "text",
+        "title": "You have approved this appointment. The customer has been notified.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "You have approved this appointment. The customer has been notified.",
+          "not_translated_title": "You have approved this appointment. The customer has been notified.",
+          "popup": "Label for appointment approved message.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_appointment_cancelled",
+        "type": "text",
+        "title": "Appointment Cancelled",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Appointment Cancelled",
+          "not_translated_title": "Appointment Cancelled",
+          "popup": "Label for appointment cancelled message.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_appointment_cancelled_admin_message",
+        "type": "text",
+        "title": "You have cancelled this appointment. The customer has been notified of the cancellation.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "You have cancelled this appointment. The customer has been notified of the cancellation.",
+          "not_translated_title": "You have cancelled this appointment. The customer has been notified of the cancellation.",
+          "popup": "Label for appointment cancelled admin message.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_appointment_cancelled_customer_message",
+        "type": "text",
+        "title": "You have cancelled your appointment. We hope to see you again soon.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "You have cancelled your appointment. We hope to see you again soon.",
+          "not_translated_title": "You have cancelled your appointment. We hope to see you again soon.",
+          "popup": "Label for appointment cancelled customer message.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_booking_canceled_message",
+        "type": "text",
+        "title": "Cancellation success message",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Your appointment booking has been canceled.",
+          "not_translated_title": "Cancellation success message",
+          "popup": "Text shown to a customer when booking is cancelled.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_payment_step_title",
+        "type": "text",
+        "title": "Payment step title",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Payment",
+          "not_translated_title": "Payment step title",
+          "popup": "Title for the payment step in the booking form.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_payment_information",
+        "type": "text",
+        "title": "Payment Information",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Payment Information",
+          "not_translated_title": "Payment Information",
+          "popup": "Label for payment information section.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_cost_breakdown",
+        "type": "text",
+        "title": "Cost Breakdown",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Cost Breakdown",
+          "not_translated_title": "Cost Breakdown",
+          "popup": "Label for cost breakdown section.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_free",
+        "type": "text",
+        "title": "Free",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Free",
+          "not_translated_title": "Free",
+          "popup": "Label for free service.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_total_amount",
+        "type": "text",
+        "title": "Total amount",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Total amount paid",
+          "not_translated_title": "Total amount",
+          "popup": "Label for total amount in payment summary.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_loading_payment_form",
+        "type": "text",
+        "title": "Loading payment form…",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Loading payment form…",
+          "not_translated_title": "Loading payment form label",
+          "popup": "Label for loading payment form message.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_processing",
+        "type": "text",
+        "title": "Processing…",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Processing…",
+          "not_translated_title": "Processing label",
+          "popup": "Label for processing message.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_please_complete_payment_confirm_booking",
+        "type": "text",
+        "title": "Please complete your payment to confirm your booking.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please complete your payment to confirm your booking.",
+          "not_translated_title": "Please complete payment to confirm booking label",
+          "popup": "Label for please complete payment to confirm booking message.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_payment_successful",
+        "type": "text",
+        "title": "Payment successful",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Payment successful",
+          "not_translated_title": "Payment successful label",
+          "popup": "Label for payment successful message.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_thank_you_payment",
+        "type": "text",
+        "title": "Thank you for your payment.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Thank you for your payment.",
+          "not_translated_title": "Thank you for your payment label",
+          "popup": "Label for thank you for your payment message.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_total_amount_tax_incl",
+        "type": "text",
+        "title": "Total Amount (tax incl.)",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Total Amount (tax incl.)",
+          "not_translated_title": "Total Amount (tax incl.)",
+          "popup": "Label for total amount (tax incl.) in payment summary.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_total_amount_due",
+        "type": "text",
+        "title": "Total amount due",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Total amount due",
+          "not_translated_title": "Total amount due label",
+          "popup": "Label for total amount due.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_complete_your_payment",
+        "type": "text",
+        "title": "Complete Your Payment",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Complete Your Payment",
+          "not_translated_title": "Complete your payment label",
+          "popup": "Label for complete your payment message.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_select_payment_method_complete_payment",
+        "type": "text",
+        "title": "Please select a payment method and complete your payment to confirm your booking.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please select a payment method and complete your payment to confirm your booking.",
+          "not_translated_title": "Select payment method and complete payment label",
+          "popup": "Label for select payment method and complete payment message.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_tax_incl",
+        "type": "text",
+        "title": "Tax incl.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Tax incl.",
+          "not_translated_title": "Tax incl.",
+          "popup": "Label indicating tax is included in the price.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_payment_item_name",
+        "type": "text",
+        "title": "Payment item text",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "#service_name on #appointment_day at #appointment_time",
+          "not_translated_title": "Payment item text",
+          "popup": "Text displayed for payment items. Available placeholders: #service_name, #appointment_day, #appointment_time.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_tax_label",
+        "type": "text",
+        "title": "Tax label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Tax",
+          "not_translated_title": "Tax label",
+          "popup": "Label for tax in payment summary.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_discount_label",
+        "type": "text",
+        "title": "Discount label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Discount",
+          "not_translated_title": "Discount label",
+          "popup": "Label for discount in payment summary.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_total_title",
+        "type": "text",
+        "title": "Total title",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Total",
+          "not_translated_title": "Total title",
+          "popup": "Label for total amount in payment summary.",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_wording_no_services_found",
+        "type": "text",
+        "title": "No services found!",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "No services found!",
+          "not_translated_title": "No services found label",
+          "popup": "Error message when no services are found.",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_no_units_found",
+        "type": "text",
+        "title": "No units found!",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "No units found!",
+          "not_translated_title": "No units found label",
+          "popup": "Error message when no units are found.",
+          "tab": "units"
+        }
+      },
+      {
+        "slug": "wbk_wording_tax_included",
+        "type": "text",
+        "title": "Tax incl.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Tax incl.",
+          "not_translated_title": "Tax incl.",
+          "popup": "Label for Tax incl. in sidebar.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_duration",
+        "type": "text",
+        "title": "Duration",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Duration",
+          "not_translated_title": "Duration",
+          "popup": "Label for Duration.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_full_price",
+        "type": "text",
+        "title": "Full price",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Full price",
+          "not_translated_title": "Full price",
+          "popup": "Label for Full price in booking form sidebar.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_pay_now",
+        "type": "text",
+        "title": "Pay now",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Pay now",
+          "not_translated_title": "Pay now",
+          "popup": "Label for Pay now in booking form sidebar.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_left_to_pay",
+        "type": "text",
+        "title": "Left to pay",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Left to pay",
+          "not_translated_title": "Left to pay",
+          "popup": "Label for Left to pay in booking form sidebar.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_show_details",
+        "type": "text",
+        "title": "Show details",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Show details",
+          "not_translated_title": "Show details",
+          "popup": "Label for Show details in booking form sidebar.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_hide_details",
+        "type": "text",
+        "title": "Hide details",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Hide details",
+          "not_translated_title": "Hide details",
+          "popup": "Label for Hide details in booking form sidebar.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_minute",
+        "type": "text",
+        "title": "Minutes",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "min",
+          "not_translated_title": "Minutes",
+          "popup": "Label for Minutes.",
+          "tab": "booking-status"
+        }
+      },
+      {
+        "slug": "wbk_wording_hour",
+        "type": "text",
+        "title": "Hours",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "h",
+          "not_translated_title": "Hours",
+          "popup": "Label for Hours.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_location",
+        "type": "text",
+        "title": "Location",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Location",
+          "not_translated_title": "Location",
+          "popup": "Label for Location.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_select_location",
+        "type": "text",
+        "title": "Select location",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Select location",
+          "not_translated_title": "Select location",
+          "popup": "Label for Select location.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_please_select_location",
+        "type": "text",
+        "title": "Please select a location first to choose services.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please select a location first to choose services.",
+          "not_translated_title": "Please select a location first to choose services.",
+          "popup": "Label for Please select a location first to choose services.",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_select_staff_member",
+        "type": "text",
+        "title": "__('SELECT STAFF MEMBER', \"webba-booking-lite\")",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "__('SELECT STAFF MEMBER', \"webba-booking-lite\")",
+          "not_translated_title": "'SELECT STAFF MEMBER'",
+          "popup": "__('Label for SELECT STAFF MEMBER.', \"webba-booking-lite\")",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_any_available",
+        "type": "text",
+        "title": "__('Any Available', \"webba-booking-lite\")",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "__('Any Available', \"webba-booking-lite\")",
+          "not_translated_title": "'Any Available'",
+          "popup": "__('Label for Any Available.', \"webba-booking-lite\")",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_best_available_time",
+        "type": "text",
+        "title": "__('Best available time.', \"webba-booking-lite\")",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "__('Best available time.', \"webba-booking-lite\")",
+          "not_translated_title": "'Best available time.'",
+          "popup": "__('Label for Best available time.', \"webba-booking-lite\")",
+          "tab": "form-fields"
+        }
+      },
+      {
+        "slug": "wbk_wording_please_select_service",
+        "type": "text",
+        "title": "Please select at least one service.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please select at least one service.",
+          "not_translated_title": "Please select at least one service.",
+          "popup": "__(\n                    'Label for \"Please select at least one service\" tooltip in the navigation button.',\n                    \"webba-booking-lite\",\n                )",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_please_select_timeslot",
+        "type": "text",
+        "title": "Please select a time slot for each selected service.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please select a time slot for each selected service.",
+          "not_translated_title": "Please select a time slot for each selected service.",
+          "popup": "__(\n                    'Label for \"please select a time slot for each selected service\" tooltip in the navigation button.',\n                    \"webba-booking-lite\",\n                )",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_please_fill_out_all_fields",
+        "type": "text",
+        "title": "Please fill out all required fields.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please fill out all required fields.",
+          "not_translated_title": "Please fill out all required fields.",
+          "popup": "__(\n                    'Label for \"Please fill out all required fields\" tooltip in the navigation button.',\n                    \"webba-booking-lite\",\n                )",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_daily_limit_reached_message",
+        "type": "text",
+        "title": "Daily limit message",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Daily booking limit is reached, please select another date.",
+          "not_translated_title": "Daily limit message",
+          "popup": "Error message shown when daily booking limit is reached.",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_no_bookings_for_payment_message",
+        "type": "text",
+        "title": "No bookings for payment message",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "There are no bookings available for payment.",
+          "not_translated_title": "No bookings for payment message",
+          "popup": "Error message when no bookings are available for payment.",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_please_select_payment_method",
+        "type": "text",
+        "title": "Please select a payment method.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please select a payment method.",
+          "not_translated_title": "Please select a payment method.",
+          "popup": "Error message when no payment method is selected.",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_please_fill_out_payment_form",
+        "type": "text",
+        "title": "Please fill out payment form.",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Please fill out payment form.",
+          "not_translated_title": "Please fill out payment form.",
+          "popup": "Error message when payment form is not filled out.",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_wording_no_bookings_found",
+        "type": "text",
+        "title": "No bookings found for the provided token",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "No bookings found for the provided token",
+          "not_translated_title": "No bookings found for the provided token",
+          "popup": "Error message when no bookings are found for the provided token.",
+          "tab": "validation"
+        }
+      },
+      {
+        "slug": "wbk_total_amount_label",
+        "type": "text",
+        "title": "Total amount label",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Total amount",
+          "not_translated_title": "Total amount label",
+          "popup": "Label for the total amount in payment details",
+          "tab": "payments"
+        }
+      },
+      {
+        "slug": "wbk_google_meet_link_text",
+        "type": "text",
+        "title": "Google Meet link text",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Click here to open your meeting in Google Meet",
+          "not_translated_title": "Google Meet link text",
+          "popup": "Text of the Google Meet link in the email notification.",
+          "tab": "integrations"
+        }
+      },
+      {
+        "slug": "wbk_wording_select_extras",
+        "type": "text",
+        "title": "Select extras",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Select extras",
+          "not_translated_title": "Select extras",
+          "popup": "Label for Select extras.",
+          "tab": "extras"
+        }
+      },
+      {
+        "slug": "wbk_wording_choose_additional_services",
+        "type": "text",
+        "title": "Choose additional items",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Choose additional items",
+          "not_translated_title": "Choose additional items",
+          "popup": "Label for Choose additional items.",
+          "tab": "extras"
+        }
+      },
+      {
+        "slug": "wbk_wording_additional_items",
+        "type": "text",
+        "title": "Additional items",
+        "section": "wbk_translation_settings_section",
+        "extra": {
+          "default": "Additional items",
+          "not_translated_title": "Additional items",
+          "popup": "Label for Additional items.",
+          "tab": "extras"
+        }
+      }
+    ]
+  }
+}

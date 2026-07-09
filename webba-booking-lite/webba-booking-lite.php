@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.4.14
+ * Version: 6.4.16
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -71,7 +71,42 @@ if ( !defined( "WP_WEBBA_BOOKING__PLUGIN_DIR" ) ) {
     define( "WP_WEBBA_BOOKING__PLUGIN_URL", plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( "WP_WEBBA_BOOKING__VERSION" ) ) {
-    define( "WP_WEBBA_BOOKING__VERSION", "6.4.12" );
+    define( "WP_WEBBA_BOOKING__VERSION", "6.4.16" );
+}
+if ( !function_exists( "wbk_is_assistance_lab_available" ) ) {
+    /**
+     * Whether the Assistance Lab developer package is present.
+     * Remove assistantlab/ from production builds to hide the feature.
+     */
+    function wbk_is_assistance_lab_available() : bool {
+        static $available = null;
+        if ( $available === null ) {
+            $available = is_dir( WP_WEBBA_BOOKING__PLUGIN_DIR . "/assistantlab" );
+        }
+        return $available;
+    }
+
+}
+if ( !function_exists( "wbk_is_assistance_available" ) ) {
+    /**
+     * Whether the user-facing Assistance chat is enabled.
+     */
+    function wbk_is_assistance_available() : bool {
+        return (bool) apply_filters( "wbk_assistance_available", true );
+    }
+
+}
+if ( !function_exists( "wbk_get_react_admin_asset_version" ) ) {
+    /**
+     * Cache-bust the React admin bundle during local webpack rebuilds.
+     */
+    function wbk_get_react_admin_asset_version() : string {
+        $build_dir = WP_WEBBA_BOOKING__PLUGIN_DIR . "/build/admin";
+        $js_path = $build_dir . "/index.js";
+        $css_path = $build_dir . "/index.css";
+        return WP_WEBBA_BOOKING__VERSION . "." . max( ( file_exists( $js_path ) ? (int) filemtime( $js_path ) : 0 ), ( file_exists( $css_path ) ? (int) filemtime( $css_path ) : 0 ) );
+    }
+
 }
 if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_textdomain" ) ) {
     include "vendor/autoload.php";
@@ -90,6 +125,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     require "deprecated/class_wbk_date_time_utils.php";
     include "includes/class_wbk_webba_connect.php";
     include "includes/class-wbk-feature-gate.php";
+    include "includes/class-wbk-remote-config.php";
     if ( get_option( "wbk_stripe_publishable_key", "" ) != "" ) {
         require "includes/third-parties/class_wbk_stripe.php";
     } else {
@@ -158,7 +194,14 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     include "includes/processors/class-wbk-pdf-processor.php";
     include "includes/processors/class-wbk-translation-processor.php";
     include "includes/processors/class-wbk-unit-availability-processor.php";
+    include "includes/class-wbk-assistance.php";
+    include "includes/class-wbk-assistance-connect.php";
+    include "includes/class-wbk-ai-tasks.php";
+    if ( wbk_is_assistance_lab_available() ) {
+        include WP_WEBBA_BOOKING__PLUGIN_DIR . "/assistantlab/load.php";
+    }
     // Request manager
+    include "includes/class-wbk-reset-all-data.php";
     include "includes/class-wbk-request-manager.php";
     // user controller
     include "includes/class-wbk-booking-user.php";
@@ -182,6 +225,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     include "includes/class_wbk_mixpanel.php";
     add_action( "init", "wbk_init", 30 );
     add_action( "wbk_daily_event", "wbk_daily" );
+    WBK_Remote_Config::init();
     add_action( "plugins_loaded", "wbk_plugins_loaded", 10 );
     add_action( "init", "wbk_regular_routine", 40 );
     add_filter(
@@ -191,8 +235,10 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
         1
     );
     add_action( "init", "wbk_admin_permission", 9 );
-    // Wizard
+    // Wizard + Onboarding + Visual tour
     include "includes/class_wbk_wizard.php";
+    include "includes/class-wbk-setup-checklist.php";
+    include "includes/class-wbk-feature-tour.php";
     $wbk_request_manager = new WBK_Request_Manager();
     $wbk_rest_cache_prevention = new WBK_REST_Cache_Prevention();
     $wbk_model = new WBK_Model();
@@ -211,6 +257,8 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
         $frontend = new WBK_Frontend_Booking();
     }
     $wizard = new WBK_Wizard();
+    $setup_checklist = new WBK_Setup_Checklist();
+    $feature_tour = new WBK_Feature_Tour();
     $js_array = [[
         "backend",
         [
@@ -429,6 +477,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
             "wbk-service-categories",
             "wbk-email-templates",
             "wbk-dashboard",
+            "wbk-assistance-lab",
             "wbk-spa",
             "wbk-locations",
             "wbk-staff-members"
@@ -501,7 +550,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
         "wbk-admin-style",
         WP_WEBBA_BOOKING__PLUGIN_URL . "/build/admin/index.css",
         [],
-        WP_WEBBA_BOOKING__VERSION
+        wbk_get_react_admin_asset_version()
     ];
     $js_array[] = [
         "backend",
@@ -530,8 +579,27 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
             "editor",
             "wp-tinymce"
         ],
-        WP_WEBBA_BOOKING__VERSION
+        wbk_get_react_admin_asset_version()
     ];
+    if ( wbk_is_assistance_lab_available() && class_exists( "WBK_Assistance_Lab" ) ) {
+        $assistance_lab_asset_version = WBK_Assistance_Lab::get_asset_version();
+        $css_array[] = [
+            "backend",
+            ["wbk-assistance-lab"],
+            "wbk-assistance-lab-style",
+            WBK_Assistance_Lab::get_build_css_url(),
+            [],
+            $assistance_lab_asset_version
+        ];
+        $js_array[] = [
+            "backend",
+            ["wbk-assistance-lab"],
+            "wbk-react-assistance-lab",
+            WBK_Assistance_Lab::get_build_js_url(),
+            ["wp-element", "wp-api-fetch"],
+            $assistance_lab_asset_version
+        ];
+    }
     $js_array[] = [
         "backend",
         ["wbk-schedule", "wbk-options", "wbk-calendar"],

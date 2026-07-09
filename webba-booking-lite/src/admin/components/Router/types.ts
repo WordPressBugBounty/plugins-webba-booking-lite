@@ -15,7 +15,8 @@ export const ROUTES = [
     'locations',
     'staff-members',
     'options',
-    'extras'
+    'extras',
+    'assistance',
 ] as const
 export const PAGES = [
     'wbk-dashboard',

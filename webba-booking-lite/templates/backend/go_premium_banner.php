@@ -12,6 +12,9 @@ if (!wbk_fs()->is_free_plan()) {
 if (isset($_GET['wbk-activation'])) {
     return;
 }
+if (isset($_GET['Assistance']) && $_GET['Assistance'] === 'true') {
+    return;
+}
 ?>
 <div style="clear: both">
 <a rel="noopener" style="border: none !important;outline: none !important;box-shadow: none !important;" target="_blank" href="https://webba-booking.com/pricing/?source=dash">

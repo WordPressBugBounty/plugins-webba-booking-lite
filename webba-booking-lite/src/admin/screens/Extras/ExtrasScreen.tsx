@@ -14,7 +14,7 @@ import { createFormFromModel } from '../../components/Form/lib/createForm'
 import { __ } from '@wordpress/i18n'
 import { useMemo } from 'react'
 import './ExtrasScreen.scss'
-import { ProFeatuerWrapper } from '../../components/ProFeatuerWrapper/ProFeatuerWrapper'
+import { LockedTableSection } from '../../components/LockedTableSection/LockedTableSection'
 import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
 import noItemsImage from '../../../../public/images/bookings-empty.png'
 import extrasModelRaw from '../../../schemas/extras.json'
@@ -57,7 +57,7 @@ export const ExtrasScreen = () => {
         (select) => select(store_name).getPreset(),
         []
     )
-    const requiredPlans = ['premium', 'pro']
+    const requiredPlans = ['premium', 'pro', 'proextended']
     const isExtrasAvailable = useMemo(
         () => plan_map && requiredPlans.some((plan) => plan_map[plan] === true),
         [requiredPlans, plan_map]
@@ -156,10 +156,12 @@ export const ExtrasScreen = () => {
 
     return (
         <>
-            <div className="wbk_extrasScreen__wrapper">
-                {!isExtrasAvailable && (
-                    <ProFeatuerWrapper requiredPlans={['premium', 'pro']} />
-                )}
+            <LockedTableSection
+                isLocked={!isExtrasAvailable}
+                requiredPlans={requiredPlans}
+                featureKey="extras"
+                className="wbk_extrasScreen__wrapper"
+            >
                 <Table
                     title={__('Extras', 'webba-booking-lite')}
                     addButtonTitle={__('Add extra', 'webba-booking-lite')}
@@ -184,7 +186,7 @@ export const ExtrasScreen = () => {
                         noItemsImage
                     }
                 />
-            </div>
+            </LockedTableSection>
             <SuccessMessage />
         </>
     )

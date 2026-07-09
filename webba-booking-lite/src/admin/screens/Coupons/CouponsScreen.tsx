@@ -17,7 +17,7 @@ import { createFormFromModel } from '../../components/Form/lib/createForm'
 import { __ } from '@wordpress/i18n'
 import { useMemo } from 'react'
 import './CouponsScreen.scss'
-import { ProFeatuerWrapper } from '../../components/ProFeatuerWrapper/ProFeatuerWrapper'
+import { LockedTableSection } from '../../components/LockedTableSection/LockedTableSection'
 import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
 import noItemsImage from '../../../../public/images/bookings-empty.png'
 
@@ -46,7 +46,7 @@ export const CouponsScreen = () => {
         (select) => select(store_name).getPreset(),
         []
     )
-    const requiredPlans = ['premium', 'pro']
+    const requiredPlans = ['premium', 'pro', 'proextended']
     const isCouponsAvailable = useMemo(
         () => plan_map && requiredPlans.some((plan) => plan_map[plan] === true),
         [requiredPlans, plan_map]
@@ -123,10 +123,12 @@ export const CouponsScreen = () => {
 
     return (
         <>
-            <div className="wbk_couponsScreen__wrapper">
-                {!isCouponsAvailable && (
-                    <ProFeatuerWrapper requiredPlans={['premium', 'pro']} />
-                )}
+            <LockedTableSection
+                isLocked={!isCouponsAvailable}
+                requiredPlans={requiredPlans}
+                featureKey="coupons"
+                className="wbk_couponsScreen__wrapper"
+            >
                 <Table
                     title={__('Coupons', 'webba-booking-lite')}
                     addButtonTitle={__('Add coupon', 'webba-booking-lite')}
@@ -150,7 +152,7 @@ export const CouponsScreen = () => {
                         noItemsImage
                     }
                 />
-            </div>
+            </LockedTableSection>
             <SuccessMessage />
         </>
     )

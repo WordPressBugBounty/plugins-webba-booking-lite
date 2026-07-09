@@ -84,6 +84,32 @@
         }
     }
 
+    .wbk_settings__section--resetAllCard {
+        cursor: default;
+        border-color: #fecaca;
+        background-color: #fffbfb;
+
+        .wbk_settings__icon--danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            font-weight: 600;
+            font-size: 20px;
+        }
+
+        .wbk_settings__actions {
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        &:hover {
+            button {
+                gap: 8px;
+            }
+        }
+    }
+
     .wbk_settings__section--supportCard {
         background: linear-gradient(135deg, #1a2e44 0%, #4a5c71 70.71%);
         box-shadow: 0px 10px 15px 0px #0000001a;
