@@ -2,10 +2,7 @@ import { __ } from '@wordpress/i18n'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
 import type { WelcomeStepProps } from '../../types'
-import {
-    trackWizardSkipLinkClick,
-    trackWizardStepAction,
-} from '../../wizardAnalytics'
+import { trackWizardSkipLinkClick } from '../../wizardAnalytics'
 import './WelcomeStep.scss'
 
 export const WelcomeStep = ({
@@ -48,20 +45,14 @@ export const WelcomeStep = ({
                             <button
                                 type="button"
                                 className="wbk_welcomeStep__launchButton"
-                                onClick={() => {
-                                    trackWizardStepAction('welcome', 'launch_ai')
-                                    onLaunchAi()
-                                }}
+                                onClick={onLaunchAi}
                             >
                                 {__('AI-assisted setup', 'webba-booking-lite')}
                             </button>
                             <button
                                 type="button"
                                 className="wbk_welcomeStep__manualButton"
-                                onClick={() => {
-                                    trackWizardStepAction('welcome', 'launch_manual')
-                                    onLaunchManual()
-                                }}
+                                onClick={onLaunchManual}
                             >
                                 {__('Regular Setup Wizard', 'webba-booking-lite')}
                             </button>
@@ -70,10 +61,7 @@ export const WelcomeStep = ({
                         <button
                             type="button"
                             className="wbk_welcomeStep__launchButton"
-                            onClick={() => {
-                                trackWizardStepAction('welcome', 'launch_manual')
-                                onLaunchManual()
-                            }}
+                            onClick={onLaunchManual}
                         >
                             {__('Launch wizard', 'webba-booking-lite')}
                         </button>

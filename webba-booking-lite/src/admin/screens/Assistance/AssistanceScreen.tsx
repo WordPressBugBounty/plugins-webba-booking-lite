@@ -40,7 +40,12 @@ import {
   createEmptyConfigInformation,
 } from "./types";
 import { normalizeAssistanceSummaryLines, normalizeAssistanceSummaryText } from "./formatSummary";
-import { trackAssistanceCompleted, trackAssistanceOpened } from "./assistanceAnalytics";
+import {
+  trackAssistanceCompleted,
+  trackAssistanceOpened,
+  trackAssistanceWizardPromptSent,
+  trackAssistanceWizardSuggestionApplied,
+} from "./assistanceAnalytics";
 import "./AssistanceScreen.scss";
 
 const createId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -335,8 +340,12 @@ export const AssistanceScreen = forwardRef<AssistanceScreenHandle, AssistanceScr
     );
 
     useEffect(() => {
+      if (isWizardVariant) {
+        return;
+      }
+
       trackAssistanceOpened(variant);
-    }, [variant]);
+    }, [isWizardVariant, variant]);
 
     const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
       const container = messagesContainerRef.current;
@@ -426,6 +435,16 @@ export const AssistanceScreen = forwardRef<AssistanceScreenHandle, AssistanceScr
 
       const priorConversation = messagesToConversationTurns(messages);
 
+      if (isWizardVariant) {
+        trackAssistanceWizardPromptSent({
+          conversation: [
+            ...priorConversation,
+            { role: "user", content: trimmed },
+          ],
+          config_information: configInformation,
+        });
+      }
+
       setMessages((prev) => [...prev, userMessage]);
       setInput("");
       setLoadingPhraseStage("preparing");
@@ -478,13 +497,19 @@ export const AssistanceScreen = forwardRef<AssistanceScreenHandle, AssistanceScr
             sessionId: sessionIdRef.current,
           });
 
-          trackAssistanceCompleted(variant, {
+          const applyTrackingProperties = {
             success: applyResult.success,
             actions_count: result.actions.length,
             has_booking_page: Boolean(applyResult.booking_page?.page_url),
             warnings_count: applyResult.warnings?.length ?? 0,
             errors_count: applyResult.errors?.length ?? 0,
-          });
+          };
+
+          if (isWizardVariant) {
+            trackAssistanceWizardSuggestionApplied(applyTrackingProperties);
+          } else {
+            trackAssistanceCompleted(variant, applyTrackingProperties);
+          }
 
           if (applyResult.success) {
             setMessages((prev) => [

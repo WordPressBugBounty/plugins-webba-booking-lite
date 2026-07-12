@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react'
 import { __ } from '@wordpress/i18n'
-import { trackWizardStepAction } from '../../wizardAnalytics'
 import './SummaryStep.scss'
 
 const HOW_TO_LINK = 'https://webba-booking.com/documentation/how-to-add-booking-form/'
@@ -21,7 +20,6 @@ export const SummaryStep = ({
     const iconSrc = pluginUrl ? `${pluginUrl}/public/images/icon-check-nobg.svg` : ''
     const [copied, setCopied] = useState(false)
     const handleCopy = useCallback(() => {
-        trackWizardStepAction('summary', 'copy_shortcode')
         navigator.clipboard.writeText(shortcode).then(() => {
             setCopied(true)
             setTimeout(() => setCopied(false), 2000)
@@ -112,7 +110,6 @@ export const SummaryStep = ({
                 className="wbk_summaryStep__closeButton"
                 onClick={(e) => {
                     e.preventDefault()
-                    trackWizardStepAction('summary', 'close')
                     onClose()
                 }}
             >

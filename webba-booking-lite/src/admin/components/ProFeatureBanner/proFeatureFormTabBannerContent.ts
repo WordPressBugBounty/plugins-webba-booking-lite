@@ -9,6 +9,29 @@ export interface ProFeatureFormTabBannerContent {
     features: string[]
 }
 
+const containsHtml = (value: string): boolean => /<[a-z][\s\S]*>/i.test(value)
+
+const getBannerDescription = (
+    lockedFields: ResolvedFormField[],
+    tabTitle: string
+): string => {
+    const plainDescription = lockedFields.find(
+        (field) => field.description && !containsHtml(field.description)
+    )?.description
+
+    if (plainDescription) {
+        return plainDescription
+    }
+
+    return sprintf(
+        __(
+            'Upgrade your plan to access %s settings and get more control over your booking experience.',
+            'webba-booking-lite'
+        ),
+        tabTitle.toLowerCase()
+    )
+}
+
 export const buildFormTabBannerContent = (
     tabTitle: string,
     lockedFields: ResolvedFormField[]
@@ -17,8 +40,6 @@ export const buildFormTabBannerContent = (
         .map((field) => field.label)
         .filter((label): label is string => Boolean(label))
     const uniqueFieldLabels = Array.from(new Set(fieldLabels))
-    const firstDescription = lockedFields.find((field) => field.description)
-        ?.description
 
     const features =
         uniqueFieldLabels.length >= 2
@@ -45,15 +66,7 @@ export const buildFormTabBannerContent = (
             __('Unlock %s features', 'webba-booking-lite'),
             tabTitle
         ),
-        description:
-            firstDescription ||
-            sprintf(
-                __(
-                    'Upgrade your plan to access %s settings and get more control over your booking experience.',
-                    'webba-booking-lite'
-                ),
-                tabTitle.toLowerCase()
-            ),
+        description: getBannerDescription(lockedFields, tabTitle),
         features,
     }
 }

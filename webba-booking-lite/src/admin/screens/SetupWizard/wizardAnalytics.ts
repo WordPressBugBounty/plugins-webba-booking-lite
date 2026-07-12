@@ -4,23 +4,14 @@ import { WIZARD_STEP_TITLES, type WizardStepId } from './steps/steps'
 export type WizardSetupMode = 'manual' | 'ai'
 export type WizardTrackedStep = WizardStepId | 'ai'
 
-const STEP_LABELS: Record<WizardTrackedStep, string> = {
-    welcome: 'Welcome',
-    businessInfo: 'Business Info',
-    firstService: 'First Service',
-    availability: 'Availability',
-    choosePlan: 'Choose Plan',
-    summary: 'Summary',
-    ai: 'AI Setup',
-}
-
-const STEP_PASSED_EVENTS: Record<WizardStepId, string> = {
-    welcome: 'Setup Wizard Welcome Passed',
-    businessInfo: 'Setup Wizard Business Info Passed',
-    firstService: 'Setup Wizard First Service Passed',
-    availability: 'Setup Wizard Availability Passed',
-    choosePlan: 'Setup Wizard Choose Plan Passed',
-    summary: 'Setup Wizard Summary Passed',
+const STEP_RENDERED_EVENTS: Record<WizardTrackedStep, string> = {
+    welcome: 'Setup Wizard Welcome Rendered',
+    businessInfo: 'Setup Wizard Business Info Rendered',
+    firstService: 'Setup Wizard First Service Rendered',
+    availability: 'Setup Wizard Availability Rendered',
+    choosePlan: 'Setup Wizard Choose Plan Rendered',
+    summary: 'Setup Wizard Summary Rendered',
+    ai: 'Setup Wizard AI Opened',
 }
 
 const getStepTitle = (step: WizardTrackedStep) => {
@@ -31,32 +22,13 @@ const getStepTitle = (step: WizardTrackedStep) => {
     return WIZARD_STEP_TITLES[step] || step
 }
 
-const getStepLabel = (step: WizardTrackedStep) => STEP_LABELS[step] || step
-
-export const trackWizardOpened = () => {
-    trackEvent('Setup Wizard Opened')
-}
-
-export const trackWizardStepPassed = (
-    step: WizardStepId,
-    setupMode: WizardSetupMode,
-    properties?: Record<string, unknown>
-) => {
-    trackEvent(STEP_PASSED_EVENTS[step], {
-        step,
-        step_title: getStepTitle(step),
-        setup_mode: setupMode,
-        ...properties,
-    })
-}
-
-export const trackWizardStepBack = (
-    fromStep: WizardTrackedStep,
+export const trackWizardStepRendered = (
+    step: WizardTrackedStep,
     setupMode: WizardSetupMode
 ) => {
-    trackEvent(`Setup Wizard ${getStepLabel(fromStep)} Back`, {
-        step: fromStep,
-        step_title: getStepTitle(fromStep),
+    trackEvent(STEP_RENDERED_EVENTS[step], {
+        step,
+        step_title: getStepTitle(step),
         setup_mode: setupMode,
     })
 }
@@ -64,19 +36,6 @@ export const trackWizardStepBack = (
 export const trackWizardCompleted = (setupMode: WizardSetupMode) => {
     trackEvent('Setup Wizard Completed', {
         setup_mode: setupMode,
-    })
-}
-
-export const trackWizardStepAction = (
-    step: WizardTrackedStep,
-    action: string,
-    properties?: Record<string, unknown>
-) => {
-    trackEvent(`Setup Wizard ${getStepLabel(step)} Action`, {
-        step,
-        step_title: getStepTitle(step),
-        action,
-        ...properties,
     })
 }
 

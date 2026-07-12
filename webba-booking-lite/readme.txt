@@ -3,8 +3,8 @@ Contributors: Webba agency, freemius
 Donate link: https://webba-booking.com/
 Tags:  appointment, booking, booking calendar, scheduling, reservation
 Requires at least: 5.6
-Tested up to: 7.0
-Stable tag: 6.4.16
+Tested up to: 7.0.1
+Stable tag: 6.4.17
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -179,6 +179,12 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 
 == Changelog ==
+
+11/07/2026
+
+6.4.17
+
+- Improvement: minor imporovements
 
 08/07/2026
 

@@ -30,7 +30,7 @@ export const initAnalytics = () => {
 
     mixpanel.init(MIXPANEL_TOKEN, {
         autocapture: false,
-        record_sessions_percent: 100,
+        record_sessions_percent: 0,
     })
 
     initialized = true

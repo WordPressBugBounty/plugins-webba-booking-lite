@@ -21,16 +21,13 @@ import { ChoosePlanStep } from './steps/ChoosePlanStep/ChoosePlanStep'
 import { SummaryStep } from './steps/SummaryStep/SummaryStep'
 import type { WizardServiceType, WizardStepId } from './steps/steps'
 import { AssistanceScreen } from '../Assistance/AssistanceScreen'
-import { trackAssistanceSkipped } from '../Assistance/assistanceAnalytics'
+import { trackAssistanceWizardSkipped } from '../Assistance/assistanceAnalytics'
 import type { AssistanceScreenHandle } from '../Assistance/types'
 import arrowRightIcon from '../../../../public/images/icon-arrow-right.svg'
 import {
     trackWizardCompleted,
-    trackWizardOpened,
-    trackWizardStepBack,
-    trackWizardStepPassed,
     trackWizardSkipLinkClick,
-    trackWizardStepAction,
+    trackWizardStepRendered,
 } from './wizardAnalytics'
 import './SetupWizard.scss'
 
@@ -216,10 +213,6 @@ export const SetupWizard = () => {
     const aiSetupCompletedRef = useRef(false)
 
     useEffect(() => {
-        trackWizardOpened()
-    }, [])
-
-    useEffect(() => {
         contentRef.current?.scrollTo({ top: 0, behavior: 'instant' })
     }, [currentStepIndex, setupMode])
 
@@ -290,6 +283,17 @@ export const SetupWizard = () => {
     const stepTitle = currentStepId
         ? WIZARD_STEP_TITLES[currentStepId] || ''
         : ''
+
+    useEffect(() => {
+        if (setupMode === 'ai') {
+            trackWizardStepRendered('ai', 'ai')
+            return
+        }
+
+        if (currentStepId) {
+            trackWizardStepRendered(currentStepId, setupMode)
+        }
+    }, [setupMode, currentStepId])
     const isFirstStep = currentStepIndex === 0
     const isLastStep = currentStepIndex === stepOrder.length - 1
     const isSummaryStep = currentStepId === 'summary'
@@ -372,10 +376,6 @@ export const SetupWizard = () => {
         const nextIndex = currentStepIndex + 1
         if (nextIndex >= totalSteps) return
 
-        if (currentStepId) {
-            trackWizardStepPassed(currentStepId, setupMode)
-        }
-
         setSlideDirection('forward')
 
         const nextStepId = stepOrder[nextIndex]
@@ -394,42 +394,35 @@ export const SetupWizard = () => {
 
     const goPrev = useCallback(() => {
         if (currentStepIndex > 0) {
-            if (currentStepId) {
-                trackWizardStepBack(currentStepId, setupMode)
-            }
             setSlideDirection('backward')
             setCurrentStepIndex(currentStepIndex - 1)
         }
-    }, [currentStepIndex, currentStepId, setupMode])
+    }, [currentStepIndex])
 
     const handleClose = useCallback(async () => {
-        trackWizardStepPassed('summary', setupMode)
         trackWizardCompleted(setupMode)
         setLoading(true)
         const url = await submitFinalSetup()
         setLoading(false)
         if (url) window.location.href = url
-    }, [submitFinalSetup])
+    }, [setupMode, submitFinalSetup])
 
     const handleSkipToManualSetup = useCallback(() => {
-        trackWizardStepAction('ai', 'switch_to_manual')
         setSetupMode('manual')
         setCurrentStepIndex(1)
         setSlideDirection('forward')
     }, [])
 
     const handleLaunchAiSetup = useCallback(() => {
-        trackWizardStepPassed('welcome', setupMode, { action: 'launch_ai' })
         setSetupMode('ai')
         setSlideDirection(null)
-    }, [setupMode])
+    }, [])
 
     const handleAiSetupComplete = useCallback(async () => {
         if (aiSetupCompletedRef.current) {
             return
         }
         aiSetupCompletedRef.current = true
-        trackWizardCompleted('ai')
         setLoading(true)
         const url = await submitFinalSetup()
         setLoading(false)
@@ -493,8 +486,7 @@ export const SetupWizard = () => {
                                     navigated = true
                                     window.location.href = dashboardUrl
                                 }
-                                trackAssistanceSkipped(
-                                    'wizard',
+                                trackAssistanceWizardSkipped(
                                     payload,
                                     undefined,
                                     navigate

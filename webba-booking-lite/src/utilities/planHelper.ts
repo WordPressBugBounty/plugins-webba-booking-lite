@@ -65,6 +65,7 @@ export const processUpgradeMessage = (
     planMap: Record<string, boolean>,
     placeholder: string
 ) => {
+    return __('Available in Pro', 'webba-booking-lite')
     const planNames = PLAN_DISPLAY_NAMES
     let upgradeMessage = ''
 

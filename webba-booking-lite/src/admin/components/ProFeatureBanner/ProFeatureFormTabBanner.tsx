@@ -45,7 +45,15 @@ export const ProFeatureFormTabBanner = ({
                     </div>
                     {planBadges.length > 0 && (
                         <div className="wbk_proFeatureBanner__badges">
-                            {planBadges.map(({ plan, label }) => (
+                            <span
+                                className={classNames(
+                                    'wbk_proFeatureBanner__badge',
+                                    `wbk_proFeatureBanner__badge--minimum`
+                                )}
+                            >
+                                {__('Available in Pro', 'webba-booking-lite')}
+                            </span>
+                            {/* {planBadges.map(({ plan, label }) => (
                                 <span
                                     key={plan}
                                     className={classNames(
@@ -55,7 +63,7 @@ export const ProFeatureFormTabBanner = ({
                                 >
                                     {label}
                                 </span>
-                            ))}
+                            ))} */}
                         </div>
                     )}
                 </div>

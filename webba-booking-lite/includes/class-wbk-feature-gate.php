@@ -123,7 +123,7 @@ class WBK_Feature_Gate
         $process_placeholders = true
     ) {
         $template = __(
-            'Available in #plan',
+            'Available in Pro',
             'webba-booking-lite'
         );
 
