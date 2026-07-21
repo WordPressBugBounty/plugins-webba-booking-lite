@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.4.17
+ * Version: 6.4.19
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -71,7 +71,7 @@ if ( !defined( "WP_WEBBA_BOOKING__PLUGIN_DIR" ) ) {
     define( "WP_WEBBA_BOOKING__PLUGIN_URL", plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( "WP_WEBBA_BOOKING__VERSION" ) ) {
-    define( "WP_WEBBA_BOOKING__VERSION", "6.4.17" );
+    define( "WP_WEBBA_BOOKING__VERSION", "6.4.19" );
 }
 if ( !function_exists( "wbk_is_assistance_lab_available" ) ) {
     /**
@@ -191,6 +191,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     include "includes/processors/class-wbk-placeholder-processor.php";
     include "includes/processors/class-wbk-options-processor.php";
     include "includes/processors/class-wbk-email-processor.php";
+    include "includes/utilities/class-wbk-mailer.php";
     include "includes/processors/class-wbk-pdf-processor.php";
     include "includes/processors/class-wbk-translation-processor.php";
     include "includes/processors/class-wbk-unit-availability-processor.php";
@@ -226,6 +227,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     add_action( "init", "wbk_init", 30 );
     add_action( "wbk_daily_event", "wbk_daily" );
     WBK_Remote_Config::init();
+    WBK_Mailer::init();
     add_action( "plugins_loaded", "wbk_plugins_loaded", 10 );
     add_action( "init", "wbk_regular_routine", 40 );
     add_filter(

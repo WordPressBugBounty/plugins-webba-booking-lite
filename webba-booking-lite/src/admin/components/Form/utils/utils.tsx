@@ -28,6 +28,7 @@ import { createColorField } from '../Fields/ColorField/ColorField'
 import { createFileUploadField } from '../Fields/FileUploadField/FileUploadField'
 import { createDurationField } from '../Fields/DurationField/DurationField'
 import { createZoomAuthField } from '../Fields/ZoomAuthField/ZoomAuthField'
+import { createSmtpTestField } from '../Fields/SmtpTestField/SmtpTestField'
 import { createPasswordField } from '../Fields/PasswordField/PasswordField'
 import { createLimitationField } from '../Fields/LimitationField/LimitationField'
 import { createNoticeField } from '../Fields/NoticeField/NoticeField'
@@ -106,6 +107,8 @@ export const getFieldComponentFromType = ({
             return createDurationField(constructorConfig)
         case inputType === 'zoom_auth':
             return createZoomAuthField(constructorConfig)
+        case inputType === 'smtp_test':
+            return createSmtpTestField(constructorConfig)
         case inputType === 'password':
             return createPasswordField(constructorConfig)
         case inputType === 'limitation':

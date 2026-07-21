@@ -4,6 +4,16 @@ import { WIZARD_STEP_TITLES, type WizardStepId } from './steps/steps'
 export type WizardSetupMode = 'manual' | 'ai'
 export type WizardTrackedStep = WizardStepId | 'ai'
 
+const STEP_LABELS: Record<WizardTrackedStep, string> = {
+    welcome: 'Welcome',
+    businessInfo: 'Business Info',
+    firstService: 'First Service',
+    availability: 'Availability',
+    choosePlan: 'Choose Plan',
+    summary: 'Summary',
+    ai: 'AI Setup',
+}
+
 const STEP_RENDERED_EVENTS: Record<WizardTrackedStep, string> = {
     welcome: 'Setup Wizard Welcome Rendered',
     businessInfo: 'Setup Wizard Business Info Rendered',

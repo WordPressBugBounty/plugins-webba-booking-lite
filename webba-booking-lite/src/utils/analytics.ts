@@ -1,71 +1,68 @@
-import mixpanel from 'mixpanel-browser'
+import mixpanel from "mixpanel-browser";
 
-const MIXPANEL_TOKEN = '428d0a61e1b30a141e9c7bb91d756b03'
+const MIXPANEL_TOKEN = "024800e3f670d30172ed941a6bec2ada";
 
-let initialized = false
+let initialized = false;
 let userContext: {
-    site_url?: string
-    is_pro?: boolean
-} = {}
+  site_url?: string;
+  is_pro?: boolean;
+} = {};
 
-const getPlanLabel = (isPro: boolean) => (isPro ? 'pro' : 'free')
+const getPlanLabel = (isPro: boolean) => (isPro ? "pro" : "free");
 
 const getUserEventProperties = () => {
-    const properties: Record<string, unknown> = {}
+  const properties: Record<string, unknown> = {};
 
-    if (userContext.site_url) {
-        properties.site_url = userContext.site_url
-    }
+  if (userContext.site_url) {
+    properties.site_url = userContext.site_url;
+  }
 
-    if (userContext.is_pro !== undefined) {
-        properties.is_pro = userContext.is_pro
-        properties.plan = getPlanLabel(userContext.is_pro)
-    }
+  if (userContext.is_pro !== undefined) {
+    properties.is_pro = userContext.is_pro;
+    properties.plan = getPlanLabel(userContext.is_pro);
+  }
 
-    return properties
-}
+  return properties;
+};
 
 export const initAnalytics = () => {
-    if (initialized) return
+  if (initialized) return;
 
-    mixpanel.init(MIXPANEL_TOKEN, {
-        autocapture: false,
-        record_sessions_percent: 0,
-    })
+  mixpanel.init(MIXPANEL_TOKEN, {
+    autocapture: false,
+    record_sessions_percent: 0,
+  });
 
-    initialized = true
-}
+  initialized = true;
+};
 
-export const identifySite = (
-    siteUrl: string,
-    options?: { is_pro?: boolean }
-) => {
-    if (!initialized || !siteUrl) return
+export const identifySite = (siteUrl: string, options?: { is_pro?: boolean }) => {
+  if (!initialized || !siteUrl) return;
 
-    userContext = {
-        site_url: siteUrl,
-        is_pro: options?.is_pro ?? userContext.is_pro,
-    }
+  userContext = {
+    site_url: siteUrl,
+    is_pro: options?.is_pro ?? userContext.is_pro,
+  };
 
-    mixpanel.identify(siteUrl)
-    mixpanel.register(getUserEventProperties())
-}
+  mixpanel.identify(siteUrl);
+  mixpanel.register(getUserEventProperties());
+};
 
 export const trackEvent = (
-    event: string,
-    properties?: Record<string, unknown>,
-    callback?: () => void
+  event: string,
+  properties?: Record<string, unknown>,
+  callback?: () => void
 ) => {
-    if (!initialized) {
-        initAnalytics()
-    }
+  if (!initialized) {
+    initAnalytics();
+  }
 
-    mixpanel.track(
-        event,
-        {
-            ...getUserEventProperties(),
-            ...properties,
-        },
-        callback ? () => callback() : undefined
-    )
-}
+  const payload = {
+    ...getUserEventProperties(),
+    ...properties,
+  };
+
+  mixpanel.track(event, payload, (response) => {
+    callback?.();
+  });
+};

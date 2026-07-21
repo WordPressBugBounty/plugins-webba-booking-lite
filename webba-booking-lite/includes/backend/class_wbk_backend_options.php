@@ -1271,6 +1271,236 @@ OLD: When one service is booked, it will automatically lock another one on the s
         );
 
         wbk_opt()->add_option(
+            "wbk_gmail_enabled",
+            "checkbox",
+            __("Send via Gmail", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "yes",
+                "not_translated_title" => "Send via Gmail",
+                "popup" => __(
+                    "Turn on to send email notifications through Gmail using OAuth. Tokens are stored securely in Webba Connect. When enabled, Gmail takes priority over SMTP.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "email",
+                "required_plan" => "start",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_gmail_email",
+            "text",
+            __("Gmail account", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [["wbk_gmail_enabled", "=", "yes"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_gmail_enabled", "!=", "yes"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "Gmail account",
+                "popup" => __(
+                    "Email address of the Google account authorized to send mail. Filled automatically after authorization when available.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "email",
+                "sub_type" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_enabled",
+            "checkbox",
+            __("Enable SMTP", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "yes",
+                "dependency" => [["wbk_gmail_enabled", "!=", "yes"]],
+                "not_translated_title" => "Enable SMTP",
+                "popup" => __(
+                    "Turn on to send email notifications through your SMTP server instead of the default WordPress mail transport.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "email",
+                "required_plan" => "start",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_host",
+            "text",
+            __("SMTP host", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [
+                    ["wbk_gmail_enabled", "!=", "yes"],
+                    ["wbk_smtp_enabled", "=", "yes"],
+                ],
+                "dependent_value" => [
+                    "condition" => ["wbk_smtp_enabled", "!=", "yes"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "SMTP host",
+                "popup" => __(
+                    "Enter your SMTP server hostname (for example, smtp.gmail.com).",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_port",
+            "number",
+            __("SMTP port", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [
+                    ["wbk_gmail_enabled", "!=", "yes"],
+                    ["wbk_smtp_enabled", "=", "yes"],
+                ],
+                "dependent_value" => [
+                    "condition" => ["wbk_smtp_enabled", "!=", "yes"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "SMTP port",
+                "popup" => __(
+                    "Enter the SMTP port. Common values are 587 for TLS and 465 for SSL.",
+                    "webba-booking-lite",
+                ),
+                "default" => "587",
+                "tab" => "email",
+                "sub_type" => "positive_integer",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_encryption",
+            "select",
+            __("SMTP encryption", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [
+                    ["wbk_gmail_enabled", "!=", "yes"],
+                    ["wbk_smtp_enabled", "=", "yes"],
+                ],
+                "dependent_value" => [
+                    "condition" => ["wbk_smtp_enabled", "!=", "yes"],
+                    "value" => "tls",
+                ],
+                "not_translated_title" => "SMTP encryption",
+                "popup" => __(
+                    "Select the encryption method supported by your SMTP server.",
+                    "webba-booking-lite",
+                ),
+                "default" => "tls",
+                "extra" => [
+                    "none" => __("None", "webba-booking-lite"),
+                    "ssl" => __("SSL", "webba-booking-lite"),
+                    "tls" => __("TLS", "webba-booking-lite"),
+                ],
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_auth",
+            "checkbox",
+            __("SMTP authentication", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "yes",
+                "dependency" => [
+                    ["wbk_gmail_enabled", "!=", "yes"],
+                    ["wbk_smtp_enabled", "=", "yes"],
+                ],
+                "dependent_value" => [
+                    "condition" => ["wbk_smtp_enabled", "!=", "yes"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "SMTP authentication",
+                "popup" => __(
+                    "Turn on if your SMTP server requires a username and password.",
+                    "webba-booking-lite",
+                ),
+                "default" => "yes",
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_username",
+            "text",
+            __("SMTP username", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [
+                    ["wbk_gmail_enabled", "!=", "yes"],
+                    ["wbk_smtp_enabled", "=", "yes"],
+                    ["wbk_smtp_auth", "=", "yes"],
+                ],
+                "dependent_value" => [
+                    "condition" => ["wbk_smtp_auth", "!=", "yes"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "SMTP username",
+                "popup" => __("Enter the username for SMTP authentication.", "webba-booking-lite"),
+                "default" => "",
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_password",
+            "password",
+            __("SMTP password", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [
+                    ["wbk_gmail_enabled", "!=", "yes"],
+                    ["wbk_smtp_enabled", "=", "yes"],
+                    ["wbk_smtp_auth", "=", "yes"],
+                ],
+                "dependent_value" => [
+                    "condition" => ["wbk_smtp_auth", "!=", "yes"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "SMTP password",
+                "popup" => __("Enter the password for SMTP authentication.", "webba-booking-lite"),
+                "default" => "",
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_test",
+            "smtp_test",
+            __("Test SMTP connection", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [
+                    ["wbk_gmail_enabled", "!=", "yes"],
+                    ["wbk_smtp_enabled", "=", "yes"],
+                ],
+                "dependent_value" => [
+                    "condition" => ["wbk_smtp_enabled", "!=", "yes"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "Test SMTP connection",
+                "popup" => __(
+                    "Send a test email to verify your SMTP settings.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
             "wbk_email_override_replyto",
             "checkbox",
             __("Override default reply-to headers with booking-related data", "webba-booking-lite"),
@@ -4168,7 +4398,10 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "default" => __("Date Flexibility", "webba-booking-lite"),
                 "not_translated_title" => "Unit date flexibility title",
-                "popup" => __("Title for date flexibility controls in unit mode.", "webba-booking-lite"),
+                "popup" => __(
+                    "Title for date flexibility controls in unit mode.",
+                    "webba-booking-lite",
+                ),
                 "tab" => "units",
             ],
         );
@@ -4180,7 +4413,10 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "default" => __("Exact match", "webba-booking-lite"),
                 "not_translated_title" => "Unit exact match option",
-                "popup" => __("Exact match option label for unit date flexibility.", "webba-booking-lite"),
+                "popup" => __(
+                    "Exact match option label for unit date flexibility.",
+                    "webba-booking-lite",
+                ),
                 "tab" => "units",
             ],
         );
@@ -4192,7 +4428,10 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "default" => __("+/- 1 day", "webba-booking-lite"),
                 "not_translated_title" => "Unit plus minus 1 day option",
-                "popup" => __("Label for +/- 1 day option in unit date flexibility.", "webba-booking-lite"),
+                "popup" => __(
+                    "Label for +/- 1 day option in unit date flexibility.",
+                    "webba-booking-lite",
+                ),
                 "tab" => "units",
             ],
         );
@@ -4204,7 +4443,10 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "default" => __("+/- 2 days", "webba-booking-lite"),
                 "not_translated_title" => "Unit plus minus 2 days option",
-                "popup" => __("Label for +/- 2 days option in unit date flexibility.", "webba-booking-lite"),
+                "popup" => __(
+                    "Label for +/- 2 days option in unit date flexibility.",
+                    "webba-booking-lite",
+                ),
                 "tab" => "units",
             ],
         );
@@ -4216,7 +4458,10 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "default" => __("+/- 3 days", "webba-booking-lite"),
                 "not_translated_title" => "Unit plus minus 3 days option",
-                "popup" => __("Label for +/- 3 days option in unit date flexibility.", "webba-booking-lite"),
+                "popup" => __(
+                    "Label for +/- 3 days option in unit date flexibility.",
+                    "webba-booking-lite",
+                ),
                 "tab" => "units",
             ],
         );
@@ -4228,7 +4473,10 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "default" => __("No date selected", "webba-booking-lite"),
                 "not_translated_title" => "Unit no date selected label",
-                "popup" => __("Label shown when no unit offer date range is selected.", "webba-booking-lite"),
+                "popup" => __(
+                    "Label shown when no unit offer date range is selected.",
+                    "webba-booking-lite",
+                ),
                 "tab" => "units",
             ],
         );
@@ -5151,22 +5399,28 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             __("Please select a location first to choose services.", "webba-booking-lite"),
             "wbk_translation_settings_section",
             [
-                "default" => __("Please select a location first to choose services.", "webba-booking-lite"),
+                "default" => __(
+                    "Please select a location first to choose services.",
+                    "webba-booking-lite",
+                ),
                 "not_translated_title" => "Please select a location first to choose services.",
-                "popup" => __("Label for Please select a location first to choose services.", "webba-booking-lite"),
+                "popup" => __(
+                    "Label for Please select a location first to choose services.",
+                    "webba-booking-lite",
+                ),
                 "tab" => "form-fields",
             ],
         );
-        
+
         wbk_opt()->add_option(
             "wbk_wording_select_staff_member",
             "text",
-            __('SELECT STAFF MEMBER', "webba-booking-lite"),
+            __("SELECT STAFF MEMBER", "webba-booking-lite"),
             "wbk_translation_settings_section",
             [
-                "default" => __('SELECT STAFF MEMBER', "webba-booking-lite"),
-                "not_translated_title" => 'SELECT STAFF MEMBER',
-                "popup" => __('Label for SELECT STAFF MEMBER.', "webba-booking-lite"),
+                "default" => __("SELECT STAFF MEMBER", "webba-booking-lite"),
+                "not_translated_title" => "SELECT STAFF MEMBER",
+                "popup" => __("Label for SELECT STAFF MEMBER.", "webba-booking-lite"),
                 "tab" => "form-fields",
             ],
         );
@@ -5174,12 +5428,12 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
         wbk_opt()->add_option(
             "wbk_wording_any_available",
             "text",
-            __('Any Available', "webba-booking-lite"),
+            __("Any Available", "webba-booking-lite"),
             "wbk_translation_settings_section",
             [
-                "default" => __('Any Available', "webba-booking-lite"),
-                "not_translated_title" => 'Any Available',
-                "popup" => __('Label for Any Available.', "webba-booking-lite"),
+                "default" => __("Any Available", "webba-booking-lite"),
+                "not_translated_title" => "Any Available",
+                "popup" => __("Label for Any Available.", "webba-booking-lite"),
                 "tab" => "form-fields",
             ],
         );
@@ -5187,12 +5441,12 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
         wbk_opt()->add_option(
             "wbk_wording_best_available_time",
             "text",
-            __('Best available time.', "webba-booking-lite"),
+            __("Best available time.", "webba-booking-lite"),
             "wbk_translation_settings_section",
             [
-                "default" => __('Best available time.', "webba-booking-lite"),
-                "not_translated_title" => 'Best available time.',
-                "popup" => __('Label for Best available time.', "webba-booking-lite"),
+                "default" => __("Best available time.", "webba-booking-lite"),
+                "not_translated_title" => "Best available time.",
+                "popup" => __("Label for Best available time.", "webba-booking-lite"),
                 "tab" => "form-fields",
             ],
         );
@@ -5364,7 +5618,6 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "tab" => "integrations",
             ],
         );
-
 
         // extras settings
         wbk_opt()->add_option(

@@ -75,6 +75,10 @@ final class WBK_Options_Processor
                 $render_callback = 'render_password';
                 $validation_callback = 'validate_password';
                 break;
+            case 'smtp_test':
+                $render_callback = 'render_smtp_test';
+                $validation_callback = 'validate_smtp_test';
+                break;
             case 'this_domain_url':
                 $render_callback = 'render_text';
                 $validation_callback = 'validate_this_domain_url';
@@ -203,6 +207,10 @@ final class WBK_Options_Processor
     {
         return $input;
     }
+    public function validate_smtp_test($input)
+    {
+        return '';
+    }
     public function render_text($args)
     {
         $html = WBK_Renderer::load_template('options/text_field', $args, false);
@@ -259,6 +267,10 @@ final class WBK_Options_Processor
     public function render_password($args)
     {
         WBK_Renderer::load_template('options/password_field', $args);
+    }
+    public function render_smtp_test($args)
+    {
+        echo '';
     }
     public function wbk_settings_section_callback($arg) {}
 

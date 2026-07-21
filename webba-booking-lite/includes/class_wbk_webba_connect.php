@@ -781,6 +781,56 @@ class WBK_Webba_Connect
     }
 
     /**
+     * Create Gmail authorization URL (tokens stored on Webba Connect).
+     *
+     * Connect endpoints are prepared here; backend routes will be added later.
+     *
+     * @param string $resource_id Site-level Gmail resource id (default: gmail)
+     * @return string|false
+     */
+    public function get_gmail_authorization_url($resource_id = "gmail")
+    {
+        $return_path = "/wp-admin/admin.php?page=wbk-options";
+
+        $query = $this->prepare_auth_parameters($return_path, "start", $resource_id);
+        if (!$query) {
+            return false;
+        }
+
+        return self::get_backend_url_for_browser() . "gmail/start?" . $query;
+    }
+
+    /**
+     * Create Gmail revoke authorization URL.
+     *
+     * @param string $resource_id Site-level Gmail resource id (default: gmail)
+     * @return string|false
+     */
+    public function get_gmail_revoke_url($resource_id = "gmail")
+    {
+        $return_path =
+            "/wp-admin/admin.php?page=wbk-options&revoke-gmail=" . rawurlencode($resource_id);
+
+        $query = $this->prepare_auth_parameters($return_path, "revoke-token", $resource_id);
+        if (!$query) {
+            return false;
+        }
+
+        return self::get_backend_url_for_browser() . "gmail/revoke-token?" . $query;
+    }
+
+    /**
+     * Fetch Gmail access token from Webba Connect.
+     *
+     * @param string $resource_id Site-level Gmail resource id (default: gmail)
+     * @return array|false
+     */
+    public function get_gmail_access_token($resource_id = "gmail")
+    {
+        return $this->fetch_access_token_from_webba_connect($resource_id, "gmail");
+    }
+
+    /**
      * Create an async assistance task on Webba Connect.
      *
      * @param array<string, mixed> $payload

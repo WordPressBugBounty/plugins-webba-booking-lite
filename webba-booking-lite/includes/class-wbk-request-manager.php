@@ -190,6 +190,11 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "send_test_email"],
                 "permission_callback" => [$this, "send_test_email_permission"],
             ] );
+            register_rest_route( "wbk/v2", "/send-test-smtp/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "send_test_smtp"],
+                "permission_callback" => [$this, "send_test_smtp_permission"],
+            ] );
             register_rest_route( "webba-booking/v1", "/get-timezones/", [
                 "methods"             => "GET",
                 "callback"            => [$this, "get_timezones"],
@@ -4693,6 +4698,29 @@ class WBK_Request_Manager {
         return current_user_can( "manage_options" );
     }
 
+    public function send_test_smtp_permission( $request ) : bool {
+        return current_user_can( "manage_options" );
+    }
+
+    public function send_test_smtp( $request ) : WP_REST_Response {
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        $email = ( isset( $params["email"] ) ? sanitize_email( $params["email"] ) : "" );
+        $result = WBK_Mailer::send_test_email( $email );
+        if ( !$result["success"] ) {
+            return new \WP_REST_Response([
+                "status"  => "error",
+                "message" => $result["message"],
+            ], 400);
+        }
+        return new \WP_REST_Response([
+            "status"  => "success",
+            "message" => $result["message"],
+        ], 200);
+    }
+
     public function send_test_email( $request ) : WP_REST_Response {
         $id = ( isset( $request["id"] ) ? sanitize_text_field( $request["id"] ) : "" );
         $bookings = ( isset( $request["bookings"] ) ? $request["bookings"] : [] );
@@ -4953,6 +4981,7 @@ class WBK_Request_Manager {
             "render_business_hours"  => "business_hours",
             "render_notice"          => "notice",
             "render_password"        => "password",
+            "render_smtp_test"       => "smtp_test",
         ];
         return $type_map[$callback_method] ?? "text";
     }

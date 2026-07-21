@@ -4,6 +4,8 @@ import { store_name } from '../../store/backend'
 import { identifySite, initAnalytics } from '../../utils/analytics'
 
 export const useAnalytics = () => {
+    initAnalytics()
+
     const { siteUrl, isPro } = useSelect(
         (select: any) => {
             const preset = select(store_name).getPreset()
