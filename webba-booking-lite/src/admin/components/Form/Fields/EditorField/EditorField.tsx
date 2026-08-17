@@ -3,11 +3,12 @@ import { InitOptions } from "@tinymce/tinymce-react/lib/cjs/main/ts/components/E
 import { FormFieldProps } from "../../types";
 import { __ } from "@wordpress/i18n";
 import { Label } from "../Label/Label";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import "./../GenericFormField/GenericFormField.scss";
 import { FormComponentConstructor } from "../../lib/types";
 import { useField } from "../../lib/hooks/useField";
 import classNames from "classnames";
+import { useTheme } from "../../../../providers/ThemeProvider/ThemeProvider";
 
 const placeHolders: Record<"name" | "text" | "content", string | ((editor: any) => string)>[] = [
   {
@@ -54,6 +55,16 @@ const placeHolders: Record<"name" | "text" | "content", string | ((editor: any) 
     name: "wbk_appointment_id_button",
     text: __("Appointment ID", "webba-booking-lite"),
     content: "#appointment_id",
+  },
+  {
+    name: "wbk_booking_id_qr_button",
+    text: __("Booking ID QR code", "webba-booking-lite"),
+    content: "#booking_id_qr",
+  },
+  {
+    name: "wbk_token_qr_button",
+    text: __("Token QR code", "webba-booking-lite"),
+    content: "#token_qr",
   },
   {
     name: "wbk_customer_phone_button",
@@ -271,11 +282,22 @@ export const createEditorField: FormComponentConstructor<any> = ({ field }) => {
   return ({ name, label, misc }) => {
     const { value, setValue, errors } = useField(field);
     const [touched, setTouched] = useState(false);
+    const { isDarkMode } = useTheme();
 
     const isValid = !errors.length;
     const showErrors = !isValid && touched;
     const [firstError] = errors;
     const [isVisual, setIsVisual] = useState(true);
+
+    const themedEditorConfigs = useMemo<InitOptions>(
+      () => ({
+        ...editorConfigs,
+        content_style: isDarkMode
+          ? "body { background-color: #32343a; color: #e5e7eb; } body a { color: #4eb0a9; }"
+          : "body { background-color: #ffffff; color: #212121; }",
+      }),
+      [isDarkMode]
+    );
 
     return (
       <div>
@@ -300,13 +322,14 @@ export const createEditorField: FormComponentConstructor<any> = ({ field }) => {
             {__("Text", "webba-booking-lite")}
           </div>
         </div>
-        <div>
+        <div className="wbk_genericFormField__editorShell">
           {isVisual && (
             <Editor
+              key={isDarkMode ? "wbk-editor-dark" : "wbk-editor-light"}
               id={name}
               onEditorChange={(content: string): void => setValue(content)}
               value={value}
-              init={editorConfigs}
+              init={themedEditorConfigs}
               onClick={() => setTouched(true)}
             />
           )}

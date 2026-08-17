@@ -34,9 +34,12 @@ export interface ISettingsField {
     tooltip: string
     mulitple?: boolean
     required_plan?: string
+    available_in_old_free?: boolean
     sub_type?: string
     dependent_value?: IDependentValue
     searchable?: boolean
+    radio_type?: string
+    column_count?: number
 }
 
 export interface ISettingsSectionProps {

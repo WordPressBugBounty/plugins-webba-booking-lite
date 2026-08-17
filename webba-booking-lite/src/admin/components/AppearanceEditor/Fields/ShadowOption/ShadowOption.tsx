@@ -6,6 +6,7 @@ import './ShadowOption.scss'
 import ReactSlider from 'react-slider'
 import Select from 'react-select'
 import { __ } from '@wordpress/i18n'
+import { getAdminSelectStyles } from '../../../../utils/adminSelectStyles'
 
 // Default values for shadow
 const defaultShadow = {
@@ -304,31 +305,33 @@ export const ShadowOption = ({ fieldConfig }: IApperanceOptionConfig) => {
                                 }
                                 options={positionOptions}
                                 isSearchable={false}
-                                styles={{
-                                    control: (base) => ({
+                                styles={getAdminSelectStyles({
+                                    control: (base: Record<string, unknown>) => ({
                                         ...base,
                                         minHeight: 32,
                                         fontSize: 13,
-                                        border: '1px solid #d0d3db',
                                         borderRadius: 4,
                                         boxShadow: 'none',
-                                        '&:hover': {
-                                            borderColor: '#4094f7',
-                                        },
                                     }),
-                                    option: (base, state) => ({
+                                    option: (
+                                        base: Record<string, unknown>,
+                                        state: {
+                                            isSelected?: boolean
+                                            isFocused?: boolean
+                                        }
+                                    ) => ({
                                         ...base,
                                         fontSize: 13,
                                         backgroundColor: state.isSelected
-                                            ? '#4094f7'
+                                            ? 'var(--wbk-admin-primary)'
                                             : state.isFocused
-                                              ? '#f0f8ff'
-                                              : 'white',
+                                              ? 'var(--wbk-admin-bg-offwhite)'
+                                              : 'transparent',
                                         color: state.isSelected
-                                            ? 'white'
-                                            : '#333',
+                                            ? 'var(--wbk-admin-text-white)'
+                                            : 'var(--wbk-admin-input-text)',
                                     }),
-                                }}
+                                })}
                             />
                         </div>
                     </div>

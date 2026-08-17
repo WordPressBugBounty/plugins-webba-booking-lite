@@ -1,11 +1,13 @@
-    import classNames from 'classnames'
+import classNames from 'classnames'
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import './Sidebar.scss'
 import { useSidebar } from './SidebarContext'
+import { useTheme } from '../../providers/ThemeProvider/ThemeProvider'
 
 export const Sidebar = () => {
-    const { element, shown, view, width, height, position } = useSidebar()
+    const { element, shown, view, width, height, position, close } = useSidebar()
+    const { theme } = useTheme()
     const sectionRef = useRef<HTMLElement | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null)
     const isAnimatingRef = useRef(false)
@@ -16,6 +18,27 @@ export const Sidebar = () => {
         }
         // Don't unset overflow immediately - wait for animation to complete
     }, [shown])
+
+    useEffect(() => {
+        if (!shown) {
+            return
+        }
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key !== 'Escape') {
+                return
+            }
+
+            event.preventDefault()
+            close()
+        }
+
+        document.addEventListener('keydown', handleKeyDown)
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown)
+        }
+    }, [shown, close])
 
     useEffect(() => {
         if (!sectionRef.current || !containerRef.current) return
@@ -147,6 +170,7 @@ export const Sidebar = () => {
             className={classNames('wbk_sidebar__container', {
                 'wbk_sidebar__container--shown': shown,
             })}
+            data-theme={theme}
             ref={containerRef}
         >
             <div

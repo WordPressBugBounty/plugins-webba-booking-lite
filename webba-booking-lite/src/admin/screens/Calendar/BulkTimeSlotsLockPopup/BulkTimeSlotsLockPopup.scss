@@ -1,0 +1,149 @@
+.wbk_bulkTimeSlotsLockPopup {
+    height: auto;
+    max-height: 85vh;
+}
+
+.wbk_bulkTimeSlotsLockPopup__body {
+    overflow-y: auto;
+    min-height: 0;
+    flex: 1 1 auto;
+    padding: 20px;
+}
+
+.wbk_bulkTimeSlotsLockPopup__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.wbk_bulkTimeSlotsLockPopup__field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &--error {
+        .wbk_bulkTimeSlotsLockPopup__label {
+            color: colors.$red;
+        }
+
+        .wbk_bulkTimeSlotsLockPopup__dateInput {
+            border-color: colors.$red;
+        }
+    }
+
+    .react-datepicker-wrapper {
+        width: 100%;
+    }
+
+    .react-datepicker-popper {
+        z-index: 10000000;
+    }
+
+    .react-datepicker__close-icon {
+        z-index: 1;
+
+        &::after {
+            background-color: colors.$primary;
+        }
+    }
+}
+
+.wbk_bulkTimeSlotsLockPopup__error {
+    margin: 16px 0 0;
+    font-size: 13px;
+    color: colors.$red;
+}
+
+.wbk_bulkTimeSlotsLockPopup__label {
+    font-size: 14px;
+    font-weight: 600;
+    color: colors.$off-black;
+}
+
+.wbk_bulkTimeSlotsLockPopup__radioGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wbk_bulkTimeSlotsLockPopup__radio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid colors.$input-border;
+    border-radius: 8px;
+    cursor: pointer;
+    background: colors.$background-white;
+    color: colors.$text-black;
+    transition: 0.2s all ease-in-out;
+
+    input {
+        margin: 0;
+    }
+
+    &--checked {
+        border-color: colors.$primary;
+        background: colors.$primary-soft;
+    }
+}
+
+.wbk_bulkTimeSlotsLockPopup__dateInput {
+    border: 1px solid colors.$field-border;
+    background: colors.$field-background;
+    border-radius: 8px;
+    height: 50px;
+    margin: 0;
+    padding: 0 20px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: colors.$input-text;
+    width: 100%;
+    box-sizing: border-box;
+
+    &::placeholder {
+        color: colors.$light-grey;
+    }
+
+    &.wbk_bulkTimeSlotsLockPopup__dateInput--focused {
+        border-color: #14b8a9;
+        outline: none;
+        box-shadow: 0 0 0 1px #14b8a9;
+    }
+}
+
+.wbk_bulkTimeSlotsLockPopup__calendar {
+    background-color: colors.$background-white;
+    border: 1px solid colors.$input-border;
+    color: colors.$input-text;
+    font-family: typography.$font-primary;
+
+    .react-datepicker {
+        border: none;
+        font-family: typography.$font-primary;
+        background-color: colors.$background-white;
+        color: colors.$input-text;
+    }
+
+    .react-datepicker__header {
+        background-color: colors.$background-offwhite;
+        border-bottom-color: colors.$input-border;
+    }
+
+    .react-datepicker__current-month,
+    .react-datepicker__day-name,
+    .react-datepicker__day {
+        color: colors.$text-black;
+    }
+
+    .react-datepicker__day--selected,
+    .react-datepicker__day--in-range,
+    .react-datepicker__day--keyboard-selected {
+        background-color: colors.$primary;
+        color: colors.$text-white;
+    }
+
+    .react-datepicker__day--in-selecting-range {
+        background-color: colors.$primary-soft;
+    }
+}

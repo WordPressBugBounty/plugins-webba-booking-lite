@@ -26,6 +26,7 @@ import {
     recurringSlotsToPlaces,
 } from './utils'
 import './RecurringBookingPopup.scss'
+import { useWording } from '../../hooks/useWording'
 
 export const RecurringBookingPopup = ({
     isOpen,
@@ -66,6 +67,7 @@ export const RecurringBookingPopup = ({
     const [listItems, setListItems] = useState<IRecurringSlotListItem[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const wording = useWording()
 
     useEffect(() => {
         if (!isOpen) return
@@ -248,7 +250,7 @@ export const RecurringBookingPopup = ({
                     id="wbk_recurring_popup_title"
                     className="wbk_recurring_booking_popup__title"
                 >
-                    {__('Recurring booking', 'webba-booking-lite')}
+                    {wording.recurring_booking || __('Recurring booking', 'webba-booking-lite')}
                 </h2>
                 <p className="wbk_recurring_booking_popup__subtitle">
                     {serviceLabel}
@@ -290,7 +292,7 @@ export const RecurringBookingPopup = ({
 
                 {wouldExceedMax && (
                     <p className="wbk_recurring_booking_popup__hint">
-                        {__(
+                        {wording.recurring_booking_hint || __(
                             'This series exceeds the maximum number of slots allowed for this service.',
                             'webba-booking-lite'
                         )}
@@ -299,7 +301,7 @@ export const RecurringBookingPopup = ({
 
                 <div className="wbk_recurring_booking_popup__actions">
                     <Button type="secondary" onClick={onClose}>
-                        {__('Cancel', 'webba-booking-lite')}
+                        {wording.cancel || __('Cancel', 'webba-booking-lite')}
                     </Button>
                     <Button
                         type="primary"
@@ -308,13 +310,13 @@ export const RecurringBookingPopup = ({
                         tooltip={
                             !canConfirm && !wouldExceedMax
                                 ? __(
-                                      'Resolve unavailable slots before confirming',
-                                      'webba-booking-lite'
-                                  )
+                                    'Resolve unavailable slots before confirming',
+                                    'webba-booking-lite'
+                                )
                                 : undefined
                         }
                     >
-                        {__('Confirm', 'webba-booking-lite')}
+                        {wording.confirm || __('Confirm', 'webba-booking-lite')}
                     </Button>
                 </div>
             </div>

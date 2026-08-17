@@ -1,3 +1,4 @@
+import classNames from 'classnames'
 import './Loading.scss'
 
 interface LoadingProps {
@@ -16,11 +17,10 @@ export const Loading = ({
     return (
         <div className={className}>
             <div
-                className="wbk_loading"
-                style={{
-                    minHeight,
-                    backgroundColor: transparent ? 'transparent' : '#ffffff',
-                }}
+                className={classNames('wbk_loading', {
+                    'wbk_loading--transparent': transparent,
+                })}
+                style={{ minHeight }}
             >
                 <div className="wbk_loading__bars">
                     {[0, 1, 2, 3, 4, 5, 6].map((index) => (

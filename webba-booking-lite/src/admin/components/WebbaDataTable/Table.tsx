@@ -89,19 +89,13 @@ export const Table = ({
                 {filter && filter}
                 {loading && <Loading minHeight="100%" transparent />}
                 {isEmpty && !isItemsForbidden && !loading && (
-                    <div
-                        style={{
-                            textAlign: 'center',
-                        }}
-                    >
+                    <div className="wbk_table__emptyState">
                         <img
-                            style={{
-                                display: 'block',
-                                margin: '0px auto',
-                            }}
+                            className="wbk_table__emptyStateImage"
                             src={noItemsImageUrl}
+                            alt=""
                         />
-                        <div>
+                        <div className="wbk_table__emptyStateText">
                             {__(
                                 'There is nothing here...',
                                 'webba-booking-lite'

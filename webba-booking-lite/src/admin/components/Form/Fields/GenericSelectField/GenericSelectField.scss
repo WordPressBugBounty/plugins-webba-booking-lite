@@ -31,7 +31,7 @@
     height: 50px;
     font-family: typography.$font-primary;
     font-size: 16px;
-    color: #333333;
+    color: colors.$input-text;
     width: 100%;
     max-width: 100%;
 
@@ -40,11 +40,11 @@
     }
 
     .css-tj5bde-Svg {
-        fill: #333333;
+        fill: colors.$light-grey;
     }
 
     .css-1jqq78o-placeholder {
-        color: #333333;
+        color: colors.$light-grey;
     }
 
     &.wbk_genericSelectField__selectInput--focused {
@@ -55,14 +55,13 @@
 .wbk_genericSelectField__multiValueMore {
     display: flex;
     min-width: 0;
-    background-color: hsl(0, 0%, 90%);
+    background-color: colors.$background-offwhite;
     border-radius: 2px;
     margin: 2px;
     box-sizing: border-box;
     max-width: 100px;
     white-space: nowrap;
-    border-radius: 2px;
-    color: hsl(0, 0%, 20%);
+    color: colors.$input-text;
     font-size: 85%;
     padding: 3px;
     padding-left: 6px;

@@ -62,7 +62,8 @@ class WBK_Schedule_Processor {
         global $wpdb;
         $result = $wpdb->get_results( "\n\t\t\t\t\t\tSELECT time, service_id\n\t\t\t\t\t\tFROM " . get_option( "wbk_db_prefix", "" ) . "wbk_locked_time_slots" );
         foreach ( $result as $item ) {
-            $this->locked_time_slots[$item->service_id][] = $item->time;
+            $service_id = (int) $item->service_id;
+            $this->locked_time_slots[$service_id][] = (int) $item->time;
         }
     }
 
@@ -454,7 +455,7 @@ class WBK_Schedule_Processor {
                                     $booking->get_start(),
                                     $booking->get_end()
                                 ) ) {
-                                    $same_service_quantity += $booking->get_quantity();
+                                    $same_service_quantity += (int) $booking->get_quantity();
                                 }
                             }
                         }
@@ -941,8 +942,12 @@ class WBK_Schedule_Processor {
         return 0;
     }
 
+    public function get_locked_days() {
+        return ( is_array( $this->locked_days ) ? $this->locked_days : [] );
+    }
+
     public function get_unlocked_days() {
-        return $this->unlocked_days;
+        return ( is_array( $this->unlocked_days ) ? $this->unlocked_days : [] );
     }
 
     public function set_connected_breakers( $input ) {
@@ -969,6 +974,7 @@ class WBK_Schedule_Processor {
     }
 
     public function get_locked_time_slots( $service_id ) {
+        $service_id = (int) $service_id;
         if ( isset( $this->locked_time_slots[$service_id] ) ) {
             return $this->locked_time_slots[$service_id];
         }

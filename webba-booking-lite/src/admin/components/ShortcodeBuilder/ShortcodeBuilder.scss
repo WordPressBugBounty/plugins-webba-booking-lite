@@ -1,5 +1,6 @@
 .wbk_shortcode_builder {
     padding: 0;
+    color: colors.$text-black;
 
     &__header {
         display: flex;
@@ -8,7 +9,7 @@
         gap: 12px;
         padding: 24px 24px 12px;
         padding-bottom: 12px;
-        border-bottom: 1px solid #e5e7eb;
+        border-bottom: 1px solid colors.$input-border;
     }
 
     &__body {
@@ -19,11 +20,12 @@
         margin: 0 0 4px 0;
         font-size: 18px;
         font-weight: 600;
+        color: colors.$off-black;
     }
 
     &__subtitle {
         margin: 0;
-        color: #6b7280;
+        color: colors.$light-grey;
         font-size: 13px;
     }
 
@@ -35,8 +37,9 @@
     }
 
     &__close {
-        border: 1px solid #e5e7eb;
-        background: #fff;
+        border: 1px solid colors.$input-border;
+        background: colors.$background-white;
+        color: colors.$text-grey;
         width: 32px;
         height: 32px;
         border-radius: 8px;
@@ -50,10 +53,11 @@
         svg {
             width: 16px;
             height: 16px;
+            stroke: currentColor;
         }
 
         &:hover {
-            background: #f9fafb;
+            background: colors.$background-offwhite;
         }
     }
 
@@ -64,7 +68,7 @@
 
         label {
             font-size: 13px;
-            color: #374151;
+            color: colors.$text-grey;
             font-weight: 600;
         }
     }
@@ -76,7 +80,7 @@
 
         label {
             font-size: 13px;
-            color: #374151;
+            color: colors.$text-grey;
             font-weight: 600;
         }
     }
@@ -86,14 +90,16 @@
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        border: 1px solid #e5e7eb;
+        border: 1px solid colors.$input-border;
         border-radius: 8px;
         padding: 10px 12px;
-        background: #fff;
+        background: colors.$field-background;
+        color: colors.$input-text;
 
         code {
             font-size: 13px;
             word-break: break-all;
+            color: colors.$input-text;
         }
     }
 
@@ -102,8 +108,9 @@
         gap: 8px;
 
         button {
-            border: 1px solid #e5e7eb;
-            background: #f9fafb;
+            border: 1px solid colors.$input-border;
+            background: colors.$background-offwhite;
+            color: colors.$input-text;
             border-radius: 6px;
             padding: 6px 8px;
             font-size: 13px;
@@ -121,23 +128,69 @@
     }
 
     .wbk_select__control {
-        border: 1px solid #e5e7eb;
+        border: 1px solid colors.$field-border;
         border-radius: 8px;
         min-height: 40px;
         box-shadow: none;
+        background-color: colors.$field-background;
+        color: colors.$input-text;
     }
 
     .wbk_select__control:hover {
-        border-color: #d1d5db;
+        border-color: colors.$border-dark;
+    }
+
+    .wbk_select__single-value,
+    .wbk_select__input-container {
+        color: colors.$input-text;
+    }
+
+    .wbk_select__placeholder {
+        color: colors.$light-grey;
+    }
+
+    .wbk_select__menu {
+        background-color: colors.$background-white;
+        border: 1px solid colors.$input-border;
+    }
+
+    .wbk_select__option {
+        background-color: transparent;
+        color: colors.$input-text;
+
+        &--is-focused {
+            background-color: colors.$background-offwhite;
+        }
+
+        &--is-selected {
+            background-color: colors.$primary;
+            color: colors.$text-white;
+        }
     }
 
     .wbk_select__multi-value {
-        background: #f3f4f6;
+        background: colors.$background-offwhite;
     }
 
     .wbk_select__multi-value__label {
-        color: #111827;
+        color: colors.$off-black;
         font-size: 12px;
     }
-}
 
+    .wbk_select__multi-value__remove {
+        color: colors.$light-grey;
+
+        &:hover {
+            background-color: colors.$row-border;
+            color: colors.$off-black;
+        }
+    }
+
+    .wbk_select__indicatorSeparator {
+        display: none;
+    }
+
+    .wbk_select__dropdown-indicator {
+        color: colors.$light-grey;
+    }
+}

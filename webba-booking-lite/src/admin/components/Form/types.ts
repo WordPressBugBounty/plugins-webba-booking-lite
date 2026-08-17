@@ -66,6 +66,7 @@ export interface FormFieldMisc {
     max_field?: string
     hidden?: boolean
     radio_type?: 'generic' | 'icon' | 'dots'
+    column_count?: number
     source_filter?: [string, string, string][]
     at_least_one_checked_rule?: IAtLeastOneCheckedRule
 }
@@ -116,6 +117,7 @@ export type TooltipMode = 'tooltip' | 'description'
 export interface ITab {
     title: string
     required_plan?: string
+    lock_fields_only?: boolean
 }
 
 export interface IFormProps<T extends Model> {
@@ -135,4 +137,5 @@ export interface IFormProps<T extends Model> {
     showTabularSearch?: boolean
     submitButtonText?: string
     submitButtonIcon?: ReactNode
+    initialSection?: string
 }

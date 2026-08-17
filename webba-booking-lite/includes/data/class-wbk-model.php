@@ -88,39 +88,51 @@ class WBK_Model
 
         $date_format = WBK_Date_Time_Utils::get_date_format_backend();
 
-        // form table definition
-        $table = new WbkData\Model($db_prefix . "wbk_forms");
-        $table->set_single_item_name(__("Form", "webba-booking-lite"));
-        $table->set_multiple_item_name(__("Forms", "webba-booking-lite"));
-        $table->sections["general"] = __("General", "webba-booking-lite");
-        $table->add_field(
-            "form_name",
-            "name",
-            __("Form name", "webba-booking-lite"),
-            "text",
-            "general",
-            ["tooltip" => __("Enter form name.", "webba-booking-lite")],
-        );
-        $table->add_field(
-            "form_fields",
-            "fields",
-            __("Fields", "webba-booking-lite"),
-            "wbk_form_fields",
-            "general",
-            [
-                "tooltip" => __(
-                    "Configure the custom fields that customers fill out during booking.",
-                    "webba-booking-lite",
-                ),
-            ],
-            [],
-            true,
-            false,
-            false,
-        );
-        $table->sync_structure();
-        WbkData()->models->add($table, $db_prefix . "wbk_forms");
-        // end form table definition
+        // // form table definition
+        // $table = new WbkData\Model($db_prefix . "wbk_forms");
+        // $table->set_single_item_name(__("Form", "webba-booking-lite"));
+        // $table->set_multiple_item_name(__("Forms", "webba-booking-lite"));
+        // $table->sections["general"] = __("General", "webba-booking-lite");
+        // $table->add_field(
+        //     "form_name",
+        //     "name",
+        //     __("Form name", "webba-booking-lite"),
+        //     "text",
+        //     "general",
+        //     ["tooltip" => __("Enter form name.", "webba-booking-lite")],
+        // );
+        // $table->add_field(
+        //     "form_fields",
+        //     "fields",
+        //     __("Fields", "webba-booking-lite"),
+        //     "wbk_form_fields",
+        //     "general",
+        //     [
+        //         "tooltip" => __(
+        //             "Configure the custom fields that customers fill out during booking.",
+        //             "webba-booking-lite",
+        //         ),
+        //     ],
+        //     [],
+        //     true,
+        //     false,
+        //     false,
+        // );
+        // $table->add_field(
+        //     "is_default",
+        //     "is_default",
+        //     __("Default", "webba-booking-lite"),
+        //     "checkbox",
+        //     "general",
+        //     ["yes" => __("Yes", "webba-booking-lite")],
+        //     "",
+        //     false,
+        //     false,
+        //     false,
+        // );
+        // $table->sync_structure();
+        // WbkData()->models->add($table, $db_prefix . "wbk_forms");
+        // // end form table definition
 
         $table = new WbkData\Model($db_prefix . "wbk_services");
         $table->set_single_item_name(__("Service", "webba-booking-lite"));
@@ -1985,11 +1997,6 @@ class WBK_Model
             false,
             false,
         );
-        if ($table->fields->get_element_at("appointment_number_of_people") != false) {
-            $table->fields
-                ->get_element_at("appointment_number_of_people")
-                ->set_dependency([["unit_id", ">", "0"]]);
-        }
 
         $table->add_field(
             "appointment_duration",
@@ -3884,7 +3891,7 @@ class WBK_Model
             "fields",
             "fields",
             __("Fields", "webba-booking-lite"),
-            "text",
+            "wbk_form_fields",
             "",
             [
                 "tooltip" => __(
@@ -3894,6 +3901,18 @@ class WBK_Model
             ],
             "",
             true,
+            false,
+            false,
+        );
+        $table->add_field(
+            "is_default",
+            "is_default",
+            __("Default", "webba-booking-lite"),
+            "checkbox",
+            "",
+            ["yes" => __("Yes", "webba-booking-lite")],
+            "",
+            false,
             false,
             false,
         );

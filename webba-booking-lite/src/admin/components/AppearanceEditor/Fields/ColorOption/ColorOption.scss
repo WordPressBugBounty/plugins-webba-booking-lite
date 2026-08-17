@@ -6,9 +6,10 @@
     .wbk_colorOption__colorPicker {
         display: flex;
         gap: 0;
-        border: 1px solid #d1d5db;
+        border: 1px solid colors.$field-border;
         border-radius: 6px;
         height: 40px;
+        background-color: colors.$field-background;
 
         input[type='text'],
         input[type='color'] {
@@ -18,6 +19,7 @@
             padding: 0;
             margin: 0;
             height: 100%;
+            color: colors.$input-text;
 
             &:focus,
             &:active {
@@ -37,7 +39,7 @@
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
             cursor: pointer;
-            border-right: 1px solid #d1d5db;
+            border-right: 1px solid colors.$field-border;
             &::-webkit-color-swatch-wrapper {
                 padding: 0;
             }

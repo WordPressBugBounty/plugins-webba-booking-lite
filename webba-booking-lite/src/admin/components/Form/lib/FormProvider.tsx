@@ -6,6 +6,7 @@ import { TooltipMode } from '../types'
 interface FormContextValue {
     form: FormFromModel<any>
     tooltipMode?: TooltipMode
+    lockFieldsOnly?: boolean
 }
 
 export const FormContext = createContext<FormContextValue | null>(null)
@@ -33,9 +34,10 @@ export const useFormContext = () => {
 export const FormProvider = ({
     form,
     tooltipMode = 'tooltip',
+    lockFieldsOnly = false,
     children,
 }: PropsWithChildren<FormContextValue>) => (
-    <FormContext.Provider value={{ form, tooltipMode }}>
+    <FormContext.Provider value={{ form, tooltipMode, lockFieldsOnly }}>
         {children}
     </FormContext.Provider>
 )

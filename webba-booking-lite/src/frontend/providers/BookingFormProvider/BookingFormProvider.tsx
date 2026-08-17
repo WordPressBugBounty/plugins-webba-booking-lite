@@ -330,22 +330,32 @@ export const BookingFormProvider = ({
                     {}
                 )
 
-                return {
+                const nextFormData = {
+                    ...prev.formData,
+                    staff: nextStaff,
+                    services: updatedServices
+                        .filter((service: IServiceProps) => service.selected)
+                        .map((service: IServiceProps) => service.id),
+                    extras: selectedExtras,
+                    ordered_extras: orderedExtras,
+                }
+
+                const nextState = {
                     ...prev,
                     services: updatedServices,
                     extras: updatedExtras,
-                    formData: {
-                        ...prev.formData,
-                        staff: nextStaff,
-                        services: updatedServices
-                            .filter(
-                                (service: IServiceProps) => service.selected
-                            )
-                            .map((service: IServiceProps) => service.id),
-                        extras: selectedExtras,
-                        ordered_extras: orderedExtras,
-                    },
+                    formData: nextFormData,
                 }
+
+                const shouldSyncPlaces =
+                    'quantity' in serviceProps || 'places' in serviceProps
+
+                return shouldSyncPlaces
+                    ? {
+                          ...nextState,
+                          formData: constructFormData(nextState) as IFormData,
+                      }
+                    : nextState
             })
         },
         [preset]

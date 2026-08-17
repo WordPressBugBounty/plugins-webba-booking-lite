@@ -356,6 +356,40 @@ class WBK_Backend
 
     public function handle_admin_redirects()
     {
+        // Handle Gmail OAuth callback / revoke return
+        if (isset($_GET["gmail_auth"])) {
+            if (!current_user_can("manage_options")) {
+                wp_die("You are not authorized to manage Gmail authorization.");
+            }
+
+            $gmail_auth = sanitize_text_field(wp_unslash($_GET["gmail_auth"]));
+
+            if ($gmail_auth === "success" && isset($_GET["gmail_email"])) {
+                $email = sanitize_email(wp_unslash($_GET["gmail_email"]));
+                if ($email !== "") {
+                    update_option("wbk_gmail_email", $email);
+                    update_option("wbk_from_email", $email);
+                }
+                if (class_exists("WBK_Mailer")) {
+                    WBK_Mailer::clear_gmail_token_cache();
+                }
+            } elseif ($gmail_auth === "revoked") {
+                update_option("wbk_gmail_email", "");
+                if (class_exists("WBK_Mailer")) {
+                    WBK_Mailer::clear_gmail_token_cache();
+                }
+            }
+
+            update_option("wbk_mailer", "gmail");
+
+            wp_redirect(
+                admin_url(
+                    "admin.php?page=wbk-options&open_section=wbk_notifications_settings_section&open_tab=email&wbk_mailer=gmail",
+                ),
+            );
+            exit();
+        }
+
         // Handle Google Calendar revocation redirect
         if (isset($_GET["revoke-gg-calendar"]) && is_numeric($_GET["revoke-gg-calendar"])) {
             if (!current_user_can("manage_options")) {

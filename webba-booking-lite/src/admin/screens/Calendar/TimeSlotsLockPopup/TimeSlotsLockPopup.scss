@@ -1,0 +1,123 @@
+.wbk_timeSlotsLockPopup {
+    height: auto;
+    max-height: 85vh;
+}
+
+.wbk_timeSlotsLockPopup__body {
+    overflow-y: auto;
+    min-height: 0;
+    flex: 1 1 auto;
+    padding: 16px 20px 20px;
+}
+
+.wbk_timeSlotsLockPopup__subtitle {
+    font-size: 13px;
+    color: colors.$light-grey;
+    margin: 0 0 12px;
+}
+
+.wbk_timeSlotsLockPopup__loading,
+.wbk_timeSlotsLockPopup__empty,
+.wbk_timeSlotsLockPopup__error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+    font-size: 14px;
+    color: colors.$light-grey;
+}
+
+.wbk_timeSlotsLockPopup__error {
+    color: colors.$red;
+}
+
+.wbk_timeSlotsLockPopup__loader,
+.wbk_timeSlotsLockPopup__slotLoader {
+    width: 16px;
+    height: 16px;
+    padding: 2px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #25b09b;
+    --_m:
+        conic-gradient(#0000 10%, #000),
+        linear-gradient(#000 0 0) content-box;
+    -webkit-mask: var(--_m);
+    mask: var(--_m);
+    -webkit-mask-composite: source-out;
+    mask-composite: subtract;
+    animation: wbk_timeSlotsLockSpin 0.5s infinite linear;
+}
+
+.wbk_timeSlotsLockPopup__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    max-height: 50vh;
+}
+
+.wbk_timeSlotsLockPopup__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid colors.$input-border;
+
+    &:last-child {
+        border-bottom: 0;
+    }
+}
+
+.wbk_timeSlotsLockPopup__time {
+    font-size: 14px;
+    color: colors.$text-black;
+}
+
+.wbk_timeSlotsLockPopup__lockButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    opacity: 0.7;
+
+    img {
+        width: 14px;
+        height: 14px;
+        object-fit: contain;
+        pointer-events: none;
+    }
+
+    &:hover:not(:disabled) {
+        opacity: 1;
+    }
+
+    &:disabled {
+        cursor: wait;
+    }
+
+    &--locked {
+        opacity: 0.95;
+
+        img {
+            filter: brightness(0) saturate(100%) invert(18%) sepia(96%)
+                saturate(7457%) hue-rotate(356deg) brightness(98%) contrast(118%);
+        }
+    }
+
+    &--loading {
+        opacity: 1;
+    }
+}
+
+@keyframes wbk_timeSlotsLockSpin {
+    to {
+        transform: rotate(1turn);
+    }
+}

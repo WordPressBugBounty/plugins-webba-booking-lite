@@ -1812,6 +1812,9 @@ function render_multiple_dates_form(dates) {
 }
 
 function fullcalendar_init() {
+    if (!jQuery('.schedule-chosen-select').length) {
+        return
+    }
     let values = []
     jQuery('.schedule-chosen-select option').each(function () {
         if (jQuery(this).val() !== '') {

@@ -21,7 +21,9 @@ const openSettingsSectionInModal = (
     sidebar: ReturnType<typeof useSidebar>,
     setOptions: (section: string, data: any) => Promise<void>,
     setToastNotification: (payload: { type: string; message: string }) => void,
-    showConfirmation: (data: any) => void
+    showConfirmation: (data: any) => void,
+    initialTab?: string,
+    fieldOverrides?: Record<string, string>
 ) => {
     const { fields, title, sections: subsectionTitles } = section
     const { model } = buildModelFromSettingsFields({ fields })
@@ -35,6 +37,10 @@ const openSettingsSectionInModal = (
         acc[field.id] = field.value
         return acc
     }, {})
+
+    if (fieldOverrides) {
+        Object.assign(storedValues, fieldOverrides)
+    }
 
     sidebar.open(
         <Form
@@ -74,6 +80,7 @@ const openSettingsSectionInModal = (
             tabs={sections[sectionId]?.tabs || {}}
             editorView={sections[sectionId]?.editor_view || 'form'}
             showTabularSearch={true}
+            initialSection={initialTab}
         />,
         {
             view: 'modal',
@@ -93,7 +100,11 @@ export const useOpenSettingsSection = () => {
     const { show: showConfirmation } = useConfirmationPopup()
 
     return useCallback(
-        (sectionId: string) => {
+        (
+            sectionId: string,
+            initialTab?: string,
+            fieldOverrides?: Record<string, string>
+        ) => {
             const section = sections[sectionId]
             if (!section) return
             openSettingsSectionInModal(
@@ -103,7 +114,9 @@ export const useOpenSettingsSection = () => {
                 sidebar,
                 setOptions,
                 setToastNotification,
-                showConfirmation
+                showConfirmation,
+                initialTab,
+                fieldOverrides
             )
         },
         [
@@ -211,9 +224,12 @@ export const buildModelFromSettingsFields = ({
                     tooltip: field.tooltip || '',
                     multiple: field.type === 'select_multiple',
                     required_plan: field.required_plan || '',
+                    available_in_old_free: field.available_in_old_free || false,
                     sub_type: field.sub_type || '',
                     dependent_value: field.dependent_value || '',
                     searchable: field.searchable || false,
+                    radio_type: field.radio_type || '',
+                    column_count: field.column_count || undefined,
                 },
                 tab: field.tab || '',
                 dependency: field.dependency || [],

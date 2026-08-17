@@ -16,6 +16,7 @@ import { Validators } from './validation'
 import { FormNotice } from '../FormNotice/FormNotice'
 import { DescriptionField } from '../Fields/DescriptionField/DescriptionField'
 import { RadioInput } from '../Fields/RadioInput/RadioInput'
+import { QuantityFieldsInput } from '../Fields/QuantityFieldsInput/QuantityFieldsInput'
 import { useBookingContext } from '../../providers/BookingFormProvider/BookingFormProvider'
 
 export const createFormFields = (
@@ -104,6 +105,15 @@ export const createFormFields = (
             case 'radio':
                 fieldsElements.push(
                     <RadioInput
+                        key={fieldConstructor.slug}
+                        fieldConstructor={fieldConstructor}
+                        anyTouched={anyTouched}
+                    />
+                )
+                break
+            case 'quantity_fields':
+                fieldsElements.push(
+                    <QuantityFieldsInput
                         key={fieldConstructor.slug}
                         fieldConstructor={fieldConstructor}
                         anyTouched={anyTouched}

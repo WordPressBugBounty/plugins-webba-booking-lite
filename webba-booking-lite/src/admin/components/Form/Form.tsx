@@ -88,9 +88,10 @@ export const Form = function <T extends Model>({
     showTabularSearch = false,
     submitButtonText,
     submitButtonIcon,
+    initialSection,
 }: IFormProps<T>) {
     const shouldShowSections = Object.keys(sections).length > 1
-    const [activeSection, setActiveSection] = useState('')
+    const [activeSection, setActiveSection] = useState(initialSection || '')
     const sidebar = useSidebar()
     const { show: showConfirmation } = useConfirmationPopup()
     // @ts-ignore
@@ -422,7 +423,8 @@ export const Form = function <T extends Model>({
             const tabInfo = getLockedFormTabInfo(
                 sections[sectionKey] || [],
                 plan_map,
-                tabs?.[sectionKey]?.required_plan
+                tabs?.[sectionKey]?.required_plan,
+                tabs?.[sectionKey]?.lock_fields_only
             )
             map[sectionKey] =
                 featureDisplayConfig.hide_fields && tabInfo.isFullyLocked
@@ -494,18 +496,33 @@ export const Form = function <T extends Model>({
     )
 
     useLayoutEffect(() => {
-        if (Object.keys(sections).length > 0 && !activeSection) {
-            const firstSection = Object.keys(sections).filter(
-                (section) => sections[section]?.length > 0
-            )[0]
-
-            if (firstSection) {
-                setActiveSection(firstSection)
-            }
+        if (Object.keys(sections).length === 0) {
+            return
         }
-    }, [sectionNavigation, activeSection])
+
+        if (activeSection && sections[activeSection]?.length > 0) {
+            return
+        }
+
+        if (initialSection && sections[initialSection]?.length > 0) {
+            setActiveSection(initialSection)
+            return
+        }
+
+        const firstSection = Object.keys(sections).filter(
+            (section) => sections[section]?.length > 0
+        )[0]
+
+        if (firstSection) {
+            setActiveSection(firstSection)
+        }
+    }, [sectionNavigation, activeSection, initialSection, sections])
 
     const checkTabRequiredPlan = useMemo(() => {
+        if (tabs?.[activeSection]?.lock_fields_only) {
+            return null
+        }
+
         const currentFields = sections[activeSection] || []
         if (currentFields.length === 0) {
             return null
@@ -548,14 +565,15 @@ export const Form = function <T extends Model>({
         }
 
         return firstRequiredPlan
-    }, [sections, activeSection, plan_map])
+    }, [sections, activeSection, plan_map, tabs])
 
     const lockedTabInfo = useMemo(
         () =>
             getLockedFormTabInfo(
                 sections[activeSection] || [],
                 plan_map,
-                tabs?.[activeSection]?.required_plan
+                tabs?.[activeSection]?.required_plan,
+                tabs?.[activeSection]?.lock_fields_only
             ),
         [sections, activeSection, plan_map, tabs]
     )
@@ -631,7 +649,11 @@ export const Form = function <T extends Model>({
     }, [sections, activeSection])
 
     return (
-        <FormProvider form={form} tooltipMode={tooltipMode}>
+        <FormProvider
+            form={form}
+            tooltipMode={tooltipMode}
+            lockFieldsOnly={Boolean(tabs?.[activeSection]?.lock_fields_only)}
+        >
             <div className="wbk_form__container">
                 {shouldShowSections ? (
                     <>

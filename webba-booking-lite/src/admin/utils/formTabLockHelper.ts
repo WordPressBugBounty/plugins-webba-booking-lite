@@ -39,7 +39,8 @@ const isFieldHiddenByPlan = (
 export const getLockedFormTabInfo = (
     fields: ResolvedFormField[],
     planMap: Record<string, boolean> | undefined,
-    tabRequiredPlan?: string
+    tabRequiredPlan?: string,
+    lockFieldsOnly?: boolean
 ): LockedFormTabInfo => {
     const emptyResult: LockedFormTabInfo = {
         isFullyLocked: false,
@@ -47,7 +48,7 @@ export const getLockedFormTabInfo = (
         lockedPlanFields: [],
     }
 
-    if (!planMap || fields.length === 0) {
+    if (!planMap || fields.length === 0 || lockFieldsOnly) {
         return emptyResult
     }
 

@@ -192,6 +192,29 @@ $menu-icon-size: 20px;
     font-size: 30px;
     line-height: 40px;
     margin: 0;
+    color: colors.$off-black;
+}
+
+.wbk_table__emptyState {
+    text-align: center;
+    padding: 40px 20px;
+    color: colors.$text-grey;
+}
+
+.wbk_table__emptyStateImage {
+    display: block;
+    margin: 0 auto 12px;
+
+    #wbk_spa_dashboard[data-theme='dark'] &,
+    .wbk_sidebar__container[data-theme='dark'] & {
+        filter: brightness(1.55) saturate(1.25) contrast(1.05);
+    }
+}
+
+.wbk_table__emptyStateText {
+    color: colors.$text-grey;
+    font-family: typography.$font-primary;
+    font-size: 16px;
 }
 
 .wbk_table__expandedData {
@@ -257,6 +280,7 @@ $menu-icon-size: 20px;
     select {
         border-radius: 4px;
         border: 1px solid colors.$input-border;
+        background-color: colors.$background-white;
         font-family: typography.$font-primary;
         font-weight: 400;
         font-size: 16px;
@@ -331,10 +355,15 @@ $menu-icon-size: 20px;
 
 .wbk_table__container {
     box-shadow: 0 0 15px rgba(161, 164, 182, 0.5);
-    border-radius: 20px;
+    border-radius: 8px;
     padding: 32px;
     margin: 20px;
     background: colors.$background-offwhite;
+
+    #wbk_spa_dashboard[data-theme='dark'] & {
+        box-shadow: none;
+        border: 1px solid colors.$input-border;
+    }
 
     @include mobile {
         margin: 10px;

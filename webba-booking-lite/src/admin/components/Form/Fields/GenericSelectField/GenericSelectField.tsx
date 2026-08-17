@@ -35,6 +35,7 @@ import { useEnableLogic } from '../../lib/hooks/useEnableLogic'
 import { useDispatch, useSelect } from '@wordpress/data'
 import { store, store_name } from '../../../../../store/backend'
 import { FieldDescription } from '../FieldDescription/FieldDescription'
+import { getAdminSelectStyles } from '../../../../utils/adminSelectStyles'
 
 const MAX_DISPLAYED_OPTIONS = 4
 
@@ -52,21 +53,6 @@ const CustomMultiValue = (props: MultiValueProps<IOption>) => {
     }
 
     return null
-}
-
-const customStyles = {
-    valueContainer: (base: any) => ({
-        ...base,
-        flexWrap: 'nowrap',
-        overflow: 'hidden',
-    }),
-    multiValue: (base: any) => ({
-        ...base,
-        maxWidth: '100px',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-    }),
 }
 
 // Hook to calculate max menu height and placement based on viewport
@@ -280,17 +266,22 @@ export const createGenericSelectField: FormComponentConstructor<any> = ({
 
         // Dynamic styles with calculated max height
         const dynamicStyles = useMemo(
-            () => ({
-                ...customStyles,
-                menu: (base: any) => ({
-                    ...base,
-                    maxHeight: `${maxMenuHeight}px`,
+            () =>
+                getAdminSelectStyles({
+                    valueContainer: (base: Record<string, unknown>) => ({
+                        ...base,
+                        flexWrap: 'nowrap',
+                        overflow: 'hidden',
+                    }),
+                    menu: (base: Record<string, unknown>) => ({
+                        ...base,
+                        maxHeight: `${maxMenuHeight}px`,
+                    }),
+                    menuList: (base: Record<string, unknown>) => ({
+                        ...base,
+                        maxHeight: `${maxMenuHeight}px`,
+                    }),
                 }),
-                menuList: (base: any) => ({
-                    ...base,
-                    maxHeight: `${maxMenuHeight}px`,
-                }),
-            }),
             [maxMenuHeight]
         )
 
@@ -336,20 +327,7 @@ export const createGenericSelectField: FormComponentConstructor<any> = ({
                                 ? { MultiValue: CustomMultiValue }
                                 : undefined
                         }
-                        styles={
-                            multiple
-                                ? dynamicStyles
-                                : {
-                                      menu: (base: any) => ({
-                                          ...base,
-                                          maxHeight: `${maxMenuHeight}px`,
-                                      }),
-                                      menuList: (base: any) => ({
-                                          ...base,
-                                          maxHeight: `${maxMenuHeight}px`,
-                                      }),
-                                  }
-                        }
+                        styles={dynamicStyles}
                         menuPlacement={
                             isLastField && hasSingleOption
                                 ? 'top'

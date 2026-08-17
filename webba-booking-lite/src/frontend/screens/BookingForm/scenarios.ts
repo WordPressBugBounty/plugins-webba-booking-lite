@@ -4,7 +4,7 @@ import { CalendarStep } from './steps/CalendarStep'
 import { CheckoutStep } from './steps/CheckoutStep'
 import { PaymentStep } from './steps/PaymentStep'
 import { useBookingContext } from '../../providers/BookingFormProvider/BookingFormProvider'
-import { validateField } from '../../components/Form/validation'
+import { validateField, createQuantityAllocationValidator } from '../../components/Form/validation'
 import { IField } from '../../components/Form/types'
 import { stripeMethods } from './PaymentHandler/payments/Stripe/StripeMethods'
 import { ExtrasStep } from './steps/ExtrasStep'
@@ -172,10 +172,48 @@ export const bookingScenarios: IScenario[] = [
         Screen: CheckoutStep,
         validationRules: {
             fields: (value) => {
-                const { fields } = useBookingContext()
+                const { fields, services, units, bookingMode } =
+                    useBookingContext()
+
+                const selectedQuantity =
+                    bookingMode === 'units'
+                        ? Math.max(
+                              1,
+                              Number(
+                                  (units || []).find((unit) => unit.selected)
+                                      ?.quantity
+                              ) || 1
+                          )
+                        : Math.max(
+                              1,
+                              (services || [])
+                                  .filter((service) => service.selected)
+                                  .reduce(
+                                      (sum, service) =>
+                                          sum +
+                                          Math.max(
+                                              1,
+                                              Number(service.quantity) || 1
+                                          ),
+                                      0
+                                  )
+                          )
 
                 for (const field of fields) {
-                    const errors = validateField(field as IField)
+                    const validators =
+                        field.type === 'quantity_fields'
+                            ? [
+                                  ...(field.validators || []),
+                                  createQuantityAllocationValidator(
+                                      selectedQuantity
+                                  ),
+                              ]
+                            : field.validators
+
+                    const errors = validateField({
+                        ...field,
+                        validators,
+                    } as IField)
                     if (errors && errors.length > 0) {
                         return 'please_fill_out_all_fields'
                     }

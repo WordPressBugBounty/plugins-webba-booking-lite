@@ -3,16 +3,11 @@ import '../../ThankYou/ThankYou.scss'
 import '../LandingPage.scss'
 import iconCancel from '../../../../../../public/images/icon-cancel-red.svg'
 import classNames from 'classnames'
-import { CustomScroll } from 'react-custom-scroll'
 
 const PaymentCancelledInner = () => {
     return (
         <div className={'wbk_thank_you__wrapper'}>
-            <CustomScroll
-                heightRelativeToParent="calc(750px - 64px)"
-                className={'wbk_thank_you__custom-scroll'}
-                allowOuterScroll={true}
-            >
+            <div className={'wbk_thank_you__native-scroll'}>
                 <div className={'wbk_thank_you__inner-wrapper'}>
                     <div
                         className={classNames(
@@ -42,7 +37,7 @@ const PaymentCancelledInner = () => {
                         </div>
                     </div>
                 </div>
-            </CustomScroll>
+            </div>
         </div>
     )
 }

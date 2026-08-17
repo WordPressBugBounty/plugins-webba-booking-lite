@@ -28,6 +28,18 @@
     &.wbk_radioButton__buttons--buttonsIcon {
         gap: 16px;
         flex-wrap: nowrap;
+        align-items: stretch;
+
+        &.wbk_radioButton__buttons--buttonsIconColumns {
+            display: grid;
+            grid-template-columns: repeat(var(--wbk-radio-columns, 3), minmax(0, 1fr));
+            flex-wrap: unset;
+
+            .wbk_radioButton__itemIcon {
+                min-width: 0;
+                width: auto;
+            }
+        }
 
         .wbk_radioButton__itemIcon {
             display: flex;
@@ -40,6 +52,12 @@
             border: 1px solid #d1d5db;
             border-radius: 8px;
             width: 100%;
+            cursor: pointer;
+            transition: $transition;
+
+            &:hover{
+                background-color: #f3f4f6;
+            }
 
             &.wbk_radioButton__itemIcon--checked {
                 border-color: #1f6763;
@@ -51,6 +69,7 @@
                 font-size: 14px;
                 font-weight: 400;
                 color: inherit;
+                text-align: center;
             }
 
             .wbk_radioButton__icon {

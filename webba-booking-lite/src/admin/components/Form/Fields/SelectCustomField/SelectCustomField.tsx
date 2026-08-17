@@ -35,6 +35,7 @@ import { useDispatch, useSelect } from '@wordpress/data'
 import { store, store_name } from '../../../../../store/backend'
 import { FieldDescription } from '../FieldDescription/FieldDescription'
 import { __ } from '@wordpress/i18n'
+import { getAdminSelectStyles } from '../../../../utils/adminSelectStyles'
 
 const CUSTOM_OPTION_VALUE = 'custom'
 
@@ -394,16 +395,16 @@ export const createSelectCustomField: FormComponentConstructor<any> = ({
                         }
                         isLoading={isLoading}
                         hideSelectedOptions={false}
-                        styles={{
-                            menu: (base: any) => ({
+                        styles={getAdminSelectStyles({
+                            menu: (base: Record<string, unknown>) => ({
                                 ...base,
                                 maxHeight: `${maxMenuHeight}px`,
                             }),
-                            menuList: (base: any) => ({
+                            menuList: (base: Record<string, unknown>) => ({
                                 ...base,
                                 maxHeight: `${maxMenuHeight}px`,
                             }),
-                        }}
+                        })}
                         menuPlacement={
                             isLastField && hasSingleOption
                                 ? 'top'

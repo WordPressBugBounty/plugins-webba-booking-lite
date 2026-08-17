@@ -47,6 +47,11 @@ final class WBK_Options_Processor
                 $render_callback = 'render_select';
                 $validation_callback = 'validate_select';
                 break;
+            case 'radio':
+                // Rendered by React admin UI; stub keeps WP settings registration working.
+                $render_callback = 'render_radio';
+                $validation_callback = 'validate_select';
+                break;
             case 'editor':
                 $render_callback = 'render_editor';
                 $validation_callback = 'validate_editor';
@@ -86,6 +91,10 @@ final class WBK_Options_Processor
             case 'zoom_auth':
                 $render_callback = 'render_zoom_auth';
                 $validation_callback = 'validate_zoom_auth';
+                break;
+            case 'gmail_auth':
+                $render_callback = 'render_gmail_auth';
+                $validation_callback = 'validate_gmail_auth';
                 break;
             case 'google_connect':
                 $render_callback = 'render_google_connect';
@@ -184,6 +193,10 @@ final class WBK_Options_Processor
     {
         return $input;
     }
+    public function validate_gmail_auth($input)
+    {
+        return '';
+    }
     public function validate_google_connect($input)
     {
         return $input;
@@ -252,6 +265,10 @@ final class WBK_Options_Processor
     {
         WBK_Renderer::load_template('options/zoom_auth', $args);
     }
+    public function render_gmail_auth($args)
+    {
+        echo '';
+    }
     public function render_google_connect($args)
     {
         WBK_Renderer::load_template('options/google_connect', $args);
@@ -269,6 +286,10 @@ final class WBK_Options_Processor
         WBK_Renderer::load_template('options/password_field', $args);
     }
     public function render_smtp_test($args)
+    {
+        echo '';
+    }
+    public function render_radio($args)
     {
         echo '';
     }

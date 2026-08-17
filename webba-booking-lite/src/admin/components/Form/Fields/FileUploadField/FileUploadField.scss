@@ -10,18 +10,18 @@
 }
 
 .wbk_fileUploadField__field.wbk_fileUploadField__field--invalid .wbk_fileUploadField__uploadArea {
-    border-color: red;
+    border-color: colors.$red;
 }
 
 .wbk_fileUploadField__errorContainer {
-    color: red;
+    color: colors.$red;
     position: absolute;
     bottom: -18px;
     left: 0;
 }
 
 .wbk_fileUploadField__uploadArea {
-    border: 2px dashed #8a9393;
+    border: 2px dashed colors.$border-dark;
     border-radius: 15px;
     min-height: 120px;
     width: 100%;
@@ -31,16 +31,16 @@
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
-    background-color: #fafafa;
+    background-color: colors.$field-background;
 
     &:hover {
-        border-color: #0073aa;
-        background-color: #f0f8ff;
+        border-color: colors.$primary;
+        background-color: colors.$primary-soft;
     }
 
     &.wbk_fileUploadField__uploadArea--dragActive {
-        border-color: #0073aa;
-        background-color: #e6f3ff;
+        border-color: colors.$primary;
+        background-color: colors.$primary-soft;
         transform: scale(1.02);
     }
 }
@@ -67,12 +67,12 @@
 }
 
 .wbk_fileUploadField__uploadIcon {
-    color: #8a9393;
+    color: colors.$light-grey;
     margin-bottom: 12px;
     transition: color 0.3s ease;
 
     .wbk_fileUploadField__uploadArea:hover & {
-        color: #0073aa;
+        color: colors.$primary;
     }
 }
 
@@ -86,24 +86,24 @@
     font-family: typography.$font-primary;
     font-size: 16px;
     font-weight: 500;
-    color: #212121;
+    color: colors.$off-black;
 }
 
 .wbk_fileUploadField__uploadSubtitle {
     font-family: typography.$font-primary;
     font-size: 14px;
-    color: #666;
+    color: colors.$light-grey;
 }
 
 .wbk_fileUploadField__filePreview {
-    border: 1px solid #8a9393;
+    border: 1px solid colors.$border-dark;
     border-radius: 15px;
     padding: 16px 20px;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: #f9f9f9;
+    background-color: colors.$field-background;
     min-height: 60px;
 }
 
@@ -115,14 +115,14 @@
 }
 
 .wbk_fileUploadField__fileIcon {
-    color: #8a9393;
+    color: colors.$light-grey;
     flex-shrink: 0;
 }
 
 .wbk_fileUploadField__fileName {
     font-family: typography.$font-primary;
     font-size: 16px;
-    color: #212121;
+    color: colors.$off-black;
     word-break: break-all;
     line-height: 1.4;
 }
@@ -133,13 +133,13 @@
     cursor: pointer;
     padding: 8px;
     border-radius: 8px;
-    color: #666;
+    color: colors.$light-grey;
     transition: all 0.3s ease;
     flex-shrink: 0;
 
     &:hover {
-        background-color: #ffebee;
-        color: #d32f2f;
+        background-color: colors.$primary-soft;
+        color: colors.$red;
     }
 
     &:disabled {

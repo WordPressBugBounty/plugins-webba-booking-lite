@@ -28,7 +28,7 @@
     font-family: typography.$font-primary;
     font-size: 16px;
     font-weight: 400;
-    color: #212121;
+    color: colors.$off-black;
 }
 
 .wbk_businessHours__dayHeaderRight {
@@ -44,7 +44,7 @@
     gap: 6px;
     background: none;
     border: none;
-    color: #1f6763;
+    color: colors.$primary;
     font-family: typography.$font-primary;
     font-size: 14px;
     cursor: pointer;
@@ -53,11 +53,11 @@
     text-decoration: none;
 
     &:hover:not(:disabled) {
-        color: #155350;
+        color: colors.$primary-hover;
     }
 
     &:disabled {
-        color: #8a9393;
+        color: colors.$border-dark;
         cursor: not-allowed;
         opacity: 0.6;
     }
@@ -72,7 +72,7 @@
 .wbk_businessHours__applyToAllButton {
     background: none;
     border: none;
-    color: #8a9393;
+    color: colors.$border-dark;
     font-family: typography.$font-primary;
     font-size: 14px;
     cursor: pointer;
@@ -81,7 +81,7 @@
     text-decoration: none;
 
     &:hover:not(:disabled) {
-        color: #212121;
+        color: colors.$off-black;
     }
 
     &:disabled {
@@ -100,7 +100,7 @@
 .wbk_businessHours__noTimeSlots {
     font-family: typography.$font-primary;
     font-size: 14px;
-    color: #8a9393;
+    color: colors.$border-dark;
     padding: 8px 0;
 }
 
@@ -109,10 +109,10 @@
     align-items: center;
     gap: 10px;
     margin-bottom: 4px;
-    background-color: #e5e7eb;
+    background-color: colors.$background-offwhite;
     padding: 12px;
     border-radius: 8px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid colors.$input-border;
 }
 
 .wbk_businessHours__slotToggle {
@@ -123,21 +123,21 @@
     position: relative;
     display: flex;
     align-items: center;
-    border: 1px solid #d0d0d0;
+    border: 1px solid colors.$field-border;
     border-radius: 8px;
-    background-color: #fff;
+    background-color: colors.$field-background;
     padding: 0 35px 0 12px;
     height: 40px;
     transition: border-color 0.2s;
     cursor: pointer;
 
     &:hover:not(.wbk_businessHours__timeInputWrapper--disabled) {
-        border-color: #8a9393;
+        border-color: colors.$border-dark;
     }
 
     &.wbk_businessHours__timeInputWrapper--disabled {
-        background-color: #f5f5f5;
-        border-color: #e0e0e0;
+        background-color: colors.$row-border;
+        border-color: colors.$input-border;
         opacity: 0.6;
         cursor: not-allowed;
     }
@@ -149,12 +149,12 @@
     gap: 4px;
     font-family: typography.$font-primary;
     font-size: 14px;
-    color: #212121;
+    color: colors.$input-text;
 }
 
 .wbk_businessHours__periodLabel {
     font-size: 12px;
-    color: #8a9393;
+    color: colors.$border-dark;
     margin-left: 2px;
 }
 
@@ -163,10 +163,10 @@
     top: calc(100% + 4px);
     left: 0;
     z-index: 1000;
-    background: #fff;
-    border: 1px solid #e0e0e0;
+    background: colors.$background-white;
+    border: 1px solid colors.$input-border;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px colors.$shadow;
     overflow: hidden;
 }
 
@@ -194,7 +194,7 @@
 }
 
 .wbk_businessHours__hourColumn {
-    border-right: 1px solid #e0e0e0;
+    border-right: 1px solid colors.$input-border;
     min-width: 60px;
 }
 
@@ -206,7 +206,7 @@
     padding: 8px 16px;
     font-family: typography.$font-primary;
     font-size: 14px;
-    color: #212121;
+    color: colors.$input-text;
     cursor: pointer;
     transition: background-color 0.2s;
     display: flex;
@@ -215,15 +215,15 @@
     gap: 4px;
 
     &:hover {
-        background-color: #f5f5f5;
+        background-color: colors.$background-offwhite;
     }
 
     &.wbk_businessHours__timeOption--selected {
-        background-color: #1f6763;
-        color: #fff;
+        background-color: colors.$primary;
+        color: colors.$text-white;
 
         .wbk_businessHours__periodLabel {
-            color: #fff;
+            color: colors.$text-white;
         }
     }
 }
@@ -234,19 +234,24 @@
     width: 16px;
     height: 16px;
     pointer-events: none;
+
+    #wbk_spa_dashboard[data-theme='dark'] &,
+    .wbk_sidebar__container[data-theme='dark'] & {
+        filter: invert(1) brightness(1.3);
+    }
 }
 
 .wbk_businessHours__timeSeparator {
     font-family: typography.$font-primary;
     font-size: 14px;
-    color: #212121;
+    color: colors.$input-text;
     margin: 0 8px;
 }
 
 .wbk_businessHours__colonSeparator {
     font-family: typography.$font-primary;
     font-size: 14px;
-    color: #212121;
+    color: colors.$input-text;
 }
 
 .wbk_businessHours__removeButton {
@@ -272,18 +277,23 @@
     img {
         width: 16px;
         height: 16px;
+
+        #wbk_spa_dashboard[data-theme='dark'] &,
+        .wbk_sidebar__container[data-theme='dark'] & {
+            filter: invert(1) brightness(1.3);
+        }
     }
 }
 
 .wbk_businessHours__error {
-    color: #dc3545;
+    color: colors.$red;
     font-family: typography.$font-primary;
     font-size: 14px;
     margin-top: 8px;
 }
 
 .wbk_businessHours__overlapError {
-    color: #dc3545;
+    color: colors.$red;
     font-family: typography.$font-primary;
     font-size: 14px;
     margin-top: 8px;

@@ -15,7 +15,6 @@ import { wbkFormatPrice } from '../../../providers/BookingFormProvider/utils'
 import { Button } from '../../../components/Button/Button'
 import classNames from 'classnames'
 import { FormNotice } from '../../../components/FormNotice/FormNotice'
-import { CustomScroll } from 'react-custom-scroll'
 import { ILandingPageProps } from './types'
 import { useWording } from '../../../hooks/useWording'
 import { toZonedTime } from 'date-fns-tz'
@@ -132,11 +131,7 @@ const LandingPageInner = ({ token, token_type, action }: ILandingPageProps) => {
 
     return (
         <div className={'wbk_thank_you__wrapper'}>
-            <CustomScroll
-                heightRelativeToParent="calc(750px - 64px)"
-                className={'wbk_thank_you__custom-scroll'}
-                allowOuterScroll={true}
-            >
+            <div className={'wbk_thank_you__native-scroll'}>
                 <div className={'wbk_thank_you__inner-wrapper'}>
                     {bookingData && Object.keys(bookingData).length > 0 && (
                         <>
@@ -416,7 +411,7 @@ const LandingPageInner = ({ token, token_type, action }: ILandingPageProps) => {
                         </div>
                     )}
                 </div>
-            </CustomScroll>
+            </div>
         </div>
     )
 }

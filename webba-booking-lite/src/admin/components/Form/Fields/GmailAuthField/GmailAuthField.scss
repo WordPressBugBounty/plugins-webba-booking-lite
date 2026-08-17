@@ -1,0 +1,90 @@
+.wbk_gmailAuthField {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wbk_gmailAuthField__label {
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.wbk_gmailAuthField__wrapper {
+    max-width: 300px;
+}
+
+.wbk_gmailAuthField__message {
+    &.wbk_gmailAuthField__message--failed {
+        .wbk_gmailAuthField__title {
+            color: #fc2525;
+        }
+    }
+
+    &.wbk_gmailAuthField__message--success {
+        .wbk_gmailAuthField__title {
+            color: #7dc677;
+        }
+    }
+
+    &.wbk_gmailAuthField__message--loading {
+        .wbk_gmailAuthField__title {
+            color: #666;
+            align-items: center;
+        }
+    }
+}
+
+.wbk_gmailAuthField__title {
+    font-size: 16px;
+    line-height: 1.1;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.wbk_gmailAuthField__subtitle {
+    font-size: 13px;
+    line-height: 1;
+    text-align: left;
+    margin-top: 10px;
+}
+
+.wbk_gmailAuthField__icon {
+    max-width: 16px;
+    width: 16px;
+    height: 16px;
+    max-height: 16px;
+    object-fit: contain;
+}
+
+.wbk_gmailAuthField__loader {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 2px solid #666;
+    animation: wbk_gmailAuthField_spin 1s linear infinite;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.wbk_gmailAuthField__description {
+    color: #8a9393;
+    font-family: typography.$font-primary;
+    font-size: 12px;
+    margin: 0;
+    margin-top: 4px;
+}
+
+@keyframes wbk_gmailAuthField_spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

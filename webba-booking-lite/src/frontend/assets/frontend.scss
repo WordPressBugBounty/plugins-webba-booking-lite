@@ -1,32 +1,3 @@
-@font-face {
-    font-family: poppins-light;
-    src: url(./fonts/poppins/Poppins-Light.ttf);
-}
-
-@font-face {
-    font-family: poppins;
-    src: url(./fonts/poppins/Poppins-Regular.ttf);
-}
-
-@font-face {
-    font-family: poppins-medium;
-    src: url(./fonts/poppins/Poppins-Medium.ttf);
-}
-
-@font-face {
-    font-family: poppins-semibold;
-    src: url(./fonts/poppins/Poppins-SemiBold.ttf);
-}
-
-@font-face {
-    font-family: poppins;
-    src: url(./fonts/poppins/Poppins-Bold.ttf);
-    font-weight: bold;
-}
-// declear variables //
-// fonts
-$font-poppins: 'poppins';
-
 // colors
 $color-black: #000000;
 $color-white: #ffffff;
@@ -150,7 +121,7 @@ li.completed-wbk .circle-digit-wbk {
     font-size: 16px;
     margin: 0 0 10px 0;
     padding: 0 !important;
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
 }
 .appointment-box-wbk .appointment-status-list-wbk .text-wbk .subtitle-list-wbk {
     list-style: disc;
@@ -181,7 +152,7 @@ li.completed-wbk .circle-digit-wbk {
     font-size: 14px;
     font-weight: normal;
     color: #000;
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
     text-align: left;
 }
 
@@ -202,7 +173,7 @@ li.completed-wbk .circle-digit-wbk {
 .current-step-wbk {
     margin: 0 !important;
     padding: 0 !important;
-    font-family: poppins-medium, arial;
+    font-family: typography.$font-primary;
     font-size: 16px;
 }
 .next-step-wbk {
@@ -315,7 +286,7 @@ li.completed-wbk .circle-digit-wbk {
 }
 
 .button-wbk {
-    font-family: poppins-semibold, arial;
+    font-family: typography.$font-primary;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -396,7 +367,7 @@ li.completed-wbk .circle-digit-wbk {
     border-radius: 15px;
     height: 50px;
     padding: 0 20px 0 20px;
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
     font-size: 16px;
     color: #212121;
     outline: none;
@@ -423,7 +394,7 @@ li.completed-wbk .circle-digit-wbk {
         color: $color-green;
         border-top-left-radius: 2px;
         border-bottom-left-radius: 2px;
-        font-family: $font-poppins;
+        font-family: typography.$font-primary;
     }
 
     &__input-wrapper {
@@ -443,7 +414,7 @@ li.completed-wbk .circle-digit-wbk {
         font-size: 16px;
         font-weight: normal;
         color: #000;
-        font-family: poppins, arial;
+        font-family: typography.$font-primary;
         text-align: left;
     }
 
@@ -462,7 +433,7 @@ li.completed-wbk .circle-digit-wbk {
         border: 1px solid #cdcfde !important;
         border-radius: 15px;
         padding: 18px 20px 18px 20px;
-        font-family: poppins, arial;
+        font-family: typography.$font-primary;
         font-size: 16px;
         color: #212121;
         outline: none;
@@ -556,14 +527,14 @@ li.item-wbk {
     background-image: url(./clock_grey.png);
 }
 .item-title-wbk {
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
     font-size: 16px;
     display: block;
     margin-bottom: 10px !important;
     color: #000;
 }
 .item-block-sub-title-wbk {
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
     font-size: 16px;
     color: #686080 !important;
     margin-right: 30px !important;
@@ -589,7 +560,7 @@ li.item-wbk {
     text-decoration: none !important;
     font-size: 16px !important;
     font-weight: 300;
-    font-family: poppins, arial !important;
+    font-family: typography.$font-primary !important;
     outline: none !important;
 }
 

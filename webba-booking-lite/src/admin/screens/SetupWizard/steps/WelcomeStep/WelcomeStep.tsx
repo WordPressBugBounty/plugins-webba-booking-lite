@@ -4,6 +4,7 @@ import { store_name } from '../../../../../store/backend'
 import type { WelcomeStepProps } from '../../types'
 import { trackWizardSkipLinkClick } from '../../wizardAnalytics'
 import './WelcomeStep.scss'
+import iconExternal from '../../../../../../public/images/icon-external.svg'
 
 export const WelcomeStep = ({
     onLaunchManual,
@@ -82,6 +83,16 @@ export const WelcomeStep = ({
                             )}
                         </a>
                     </div>
+                    <p className='wbk_welcomeStep__privacyPolicy'>
+                        {__(
+                            "By continuing, you agree to our ",
+                            'webba-booking-lite'
+                        )}
+                        <a href='https://webba-booking.com/privacy-policy/' target='_blank'>
+                            {__('privacy policy ', 'webba-booking-lite')}
+                            <img src={iconExternal} alt='External link' />
+                        </a>
+                    </p>
                 </div>
             </div>
         </div>

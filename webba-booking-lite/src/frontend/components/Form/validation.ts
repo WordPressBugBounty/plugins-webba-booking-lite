@@ -1,6 +1,10 @@
 import { isValidPhoneNumber } from 'react-phone-number-input'
 import { IField, TAcceptedInputValues, ValidatorFn } from './types'
 import { __ } from '@wordpress/i18n'
+import {
+    getQuantityFieldsTotal,
+    IQuantityFieldValue,
+} from '../Fields/QuantityFieldsInput/types'
 
 export const Validators: Record<string, ValidatorFn<TAcceptedInputValues>> = {
     required: (value: TAcceptedInputValues) => {
@@ -39,6 +43,29 @@ export const Validators: Record<string, ValidatorFn<TAcceptedInputValues>> = {
 
         return 'the_entered_number_is_invalid'
     },
+}
+
+/**
+ * Validates that allocated quantity field values exactly match the selected service quantity.
+ */
+export const createQuantityAllocationValidator = (
+    selectedQuantity: number
+): ValidatorFn<TAcceptedInputValues> => {
+    return (value: TAcceptedInputValues) => {
+        const safeSelectedQuantity = Math.max(0, Number(selectedQuantity) || 0)
+        const assigned = getQuantityFieldsTotal(
+            value as IQuantityFieldValue | null | undefined
+        )
+
+        if (assigned === safeSelectedQuantity) {
+            return true
+        }
+
+        return (
+            __('Please allocate all selected quantities', 'webba-booking-lite') +
+            ` (${assigned} of ${safeSelectedQuantity} assigned).`
+        )
+    }
 }
 
 export const validateField = ({ validators, value }: IField) => {

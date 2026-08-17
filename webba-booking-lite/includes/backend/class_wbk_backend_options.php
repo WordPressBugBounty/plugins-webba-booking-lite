@@ -166,6 +166,12 @@ class WBK_Backend_Options
                     "Configure email and SMS notification settings.",
                     "webba-booking-lite",
                 ),
+                "tabs" => [
+                    "general" => [
+                        "title" => __("General", "webba-booking-lite"),
+                        "lock_fields_only" => true,
+                    ],
+                ],
             ],
         );
 
@@ -1221,6 +1227,319 @@ OLD: When one service is booked, it will automatically lock another one on the s
             ],
         );
 
+        $mailer_default = "default";
+        if (get_option("wbk_gmail_enabled", "") === "yes") {
+            $mailer_default = "gmail";
+        } elseif (get_option("wbk_smtp_enabled", "") === "yes") {
+            $mailer_default = "smtp";
+        }
+
+        wbk_opt()->add_option(
+            "wbk_mailer",
+            "radio",
+            __("Mailer", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "not_translated_title" => "Mailer",
+                "popup" => __(
+                    "Choose how Webba Booking sends email notifications: the default WordPress mailer, SMTP, Gmail OAuth, or SendGrid.",
+                    "webba-booking-lite",
+                ),
+                "default" => $mailer_default,
+                "extra" => [
+                    [
+                        'value' => 'default',
+                        'title' => __("Default WordPress mailer", "webba-booking-lite"),
+                        'icon' => 'icon-wordpress.svg',
+                    ],
+                    [
+                        'value' => 'smtp',
+                        'title' => __("SMTP", "webba-booking-lite"),
+                        'icon' => 'icon-mail-inbox.svg',
+                    ],
+                    // [
+                    //     'value' => 'gmail',
+                    //     'title' => __("Gmail", "webba-booking-lite"),
+                    //     'icon' => 'icon-gmail.svg',
+                    //     'required_plan' => 'premium'
+                    // ],
+                    [
+                        'value' => 'sendgrid',
+                        'title' => __("SendGrid", "webba-booking-lite"),
+                        'icon' => 'icon-sendgrid.svg',
+                        'required_plan' => 'premium'
+                    ],
+                ],
+                "radio_type" => "icon",
+                "column_count" => 3,
+                "tab" => "email",
+                "required_plan" => "start",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_gmail_auth",
+            "gmail_auth",
+            __("Gmail authorization", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [["wbk_mailer", "=", "gmail"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_mailer", "!=", "gmail"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "Gmail authorization",
+                "popup" => __(
+                    "Authorize Webba Booking to send email notifications through your Gmail account via Google OAuth.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "email",
+                "required_plan" => "start",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_host",
+            "text",
+            __("SMTP host", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [["wbk_mailer", "=", "smtp"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_mailer", "!=", "smtp"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "SMTP host",
+                "popup" => __(
+                    "Enter your SMTP server hostname (for example, smtp.gmail.com).",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_port",
+            "number",
+            __("SMTP port", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [["wbk_mailer", "=", "smtp"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_mailer", "!=", "smtp"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "SMTP port",
+                "popup" => __(
+                    "Enter the SMTP port. Common values are 587 for TLS and 465 for SSL.",
+                    "webba-booking-lite",
+                ),
+                "default" => "587",
+                "tab" => "email",
+                "sub_type" => "positive_integer",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_encryption",
+            "select",
+            __("SMTP encryption", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [["wbk_mailer", "=", "smtp"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_mailer", "!=", "smtp"],
+                    "value" => "tls",
+                ],
+                "not_translated_title" => "SMTP encryption",
+                "popup" => __(
+                    "Select the encryption method supported by your SMTP server.",
+                    "webba-booking-lite",
+                ),
+                "default" => "tls",
+                "extra" => [
+                    "none" => __("None", "webba-booking-lite"),
+                    "ssl" => __("SSL", "webba-booking-lite"),
+                    "tls" => __("TLS", "webba-booking-lite"),
+                ],
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_auth",
+            "checkbox",
+            __("SMTP authentication", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "yes",
+                "dependency" => [["wbk_mailer", "=", "smtp"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_mailer", "!=", "smtp"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "SMTP authentication",
+                "popup" => __(
+                    "Turn on if your SMTP server requires a username and password.",
+                    "webba-booking-lite",
+                ),
+                "default" => "yes",
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_username",
+            "text",
+            __("SMTP username", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [
+                    ["wbk_mailer", "=", "smtp"],
+                    ["wbk_smtp_auth", "=", "yes"],
+                ],
+                "dependent_value" => [
+                    "condition" => ["wbk_smtp_auth", "!=", "yes"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "SMTP username",
+                "popup" => __("Enter the username for SMTP authentication.", "webba-booking-lite"),
+                "default" => "",
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_password",
+            "password",
+            __("SMTP password", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [
+                    ["wbk_mailer", "=", "smtp"],
+                    ["wbk_smtp_auth", "=", "yes"],
+                ],
+                "dependent_value" => [
+                    "condition" => ["wbk_smtp_auth", "!=", "yes"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "SMTP password",
+                "popup" => __("Enter the password for SMTP authentication.", "webba-booking-lite"),
+                "default" => "",
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_smtp_test",
+            "smtp_test",
+            __("Test SMTP connection", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [["wbk_mailer", "=", "smtp"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_mailer", "!=", "smtp"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "Test SMTP connection",
+                "popup" => __(
+                    "Send a test email to verify your SMTP settings.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_gmail_test",
+            "smtp_test",
+            __("Test Gmail connection", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [["wbk_mailer", "=", "gmail"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_mailer", "!=", "gmail"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "Test Gmail connection",
+                "popup" => __(
+                    "Send a test email to verify your Gmail authorization.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "email",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_sendgrid_api_key",
+            "password",
+            __("SendGrid API key", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [["wbk_mailer", "=", "sendgrid"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_mailer", "!=", "sendgrid"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "SendGrid API key",
+                "popup" => __(
+                    "Enter your SendGrid API key with Mail Send permission. The From email must be a verified sender or domain in SendGrid.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "email",
+                "required_plan" => "start",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_sendgrid_eu_data_residency",
+            "checkbox",
+            __("EU Data Residency", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "yes",
+                "dependency" => [["wbk_mailer", "=", "sendgrid"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_mailer", "!=", "sendgrid"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "EU Data Residency",
+                "popup" => __(
+                    "Route SendGrid API requests through the EU data center (api.eu.sendgrid.com). Enable this if your SendGrid account is configured for EU data residency.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "email",
+                "required_plan" => "start",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_sendgrid_test",
+            "smtp_test",
+            __("Test SendGrid connection", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => [["wbk_mailer", "=", "sendgrid"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_mailer", "!=", "sendgrid"],
+                    "value" => "",
+                ],
+                "not_translated_title" => "Test SendGrid connection",
+                "popup" => __(
+                    "Send a test email to verify your SendGrid API key and sender settings.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "email",
+            ],
+        );
+
         wbk_opt()->add_option(
             "wbk_super_admin_email",
             "text",
@@ -1261,242 +1580,13 @@ OLD: When one service is booked, it will automatically lock another one on the s
             [
                 "not_translated_title" => "From: email",
                 "popup" => __(
-                    "Enter the email that will be displayed as the sender in the email notifications.",
+                    "Enter the email that will be displayed as the sender in the email notifications. When Gmail is selected as the mailer, this field is locked to the authorized Gmail account.",
                     "webba-booking-lite",
                 ),
                 "default" => "demo@webba-booking.com",
                 "tab" => "email",
                 "sub_type" => "email",
-            ],
-        );
-
-        wbk_opt()->add_option(
-            "wbk_gmail_enabled",
-            "checkbox",
-            __("Send via Gmail", "webba-booking-lite"),
-            "wbk_notifications_settings_section",
-            [
-                "checkbox_value" => "yes",
-                "not_translated_title" => "Send via Gmail",
-                "popup" => __(
-                    "Turn on to send email notifications through Gmail using OAuth. Tokens are stored securely in Webba Connect. When enabled, Gmail takes priority over SMTP.",
-                    "webba-booking-lite",
-                ),
-                "default" => "",
-                "tab" => "email",
-                "required_plan" => "start",
-            ],
-        );
-
-        wbk_opt()->add_option(
-            "wbk_gmail_email",
-            "text",
-            __("Gmail account", "webba-booking-lite"),
-            "wbk_notifications_settings_section",
-            [
-                "dependency" => [["wbk_gmail_enabled", "=", "yes"]],
-                "dependent_value" => [
-                    "condition" => ["wbk_gmail_enabled", "!=", "yes"],
-                    "value" => "",
-                ],
-                "not_translated_title" => "Gmail account",
-                "popup" => __(
-                    "Email address of the Google account authorized to send mail. Filled automatically after authorization when available.",
-                    "webba-booking-lite",
-                ),
-                "default" => "",
-                "tab" => "email",
-                "sub_type" => "email",
-            ],
-        );
-
-        wbk_opt()->add_option(
-            "wbk_smtp_enabled",
-            "checkbox",
-            __("Enable SMTP", "webba-booking-lite"),
-            "wbk_notifications_settings_section",
-            [
-                "checkbox_value" => "yes",
-                "dependency" => [["wbk_gmail_enabled", "!=", "yes"]],
-                "not_translated_title" => "Enable SMTP",
-                "popup" => __(
-                    "Turn on to send email notifications through your SMTP server instead of the default WordPress mail transport.",
-                    "webba-booking-lite",
-                ),
-                "default" => "",
-                "tab" => "email",
-                "required_plan" => "start",
-            ],
-        );
-
-        wbk_opt()->add_option(
-            "wbk_smtp_host",
-            "text",
-            __("SMTP host", "webba-booking-lite"),
-            "wbk_notifications_settings_section",
-            [
-                "dependency" => [
-                    ["wbk_gmail_enabled", "!=", "yes"],
-                    ["wbk_smtp_enabled", "=", "yes"],
-                ],
-                "dependent_value" => [
-                    "condition" => ["wbk_smtp_enabled", "!=", "yes"],
-                    "value" => "",
-                ],
-                "not_translated_title" => "SMTP host",
-                "popup" => __(
-                    "Enter your SMTP server hostname (for example, smtp.gmail.com).",
-                    "webba-booking-lite",
-                ),
-                "default" => "",
-                "tab" => "email",
-            ],
-        );
-
-        wbk_opt()->add_option(
-            "wbk_smtp_port",
-            "number",
-            __("SMTP port", "webba-booking-lite"),
-            "wbk_notifications_settings_section",
-            [
-                "dependency" => [
-                    ["wbk_gmail_enabled", "!=", "yes"],
-                    ["wbk_smtp_enabled", "=", "yes"],
-                ],
-                "dependent_value" => [
-                    "condition" => ["wbk_smtp_enabled", "!=", "yes"],
-                    "value" => "",
-                ],
-                "not_translated_title" => "SMTP port",
-                "popup" => __(
-                    "Enter the SMTP port. Common values are 587 for TLS and 465 for SSL.",
-                    "webba-booking-lite",
-                ),
-                "default" => "587",
-                "tab" => "email",
-                "sub_type" => "positive_integer",
-            ],
-        );
-
-        wbk_opt()->add_option(
-            "wbk_smtp_encryption",
-            "select",
-            __("SMTP encryption", "webba-booking-lite"),
-            "wbk_notifications_settings_section",
-            [
-                "dependency" => [
-                    ["wbk_gmail_enabled", "!=", "yes"],
-                    ["wbk_smtp_enabled", "=", "yes"],
-                ],
-                "dependent_value" => [
-                    "condition" => ["wbk_smtp_enabled", "!=", "yes"],
-                    "value" => "tls",
-                ],
-                "not_translated_title" => "SMTP encryption",
-                "popup" => __(
-                    "Select the encryption method supported by your SMTP server.",
-                    "webba-booking-lite",
-                ),
-                "default" => "tls",
-                "extra" => [
-                    "none" => __("None", "webba-booking-lite"),
-                    "ssl" => __("SSL", "webba-booking-lite"),
-                    "tls" => __("TLS", "webba-booking-lite"),
-                ],
-                "tab" => "email",
-            ],
-        );
-
-        wbk_opt()->add_option(
-            "wbk_smtp_auth",
-            "checkbox",
-            __("SMTP authentication", "webba-booking-lite"),
-            "wbk_notifications_settings_section",
-            [
-                "checkbox_value" => "yes",
-                "dependency" => [
-                    ["wbk_gmail_enabled", "!=", "yes"],
-                    ["wbk_smtp_enabled", "=", "yes"],
-                ],
-                "dependent_value" => [
-                    "condition" => ["wbk_smtp_enabled", "!=", "yes"],
-                    "value" => "",
-                ],
-                "not_translated_title" => "SMTP authentication",
-                "popup" => __(
-                    "Turn on if your SMTP server requires a username and password.",
-                    "webba-booking-lite",
-                ),
-                "default" => "yes",
-                "tab" => "email",
-            ],
-        );
-
-        wbk_opt()->add_option(
-            "wbk_smtp_username",
-            "text",
-            __("SMTP username", "webba-booking-lite"),
-            "wbk_notifications_settings_section",
-            [
-                "dependency" => [
-                    ["wbk_gmail_enabled", "!=", "yes"],
-                    ["wbk_smtp_enabled", "=", "yes"],
-                    ["wbk_smtp_auth", "=", "yes"],
-                ],
-                "dependent_value" => [
-                    "condition" => ["wbk_smtp_auth", "!=", "yes"],
-                    "value" => "",
-                ],
-                "not_translated_title" => "SMTP username",
-                "popup" => __("Enter the username for SMTP authentication.", "webba-booking-lite"),
-                "default" => "",
-                "tab" => "email",
-            ],
-        );
-
-        wbk_opt()->add_option(
-            "wbk_smtp_password",
-            "password",
-            __("SMTP password", "webba-booking-lite"),
-            "wbk_notifications_settings_section",
-            [
-                "dependency" => [
-                    ["wbk_gmail_enabled", "!=", "yes"],
-                    ["wbk_smtp_enabled", "=", "yes"],
-                    ["wbk_smtp_auth", "=", "yes"],
-                ],
-                "dependent_value" => [
-                    "condition" => ["wbk_smtp_auth", "!=", "yes"],
-                    "value" => "",
-                ],
-                "not_translated_title" => "SMTP password",
-                "popup" => __("Enter the password for SMTP authentication.", "webba-booking-lite"),
-                "default" => "",
-                "tab" => "email",
-            ],
-        );
-
-        wbk_opt()->add_option(
-            "wbk_smtp_test",
-            "smtp_test",
-            __("Test SMTP connection", "webba-booking-lite"),
-            "wbk_notifications_settings_section",
-            [
-                "dependency" => [
-                    ["wbk_gmail_enabled", "!=", "yes"],
-                    ["wbk_smtp_enabled", "=", "yes"],
-                ],
-                "dependent_value" => [
-                    "condition" => ["wbk_smtp_enabled", "!=", "yes"],
-                    "value" => "",
-                ],
-                "not_translated_title" => "Test SMTP connection",
-                "popup" => __(
-                    "Send a test email to verify your SMTP settings.",
-                    "webba-booking-lite",
-                ),
-                "default" => "",
-                "tab" => "email",
+                "disable_condition" => ["wbk_mailer" => "gmail"],
             ],
         );
 
@@ -2027,9 +2117,9 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             __("Tax label", "webba-booking-lite"),
             "wbk_translation_settings_section",
             [
-                "default" => __("Tax", "webba-booking-lite"),
-                "not_translated_title" => "Tax label",
-                "popup" => __("Label for the tax in payment details", "webba-booking-lite"),
+                "default" => __("Sales tax", "webba-booking-lite"),
+                "not_translated_title" => "Sales tax label",
+                "popup" => __("Label for the sales tax in payment details", "webba-booking-lite"),
                 "tab" => "payments",
             ],
         );
@@ -2061,6 +2151,33 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "tab" => "payments",
             ],
         );
+
+        wbk_opt()->add_option(
+            "wbk_total_booked_items_label",
+            "text",
+            __("Total booked items label", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Total booked items", "webba-booking-lite"),
+                "not_translated_title" => "Total booked items label",
+                "popup" => __("Label for the total booked items in payment details", "webba-booking-lite"),
+                "tab" => "payments",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_grand_total_label",
+            "text",
+            __("Grand total label", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Grand total", "webba-booking-lite"),
+                "not_translated_title" => "Grand total label",
+                "popup" => __("Label for the grand total in payment details", "webba-booking-lite"),
+                "tab" => "payments",
+            ],
+        );
+
         wbk_opt()->add_option(
             "wbk_nothing_to_pay_message",
             "text",
@@ -3757,6 +3874,19 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             ],
         );
         wbk_opt()->add_option(
+            "wbk_wording_hide_summary",
+            "text",
+            __("Hide summary", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Hide summary", "webba-booking-lite"),
+                "not_translated_title" => "Hide summary",
+                "popup" => __("Label for hide summary button.", "webba-booking-lite"),
+                "tab" => "buttons-ui",
+            ],
+        );
+
+        wbk_opt()->add_option(
             "wbk_sidebar_help_title",
             "text",
             __("Booking form sidebar support title", "webba-booking-lite"),
@@ -5252,6 +5382,19 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
         );
 
         wbk_opt()->add_option(
+            "wbk_wording_price",
+            "text",
+            __("Price", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Price", "webba-booking-lite"),
+                "not_translated_title" => "Price",
+                "popup" => __("Label for Price.", "webba-booking-lite"),
+                "tab" => "booking-status",
+            ],
+        );
+
+        wbk_opt()->add_option(
             "wbk_wording_full_price",
             "text",
             __("Full price", "webba-booking-lite"),
@@ -5600,6 +5743,68 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "tab" => "payments",
             ],
         );
+
+        wbk_opt()->add_option(
+            "wbk_wording_pay_full_amount",
+            "text",
+            __("I want to pay full amount", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("I want to pay full amount", "webba-booking-lite"),
+                "not_translated_title" => "I want to pay full amount",
+                "popup" => __(
+                    "Label for the I want to pay full amount option in payment details",
+                    "webba-booking-lite",
+                ),
+                "tab" => "payments",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_to_pay",
+            "text",
+            __("To pay now", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("To pay now", "webba-booking-lite"),
+                "not_translated_title" => "To pay now",
+                "popup" => __("Label for the To pay now option in payment details", "webba-booking-lite"),
+                "tab" => "payments",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_left_to_pay_later",
+            "text",
+            __("Left to pay later", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Left to pay later", "webba-booking-lite"),
+                "not_translated_title" => "Left to pay later",
+                "popup" => __(
+                    "Label for the Left to pay later option in payment details",
+                    "webba-booking-lite",
+                ),
+                "tab" => "payments",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_deposits",
+            "text",
+            __("Deposits", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Deposits", "webba-booking-lite"),
+                "not_translated_title" => "Deposits",
+                "popup" => __(
+                    "Label for the Deposits option in payment details",
+                    "webba-booking-lite",
+                ),
+                "tab" => "payments",
+            ],
+        );
+
         wbk_opt()->add_option(
             "wbk_google_meet_link_text",
             "text",
@@ -5657,7 +5862,171 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             ],
         );
 
+        wbk_opt()->add_option(
+            'wbk_wording_recurring_booking',
+            'text',
+            __('Recurring booking', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('Recurring booking', 'webba-booking-lite'),
+                'not_translated_title' => 'Recurring booking',
+                'popup' => __('Label for Recurring booking.', 'webba-booking-lite'),
+                'tab' => 'recurring',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_wording_recurring_booking_hint',
+            'text',
+            __('This series exceeds the maximum number of slots allowed for this service.', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('This series exceeds the maximum number of slots allowed for this service.', 'webba-booking-lite'),
+                'not_translated_title' => 'This series exceeds the maximum number of slots allowed for this service.',
+                'popup' => __('Label for This series exceeds the maximum number of slots allowed for this service.', 'webba-booking-lite'),
+                'tab' => 'recurring',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_wording_recurring_booking_repeat_every',
+            'text',
+            __('Repeat every', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('Repeat every', 'webba-booking-lite'),
+                'not_translated_title' => 'Repeat every',
+                'popup' => __('Label for Repeat every.', 'webba-booking-lite'),
+                'tab' => 'recurring',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_wording_recurring_booking_interval',
+            'text',
+            __('Interval', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('Interval', 'webba-booking-lite'),
+                'not_translated_title' => 'Interval',
+                'popup' => __('Label for Interval.', 'webba-booking-lite'),
+                'tab' => 'recurring',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_wording_recurring_booking_number_of_time_slots',
+            'text',
+            __('Number of time slots', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('Number of time slots', 'webba-booking-lite'),
+                'not_translated_title' => 'Number of time slots',
+                'popup' => __('Label for Number of time slots.', 'webba-booking-lite'),
+                'tab' => 'recurring',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_wording_loading_appointments',
+            'text',
+            __('Loading appointments...', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('Loading appointments...', 'webba-booking-lite'),
+                'not_translated_title' => 'Loading appointments...',
+                'popup' => __('Label for Loading appointments....', 'webba-booking-lite'),
+                'tab' => 'recurring',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_wording_no_appointments_selected',
+            'text',
+            __('No appointments selected. Add slots using the controls above or close the popup.', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('No appointments selected. Add slots using the controls above or close the popup.', 'webba-booking-lite'),
+                'not_translated_title' => 'No appointments selected. Add slots using the controls above or close the popup.',
+                'popup' => __('Label for No appointments selected. Add slots using the controls above or close the popup.', 'webba-booking-lite'),
+                'tab' => 'recurring',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_wording_unavailable',
+            'text',
+            __('unavailable', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('unavailable', 'webba-booking-lite'),
+                'not_translated_title' => 'unavailable',
+                'popup' => __('Label for unavailable.', 'webba-booking-lite'),
+                'tab' => 'recurring',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_wording_choose_another_time',
+            'text',
+            __('Choose another time', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('Choose another time', 'webba-booking-lite'),
+                'not_translated_title' => 'Choose another time',
+                'popup' => __('Label for Choose another time.', 'webba-booking-lite'),
+                'tab' => 'recurring',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_wording_select_a_time',
+            'text',
+            __('Select a time', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('Select a time', 'webba-booking-lite'),
+                'not_translated_title' => 'Select a time',
+                'popup' => __('Label for Select a time.', 'webba-booking-lite'),
+                'tab' => 'recurring',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_wording_adjusted',
+            'text',
+            __('adjusted', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('adjusted', 'webba-booking-lite'),
+                'not_translated_title' => 'adjusted',
+                'popup' => __('Label for adjusted.', 'webba-booking-lite'),
+                'tab' => 'recurring',
+            ],
+        );
+        
+        wbk_opt()->add_option(
+            'wbk_wording_remove_appointment',
+            'text',
+            __('Remove appointment', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('Remove appointment', 'webba-booking-lite'),
+                'not_translated_title' => 'Remove appointment',
+                'popup' => __('Label for Remove appointment.', 'webba-booking-lite'),
+                'tab' => 'recurring',
+            ],
+        );
+
         do_action("wbk_options_after");
+
+        global $wp_settings_fields;
+        if (isset($wp_settings_fields["wbk-options"])) {
+            $wp_settings_fields["wbk-options"] = apply_filters(
+                "wbk_settings_fields",
+                $wp_settings_fields["wbk-options"],
+            );
+        }
     }
 
     public function wbk_default_editor()

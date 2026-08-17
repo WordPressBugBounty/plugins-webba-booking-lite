@@ -4,21 +4,32 @@
     gap: 8px;
     padding: 16px;
     border-radius: 8px;
-    background-color: #eff6ff;
-    border: 1px solid #bfdbfe;
+    background-color: colors.$primary-soft;
+    border: 1px solid colors.$field-border;
     font-weight: 300;
     font-size: 14px;
     line-height: 18px;
     letter-spacing: 1%;
-    color: #668091;
+    color: colors.$text-grey;
+
+    #wbk_spa_dashboard[data-theme='dark'] &,
+    .wbk_sidebar__container[data-theme='dark'] & {
+        background-color: rgba(61, 155, 149, 0.16);
+        border-color: rgba(61, 155, 149, 0.35);
+    }
 }
 
 .wbk_noticeField__content {
     flex: 1;
-    color: #1e40af;
+    color: colors.$off-black;
+
+    a {
+        color: colors.$primary;
+    }
 }
 
 .wbk_noticeField__icon {
     width: 24px;
     height: 24px;
+    flex-shrink: 0;
 }

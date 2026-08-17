@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n'
 import classNames from 'classnames'
-import { InputHTMLAttributes, useState } from 'react'
+import { InputHTMLAttributes, useEffect, useState } from 'react'
 import CloseIcon from '../../../../../public/images/close-icon-medium.png'
 import MoreIcon from '../../../../../public/images/more-icon.png'
 import { capitalize } from '../../../utils/capitalize'
@@ -9,18 +9,25 @@ import { Option, Select } from '../../Select/Select'
 import { FieldType } from '../types'
 import { CheckboxField } from './CheckboxField/Checkbox'
 import { OptionsField } from './OptionsField/OptionsField'
+import { QuantityFieldsField } from './QuantityFieldsField/QuantityFieldsField'
 
-import { Label } from '../../Label/Label'
 import { useSortableItem } from '../../SortableList/SortableList'
 import { Toggle } from '../../Toggle/Toggle'
-import { getGroupStateValue, useGroup } from '../hooks/useGroup'
+import { useFormBuilderValidation } from '../FormBuilderValidationContext'
+import {
+    getGroupStateValue,
+    isGroupStateValid,
+    useGroup,
+} from '../hooks/useGroup'
 import { getBuilderFieldsByType } from '../utils/createBuilderField'
+import { getFieldTypeInfo } from '../utils/fieldTypeInfo'
 import './Field.scss'
 import { FieldComponent } from './types'
 
 interface FieldProps {
     groupId: number
     onDelete: () => void
+    allowDelete?: boolean
 }
 
 const mapInputType = (
@@ -40,6 +47,7 @@ const typeToFieldMap: Record<string, FieldComponent> = {
     checkbox: CheckboxField,
     dropdown: OptionsField,
     radio: OptionsField,
+    quantity_fields: QuantityFieldsField,
     file: () => null,
 }
 
@@ -48,9 +56,14 @@ const options: Option[] = Object.values(FieldType).map((type) => ({
     label: capitalize(type),
 }))
 
-export const Field = ({ groupId, onDelete }: FieldProps) => {
+export const Field = ({
+    groupId,
+    onDelete,
+    allowDelete = true,
+}: FieldProps) => {
     const { handleRef } = useSortableItem()
     const group = useGroup(groupId)
+    const { showValidation } = useFormBuilderValidation()
     const {
         values: { type, slug, required, placeholder, width, defaultValue },
         errors,
@@ -58,13 +71,23 @@ export const Field = ({ groupId, onDelete }: FieldProps) => {
     const [collapsed, setCollapsed] = useState(!!group.meta.collapsed)
     const disabled = !!group.meta.disabled
     const inputType = mapInputType(type) as string
+    const isValid = isGroupStateValid(group.state)
 
     const DefaultValueField = typeToFieldMap[inputType]
+    const fieldTypeInfo = getFieldTypeInfo(type as FieldType)
+
+    useEffect(() => {
+        if (showValidation && !isValid) {
+            setCollapsed(false)
+        }
+    }, [showValidation, isValid])
 
     return (
         <div
             className={classNames('wbk_formBuilderField__fieldsContainer', {
                 'wbk_formBuilderField__fieldsContainer--containerCollapsed': collapsed,
+                'wbk_formBuilderField__fieldsContainer--invalid':
+                    showValidation && !isValid,
             })}
         >
             <div className="wbk_formBuilderField__fieldSummary">
@@ -92,11 +115,15 @@ export const Field = ({ groupId, onDelete }: FieldProps) => {
                         onChange={(value) => {
                             group.update('slug', value)
                         }}
-                        placeholder={__('xx', 'webba-booking-lite')}
+                        placeholder={__('Internal name (slug)', 'webba-booking-lite')}
                         id={`slug-field-${group.id}`}
                         type="text"
                         errors={errors.slug as string[]}
+                        forceShowErrors={showValidation}
                     />
+                    {slug.length === 0 && (
+                        <p>{__("Give this field a name. It won't be visible to users, but can be used in the Pricing Rules.", 'webba-booking-lite')}</p>
+                    )}
                 </div>
                 <div>
                     <button
@@ -136,7 +163,7 @@ export const Field = ({ groupId, onDelete }: FieldProps) => {
                             : __('Optional', 'webba-booking-lite')}
                     </div>
                 </div>
-                {!disabled && (
+                {!disabled && allowDelete && (
                     <div>
                         <button
                             type="button"
@@ -156,7 +183,7 @@ export const Field = ({ groupId, onDelete }: FieldProps) => {
                     'wbk_formBuilderField__fields--collapsed': collapsed,
                 })}
             >
-                <div>
+                <div className="wbk_formBuilderField__typeField">
                     <Select
                         isDisabled={disabled}
                         name="type"
@@ -174,18 +201,50 @@ export const Field = ({ groupId, onDelete }: FieldProps) => {
                             })
                         }}
                     />
+                    {fieldTypeInfo && (
+                        <div className="wbk_formBuilderField__typeInfo">
+                            <p className="wbk_formBuilderField__typeDescription">
+                                {fieldTypeInfo.description}
+                            </p>
+                            <a
+                                className="wbk_formBuilderField__typeDocsLink"
+                                href={fieldTypeInfo.documentationUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {__(
+                                    'Learn more in documentation',
+                                    'webba-booking-lite'
+                                )}
+                            </a>
+                        </div>
+                    )}
                 </div>
                 {placeholder !== undefined && (
                     <div>
                         <Input
                             id={`placeholder-field-${group.id}`}
                             type="text"
-                            label={__('Placeholder text', 'webba-booking-lite')}
+                            label={
+                                type === FieldType.QuantityFields
+                                    ? __(
+                                        'Field title',
+                                        'webba-booking-lite'
+                                    )
+                                    : __(
+                                        'Placeholder text',
+                                        'webba-booking-lite'
+                                    )
+                            }
                             value={placeholder}
-                            placeholder={__(
-                                'Input placeholder',
-                                'webba-booking-lite'
-                            )}
+                            placeholder={
+                                type === FieldType.QuantityFields
+                                    ? __('Quantity', 'webba-booking-lite')
+                                    : __(
+                                        'Input placeholder',
+                                        'webba-booking-lite'
+                                    )
+                            }
                             onChange={(placeholder) => {
                                 group.update('placeholder', placeholder)
                             }}

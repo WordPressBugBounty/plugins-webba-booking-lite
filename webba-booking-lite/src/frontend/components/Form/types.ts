@@ -1,4 +1,8 @@
 import { FileWithPath } from 'react-dropzone'
+import {
+    IQuantityFieldOption,
+    IQuantityFieldValue,
+} from '../Fields/QuantityFieldsInput/types'
 
 export type TAcceptedInputValues =
     | string
@@ -8,6 +12,7 @@ export type TAcceptedInputValues =
     | IOption[]
     | null
     | FileWithPath[]
+    | IQuantityFieldValue
 
 export type TAcceptedInputTypes =
     | 'text'
@@ -21,6 +26,7 @@ export type TAcceptedInputTypes =
     | 'dropdown'
     | 'radio'
     | 'description'
+    | 'quantity_fields'
 
 export type ValidatorFn<T> = (value: T) => boolean | string
 
@@ -36,6 +42,7 @@ export interface IFieldConfig {
     checkboxText?: string
     defaultValue?: TAcceptedInputValues
     options?: string[]
+    quantityFields?: Array<string | IQuantityFieldOption>
     validators?: ValidatorFn<TAcceptedInputValues>[]
 }
 

@@ -9,6 +9,7 @@ export interface InputProps extends VanillaProps {
     label?: string
     errors?: string[] | readonly string[]
     tooltip?: string
+    forceShowErrors?: boolean
     onChange: (value: string) => void
 }
 
@@ -17,12 +18,13 @@ export const Input = ({
     label,
     id,
     onChange,
+    forceShowErrors = false,
     ...otherProps
 }: InputProps) => {
     const [touched, setTouched] = useState(false)
     const isValid = !errors.length
     const [firstError] = errors
-    const showErrors = !isValid && touched && firstError
+    const showErrors = !isValid && (touched || forceShowErrors) && firstError
 
     return (
         <div

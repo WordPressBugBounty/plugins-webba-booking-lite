@@ -8,9 +8,14 @@ import CloseIcon from '../../../../../../public/images/close-icon-medium.png'
 import styles from './OptionsField.module.css'
 import { Validators } from '../../../Form/utils/validation'
 import { useArrayField } from '../../hooks/useGroup'
+import { useFormBuilderValidation } from '../../FormBuilderValidationContext'
+import classNames from 'classnames'
 
 export const OptionsField = ({ group }: BuilderFieldProps) => {
     const options = useArrayField(group.id, 'options')
+    const { showValidation } = useFormBuilderValidation()
+    const hasNoOptions = options.fields.length === 0
+    const showEmptyError = showValidation && hasNoOptions
 
     return (
         <div className={styles.optionsWrapper}>
@@ -23,7 +28,7 @@ export const OptionsField = ({ group }: BuilderFieldProps) => {
                           const id = `option-field-${group.id}-${index}`
 
                           return (
-                              <div>
+                              <div key={id}>
                                   <div>
                                       <Label for={id}>
                                           {__('Option', 'webba-booking-lite')}{' '}
@@ -46,6 +51,7 @@ export const OptionsField = ({ group }: BuilderFieldProps) => {
                                                   'webba-booking-lite'
                                               )}
                                               errors={field.errors}
+                                              forceShowErrors={showValidation}
                                           />
                                       </div>
                                       <button
@@ -64,9 +70,17 @@ export const OptionsField = ({ group }: BuilderFieldProps) => {
                               </div>
                           )
                       })
-                    : __(
-                          'No options added. Press "Add option" button to add an option',
-                          'webba-booking-lite'
+                    : (
+                          <div
+                              className={classNames(styles.emptyState, {
+                                  [styles.emptyStateError]: showEmptyError,
+                              })}
+                          >
+                              {__(
+                                  'No options added. Press "Add option" button to add an option',
+                                  'webba-booking-lite'
+                              )}
+                          </div>
                       )}
             </div>
             <div>

@@ -60,11 +60,19 @@ class WBK_Email_Processor {
                 $message = WBK_Placeholder_Processor::process_agenda_placehoder( $message, $bookings );
             }
             $recipients = json_decode( $et->get( "recipients" ) );
+            if ( is_string( $recipients ) ) {
+                $recipients = json_decode( $recipients );
+            }
             if ( !$recipients || !is_array( $recipients ) ) {
                 continue;
             }
+            $recipients = array_map( "strval", $recipients );
+            $group_enabled = in_array( "group", $recipients, true );
+            $customer_group_handled = false;
             foreach ( $recipients as $recipient ) {
                 $attachments = [];
+                $item_header = [];
+                $recipient_addresses = [];
                 if ( $recipient == "admin" ) {
                     $attachment = $booking->get( "attachment" );
                     if ( $attachment == "" ) {
@@ -73,14 +81,15 @@ class WBK_Email_Processor {
                         $attachment = json_decode( $attachment );
                     }
                     $attachments = array_merge( $attachments, $attachment );
-                }
-                $item_header = [];
-                if ( $recipient == "admin" ) {
                     if ( get_option( "wbk_email_override_replyto", "true" ) == "true" ) {
                         $item_header[] = "Reply-To: " . $booking->get( "name" ) . " <" . $booking->get( "email" ) . ">";
                     }
-                    $email = ( $notification_service ? $notification_service->get_email() : get_option( "wbk_super_admin_email", get_option( "admin_email" ) ) );
+                    $recipient_addresses[] = ( $notification_service ? $notification_service->get_email() : get_option( "wbk_super_admin_email", get_option( "admin_email" ) ) );
                 } elseif ( $recipient == "customer" || $recipient == "group" ) {
+                    if ( $customer_group_handled ) {
+                        continue;
+                    }
+                    $customer_group_handled = true;
                     if ( get_option( "wbk_email_override_replyto", "true" ) == "true" ) {
                         if ( $notification_service ) {
                             $item_header[] = "Reply-To: " . $notification_service->get( "name" ) . " <" . $notification_service->get( "email" ) . ">";
@@ -88,15 +97,20 @@ class WBK_Email_Processor {
                             $item_header[] = "Reply-To: " . $notification_unit->get( "name" ) . " <" . get_option( "wbk_super_admin_email", get_option( "admin_email" ) ) . ">";
                         }
                     }
-                    $email = $booking->get( "email" );
-                    if ( $trigger == "booking_paid" ) {
-                        $attachments = apply_filters(
-                            "wbk_payment_notification_attachmets",
-                            $attachments,
-                            $bookings,
-                            $booking->get( "email" )
-                        );
+                    $recipient_addresses[] = $booking->get( "email" );
+                    if ( $group_enabled ) {
+                        $recipient_addresses = array_merge( $recipient_addresses, WBK_Form_Builder_Utils::get_additional_email_field_values( $booking ) );
                     }
+                    $normalized_addresses = [];
+                    foreach ( $recipient_addresses as $address ) {
+                        $normalized = WBK_Form_Builder_Utils::normalize_email_address( (string) $address );
+                        if ( $normalized !== "" ) {
+                            $normalized_addresses[] = $normalized;
+                        }
+                    }
+                    $recipient_addresses = array_values( array_unique( $normalized_addresses ) );
+                } else {
+                    continue;
                 }
                 $pdf_attachement = strip_tags( $et->get( "pdf_attachment" ) );
                 if ( $pdf_attachement != "" && WBK_Feature_Gate::have_required_plan( "premium" ) ) {
@@ -106,16 +120,27 @@ class WBK_Email_Processor {
                         $attachments[] = $pdf_file;
                     }
                 }
-                $queue_item = [
-                    "address" => $email,
-                    "message" => $message,
-                    "subject" => $subject,
-                    "headers" => $item_header,
-                ];
-                if ( count( $attachments ) > 0 ) {
-                    $queue_item["attachments"] = $attachments;
+                foreach ( $recipient_addresses as $email ) {
+                    $item_attachments = $attachments;
+                    if ( ($recipient == "customer" || $recipient == "group") && $trigger == "booking_paid" ) {
+                        $item_attachments = apply_filters(
+                            "wbk_payment_notification_attachmets",
+                            $item_attachments,
+                            $bookings,
+                            $email
+                        );
+                    }
+                    $queue_item = [
+                        "address" => $email,
+                        "message" => $message,
+                        "subject" => $subject,
+                        "headers" => $item_header,
+                    ];
+                    if ( count( $item_attachments ) > 0 ) {
+                        $queue_item["attachments"] = $item_attachments;
+                    }
+                    $queue[] = $queue_item;
                 }
-                $queue[] = $queue_item;
             }
         }
         foreach ( $queue as $notification ) {

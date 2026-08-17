@@ -1,18 +1,35 @@
 @mixin wbk_calendar_event {
-    border-color: #d8eded;
+    border-color: colors.$input-border;
     margin: 0;
     border-left: 10px solid transparent;
     border-radius: 4px;
     padding: 0 0 0 2px;
     background-color: transparent;
-    color: #212121;
+    color: colors.$off-black;
 }
 
 .wbk_calendar__eventWrapper {
     border-radius: 4px;
 
+    &.wbk_calendar__eventWrapper--lockedSlot {
+        .rbc-event {
+            background-color: rgba(254, 6, 6, 0.22) !important;
+            border-left-color: #fe0606;
+            color: colors.$off-black;
+            opacity: 0.95;
+        }
+
+        .rbc-event-label {
+            display: none;
+        }
+
+        .rbc-event-content {
+            width: 100%;
+        }
+    }
+
     @each $status, $color in colors.$status-colors {
-    &.wbk_calendar__eventWrapper--#{$status} {
+        &.wbk_calendar__eventWrapper--#{$status} {
             .rbc-event {
                 border-left-color: $color;
             }
@@ -20,8 +37,89 @@
     }
 }
 
+.wbk_calendar__lockedSlotEvent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.wbk_calendar__lockedSlotTime {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.wbk_calendar__lockedSlotUnlock {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-left: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    cursor: pointer;
+    opacity: 0.75;
+
+    img {
+        width: 10px;
+        height: 10px;
+        object-fit: contain;
+        pointer-events: none;
+        filter: brightness(0) saturate(100%) invert(18%) sepia(96%)
+            saturate(7457%) hue-rotate(356deg) brightness(98%) contrast(118%);
+    }
+
+    &:hover:not(:disabled) {
+        opacity: 1;
+        background: rgba(254, 6, 6, 0.12);
+    }
+
+    &:disabled {
+        cursor: wait;
+    }
+
+    &--loading {
+        opacity: 1;
+    }
+}
+
 .wbk_calendar__wrapper {
     padding: 0 20px 0 20px;
+    color: colors.$text-black;
+
+    .wbk_calendar__calendar,
+    .rbc-calendar {
+        background-color: colors.$background-white;
+        color: colors.$text-black;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 0 15px rgba(161, 164, 182, 0.5);
+
+        #wbk_spa_dashboard[data-theme='dark'] & {
+            box-shadow: none;
+            border: 1px solid colors.$input-border;
+        }
+    }
+
+    .rbc-month-view,
+    .rbc-time-view,
+    .rbc-agenda-view {
+        background-color: colors.$background-white;
+        border-color: colors.$input-border;
+    }
 
     .rbc-header {
         min-height: 40px;
@@ -29,80 +127,336 @@
         align-items: center;
         justify-content: center;
         text-align: center;
+        background-color: colors.$background-offwhite;
+        color: colors.$off-black;
+        border-color: colors.$input-border;
+    }
+
+    .rbc-month-row,
+    .rbc-day-bg,
+    .rbc-time-content,
+    .rbc-time-header,
+    .rbc-timeslot-group,
+    .rbc-time-slot,
+    .rbc-day-slot .rbc-time-slot,
+    .rbc-time-header-content,
+    .rbc-time-view-resources .rbc-time-header-gutter,
+    .rbc-time-view-resources .rbc-time-gutter,
+    .rbc-time-gutter,
+    .rbc-label {
+        background-color: colors.$background-white;
+        border-color: colors.$input-border;
+        color: colors.$text-black;
+    }
+
+    .rbc-off-range-bg {
+        background-color: colors.$background-offwhite;
+    }
+
+    .rbc-day-bg.wbk_calendar__day--locked {
+        background-color: colors.$background-offwhite;
+    }
+
+    .rbc-day-bg.rbc-today.wbk_calendar__day--locked {
+        background-color: colors.$background-offwhite;
+    }
+
+    .rbc-today {
+        background-color: colors.$primary-soft;
+    }
+
+    .rbc-date-cell {
+        color: colors.$text-black;
+        position: relative;
+        padding-right: 18px;
+    }
+
+    .wbk_calendar__dateHeader {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-end;
+        gap: 4px;
+        width: 100%;
+        min-height: 20px;
+        padding: 2px 2px 0;
+        box-sizing: border-box;
+    }
+
+    .wbk_calendar__dateLabel {
+        line-height: 1.2;
+    }
+
+    .wbk_calendar__dayActions {
+        position: absolute;
+        top: 1px;
+        left: 2px;
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        z-index: 2;
+    }
+
+    .wbk_calendar__dayLock,
+    .wbk_calendar__timeLock {
+        position: static;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        opacity: 0.7;
+
+        img {
+            width: 12px;
+            height: 12px;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        &:hover:not(:disabled) {
+            opacity: 1;
+        }
+
+        &:disabled {
+            cursor: wait;
+        }
+    }
+
+    .wbk_calendar__dayLock {
+        &--locked {
+            opacity: 0.95;
+
+            img {
+                filter: brightness(0) saturate(100%) invert(18%) sepia(96%)
+                    saturate(7457%) hue-rotate(356deg) brightness(98%) contrast(118%);
+            }
+        }
+
+        &--unlocked {
+            opacity: 0.55;
+        }
+
+        &--loading {
+            opacity: 1;
+        }
+    }
+
+    .wbk_calendar__timeLock {
+        opacity: 0.65;
+    }
+
+    .wbk_calendar__dayLockLoader {
+        width: 12px;
+        height: 12px;
+        padding: 1px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: #25b09b;
+        --_m:
+            conic-gradient(#0000 10%, #000),
+            linear-gradient(#000 0 0) content-box;
+        -webkit-mask: var(--_m);
+        mask: var(--_m);
+        -webkit-mask-composite: source-out;
+        mask-composite: subtract;
+        animation: wbk_calendar_dayLockSpin 0.5s infinite linear;
+    }
+
+    @keyframes wbk_calendar_dayLockSpin {
+        to {
+            transform: rotate(1turn);
+        }
+    }
+
+    .rbc-off-range {
+        color: colors.$light-grey;
     }
 
     .rbc-toolbar {
-        margin: 20px;
+        margin: 0;
+        padding: 16px 20px;
+        color: colors.$off-black;
+        background-color: colors.$background-white;
+        border-bottom: 1px solid colors.$input-border;
+
+        .rbc-toolbar-label {
+            color: colors.$off-black;
+        }
 
         label {
             padding: 20px 0;
+            color: colors.$off-black;
         }
 
         button {
             transition: 0.2s all ease-in-out;
+            background-color: colors.$background-offwhite;
+            color: colors.$input-text;
+            border-color: colors.$input-border;
+            box-shadow: none;
 
             &.rbc-active,
             &:active,
             &:focus {
-                background-color: #1f6763;
-                color: #ffffff;
-                border-color: #1f6763;
+                background-color: colors.$primary;
+                color: colors.$text-white;
+                border-color: colors.$primary;
+                box-shadow: none;
             }
 
             &.rbc-active {
-                background-color: #1f6763;
-                color: #ffffff;
-                border-color: #1f6763;
+                background-color: colors.$primary;
+                color: colors.$text-white;
+                border-color: colors.$primary;
             }
 
             &:hover {
-                background-color: lighten(#1f6763, 5%);
-                color: #ffffff;
-                border-color: #1f6763;
+                background-color: colors.$primary-hover;
+                color: colors.$text-white;
+                border-color: colors.$primary;
+            }
+        }
+
+        .rbc-btn-group {
+            button {
+                border-color: colors.$input-border;
             }
         }
     }
 
     .rbc-event {
         @include wbk_calendar_event;
+        background-color: colors.$background-offwhite;
     }
 
     .wbk_calendar__toolWrapper {
         margin-top: 20px;
         display: flex;
-        gap: 10px;
-        align-items: flex-end;
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
         margin-bottom: 20px;
 
         .wbk_calendar__filterWrapper {
             margin-bottom: 0;
+            transition: opacity 0.2s ease;
+
+            &--switching {
+                opacity: 0.4;
+            }
         }
 
         @media (max-width: 768px) {
-            flex-flow: column-reverse;
-
             .wbk_calendar__addButton {
                 margin-left: 0;
             }
         }
     }
 
-    .rbc-show-more {
-        color: #1f6763;
+    .wbk_calendar__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .wbk_calendar__scheduleToolsToggle {
+        margin-left: 4px;
+        flex-shrink: 0;
+    }
+
+    .wbk_calendar__scheduleNotice {
+        display: grid;
+        grid-template-rows: 0fr;
+        opacity: 0;
+        margin-top: -12px;
+        pointer-events: none;
+        transition:
+            grid-template-rows 0.28s ease,
+            opacity 0.22s ease,
+            margin-top 0.28s ease;
+
+        &--visible {
+            grid-template-rows: 1fr;
+            opacity: 1;
+            margin-top: 0;
+            pointer-events: auto;
+        }
+    }
+
+    .wbk_calendar__scheduleNoticeInner {
+        min-height: 0;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 16px;
+        border-radius: 8px;
+        background-color: colors.$primary-soft;
+        border: 1px solid transparent;
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 18px;
+        color: colors.$text-grey;
+        transition:
+            padding 0.28s ease,
+            border-color 0.28s ease;
+
+        #wbk_spa_dashboard[data-theme='dark'] & {
+            background-color: rgba(61, 155, 149, 0.16);
+        }
+    }
+
+    .wbk_calendar__scheduleNotice--visible .wbk_calendar__scheduleNoticeInner {
+        padding: 16px;
+        border-color: colors.$field-border;
+
+        #wbk_spa_dashboard[data-theme='dark'] & {
+            border-color: rgba(61, 155, 149, 0.35);
+        }
+    }
+
+    .wbk_calendar__scheduleNoticeContent {
+        flex: 1;
+        color: colors.$off-black;
+    }
+
+    .wbk_calendar__scheduleNoticeIcon {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
     }
 
     .wbk_calendar__addButton {
-        margin-left: auto;
+        margin-left: 0;
+    }
+
+    .rbc-show-more {
+        color: colors.$primary;
+        background-color: transparent;
     }
 
     .rbc-event[role='button'] {
         background-color: inherit;
     }
+
+    .rbc-current-time-indicator {
+        background-color: colors.$primary;
+    }
 }
 
 .rbc-overlay {
+    background-color: colors.$background-white;
+    border-color: colors.$input-border;
+    color: colors.$text-black;
+
     .rbc-event {
         @include wbk_calendar_event;
+        background-color: colors.$background-offwhite;
 
         &:not(:last-child) {
             margin-bottom: 1px;

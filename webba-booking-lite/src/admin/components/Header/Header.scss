@@ -5,12 +5,13 @@
 .wbk_header {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid lightgray;
+    border-bottom: 1px solid var(--wbk-admin-header-border);
     padding: 20px;
     margin: 0 0 30px 0;
     gap: 10px;
     background-color: colors.$background-white;
-    max-height: 100px;
+    max-height: 80px;
+    color: colors.$text-black;
 }
 
 .wbk_header__title {
@@ -18,6 +19,7 @@
     line-height: 32px;
     white-space: nowrap;
     margin: 0;
+    color: colors.$off-black;
 
     @media (max-width: 768px) {
         font-size: 18px;
@@ -73,7 +75,7 @@
 .wbk_header__verticalLine {
     width: 1px;
     height: 20px;
-    background-color: lightgray;
+    background-color: var(--wbk-admin-header-border);
 }
 
 .wbk_header__quickLinksContainer {
@@ -85,12 +87,14 @@
     .wbk_header__quickLinksSeparator {
         width: 1px;
         height: 20px;
-        background-color: lightgray;
+        background-color: var(--wbk-admin-header-border);
     }
 
-    .wbk_header__iconButton {
-        border: 1px solid #e5e7eb;
-        background: #fff;
+    .wbk_header__themeToggle,
+    .wbk_header__settingsIconButton {
+        border: 1px solid var(--wbk-admin-icon-button-border);
+        background: var(--wbk-admin-icon-button-bg);
+        color: colors.$text-grey;
         width: 32px;
         height: 32px;
         border-radius: 999px;
@@ -99,38 +103,47 @@
         justify-content: center;
         cursor: pointer;
         padding: 0;
-        gap: 0px;
-        overflow: hidden;
-        white-space: nowrap;
-        transition: width 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+        text-decoration: none;
+        transition: background-color 0.2s ease, border-color 0.2s ease,
+            color 0.2s ease;
 
         &:hover {
-            width: 190px;
-            padding: 0 10px;
-            background: #eef2f3;
-            border-color: #d1d5db;
-            gap: 2px;
+            background: var(--wbk-admin-icon-button-hover-bg);
+            border-color: var(--wbk-admin-icon-button-hover-border);
+            color: colors.$off-black;
+            text-decoration: none;
+        }
+    }
+
+    .wbk_header__iconButton {
+        border: 1px solid var(--wbk-admin-icon-button-border);
+        background: var(--wbk-admin-icon-button-bg);
+        height: 32px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0 10px;
+        gap: 2px;
+        white-space: nowrap;
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+
+        &:hover {
+            background: var(--wbk-admin-icon-button-hover-bg);
+            border-color: var(--wbk-admin-icon-button-hover-border);
         }
     }
 
     .wbk_header__iconButtonLabel {
-        opacity: 0;
-        max-width: 0;
-        transition: opacity 0.15s ease, max-width 0.2s ease;
         font-size: 13px;
         font-weight: 600;
-        color: #22292f;
+        color: var(--wbk-admin-icon-button-label);
     }
 
-    .wbk_header__iconButton:hover .wbk_header__iconButtonLabel {
-        opacity: 1;
-        max-width: 240px;
-    }
-
-    a,
-    .wbk_header__settingsLink,
+    a:not(.wbk_header__settingsIconButton),
     .wbk_header__quickSetupGuideLink {
-        color: #000;
+        color: var(--wbk-admin-link);
         font-size: 14px;
         line-height: 20px;
         font-weight: 500;
@@ -141,16 +154,8 @@
         border: none;
         cursor: pointer;
         padding: 0;
-
-        &:not(:last-child) {
-            border-right: 1px solid lightgray;
-            padding-right: 10px;
-        }
-
-        &:last-child {
-            border-right: none;
-            padding-right: 0;
-        }
+        border-right: 1px solid var(--wbk-admin-header-border);
+        padding-right: 10px;
 
         &:hover {
             text-decoration: underline;
@@ -164,6 +169,12 @@
     }
 
     @include mobile {
-        display: none;
+        .wbk_header__iconButton,
+        .wbk_header__quickLinksSeparator,
+        .wbk_header__quickSetupGuideLink,
+        .wbk_header__settingsIconButton,
+        a {
+            display: none;
+        }
     }
 }

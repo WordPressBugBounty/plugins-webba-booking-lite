@@ -4,7 +4,7 @@ Donate link: https://webba-booking.com/
 Tags:  appointment, booking, booking calendar, scheduling, reservation
 Requires at least: 5.6
 Tested up to: 7.0
-Stable tag: 6.4.19
+Stable tag: 6.4.20
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -205,6 +205,20 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  
 
 == Changelog ==
+
+14/08/2026
+
+6.4.20
+
+- Improvement: added SendGrid as email provider
+- Improvement: improved schedule tools
+- Improvement: dark theme feature in admin UI
+- Improvement: improved translations
+- Improvement: PHP 8.4 compatibility
+- Improvement: editable default form
+- Bug fix: CSV compatibility to support universal excel providers
+- Bug fix: distorted booking form preview in Gutenberg editor
+- Bug fix: other minor fixes and visual improvements both in admin UI and booking form
 
 21/07/2026
 

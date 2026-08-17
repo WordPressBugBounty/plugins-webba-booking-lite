@@ -11,6 +11,12 @@ import {
     IServiceProps,
     IUnitProps,
 } from '../../components/Services/types'
+import {
+    buildNumberOfPeopleFromQuantityFields,
+    getDefaultQuantityFields,
+    IQuantityFieldValue,
+    normalizeQuantityFields,
+} from '../../components/Fields/QuantityFieldsInput/types'
 import { wbkFormat, wbkGetTimezoneOffset } from '../../../admin/components/Form/utils/dateTime'
 import { IBookingFormObj } from './types'
 
@@ -236,6 +242,37 @@ export const constructFormData = (formObj: IBookingFormObj) => {
                     >),
                     [slug]: value,
                 }
+            } else if (type === 'quantity_fields') {
+                const quantityOptions = normalizeQuantityFields(
+                    field.quantityFields
+                )
+                const options = quantityOptions.length
+                    ? quantityOptions
+                    : getDefaultQuantityFields()
+                const quantityValue = (value || {}) as IQuantityFieldValue
+
+                acc['extra'] = {
+                    ...((acc['extra'] || {}) as Record<
+                        string,
+                        TAcceptedInputValues
+                    >),
+                    ...options.reduce(
+                        (extraFields, option) => ({
+                            ...extraFields,
+                            [option.slug]: wbkCreateExtraFieldValue(
+                                option.slug,
+                                option.label,
+                                Number(quantityValue[option.slug]) || 0
+                            ),
+                        }),
+                        {} as Record<string, TAcceptedInputValues>
+                    ),
+                }
+
+                acc['number_of_people'] = buildNumberOfPeopleFromQuantityFields(
+                    quantityValue,
+                    options
+                )
             } else {
                 acc['extra'] = {
                     ...((acc['extra'] || {}) as Record<
@@ -325,7 +362,9 @@ export const constructFormData = (formObj: IBookingFormObj) => {
             units: selectedUnits.map((unit) => unit.id),
             unit_id: selectedUnit?.id || null,
             range: unitRange,
-            number_of_people: unitPeoplePayload,
+            number_of_people:
+                (fieldValues.number_of_people as IQuantityFieldValue) ||
+                unitPeoplePayload,
             payment_method,
             coupon,
             attachments,

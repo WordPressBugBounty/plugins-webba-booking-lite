@@ -9,7 +9,6 @@ import classNames from 'classnames'
 import iconCheck from '../../../../../public/images/icon-check.svg'
 import { useBookingContext } from '../../../providers/BookingFormProvider/BookingFormProvider'
 import { useWording } from '../../../hooks/useWording'
-import { CustomScroll } from 'react-custom-scroll'
 import { fromUnixTime } from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
 export const PaymentHandler: React.FC<{
@@ -168,36 +167,31 @@ export const PaymentHandler: React.FC<{
         }
     }
 
-    return (
-        <div className={'wbk_thank_you__wrapper'}>
-            <CustomScroll
-                heightRelativeToParent="Calc(750px - 64px)"
-                allowOuterScroll={true}
-            >
+    const paymentContent = (
                 <div className={'wbk_thank_you__inner-wrapper'}>
-                    {/* Header always visible, animate only the success state */}
-                    <div className={'wbk_thank_you__header'}>
-                        {!paymentSuccess && (
-                            <>
-                                <img
-                                    src={paymentIcon}
-                                    alt={paymentMethod}
-                                    style={{ width: 56, height: 56 }}
-                                />
-                                <div
-                                    className={'wbk_thank_you__header__content'}
-                                >
-                                    <h3>{paymentTitle}</h3>
-                                    <p>
-                                        {wording?.please_complete_payment_confirm_booking ||
-                                            __(
-                                                'Please complete your payment to confirm your booking.',
-                                                'webba-booking-lite'
-                                            )}
-                                    </p>
-                                </div>
-                            </>
-                        )}
+                        {/* Header always visible, animate only the success state */}
+                        <div className={'wbk_thank_you__header'}>
+                            {!paymentSuccess && (
+                                <>
+                                    <img
+                                        src={paymentIcon}
+                                        alt={paymentMethod}
+                                        style={{ width: 56, height: 56 }}
+                                    />
+                                    <div
+                                        className={'wbk_thank_you__header__content'}
+                                    >
+                                        <h3>{paymentTitle}</h3>
+                                        <p>
+                                            {wording?.please_complete_payment_confirm_booking ||
+                                                __(
+                                                    'Please complete your payment to confirm your booking.',
+                                                    'webba-booking-lite'
+                                                )}
+                                        </p>
+                                    </div>
+                                </>
+                            )}
                         {paymentSuccess && (
                             <div className={'wbk_thank_you__header--visible'}>
                                 <img
@@ -405,7 +399,13 @@ export const PaymentHandler: React.FC<{
                             </FormNotice>
                         )}
                 </div>
-            </CustomScroll>
+    )
+
+    return (
+        <div className={'wbk_thank_you__wrapper'}>
+            <div className={'wbk_thank_you__native-scroll'}>
+                {paymentContent}
+            </div>
         </div>
     )
 }

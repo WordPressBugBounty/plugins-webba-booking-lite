@@ -1,23 +1,29 @@
-$primary: #1f6763;
-$text-black: #333;
-$text-white: #fff;
-$background-white: #fff;
-$background-offwhite: #f9fafb;
-$border: rgba(0, 0, 0, 0.1);
-$shadow: rgba(0, 0, 0, 0.1);
-$input-border: #e5e7eb;
-$input-text: #1f2937;
-$text-grey: #4b5563;
-$row-border: #f3f4f6;
-$light-grey: #6b7280;
-$off-black: #111827;
-$red: #ef4444;
-$green: #0f766e;
-$border-dark: #8a9393;
+// Admin palette — values come from CSS custom properties on #wbk_spa_dashboard
+// so light/dark themes can swap at runtime. See App.scss for token definitions.
+$primary: var(--wbk-admin-primary);
+$primary-hover: var(--wbk-admin-primary-hover);
+$primary-soft: var(--wbk-admin-primary-soft);
+$text-black: var(--wbk-admin-text-black);
+$text-white: var(--wbk-admin-text-white);
+$background-white: var(--wbk-admin-bg-white);
+$background-offwhite: var(--wbk-admin-bg-offwhite);
+$border: var(--wbk-admin-border);
+$shadow: var(--wbk-admin-shadow);
+$input-border: var(--wbk-admin-input-border);
+$input-text: var(--wbk-admin-input-text);
+$text-grey: var(--wbk-admin-text-grey);
+$row-border: var(--wbk-admin-row-border);
+$light-grey: var(--wbk-admin-light-grey);
+$off-black: var(--wbk-admin-off-black);
+$red: var(--wbk-admin-red);
+$green: var(--wbk-admin-green);
+$border-dark: var(--wbk-admin-border-dark);
 
-$field-background: #f9fafb;
-$field-border: #d1d5db;
+$field-background: var(--wbk-admin-field-background);
+$field-border: var(--wbk-admin-field-border);
+$surface-elevated: var(--wbk-admin-surface-elevated);
 
+// Semantic status colors stay compile-time hex (used in @each maps)
 $status-colors: (
     'pending': #ff7e07,
     'approved': #0eb500,

@@ -40,12 +40,13 @@
 
 .wbk_welcomeStep__description {
     font-weight: 300;
-    font-size: 18px;
-    line-height: 28px;
+    font-size: 16px;
+    line-height: 24px;
     letter-spacing: 0%;
     color: #4b5563;
     margin: 0;
     text-align: center;
+    margin-top: 5px;
 }
 
 .wbk_welcomeStep__actions {
@@ -63,8 +64,8 @@
     border-radius: 6px;
     padding: 12px 24px;
     font-weight: 400;
-    font-size: 16px;
-    line-height: 100%;
+    font-size: 14px;
+    line-height: 22px;
     letter-spacing: 0%;
     text-align: center;
     border: 1px solid transparent;
@@ -110,5 +111,19 @@
         &:hover {
             text-decoration: underline;
         }
+    }
+}
+
+
+.wbk_welcomeStep__privacyPolicy {
+    font-size: 14px;
+    bottom: 20px;
+    position: fixed;
+    
+
+    img {
+        width: 16px;
+        height: 16px;
+        vertical-align: middle;
     }
 }

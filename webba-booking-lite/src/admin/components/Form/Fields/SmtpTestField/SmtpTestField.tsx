@@ -20,11 +20,25 @@ export const createSmtpTestField: FormComponentConstructor<any> = () => {
             []
         )
 
+        const mailerField = form.fields.wbk_mailer
+        const { value: mailerValue } = mailerField
+            ? useField(mailerField)
+            : { value: 'smtp' }
+        const mailer = String(mailerValue || 'smtp')
+        const isGmail = mailer === 'gmail'
+        const isSendGrid = mailer === 'sendgrid'
+
         const smtpHostField = form.fields.wbk_smtp_host
         const { value: smtpHostValue } = smtpHostField
             ? useField(smtpHostField)
             : { value: '' }
         const smtpHost = String(smtpHostValue || '').trim()
+
+        const sendgridApiKeyField = form.fields.wbk_sendgrid_api_key
+        const { value: sendgridApiKeyValue } = sendgridApiKeyField
+            ? useField(sendgridApiKeyField)
+            : { value: '' }
+        const sendgridApiKey = String(sendgridApiKeyValue || '').trim()
 
         const [email, setEmail] = useState(current_user_email || '')
         const [isLoading, setIsLoading] = useState(false)
@@ -47,11 +61,22 @@ export const createSmtpTestField: FormComponentConstructor<any> = () => {
                 return
             }
 
-            if (!smtpHost) {
+            if (!isGmail && !isSendGrid && !smtpHost) {
                 setStatus({
                     type: 'error',
                     message: __(
                         'SMTP host is required.',
+                        'webba-booking-lite'
+                    ),
+                })
+                return
+            }
+
+            if (isSendGrid && !sendgridApiKey) {
+                setStatus({
+                    type: 'error',
+                    message: __(
+                        'SendGrid API key is required.',
                         'webba-booking-lite'
                     ),
                 })

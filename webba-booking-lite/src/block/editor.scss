@@ -5,12 +5,110 @@
 }
 
 .wbk-gutenberg-booking-form__preview {
-    // max-height: 70vh;
-    // overflow: auto;
-    // border: 1px solid #dcdcde;
-    // border-radius: 4px;
     background: transparent;
     margin-top: 8px;
+
+    .wbk_timezone_selector,
+    .wbk_input__select {
+        position: relative;
+
+        &__control,
+        &__value-container,
+        &__indicators,
+        &__dropdown-indicator {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+        }
+
+        &__control {
+            flex-wrap: nowrap !important;
+            box-sizing: border-box !important;
+            min-height: 40px !important;
+            width: 100% !important;
+            background: #fff !important;
+            border: 1px solid #d4dde2 !important;
+            border-radius: 8px !important;
+            box-shadow: none !important;
+        }
+
+        &__menu {
+            position: absolute !important;
+            top: calc(100% + 4px) !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 30 !important;
+            background: #fff !important;
+            border: 1px solid #d4dde2 !important;
+            border-radius: 8px !important;
+            box-shadow: 0 8px 24px rgba(34, 41, 47, 0.12) !important;
+        }
+
+        &__dropdown-indicator svg {
+            width: 20px !important;
+            height: 20px !important;
+            max-width: 20px !important;
+            max-height: 20px !important;
+            display: block !important;
+        }
+
+        &__a11yText,
+        [aria-live='polite'],
+        [aria-atomic='true'][aria-live] {
+            border: 0 !important;
+            clip: rect(1px, 1px, 1px, 1px) !important;
+            height: 1px !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            position: absolute !important;
+            width: 1px !important;
+            white-space: nowrap !important;
+        }
+
+        input {
+            height: auto !important;
+            min-height: 0 !important;
+            box-shadow: none !important;
+            border: 0 !important;
+            background: transparent !important;
+        }
+    }
+
+    .wbk_timezone_selector__control {
+        height: 40px !important;
+    }
+
+    .wbk_input__select__control {
+        min-height: 42px !important;
+        padding: 4px 8px 4px 12px !important;
+    }
+
+    .custom-scroll-container,
+    .rcs-custom-scroll,
+    .rcs-outer-container,
+    .rcs-inner-container {
+        height: auto !important;
+        max-height: none !important;
+    }
+
+    .custom-scroll-handle,
+    .rcs-custom-scrollbar,
+    .rcs-custom-scroll-handle {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    .wbk_thank_you__wrapper,
+    .wbk_thank_you__inner-wrapper,
+    .wbk_thank_you__native-scroll {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+    }
 }
 
 .wbk-gutenberg-style-lock {

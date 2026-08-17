@@ -8,19 +8,23 @@
             "hidden": false,
             "title": "Name",
             "tab": "",
-            "misc": [],
+            "misc": {
+                "tooltip": "Enter form name."
+            },
             "required": false,
             "dependency": [],
             "default_value": "",
             "editable": true
         },
         "fields": {
-            "type": "string",
-            "input_type": "text",
+            "type": "not_defined",
+            "input_type": "not_defined",
             "hidden": true,
             "title": "Fields",
             "tab": "",
-            "misc": [],
+            "misc": {
+                "tooltip": "Configure the custom fields that customers fill out during booking."
+            },
             "required": false,
             "dependency": [],
             "default_value": "",

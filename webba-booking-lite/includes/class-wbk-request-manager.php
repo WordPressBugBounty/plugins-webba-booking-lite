@@ -95,6 +95,11 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "get_gg_auth_data"],
                 "permission_callback" => [$this, "get_gg_auth_data_permission"],
             ] );
+            register_rest_route( "wbk/v2", "/get-gmail-auth-data/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_gmail_auth_data"],
+                "permission_callback" => [$this, "get_gmail_auth_data_permission"],
+            ] );
             register_rest_route( "wbk/v2", "/get-dashboard-stats/", [
                 "methods"             => "GET",
                 "callback"            => [$this, "get_dashboard_stats"],
@@ -105,10 +110,50 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "get_cell_detail"],
                 "permission_callback" => [$this, "get_cell_detail_permission"],
             ] );
+            register_rest_route( "wbk/v2", "/get-schedule/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_schedule"],
+                "permission_callback" => [$this, "get_schedule_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/lock-day/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "lock_day"],
+                "permission_callback" => [$this, "schedule_lock_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/unlock-day/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "unlock_day"],
+                "permission_callback" => [$this, "schedule_lock_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/lock-time/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "lock_time"],
+                "permission_callback" => [$this, "schedule_lock_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/unlock-time/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "unlock_time"],
+                "permission_callback" => [$this, "schedule_lock_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/schedule-tools-action/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "schedule_tools_action_rest"],
+                "permission_callback" => [$this, "schedule_tools_action_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/create-multiple-bookings/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "create_multiple_bookings_rest"],
+                "permission_callback" => [$this, "create_multiple_bookings_permission"],
+            ] );
             register_rest_route( "wbk/v2", "/save-appearance/", [
                 "methods"             => "POST",
                 "callback"            => [$this, "save_appearance"],
                 "permission_callback" => [$this, "save_appearance_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/save-admin-theme/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "save_admin_theme"],
+                "permission_callback" => [$this, "save_admin_theme_permission"],
             ] );
             register_rest_route( "webba-booking/v1", "/get-service-availability/", [
                 "methods"             => "GET",
@@ -243,7 +288,6 @@ class WBK_Request_Manager {
         } );
         add_action( "wp_ajax_wbk_cancel_appointment", [$this, "cancel_booking"] );
         add_action( "wp_ajax_nopriv_wbk_cancel_appointment", [$this, "cancel_booking"] );
-        add_action( "wp_ajax_wbk_schedule_tools_action", [$this, "schedule_tools_action"] );
         add_action( "wp_ajax_wbk_report_error", [$this, "wbk_report_error"] );
         add_action( "wp_ajax_nopriv_wbk_report_error", [$this, "wbk_report_error"] );
         add_action( "wp_ajax_wbk_backend_hide_notice", [$this, "wbk_backend_hide_notice"] );
@@ -819,133 +863,340 @@ class WBK_Request_Manager {
         return;
     }
 
-    public function schedule_tools_action() {
-        global $wpdb;
-        global $current_user;
-        date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
-        if ( !wp_verify_nonce( $_POST["nonce"], "wbkb_nonce" ) ) {
-            wp_die();
-            return;
+    /**
+     * REST endpoint for schedule tools lock/unlock.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function schedule_tools_action_rest( WP_REST_Request $request ) : WP_REST_Response {
+        $result = $this->process_schedule_tools_action( [
+            "lock_action"   => $request->get_param( "lock_action" ),
+            "lock_target"   => ( $request->get_param( "lock_target" ) ?: "dates" ),
+            "date_range"    => $request->get_param( "date_range" ),
+            "service"       => $request->get_param( "service" ),
+            "category"      => $request->get_param( "category" ),
+            "exclude_dates" => ( $request->get_param( "exclude_dates" ) ?: "" ),
+            "days_of_week"  => $request->get_param( "days_of_week" ),
+            "from"          => $request->get_param( "from" ),
+            "to"            => $request->get_param( "to" ),
+        ] );
+        return new WP_REST_Response($result, 200);
+    }
+
+    /**
+     * Permission for schedule tools bulk lock/unlock.
+     *
+     * @param WP_REST_Request $request
+     * @return bool
+     */
+    public function schedule_tools_action_permission( $request ) : bool {
+        if ( !is_user_logged_in() ) {
+            return false;
         }
-        if ( !isset( $_POST["lock_action"] ) ) {
-            echo json_encode( [
+        if ( current_user_can( "manage_options" ) ) {
+            return true;
+        }
+        $service_id = $request->get_param( "service" );
+        if ( WBK_Validator::check_integer( $service_id, 1, 9999999 ) ) {
+            return WBK_Validator::check_access_to_service( $service_id );
+        }
+        $category_id = $request->get_param( "category" );
+        return WBK_Validator::check_integer( $category_id, 1, 9999999 );
+    }
+
+    /**
+     * Permission for creating multiple bookings from the calendar.
+     *
+     * @param WP_REST_Request $request
+     * @return bool
+     */
+    public function create_multiple_bookings_permission( $request ) : bool {
+        if ( !is_user_logged_in() ) {
+            return false;
+        }
+        if ( current_user_can( "manage_options" ) ) {
+            return true;
+        }
+        $service_id = $request->get_param( "service_id" );
+        if ( !WBK_Validator::check_integer( $service_id, 1, 9999999 ) ) {
+            return false;
+        }
+        return WBK_Validator::check_access_to_service( $service_id );
+    }
+
+    /**
+     * REST endpoint based on legacy wbk_create_multiple_bookings AJAX action.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function create_multiple_bookings_rest( WP_REST_Request $request ) : WP_REST_Response {
+        $result = $this->process_create_multiple_bookings( [
+            "service_id" => $request->get_param( "service_id" ),
+            "date"       => $request->get_param( "date" ),
+            "name"       => $request->get_param( "name" ),
+            "email"      => $request->get_param( "email" ),
+            "phone"      => $request->get_param( "phone" ),
+            "desc"       => $request->get_param( "desc" ),
+            "quantity"   => $request->get_param( "quantity" ),
+            "times"      => $request->get_param( "times" ),
+            "status"     => $request->get_param( "status" ),
+        ] );
+        return new WP_REST_Response($result, 200);
+    }
+
+    /**
+     * Shared processor for creating multiple bookings for selected time slots.
+     *
+     * @param array $data
+     * @return array{status:int,message:string,booking_ids?:int[]}
+     */
+    private function process_create_multiple_bookings( array $data ) : array {
+        global $wpdb;
+        date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+        $service_id = ( isset( $data["service_id"] ) ? $data["service_id"] : null );
+        $name = ( isset( $data["name"] ) ? sanitize_text_field( $data["name"] ) : "" );
+        $email = ( isset( $data["email"] ) ? sanitize_email( $data["email"] ) : "" );
+        $phone = ( isset( $data["phone"] ) ? sanitize_text_field( $data["phone"] ) : "" );
+        $desc = ( isset( $data["desc"] ) ? sanitize_textarea_field( $data["desc"] ) : "" );
+        $quantity = ( isset( $data["quantity"] ) ? absint( $data["quantity"] ) : 0 );
+        $booking_status = ( isset( $data["status"] ) ? sanitize_text_field( $data["status"] ) : "pending" );
+        $times = ( isset( $data["times"] ) ? $data["times"] : [] );
+        if ( is_string( $times ) ) {
+            $times = array_filter( array_map( "trim", explode( ",", $times ) ) );
+        }
+        if ( !is_array( $times ) ) {
+            $times = [];
+        }
+        $times = array_values( array_filter( array_map( "intval", $times ), function ( $time ) {
+            return $time > 0;
+        } ) );
+        if ( !WBK_Validator::validateId( $service_id, "wbk_services" ) || $name === "" || !is_email( $email ) || $quantity < 1 || empty( $times ) ) {
+            date_default_timezone_set( "UTC" );
+            return [
+                "status"  => 0,
+                "message" => __( "Please fill in all required fields.", "webba-booking-lite" ),
+            ];
+        }
+        if ( !array_key_exists( $booking_status, WBK_Model_Utils::get_booking_status_list() ) ) {
+            date_default_timezone_set( "UTC" );
+            return [
+                "status"  => 0,
+                "message" => __( "Status error", "webba-booking-lite" ),
+            ];
+        }
+        $service = new WBK_Service_deprecated();
+        if ( !$service->setId( $service_id ) || !$service->load() ) {
+            date_default_timezone_set( "UTC" );
+            return [
+                "status"  => 0,
+                "message" => __( "Service not found.", "webba-booking-lite" ),
+            ];
+        }
+        $appointment_ids = [];
+        $duration = $service->getDuration();
+        foreach ( $times as $time ) {
+            $count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM " . get_option( "wbk_db_prefix", "" ) . "wbk_appointments where service_id = %d and time = %d and " . WBK_Model_Utils::get_not_canclled_sql(), $service_id, $time ) );
+            if ( $count > 0 && $service->getQuantity() == 1 ) {
+                date_default_timezone_set( "UTC" );
+                return [
+                    "status"  => 0,
+                    "message" => __( "Overbooking error", "webba-booking-lite" ),
+                ];
+            }
+            $booking_data = [
+                "name"             => $name,
+                "email"            => $email,
+                "phone"            => $phone,
+                "time"             => $time,
+                "service_id"       => $service_id,
+                "duration"         => $duration,
+                "description"      => $desc,
+                "quantity"         => $quantity,
+                "service_category" => 0,
+                "time_offset"      => 0,
+            ];
+            $booking_factory = new WBK_Booking_Factory();
+            $status = $booking_factory->build_from_array( $booking_data );
+            if ( $status[0] == true ) {
+                $appointment_ids[] = $status[1];
+                $booking = new WBK_Booking($status[1]);
+                $booking->set( "status", $booking_status );
+                $booking->save();
+            }
+        }
+        $booking_factory = new WBK_Booking_Factory();
+        $booking_factory->post_production( $appointment_ids );
+        date_default_timezone_set( "UTC" );
+        return [
+            "status"      => 1,
+            "message"     => __( "Appointments added:", "webba-booking-lite" ) . " " . count( $appointment_ids ),
+            "booking_ids" => $appointment_ids,
+        ];
+    }
+
+    /**
+     * Shared processor for schedule tools lock/unlock (dates and timeslots).
+     *
+     * @param array $data
+     * @return array{status:int,message:string}
+     */
+    /**
+     * Parse a schedule-tools date string as midnight in the business timezone.
+     *
+     * @param string       $date_str
+     * @param DateTimeZone $timezone
+     * @return int|false Unix timestamp or false on failure
+     */
+    private function parse_schedule_tools_date( string $date_str, DateTimeZone $timezone ) {
+        $date_str = trim( $date_str );
+        if ( $date_str === "" ) {
+            return false;
+        }
+        $formats = [
+            "n/j/Y",
+            "n/j/y",
+            "m/d/Y",
+            "m/d/y",
+            "Y-m-d"
+        ];
+        foreach ( $formats as $format ) {
+            $dt = DateTime::createFromFormat( "!" . $format, $date_str, $timezone );
+            if ( $dt instanceof DateTime ) {
+                $errors = DateTime::getLastErrors();
+                $warning_count = ( is_array( $errors ) ? (int) ($errors["warning_count"] ?? 0) : 0 );
+                $error_count = ( is_array( $errors ) ? (int) ($errors["error_count"] ?? 0) : 0 );
+                if ( $warning_count === 0 && $error_count === 0 ) {
+                    return $dt->getTimestamp();
+                }
+            }
+        }
+        try {
+            $dt = new DateTime($date_str, $timezone);
+            $dt->setTime( 0, 0, 0 );
+            return $dt->getTimestamp();
+        } catch ( Exception $e ) {
+            return false;
+        }
+    }
+
+    private function process_schedule_tools_action( array $data ) : array {
+        global $wpdb;
+        $timezone_string = get_option( "wbk_timezone", "UTC" );
+        try {
+            $wbk_timezone = new DateTimeZone($timezone_string);
+        } catch ( Exception $e ) {
+            $wbk_timezone = new DateTimeZone("UTC");
+            $timezone_string = "UTC";
+        }
+        date_default_timezone_set( $timezone_string );
+        if ( !isset( $data["lock_action"] ) ) {
+            return [
                 "status"  => 0,
                 "message" => "Wrong action.",
-            ] );
-            wp_die();
-            return;
+            ];
         }
-        if ( $_POST["lock_action"] != "lock" && $_POST["lock_action"] != "unlock" ) {
-            echo json_encode( [
+        if ( $data["lock_action"] != "lock" && $data["lock_action"] != "unlock" ) {
+            return [
                 "status"  => 0,
                 "message" => "Wrong action target.",
-            ] );
-            wp_die();
-            return;
+            ];
         }
-        $lock_action = sanitize_text_field( $_POST["lock_action"] );
-        if ( !isset( $_POST["lock_target"] ) ) {
-            echo json_encode( [
+        $lock_action = sanitize_text_field( $data["lock_action"] );
+        if ( !isset( $data["lock_target"] ) ) {
+            return [
                 "status"  => 0,
                 "message" => "Wrong action target.",
-            ] );
-            wp_die();
-            return;
+            ];
         }
-        if ( $_POST["lock_target"] != "dates" && $_POST["lock_target"] != "timeslots" ) {
-            echo json_encode( [
+        if ( $data["lock_target"] != "dates" && $data["lock_target"] != "timeslots" ) {
+            return [
                 "status"  => 0,
                 "message" => "Wrong action target.",
-            ] );
-            wp_die();
-            return;
+            ];
         }
-        $lock_target = sanitize_text_field( $_POST["lock_target"] );
-        $date_range = sanitize_text_field( $_POST["date_range"] );
+        $lock_target = sanitize_text_field( $data["lock_target"] );
+        $date_range = sanitize_text_field( $data["date_range"] ?? "" );
         $date_range = explode( " - ", $date_range );
         if ( !is_array( $date_range ) || count( $date_range ) != 2 ) {
-            echo json_encode( [
+            return [
                 "status"  => 0,
                 "message" => "Wrong date range.",
-            ] );
-            wp_die();
-            return;
+            ];
         }
-        $start = strtotime( $date_range[0] );
-        $end = strtotime( $date_range[1] );
-        if ( $end < $start ) {
-            echo json_encode( [
+        $start = $this->parse_schedule_tools_date( $date_range[0], $wbk_timezone );
+        $end = $this->parse_schedule_tools_date( $date_range[1], $wbk_timezone );
+        if ( $start === false || $end === false || $end < $start ) {
+            return [
                 "status"  => 0,
                 "message" => "Wrong date range.",
-            ] );
-            wp_die();
-            return;
+            ];
         }
-        $service_id = sanitize_text_field( $_POST["service"] );
-        $category_id = sanitize_text_field( $_POST["category"] );
+        $service_id = sanitize_text_field( $data["service"] ?? "" );
+        $category_id = sanitize_text_field( $data["category"] ?? "" );
         if ( !is_numeric( $service_id ) && !is_numeric( $category_id ) ) {
-            echo json_encode( [
+            return [
                 "status"  => 0,
                 "message" => "Wrong service or category.",
-            ] );
-            wp_die();
-            return;
+            ];
         }
+        $excluded_dates = [];
+        $from = null;
+        $to = null;
         if ( $lock_target == "timeslots" ) {
-            $from = sanitize_text_field( $_POST["from"] );
-            $to = sanitize_text_field( $_POST["to"] );
+            $from = sanitize_text_field( $data["from"] ?? "" );
+            $to = sanitize_text_field( $data["to"] ?? "" );
             if ( !WBK_Validator::check_integer( $from, 900, 85500 ) || !WBK_Validator::check_integer( $to, 0, 86400 ) ) {
-                echo json_encode( [
+                return [
                     "status"  => 0,
                     "message" => "Wrong time interval.",
-                ] );
-                wp_die();
-                return;
+                ];
             }
             if ( $from >= $to ) {
-                echo json_encode( [
+                return [
                     "status"  => 0,
                     "message" => "Wrong time interval.",
-                ] );
-                wp_die();
-                return;
+                ];
             }
         } else {
-            $excluded_dates = explode( ",", sanitize_text_field( $_POST["exclude_dates"] ) );
+            $exclude_dates_raw = sanitize_text_field( $data["exclude_dates"] ?? "" );
             $excluded_dates_temp = [];
-            foreach ( $excluded_dates as $date ) {
-                $date = strtotime( $date );
-                if ( $date ) {
-                    $excluded_dates_temp[] = $date;
+            if ( $exclude_dates_raw !== "" ) {
+                foreach ( explode( ",", $exclude_dates_raw ) as $date ) {
+                    $parsed_exclude = $this->parse_schedule_tools_date( trim( $date ), $wbk_timezone );
+                    if ( $parsed_exclude !== false ) {
+                        $excluded_dates_temp[] = $parsed_exclude;
+                    }
                 }
             }
             $excluded_dates = $excluded_dates_temp;
         }
-        $days_of_week = explode( ",", $_POST["days_of_week"] );
+        $days_of_week_raw = $data["days_of_week"] ?? "";
+        if ( is_array( $days_of_week_raw ) ) {
+            $days_of_week = array_map( "strval", $days_of_week_raw );
+        } else {
+            $days_of_week = explode( ",", (string) $days_of_week_raw );
+        }
+        $days_of_week = array_values( array_filter( array_map( "trim", $days_of_week ), "strlen" ) );
         if ( !is_array( $days_of_week ) ) {
-            echo json_encode( [
+            return [
                 "status"  => 0,
                 "message" => "Wrong days of the week.",
-            ] );
-            wp_die();
-            return;
+            ];
         }
         if ( count( $days_of_week ) == 0 || count( $days_of_week ) > 7 ) {
-            echo json_encode( [
+            return [
                 "status"  => 0,
                 "message" => "Wrong days of the week.",
-            ] );
-            wp_die();
-            return;
+            ];
         }
         foreach ( $days_of_week as $day_of_week ) {
             if ( !WBK_Validator::check_integer( $day_of_week, 1, 7 ) ) {
-                echo json_encode( [
+                return [
                     "status"  => 0,
                     "message" => "Wrong days of the week.",
-                ] );
-                wp_die();
-                return;
+                ];
             }
         }
         $total_locked = 0;
@@ -955,17 +1206,23 @@ class WBK_Request_Manager {
                 $arr_service_ids = WBK_Model_Utils::get_services_in_category( $category_id );
             }
         }
+        if ( !is_array( $arr_service_ids ) || count( $arr_service_ids ) === 0 ) {
+            date_default_timezone_set( "UTC" );
+            return [
+                "status"  => 0,
+                "message" => "Wrong service or category.",
+            ];
+        }
         $sp = new WBK_Schedule_Processor();
         $sp->load_data();
         foreach ( $arr_service_ids as $service_id ) {
             if ( !current_user_can( "manage_options" ) ) {
                 if ( !WBK_Validator::check_access_to_service( $service_id ) ) {
-                    echo json_encode( [
+                    date_default_timezone_set( "UTC" );
+                    return [
                         "status"  => 0,
                         "message" => "Unauthorised access.",
-                    ] );
-                    wp_die();
-                    return;
+                    ];
                 }
             }
             $service = new WBK_Service($service_id);
@@ -984,12 +1241,11 @@ class WBK_Request_Manager {
                 }
                 if ( $lock_target == "dates" ) {
                     if ( $wpdb->query( $wpdb->prepare( "DELETE FROM " . get_option( "wbk_db_prefix", "" ) . "wbk_days_on_off WHERE day = %d and service_id = %d", $curent_day, $service_id ) ) === false ) {
-                        echo json_encode( [
+                        date_default_timezone_set( "UTC" );
+                        return [
                             "status"  => 0,
                             "message" => "Internal database error.",
-                        ] );
-                        wp_die();
-                        return;
+                        ];
                     } else {
                         $total_locked++;
                     }
@@ -1003,18 +1259,22 @@ class WBK_Request_Manager {
                         "day"        => $curent_day,
                         "status"     => $status,
                     ], ["%d", "%d", "%d"] ) === false ) {
-                        echo json_encode( [
+                        date_default_timezone_set( "UTC" );
+                        return [
                             "status"  => 0,
                             "message" => "Internal database error.",
-                        ] );
-                        wp_die();
-                        return;
+                        ];
                     }
                     $curent_day = strtotime( "tomorrow", $curent_day );
                     continue;
                 }
-                $day_time_start = WBK_Time_Math_Utils::adjust_times( $curent_day, $from, get_option( "wbk_timezone", "UTC" ) );
-                $day_time_end = WBK_Time_Math_Utils::adjust_times( $curent_day, $to, get_option( "wbk_timezone", "UTC" ) );
+                // Resolve from/to against midnight in the business timezone explicitly.
+                // Avoid relying solely on date_default_timezone_set(), which can stay on UTC
+                // in some REST/runtime environments and shift locks by the TZ offset.
+                $day_ymd = ( new DateTime("@" . $curent_day) )->setTimezone( $wbk_timezone )->format( "Y-m-d" );
+                $day_midnight = new DateTime($day_ymd . " 00:00:00", $wbk_timezone);
+                $day_time_start = WBK_Time_Math_Utils::adjust_times( $day_midnight->getTimestamp(), (int) $from, $timezone_string );
+                $day_time_end = WBK_Time_Math_Utils::adjust_times( $day_midnight->getTimestamp(), (int) $to, $timezone_string );
                 $i = 1;
                 $timeslots = $sp->get_time_slots_by_day( $curent_day, $service_id, [
                     "skip_gg_calendar"       => true,
@@ -1026,12 +1286,11 @@ class WBK_Request_Manager {
                         continue;
                     }
                     if ( $wpdb->query( $wpdb->prepare( "DELETE FROM " . get_option( "wbk_db_prefix", "" ) . "wbk_locked_time_slots WHERE time = %d and service_id = %d", $timeslot->get_start(), $service_id ) ) === false ) {
-                        echo json_encode( [
+                        date_default_timezone_set( "UTC" );
+                        return [
                             "status"  => 0,
                             "message" => "Internal database error.",
-                        ] );
-                        wp_die();
-                        return;
+                        ];
                     } else {
                         $total_locked++;
                     }
@@ -1040,12 +1299,11 @@ class WBK_Request_Manager {
                             "service_id" => $service_id,
                             "time"       => $timeslot->get_start(),
                         ], ["%d", "%d"] ) === false ) {
-                            echo json_encode( [
+                            date_default_timezone_set( "UTC" );
+                            return [
                                 "status"  => 0,
                                 "message" => "Internal database error.",
-                            ] );
-                            wp_die();
-                            return;
+                            ];
                         }
                     }
                     $i++;
@@ -1053,20 +1311,17 @@ class WBK_Request_Manager {
                 $curent_day = strtotime( "tomorrow", $curent_day );
             }
         }
+        date_default_timezone_set( "UTC" );
         if ( $lock_action == "lock" ) {
-            echo json_encode( [
+            return [
                 "status"  => 1,
                 "message" => __( "Total locked: ", "webba-booking-lite" ) . $total_locked,
-            ] );
-        } else {
-            echo json_encode( [
-                "status"  => 1,
-                "message" => __( "Total unlocked: ", "webba-booking-lite" ) . $total_locked,
-            ] );
+            ];
         }
-        date_default_timezone_set( "UTC" );
-        wp_die();
-        return;
+        return [
+            "status"  => 1,
+            "message" => __( "Total unlocked: ", "webba-booking-lite" ) . $total_locked,
+        ];
     }
 
     public function wbk_report_error() {
@@ -1485,6 +1740,17 @@ class WBK_Request_Manager {
                 "max_quantity"    => $extra->get_max_quantity(),
             ];
         }
+        $admin_theme = get_option( 'wbk_admin_theme', 'light' );
+        $admin_theme = ( $admin_theme === 'dark' ? 'dark' : 'light' );
+        $timezone_string = get_option( "wbk_timezone", "UTC" );
+        try {
+            $timezone_obj = new DateTimeZone($timezone_string);
+        } catch ( Exception $e ) {
+            $timezone_obj = new DateTimeZone("UTC");
+            $timezone_string = "UTC";
+        }
+        // Minutes east of UTC as negative values (Date.getTimezoneOffset / wbkGetTimezoneOffset).
+        $timezone_offset_minutes = (int) round( $timezone_obj->getOffset( new DateTime("now", $timezone_obj) ) * -1 / 60 );
         $data = [
             "services"                    => $services_arr,
             "categories"                  => $categories_arr,
@@ -1502,12 +1768,16 @@ class WBK_Request_Manager {
             "feature_display_config"      => WBK_Remote_Config::get_config(),
             "assistance_available"        => wbk_is_assistance_available(),
             "multiservice"                => WBK_Feature_Gate::have_required_plan( "start", "only_old_users" ),
+            "admin_theme"                 => $admin_theme,
             "settings"                    => [
                 "narrow_form"                        => get_option( "wbk_form_layout", "yes" ) !== "yes",
                 "week_start"                         => WBK_Date_Time_Utils::getStartOfWeek(),
                 "time_format"                        => WBK_Date_Time_Utils::get_time_format(),
                 "date_format"                        => WBK_Date_Time_Utils::get_date_format(),
-                "timezone"                           => get_option( "wbk_timezone", "UTC" ),
+                "wbk_date_format_backend"            => get_option( "wbk_date_format_backend", "inherit" ),
+                "wbk_date_format_time_slot_schedule" => get_option( "wbk_date_format_time_slot_schedule", "start-end" ),
+                "timezone"                           => $timezone_string,
+                "offset"                             => $timezone_offset_minutes,
                 "locale"                             => get_locale(),
                 "custom_fields"                      => WBK_Model_Utils::get_custom_fields_list(),
                 "is_admin"                           => current_user_can( "manage_options" ),
@@ -1667,12 +1937,9 @@ class WBK_Request_Manager {
                 "pay_now"                                 => get_option( "wbk_wording_pay_now", __( "Pay now", "webba-booking-lite" ) ),
                 "left_to_pay"                             => get_option( "wbk_wording_left_to_pay", __( "Left to pay", "webba-booking-lite" ) ),
                 "show_details"                            => get_option( "wbk_wording_show_details", __( "Show details", "webba-booking-lite" ) ),
-                "full_price"                              => get_option( "wbk_wording_full_price", __( "Full price", "webba-booking-lite" ) ),
-                "pay_now"                                 => get_option( "wbk_wording_pay_now", __( "Pay now", "webba-booking-lite" ) ),
+                "price"                                   => get_option( "wbk_wording_price", __( "Price", "webba-booking-lite" ) ),
                 "to_pay"                                  => get_option( "wbk_wording_to_pay", __( "To pay now", "webba-booking-lite" ) ),
                 "total_amount_tax_incl"                   => get_option( "wbk_wording_total_amount_tax_incl", __( "Total Amount (tax incl.)", "webba-booking-lite" ) ),
-                "left_to_pay"                             => get_option( "wbk_wording_left_to_pay", __( "Left to pay", "webba-booking-lite" ) ),
-                "show_details"                            => get_option( "wbk_wording_show_details", __( "Show details", "webba-booking-lite" ) ),
                 "hide_details"                            => get_option( "wbk_wording_hide_details", __( "Hide details", "webba-booking-lite" ) ),
                 "location"                                => get_option( "wbk_wording_location", __( "Location", "webba-booking-lite" ) ),
                 "select_location"                         => get_option( "wbk_wording_select_location", __( "Select location", "webba-booking-lite" ) ),
@@ -1684,6 +1951,24 @@ class WBK_Request_Manager {
                 "select_extras"                           => get_option( "wbk_wording_select_extras", __( "Select extras", "webba-booking-lite" ) ),
                 "choose_additional_services"              => get_option( "wbk_wording_choose_additional_services", __( "Choose additional items", "webba-booking-lite" ) ),
                 "additional_items"                        => get_option( "wbk_wording_additional_items", __( "Additional items", "webba-booking-lite" ) ),
+                "pay_full_amount"                         => get_option( 'wbk_wording_pay_full_amount', __( 'I want to pay full amount', 'webba-booking-lite' ) ),
+                "left_to_pay_later"                       => get_option( 'wbk_wording_left_to_pay_later', __( 'Left to pay later', 'webba-booking-lite' ) ),
+                "deposits"                                => get_option( 'wbk_wording_deposits', __( 'Deposits', 'webba-booking-lite' ) ),
+                "hide_summary"                            => get_option( 'wbk_wording_hide_summary', __( 'Hide summary', 'webba-booking-lite' ) ),
+                "total_booked_items"                      => get_option( "wbk_total_booked_items_label", __( "Total booked items", "webba-booking-lite" ) ),
+                "grand_total"                             => get_option( "wbk_grand_total_label", __( "Grand total", "webba-booking-lite" ) ),
+                "recurring_booking"                       => get_option( "wbk_wording_recurring_booking", __( "Recurring booking", "webba-booking-lite" ) ),
+                "recurring_booking_hint"                  => get_option( "wbk_wording_recurring_booking_hint", __( "This series exceeds the maximum number of slots allowed for this service.", "webba-booking-lite" ) ),
+                "recurring_booking_repeat_every"          => get_option( "wbk_wording_recurring_booking_repeat_every", __( "Repeat every", "webba-booking-lite" ) ),
+                "recurring_booking_interval"              => get_option( "wbk_wording_recurring_booking_interval", __( "Interval", "webba-booking-lite" ) ),
+                "recurring_booking_number_of_time_slots"  => get_option( "wbk_wording_recurring_booking_number_of_time_slots", __( "Number of time slots", "webba-booking-lite" ) ),
+                "loading_appointments"                    => get_option( "wbk_wording_loading_appointments", __( "Loading appointments...", "webba-booking-lite" ) ),
+                "no_appointments_selected"                => get_option( "wbk_wording_no_appointments_selected", __( "No appointments selected. Add slots using the controls above or close the popup.", "webba-booking-lite" ) ),
+                "unavailable"                             => get_option( "wbk_wording_unavailable", __( "unavailable", "webba-booking-lite" ) ),
+                "choose_another_time"                     => get_option( "wbk_wording_choose_another_time", __( "Choose another time", "webba-booking-lite" ) ),
+                "select_a_time"                           => get_option( "wbk_wording_select_a_time", __( "Select a time", "webba-booking-lite" ) ),
+                "adjusted"                                => get_option( "wbk_wording_adjusted", __( "adjusted", "webba-booking-lite" ) ),
+                "remove_appointment"                      => get_option( "wbk_wording_remove_appointment", __( "Remove appointment", "webba-booking-lite" ) ),
             ],
             "appearance"                  => WBK_Model_Utils::get_appearance_data(),
             "appearance_options"          => get_option( "wbk_appearance_options", [] ),
@@ -2241,6 +2526,31 @@ class WBK_Request_Manager {
             $response->set_status( 200 );
             return $response;
         }
+        $response = new \WP_REST_Response($auth_parameters);
+        $response->set_status( 200 );
+        return $response;
+    }
+
+    /**
+     * Permission for Gmail auth data
+     *
+     * @param WP_REST_Request $request
+     * @return boolean
+     */
+    public function get_gmail_auth_data_permission( $request ) : bool {
+        return current_user_can( "manage_options" );
+    }
+
+    /**
+     * Returns Gmail auth status and authorize/revoke URLs
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function get_gmail_auth_data( WP_REST_Request $request ) : WP_REST_Response {
+        WBK_Translation_Processor::switch_to_locale_from_get_param();
+        $webba_connect = new WBK_Webba_Connect();
+        $auth_parameters = $webba_connect->get_gmail_auth_parameters();
         $response = new \WP_REST_Response($auth_parameters);
         $response->set_status( 200 );
         return $response;
@@ -2823,15 +3133,22 @@ class WBK_Request_Manager {
                     }
                     foreach ( $timeslots as $slot ) {
                         $start = $slot->get_start();
+                        $is_locked = (int) $slot->get_status() === -2;
                         if ( !isset( $slots_by_start[$start] ) ) {
                             $slots_by_start[$start] = [
                                 "slot"             => $slot,
                                 "staff_member_ids" => [],
                                 "free_places"      => 0,
+                                "locked_count"     => 0,
+                                "slot_count"       => 0,
                             ];
                         }
                         $slots_by_start[$start]["staff_member_ids"][] = $staff_id;
                         $slots_by_start[$start]["free_places"] += $slot->get_free_places();
+                        $slots_by_start[$start]["slot_count"]++;
+                        if ( $is_locked ) {
+                            $slots_by_start[$start]["locked_count"]++;
+                        }
                     }
                 }
                 ksort( $slots_by_start );
@@ -2843,6 +3160,7 @@ class WBK_Request_Manager {
                         "formatted_time"       => $item["slot"]->get_formated_time(),
                         "formatted_time_local" => $item["slot"]->get_formated_time_local(),
                         "staff_member_ids"     => $item["staff_member_ids"],
+                        "is_locked"            => $item["slot_count"] > 0 && $item["locked_count"] === $item["slot_count"],
                     ];
                 }, array_values( $slots_by_start ) );
             } else {
@@ -2864,6 +3182,7 @@ class WBK_Request_Manager {
                         "free_places"          => $slot->get_free_places(),
                         "formatted_time"       => $slot->get_formated_time(),
                         "formatted_time_local" => $slot->get_formated_time_local(),
+                        "is_locked"            => (int) $slot->get_status() === -2,
                     ];
                     if ( $staff_member_id !== null ) {
                         $result["staff_member_ids"] = [$staff_member_id];
@@ -2871,6 +3190,12 @@ class WBK_Request_Manager {
                     return $result;
                 }, $timeslots );
             }
+            $formatted_slots = apply_filters(
+                "wbk_frontend_time_slots",
+                $formatted_slots,
+                $service_id,
+                $day_to_render
+            );
             return new WP_REST_Response([
                 "service_id" => $service_id,
                 "date"       => date( "Y-m-d", $day_to_render ),
@@ -3333,11 +3658,12 @@ class WBK_Request_Manager {
                 }
             }
             if ( !WBK_Feature_Gate::have_required_plan( "standard" ) || $found_forms === false ) {
-                // user is free, so we return the default fields
                 $found_forms = true;
                 $all_fields = WBK_Form_Builder_Utils::get_default_fields();
-                $all_fields = array_map( function ( $field ) {
-                    return WBK_Translation_Processor::translate_form_field( $field, "default" );
+                $default_form_id = WBK_Form_Builder_Utils::get_default_form_id();
+                $translate_key = ( $default_form_id ? $default_form_id : "default" );
+                $all_fields = array_map( function ( $field ) use($translate_key) {
+                    return WBK_Translation_Processor::translate_form_field( $field, $translate_key );
                 }, $all_fields );
             }
             if ( !$found_forms ) {
@@ -3625,6 +3951,12 @@ class WBK_Request_Manager {
             $params["staff"] = [];
         }
         $params["location"] = ( isset( $params["location"] ) ? json_decode( $params["location"], true ) : null );
+        if ( isset( $params["number_of_people"] ) && is_string( $params["number_of_people"] ) ) {
+            $decoded_people = json_decode( $params["number_of_people"], true );
+            if ( json_last_error() === JSON_ERROR_NONE ) {
+                $params["number_of_people"] = $decoded_people;
+            }
+        }
         // Validate required fields
         $required_fields = [
             "first_name",
@@ -3826,6 +4158,20 @@ class WBK_Request_Manager {
             }
             if ( !empty( $ordered_extras_lines ) ) {
                 $booking_data["booking_extra"] = $this->encode_booking_extra_field_from_ordered_lines( $ordered_extras_lines );
+            }
+            if ( isset( $params["number_of_people"] ) ) {
+                $number_of_people = $params["number_of_people"];
+                if ( is_string( $number_of_people ) ) {
+                    $decoded_people = json_decode( $number_of_people, true );
+                    if ( json_last_error() === JSON_ERROR_NONE ) {
+                        $number_of_people = $decoded_people;
+                    }
+                }
+                if ( is_array( $number_of_people ) ) {
+                    $booking_data["number_of_people"] = wp_json_encode( $number_of_people );
+                } elseif ( is_numeric( $number_of_people ) ) {
+                    $booking_data["number_of_people"] = (string) (int) $number_of_people;
+                }
             }
             // Validate time slot availability
             $day = $days[$i];
@@ -4929,6 +5275,8 @@ class WBK_Request_Manager {
                     "sub_type"              => ( isset( $field_args["sub_type"] ) ? $field_args["sub_type"] : "" ),
                     "dependent_value"       => ( isset( $field_args["dependent_value"] ) ? $field_args["dependent_value"] : "" ),
                     "searchable"            => ( isset( $field_args["searchable"] ) ? $field_args["searchable"] : false ),
+                    "radio_type"            => ( isset( $field_args["radio_type"] ) ? $field_args["radio_type"] : "" ),
+                    "column_count"          => ( isset( $field_args["column_count"] ) ? intval( $field_args["column_count"] ) : null ),
                 ];
                 // Add extra field-specific data
                 if ( isset( $field_args["extra"] ) ) {
@@ -4972,10 +5320,12 @@ class WBK_Request_Manager {
             "render_textarea"        => "textarea",
             "render_checkbox"        => "checkbox",
             "render_select"          => "select",
+            "render_radio"           => "radio",
             "render_select_multiple" => "select_multiple",
             "render_editor"          => "editor",
             "render_google_connect"  => "google_connect",
             "render_zoom_auth"       => "zoom_auth",
+            "render_gmail_auth"      => "gmail_auth",
             "render_duration"        => "duration",
             "render_date_multiple"   => "date_multiple",
             "render_business_hours"  => "business_hours",
@@ -5164,6 +5514,41 @@ class WBK_Request_Manager {
         $data["priceFormat"] = $price_format;
         $data["isPro"] = $pro_version;
         $response = new \WP_REST_Response($data);
+        $response->set_status( 200 );
+        return $response;
+    }
+
+    /**
+     * Check if user has permission to save admin theme.
+     *
+     * @param WP_REST_Request $request
+     * @return boolean
+     */
+    public function save_admin_theme_permission( WP_REST_Request $request ) : bool {
+        return current_user_can( "manage_options" );
+    }
+
+    /**
+     * Persist admin light/dark theme preference.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function save_admin_theme( WP_REST_Request $request ) : WP_REST_Response {
+        $theme = sanitize_text_field( (string) $request->get_param( "theme" ) );
+        if ( $theme !== "dark" && $theme !== "light" ) {
+            $response = new \WP_REST_Response([
+                "status"  => "error",
+                "message" => __( "Invalid theme value", "webba-booking-lite" ),
+            ]);
+            $response->set_status( 400 );
+            return $response;
+        }
+        update_option( "wbk_admin_theme", $theme );
+        $response = new \WP_REST_Response([
+            "status" => "success",
+            "theme"  => $theme,
+        ]);
         $response->set_status( 200 );
         return $response;
     }
@@ -5458,6 +5843,405 @@ class WBK_Request_Manager {
         }
     }
 
+    /**
+     * Permission for get-schedule: admins or users with access to the service.
+     *
+     * @param WP_REST_Request $request
+     * @return bool
+     */
+    public function get_schedule_permission( $request ) : bool {
+        if ( current_user_can( "manage_options" ) ) {
+            return true;
+        }
+        $service_id = $request->get_param( "service_id" );
+        if ( !WBK_Validator::check_integer( $service_id, 1, 9999999 ) ) {
+            return false;
+        }
+        return WBK_Validator::check_access_to_service( $service_id );
+    }
+
+    /**
+     * Load a month of schedule data with locked/unlocked days and time slots.
+     * Based on the legacy wbk_schedule_load AJAX action.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function get_schedule( WP_REST_Request $request ) : WP_REST_Response {
+        try {
+            WBK_Translation_Processor::switch_to_locale_from_get_param();
+            date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+            $service_id = $request->get_param( "service_id" );
+            $month = $request->get_param( "month" );
+            if ( !WBK_Validator::check_integer( $service_id, 1, 9999999 ) ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid service ID",
+                ], 400);
+            }
+            $service_id = (int) $service_id;
+            if ( $month === null || $month === "" ) {
+                $month = date( "Y-m" );
+            }
+            if ( !preg_match( '/^\\d{4}-\\d{2}$/', (string) $month ) ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid month format. Expected YYYY-MM.",
+                ], 400);
+            }
+            $month_start = strtotime( $month . "-01 00:00:00" );
+            if ( $month_start === false ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid month value",
+                ], 400);
+            }
+            $days_in_month = (int) date( "t", $month_start );
+            if ( !current_user_can( "manage_options" ) ) {
+                if ( !WBK_Validator::check_access_to_service( $service_id ) ) {
+                    return new WP_REST_Response([
+                        "error" => "Unauthorised access.",
+                    ], 403);
+                }
+            }
+            $service = new WBK_Service($service_id);
+            if ( !$service->is_loaded() ) {
+                return new WP_REST_Response([
+                    "error" => "Service not found",
+                ], 404);
+            }
+            $sp = new WBK_Schedule_Processor();
+            $sp->load_data();
+            $day_to_render = $month_start;
+            $month_end = strtotime( "+1 month", $month_start );
+            $date_format = WBK_Format_Utils::get_date_format();
+            $locked_days_for_service = [];
+            $all_locked_days = $sp->get_locked_days();
+            if ( isset( $all_locked_days[$service_id] ) && is_array( $all_locked_days[$service_id] ) ) {
+                $locked_days_for_service = array_map( "intval", $all_locked_days[$service_id] );
+            }
+            $unlocked_days_for_service = [];
+            $all_unlocked_days = $sp->get_unlocked_days();
+            if ( isset( $all_unlocked_days[$service_id] ) && is_array( $all_unlocked_days[$service_id] ) ) {
+                $unlocked_days_for_service = array_map( "intval", $all_unlocked_days[$service_id] );
+            }
+            // Read locked time slots directly from DB for this service + month.
+            global $wpdb;
+            $locked_slots_table = get_option( "wbk_db_prefix", "" ) . "wbk_locked_time_slots";
+            $locked_slot_times = $wpdb->get_col( $wpdb->prepare(
+                "SELECT time FROM {$locked_slots_table} WHERE service_id = %d AND time >= %d AND time < %d ORDER BY time ASC",
+                $service_id,
+                $month_start,
+                $month_end
+            ) );
+            if ( !is_array( $locked_slot_times ) ) {
+                $locked_slot_times = [];
+            }
+            $locked_time_slots = [];
+            $locked_time_slots_by_day = [];
+            foreach ( $locked_slot_times as $slot_time ) {
+                $slot_time = (int) $slot_time;
+                if ( $slot_time <= 0 ) {
+                    continue;
+                }
+                $locked_time_slots[] = $slot_time;
+                $slot_day = strtotime( date( "Y-m-d", $slot_time ) . " 00:00:00" );
+                $locked_time_slots_by_day[$slot_day][] = [
+                    "start_time" => $slot_time,
+                    "is_locked"  => true,
+                ];
+            }
+            $days = [];
+            $locked_days = [];
+            $unlocked_days = [];
+            for ($i = 1; $i <= $days_in_month; $i++) {
+                date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+                $day_status = $sp->get_day_status( $day_to_render, $service_id );
+                $is_day_locked = in_array( (int) $day_to_render, $locked_days_for_service, true );
+                $is_day_unlocked = in_array( (int) $day_to_render, $unlocked_days_for_service, true );
+                if ( $is_day_locked ) {
+                    $locked_days[] = (int) $day_to_render;
+                }
+                if ( $is_day_unlocked ) {
+                    $unlocked_days[] = (int) $day_to_render;
+                }
+                $days[] = [
+                    "day"            => (int) $day_to_render,
+                    "date"           => date( "Y-m-d", $day_to_render ),
+                    "formatted_date" => wp_date( $date_format, $day_to_render, new DateTimeZone(date_default_timezone_get()) ),
+                    "day_status"     => (int) $day_status,
+                    "is_locked"      => $is_day_locked,
+                    "is_unlocked"    => $is_day_unlocked,
+                    "time_slots"     => $locked_time_slots_by_day[(int) $day_to_render] ?? [],
+                ];
+                $day_to_render = strtotime( "tomorrow", $day_to_render );
+            }
+            return new WP_REST_Response([
+                "service_id"        => $service_id,
+                "month"             => $month,
+                "month_start"       => (int) $month_start,
+                "days"              => $days,
+                "locked_days"       => $locked_days,
+                "unlocked_days"     => $unlocked_days,
+                "locked_time_slots" => $locked_time_slots,
+            ], 200);
+        } catch ( \Exception $e ) {
+            return new WP_REST_Response([
+                "error" => "Internal server error",
+            ], 500);
+        } finally {
+            date_default_timezone_set( "UTC" );
+        }
+    }
+
+    /**
+     * Permission for schedule lock/unlock endpoints.
+     * Admins or users with access to the given service.
+     *
+     * @param WP_REST_Request $request
+     * @return bool
+     */
+    public function schedule_lock_permission( $request ) : bool {
+        if ( current_user_can( "manage_options" ) ) {
+            return true;
+        }
+        $service_id = $request->get_param( "service_id" );
+        if ( !WBK_Validator::check_integer( $service_id, 1, 9999999 ) ) {
+            return false;
+        }
+        return WBK_Validator::check_access_to_service( $service_id );
+    }
+
+    /**
+     * Validate service access and IDs for schedule lock operations.
+     *
+     * @param mixed $service_id
+     * @return int|WP_REST_Response
+     */
+    private function validate_schedule_lock_service( $service_id ) {
+        if ( !WBK_Validator::check_integer( $service_id, 1, 9999999 ) ) {
+            return new WP_REST_Response([
+                "error" => "Invalid service ID",
+            ], 400);
+        }
+        $service_id = (int) $service_id;
+        if ( !current_user_can( "manage_options" ) ) {
+            if ( !WBK_Validator::check_access_to_service( $service_id ) ) {
+                return new WP_REST_Response([
+                    "error" => "Unauthorised access.",
+                ], 403);
+            }
+        }
+        $service = new WBK_Service($service_id);
+        if ( !$service->is_loaded() ) {
+            return new WP_REST_Response([
+                "error" => "Service not found",
+            ], 404);
+        }
+        return $service_id;
+    }
+
+    /**
+     * Validate a unix timestamp used for day/time lock operations.
+     *
+     * @param mixed $value
+     * @param string $field
+     * @return int|WP_REST_Response
+     */
+    private function validate_schedule_lock_timestamp( $value, string $field ) {
+        if ( !WBK_Validator::check_integer( $value, 1438426800, 2754046000 ) ) {
+            return new WP_REST_Response([
+                "error" => "Invalid {$field} value",
+            ], 400);
+        }
+        return (int) $value;
+    }
+
+    /**
+     * Lock a service day. Based on legacy wbk_lock_day AJAX action.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function lock_day( WP_REST_Request $request ) : WP_REST_Response {
+        global $wpdb;
+        try {
+            date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+            $service_id = $this->validate_schedule_lock_service( $request->get_param( "service_id" ) );
+            if ( $service_id instanceof WP_REST_Response ) {
+                return $service_id;
+            }
+            $day = $this->validate_schedule_lock_timestamp( $request->get_param( "day" ), "day" );
+            if ( $day instanceof WP_REST_Response ) {
+                return $day;
+            }
+            $table = get_option( "wbk_db_prefix", "" ) . "wbk_days_on_off";
+            if ( $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE day = %d AND service_id = %d", $day, $service_id ) ) === false ) {
+                return new WP_REST_Response([
+                    "error" => "Internal database error.",
+                ], 500);
+            }
+            if ( $wpdb->insert( $table, [
+                "service_id" => $service_id,
+                "day"        => $day,
+                "status"     => 0,
+            ], ["%d", "%d", "%d"] ) === false ) {
+                return new WP_REST_Response([
+                    "error" => "Internal database error.",
+                ], 500);
+            }
+            return new WP_REST_Response([
+                "status"      => "success",
+                "service_id"  => $service_id,
+                "day"         => $day,
+                "date"        => date( "Y-m-d", $day ),
+                "is_locked"   => true,
+                "is_unlocked" => false,
+            ], 200);
+        } catch ( \Exception $e ) {
+            return new WP_REST_Response([
+                "error" => "Internal server error",
+            ], 500);
+        } finally {
+            date_default_timezone_set( "UTC" );
+        }
+    }
+
+    /**
+     * Unlock a service day. Based on legacy wbk_unlock_day AJAX action.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function unlock_day( WP_REST_Request $request ) : WP_REST_Response {
+        global $wpdb;
+        try {
+            date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+            $service_id = $this->validate_schedule_lock_service( $request->get_param( "service_id" ) );
+            if ( $service_id instanceof WP_REST_Response ) {
+                return $service_id;
+            }
+            $day = $this->validate_schedule_lock_timestamp( $request->get_param( "day" ), "day" );
+            if ( $day instanceof WP_REST_Response ) {
+                return $day;
+            }
+            $table = get_option( "wbk_db_prefix", "" ) . "wbk_days_on_off";
+            if ( $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE day = %d AND service_id = %d", $day, $service_id ) ) === false ) {
+                return new WP_REST_Response([
+                    "error" => "Internal database error.",
+                ], 500);
+            }
+            if ( $wpdb->insert( $table, [
+                "service_id" => $service_id,
+                "day"        => $day,
+                "status"     => 1,
+            ], ["%d", "%d", "%d"] ) === false ) {
+                return new WP_REST_Response([
+                    "error" => "Internal database error.",
+                ], 500);
+            }
+            return new WP_REST_Response([
+                "status"      => "success",
+                "service_id"  => $service_id,
+                "day"         => $day,
+                "date"        => date( "Y-m-d", $day ),
+                "is_locked"   => false,
+                "is_unlocked" => true,
+            ], 200);
+        } catch ( \Exception $e ) {
+            return new WP_REST_Response([
+                "error" => "Internal server error",
+            ], 500);
+        } finally {
+            date_default_timezone_set( "UTC" );
+        }
+    }
+
+    /**
+     * Lock a service time slot. Based on legacy wbk_lock_time AJAX action.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function lock_time( WP_REST_Request $request ) : WP_REST_Response {
+        global $wpdb;
+        try {
+            date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+            $service_id = $this->validate_schedule_lock_service( $request->get_param( "service_id" ) );
+            if ( $service_id instanceof WP_REST_Response ) {
+                return $service_id;
+            }
+            $time = $this->validate_schedule_lock_timestamp( $request->get_param( "time" ), "time" );
+            if ( $time instanceof WP_REST_Response ) {
+                return $time;
+            }
+            $table = get_option( "wbk_db_prefix", "" ) . "wbk_locked_time_slots";
+            if ( $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE time = %d AND service_id = %d", $time, $service_id ) ) === false ) {
+                return new WP_REST_Response([
+                    "error" => "Internal database error.",
+                ], 500);
+            }
+            if ( $wpdb->insert( $table, [
+                "service_id" => $service_id,
+                "time"       => $time,
+            ], ["%d", "%d"] ) === false ) {
+                return new WP_REST_Response([
+                    "error" => "Internal database error.",
+                ], 500);
+            }
+            return new WP_REST_Response([
+                "status"     => "success",
+                "service_id" => $service_id,
+                "time"       => $time,
+                "date"       => date( "Y-m-d", $time ),
+                "is_locked"  => true,
+            ], 200);
+        } catch ( \Exception $e ) {
+            return new WP_REST_Response([
+                "error" => "Internal server error",
+            ], 500);
+        } finally {
+            date_default_timezone_set( "UTC" );
+        }
+    }
+
+    /**
+     * Unlock a service time slot. Based on legacy wbk_unlock_time AJAX action.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function unlock_time( WP_REST_Request $request ) : WP_REST_Response {
+        global $wpdb;
+        try {
+            date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+            $service_id = $this->validate_schedule_lock_service( $request->get_param( "service_id" ) );
+            if ( $service_id instanceof WP_REST_Response ) {
+                return $service_id;
+            }
+            $time = $this->validate_schedule_lock_timestamp( $request->get_param( "time" ), "time" );
+            if ( $time instanceof WP_REST_Response ) {
+                return $time;
+            }
+            $table = get_option( "wbk_db_prefix", "" ) . "wbk_locked_time_slots";
+            if ( $wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE time = %d AND service_id = %d", $time, $service_id ) ) === false ) {
+                return new WP_REST_Response([
+                    "error" => "Internal database error.",
+                ], 500);
+            }
+            return new WP_REST_Response([
+                "status"     => "success",
+                "service_id" => $service_id,
+                "time"       => $time,
+                "date"       => date( "Y-m-d", $time ),
+                "is_locked"  => false,
+            ], 200);
+        } catch ( \Exception $e ) {
+            return new WP_REST_Response([
+                "error" => "Internal server error",
+            ], 500);
+        } finally {
+            date_default_timezone_set( "UTC" );
+        }
+    }
+
     public function get_time_slots_permission( $request ) {
         return is_user_logged_in();
     }
@@ -5465,29 +6249,31 @@ class WBK_Request_Manager {
     public function get_time_slots( $request ) {
         WBK_Translation_Processor::switch_to_locale_from_get_param();
         $day = explode( "00:00:00", $request["date"] );
-        $day = $day[0];
+        $day = trim( $day[0] );
         if ( !WBK_Validator::is_date( $day ) ) {
             return $this->response_error( "Wrong date." );
         }
         date_default_timezone_set( "UTC" );
-        $day = date( "d-m-Y", strtotime( $day ) - $request["offset"] * 60 );
+        $offset = ( isset( $request["offset"] ) ? (int) $request["offset"] : 0 );
+        $day = date( "d-m-Y", strtotime( $day ) - $offset * 60 );
         date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
         $day = strtotime( $day . " 00:00:00" );
         $services = [];
         if ( isset( $request["services"] ) && $request["services"] != "" ) {
             $services = explode( ",", $request["services"] );
         }
-        if ( isset( $request["booking"] ) ) {
-            if ( ctype_digit( $request["booking"] ) ) {
-                $booking = new WBK_Booking($request["booking"]);
-                if ( $booking->is_loaded() ) {
-                    $services = [$booking->get_service()];
-                }
+        $booking = null;
+        if ( isset( $request["booking"] ) && ctype_digit( (string) $request["booking"] ) ) {
+            $candidate = new WBK_Booking($request["booking"]);
+            if ( $candidate->is_loaded() ) {
+                $booking = $candidate;
+                $services = [$booking->get_service()];
             }
         }
         if ( count( $services ) == 0 ) {
             return $this->response_error( "No valid services found." );
         }
+        $filtered = [];
         foreach ( $services as $service_id ) {
             if ( !WBK_Validator::is_service_exists( $service_id ) ) {
                 return $this->response_error( "Wrong service ID." );
@@ -5499,11 +6285,13 @@ class WBK_Request_Manager {
                 "calculate_availability" => true,
                 "filter_availability"    => false,
             ] );
-            if ( $booking->is_loaded() ) {
-                $filtered = array_values( array_filter( $timeslots, fn( $obj ) => $obj->get_free_places() >= $booking->get_quantity() ) );
-            } else {
-                $filtered = $timeslots;
+            if ( !is_array( $timeslots ) ) {
+                $timeslots = [];
             }
+            if ( $booking !== null ) {
+                $timeslots = array_values( array_filter( $timeslots, fn( $obj ) => $obj->get_free_places() >= $booking->get_quantity() ) );
+            }
+            $filtered = $timeslots;
         }
         return new \WP_REST_Response([
             "status"    => "success",

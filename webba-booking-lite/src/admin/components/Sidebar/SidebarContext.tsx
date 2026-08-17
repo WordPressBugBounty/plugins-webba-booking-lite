@@ -2,6 +2,7 @@ import {
     createContext,
     PropsWithChildren,
     ReactElement,
+    useCallback,
     useContext,
     useState,
 } from 'react'
@@ -51,23 +52,23 @@ export const SidebarProvider = ({ children }: PropsWithChildren) => {
     const [height, setHeight] = useState<Height>('medium')
     const [position, setPosition] = useState<Position>('top')
 
-    const open = (element: ReactElement, options: OpenOptions = {}) => {
+    const open = useCallback((element: ReactElement, options: OpenOptions = {}) => {
         setShown(true)
         setElement(element)
         setView(options.view || 'modal')
         setWidth(options.width || 'small')
         setHeight(options.height || 'medium')
         setPosition(options.position || 'top')
-    }
+    }, [])
 
-    const close = () => {
+    const close = useCallback(() => {
         setShown(false)
         // Wait for closing animation to complete before removing element
         // Add extra time to ensure animation is fully visible
         setTimeout(() => {
             setElement(null)
         }, 350)
-    }
+    }, [])
 
     const contextValue: SidebarContextValue = {
         shown,

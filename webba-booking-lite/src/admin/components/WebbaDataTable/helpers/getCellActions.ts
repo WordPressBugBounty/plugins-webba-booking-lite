@@ -20,6 +20,13 @@ export const getCellActions = ({ cell, collectionName }: CellActionsParams) => {
             name: `Copy of ${cell.row.original.name}`,
         }
 
+        if (
+            collectionName === 'forms' ||
+            collectionName === 'email_templates'
+        ) {
+            update.is_default = ''
+        }
+
         Object.keys(update).forEach((key) => {
             if (update[key] === null) {
                 update[key] = ''

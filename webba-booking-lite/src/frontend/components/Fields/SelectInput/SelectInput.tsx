@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import { useField } from '../../Form/hooks/useField'
 import { IFieldProps, IOption } from '../../Form/types'
+import '../Fields.scss'
 import './SelectInput.scss'
 import Select from 'react-select'
 
@@ -23,6 +24,7 @@ export const SelectInput = ({ fieldConstructor, anyTouched }: IFieldProps) => {
         <div
             className={classNames('wbk_input wbk_input__select', {
                 'wbk_input--half-width': width === 'half-width',
+                'wbk_input__select--error': showError,
             })}
         >
             <Select
@@ -39,10 +41,9 @@ export const SelectInput = ({ fieldConstructor, anyTouched }: IFieldProps) => {
                 placeholder={placeholder}
                 name={slug}
                 onBlur={() => setTouched(true)}
-                classNames={{
-                    control: () => 'wbk_input__main wbk_input__select__input',
-                    option: () => 'wbk_input__select__option',
-                }}
+                className="wbk_input__select"
+                classNamePrefix="wbk_input__select"
+                unstyled
             />
             {showError && <div className={'wbk_input__error'}>{errors[0]}</div>}
         </div>

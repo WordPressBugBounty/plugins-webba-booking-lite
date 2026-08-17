@@ -20,18 +20,18 @@
 
 .wbk_formLabel__label {
     font-size: 14px;
-    color: #111827;
+    color: colors.$off-black;
 }
 
 .wbk_formLabel__tooltip {
     position: absolute;
-    background: #212121;
+    background: colors.$off-black;
     padding: 5px;
     border-radius: 10px 10px 10px 10px;
     font-size: 12px;
     min-width: 110px;
     text-align: center;
-    color: #fff;
+    color: colors.$text-white;
     width: 137px;
     z-index: 9999999999;
     transform: translateY(-100%);
@@ -44,7 +44,7 @@
         position: absolute;
         top: 100%;
         left: 10px;
-        border-top: 10px solid #212121;
+        border-top: 10px solid colors.$off-black;
         border-right: 5px solid transparent;
         border-bottom: 0;
         border-left: 5px solid transparent;
@@ -54,15 +54,11 @@
 .wbk_formLabel__description {
     width: 100%;
     margin-top: 5px;
-    background: #fff;
-    font-size: 14px;
-    line-height: 1.5;
+    background: colors.$background-white;
     font-family: typography.$font-primary;
     font-weight: 300;
-    font-style: Regular;
     font-size: 12px;
-    leading-trim: NONE;
     line-height: 20px;
     letter-spacing: 0%;
-    color: #6b7280;
+    color: colors.$light-grey;
 }

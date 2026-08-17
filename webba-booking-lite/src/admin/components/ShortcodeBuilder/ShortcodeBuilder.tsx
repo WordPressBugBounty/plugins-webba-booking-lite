@@ -21,8 +21,17 @@ import {
     pruneSelections,
     staffMatchesShortcodeFilters,
 } from './utils'
+import { getAdminSelectStyles } from '../../utils/adminSelectStyles'
 
 type TOption = { value: string; label: string }
+
+const selectStyles = getAdminSelectStyles({
+    control: (base: Record<string, unknown>) => ({
+        ...base,
+        minHeight: 40,
+        borderRadius: 8,
+    }),
+})
 
 const sameIdSet = (a: string[], b: string[]) => {
     if (a.length !== b.length) return false
@@ -315,6 +324,7 @@ export const ShortcodeBuilder = () => {
                         <label>{__('Service type', 'webba-booking-lite')}</label>
                         <Select
                             classNamePrefix="wbk_select"
+                            styles={selectStyles}
                             options={serviceTypeOptions}
                             value={
                                 serviceTypeOptions.find(
@@ -339,6 +349,7 @@ export const ShortcodeBuilder = () => {
                         </label>
                         <Select
                             classNamePrefix="wbk_select"
+                            styles={selectStyles}
                             placeholder={
                                 isDailyServiceType
                                     ? __('Select daily service...', 'webba-booking-lite')
@@ -364,6 +375,7 @@ export const ShortcodeBuilder = () => {
                         <Select
                             isMulti
                             classNamePrefix="wbk_select"
+                            styles={selectStyles}
                             placeholder={__('Select Categories...', 'webba-booking-lite')}
                             options={categoryOptions}
                             value={categoryOptions.filter((o) =>
@@ -380,6 +392,7 @@ export const ShortcodeBuilder = () => {
                         <Select
                             isMulti
                             classNamePrefix="wbk_select"
+                            styles={selectStyles}
                             placeholder={__('Select Locations...', 'webba-booking-lite')}
                             options={locationOptions}
                             value={locationOptions.filter((o) =>
@@ -397,6 +410,7 @@ export const ShortcodeBuilder = () => {
                             <Select
                                 isMulti
                                 classNamePrefix="wbk_select"
+                                styles={selectStyles}
                                 placeholder={__('Select Staff...', 'webba-booking-lite')}
                                 options={staffOptions}
                                 value={staffOptions.filter((o) =>

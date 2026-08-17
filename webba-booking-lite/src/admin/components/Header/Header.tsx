@@ -1,7 +1,6 @@
-import { Page, Route } from '../Router/types'
+import { Route } from '../Router/types'
 import { useRoute } from '../Router/useRoute'
 import './Header.scss'
-import { usePage } from '../Router/usePage'
 import { __ } from '@wordpress/i18n'
 import { useMemo, useCallback, useState } from 'react'
 import { useDispatch, useSelect } from '@wordpress/data'
@@ -11,6 +10,7 @@ import { useOpenSettingsSection } from '../Settings/utils/utils'
 import { useSidebar } from '../Sidebar/SidebarContext'
 import { ShortcodeBuilder } from '../ShortcodeBuilder/ShortcodeBuilder'
 import { ReactComponent as GeneratorIcon } from '../../../../public/images/icon-plus-green.svg'
+import { useTheme } from '../../providers/ThemeProvider/ThemeProvider'
 
 interface TabConfig {
     route: Route
@@ -24,11 +24,83 @@ const ROUTE_TO_SETTINGS_SECTION: Partial<Record<Route, string>> = {
     bookings: 'wbk_advanced_booking_rules_section',
 }
 
+const DOCUMENTATION_URL = 'https://webba-booking.com/documentation'
+
+const MoonIcon = () => (
+    <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+    >
+        <path
+            d="M21 14.3A9 9 0 0 1 9.7 3 7 7 0 1 0 21 14.3Z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+    </svg>
+)
+
+const SunIcon = () => (
+    <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+    >
+        <circle
+            cx="12"
+            cy="12"
+            r="4"
+            stroke="currentColor"
+            strokeWidth="1.8"
+        />
+        <path
+            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+        />
+    </svg>
+)
+
+const SettingsIcon = () => (
+    <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+    >
+        <path
+            d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+        <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852 1.01 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+    </svg>
+)
+
 export const Header = () => {
-    const { page } = usePage()
-    const { setRoute, route } = useRoute()
+    const { route } = useRoute()
     const openSettingsSection = useOpenSettingsSection()
     const sidebar = useSidebar()
+    const { isDarkMode, toggleTheme } = useTheme()
     const { admin_url } = useSelect(
         // @ts-ignore
         (select) => select(store_name).getPreset(),
@@ -52,6 +124,14 @@ export const Header = () => {
         }
     }, [isRelaunchingOnboarding, relaunchOnboarding])
 
+    const settingsLabel = __('Settings', 'webba-booking-lite')
+    const supportUrl = admin_url
+        ? `${admin_url}admin.php?page=wbk-main-contact`
+        : undefined
+    const settingsUrl = admin_url
+        ? `${admin_url}admin.php?page=wbk-options`
+        : undefined
+
     const dataAssetsTabs: TabConfig[] = useMemo(
         () => [
             {
@@ -72,67 +152,84 @@ export const Header = () => {
             },
             {
                 route: 'calendar',
-                slug: 'wbk-calendar',
                 label: __('Calendar', 'webba-booking-lite'),
             },
             {
                 route: 'settings',
-                slug: 'wbk-settings',
                 url: admin_url + 'admin.php?page=wbk-options',
                 label: __('Settings', 'webba-booking-lite'),
             },
             {
                 route: 'coupons',
-                slug: 'wbk-coupons',
                 label: __('Coupons', 'webba-booking-lite'),
             },
             {
                 route: 'pricing-rules',
-                slug: 'wbk-pricing-rules',
                 label: __('Pricing rules', 'webba-booking-lite'),
             },
             {
                 route: 'email-templates',
-                slug: 'wbk-email-templates',
                 label: __('Email notifications', 'webba-booking-lite'),
             },
             {
                 route: 'connected-calendars',
-                slug: 'wbk-gg-calendars',
                 label: __('Google calendars', 'webba-booking-lite'),
             },
             {
                 route: 'form-builder',
-                slug: 'wbk-form-builder',
                 label: __('Form builder', 'webba-booking-lite'),
             },
             {
                 route: 'appearance',
-                slug: 'wbk-appearance',
                 label: __('Appearance', 'webba-booking-lite'),
             },
         ],
         [admin_url]
     )
 
-    // const pageToTabMap: Record<Page, TabConfig[]> = useMemo(() => {
-    //     return {
-    //         'wbk-services': dataAssetsTabs,
-    //         'wbk-pricing-rules': dataAssetsTabs,
-    //         'wbk-email-templates': dataAssetsTabs,
-    //         'wbk-coupons': dataAssetsTabs,
-    //         'wbk-gg-calendars': dataAssetsTabs,
-    //         'wbk-service-categories': dataAssetsTabs,
-    //         'wbk-calendar': dataAssetsTabs,
-    //         'wbk-appointments': dataAssetsTabs,
-    //         'wbk-dashboard': dataAssetsTabs,
-    //         'wbk-settings': dataAssetsTabs,
-    //     }
-    // }, [dataAssetsTabs])
-
     const pageTitle = useMemo(() => {
         return dataAssetsTabs.find((tab) => tab.route === route)?.label
     }, [route, dataAssetsTabs])
+
+    const darkModeLabel = isDarkMode
+        ? __('Switch to light mode', 'webba-booking-lite')
+        : __('Switch to dark mode', 'webba-booking-lite')
+
+    const renderSettingsControl = () => {
+        if (ROUTE_TO_SETTINGS_SECTION[route]) {
+            return (
+                <button
+                    type="button"
+                    className="wbk_header__settingsIconButton"
+                    data-feature-tour="header-settings"
+                    title={settingsLabel}
+                    aria-label={settingsLabel}
+                    onClick={() =>
+                        openSettingsSection(ROUTE_TO_SETTINGS_SECTION[route]!)
+                    }
+                >
+                    <SettingsIcon />
+                </button>
+            )
+        }
+
+        if (!settingsUrl) {
+            return null
+        }
+
+        return (
+            <a
+                href={settingsUrl}
+                className="wbk_header__settingsIconButton"
+                rel="noopener"
+                data-feature-tour="header-settings"
+                title={settingsLabel}
+                aria-label={settingsLabel}
+            >
+                <SettingsIcon />
+            </a>
+        )
+    }
 
     return (
         <header className="wbk_header">
@@ -152,10 +249,23 @@ export const Header = () => {
             <div className="wbk_header__quickLinksContainer">
                 <button
                     type="button"
+                    className="wbk_header__themeToggle"
+                    title={darkModeLabel}
+                    aria-label={darkModeLabel}
+                    aria-pressed={isDarkMode}
+                    onClick={toggleTheme}
+                >
+                    {isDarkMode ? <SunIcon /> : <MoonIcon />}
+                </button>
+                <button
+                    type="button"
                     className="wbk_header__iconButton"
                     data-feature-tour="shortcode-builder"
                     title={__('Open shortcode builder', 'webba-booking-lite')}
-                    aria-label={__('Open shortcode builder', 'webba-booking-lite')}
+                    aria-label={__(
+                        'Open shortcode builder',
+                        'webba-booking-lite'
+                    )}
                     onClick={() =>
                         sidebar.open(<ShortcodeBuilder />, {
                             view: 'modal',
@@ -174,44 +284,34 @@ export const Header = () => {
                     className="wbk_header__quickLinksSeparator"
                     aria-hidden="true"
                 />
-                {
-                    admin_url && (
-                        <button
-                            type="button"
-                            className="wbk_header__quickSetupGuideLink"
-                            data-feature-tour="quick-setup-guide"
-                            disabled={isRelaunchingOnboarding}
-                            onClick={handleQuickSetupGuide}
-                        >
-                            {__(
-                                'Quick Setup Guide',
-                                'webba-booking-lite'
-                            )}
-                        </button>
-                    )
-                }
-                {ROUTE_TO_SETTINGS_SECTION[route] ? (
+                {admin_url && (
                     <button
                         type="button"
-                        className="wbk_header__settingsLink"
-                        data-feature-tour="header-settings"
-                        onClick={() =>
-                            openSettingsSection(
-                                ROUTE_TO_SETTINGS_SECTION[route]!
-                            )
-                        }
+                        className="wbk_header__quickSetupGuideLink"
+                        data-feature-tour="quick-setup-guide"
+                        disabled={isRelaunchingOnboarding}
+                        onClick={handleQuickSetupGuide}
                     >
-                        {__('Settings', 'webba-booking-lite')}
+                        {__('Quick Setup Guide', 'webba-booking-lite')}
                     </button>
-                ) : (
+                )}
+                <a
+                    href={DOCUMENTATION_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    {__('Documentation', 'webba-booking-lite')}
+                </a>
+                {supportUrl && (
                     <a
-                        href={admin_url + 'admin.php?page=wbk-options'}
-                        rel="noopener"
-                        data-feature-tour="header-settings"
+                        href={supportUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
                     >
-                        {__('Settings', 'webba-booking-lite')}
+                        {__('Support', 'webba-booking-lite')}
                     </a>
                 )}
+                {renderSettingsControl()}
             </div>
         </header>
     )

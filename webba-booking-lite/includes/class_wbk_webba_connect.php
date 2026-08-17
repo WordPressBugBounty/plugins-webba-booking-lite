@@ -501,7 +501,10 @@ class WBK_Webba_Connect
      */
     public function fetch_access_token_from_webba_connect($calendar_id = "", $provider = "google")
     {
-        $return_path = "/wp-admin/admin.php?page=wbk-connected-calendars";
+        $return_path =
+            $provider === "gmail"
+                ? "/wp-admin/admin.php?page=wbk-options"
+                : "/wp-admin/admin.php?page=wbk-connected-calendars";
 
         error_log(
             "[WBK_AUTH_DEBUG] fetch_access_token_from_webba_connect: provider=" . $provider .
@@ -781,18 +784,20 @@ class WBK_Webba_Connect
     }
 
     /**
+    /**
      * Create Gmail authorization URL (tokens stored on Webba Connect).
      *
      * Connect endpoints are prepared here; backend routes will be added later.
      *
      * @param string $resource_id Site-level Gmail resource id (default: gmail)
-     * @return string|false
+     * @return string|false The authorization URL or false on failure
      */
     public function get_gmail_authorization_url($resource_id = "gmail")
     {
         $return_path = "/wp-admin/admin.php?page=wbk-options";
 
         $query = $this->prepare_auth_parameters($return_path, "start", $resource_id);
+
         if (!$query) {
             return false;
         }
@@ -801,17 +806,18 @@ class WBK_Webba_Connect
     }
 
     /**
+    /**
      * Create Gmail revoke authorization URL.
      *
      * @param string $resource_id Site-level Gmail resource id (default: gmail)
-     * @return string|false
+     * @return string|false The revoke URL or false on failure
      */
     public function get_gmail_revoke_url($resource_id = "gmail")
     {
-        $return_path =
-            "/wp-admin/admin.php?page=wbk-options&revoke-gmail=" . rawurlencode($resource_id);
+        $return_path = "/wp-admin/admin.php?page=wbk-options&revoke-gmail=" . rawurlencode($resource_id);
 
         $query = $this->prepare_auth_parameters($return_path, "revoke-token", $resource_id);
+
         if (!$query) {
             return false;
         }
@@ -820,15 +826,118 @@ class WBK_Webba_Connect
     }
 
     /**
-     * Fetch Gmail access token from Webba Connect.
+    /**
+     * Get Gmail access token from Webba Connect
      *
-     * @param string $resource_id Site-level Gmail resource id (default: gmail)
-     * @return array|false
+     * @return array|false The access token response or false on failure
      */
-    public function get_gmail_access_token($resource_id = "gmail")
+    public function get_gmail_access_token()
     {
-        return $this->fetch_access_token_from_webba_connect($resource_id, "gmail");
+        return $this->fetch_access_token_from_webba_connect("", "gmail");
     }
+
+    /**
+     * Get Gmail authorization status and action URLs for the options UI
+     *
+     * @return array{isAuthenticated: bool, internalError: bool, authUrl?: string|null, revokeUrl?: string|null, email?: string}
+     */
+    public function get_gmail_auth_parameters()
+    {
+        if ($this->check_backend_health() === false) {
+            return [
+                "isAuthenticated" => false,
+                "internalError" => true,
+            ];
+        }
+
+        $token_response = $this->get_gmail_access_token();
+
+        if (
+            $token_response === false ||
+            !isset($token_response["access_token"]) ||
+            empty($token_response["access_token"])
+        ) {
+            $auth_url = $this->get_gmail_authorization_url();
+
+            return [
+                "isAuthenticated" => false,
+                "internalError" => $auth_url === false,
+                "authUrl" => $auth_url !== false ? $auth_url : null,
+            ];
+        }
+
+        if (!empty($token_response["email"])) {
+            update_option("wbk_gmail_email", sanitize_email($token_response["email"]));
+            if (WBK_Mailer::get_active_transport() === "gmail") {
+                update_option(
+                    "wbk_from_email",
+                    sanitize_email($token_response["email"]),
+                );
+            }
+        }
+
+        $revoke_url = $this->get_gmail_revoke_url();
+
+        $email = "";
+        if (!empty($token_response["email"])) {
+            $email = sanitize_email((string) $token_response["email"]);
+        }
+        if ($email === "") {
+            $email = sanitize_email((string) get_option("wbk_gmail_email", ""));
+        }
+
+        if (
+            $email === "" &&
+            !empty($token_response["access_token"])
+        ) {
+            $profile_response = wp_remote_get(
+                "https://gmail.googleapis.com/gmail/v1/users/me/profile",
+                [
+                    "timeout" => 15,
+                    "headers" => [
+                        "Authorization" =>
+                            "Bearer " . $token_response["access_token"],
+                    ],
+                ],
+            );
+
+            if (!is_wp_error($profile_response)) {
+                $profile_code = (int) wp_remote_retrieve_response_code(
+                    $profile_response,
+                );
+                $profile_body = json_decode(
+                    (string) wp_remote_retrieve_body($profile_response),
+                    true,
+                );
+                if (
+                    $profile_code >= 200 &&
+                    $profile_code < 300 &&
+                    is_array($profile_body) &&
+                    !empty($profile_body["emailAddress"])
+                ) {
+                    $email = sanitize_email((string) $profile_body["emailAddress"]);
+                    if ($email !== "") {
+                        update_option("wbk_gmail_email", $email);
+                    }
+                }
+            }
+        }
+
+        if (
+            $email !== "" &&
+            WBK_Mailer::get_active_transport() === "gmail"
+        ) {
+            update_option("wbk_from_email", $email);
+        }
+
+        return [
+            "isAuthenticated" => true,
+            "internalError" => false,
+            "revokeUrl" => $revoke_url !== false ? $revoke_url : null,
+            "email" => $email,
+        ];
+    }
+    
 
     /**
      * Create an async assistance task on Webba Connect.

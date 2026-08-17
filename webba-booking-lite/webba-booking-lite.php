@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.4.19
+ * Version: 6.4.20
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -71,7 +71,7 @@ if ( !defined( "WP_WEBBA_BOOKING__PLUGIN_DIR" ) ) {
     define( "WP_WEBBA_BOOKING__PLUGIN_URL", plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( "WP_WEBBA_BOOKING__VERSION" ) ) {
-    define( "WP_WEBBA_BOOKING__VERSION", "6.4.19" );
+    define( "WP_WEBBA_BOOKING__VERSION", "6.4.20" );
 }
 if ( !function_exists( "wbk_is_assistance_lab_available" ) ) {
     /**
@@ -193,6 +193,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     include "includes/processors/class-wbk-email-processor.php";
     include "includes/utilities/class-wbk-mailer.php";
     include "includes/processors/class-wbk-pdf-processor.php";
+    include "includes/processors/class-wbk-qr-code-processor.php";
     include "includes/processors/class-wbk-translation-processor.php";
     include "includes/processors/class-wbk-unit-availability-processor.php";
     include "includes/class-wbk-assistance.php";
@@ -662,7 +663,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     ];
     $js_array[] = [
         "backend",
-        ["wbk-schedule", "wbk-options", "wbk-calendar"],
+        ["wbk-schedule", "wbk-options"],
         "wbk-chosen",
         WP_WEBBA_BOOKING__PLUGIN_URL . "/public/js/chosen.jquery.min.js",
         ["jquery", "jquery-ui-core", "jquery-ui-tabs"],
@@ -670,22 +671,9 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     ];
     $js_array[] = [
         "backend",
-        ["wbk-schedule", "wbk-options", "wbk-calendar"],
+        ["wbk-schedule", "wbk-options"],
         "multidate-picker",
         WP_WEBBA_BOOKING__PLUGIN_URL . "/public/js/jquery.datepick.min.js",
-        ["jquery"],
-        WP_WEBBA_BOOKING__VERSION
-    ];
-    $js_array[] = [
-        "backend",
-        [
-            "wbk-appearance",
-            "wbk-schedule",
-            "wbk-options",
-            "wbk-calendar"
-        ],
-        "wbk-backend-script",
-        WP_WEBBA_BOOKING__PLUGIN_URL . "/public/js/wbk-backend.js",
         ["jquery"],
         WP_WEBBA_BOOKING__VERSION
     ];

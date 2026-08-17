@@ -12,6 +12,7 @@ import {
 } from './types'
 import { ReactComponent as CloseIcon } from '../../../../public/images/icon-close.svg'
 import './RecurringBookingListItem.scss'
+import { useWording } from '../../hooks/useWording'
 
 export const RecurringBookingListItem = ({
     item,
@@ -32,6 +33,7 @@ export const RecurringBookingListItem = ({
 }: IRecurringBookingListItemProps) => {
     const [pickerOpen, setPickerOpen] = useState(false)
     const { fetchServiceTimeslots } = useDispatch(store_name)
+    const wording = useWording()
 
     const dateFnsLocale = useMemo(
         () => getDateFnsLocale(locale || 'en'),
@@ -140,7 +142,7 @@ export const RecurringBookingListItem = ({
                             </span>
                         </div>
                         <span className="wbk_recurring_list_item__status">
-                            {__('unavailable', 'webba-booking-lite')}
+                            {wording.unavailable || __('unavailable', 'webba-booking-lite')}
                         </span>
                         {!pickerOpen ? (
                             <button
@@ -148,7 +150,7 @@ export const RecurringBookingListItem = ({
                                 className="wbk_recurring_list_item__choose-link"
                                 onClick={handleOpenPicker}
                             >
-                                {__(
+                                {wording.choose_another_time || __(
                                     'Choose another time',
                                     'webba-booking-lite'
                                 )}
@@ -168,7 +170,7 @@ export const RecurringBookingListItem = ({
                                 }}
                             >
                                 <option value="">
-                                    {__(
+                                    {wording.select_a_time || __(
                                         'Select a time',
                                         'webba-booking-lite'
                                     )}
@@ -211,9 +213,9 @@ export const RecurringBookingListItem = ({
                         </div>
                         {isAdjusted && (
                             <span className="wbk_recurring_list_item__badge">
-                                {__('adjusted', 'webba-booking-lite')},{' '}
+                                {wording.adjusted || __('adjusted', 'webba-booking-lite')},{' '}
                                 {expectedTimeLabel}{' '}
-                                {__('unavailable', 'webba-booking-lite')}
+                                {wording.unavailable || __('unavailable', 'webba-booking-lite')}
                             </span>
                         )}
                     </>
@@ -223,7 +225,7 @@ export const RecurringBookingListItem = ({
                 type="button"
                 className="wbk_recurring_list_item__remove"
                 onClick={onRemove}
-                aria-label={__('Remove appointment', 'webba-booking-lite')}
+                aria-label={wording.remove_appointment || __('Remove appointment', 'webba-booking-lite')}
             >
                 <CloseIcon />
             </button>

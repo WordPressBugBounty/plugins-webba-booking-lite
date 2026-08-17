@@ -704,8 +704,8 @@ export const Sidebar: FC<ISidebarProps> = ({
                                     >
                                         <span>
                                             {showSummary
-                                                ? __('Hide summary', 'webba-booking-lite')
-                                                : __('Show summary', 'webba-booking-lite')}
+                                                ? wording.hide_summary || __('Hide summary', 'webba-booking-lite')
+                                                : wording.show_summary || __('Show summary', 'webba-booking-lite')}
                                         </span>
                                         <ArrowDownIcon
                                             className={classNames(
@@ -719,30 +719,61 @@ export const Sidebar: FC<ISidebarProps> = ({
                                     </div>
                                     {showSummary && (
                                         <div className={'wbk_sidebar__summary-detail'}>
-                                            {depositTotal > 0 && (
-                                                <div className={'wbk_sidebar__summary-detail__row'}>
-                                                    <span>{__('Deposits', 'webba-booking-lite')}:</span>
-                                                    <span>{wbkFormatPrice(depositTotal, priceFormat)}</span>
-                                                </div>
-                                            )}
+                                            {/* booked items */}
+                                            <div className={'wbk_sidebar__summary-detail__row'}>
+                                                <span>
+                                                    {wording.total_booked_items || __('Total booked items', 'webba-booking-lite')}:
+                                                </span>
+                                                <span>
+                                                    {wbkFormatPrice(
+                                                        Number(amountData?.subtotal || 0),
+                                                        priceFormat
+                                                    )}
+                                                </span>
+                                            </div>
+                                            {/* booked items end */}
+                                            {/* service fees */}
                                             {Number(amountData?.service_fees) > 0 && (
                                                 <div className={'wbk_sidebar__summary-detail__row'}>
                                                     <span>{wording.service_fees || __('Service fees', 'webba-booking-lite')}:</span>
                                                     <span>{wbkFormatPrice(Number(amountData.service_fees), priceFormat)}</span>
                                                 </div>
                                             )}
+                                            {/* service fees end */}
+                                            {/* tax */}
                                             {displayTax > 0 && (
                                                 <div className={'wbk_sidebar__summary-detail__row'}>
-                                                    <span>{wording.tax || __('Taxes', 'webba-booking-lite')}:</span>
+                                                    <span>{wording.tax || __('Sales tax', 'webba-booking-lite')}:</span>
                                                     <span>{wbkFormatPrice(displayTax, priceFormat)}</span>
                                                 </div>
                                             )}
+                                            {/* tax end */}
+                                            {/* grand total */}
+                                            <div className={'wbk_sidebar__summary-detail__row wbk_sidebar__summary-detail__row--has-bottom-border'}>
+                                                <span>
+                                                    <strong>{wording.grand_total || __('Grand total', 'webba-booking-lite')}:</strong>
+                                                </span>
+                                                <span>
+                                                    <strong>{wbkFormatPrice(Number(amountData?.total || 0), priceFormat)}</strong>
+                                                </span>
+                                            </div>
+                                            {/* grand total end */}
+                                            {/* deposits */}
+                                            {depositTotal > 0 && (
+                                                <div className={'wbk_sidebar__summary-detail__row'}>
+                                                    <span >{wording.deposits || __('Deposits', 'webba-booking-lite')}:</span>
+                                                    <span>{wbkFormatPrice(depositTotal, priceFormat)}</span>
+                                                </div>
+                                            )}
+                                            {/* deposits end */}
+                                            {/* left to pay */}
                                             {Number(amountData?.left_to_pay) > 0 && (
                                                 <div className={'wbk_sidebar__summary-detail__row'}>
-                                                    <span>{__('Left to pay later', 'webba-booking-lite')}:</span>
+                                                    <span>{wording.left_to_pay_later || __('Left to pay later', 'webba-booking-lite')}:</span>
                                                     <span>{wbkFormatPrice(Number(amountData.left_to_pay), priceFormat)}</span>
                                                 </div>
                                             )}
+                                            {/* left to pay end */}
                                         </div>
                                     )}
                                 </div>

@@ -6,8 +6,14 @@
 
 .wbk_appearanceEditor__section {
     padding: 24px;
-    background-color: #fff;
+    background-color: colors.$background-white;
+    border: 1px solid colors.$input-border;
     border-radius: 8px;
+    color: colors.$text-black;
+
+    #wbk_spa_dashboard[data-theme='dark'] & {
+        box-shadow: none;
+    }
 
     .wbk_appearanceEditor__sectionHeader {
         display: flex;
@@ -19,17 +25,19 @@
         .wbk_appearanceEditor__sectionTitle {
             font-family: typography.$font-primary;
             font-weight: 600;
-            font-style: Semi Bold;
             font-size: 18px;
-            leading-trim: NONE;
             line-height: 28px;
             letter-spacing: 0%;
-            color: #1d2939;
+            color: colors.$off-black;
             margin: 0;
         }
 
         .wbk_appearanceEditor__accordionIcon {
             transition: 0.3s all linear;
+
+            #wbk_spa_dashboard[data-theme='dark'] & {
+                filter: invert(1) brightness(1.3);
+            }
         }
 
         .wbk_appearanceEditor__accordionIcon--rotate {
@@ -76,12 +84,16 @@
             align-items: flex-start;
 
             .wbk_appearanceEditor__upgradeButton {
-                box-shadow: 12px 4px 20px #646464;
+                box-shadow: 12px 4px 20px colors.$shadow;
                 margin-left: auto;
                 margin-right: auto;
                 display: flex;
                 margin-top: 150px;
                 white-space: pre-wrap;
+
+                #wbk_spa_dashboard[data-theme='dark'] & {
+                    box-shadow: none;
+                }
             }
         }
     }
@@ -96,10 +108,10 @@
             font-weight: 500;
             font-size: 16px;
             line-height: 24px;
-            color: #374151;
+            color: colors.$text-grey;
             margin: 0;
             padding-bottom: 8px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid colors.$input-border;
         }
 
         .wbk_appearanceEditor__subsectionFields {

@@ -12,7 +12,7 @@
         right: 0;
         width: 100vw;
         height: 100vh;
-        background: #f3f4f6;
+        background: var(--wbk-admin-page-bg);
     }
 }
 
@@ -28,8 +28,8 @@
     border: none;
     border-radius: 12px;
     overflow: hidden;
-    background: #fff;
-    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+    background: colors.$background-white;
+    box-shadow: 0 12px 32px colors.$shadow;
     text-align: left;
     cursor: pointer;
     padding: 0;
@@ -41,8 +41,8 @@
     justify-content: space-between;
     gap: 12px;
     padding: 14px 16px;
-    background: #14b8a9;
-    color: #fff;
+    background: colors.$primary;
+    color: colors.$text-white;
 }
 
 .wbk_setupChecklist__minimizedTitle {
@@ -80,12 +80,12 @@
     gap: 10px;
     padding: 10px 16px;
     font-size: 13px;
-    color: #374151;
-    border-top: 1px solid #f3f4f6;
+    color: colors.$text-grey;
+    border-top: 1px solid colors.$row-border;
 
     &--completed span {
         text-decoration: line-through;
-        color: #9ca3af;
+        color: colors.$light-grey;
     }
 }
 
@@ -99,7 +99,7 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    border: 2px solid #d1d5db;
+    border: 2px solid colors.$field-border;
     flex-shrink: 0;
 }
 
@@ -107,16 +107,16 @@
     display: block;
     width: 100%;
     border: none;
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid colors.$row-border;
     background: transparent;
     padding: 12px 16px;
     font-size: 12px;
-    color: #6b7280;
+    color: colors.$light-grey;
     cursor: pointer;
     text-align: right;
 
     &:hover {
-        color: #14b8a9;
+        color: colors.$primary;
     }
 }
 
@@ -148,8 +148,8 @@
     height: 52px;
     border-radius: 50%;
     border: none;
-    background: #14b8a9;
-    box-shadow: 0 8px 20px rgba(20, 184, 169, 0.35);
+    background: colors.$primary;
+    box-shadow: 0 8px 20px colors.$shadow;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -195,8 +195,8 @@
     justify-content: space-between;
     gap: 24px;
     padding: 24px 32px;
-    background: #fff;
-    border-bottom: 1px solid #e5e7eb;
+    background: colors.$background-white;
+    border-bottom: 1px solid colors.$input-border;
 }
 
 .wbk_setupChecklist__expandedHeaderLeft {
@@ -214,13 +214,13 @@
     margin: 0 0 4px;
     font-size: 24px;
     font-weight: 500;
-    color: #111827;
+    color: colors.$off-black;
 }
 
 .wbk_setupChecklist__expandedSubtitle {
     margin: 0;
     font-size: 14px;
-    color: #6b7280;
+    color: colors.$light-grey;
 }
 
 .wbk_setupChecklist__expandedHeaderActions {
@@ -230,17 +230,17 @@
 }
 
 .wbk_setupChecklist__minimizeButton {
-    border: 1px solid #e5e7eb;
+    border: 1px solid colors.$input-border;
     border-radius: 8px;
-    background: #fff;
+    background: colors.$background-white;
     padding: 8px 14px;
     font-size: 13px;
-    color: #6b7280;
+    color: colors.$light-grey;
     cursor: pointer;
 
     &:hover {
-        border-color: #14b8a9;
-        color: #14b8a9;
+        border-color: colors.$primary;
+        color: colors.$primary;
     }
 }
 
@@ -254,8 +254,8 @@
 }
 
 .wbk_setupChecklist__mainColumn {
-    background: #fff;
-    border: 1px solid #e5e7eb;
+    background: colors.$background-white;
+    border: 1px solid colors.$input-border;
     border-radius: 12px;
     padding: 24px;
 }
@@ -265,14 +265,14 @@
     align-items: center;
     justify-content: space-between;
     font-size: 14px;
-    color: #374151;
+    color: colors.$text-grey;
     margin-bottom: 8px;
 }
 
 .wbk_setupChecklist__progressTrack {
     height: 8px;
     border-radius: 999px;
-    background: #e5e7eb;
+    background: colors.$input-border;
     overflow: hidden;
     margin-bottom: 24px;
 }
@@ -281,7 +281,7 @@
     height: 100%;
     width: var(--wbk-checklist-progress, 0%);
     border-radius: 999px;
-    background: #14b8a9;
+    background: colors.$primary;
     transition: width 0.3s ease;
 }
 
@@ -292,7 +292,7 @@
 }
 
 .wbk_setupChecklist__step {
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid colors.$row-border;
     padding: 20px 0;
     scroll-margin-top: 16px;
 
@@ -302,7 +302,7 @@
     }
 
     &--active {
-        background: #f9fafb;
+        background: colors.$background-offwhite;
         margin: 0 -24px;
         padding-left: 24px;
         padding-right: 24px;
@@ -337,7 +337,7 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    border: 2px solid #d1d5db;
+    border: 2px solid colors.$field-border;
 }
 
 .wbk_setupChecklist__stepContent {
@@ -356,7 +356,7 @@
     margin: 0;
     font-size: 16px;
     font-weight: 500;
-    color: #111827;
+    color: colors.$off-black;
 }
 
 .wbk_setupChecklist__stepTitleLink {
@@ -364,16 +364,16 @@
     text-decoration: none;
 
     &:hover {
-        color: #14b8a9;
+        color: colors.$primary;
         text-decoration: underline;
     }
 
     &--done {
-        color: #6b7280;
+        color: colors.$light-grey;
         text-decoration: line-through;
 
         &:hover {
-            color: #374151;
+            color: colors.$text-grey;
             text-decoration: line-through underline;
         }
     }
@@ -405,13 +405,31 @@
     }
 
     &--pending {
-        background: #f3f4f6;
-        color: #6b7280;
+        background: colors.$row-border;
+        color: colors.$light-grey;
     }
 
     &--skipped {
         background: #fef3c7;
         color: #b45309;
+    }
+
+    #wbk_spa_dashboard[data-theme='dark'] &,
+    body[data-wbk-theme='dark'] & {
+        &--completed {
+            background: rgba(21, 128, 61, 0.22);
+            color: #4ade80;
+        }
+
+        &--in_progress {
+            background: rgba(29, 78, 216, 0.22);
+            color: #93c5fd;
+        }
+
+        &--skipped {
+            background: rgba(180, 83, 9, 0.22);
+            color: #fbbf24;
+        }
     }
 }
 
@@ -419,7 +437,7 @@
     margin: 8px 0 0;
     font-size: 14px;
     line-height: 1.5;
-    color: #6b7280;
+    color: colors.$light-grey;
 }
 
 .wbk_setupChecklist__stepActions {
@@ -476,21 +494,21 @@
     justify-content: center;
     padding: 10px 18px;
     border-radius: 8px;
-    background: #14b8a9;
-    color: #fff;
+    background: colors.$primary;
+    color: colors.$text-white;
     font-size: 14px;
     font-weight: 500;
     text-decoration: none;
 
     &:hover {
-        background: #0d9488;
-        color: #fff;
+        background: colors.$primary-hover;
+        color: colors.$text-white;
     }
 }
 
 .wbk_setupChecklist__secondaryLink {
     font-size: 14px;
-    color: #14b8a9;
+    color: colors.$primary;
     text-decoration: none;
 
     &:hover {
@@ -501,7 +519,7 @@
 .wbk_setupChecklist__savedNote {
     margin: 20px 0 0;
     font-size: 12px;
-    color: #9ca3af;
+    color: colors.$light-grey;
 }
 
 .wbk_setupChecklist__sidebar {
@@ -511,8 +529,8 @@
 }
 
 .wbk_setupChecklist__sidebarSection {
-    background: #fff;
-    border: 1px solid #e5e7eb;
+    background: colors.$background-white;
+    border: 1px solid colors.$input-border;
     border-radius: 12px;
     padding: 20px;
 }
@@ -523,7 +541,7 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #9ca3af;
+    color: colors.$light-grey;
 }
 
 .wbk_setupChecklist__videoCard {
@@ -560,7 +578,7 @@
     margin: 12px 0 0;
     font-size: 13px;
     line-height: 1.5;
-    color: #6b7280;
+    color: colors.$light-grey;
 }
 
 .wbk_setupChecklist__resourceLink {
@@ -570,7 +588,7 @@
     padding: 12px 0;
     text-decoration: none;
     color: inherit;
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid colors.$row-border;
 
     &:first-of-type {
         border-top: none;
@@ -581,19 +599,24 @@
         width: 20px;
         height: 20px;
         margin-top: 2px;
+
+        #wbk_spa_dashboard[data-theme='dark'] &,
+        body[data-wbk-theme='dark'] & {
+            filter: invert(1) brightness(0.9);
+        }
     }
 
     strong {
         display: block;
         font-size: 14px;
-        color: #111827;
+        color: colors.$off-black;
     }
 
     small {
         display: block;
         margin-top: 2px;
         font-size: 12px;
-        color: #6b7280;
+        color: colors.$light-grey;
     }
 }
 
@@ -607,19 +630,24 @@
         width: 20px;
         height: 20px;
         margin-top: 2px;
+
+        #wbk_spa_dashboard[data-theme='dark'] &,
+        body[data-wbk-theme='dark'] & {
+            filter: invert(1) brightness(0.9);
+        }
     }
 
     strong {
         display: block;
         font-size: 14px;
-        color: #111827;
+        color: colors.$off-black;
     }
 
     small {
         display: block;
         margin-top: 2px;
         font-size: 12px;
-        color: #6b7280;
+        color: colors.$light-grey;
     }
 }
 
@@ -631,14 +659,14 @@
     padding: 10px 18px;
     border: none;
     border-radius: 8px;
-    background: #14b8a9;
-    color: #fff;
+    background: colors.$primary;
+    color: colors.$text-white;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
 
     &:hover {
-        background: #0d9488;
+        background: colors.$primary-hover;
     }
 }
 
@@ -650,8 +678,8 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
-    background: #fff;
-    border: 1px solid #e5e7eb;
+    background: colors.$background-white;
+    border: 1px solid colors.$input-border;
     border-radius: 12px;
     overflow: hidden;
 }
@@ -661,7 +689,7 @@
     align-items: center;
     gap: 16px;
     padding: 16px 24px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid colors.$input-border;
 }
 
 .wbk_setupChecklist__assistanceBack {
@@ -673,16 +701,21 @@
     padding: 0;
     font-size: 14px;
     font-weight: 500;
-    color: #374151;
+    color: colors.$text-grey;
     cursor: pointer;
 
     img {
         width: 16px;
         height: 16px;
+
+        #wbk_spa_dashboard[data-theme='dark'] &,
+        body[data-wbk-theme='dark'] & {
+            filter: invert(1) brightness(0.9);
+        }
     }
 
     &:hover {
-        color: #111827;
+        color: colors.$off-black;
     }
 }
 
@@ -690,7 +723,7 @@
     margin: 0;
     font-size: 18px;
     font-weight: 600;
-    color: #111827;
+    color: colors.$off-black;
 }
 
 .wbk_setupChecklist__assistanceBody {
@@ -727,6 +760,20 @@
         margin-top: 4px;
         font-size: 12px;
         color: #c2410c;
+    }
+
+    #wbk_spa_dashboard[data-theme='dark'] &,
+    body[data-wbk-theme='dark'] & {
+        background: rgba(249, 115, 22, 0.14);
+        border-color: rgba(249, 115, 22, 0.35);
+
+        strong {
+            color: #fdba74;
+        }
+
+        small {
+            color: #fb923c;
+        }
     }
 }
 

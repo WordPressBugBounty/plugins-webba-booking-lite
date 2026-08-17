@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n'
 import { RecurringBookingListItem } from './RecurringBookingListItem'
 import { IRecurringBookingListProps } from './types'
 import './RecurringBookingList.scss'
+import { useWording } from '../../hooks/useWording'
 
 export const RecurringBookingList = ({
     items,
@@ -21,10 +22,12 @@ export const RecurringBookingList = ({
     onItemOverride,
     onItemRemove,
 }: IRecurringBookingListProps) => {
+    const wording = useWording()
+
     if (isLoading) {
         return (
             <div className="wbk_recurring_list wbk_recurring_list--loading">
-                {__('Loading appointments...', 'webba-booking-lite')}
+                {wording.loading_appointments || __('Loading appointments...', 'webba-booking-lite')}
             </div>
         )
     }
@@ -42,7 +45,7 @@ export const RecurringBookingList = ({
     if (visibleItems.length === 0) {
         return (
             <div className="wbk_recurring_list wbk_recurring_list--empty">
-                {__(
+                {wording.no_appointments_selected || __(
                     'No appointments selected. Add slots using the controls above or close the popup.',
                     'webba-booking-lite'
                 )}

@@ -34,9 +34,11 @@ export const Menu = ({
         (select) => select(store_name).getPreset(),
         []
     )
-    const hideForEmails =
-        collectionName === 'email_templates' &&
+    const isDefaultItemDeleteForbidden =
+        (collectionName === 'email_templates' ||
+            collectionName === 'forms') &&
         cell.row.original?.can_delete === false
+    const canDuplicate = cell.row.original?.can_duplicate !== false
 
     return (
         <div className="wbk_table__menu">
@@ -50,7 +52,7 @@ export const Menu = ({
                     <img src={EditIcon} />
                 </button>
             )}
-            {settings?.is_admin && (
+            {settings?.is_admin && canDuplicate && (
                 <Button
                     className="wbk_table__menuBtn"
                     onClick={onDuplicate}
@@ -61,7 +63,7 @@ export const Menu = ({
                 </Button>
             )}
             {(cell.row.original.can_delete || settings?.is_admin) &&
-                !hideForEmails && (
+                !isDefaultItemDeleteForbidden && (
                     <ConfirmationButton
                         action={onDelete}
                         confirmationMessage={__(

@@ -6,7 +6,6 @@ import { FormNotice } from '../../../../components/FormNotice/FormNotice'
 import '../../ThankYou/ThankYou.scss'
 import { Button } from '../../../../components/Button/Button'
 import { PaymentSelector } from '../../../../components/PaymentSelector/PaymentSelector'
-import { CustomScroll } from 'react-custom-scroll'
 import classNames from 'classnames'
 import { BookingBlock } from '../../../../components/BookingBlock/BookingBlock'
 import { wbkFormatPrice } from '../../../../providers/BookingFormProvider/utils'
@@ -256,11 +255,7 @@ export const CustomerPayment = ({
     // Only show the selector, breakdown, and Pay button if NOT initialized
     return (
         <div className={'wbk_thank_you__wrapper'}>
-            <CustomScroll
-                heightRelativeToParent="calc(750px - 64px)"
-                className={'wbk_thank_you__custom-scroll'}
-                allowOuterScroll={true}
-            >
+            <div className={'wbk_thank_you__native-scroll'}>
                 <div className={'wbk_thank_you__inner-wrapper'}>
                     <div className={'wbk_thank_you__header'}>
                         <div className={'wbk_thank_you__header__content'}>
@@ -416,7 +411,7 @@ export const CustomerPayment = ({
                             </FormNotice>
                         )}
                 </div>
-            </CustomScroll>
+            </div>
         </div>
     )
 }

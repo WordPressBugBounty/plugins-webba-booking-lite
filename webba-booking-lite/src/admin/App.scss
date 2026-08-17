@@ -52,7 +52,85 @@
     font-style: italic;
 }
 
+// Shared by the SPA root and the sidebar portal (rendered under #wpwrap).
+@mixin wbk-admin-color-tokens {
+    --wbk-admin-primary: #1f6763;
+    --wbk-admin-primary-hover: #18524f;
+    --wbk-admin-primary-soft: rgba(31, 103, 99, 0.14);
+    --wbk-admin-text-black: #333333;
+    --wbk-admin-text-white: #ffffff;
+    --wbk-admin-bg-white: #ffffff;
+    --wbk-admin-bg-offwhite: #f9fafb;
+    --wbk-admin-page-bg: #f0f0f1;
+    --wbk-admin-border: rgba(0, 0, 0, 0.1);
+    --wbk-admin-shadow: rgba(0, 0, 0, 0.1);
+    --wbk-admin-input-border: #e5e7eb;
+    --wbk-admin-input-text: #1f2937;
+    --wbk-admin-text-grey: #4b5563;
+    --wbk-admin-row-border: #f3f4f6;
+    --wbk-admin-light-grey: #6b7280;
+    --wbk-admin-off-black: #111827;
+    --wbk-admin-red: #ef4444;
+    --wbk-admin-green: #0f766e;
+    --wbk-admin-border-dark: #8a9393;
+    --wbk-admin-field-background: #ffffff;
+    --wbk-admin-field-border: #8a9393;
+    --wbk-admin-header-border: #d3d3d3;
+    --wbk-admin-icon-button-bg: #ffffff;
+    --wbk-admin-icon-button-border: #e5e7eb;
+    --wbk-admin-icon-button-hover-bg: #eef2f3;
+    --wbk-admin-icon-button-hover-border: #d1d5db;
+    --wbk-admin-icon-button-label: #22292f;
+    --wbk-admin-link: #000000;
+    --wbk-admin-secondary-button-bg: #ffffff;
+    --wbk-admin-secondary-button-text: #333333;
+    --wbk-admin-surface-elevated: #ffffff;
+
+    &[data-theme='dark'] {
+        --wbk-admin-primary: #3d9b95;
+        --wbk-admin-primary-hover: #4eb0a9;
+        --wbk-admin-primary-soft: rgba(61, 155, 149, 0.22);
+        --wbk-admin-text-black: #e5e7eb;
+        --wbk-admin-text-white: #ffffff;
+        --wbk-admin-bg-white: #1e1f22;
+        --wbk-admin-bg-offwhite: #26272b;
+        --wbk-admin-page-bg: #141516;
+        --wbk-admin-border: rgba(255, 255, 255, 0.12);
+        --wbk-admin-shadow: rgba(0, 0, 0, 0.4);
+        --wbk-admin-input-border: #3f4147;
+        --wbk-admin-input-text: #e5e7eb;
+        --wbk-admin-text-grey: #9ca3af;
+        --wbk-admin-row-border: #2d2f34;
+        --wbk-admin-light-grey: #9ca3af;
+        --wbk-admin-off-black: #f3f4f6;
+        --wbk-admin-red: #f87171;
+        --wbk-admin-green: #2dd4bf;
+        --wbk-admin-border-dark: #6b7280;
+        --wbk-admin-field-background: #32343a;
+        --wbk-admin-field-border: #5b5e66;
+        --wbk-admin-header-border: #3f4147;
+        --wbk-admin-icon-button-bg: #26272b;
+        --wbk-admin-icon-button-border: #3f4147;
+        --wbk-admin-icon-button-hover-bg: #32343a;
+        --wbk-admin-icon-button-hover-border: #4b5563;
+        --wbk-admin-icon-button-label: #e5e7eb;
+        --wbk-admin-link: #e5e7eb;
+        --wbk-admin-secondary-button-bg: #26272b;
+        --wbk-admin-secondary-button-text: #e5e7eb;
+        --wbk-admin-surface-elevated: #26272b;
+    }
+}
+
 #wbk_spa_dashboard {
+    @include wbk-admin-color-tokens;
     font-family: typography.$font-primary;
     font-weight: 300;
+    color: var(--wbk-admin-text-black);
+    background-color: var(--wbk-admin-page-bg);
+    min-height: 100vh;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.wbk_sidebar__container {
+    @include wbk-admin-color-tokens;
 }

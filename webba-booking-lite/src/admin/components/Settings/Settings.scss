@@ -4,16 +4,17 @@
     gap: 24px;
 
     .wbk_settings__section {
-        border: 1px solid #e2e8f0;
+        border: 1px solid colors.$input-border;
         border-radius: 16px;
-        box-shadow: 0px 1px 2px 0px #0000000d;
-        background-color: #ffffff;
+        box-shadow: 0px 1px 2px 0px colors.$shadow;
+        background-color: colors.$background-white;
         padding: 25px;
         display: flex;
         flex-flow: column;
         min-height: 290px;
         position: relative;
         cursor: pointer;
+        color: colors.$off-black;
 
         .wbk_settings__icon {
             width: 48px;
@@ -25,7 +26,7 @@
             justify-content: center;
             padding: 14px;
             border-radius: 12px;
-            background-color: #e0f7f8;
+            background-color: colors.$primary-soft;
 
             img {
                 max-width: 100%;
@@ -39,11 +40,10 @@
             margin-top: 16px;
             font-family: typography.$font-primary;
             font-weight: 300;
-            font-style: Regular;
             font-size: 18px;
-            leading-trim: NONE;
             line-height: 28px;
             letter-spacing: 0%;
+            color: colors.$off-black;
         }
 
         .wbk_settings__description {
@@ -51,12 +51,10 @@
             margin-top: 4px;
             font-family: typography.$font-primary;
             font-weight: 300;
-            font-style: Regular;
             font-size: 14px;
-            leading-trim: NONE;
             line-height: 20px;
             letter-spacing: 0%;
-            color: #4a5c71;
+            color: colors.$text-grey;
         }
 
         .wbk_settings__actions {
@@ -71,7 +69,7 @@
                 display: flex;
                 gap: 8px;
                 align-items: center;
-                color: #00a3ad;
+                color: colors.$primary;
                 cursor: pointer;
                 transition: 0.2s all ease;
             }
@@ -87,13 +85,23 @@
     .wbk_settings__section--resetAllCard {
         cursor: default;
         border-color: #fecaca;
-        background-color: #fffbfb;
+        background-color: colors.$background-white;
+
+        #wbk_spa_dashboard[data-theme='dark'] & {
+            border-color: rgba(248, 113, 113, 0.45);
+            background-color: colors.$background-offwhite;
+        }
 
         .wbk_settings__icon--danger {
             background-color: #fee2e2;
             color: #b91c1c;
             font-weight: 600;
             font-size: 20px;
+
+            #wbk_spa_dashboard[data-theme='dark'] & {
+                background-color: rgba(248, 113, 113, 0.2);
+                color: colors.$red;
+            }
         }
 
         .wbk_settings__actions {

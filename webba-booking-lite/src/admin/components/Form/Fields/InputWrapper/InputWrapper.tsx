@@ -1,4 +1,4 @@
-import { PropsWithChildren, useMemo, isValidElement, cloneElement, Fragment, useRef, useEffect, useState, Children } from 'react'
+import { PropsWithChildren, useMemo, isValidElement, cloneElement, Fragment, useRef, useEffect, useState, Children, useContext } from 'react'
 import { __, sprintf } from '@wordpress/i18n'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
@@ -9,6 +9,7 @@ import classNames from 'classnames'
 import { processUpgradeMessage } from '../../../../../utilities/planHelper'
 import { Toggle } from '../../../Toggle/Toggle'
 import { useFeatureDisplayConfig } from '../../../../hooks/useFeatureDisplayConfig'
+import { FormContext } from '../../lib/FormProvider'
 
 export const InputWrapper = ({
     field,
@@ -30,6 +31,7 @@ export const InputWrapper = ({
     const [overlayStyle, setOverlayStyle] = useState<React.CSSProperties>({})
     
     const featureDisplayConfig = useFeatureDisplayConfig()
+    const formContext = useContext(FormContext)
 
     const proLabelApplicable = useMemo(() => {
         if (skipProLabel) {
@@ -43,18 +45,21 @@ export const InputWrapper = ({
             return false
         }
 
+        if (!requiredPlan || !plan_map || typeof plan_map !== 'object') {
+            return false
+        }
+
         return (
-            requiredPlan &&
             Object.keys(plan_map).includes(requiredPlan) &&
             plan_map[
                 Object.keys(plan_map).find(
                     (plan: string) => plan === requiredPlan
-                )
+                ) as string
             ] !== true
         )
     }, [requiredPlan, plan_map, fieldConfig?.misc?.available_in_old_free, skipProLabel])
 
-    if (proLabelApplicable && featureDisplayConfig.hide_fields) {
+    if (proLabelApplicable && featureDisplayConfig.hide_fields && !formContext?.lockFieldsOnly) {
         return null
     }
 

@@ -9,6 +9,7 @@ import { constructField } from '../../../components/Form/utils'
 import { IFieldConfig } from '../../../components/Form/types'
 import { extractFormValue } from '../../../providers/BookingFormProvider/utils'
 import { Loading } from '../../../components/Loading/Loading'
+import { allocateQuantityDefaults, getDefaultQuantityFields, normalizeQuantityFields } from '../../../components/Fields/QuantityFieldsInput/types'
 
 export const CheckoutStep = () => {
     const {
@@ -51,6 +52,26 @@ export const CheckoutStep = () => {
         const enhancedFields =
             bookingFields.length === 0 ? [] : bookingFields.map(constructField)
         const prefillableFields = ['first_name', 'last_name', 'email', 'phone']
+        const selectedQuantity =
+            bookingMode === 'units'
+                ? Math.max(
+                      1,
+                      Number(
+                          (units || []).find((unit) => unit.selected)?.quantity
+                      ) || 1
+                  )
+                : Math.max(
+                      1,
+                      (services || [])
+                          .filter((service) => service.selected)
+                          .reduce(
+                              (sum, service) =>
+                                  sum +
+                                  Math.max(1, Number(service.quantity) || 1),
+                              0
+                          )
+                  )
+
         setFormObj(
             'fields',
             enhancedFields.map((field: IFieldConfig) => {
@@ -66,6 +87,37 @@ export const CheckoutStep = () => {
                             preset?.user_data?.[field.slug],
                     }
                 }
+
+                if (field.type === 'quantity_fields') {
+                    const quantityOptions = normalizeQuantityFields(
+                        field.quantityFields
+                    )
+                    const options = quantityOptions.length
+                        ? quantityOptions
+                        : getDefaultQuantityFields()
+                    const existingPeople =
+                        formData?.number_of_people &&
+                        typeof formData.number_of_people === 'object' &&
+                        !Array.isArray(formData.number_of_people)
+                            ? (formData.number_of_people as Record<
+                                  string,
+                                  number
+                              >)
+                            : null
+
+                    return {
+                        ...field,
+                        quantityFields: options,
+                        value:
+                            existingPeople ||
+                            field.defaultValue ||
+                            allocateQuantityDefaults(
+                                options,
+                                selectedQuantity
+                            ),
+                    }
+                }
+
                 return {
                     ...field,
                     value:

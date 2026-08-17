@@ -5,6 +5,12 @@ import {
     FieldGroupConfig,
 } from '../hooks/useGroup'
 import { FieldType } from '../types'
+import { __ } from '@wordpress/i18n'
+
+export interface QuantityFieldOption {
+    label: string
+    slug: string
+}
 
 export interface BuilderGroupConfig {
     type: FieldType
@@ -15,6 +21,59 @@ export interface BuilderGroupConfig {
     defaultValue?: any
     width?: string
     options?: string[]
+    quantityFields?: Array<string | QuantityFieldOption>
+}
+
+const getDefaultQuantityFields = (): QuantityFieldOption[] => [
+    {
+        label: __('Adult', 'webba-booking-lite'),
+        slug: 'adult',
+    },
+    {
+        label: __('Child', 'webba-booking-lite'),
+        slug: 'child',
+    },
+    {
+        label: __('Infant', 'webba-booking-lite'),
+        slug: 'infant',
+    },
+]
+
+const slugifyQuantityLabel = (label: string): string =>
+    String(label || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '')
+
+const normalizeQuantityFieldOption = (
+    field: string | QuantityFieldOption
+): QuantityFieldOption => {
+    if (typeof field === 'string') {
+        const label = field.trim()
+        return {
+            label,
+            slug: slugifyQuantityLabel(label),
+        }
+    }
+
+    const label = String(field?.label || '').trim()
+    const slug =
+        String(field?.slug || '').trim() || slugifyQuantityLabel(label)
+
+    return { label, slug }
+}
+
+const quantityFieldOptionValidator = (value: QuantityFieldOption) => {
+    if (
+        !value ||
+        !String(value.label || '').trim() ||
+        !String(value.slug || '').trim()
+    ) {
+        return __('Required field', 'webba-booking-lite')
+    }
+
+    return null
 }
 
 export interface BuilderGroupMeta {
@@ -71,6 +130,8 @@ const getWidthFieldConfig = (
 const getOptions = (options: any[] = []): FieldConfig[] =>
     options.map((option) => ({
         defaultValue: option,
+        validators: [Validators.required],
+        validateOnInit: true,
     }))
 
 export const getBuilderFieldsByType = ({
@@ -82,6 +143,7 @@ export const getBuilderFieldsByType = ({
     defaultValue,
     width,
     options,
+    quantityFields,
 }: Partial<BuilderGroupConfig>): CreateFieldGroupConfig => {
     switch (type) {
         case FieldType.Checkbox:
@@ -104,6 +166,23 @@ export const getBuilderFieldsByType = ({
                 options: getOptions(options),
                 ...getSharedFieldsConfig(type, slug, required),
                 ...getPlaceholderFieldConfig(placeholder),
+                ...getWidthFieldConfig(width),
+            }
+        case FieldType.QuantityFields:
+            return {
+                quantityFields: (
+                    quantityFields?.length
+                        ? quantityFields
+                        : getDefaultQuantityFields()
+                ).map((field) => ({
+                    defaultValue: normalizeQuantityFieldOption(field),
+                    validators: [quantityFieldOptionValidator],
+                    validateOnInit: true,
+                })),
+                ...getSharedFieldsConfig(type, slug, required),
+                ...getPlaceholderFieldConfig(
+                    placeholder || __('Quantity', 'webba-booking-lite')
+                ),
                 ...getWidthFieldConfig(width),
             }
         case FieldType.Email:

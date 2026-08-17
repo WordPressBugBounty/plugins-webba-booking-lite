@@ -107,7 +107,7 @@
             "misc": {
                 "tooltip": "Select the booking date.",
                 "date_format": "F j, Y",
-                "time_zone": "Europe/Warsaw"
+                "time_zone": "Asia/Dhaka"
             },
             "required": true,
             "dependency": [],
@@ -122,7 +122,7 @@
             "tab": "",
             "misc": {
                 "tooltip": "Select the booking time.",
-                "time_format": "H:i",
+                "time_format": "g:i a",
                 "options": "backend"
             },
             "required": true,
@@ -168,13 +168,7 @@
                 "tooltip": "Breakdown by attendee types (e.g. adults, children, infants) when your booking flow collects per-type counts."
             },
             "required": false,
-            "dependency": [
-                [
-                    "unit_id",
-                    ">",
-                    "0"
-                ]
-            ],
+            "dependency": [],
             "default_value": "",
             "editable": true
         },
@@ -185,6 +179,7 @@
             "title": "Duration",
             "tab": "",
             "misc": {
+                "tooltip": "Duration of the booking in minutes.",
                 "sub_type": "positive_integer"
             },
             "required": false,
@@ -255,7 +250,9 @@
             "hidden": true,
             "title": "Custom fields",
             "tab": "",
-            "misc": null,
+            "misc": {
+                "tooltip": "Custom field values submitted with this booking."
+            },
             "required": false,
             "dependency": [],
             "default_value": "",

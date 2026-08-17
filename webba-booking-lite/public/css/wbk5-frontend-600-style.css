@@ -1,28 +1,3 @@
-@font-face {
-    font-family: poppins-light;
-    src: url(../fonts/poppins/Poppins-Light.ttf);
-}
-
-@font-face {
-    font-family: poppins;
-    src: url(../fonts/poppins/Poppins-Regular.ttf);
-}
-
-@font-face {
-    font-family: poppins-medium;
-    src: url(../fonts/poppins/Poppins-Medium.ttf);
-}
-
-@font-face {
-    font-family: poppins-semibold;
-    src: url(../fonts/poppins/Poppins-SemiBold.ttf);
-}
-
-@font-face {
-    font-family: poppins;
-    src: url(../fonts/poppins/Poppins-Bold.ttf);
-    font-weight: bold;
-}
 body {
     margin: 0;
 }
@@ -570,7 +545,7 @@ font-weight: 400;
 
 .button-wbk,
 .button-wbk:focus {
-    font-family: poppins-semibold, arial !important;
+    font-family: "Ubuntu", sans-serif !important;
     display: inline-block;
     background: #1f6763;
     border-radius: 15px !important;
@@ -2662,7 +2637,7 @@ font-weight: 400;
     border: none !important;
 }
 .payment-details-wrapper-w table thead td {
-    font-family: poppins-semibold;
+    font-family: "Ubuntu", sans-serif;
     border: none !important;
 }
 .payment-details-wrapper-w table tfoot tr:first-child td {
@@ -3019,7 +2994,7 @@ font-weight: 400;
 
 .label-standalone-w {
     margin: 0 0 10px 0;
-    font-family: poppins-semibold;
+    font-family: "Ubuntu", sans-serif;
 }
 
 .calendar-horizontal-w {

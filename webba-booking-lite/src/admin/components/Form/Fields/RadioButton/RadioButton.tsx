@@ -55,6 +55,10 @@ export const createRadioButton: FormComponentConstructor<any> = ({ field, fieldC
         const options = getOptions(misc)
         const isIconType = misc?.radio_type === 'icon'
         const isDotsType = misc?.radio_type === 'dots'
+        const columnCount =
+            isIconType && typeof misc?.column_count === 'number' && misc.column_count > 0
+                ? misc.column_count
+                : undefined
         const form = useMemo(() => useForm(), [value])
         const { plan_map, admin_url, wording, plugin_url } = useSelect(
             (select: any) => select(store).getPreset(),
@@ -80,8 +84,14 @@ export const createRadioButton: FormComponentConstructor<any> = ({ field, fieldC
                     className={classNames(
                         'wbk_radioButton__buttons',
                         isIconType && 'wbk_radioButton__buttons--buttonsIcon',
+                        columnCount && 'wbk_radioButton__buttons--buttonsIconColumns',
                         isDotsType && 'wbk_radioButton__buttons--buttonsDots'
                     )}
+                    style={
+                        columnCount
+                            ? ({ '--wbk-radio-columns': columnCount } as React.CSSProperties)
+                            : undefined
+                    }
                 >
                     {options.map((option) => {
                         const optionValue = option.value

@@ -182,12 +182,6 @@ class WBK_Assets_Manager
             $translation_array
         );
 
-        wp_localize_script(
-            'wbk-backend-script',
-            'wbk_dashboardl10n_old',
-            $translation_array
-        );
-
         // remove in V5
         if (
             isset($_GET['page']) &&

@@ -14,12 +14,18 @@ $menu-icon-size: 24px;
     display: flex;
     flex-direction: column;
     gap: 24px;
-    background-color: #efefef;
+    background-color: colors.$background-offwhite;
+    border: 1px solid colors.$input-border;
     padding: 6px 4px;
     border-radius: 8px;
+    color: colors.$text-black;
 
     &:not(.wbk_formBuilderField__fieldsContainer--containerCollapsed) {
         padding: 12px;
+    }
+
+    &.wbk_formBuilderField__fieldsContainer--invalid {
+        border-color: colors.$red;
     }
 }
 
@@ -49,6 +55,7 @@ $menu-icon-size: 24px;
     cursor: pointer;
     padding: 1px 6px;
     min-width: unset;
+    color: colors.$text-grey;
 }
 
 .wbk_formBuilderField__moreIcon {
@@ -58,6 +65,11 @@ $menu-icon-size: 24px;
     min-height: 24px;
     max-width: 24px;
     min-height: 24px;
+
+    #wbk_spa_dashboard[data-theme='dark'] &,
+    .wbk_sidebar__container[data-theme='dark'] & {
+        filter: invert(1) brightness(1.3);
+    }
 }
 
 .wbk_formBuilderField__deleteIcon {
@@ -67,6 +79,11 @@ $menu-icon-size: 24px;
     min-height: 16px;
     max-width: 16px;
     min-height: 16px;
+
+    #wbk_spa_dashboard[data-theme='dark'] &,
+    .wbk_sidebar__container[data-theme='dark'] & {
+        filter: invert(1) brightness(1.3);
+    }
 }
 
 .wbk_formBuilderField__menuBtn:hover {
@@ -90,10 +107,12 @@ $menu-icon-size: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: colors.$light-grey;
 
     svg {
         width: 24px;
         height: 24px;
+        fill: currentColor;
     }
 }
 
@@ -113,8 +132,8 @@ $menu-icon-size: 24px;
     left: auto;
     top: -32px;
     transform: none;
-    background: #222;
-    color: #fff;
+    background: colors.$off-black;
+    color: colors.$text-white;
     padding: 6px 12px;
     border-radius: 4px;
     font-size: 13px;
@@ -129,4 +148,35 @@ $menu-icon-size: 24px;
 
 .wbk_formBuilderField__requiredToggleWrapper:hover .wbk_formBuilderField__requiredTooltip {
     display: block;
+}
+
+.wbk_formBuilderField__typeField {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wbk_formBuilderField__typeInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wbk_formBuilderField__typeDescription {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: colors.$light-grey;
+}
+
+.wbk_formBuilderField__typeDocsLink {
+    font-size: 13px;
+    line-height: 1.45;
+    color: colors.$primary;
+    text-decoration: underline;
+    width: fit-content;
+
+    &:hover {
+        color: colors.$primary-hover;
+    }
 }

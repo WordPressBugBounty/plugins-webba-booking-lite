@@ -10,26 +10,26 @@
 }
 
 .wbk_settingsSectionStep__tab {
-    border: 1px solid #e5e7eb;
+    border: 1px solid colors.$input-border;
     border-radius: 999px;
-    background: #fff;
+    background: colors.$background-white;
     padding: 6px 14px;
     font-size: 13px;
-    color: #6b7280;
+    color: colors.$light-grey;
     cursor: pointer;
 
     &--active {
-        border-color: #14b8a9;
-        background: #ecfdf5;
-        color: #0f766e;
+        border-color: colors.$primary;
+        background: colors.$primary-soft;
+        color: colors.$green;
     }
 }
 
 .wbk_settingsSectionStep__fields {
-    border: 1px solid #e5e7eb;
+    border: 1px solid colors.$input-border;
     border-radius: 8px;
     padding: 16px;
-    background: #fff;
+    background: colors.$background-white;
 }
 
 .wbk_settingsSectionStep__field {
@@ -55,8 +55,8 @@
     padding: 10px 18px;
     border: none;
     border-radius: 8px;
-    background: #14b8a9;
-    color: #fff;
+    background: colors.$primary;
+    color: colors.$text-white;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -65,15 +65,19 @@
         opacity: 0.7;
         cursor: not-allowed;
     }
+
+    &:hover:not(:disabled) {
+        background: colors.$primary-hover;
+    }
 }
 
 .wbk_settingsSectionStep__skipButton {
-    border: 1px solid #e5e7eb;
+    border: 1px solid colors.$input-border;
     border-radius: 8px;
-    background: #fff;
+    background: colors.$background-white;
     padding: 10px 18px;
     font-size: 14px;
-    color: #6b7280;
+    color: colors.$light-grey;
     cursor: pointer;
 
     &:disabled {
@@ -82,14 +86,14 @@
     }
 
     &:hover:not(:disabled) {
-        border-color: #d1d5db;
-        color: #374151;
+        border-color: colors.$field-border;
+        color: colors.$text-grey;
     }
 }
 
 .wbk_settingsSectionStep__secondaryLink {
     font-size: 14px;
-    color: #14b8a9;
+    color: colors.$primary;
     text-decoration: none;
 
     &:hover {
@@ -100,5 +104,5 @@
 .wbk_settingsSectionStep__empty {
     margin: 0;
     font-size: 14px;
-    color: #6b7280;
+    color: colors.$light-grey;
 }

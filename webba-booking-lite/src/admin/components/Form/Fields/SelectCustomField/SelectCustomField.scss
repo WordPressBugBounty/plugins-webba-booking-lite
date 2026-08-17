@@ -31,7 +31,7 @@
     height: 50px;
     font-family: typography.$font-primary;
     font-size: 16px;
-    color: #333333;
+    color: colors.$input-text;
     width: 100%;
     max-width: 100%;
 
@@ -40,11 +40,11 @@
     }
 
     .css-tj5bde-Svg {
-        fill: #333333;
+        fill: colors.$light-grey;
     }
 
     .css-1jqq78o-placeholder {
-        color: #333333;
+        color: colors.$light-grey;
     }
 }
 
@@ -59,7 +59,7 @@
     height: 50px;
     font-family: typography.$font-primary;
     font-size: 16px;
-    color: #333333;
+    color: colors.$input-text;
     width: 100%;
     padding: 0 16px;
     box-sizing: border-box;

@@ -6,16 +6,19 @@ import { ProFeatureBannerKey } from '../../types/featureDisplay'
 import { PRO_FEATURE_BANNER_CONTENT } from './proFeatureBannerContent'
 import { ProFeatureBannerPreview } from './ProFeatureBannerPreview'
 import { getUniquePlanBadges } from '../../../utilities/planHelper'
+import closeIcon2 from '../../../../public/images/close-icon2.png'
 import './ProFeatureBanner.scss'
 
 interface ProFeatureBannerProps {
     featureKey: ProFeatureBannerKey
     requiredPlans: string[]
+    onClose?: () => void
 }
 
 export const ProFeatureBanner = ({
     featureKey,
     requiredPlans,
+    onClose,
 }: ProFeatureBannerProps) => {
     const { plugin_url, admin_url } = useSelect(
         (select) => select(store).getPreset(),
@@ -26,7 +29,21 @@ export const ProFeatureBanner = ({
     const planBadges = getUniquePlanBadges(requiredPlans)
 
     return (
-        <div className="wbk_proFeatureBanner">
+        <div
+            className={classNames('wbk_proFeatureBanner', {
+                'wbk_proFeatureBanner--dismissible': !!onClose,
+            })}
+        >
+            {onClose && (
+                <button
+                    type="button"
+                    className="wbk_proFeatureBanner__closeBtn"
+                    onClick={onClose}
+                    aria-label={__('Close', 'webba-booking-lite')}
+                >
+                    <img src={closeIcon2} alt="" />
+                </button>
+            )}
             <div className="wbk_proFeatureBanner__content">
                 <div className="wbk_proFeatureBanner__header">
                     <div className="wbk_proFeatureBanner__titleGroup">

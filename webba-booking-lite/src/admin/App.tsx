@@ -12,6 +12,7 @@ import { usePage } from "./components/Router/usePage";
 import { BookingsScreen } from "./screens/Bookings/BookingsScreen";
 import { Dashboard } from "./screens/Dashboard/Dashboard";
 import { SettingsProvider } from "./providers/SettingsProvider";
+import { ThemeProvider } from "./providers/ThemeProvider/ThemeProvider";
 import { useSelect } from "@wordpress/data";
 import { store_name } from "../store/backend";
 import { CanecelledBookingsScreen } from "./screens/Bookings/CanecelledBookingsScreen";
@@ -141,17 +142,19 @@ export const App = () => {
   );
 
   return (
-    <SidebarProvider>
-      <ConfirmationPopupProvider>
-        <SettingsProvider settings={settings}>
-          {!isActivationPage && <Header />}
-          {!isActivationPage && <Router config={pageToRoutesMap[page]} />}
-          {!isActivationPage && <Sidebar />}
-          {!isActivationPage && <ConfirmationPopup />}
-          {!isActivationPage && <SetupChecklist />}
-          {!isActivationPage && <FeatureTour />}
-        </SettingsProvider>
-      </ConfirmationPopupProvider>
-    </SidebarProvider>
+    <ThemeProvider>
+      <SidebarProvider>
+        <ConfirmationPopupProvider>
+          <SettingsProvider settings={settings}>
+            {!isActivationPage && <Header />}
+            {!isActivationPage && <Router config={pageToRoutesMap[page]} />}
+            {!isActivationPage && <Sidebar />}
+            {!isActivationPage && <ConfirmationPopup />}
+            {!isActivationPage && <SetupChecklist />}
+            {!isActivationPage && <FeatureTour />}
+          </SettingsProvider>
+        </ConfirmationPopupProvider>
+      </SidebarProvider>
+    </ThemeProvider>
   );
 };

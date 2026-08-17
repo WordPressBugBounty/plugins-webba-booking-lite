@@ -5,7 +5,7 @@
     position: relative;
 
     &.wbk_durationField--invalid .wbk_durationField__inputWrapper {
-        border-color: red;
+        border-color: colors.$red;
     }
 }
 
@@ -20,11 +20,11 @@
     display: flex;
     align-items: center;
     flex: 1;
-    background: #f9fafb;
-    border: 1px solid #d1d5db;
+    background: colors.$field-background;
+    border: 1px solid colors.$field-border;
     border-radius: 8px;
-    color: #212121;
-    font-family: Ubuntu, sans-serif;
+    color: colors.$input-text;
+    font-family: typography.$font-primary;
     font-size: 16px;
     height: 50px;
     margin: 0;
@@ -41,7 +41,7 @@
     background: transparent;
     font-family: typography.$font-primary;
     font-size: 16px;
-    color: #212121;
+    color: colors.$input-text;
     outline: none;
     padding: 0;
     margin: 0;
@@ -69,7 +69,7 @@
 }
 
 .wbk_durationField__label {
-    color: #8a9393;
+    color: colors.$border-dark;
     font-family: typography.$font-primary;
     font-size: 16px;
     margin-left: auto;
@@ -77,7 +77,7 @@
 }
 
 .wbk_durationField__errorContainer {
-    color: red;
+    color: colors.$red;
     position: absolute;
     bottom: -18px;
     left: 0;

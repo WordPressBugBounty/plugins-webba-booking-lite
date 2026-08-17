@@ -429,15 +429,38 @@ export const SelectedItem = ({
         }
     }, [isTimeslotsLoading, timeslots, expanded])
 
+    const minQ = Math.max(1, Number(min_quantity) || 1)
+    const maxQ = Math.max(minQ, Number(max_quantity) || 1)
+    const hasQuantityRange = maxQ > minQ
+    const currentQuantity = Math.min(
+        maxQ,
+        Math.max(minQ, Number(quantity) || minQ)
+    )
+
     useEffect(() => {
-        if (!formData.places || Object.keys(formData.places).length === 0)
+        if (!formData.places || Object.keys(formData.places).length === 0) {
             return
+        }
+
+        const placesWithQuantity = Object.fromEntries(
+            Object.entries(formData.places).map(([serviceId, slots]) => [
+                serviceId,
+                Array.isArray(slots)
+                    ? slots.map((slot) =>
+                          Number(serviceId) === Number(id)
+                              ? { ...slot, quantity: currentQuantity }
+                              : slot
+                      )
+                    : slots,
+            ])
+        )
 
         fetchBookingAmounts({
             ...formData,
+            places: placesWithQuantity,
             generate_stripe_intent: false,
         })
-    }, [formData.places])
+    }, [formData.places, currentQuantity, id])
 
     const addPlacesFromSelection = useCallback(
         (time: number, singleSlotMode: boolean) => {
@@ -610,14 +633,6 @@ export const SelectedItem = ({
 
         return selectedServices[currentIndex - 1]?.places?.length === 0
     }, [services, id])
-
-    const minQ = Math.max(1, Number(min_quantity) || 1)
-    const maxQ = Math.max(minQ, Number(max_quantity) || 1)
-    const hasQuantityRange = maxQ > minQ
-    const currentQuantity = Math.min(
-        maxQ,
-        Math.max(minQ, Number(quantity) || minQ)
-    )
 
     const setQuantity = useCallback(
         (updatedQuantity: number) => {

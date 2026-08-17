@@ -17,6 +17,15 @@
         rgba(196, 181, 253, 0.35)
     );
     filter: blur(24px);
+
+    #wbk_spa_dashboard[data-theme='dark'] &,
+    body[data-wbk-theme='dark'] & {
+        background: linear-gradient(
+            135deg,
+            rgba(61, 155, 149, 0.28),
+            rgba(125, 211, 252, 0.16)
+        );
+    }
 }
 
 .wbk_proFeatureBannerPreview__table {
@@ -24,10 +33,10 @@
     width: 100%;
     max-width: 360px;
     padding: 16px;
-    border: 1px solid #ececf1;
+    border: 1px solid colors.$input-border;
     border-radius: 14px;
-    background: rgba(255, 255, 255, 0.92);
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+    background: colors.$surface-elevated;
+    box-shadow: 0 18px 40px colors.$shadow;
     transform: rotate(-4deg);
 }
 
@@ -42,18 +51,18 @@
 .wbk_proFeatureBannerPreview__header {
     margin-bottom: 10px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #f0f0f3;
+    border-bottom: 1px solid colors.$row-border;
     font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: #9ca3af;
+    color: colors.$light-grey;
 }
 
 .wbk_proFeatureBannerPreview__row {
     padding: 8px 0;
     font-size: 11px;
-    color: #4b5563;
+    color: colors.$text-grey;
 
     span {
         overflow: hidden;
@@ -62,12 +71,12 @@
     }
 
     span:first-child {
-        color: #9ca3af;
+        color: colors.$light-grey;
     }
 
     span:last-child {
         font-weight: 600;
-        color: #111827;
+        color: colors.$off-black;
     }
 }
 

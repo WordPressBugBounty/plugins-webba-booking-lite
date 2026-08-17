@@ -4,11 +4,44 @@
     align-items: center;
     justify-content: space-between;
     padding: 32px;
-    border: 1px solid #e8e8e8;
+    border: 1px solid colors.$input-border;
     border-radius: 16px;
-    background: #fff;
+    background: colors.$background-white;
     overflow: hidden;
     margin: 20px;
+    color: colors.$text-black;
+}
+
+.wbk_proFeatureBanner--dismissible {
+    position: relative;
+    padding-top: 48px;
+}
+
+.wbk_proFeatureBanner__closeBtn {
+    all: unset;
+    cursor: pointer;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    border: 1px solid colors.$border-dark;
+    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    background: colors.$background-white;
+
+    img {
+        width: 12px;
+        height: 12px;
+
+        #wbk_spa_dashboard[data-theme='dark'] &,
+        body[data-wbk-theme='dark'] & {
+            filter: invert(1) brightness(0.9);
+        }
+    }
 }
 
 .wbk_proFeatureBanner__content {
@@ -37,11 +70,16 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: #f4f4f6;
+    background: colors.$background-offwhite;
 
     img {
         width: 18px;
         height: 18px;
+
+        #wbk_spa_dashboard[data-theme='dark'] &,
+        body[data-wbk-theme='dark'] & {
+            filter: invert(1) brightness(0.9);
+        }
     }
 }
 
@@ -49,7 +87,7 @@
     margin: 0;
     font-size: 18px;
     font-weight: 700;
-    color: #1a1a1a;
+    color: colors.$off-black;
 }
 
 .wbk_proFeatureBanner__badges {
@@ -70,7 +108,7 @@
 
 .wbk_proFeatureBanner__badge--minimum {
     color: colors.$primary;
-    background: rgba(colors.$primary, 0.14);
+    background: colors.$primary-soft;
 }
 
 .wbk_proFeatureBanner__headline {
@@ -78,14 +116,14 @@
     font-size: 28px;
     line-height: 1.25;
     font-weight: 700;
-    color: #111;
+    color: colors.$off-black;
 }
 
 .wbk_proFeatureBanner__description {
     margin: 0 0 20px;
     font-size: 15px;
     line-height: 1.6;
-    color: #6b7280;
+    color: colors.$light-grey;
 }
 
 .wbk_proFeatureBanner__features {
@@ -99,7 +137,7 @@
         margin-bottom: 10px;
         font-size: 14px;
         line-height: 1.5;
-        color: #374151;
+        color: colors.$text-grey;
 
         &::before {
             content: '';
@@ -136,22 +174,23 @@
 }
 
 .wbk_proFeatureBanner__upgradeButton {
-    color: #fff;
+    color: colors.$text-white;
     background: colors.$primary;
 
     &:hover {
-        color: #fff;
-        background: darken(colors.$primary, 10%);
+        color: colors.$text-white;
+        background: colors.$primary-hover;
     }
 }
 
 .wbk_proFeatureBanner__learnMoreButton {
-    color: #374151;
-    background: #f3f4f6;
+    color: colors.$text-grey;
+    background: colors.$background-offwhite;
+    border: 1px solid colors.$input-border;
 
     &:hover {
-        color: #111;
-        background: #e5e7eb;
+        color: colors.$off-black;
+        background: colors.$row-border;
     }
 }
 

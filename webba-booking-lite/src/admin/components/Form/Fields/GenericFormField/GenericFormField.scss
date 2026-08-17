@@ -10,7 +10,7 @@
 }
 
 .wbk_genericFormField__field.wbk_genericFormField__field--invalid .wbk_genericFormField__input {
-    border-color: red;
+    border-color: colors.$red;
 }
 
 .wbk_genericFormField__labelContainer {
@@ -18,7 +18,7 @@
 }
 
 .wbk_genericFormField__errorContainer {
-    color: red;
+    color: colors.$red;
     position: absolute;
     bottom: -18px;
     left: 0;
@@ -33,11 +33,16 @@
     padding: 0 20px 0 20px;
     font-family: typography.$font-primary;
     font-size: 16px;
-    color: #212121;
+    color: colors.$input-text;
     width: 100%;
 
     &:focus {
         @include fields.field-focused-state;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 }
 
@@ -46,6 +51,9 @@
     min-height: 280px;
     border-radius: 2px;
     padding: 10px;
+    background: colors.$field-background;
+    border: 1px solid colors.$field-border;
+    color: colors.$input-text;
 }
 
 .wbk_genericFormField__editorToggle {
@@ -55,13 +63,151 @@
 
     .wbk_genericFormField__editorToggleButton {
         padding: 5px 8px;
-        background-color: darker(#f6f7f7, 5);
-        color: #595959;
+        background-color: colors.$background-offwhite;
+        color: colors.$text-grey;
         cursor: pointer;
-        border: 1px solid #dcdcde;
+        border: 1px solid colors.$field-border;
 
         &.wbk_genericFormField__editorToggleButton--active {
-            background-color: #f6f7f7;
+            background-color: colors.$field-background;
+            color: colors.$off-black;
         }
+    }
+}
+
+.wbk_genericFormField__editorShell {
+    border: 1px solid colors.$field-border;
+    border-radius: 8px;
+    overflow: hidden;
+    background: colors.$field-background;
+
+    .tox-tinymce,
+    .mce-tinymce {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    .tox .tox-edit-area__iframe,
+    .mce-edit-area iframe {
+        background: colors.$field-background;
+    }
+
+    .tox .tox-toolbar,
+    .tox .tox-toolbar__primary,
+    .tox .tox-toolbar__overflow,
+    .tox .tox-menubar,
+    .tox .tox-statusbar,
+    .mce-toolbar,
+    .mce-toolbar-grp,
+    .mce-statusbar,
+    .mce-panel {
+        background: colors.$background-offwhite !important;
+        border-color: colors.$input-border !important;
+        color: colors.$input-text !important;
+    }
+
+    .tox .tox-tbtn,
+    .tox .tox-tbtn svg,
+    .mce-btn button,
+    .mce-ico {
+        color: colors.$input-text !important;
+        fill: colors.$input-text !important;
+    }
+
+    .tox .tox-tbtn:hover,
+    .mce-btn:hover {
+        background: colors.$row-border !important;
+    }
+
+    .tox .tox-edit-area,
+    .mce-edit-area {
+        border-color: colors.$input-border !important;
+        background: colors.$field-background !important;
+    }
+
+    .mce-listbox,
+    .mce-listbox.mce-btn,
+    .mce-btn.mce-listbox {
+        background: colors.$field-background !important;
+        border: 1px solid colors.$field-border !important;
+        border-radius: 4px !important;
+        box-shadow: none !important;
+    }
+
+    .mce-listbox button,
+    .mce-listbox .mce-txt,
+    .mce-listbox .mce-open {
+        background: transparent !important;
+        color: colors.$input-text !important;
+        text-shadow: none !important;
+    }
+
+    .mce-listbox .mce-caret {
+        border-top-color: colors.$input-text !important;
+    }
+
+    .mce-listbox:hover,
+    .mce-listbox:hover button {
+        background: colors.$row-border !important;
+        color: colors.$input-text !important;
+    }
+
+    .tox .tox-listboxfield .tox-listbox--select,
+    .tox .tox-listbox__select-label {
+        background: colors.$field-background !important;
+        color: colors.$input-text !important;
+        border-color: colors.$field-border !important;
+    }
+}
+
+body[data-wbk-theme='dark'],
+#wbk_spa_dashboard[data-theme='dark'],
+.wbk_sidebar__container[data-theme='dark'] {
+    .mce-floatpanel,
+    .mce-menu,
+    .mce-panel.mce-menu,
+    .mce-popover {
+        background: colors.$background-white !important;
+        border: 1px solid colors.$input-border !important;
+        box-shadow: 0 8px 24px colors.$shadow !important;
+        color: colors.$input-text !important;
+    }
+
+    .mce-menu-item,
+    .mce-menu-item .mce-text,
+    .mce-menu-item .mce-ico {
+        color: colors.$input-text !important;
+        background: transparent !important;
+        text-shadow: none !important;
+    }
+
+    .mce-menu-item:hover,
+    .mce-menu-item:focus,
+    .mce-menu-item.mce-selected,
+    .mce-menu-item.mce-active {
+        background: colors.$background-offwhite !important;
+        color: colors.$off-black !important;
+    }
+
+    .mce-menu-item.mce-disabled,
+    .mce-menu-item.mce-disabled .mce-text {
+        color: colors.$light-grey !important;
+    }
+
+    .mce-menu .mce-menu-shortcut {
+        color: colors.$light-grey !important;
+    }
+
+    .tox .tox-menu,
+    .tox .tox-collection--list,
+    .tox .tox-collection__item {
+        background: colors.$background-white !important;
+        color: colors.$input-text !important;
+        border-color: colors.$input-border !important;
+    }
+
+    .tox .tox-collection__item--active,
+    .tox .tox-collection__item--enabled {
+        background: colors.$background-offwhite !important;
     }
 }

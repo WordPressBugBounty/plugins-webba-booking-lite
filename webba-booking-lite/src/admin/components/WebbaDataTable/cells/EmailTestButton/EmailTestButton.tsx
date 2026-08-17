@@ -11,6 +11,7 @@ import { store_name } from '../../../../../store/backend'
 import classNames from 'classnames'
 import Select from 'react-select'
 import closeIcon from '../../../../../../public/images/close-icon2.png'
+import { getAdminSelectStyles } from '../../../../utils/adminSelectStyles'
 
 export const EmailTestButton = ({ cell, row }: CellContext<any, any>) => {
     const { id, recipients, template: message, subject } = row.original
@@ -153,6 +154,16 @@ export const EmailTestButton = ({ cell, row }: CellContext<any, any>) => {
                             classNames={{
                                 control: () => 'wbk_emailTestButton__selectControl',
                             }}
+                            styles={getAdminSelectStyles({
+                                control: (base: Record<string, unknown>) => ({
+                                    ...base,
+                                    minHeight: 64,
+                                    height: 64,
+                                    borderTopRightRadius: 0,
+                                    borderBottomRightRadius: 0,
+                                    borderRight: 'none',
+                                }),
+                            })}
                             placeholder={__(
                                 'Select bookings to test',
                                 'webba-booking-lite'

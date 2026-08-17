@@ -5,6 +5,7 @@ import { IApperanceOptionConfig } from '../../types'
 import './SelectOption.scss'
 import { IOption } from '../../../Form/types'
 import warningIcon from '../../../../../../public/images/warning.svg'
+import { getAdminSelectStyles } from '../../../../utils/adminSelectStyles'
 
 export const SelectOption = ({ fieldConfig }: IApperanceOptionConfig) => {
     const { id, value, setValue, label, options, warning } =
@@ -24,6 +25,13 @@ export const SelectOption = ({ fieldConfig }: IApperanceOptionConfig) => {
                 classNames={{
                     control: () => 'wbk_selectOption__selectInput',
                 }}
+                styles={getAdminSelectStyles({
+                    control: (base: Record<string, unknown>) => ({
+                        ...base,
+                        minHeight: 40,
+                        borderRadius: 6,
+                    }),
+                })}
                 isSearchable={false}
             />
             {warning && (

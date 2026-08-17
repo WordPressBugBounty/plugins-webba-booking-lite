@@ -1,0 +1,144 @@
+.wbk_massAddBookingsPopup {
+    height: auto;
+    max-height: 85vh;
+}
+
+.wbk_massAddBookingsPopup__body {
+    overflow-y: auto;
+    min-height: 0;
+    flex: 1 1 auto;
+    padding: 20px;
+}
+
+.wbk_massAddBookingsPopup__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.wbk_massAddBookingsPopup__field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &--error {
+        .wbk_massAddBookingsPopup__label {
+            color: colors.$red;
+        }
+
+        .wbk_massAddBookingsPopup__dateInput,
+        .wbk_massAddBookingsPopup__textInput,
+        .wbk_massAddBookingsPopup__textarea {
+            border-color: colors.$red;
+        }
+    }
+}
+
+.wbk_massAddBookingsPopup__label {
+    font-size: 14px;
+    font-weight: 600;
+    color: colors.$off-black;
+}
+
+.wbk_massAddBookingsPopup__dateInput,
+.wbk_massAddBookingsPopup__textInput,
+.wbk_massAddBookingsPopup__textarea {
+    border: 1px solid colors.$field-border;
+    background: colors.$field-background;
+    border-radius: 8px;
+    margin: 0;
+    padding: 0 20px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: colors.$input-text;
+    width: 100%;
+    box-sizing: border-box;
+
+    &::placeholder {
+        color: colors.$light-grey;
+    }
+
+    &:focus {
+        border-color: #14b8a9;
+        outline: none;
+        box-shadow: 0 0 0 1px #14b8a9;
+    }
+}
+
+.wbk_massAddBookingsPopup__dateInput,
+.wbk_massAddBookingsPopup__textInput {
+    height: 50px;
+}
+
+.wbk_massAddBookingsPopup__textarea {
+    min-height: 90px;
+    padding: 14px 20px;
+    resize: vertical;
+}
+
+.wbk_massAddBookingsPopup__hint {
+    margin: 0;
+    font-size: 13px;
+    color: colors.$text-grey;
+}
+
+.wbk_massAddBookingsPopup__loading {
+    margin: 0;
+    font-size: 13px;
+    color: colors.$text-grey;
+}
+
+.wbk_massAddBookingsPopup__error {
+    margin: 16px 0 0;
+    font-size: 13px;
+    color: colors.$red;
+}
+
+.wbk_massAddBookingsPopup__field {
+    .react-datepicker-wrapper {
+        width: 100%;
+    }
+
+    .react-datepicker-popper {
+        z-index: 10000000;
+    }
+
+    .react-datepicker__close-icon {
+        z-index: 1;
+
+        &::after {
+            background-color: colors.$primary;
+        }
+    }
+}
+
+.wbk_massAddBookingsPopup__calendar {
+    background-color: colors.$background-white;
+    border: 1px solid colors.$input-border;
+    color: colors.$input-text;
+    font-family: typography.$font-primary;
+
+    .react-datepicker {
+        border: none;
+        font-family: typography.$font-primary;
+        background-color: colors.$background-white;
+        color: colors.$input-text;
+    }
+
+    .react-datepicker__header {
+        background-color: colors.$background-offwhite;
+        border-bottom-color: colors.$input-border;
+    }
+
+    .react-datepicker__current-month,
+    .react-datepicker__day-name,
+    .react-datepicker__day {
+        color: colors.$text-black;
+    }
+
+    .react-datepicker__day--selected,
+    .react-datepicker__day--keyboard-selected {
+        background-color: colors.$primary;
+        color: colors.$text-white;
+    }
+}

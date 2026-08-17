@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n'
 import { CounterInput } from './CounterInput'
 import { IRecurringBookingControlsProps, RecurringRepeatInterval } from './types'
 import './RecurringBookingControls.scss'
+import { useWording } from '../../hooks/useWording'
 
 const INTERVAL_OPTIONS: Record<
     RecurringRepeatInterval,
@@ -24,11 +25,12 @@ export const RecurringBookingControls = ({
     onRepeatIntervalChange,
     onCountChange,
 }: IRecurringBookingControlsProps) => {
+    const wording = useWording()
     return (
         <div className="wbk_recurring_controls">
             <div className="wbk_recurring_controls__row">
                 <CounterInput
-                    label={__('Repeat every', 'webba-booking-lite')}
+                    label={wording.recurring_booking_repeat_every || __('Repeat every', 'webba-booking-lite')}
                     value={intervalStep}
                     min={1}
                     disabled={disabled}
@@ -39,7 +41,7 @@ export const RecurringBookingControls = ({
                         className="wbk_recurring_controls__interval-label"
                         htmlFor="wbk_recurring_interval_select"
                     >
-                        {__('Interval', 'webba-booking-lite')}
+                        {wording.recurring_booking_interval || __('Interval', 'webba-booking-lite')}
                     </label>
                     <select
                         id="wbk_recurring_interval_select"
@@ -64,7 +66,7 @@ export const RecurringBookingControls = ({
                 </div>
             </div>
             <CounterInput
-                label={__(
+                label={wording.recurring_booking_number_of_time_slots || __(
                     'Number of time slots',
                     'webba-booking-lite'
                 )}

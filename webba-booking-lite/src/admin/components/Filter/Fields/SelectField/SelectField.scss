@@ -28,8 +28,11 @@
 }
 
 .wbk_selectField__selectInput {
+    display: flex;
+    align-items: center;
     border-radius: dimensions.$input-radius;
     border: 1px solid colors.$input-border;
+    background-color: colors.$background-white;
     height: dimensions.$input-height;
     width: 100%;
     max-width: 100%;
@@ -40,8 +43,18 @@
         $weight: 300
     );
 
+    input {
+        margin: 0;
+        padding: 0;
+    }
+
     .css-hlgwow {
         padding-left: 12px;
+        padding-top: 0;
+        padding-bottom: 0;
+        display: flex;
+        align-items: center;
+        height: 100%;
     }
 
     &.wbk_selectField__selectInput--preventOverlap {
@@ -53,25 +66,24 @@
     }
 
     .css-tj5bde-Svg {
-        fill: #9ca3af;
+        fill: colors.$light-grey;
     }
 
     .css-1jqq78o-placeholder {
-        color: #333333;
+        color: colors.$light-grey;
     }
 }
 
 .wbk_selectField__multiValueMore {
     display: flex;
     min-width: 0;
-    background-color: hsl(0, 0%, 90%);
+    background-color: colors.$background-offwhite;
     border-radius: 2px;
     margin: 2px;
     box-sizing: border-box;
     max-width: 100px;
     white-space: nowrap;
-    border-radius: 2px;
-    color: hsl(0, 0%, 20%);
+    color: colors.$input-text;
     font-size: 85%;
     padding: 3px;
     padding-left: 6px;

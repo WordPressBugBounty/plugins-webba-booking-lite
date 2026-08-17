@@ -1,0 +1,72 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    list-style: none;
+}
+
+.handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    cursor: grab;
+    padding: 8px 4px;
+    color: var(--wbk-admin-light-grey, #668091);
+    flex-shrink: 0;
+}
+
+.handle:active {
+    cursor: grabbing;
+}
+
+.inputWrapper {
+    width: 100%;
+}
+
+.inputs {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+}
+
+.menuBtn {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 1px 6px;
+    min-width: unset;
+    flex-shrink: 0;
+}
+
+.deleteIcon {
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    max-width: 16px;
+}
+
+.emptyState {
+    color: var(--wbk-admin-light-grey, #668091);
+    font-size: 14px;
+}
+
+.emptyStateError {
+    color: #d63638;
+}

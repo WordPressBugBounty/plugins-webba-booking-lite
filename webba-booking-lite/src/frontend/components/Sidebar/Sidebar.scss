@@ -570,6 +570,12 @@ $transition: 0.3s all linear;
             display: flex;
             justify-content: space-between;
             align-items: center;
+
+            &--has-bottom-border{
+                border-bottom: 1px solid #edeff2;
+                padding-bottom: 8px;
+                margin-bottom: 8px;
+            }
         }
     }
 

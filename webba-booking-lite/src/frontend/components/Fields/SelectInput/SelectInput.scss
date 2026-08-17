@@ -1,21 +1,198 @@
 .wbk_input {
     &__select {
-        &__input {
-            padding: 4px;
+        position: relative;
+        width: 100%;
+
+        &--error {
+            .wbk_input__select__control {
+                border-color: red !important;
+            }
+        }
+
+        &__control {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            box-sizing: border-box !important;
+            min-height: 42px !important;
+            height: auto !important;
+            width: 100% !important;
+            max-width: unset !important;
+            margin: 0 !important;
+            padding: 4px 8px 4px 12px !important;
             border-radius: 8px !important;
+            border: 1px solid #d4dde2 !important;
+            outline: none !important;
+            box-shadow: none !important;
+            background-color: #ffffff !important;
+            transition: 0.2s all ease !important;
+            cursor: pointer;
+        }
+
+        &__control--is-focused {
+            border-color: colors.$wbk-primary-500 !important;
+        }
+
+        &__value-container {
+            display: flex !important;
+            flex: 1 1 auto !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            flex-wrap: wrap !important;
+            gap: 4px;
+            min-width: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: hidden;
+        }
+
+        &__single-value {
+            margin: 0 !important;
+            padding: 0 !important;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            position: static !important;
+            transform: none !important;
+            font-weight: 300 !important;
+            font-size: 14px !important;
+            line-height: 22px !important;
+            color: #22292f !important;
+        }
+
+        &__placeholder {
+            margin: 0 !important;
+            position: static !important;
+            transform: none !important;
+            font-weight: 300 !important;
+            font-size: 14px !important;
+            line-height: 22px !important;
+            color: #668091 !important;
+        }
+
+        &__input-container {
+            margin: 0 !important;
+            padding: 0 !important;
+            flex: 1 1 auto !important;
+
+            input {
+                height: auto !important;
+                min-height: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: 0 !important;
+                box-shadow: none !important;
+                background: transparent !important;
+                font-weight: 300 !important;
+                font-size: 14px !important;
+                line-height: 22px !important;
+                color: #22292f !important;
+            }
+        }
+
+        &__indicators {
+            display: flex !important;
+            flex: 0 0 auto !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            align-self: stretch !important;
+            height: auto !important;
+            padding: 0 !important;
+        }
+
+        &__indicator-separator {
+            display: none !important;
+        }
+
+        &__dropdown-indicator {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 4px !important;
+            color: #668091 !important;
+
+            svg {
+                width: 20px !important;
+                height: 20px !important;
+                max-width: 20px !important;
+                max-height: 20px !important;
+                display: block !important;
+            }
+        }
+
+        &__clear-indicator {
+            display: flex !important;
+            align-items: center !important;
+            padding: 4px !important;
+            color: #668091 !important;
+        }
+
+        &__menu {
+            position: absolute !important;
+            top: calc(100% + 4px) !important;
+            left: 0 !important;
+            right: 0 !important;
+            z-index: 20 !important;
+            margin: 0 !important;
+            padding: 4px 0 !important;
+            border: 1px solid #d4dde2 !important;
+            border-radius: 8px !important;
+            background: #ffffff !important;
+            box-shadow: 0 8px 24px rgba(34, 41, 47, 0.12) !important;
+            overflow: hidden;
+        }
+
+        &__menu-list {
+            max-height: 220px !important;
+            overflow-y: auto !important;
+            padding: 0 !important;
         }
 
         &__option {
-            font-weight: 300;
+            padding: 8px 12px !important;
+            font-weight: 300 !important;
             font-size: 14px !important;
             line-height: 22px !important;
-            letter-spacing: 1%;
+            color: #22292f !important;
+            cursor: pointer;
+            background: transparent !important;
         }
-    }
 
-    .css-19bb58m {
-        input {
-            min-height: initial !important;
+        &__option--is-focused {
+            background: #f3f6f8 !important;
+        }
+
+        &__option--is-selected {
+            background: colors.$wbk-primary-50 !important;
+            color: #22292f !important;
+        }
+
+        &__a11yText {
+            border: 0 !important;
+            clip: rect(1px, 1px, 1px, 1px) !important;
+            height: 1px !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            position: absolute !important;
+            width: 1px !important;
+            white-space: nowrap !important;
+        }
+
+        [aria-live='polite'],
+        [aria-atomic='true'][aria-live] {
+            border: 0 !important;
+            clip: rect(1px, 1px, 1px, 1px) !important;
+            height: 1px !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            position: absolute !important;
+            width: 1px !important;
+            white-space: nowrap !important;
         }
     }
 }

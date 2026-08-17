@@ -7,8 +7,12 @@
     padding: 0 20px 0 20px;
     font-family: typography.$font-primary;
     font-size: 16px;
-    color: #212121;
+    color: colors.$input-text;
     width: 100%;
+
+    &::placeholder {
+        color: colors.$light-grey;
+    }
 
     &:active,
     &:focus {
@@ -34,40 +38,88 @@
         z-index: 99999;
 
         &::after {
-            background-color: #1f6763;
+            background-color: colors.$primary;
         }
     }
 }
 
 .wbk_formDateRangeField__calendar {
     z-index: 9;
+    background-color: colors.$background-white;
+    border: 1px solid colors.$input-border;
+    color: colors.$input-text;
+    font-family: typography.$font-primary;
+
+    .react-datepicker {
+        border: none;
+        font-family: typography.$font-primary;
+        background-color: colors.$background-white;
+        color: colors.$input-text;
+    }
+
+    .react-datepicker__header {
+        background-color: colors.$background-offwhite;
+        border-bottom: 1px solid colors.$input-border;
+    }
+
+    .react-datepicker__current-month,
+    .react-datepicker-time__header,
+    .react-datepicker-year-header {
+        color: colors.$off-black;
+    }
+
+    .react-datepicker__day-name {
+        color: colors.$light-grey;
+    }
+
+    .react-datepicker__day {
+        color: colors.$input-text !important;
+
+        &:hover {
+            background-color: colors.$background-offwhite;
+        }
+    }
+
+    .react-datepicker__day--keyboard-selected {
+        background-color: colors.$primary-soft;
+        color: colors.$input-text !important;
+    }
+
+    .react-datepicker__navigation-icon::before {
+        border-color: colors.$light-grey;
+    }
 }
 
 .wbk_formDateRangeField__day.react-datepicker__day--in-range {
-    background-color: #1f6763;
+    background-color: colors.$primary !important;
+    color: colors.$text-white !important;
 
     &:hover {
-        background-color: #1f6763;
+        background-color: colors.$primary !important;
     }
 }
 
 .wbk_formDateRangeField__day.react-datepicker__day--in-selecting-range {
-    background-color: #1f676350;
+    background-color: colors.$primary-soft !important;
+    color: colors.$input-text !important;
 }
 
 .wbk_formDateRangeField__day.react-datepicker__day--selecting-range-end {
-    background-color: #1f6763;
+    background-color: colors.$primary !important;
+    color: colors.$text-white !important;
 
     &:hover {
-        background-color: #1f6763;
+        background-color: colors.$primary !important;
     }
 }
 
-.wbk_formDateRangeField__day.react-datepicker__day--range-start {
-    background-color: #1f676350;
+.wbk_formDateRangeField__day.react-datepicker__day--range-start,
+.wbk_formDateRangeField__day.react-datepicker__day--range-end {
+    background-color: colors.$primary !important;
+    color: colors.$text-white !important;
 }
 
 .wbk_formDateRangeField__error {
-    color: red;
+    color: colors.$red;
     margin-top: 5px;
 }

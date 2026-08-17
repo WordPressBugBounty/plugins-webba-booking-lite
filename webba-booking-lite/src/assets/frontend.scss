@@ -1,33 +1,3 @@
-@font-face {
-    font-family: poppins-light;
-    src: url(./fonts/poppins/Poppins-Light.ttf);
-    font-weight: 300;
-}
-
-@font-face {
-    font-family: poppins;
-    src: url(./fonts/poppins/Poppins-Regular.ttf);
-    font-weight: normal;
-}
-
-@font-face {
-    font-family: poppins-medium;
-    src: url(./fonts/poppins/Poppins-Medium.ttf);
-    font-weight: 500;
-}
-
-@font-face {
-    font-family: poppins-semibold;
-    src: url(./fonts/poppins/Poppins-SemiBold.ttf);
-    font-weight: 600;
-}
-
-@font-face {
-    font-family: poppins;
-    src: url(./fonts/poppins/Poppins-Bold.ttf);
-    font-weight: bold;
-}
-
 .appointment-box-w {
     display: flex;
     max-width: 760px;
@@ -142,7 +112,7 @@ li.completed-w .circle-digit-w {
     font-size: 16px;
     margin: 0 0 10px 0;
     padding: 0 !important;
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
 }
 .appointment-box-w .appointment-status-list-w .text-w .subtitle-list-w {
     list-style: disc;
@@ -179,7 +149,7 @@ li.wbk_service_item {
     font-size: 14px;
     font-weight: bold;
     color: #000;
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
 }
 
 .appointment-content-w:after {
@@ -199,7 +169,7 @@ li.wbk_service_item {
 .current-step-w {
     margin: 0 !important;
     padding: 0 !important;
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
     font-weight: 500;
     font-size: 16px;
 }
@@ -262,7 +232,7 @@ li.wbk_service_item {
     font-weight: normal;
 }
 .wbk_single_service_title {
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
     font-size: 16px;
     display: block;
     margin-bottom: 10px !important;
@@ -276,7 +246,7 @@ li.wbk_service_item {
     vertical-align: middle;
 }
 .wbk_single_service_sub_title {
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
     font-size: 16px;
     color: #686080 !important;
     margin-right: 30px !important;
@@ -297,7 +267,7 @@ li.wbk_service_item {
     border-radius: 15px !important;
     height: 50px !important;
     padding: 0 20px 0 20px !important;
-    font-family: poppins, arial !important;
+    font-family: typography.$font-primary !important;
     font-size: 16px !important;
     color: #212121 !important;
     outline: none !important;
@@ -341,7 +311,7 @@ li.wbk_service_item {
     float: left;
     line-height: 46px;
     font-size: 16px;
-    font-family: poppins, arial;
+    font-family: typography.$font-primary;
 }
 .wbk_narrow_form {
     max-width: 600px;
@@ -362,7 +332,7 @@ li.wbk_service_item {
     padding: 0 25px 0 0;
 }
 .button-w {
-    font-family: poppins-semibold, arial !important;
+    font-family: typography.$font-primary !important;
     display: flex;
     align-items: center;
     background: #1f6763;

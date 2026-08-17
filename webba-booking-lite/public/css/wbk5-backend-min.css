@@ -1,24 +1,3 @@
-@font-face {
-    font-family: poppins-light;
-    src: url(../fonts/poppins/Poppins-Light.ttf);
-}
-@font-face {
-    font-family: poppins;
-    src: url(../fonts/poppins/Poppins-Regular.ttf);
-}
-@font-face {
-    font-family: poppins-medium;
-    src: url(../fonts/poppins/Poppins-Medium.ttf);
-}
-@font-face {
-    font-family: poppins-semibold;
-    src: url(../fonts/poppins/Poppins-SemiBold.ttf);
-}
-@font-face {
-    font-family: poppins;
-    src: url(../fonts/poppins/Poppins-Bold.ttf);
-    font-weight: bold;
-}
 body {
     margin: 0;
 }
@@ -3068,7 +3047,7 @@ font-weight: 300;;
 }
 .label-standalone-w {
     margin: 0 0 10px 0;
-    font-family: poppins-semibold;
+    font-family: "Ubuntu", sans-serif;
 }
 .appointment-content-wbk .first-text-w {
     margin: 0 0 30px 0;
@@ -4391,7 +4370,7 @@ font-weight: 300;;
     padding-right: 0;
 }
 .payment-details-wrapper-w table thead td {
-    font-family: poppins-semibold;
+    font-family: "Ubuntu", sans-serif;
 }
 .payment-details-wrapper-w table tfoot tr:first-child td {
     border-bottom: 1px solid #cdcfde;
@@ -6182,7 +6161,7 @@ font-weight: 400;
     height: 44px;
     line-height: 45px;
     text-align: center;
-    font-family: poppins;
+    font-family: "Ubuntu", sans-serif;
     font-weight: bold;
     border-radius: 100%;
 }
@@ -9098,7 +9077,7 @@ a.fc-event:hover {
 }
 .fc-theme-standard .fc-scrollgrid table th .fc-scrollgrid-sync-inner {
     font-weight: normal;
-    font-family: poppins-medium;
+    font-family: "Ubuntu", sans-serif;
     padding: 5px 5px 20px 5px;
     text-align: left;
 }

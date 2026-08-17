@@ -9,7 +9,6 @@ import classNames from 'classnames'
 import { FormNotice } from '../../../components/FormNotice/FormNotice'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../store/frontend'
-import { CustomScroll } from 'react-custom-scroll'
 import { useWording } from '../../../hooks/useWording'
 import { fromUnixTime } from 'date-fns'
 import { toZonedTime } from 'date-fns-tz'
@@ -471,14 +470,8 @@ export const ThankYou = ({
         totalAmount = Number(bookingData.payment_details.to_pay_total)
     }
 
-    return (
-        <div className={'wbk_thank_you__wrapper'}>
-            <CustomScroll
-                heightRelativeToParent="calc(750px - 64px)"
-                className={'wbk_thank_you__custom-scroll'}
-                allowOuterScroll={true}
-            >
-                <div className={'wbk_thank_you__inner-wrapper'}>
+    const thankYouContent = (
+        <div className={'wbk_thank_you__inner-wrapper'}>
                     <div className={'wbk_thank_you__header'}>
                         <IconCheck />
                         <div className={'wbk_thank_you__header__content'}>
@@ -769,7 +762,13 @@ export const ThankYou = ({
                             </FormNotice>
                         )}
                 </div>
-            </CustomScroll>
+    )
+
+    return (
+        <div className={'wbk_thank_you__wrapper'}>
+            <div className={'wbk_thank_you__native-scroll'}>
+                {thankYouContent}
+            </div>
         </div>
     )
 }

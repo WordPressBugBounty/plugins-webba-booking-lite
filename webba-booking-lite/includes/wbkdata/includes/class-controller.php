@@ -2,6 +2,7 @@
 namespace WbkData;
 
 use WBK_Date_Time_Utils;
+use WBK_Feature_Gate;
 use WBK_Model_Utils;
 use WBK_Placeholder_Processor;
 use WBK_User_Utils;
@@ -116,6 +117,21 @@ class Controller
                         ),
                         $action_result["id"],
                     );
+                } elseif ($model === "email_templates") {
+                    $action_result["data"]["can_edit"] = true;
+                    $action_result["data"]["can_delete"] =
+                        isset($action_result["data"]["is_default"]) &&
+                        $action_result["data"]["is_default"] === "yes"
+                            ? false
+                            : true;
+                } elseif ($model === "forms") {
+                    $is_default =
+                        isset($action_result["data"]["is_default"]) &&
+                        $action_result["data"]["is_default"] === "yes";
+                    $has_forms_plan = WBK_Feature_Gate::have_required_plan("standard");
+                    $action_result["data"]["can_edit"] = $has_forms_plan || $is_default;
+                    $action_result["data"]["can_delete"] = $is_default ? false : true;
+                    $action_result["data"]["can_duplicate"] = $has_forms_plan && !$is_default;
                 } else {
                     $action_result["data"]["can_edit"] = true;
                     $action_result["data"]["can_delete"] = true;
@@ -231,6 +247,12 @@ class Controller
             } elseif (trim(sanitize_text_field($params["model"])) === "email_templates") {
                 $item->can_edit = true;
                 $item->can_delete = $item->is_default === "yes" ? false : true;
+            } elseif (trim(sanitize_text_field($params["model"])) === "forms") {
+                $is_default = isset($item->is_default) && $item->is_default === "yes";
+                $has_forms_plan = WBK_Feature_Gate::have_required_plan("standard");
+                $item->can_edit = $has_forms_plan || $is_default;
+                $item->can_delete = $is_default ? false : true;
+                $item->can_duplicate = $has_forms_plan && !$is_default;
             } else {
                 $item->can_delete = true;
                 $item->can_edit = true;

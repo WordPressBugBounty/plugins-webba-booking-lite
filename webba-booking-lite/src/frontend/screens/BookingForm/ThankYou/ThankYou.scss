@@ -190,8 +190,29 @@
         }
     }
 
-    &__custom-scroll {
+    &__native-scroll {
         width: 100%;
+        max-height: calc(750px - 64px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-gutter: stable;
+
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: #b0b8c1;
+        }
     }
 
     &__staff_name {

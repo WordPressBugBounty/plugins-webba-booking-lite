@@ -94,14 +94,21 @@
 .wbk_bookingDetail__emailSelect {
     padding: 8px 12px;
     padding-left: 40px;
+    background-color: colors.$field-background;
     background-image: url('../../../../../../public/images/icon-send.svg');
     background-position: 12px center;
+    background-repeat: no-repeat;
     border: 1px solid colors.$input-border;
     border-radius: dimensions.$input-radius;
     color: colors.$primary;
     @include typography.use-font($font: typography.$font-primary, $size: 16px);
     -webkit-appearance: listbox;
     appearance: listbox;
+
+    #wbk_spa_dashboard[data-theme='dark'] &,
+    .wbk_sidebar__container[data-theme='dark'] & {
+        background-image: none;
+    }
 }
 
 .wbk_bookingDetail__inputNote {
@@ -109,6 +116,10 @@
     border-radius: dimensions.$input-radius;
     height: 140px;
     padding: 8px;
+    background-color: colors.$field-background;
+    color: colors.$input-text;
+    width: 100%;
+    font-family: typography.$font-primary;
 }
 
 .wbk_bookingDetail__emailSelectWrapper {
@@ -119,6 +130,7 @@
 
 .wbk_bookingDetail__customDetailWrapper {
     max-width: 250px;
+    color: colors.$text-black;
 
     @media (max-width: 768px) {
         max-width: 100%;

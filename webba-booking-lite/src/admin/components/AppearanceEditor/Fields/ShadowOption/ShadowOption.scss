@@ -6,8 +6,8 @@
 }
 
 .wbk_shadowOption__inputPreview {
-    background: #fff;
-    border: 1px solid #d1d5db;
+    background: colors.$field-background;
+    border: 1px solid colors.$field-border;
     border-radius: 6px;
     height: 40px;
     display: flex;
@@ -16,7 +16,7 @@
     padding: 0 10px;
 
     &:hover {
-        border-color: #9ca3af;
+        border-color: colors.$border-dark;
     }
 }
 
@@ -26,14 +26,14 @@
     height: 24px;
     border-radius: 6px;
     margin-right: 10px;
-    border: 1px solid #d6d6d6;
+    border: 1px solid colors.$field-border;
 }
 
 .wbk_shadowOption__previewText {
     flex: 1;
     font-family: typography.$font-primary;
     font-size: 13px;
-    color: #666;
+    color: colors.$text-grey;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -42,15 +42,20 @@
 .wbk_shadowOption__popup {
     position: absolute;
     z-index: 9999;
-    background: #fff;
-    border: 1px solid #d0d3db;
-    box-shadow: 0px 6px 24px rgba(30, 41, 59, 0.1);
+    background: colors.$background-white;
+    border: 1px solid colors.$input-border;
+    box-shadow: 0px 6px 24px colors.$shadow;
     border-radius: 10px;
     padding: 24px;
     min-width: 360px;
     margin-top: 8px;
     right: 0;
     top: 100%;
+    color: colors.$text-black;
+
+    #wbk_spa_dashboard[data-theme='dark'] & {
+        box-shadow: none;
+    }
 }
 
 .wbk_shadowOption__popupHeader {
@@ -63,18 +68,19 @@
 .wbk_shadowOption__popupTitle {
     font-weight: 600;
     font-size: 16px;
+    color: colors.$off-black;
 }
 
 .wbk_shadowOption__removeButton {
     background: none;
     border: none;
-    color: #4094f7;
+    color: colors.$primary;
     padding: 0;
     cursor: pointer;
     font-size: 13px;
 
     &:hover {
-        color: #2563eb;
+        color: colors.$primary-hover;
     }
 }
 
@@ -87,6 +93,7 @@
 
 .wbk_shadowOption__label {
     min-width: 70px;
+    color: colors.$text-grey;
 }
 
 .wbk_shadowOption__colorInput {
@@ -102,12 +109,13 @@
 .wbk_shadowOption__colorTextInput {
     width: 66px;
     text-align: center;
-    border: 1px solid #d0d3db;
+    border: 1px solid colors.$input-border;
     border-radius: 4px;
     padding: 4px 8px;
     font-size: 12px;
     font-family: monospace;
-    background: #f9f9f9;
+    background: colors.$field-background;
+    color: colors.$input-text;
 }
 
 .wbk_shadowOption__sliderRow {
@@ -124,10 +132,12 @@
 .wbk_shadowOption__numberInput {
     width: 50px;
     text-align: center;
-    border: 1px solid #d0d3db;
+    border: 1px solid colors.$input-border;
     border-radius: 4px;
     padding: 4px 8px;
     font-size: 12px;
+    background: colors.$field-background;
+    color: colors.$input-text;
 }
 
 .wbk_shadowOption__selectRow {
@@ -142,21 +152,21 @@
 
 .wbk_shadowOption__slider {
     height: 6px;
-    background: #e5e7eb;
+    background: colors.$row-border;
     border-radius: 3px;
     position: relative;
 }
 
 .wbk_shadowOption__track {
     height: 6px;
-    background: #e5e7eb;
+    background: colors.$row-border;
     border-radius: 3px;
 }
 
 .wbk_shadowOption__thumb {
     height: 16px;
     width: 16px;
-    background: #4094f7;
+    background: colors.$primary;
     border-radius: 50%;
     border: none;
     cursor: pointer;
@@ -164,10 +174,10 @@
     margin-top: -5px;
 
     &:hover {
-        background: #2563eb;
+        background: colors.$primary-hover;
     }
 
     &:focus {
-        box-shadow: 0 0 0 3px rgba(64, 148, 247, 0.2);
+        box-shadow: 0 0 0 3px colors.$primary-soft;
     }
 }

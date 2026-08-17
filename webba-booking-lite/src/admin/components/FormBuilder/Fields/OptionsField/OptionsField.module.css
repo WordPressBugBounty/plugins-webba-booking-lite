@@ -32,3 +32,12 @@
     max-width: 16px;
     min-height: 16px;
 }
+
+.emptyState {
+    color: var(--wbk-admin-light-grey, #668091);
+    font-size: 14px;
+}
+
+.emptyStateError {
+    color: #d63638;
+}

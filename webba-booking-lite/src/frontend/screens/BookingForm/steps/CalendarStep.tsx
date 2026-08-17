@@ -676,7 +676,9 @@ export const CalendarStep = () => {
                         onChange={(option: any) =>
                             setTimezoneData({ selectedZone: option.value })
                         }
-                        className={'wbk_timezone_selector'}
+                        className="wbk_timezone_selector"
+                        classNamePrefix="wbk_timezone_selector"
+                        unstyled
                     />
                 </div>
             )}

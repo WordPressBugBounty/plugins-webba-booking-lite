@@ -67,6 +67,59 @@ class WBK_Model_Updater
         self::update_custom_fields_6_3_11();
         self::update_services_6_3_11();
         self::update_email_notifications_6_3_11();
+        self::create_default_booking_form_6_4_20();
+    }
+
+    /**
+     * Create the default booking form in the database when missing.
+     *
+     * @return void
+     */
+    public static function create_default_booking_form_6_4_20(): void
+    {
+        if (!self::is_update_required("create_default_booking_form_6_4_20")) {
+            return;
+        }
+
+        global $wpdb;
+
+        $table = get_option("wbk_db_prefix", "") . "wbk_forms";
+        $table_exists =
+            $wpdb->get_var(
+                $wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($table)),
+            ) === $table;
+
+        if (!$table_exists) {
+            self::set_update_as_complete("create_default_booking_form_6_4_20");
+            return;
+        }
+
+        $column = $wpdb->get_results(
+            $wpdb->prepare("SHOW COLUMNS FROM `{$table}` LIKE %s", "is_default"),
+        );
+
+        if (empty($column)) {
+            $wpdb->query(
+                "ALTER TABLE `{$table}` ADD `is_default` varchar(128) NOT NULL DEFAULT ''",
+            );
+        }
+
+        $existing_default_id = $wpdb->get_var(
+            "SELECT id FROM `{$table}` WHERE is_default = 'yes' ORDER BY id ASC LIMIT 1",
+        );
+
+        if ($existing_default_id) {
+            self::set_update_as_complete("create_default_booking_form_6_4_20");
+            return;
+        }
+
+        $form = new WBK_Form(null);
+        $form->set_name(__("Default form", "webba-booking-lite"));
+        $form->set_fields(WBK_Form_Builder_Utils::get_seed_default_fields());
+        $form->set("is_default", "yes");
+        $form->save();
+
+        self::set_update_as_complete("create_default_booking_form_6_4_20");
     }
 
     static function update_4_3_0_1()

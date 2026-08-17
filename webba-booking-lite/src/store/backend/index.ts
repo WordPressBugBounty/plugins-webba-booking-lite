@@ -3,6 +3,20 @@ import { createReduxStore, register } from "@wordpress/data";
 import { addQueryArgs } from "@wordpress/url";
 import { ISettingsField } from "../../admin/components/Settings/types";
 
+declare global {
+  interface Window {
+    __wbkScheduleFetchStatus?: Map<string, "pending">;
+  }
+}
+
+const scheduleFetchStatus =
+  typeof window !== "undefined"
+    ? (window.__wbkScheduleFetchStatus ??= new Map<string, "pending">())
+    : new Map<string, "pending">();
+
+const getScheduleFetchKey = (serviceId: number | string, month: string) =>
+  `${String(serviceId)}:${month}`;
+
 const DEFAULT_STATE = {
   staff_members: null,
   locations: null,
@@ -41,6 +55,8 @@ const DEFAULT_STATE = {
   setupChecklistExpandRequest: 0,
   featureTour: null,
   featureTourLoading: false,
+  schedule: {},
+  scheduleLoading: false,
   loadingStates: {
     locations: false,
     staff_members: false,
@@ -223,6 +239,148 @@ const actions = {
       });
       dispatch.setDashboardStats(result);
     },
+  setSchedule: (serviceId: number | string, month: string, data: Record<string, unknown>) => {
+    return {
+      type: "SET_SCHEDULE",
+      serviceId,
+      month,
+      data,
+    };
+  },
+  setScheduleLoading: (loading: boolean) => ({
+    type: "SET_SCHEDULE_LOADING",
+    loading,
+  }),
+  fetchSchedule:
+    (serviceId: number | string, month: string) =>
+    async ({ dispatch }) => {
+      if (!serviceId || !month) {
+        return null;
+      }
+
+      const key = getScheduleFetchKey(serviceId, month);
+      if (scheduleFetchStatus.get(key) === "pending") {
+        return null;
+      }
+
+      scheduleFetchStatus.set(key, "pending");
+      dispatch.setScheduleLoading(true);
+      try {
+        const result = await apiFetch({
+          path: addQueryArgs(`/wbk/v2/get-schedule/`, {
+            service_id: serviceId,
+            month,
+          }),
+        });
+        dispatch.setSchedule(serviceId, month, result as Record<string, unknown>);
+        return result;
+      } catch (error) {
+        throw error;
+      } finally {
+        scheduleFetchStatus.delete(key);
+        dispatch.setScheduleLoading(false);
+      }
+    },
+  lockDay:
+    (serviceId: number | string, day: number) =>
+    async () => {
+      return apiFetch({
+        path: "/wbk/v2/lock-day/",
+        method: "POST",
+        data: {
+          service_id: serviceId,
+          day,
+        },
+      });
+    },
+  unlockDay:
+    (serviceId: number | string, day: number) =>
+    async () => {
+      return apiFetch({
+        path: "/wbk/v2/unlock-day/",
+        method: "POST",
+        data: {
+          service_id: serviceId,
+          day,
+        },
+      });
+    },
+  lockTime:
+    (serviceId: number | string, time: number) =>
+    async () => {
+      return apiFetch({
+        path: "/wbk/v2/lock-time/",
+        method: "POST",
+        data: {
+          service_id: serviceId,
+          time,
+        },
+      });
+    },
+  unlockTime:
+    (serviceId: number | string, time: number) =>
+    async () => {
+      return apiFetch({
+        path: "/wbk/v2/unlock-time/",
+        method: "POST",
+        data: {
+          service_id: serviceId,
+          time,
+        },
+      });
+    },
+  scheduleToolsAction:
+    (data: {
+      lock_action: "lock" | "unlock";
+      lock_target?: "dates" | "timeslots";
+      date_range: string;
+      service: number | string;
+      category: number | string;
+      exclude_dates?: string;
+      days_of_week: string | Array<number | string>;
+      from?: number | string;
+      to?: number | string;
+    }) =>
+    async () => {
+      return apiFetch({
+        path: "/wbk/v2/schedule-tools-action/",
+        method: "POST",
+        data: {
+          lock_target: "dates",
+          ...data,
+        },
+      });
+    },
+  createMultipleBookings:
+    (data: {
+      service_id: number | string;
+      date: string;
+      times: Array<number | string>;
+      quantity: number | string;
+      status: string;
+      name: string;
+      email: string;
+      phone?: string;
+      desc?: string;
+    }) =>
+    async () => {
+      return apiFetch({
+        path: "/wbk/v2/create-multiple-bookings/",
+        method: "POST",
+        data,
+      });
+    },
+  fetchTimeSlots:
+    (params: { date: string; services: string | number; offset?: number }) =>
+    async () => {
+      return apiFetch({
+        path: addQueryArgs(`/wbk/v2/get-time-slots`, {
+          date: params.date,
+          services: params.services,
+          offset: params.offset ?? 0,
+        }),
+      });
+    },
   setCellData: (model, data) => {
     return {
       type: "SET_CELL_DATA",
@@ -255,6 +413,22 @@ const actions = {
       });
 
       return res;
+    },
+  setAdminTheme: (theme: "light" | "dark") => ({
+    type: "SET_ADMIN_THEME",
+    theme,
+  }),
+  saveAdminTheme:
+    (theme: "light" | "dark") =>
+    async ({ dispatch }) => {
+      const result = await apiFetch({
+        path: "/wbk/v2/save-admin-theme/",
+        method: "POST",
+        data: { theme },
+      });
+
+      dispatch.setAdminTheme(theme);
+      return result;
     },
   setEnableData: (endpoint: string, data: Record<string, string | number | boolean>) => {
     return {
@@ -581,6 +755,15 @@ const reducer = (state: State = DEFAULT_STATE, action: Action): State => {
         preset: action.preset,
       };
     }
+    case "SET_ADMIN_THEME": {
+      return {
+        ...state,
+        preset: {
+          ...state.preset,
+          admin_theme: action.theme,
+        },
+      };
+    }
     case "SET_SETUP_CHECKLIST": {
       return {
         ...state,
@@ -695,6 +878,22 @@ const reducer = (state: State = DEFAULT_STATE, action: Action): State => {
       return {
         ...state,
         dashboardStats: action.data,
+      };
+    }
+    case "SET_SCHEDULE": {
+      const key = `${action.serviceId}:${action.month}`;
+      return {
+        ...state,
+        schedule: {
+          ...state.schedule,
+          [key]: action.data,
+        },
+      };
+    }
+    case "SET_SCHEDULE_LOADING": {
+      return {
+        ...state,
+        scheduleLoading: action.loading,
       };
     }
     case "SET_CELL_DATA": {
@@ -829,6 +1028,13 @@ const selectors = {
   },
   isBusy: (state) => state.busy,
   getDashboardStats: (state) => state.dashboardStats,
+  getSchedule: (state, serviceId: number | string, month: string) => {
+    if (!serviceId || !month) {
+      return null;
+    }
+    return state.schedule?.[`${serviceId}:${month}`] || null;
+  },
+  isScheduleLoading: (state) => state.scheduleLoading,
   getCellData: (state, model) => state.cellData?.[model] || {},
   getDeleteFailed: (state) => state.deleteFailed,
   getFilters: (state: any, model: string) => state.filters?.[model] || {},

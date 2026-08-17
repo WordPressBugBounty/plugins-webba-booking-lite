@@ -8,7 +8,9 @@
 .wbk_selectOption__selectInput {
     padding: 0;
     border-radius: 6px;
-    border-color: #d1d5db;
+    border-color: colors.$field-border;
+    background-color: colors.$field-background;
+    color: colors.$input-text;
 
     .css-19bb58m {
         height: 30px;
@@ -16,6 +18,7 @@
 
     .css-19bb58m input {
         height: 30px;
+        color: colors.$input-text;
     }
 }
 

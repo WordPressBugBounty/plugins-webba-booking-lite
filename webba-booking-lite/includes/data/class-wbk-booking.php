@@ -100,7 +100,7 @@ class WBK_Booking extends WBK_Model_Object
         if (!isset($this->fields["quantity"])) {
             return 0;
         }
-        return $this->fields["quantity"];
+        return (int)$this->fields["quantity"];
     }
 
     /**

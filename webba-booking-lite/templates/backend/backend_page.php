@@ -77,22 +77,7 @@ if (isset($_GET["test"])) {
             WBK_Renderer::load_template("backend/react_app", [], true);
             break;
         case "wbk-calendar":
-            if (isset($_GET["tools"])) {
-                WBK_Renderer::load_template("backend/backend_page_header", [
-                    __("Schedule tools", "webba-booking-lite"),
-                    true,
-                ]); ?>
-                <div style="padding:25px">
-                    <?php WBK_Renderer::load_template(
-                        "backend/schedule_tools_content",
-                        [],
-                        true,
-                    ); ?>
-                </div>
-                <?php
-            } else {
-                WBK_Renderer::load_template("backend/react_app", [], true);
-            }
+            WBK_Renderer::load_template("backend/react_app", [], true);
             break;
         case "wbk-connected-calendars":
             if (isset($_GET["clid"]) && isset($_GET["action"]) && $_GET["action"] === "revoke") {

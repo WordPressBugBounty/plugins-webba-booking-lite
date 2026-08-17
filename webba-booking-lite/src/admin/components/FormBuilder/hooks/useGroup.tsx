@@ -665,25 +665,36 @@ export const getGroupArrayState = (groups: FieldGroupState[]) => {
 export const getGroupArrayValue = (groups: FieldGroupState[]) =>
     groups.map((group) => getGroupValue(group.state))
 
-export const getGroupArrayValid = (groups: FieldGroupState[]) => {
-    const groupErrorState = groups.map((group) => getGroupErrors(group.state))
+export const isGroupStateValid = (
+    state: Record<string, FieldState | FieldState[]>
+) => {
+    for (const key of Object.keys(state)) {
+        const field = state[key]
 
-    for (const groupErrors of groupErrorState) {
-        for (const errors of Object.values(groupErrors)) {
-            for (const error of errors) {
-                if (Array.isArray(error) && !!error.length) {
-                    return false
-                }
+        if (Array.isArray(field)) {
+            if (field.length === 0) {
+                return false
+            }
 
-                if (typeof error === 'string') {
+            for (const item of field) {
+                if (item.errors.length > 0) {
                     return false
                 }
             }
+
+            continue
+        }
+
+        if (field.errors.length > 0) {
+            return false
         }
     }
 
     return true
 }
+
+export const getGroupArrayValid = (groups: FieldGroupState[]) =>
+    groups.every((group) => isGroupStateValid(group.state))
 
 export const useArrayField = (groupId: number, fieldName: string) => {
     const group = useGroup(groupId)
@@ -705,12 +716,24 @@ export const useArrayField = (groupId: number, fieldName: string) => {
         group.setArray(fieldName, [])
     }
 
+    const reorder = (orderedValues: any[]) => {
+        group.setArray(
+            fieldName,
+            orderedValues.map((value) => ({
+                defaultValue: value,
+                validators: fieldState[0]?.config?.validators,
+                validateOnInit: fieldState[0]?.config?.validateOnInit,
+            }))
+        )
+    }
+
     return {
         fields: fieldState,
         setValueAt,
         push,
         removeAt,
         clear,
+        reorder,
     }
 }
 

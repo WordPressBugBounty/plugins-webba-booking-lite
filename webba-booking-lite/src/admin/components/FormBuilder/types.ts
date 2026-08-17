@@ -14,4 +14,10 @@ export enum FieldType {
     Radio = 'radio',
     Checkbox = 'checkbox',
     File = 'file',
+    QuantityFields = 'quantity_fields',
+}
+
+export interface FieldTypeInfo {
+    description: string
+    documentationUrl: string
 }

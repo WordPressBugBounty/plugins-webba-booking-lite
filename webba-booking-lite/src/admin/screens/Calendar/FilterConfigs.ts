@@ -2,14 +2,18 @@ import { IFilterField } from '../../components/Filter/types'
 import { __ } from '@wordpress/i18n'
 import metadata from '../../../schemas/appointments.json'
 
-export const filterFields: IFilterField[] = [
+export const getFilterFields = (
+    serviceMultiple: boolean,
+    serviceSearchable = false
+): IFilterField[] => [
     {
         name: 'appointment_service_id',
         type: 'select',
         options: 'services',
         label: __('Filter by service', 'webba-booking-lite'),
         misc: {
-            multiple: true,
+            multiple: serviceMultiple,
+            searchable: serviceSearchable,
         },
     },
     {
@@ -22,3 +26,5 @@ export const filterFields: IFilterField[] = [
         },
     },
 ]
+
+export const filterFields: IFilterField[] = getFilterFields(true)

@@ -266,6 +266,8 @@ class WBK_Placeholder_Processor
         $message = str_replace("#zoom_pass", $zoom_pass, $message);
         $message = str_replace("#zoom_meeting_id", $zoom_meeting_id, $message);
 
+        $message = self::replace_qr_placeholders($message, $booking);
+
         $message = str_replace("#admin_token", $booking->get("admin_token"), $message);
         $message = str_replace("#token", $booking->get("token"), $message);
 
@@ -998,6 +1000,8 @@ class WBK_Placeholder_Processor
         $message = str_replace("#zoom_pass", $zoom_pass, $message);
         $message = str_replace("#zoom_meeting_id", $zoom_meeting_id, $message);
 
+        $message = self::replace_qr_placeholders($message, $booking);
+
         $message = str_replace("#admin_token", $booking->get("admin_token"), $message);
         $message = str_replace("#token", $booking->get("token"), $message);
 
@@ -1355,6 +1359,32 @@ class WBK_Placeholder_Processor
                 }
             }
         }
+        return $message;
+    }
+
+    /**
+     * Replace QR code placeholders with <img> tags pointing to generated QR images.
+     * Must run before #token replacements (prefix collision).
+     *
+     * @param string      $message
+     * @param WBK_Booking $booking
+     * @return string
+     */
+    private static function replace_qr_placeholders($message, $booking)
+    {
+        if (strpos($message, "#booking_id_qr") !== false) {
+            $url = WBK_Qr_Code_Processor::process((string) $booking->get_id());
+            $html = $url !== "" ? '<img src="' . esc_url($url) . '" alt="" />' : "";
+            $message = str_replace("#booking_id_qr", $html, $message);
+        }
+
+        if (strpos($message, "#token_qr") !== false) {
+            $token = (string) $booking->get("token");
+            $url = $token !== "" ? WBK_Qr_Code_Processor::process($token) : "";
+            $html = $url !== "" ? '<img src="' . esc_url($url) . '" alt="" />' : "";
+            $message = str_replace("#token_qr", $html, $message);
+        }
+
         return $message;
     }
 

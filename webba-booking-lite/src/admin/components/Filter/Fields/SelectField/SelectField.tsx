@@ -9,6 +9,7 @@ import { store_name } from '../../../../../store/backend'
 import { useFilterField } from '../../hooks/useFilterField'
 import { IFilterFieldProps, TFilterSelectOptions } from '../../types'
 import { Label } from '../../../Form/Fields/Label/Label'
+import { getAdminSelectStyles } from '../../../../utils/adminSelectStyles'
 
 const MAX_DISPLAYED_OPTIONS = 4
 
@@ -22,26 +23,58 @@ const CustomMultiValue = (props: MultiValueProps<IOption>) => {
 
     if (index === MAX_DISPLAYED_OPTIONS) {
         const remaining = selectedValues.length - MAX_DISPLAYED_OPTIONS
-        return <div className="wbk_selectField__multiValueMore">+{remaining}</div>
+        return (
+            <div className="wbk_selectField__multiValueMore">+{remaining}</div>
+        )
     }
 
     return null
 }
 
-const customStyles = {
-    valueContainer: (base: any) => ({
+const selectStyles = getAdminSelectStyles({
+    valueContainer: (
+        base: Record<string, unknown>,
+        state: { isMulti?: boolean }
+    ) => ({
         ...base,
         flexWrap: 'nowrap',
         overflow: 'hidden',
+        ...(state?.isMulti
+            ? {}
+            : {
+                  paddingTop: 0,
+                  paddingBottom: 0,
+                  height: '100%',
+                  alignItems: 'center',
+              }),
     }),
-    multiValue: (base: any) => ({
+    input: (base: Record<string, unknown>) => ({
         ...base,
-        maxWidth: '100px',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
+        margin: 0,
+        padding: 0,
     }),
-}
+    singleValue: (base: Record<string, unknown>) => ({
+        ...base,
+        margin: 0,
+        lineHeight: 1.2,
+    }),
+    indicatorsContainer: (base: Record<string, unknown>) => ({
+        ...base,
+        height: '100%',
+        alignItems: 'center',
+    }),
+    control: (base: Record<string, unknown>) => ({
+        ...base,
+        backgroundColor: 'var(--wbk-admin-bg-white)',
+        borderColor: 'var(--wbk-admin-input-border)',
+        minHeight: 'inherit',
+        alignItems: 'center',
+        boxShadow: 'none',
+        '&:hover': {
+            borderColor: 'var(--wbk-admin-border-dark)',
+        },
+    }),
+})
 
 export const SelectField = ({
     name,
@@ -59,15 +92,21 @@ export const SelectField = ({
         nullValue: field.null_value,
     })
 
+    const selectedValues = useMemo(() => {
+        if (value == null || value === '') {
+            return [] as string[]
+        }
+
+        return (Array.isArray(value) ? value : [value])
+            .map(String)
+            .filter(Boolean)
+    }, [value])
+
     const valueObject = useMemo(() => {
-        if (isInitiated || !multiple) {
-            return options.filter((option: IOption) => {
-                if (multiple && value) {
-                    return value.includes(option.value)
-                } else if (!multiple && value) {
-                    return value.toString() === option.value
-                }
-            }) as IOption[]
+        if (isInitiated || !multiple || selectedValues.length > 0) {
+            return options.filter((option: IOption) =>
+                selectedValues.includes(String(option.value))
+            ) as IOption[]
         }
 
         if (
@@ -80,7 +119,7 @@ export const SelectField = ({
         }
 
         return options as IOption[]
-    }, [value, options])
+    }, [selectedValues, options, isInitiated, multiple, model, name])
 
     useEffect(() => {
         if (field?.initialValue) {
@@ -96,8 +135,8 @@ export const SelectField = ({
 
         if (multiple && selectedOptions && selectedOptions[0]?.value) {
             setFilter(selectedOptions.map((option: IOption) => option.value))
-        } else if (!multiple && selectedOptions.value) {
-            setFilter(selectedOptions?.value as string)
+        } else if (!multiple && selectedOptions?.value) {
+            setFilter(selectedOptions.value as string)
         } else {
             setFilter([])
         }
@@ -118,20 +157,21 @@ export const SelectField = ({
             {label && <Label title={label} id={name} />}
             <div>
                 <Select
-                    value={valueObject}
+                    value={multiple ? valueObject : valueObject[0] || null}
                     options={options}
                     onChange={(selectedOptions: IOption[] | unknown) =>
                         handleChange(selectedOptions as IOption[])
                     }
                     classNames={{
-                        control: (state) =>
+                        control: () =>
                             classNames('wbk_selectField__selectInput', {
-                                'wbk_selectField__selectInput--preventOverlap': misc?.preventOverlap,
+                                'wbk_selectField__selectInput--preventOverlap':
+                                    misc?.preventOverlap,
                             }),
                     }}
                     id={name}
                     isMulti={multiple}
-                    isSearchable={false}
+                    isSearchable={Boolean(misc?.searchable)}
                     isDisabled={isLoading}
                     isLoading={isLoading}
                     placeholder={placeholder}
@@ -139,7 +179,7 @@ export const SelectField = ({
                     components={
                         multiple ? { MultiValue: CustomMultiValue } : undefined
                     }
-                    styles={multiple ? customStyles : undefined}
+                    styles={selectStyles}
                 />
             </div>
         </div>
