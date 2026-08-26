@@ -202,3 +202,19 @@ $sidebar-positions: (
 .wbk_sidebar__scrollLock {
     overflow: hidden;
 }
+
+.wbk_sidebar__container--nested {
+    z-index: 100010;
+    background-color: rgba(0, 0, 0, 0.45);
+
+    .wbk_sidebar__view--modal {
+        will-change: auto;
+        transform: translate(-50%, 0);
+
+        &.wbk_sidebar__panel--shown,
+        &.wbk_sidebar__position--top {
+            top: calc(5% + 12px);
+            transform: translate(-50%, 0);
+        }
+    }
+}

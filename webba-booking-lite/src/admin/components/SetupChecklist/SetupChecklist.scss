@@ -14,6 +14,11 @@
         height: 100vh;
         background: var(--wbk-admin-page-bg);
     }
+
+    &__separator {
+        margin: 16px 0;
+        border-bottom: 1px solid colors.$row-border;
+    }
 }
 
 .wbk_setupChecklist__minimizedWrapper {
@@ -667,6 +672,16 @@
 
     &:hover {
         background: colors.$primary-hover;
+    }
+
+    &--wizard {
+        background: colors.$background-offwhite;
+        color: colors.$text-grey;
+        border: 1px solid colors.$input-border;
+
+        &:hover {
+            background: colors.$background-offwhite;
+        }
     }
 }
 

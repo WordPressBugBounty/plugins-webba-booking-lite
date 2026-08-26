@@ -6,6 +6,50 @@ if ( !defined( "ABSPATH" ) ) {
 }
 class WBK_Model_Utils {
     /**
+     * Get the database table prefix used by Webba Booking.
+     *
+     * Returns the stored wbk_db_prefix option, or $wpdb->prefix if the option is missing or empty.
+     *
+     * @return string
+     */
+    public static function get_db_prefix() {
+        global $wpdb;
+        $prefix = get_option( "wbk_db_prefix", "" );
+        if ( $prefix === "" || $prefix === false ) {
+            $prefix = $wpdb->prefix;
+        }
+        return $prefix;
+    }
+
+    /**
+     * Persist wbk_db_prefix when it is missing or empty.
+     *
+     * @return string The prefix that was stored or already present.
+     */
+    public static function ensure_db_prefix() {
+        $prefix = get_option( "wbk_db_prefix", "" );
+        if ( $prefix === "" || $prefix === false ) {
+            global $wpdb;
+            $prefix = $wpdb->prefix;
+            update_option( "wbk_db_prefix", $prefix );
+        }
+        return $prefix;
+    }
+
+    /**
+     * Check whether a Webba Booking table exists.
+     *
+     * @param string $table_suffix Table name without prefix, e.g. "wbk_services".
+     * @return bool
+     */
+    public static function table_exists( $table_suffix ) {
+        global $wpdb;
+        $table = self::get_db_prefix() . $table_suffix;
+        $query = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $table ) );
+        return $wpdb->get_var( $query ) === $table;
+    }
+
+    /**
      * get ids of all services
      * @return array ids of services
      */
@@ -292,7 +336,10 @@ class WBK_Model_Utils {
 
     public static function get_all_email_templates() {
         global $wpdb;
-        $sql = "SELECT id, name FROM " . get_option( "wbk_db_prefix", "" ) . "wbk_email_templates";
+        if ( !self::table_exists( "wbk_email_templates" ) ) {
+            return [];
+        }
+        $sql = "SELECT id, name FROM " . self::get_db_prefix() . "wbk_email_templates";
         $templates = $wpdb->get_results( $sql, ARRAY_A );
         $result = [];
         foreach ( $templates as $template ) {
@@ -840,7 +887,7 @@ class WBK_Model_Utils {
         global $wpdb;
         $query = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( get_option( "wbk_db_prefix", "" ) . "wbk_pricing_rules" ) );
         if ( !$wpdb->get_var( $query ) == get_option( "wbk_db_prefix", "" ) . "wbk_pricing_rules" ) {
-            return;
+            return [];
         }
         $sql = "SELECT id,name FROM " . get_option( "wbk_db_prefix", "" ) . "wbk_pricing_rules";
         $result = $wpdb->get_results( $sql, ARRAY_A );

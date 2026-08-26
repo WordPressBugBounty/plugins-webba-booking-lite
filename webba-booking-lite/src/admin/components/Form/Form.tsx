@@ -92,6 +92,7 @@ export const Form = function <T extends Model>({
 }: IFormProps<T>) {
     const shouldShowSections = Object.keys(sections).length > 1
     const [activeSection, setActiveSection] = useState(initialSection || '')
+    const [showValidation, setShowValidation] = useState(false)
     const sidebar = useSidebar()
     const { show: showConfirmation } = useConfirmationPopup()
     // @ts-ignore
@@ -181,6 +182,7 @@ export const Form = function <T extends Model>({
         try {
             const { values, errors, isValid } = getFormState(form)
             if (!isValid) {
+                setShowValidation(true)
                 toast.dismiss()
                 toast.error(ErrorNotification, {
                     autoClose: 5000,
@@ -337,6 +339,16 @@ export const Form = function <T extends Model>({
         })
     }, [hasFormChanged, sidebar, showConfirmation])
 
+    const handleCloseRef = useRef(handleClose)
+    handleCloseRef.current = handleClose
+    const registerCloseHandler = sidebar.registerCloseHandler
+
+    useEffect(() => {
+        return registerCloseHandler(() => {
+            handleCloseRef.current()
+        })
+    }, [registerCloseHandler])
+
     const header = (
         <div className="wbk_form__header">
             <div className="wbk_form__headerTitle">{name}</div>
@@ -401,20 +413,6 @@ export const Form = function <T extends Model>({
     useLayoutEffect(() => {
         checkScrollability()
     }, [sections, activeSection, checkScrollability])
-
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                handleClose()
-            }
-        }
-
-        window.addEventListener('keydown', handleKeyDown)
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown)
-        }
-    }, [handleClose])
 
     const lockedTabMap = useMemo(() => {
         const map: Record<string, boolean> = {}
@@ -653,6 +651,7 @@ export const Form = function <T extends Model>({
             form={form}
             tooltipMode={tooltipMode}
             lockFieldsOnly={Boolean(tabs?.[activeSection]?.lock_fields_only)}
+            showValidation={showValidation}
         >
             <div className="wbk_form__container">
                 {shouldShowSections ? (

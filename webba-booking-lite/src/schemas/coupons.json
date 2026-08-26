@@ -69,6 +69,7 @@
             "title": "Used",
             "tab": "",
             "misc": {
+                "tooltip": "Number of times this coupon has been used.",
                 "sub_type": "positive_integer"
             },
             "required": false,
@@ -78,7 +79,7 @@
         },
         "coupon_amount_fixed": {
             "type": "string",
-            "input_type": "text",
+            "input_type": "price",
             "hidden": false,
             "title": "Discount (fixed)",
             "tab": "",

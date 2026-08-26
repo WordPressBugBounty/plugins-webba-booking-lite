@@ -3,10 +3,11 @@ import { InitOptions } from "@tinymce/tinymce-react/lib/cjs/main/ts/components/E
 import { FormFieldProps } from "../../types";
 import { __ } from "@wordpress/i18n";
 import { Label } from "../Label/Label";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import "./../GenericFormField/GenericFormField.scss";
 import { FormComponentConstructor } from "../../lib/types";
 import { useField } from "../../lib/hooks/useField";
+import { useShowValidation } from "../../lib/FormProvider";
 import classNames from "classnames";
 import { useTheme } from "../../../../providers/ThemeProvider/ThemeProvider";
 
@@ -182,6 +183,7 @@ const placeHolders: Record<"name" | "text" | "content", string | ((editor: any) 
 
 const editorConfigs: InitOptions = {
   height: 150,
+  width: "100%",
   wpautop: true,
   language: "en",
   valid_elements: "*[*]",
@@ -282,10 +284,16 @@ export const createEditorField: FormComponentConstructor<any> = ({ field }) => {
   return ({ name, label, misc }) => {
     const { value, setValue, errors } = useField(field);
     const [touched, setTouched] = useState(false);
+    const showValidation = useShowValidation();
     const { isDarkMode } = useTheme();
+    const editorId = useRef(
+      `wbk-editor-${String(name).replace(/[^a-zA-Z0-9_-]/g, "_")}-${Math.random()
+        .toString(36)
+        .slice(2, 9)}`
+    ).current;
 
     const isValid = !errors.length;
-    const showErrors = !isValid && touched;
+    const showErrors = !isValid && (touched || showValidation);
     const [firstError] = errors;
     const [isVisual, setIsVisual] = useState(true);
 
@@ -300,9 +308,13 @@ export const createEditorField: FormComponentConstructor<any> = ({ field }) => {
     );
 
     return (
-      <div>
+      <div
+        className={classNames("wbk_genericFormField__field", {
+          "wbk_genericFormField__field--invalid": showErrors,
+        })}
+      >
         <div>
-          <Label id={name} title={label} tooltip={misc?.tooltip} />
+          <Label id={editorId} title={label} tooltip={misc?.tooltip} />
         </div>
         <div className="wbk_genericFormField__editorToggle">
           <div
@@ -322,11 +334,15 @@ export const createEditorField: FormComponentConstructor<any> = ({ field }) => {
             {__("Text", "webba-booking-lite")}
           </div>
         </div>
-        <div className="wbk_genericFormField__editorShell">
+        <div
+          className={classNames("wbk_genericFormField__editorShell", {
+            "wbk_genericFormField__editorShell--invalid": showErrors,
+          })}
+        >
           {isVisual && (
             <Editor
-              key={isDarkMode ? "wbk-editor-dark" : "wbk-editor-light"}
-              id={name}
+              key={`${editorId}-${isDarkMode ? "dark" : "light"}`}
+              id={editorId}
               onEditorChange={(content: string): void => setValue(content)}
               value={value}
               init={themedEditorConfigs}
@@ -340,14 +356,16 @@ export const createEditorField: FormComponentConstructor<any> = ({ field }) => {
                 "wbk_genericFormField__input"
               )}
               name={name}
-              id={name}
+              id={editorId}
               onChange={(e) => setValue(e.target.value)}
-            >
-              {value}
-            </textarea>
+              onBlur={() => setTouched(true)}
+              value={value}
+            />
           )}
         </div>
-        {showErrors && <div className="wbk_genericFormField__errorContainer">{firstError}</div>}
+        {showErrors && (
+          <div className="wbk_genericFormField__errorContainer">{firstError}</div>
+        )}
       </div>
     );
   };

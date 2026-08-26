@@ -126,8 +126,18 @@ export const SelectField = ({
             return
         }
 
-        valueObject &&
-            setInitialValue(valueObject.map((option) => option.value))
+        const nextInitialValue = valueObject.map((option) => option.value)
+        const hasMeaningfulValue = nextInitialValue.some(
+            (optionValue) =>
+                optionValue !== '' &&
+                optionValue !== 0 &&
+                optionValue !== '0' &&
+                optionValue != null
+        )
+
+        if (hasMeaningfulValue) {
+            setInitialValue(nextInitialValue)
+        }
     }, [valueObject])
 
     const handleChange = (selectedOptions: any) => {

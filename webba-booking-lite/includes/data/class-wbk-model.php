@@ -8,8 +8,19 @@ if (!defined("ABSPATH")) {
 
 class WBK_Model
 {
+    /**
+     * Whether the init hook for model initialization has already been registered.
+     *
+     * @var bool
+     */
+    private static $model_hook_registered = false;
+
     public function __construct()
     {
+        if (self::$model_hook_registered) {
+            return;
+        }
+        self::$model_hook_registered = true;
         add_action("init", [$this, "initalize_model"], 20);
     }
     static function create_tables()
@@ -697,7 +708,7 @@ class WBK_Model
             "service_price",
             "price",
             __("Price", "webba-booking-lite"),
-            "text",
+            "price",
             "pricing",
             ["tooltip" => $tooltip, "sub_type" => "none_negative_float"],
             "0",
@@ -1169,7 +1180,7 @@ class WBK_Model
             "integrations",
             [
                 "tooltip" => __(
-                    'Choose how external calendar events affect group service availability: reduce the number of available places or lock the entire time slot.',
+                    "Choose how external calendar events affect group service availability: reduce the number of available places or lock the entire time slot.",
                     "webba-booking-lite",
                 ),
                 "items" => [
@@ -1943,10 +1954,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Who cancelled the booking, if applicable.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Who cancelled the booking, if applicable.", "webba-booking-lite"),
             ],
             "",
             false,
@@ -2005,10 +2013,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Duration of the booking in minutes.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Duration of the booking in minutes.", "webba-booking-lite"),
                 "sub_type" => "positive_integer",
             ],
             "",
@@ -2114,10 +2119,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Coupon applied to this booking, if any.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Coupon applied to this booking, if any.", "webba-booking-lite"),
                 "sub_type" => "positive_integer",
             ],
             "",
@@ -2132,10 +2134,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Payment method used for this booking.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Payment method used for this booking.", "webba-booking-lite"),
             ],
             "",
             false,
@@ -2245,10 +2244,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Service category at the time of booking.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Service category at the time of booking.", "webba-booking-lite"),
             ],
             "",
             false,
@@ -2262,10 +2258,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Language used when the booking was made.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Language used when the booking was made.", "webba-booking-lite"),
             ],
             "",
             false,
@@ -2279,10 +2272,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "End time of the booking (Unix timestamp).",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("End time of the booking (Unix timestamp).", "webba-booking-lite"),
                 "sub_type" => "positive_integer",
             ],
             "",
@@ -2314,10 +2304,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Payment transaction identifier.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Payment transaction identifier.", "webba-booking-lite"),
             ],
             "",
             false,
@@ -2365,10 +2352,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Token used to cancel the payment.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Token used to cancel the payment.", "webba-booking-lite"),
             ],
             "",
             false,
@@ -2382,10 +2366,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Time when an unpaid booking expires.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Time when an unpaid booking expires.", "webba-booking-lite"),
                 "sub_type" => "positive_integer",
             ],
             "",
@@ -2418,10 +2399,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Time offset applied to this booking.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Time offset applied to this booking.", "webba-booking-lite"),
                 "sub_type" => "integer",
             ],
             "",
@@ -2487,10 +2465,7 @@ class WBK_Model
             "textarea",
             "",
             [
-                "tooltip" => __(
-                    "Detailed breakdown of the booking amount.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Detailed breakdown of the booking amount.", "webba-booking-lite"),
             ],
             "",
             false,
@@ -2504,10 +2479,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Zoom meeting ID for this booking.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Zoom meeting ID for this booking.", "webba-booking-lite"),
             ],
             "",
             false,
@@ -2521,10 +2493,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Zoom meeting URL for this booking.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Zoom meeting URL for this booking.", "webba-booking-lite"),
             ],
             "",
             false,
@@ -2538,10 +2507,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Zoom meeting password for this booking.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Zoom meeting password for this booking.", "webba-booking-lite"),
             ],
             "",
             false,
@@ -2556,10 +2522,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Google Meet link for this booking.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Google Meet link for this booking.", "webba-booking-lite"),
             ],
             "",
             false,
@@ -2623,507 +2586,6 @@ class WBK_Model
             ->get_element_at("appointment_created_on")
             ->set_filter_data("wbk_date_range", [">=", "<="], [null, null], " AND ");
         date_default_timezone_set("UTC");
-
-        $table = new WbkData\Model($db_prefix . "wbk_cancelled_appointments");
-        $table->set_single_item_name(__("Booking", "webba-booking-lite"));
-        $table->set_multiple_item_name(__("Bookings", "webba-booking-lite"));
-        $table->set_duplicatable(false);
-        $table->add_field(
-            "appointment_id_cancelled",
-            "id_cancelled",
-            __("ID of cancelled appointment", "webba-booking-lite"),
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Original booking ID before cancellation.",
-                    "webba-booking-lite",
-                ),
-                "sub_type" => "positive_integer",
-            ],
-            "",
-            false,
-            true,
-            false,
-        );
-        $table->add_field(
-            "appointment_time",
-            "time",
-            __("Time", "webba-booking-lite"),
-            "select",
-            "",
-            [
-                "tooltip" => __("Select the booking time.", "webba-booking-lite"),
-                "time_format" => $time_format,
-                "time_zone" => get_option("wbk_timezone", "UTC"),
-                "options" => "backend",
-            ],
-            "",
-            false,
-            in_array("time", $allowed_fields),
-        );
-        $table->add_field(
-            "appointment_cancelled_by",
-            "cancelled_by",
-            __("Cancelled by", "webba-booking-lite"),
-            "textarea",
-            "",
-            [
-                "tooltip" => __(
-                    "Who cancelled this booking.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            true,
-            false,
-        );
-        $table->add_field(
-            "appointment_service_id",
-            "service_id",
-            __("Service", "webba-booking-lite"),
-            "select",
-            "",
-            [
-                "tooltip" => __(
-                    "Select the service for which the booking is being made.",
-                    "webba-booking-lite",
-                ),
-                "items" => WBK_Model_Utils::get_services(),
-                "sub_type" => "positive_integer",
-            ],
-            null,
-            false,
-            in_array("service_id", $allowed_fields),
-            false,
-        );
-        $table->add_field(
-            "appointment_created_on",
-            "created_on",
-            "created_on",
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Date and time when the booking was created.",
-                    "webba-booking-lite",
-                ),
-                "sub_type" => "positive_integer",
-            ],
-            "",
-            true,
-            true, //in_array('created_on', $allowed_fields),
-            true, //false
-        );
-        $table->add_field(
-            "appointment_day",
-            "day",
-            __("Date", "webba-booking-lite"),
-            "wbk_date",
-            "",
-            [
-                "tooltip" => __("Select the booking date.", "webba-booking-lite"),
-                "date_format" => $date_format,
-                "time_zone" => get_option("wbk_timezone", "UTC"),
-            ],
-            "",
-            false,
-            in_array("day", $allowed_fields),
-        );
-        $table->add_field(
-            "appointment_quantity",
-            "quantity",
-            __("Places booked", "webba-booking-lite"),
-            "select",
-            "",
-            [
-                "tooltip" => __(
-                    "Specify the number of places being booked for this appointment.",
-                    "webba-booking-lite",
-                ),
-                "sub_type" => "positive_integer",
-                "items" => [],
-            ],
-            null,
-            false,
-            in_array("quantity", $allowed_fields),
-            true,
-        );
-        $table->add_field(
-            "appointment_name",
-            "name",
-            __("Name", "webba-booking-lite"),
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Enter the name of the customer.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            true,
-            in_array("name", $allowed_fields),
-        );
-        $table->add_field(
-            "appointment_email",
-            "email",
-            __("Email", "webba-booking-lite"),
-            "text",
-            "",
-            [
-                "tooltip" => __('Enter the customer\'s email address.', "webba-booking-lite"),
-                "sub_type" => "email",
-            ],
-            "",
-            false,
-            in_array("email", $allowed_fields),
-        );
-        $table->add_field(
-            "appointment_phone",
-            "phone",
-            __("Phone", "webba-booking-lite"),
-            "text",
-            "",
-            [
-                "tooltip" => __('Enter the customer\'s phone number.', "webba-booking-lite"),
-            ],
-            "",
-            false,
-            in_array("phone", $allowed_fields),
-            false,
-        );
-        $table->add_field(
-            "appointment_description",
-            "description",
-            __("Comment", "webba-booking-lite"),
-            "textarea",
-            "",
-            [
-                "tooltip" => __(
-                    "Add any additional comments related to the booking.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            true,
-            in_array("description", $allowed_fields),
-            false,
-        );
-        $table->add_field(
-            "appointment_booking_extra",
-            "booking_extra",
-            __("Booking extra", "webba-booking-lite"),
-            "text",
-            "",
-            [
-                "tooltip" => __("Extras for this booking", "webba-booking-lite"),
-            ],
-            "",
-            true,
-            in_array("booking_extra", $allowed_fields),
-            false,
-        );
-        $table->add_field(
-            "appointment_extra",
-            "extra",
-            __("Custom fields", "webba-booking-lite"),
-            "wbk_app_custom_data",
-            "",
-            [
-                "tooltip" => __(
-                    "Custom field values submitted with this booking.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            in_array("extra", $allowed_fields),
-            false,
-        );
-        $table->add_field(
-            "appointment_coupon",
-            "coupon",
-            "coupon",
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Coupon applied to this booking, if any.",
-                    "webba-booking-lite",
-                ),
-                "sub_type" => "positive_integer",
-            ],
-            "",
-            false,
-            in_array("coupon", $allowed_fields),
-            false,
-        );
-        $table->add_field(
-            "appointment_payment_method",
-            "payment_method",
-            __("Payment method", "webba-booking-lite"),
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Payment method used for this booking.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            in_array("payment_method", $allowed_fields),
-            false,
-        );
-        $table->add_field(
-            "appointment_moment_price",
-            "moment_price",
-            __("Price", "webba-booking-lite"),
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "If the payment has already been made, enter the payment amount paid for 1 person.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            in_array("moment_price", $allowed_fields),
-            true,
-        );
-
-        $table->add_field(
-            "appointment_user_ip",
-            "user_ip",
-            __("User IP", "webba-booking-lite"),
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "IP address of the customer when the booking was made.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            in_array("ip", $allowed_fields),
-        );
-        $table->add_field(
-            "appointment_status",
-            "status",
-            __("Status", "webba-booking-lite"),
-            "select",
-            "",
-            [
-                "tooltip" => __(
-                    "Choose the appropriate booking status from the options available.",
-                    "webba-booking-lite",
-                ),
-                "items" => WBK_Model_Utils::get_booking_status_list(),
-                "options" => WBK_Model_Utils::get_booking_status_list(),
-            ],
-            "",
-            false,
-            false,
-        );
-
-        $table->add_field(
-            "appointment_service_category",
-            "service_category",
-            "service_category",
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Service category at the time of booking.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            false,
-            false,
-        );
-        $table->add_field(
-            "appointment_lang",
-            "lang",
-            "lang",
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Language used when the booking was made.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            false,
-            false,
-        );
-        $table->add_field(
-            "appointment_duration",
-            "duration",
-            __("Duration", "webba-booking-lite"),
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Duration of the booking in minutes.",
-                    "webba-booking-lite",
-                ),
-                "sub_type" => "positive_integer",
-            ],
-            "",
-            false,
-            true,
-            false,
-        );
-        $table->add_field(
-            "appointment_attachment",
-            "attachment",
-            "attachment",
-            "textarea",
-            "",
-            [
-                "tooltip" => __(
-                    "File attachments submitted with this booking.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            false,
-            false,
-        );
-        $table->add_field(
-            "appointment_payment_id",
-            "payment_id",
-            "payment_id",
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Payment transaction identifier.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            false,
-            false,
-        );
-        $table->add_field(
-            "appointment_token",
-            "token",
-            "token",
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Unique token for customer access to this booking.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            false,
-            false,
-        );
-        $table->add_field(
-            "appointment_admin_token",
-            "admin_token",
-            "admin_token",
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Unique token for administrator access to this booking.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            false,
-            false,
-        );
-        $table->add_field(
-            "appointment_payment_cancel_token",
-            "payment_cancel_token",
-            "payment_cancel_token",
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Token used to cancel the payment.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            false,
-            false,
-        );
-        $table->add_field(
-            "appointment_expiration_time",
-            "expiration_time",
-            "expiration_time",
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Time when an unpaid booking expires.",
-                    "webba-booking-lite",
-                ),
-                "sub_type" => "positive_integer",
-            ],
-            "",
-            false,
-            false,
-            false,
-        );
-        $table->add_field(
-            "appointment_time_offset",
-            "time_offset",
-            "time_offset",
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Time offset applied to this booking.",
-                    "webba-booking-lite",
-                ),
-                "sub_type" => "positive_integer",
-            ],
-            "",
-            false,
-            false,
-            false,
-        );
-        $table->add_field(
-            "appointment_gg_event_id",
-            "gg_event_id",
-            "gg_event_id",
-            "text",
-            "",
-            [
-                "tooltip" => __(
-                    "Google Calendar event ID linked to this booking.",
-                    "webba-booking-lite",
-                ),
-            ],
-            "",
-            false,
-            false,
-            false,
-        );
-
-        $table->sync_structure();
-
-        $table = WbkData()->models->add($table, $db_prefix . "wbk_cancelled_appointments");
 
         date_default_timezone_set(get_option("wbk_timezone", "UTC"));
         date_default_timezone_set("UTC");
@@ -3290,7 +2752,7 @@ class WBK_Model
             ],
             "general",
             true,
-            true,
+            false,
             false,
         );
 
@@ -3381,10 +2843,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Number of times this coupon has been used.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Number of times this coupon has been used.", "webba-booking-lite"),
                 "sub_type" => "positive_integer",
             ],
             "",
@@ -3401,7 +2860,7 @@ class WBK_Model
             "coupon_amount_fixed",
             "amount_fixed",
             __("Discount (fixed)", "webba-booking-lite"),
-            "text",
+            "price",
             "",
             [
                 "tooltip" => $tooltip,
@@ -3735,7 +3194,7 @@ class WBK_Model
             "pricing_rule_amount",
             "amount",
             __("Amount", "webba-booking-lite"),
-            "text",
+            "price",
             "",
             [
                 "tooltip" => $tooltip,

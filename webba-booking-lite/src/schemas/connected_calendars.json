@@ -9,6 +9,7 @@
             "title": "Calendar provider",
             "tab": "",
             "misc": {
+                "tooltip": "Select the calendar provider to connect (Google Calendar or Microsoft Outlook).",
                 "options": [
                     {
                         "value": "google",
@@ -144,10 +145,11 @@
         "calendar_access_token": {
             "type": "string",
             "input_type": "webba_google_access_token",
-            "hidden": false,
+            "hidden": true,
             "title": "Authorization",
             "tab": null,
             "misc": {
+                "tooltip": "Authorization status for the connected calendar account.",
                 "hidden": true
             },
             "required": false,

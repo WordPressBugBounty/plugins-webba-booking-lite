@@ -81,10 +81,22 @@
     overflow: hidden;
     background: colors.$field-background;
 
+    &.wbk_genericFormField__editorShell--invalid {
+        border-color: colors.$red;
+    }
+
     .tox-tinymce,
     .mce-tinymce {
+        width: 100% !important;
         border: none !important;
         box-shadow: none !important;
+    }
+
+    > textarea {
+        width: 100%;
+        min-height: 150px;
+        display: block;
+        box-sizing: border-box;
     }
 
     .tox .tox-edit-area__iframe,

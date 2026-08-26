@@ -20,6 +20,7 @@ import { SearchField } from '../../components/Filter/Fields/SearchField/SearchFi
 import { useState } from 'react'
 import metadata from '../../../schemas/email_templates.json'
 import noItemsImage from '../../../../public/images/bookings-empty.png'
+import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
 
 const columns = generateColumnDefsFromModel(
     emailTemplatesModel,
@@ -196,28 +197,31 @@ export const EmailTemplateScreen = () => {
     }
 
     return (
-        <Table
-            title={__('Email notifications', 'webba-booking-lite')}
-            addButtonTitle={__('Add Email Template', 'webba-booking-lite')}
-            table={table}
-            loading={isLoading}
-            onDeleteSelected={onDeleteSelected}
-            horizontalOverflow={true}
-            search={searchField}
-            onAdd={() =>
-                sidebar.open(
-                    <Form
-                        name={__('Add Email Template', 'webba-booking-lite')}
-                        id="add-emailTemplate-form"
-                        form={form}
-                        sections={formSections}
-                        onSubmit={async (data) => {
-                            return await addModelItem(data)
-                        }}
-                    />
-                )
-            }
-            noItemsImageUrl={noItemsImage}
-        />
+        <>
+            <Table
+                title={__('Email notifications', 'webba-booking-lite')}
+                addButtonTitle={__('Add Email Template', 'webba-booking-lite')}
+                table={table}
+                loading={isLoading}
+                onDeleteSelected={onDeleteSelected}
+                horizontalOverflow={true}
+                search={searchField}
+                onAdd={() =>
+                    sidebar.open(
+                        <Form
+                            name={__('Add Email Template', 'webba-booking-lite')}
+                            id="add-emailTemplate-form"
+                            form={form}
+                            sections={formSections}
+                            onSubmit={async (data) => {
+                                return await addModelItem(data)
+                            }}
+                        />
+                    )
+                }
+                noItemsImageUrl={noItemsImage}
+            />
+            <SuccessMessage />
+        </>
     )
 }

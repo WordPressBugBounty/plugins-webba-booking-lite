@@ -1,4 +1,5 @@
 import {
+    IBookingFormDataAttrs,
     IShortcodePresetCategory,
     IShortcodePresetLocation,
     IShortcodePresetService,
@@ -357,4 +358,28 @@ export const pruneSelections = (
     }
 
     return current
+}
+
+export const selectionsToBookingFormDataAttrs = (
+    sel: IShortcodeSelections
+): IBookingFormDataAttrs => {
+    const attrs: IBookingFormDataAttrs = {}
+
+    if (isUnitsMode(sel)) {
+        attrs.units = 'yes'
+    }
+    if (sel.serviceId) {
+        attrs.service = sel.serviceId
+    }
+    if (sel.categoryIds.length > 0) {
+        attrs.category = sel.categoryIds.join(',')
+    }
+    if (sel.locationIds.length > 0) {
+        attrs.location = sel.locationIds.join(',')
+    }
+    if (!isUnitsMode(sel) && sel.staffIds.length > 0) {
+        attrs.staff = sel.staffIds.join(',')
+    }
+
+    return attrs
 }

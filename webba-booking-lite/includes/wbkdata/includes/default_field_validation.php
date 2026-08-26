@@ -638,6 +638,18 @@ function validate_select_custom($input, $value, $slug, $field)
     return [true, $value];
 }
 
+// price
+add_filter(
+    'wbkdata_property_field_validation_price',
+    'validate_price',
+    10,
+    4
+);
+function validate_price($input, $value, $slug, $field)
+{
+    return [true, $value];
+}
+
 // price variant
 add_filter(
     'wbkdata_property_field_validation_price_variant',

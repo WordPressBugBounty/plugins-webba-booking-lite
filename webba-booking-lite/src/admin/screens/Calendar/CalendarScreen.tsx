@@ -44,12 +44,16 @@ import infoIcon from "../../../../public/images/info-blue.svg";
 import { TimeSlotsLockPopup } from "./TimeSlotsLockPopup/TimeSlotsLockPopup";
 import type {
   IEvent,
+  IConnectedCalendarAttendee,
   TCalendarRememberedServiceSelection,
   TCalendarServiceFilterValue,
 } from "./types";
 import { BulkDateLockPopup } from "./BulkDateLockPopup/BulkDateLockPopup";
 import { BulkTimeSlotsLockPopup } from "./BulkTimeSlotsLockPopup/BulkTimeSlotsLockPopup";
 import { MassAddBookingsPopup } from "./MassAddBookingsPopup/MassAddBookingsPopup";
+import { ConnectedCalendarEventDetails } from "./ConnectedCalendarEventDetails/ConnectedCalendarEventDetails";
+import apiFetch from "@wordpress/api-fetch";
+import { addQueryArgs } from "@wordpress/url";
 
 type DayLockStatus = "locked" | "unlocked";
 
@@ -119,11 +123,71 @@ const getServiceFilterValues = (filters: TAllowedFilterValue<any>[]): string[] =
     : [String(serviceFilter.value)].filter(Boolean);
 };
 
+type ConnectedCalendarEventPayload = {
+  id: string;
+  title: string;
+  description?: string;
+  start: number;
+  end: number;
+  attendees?: IConnectedCalendarAttendee[];
+  calendar_id?: number;
+  calendar_name?: string;
+  provider?: string;
+};
+
+const getVisibleRangeUnix = (startDate: Date, endDate: Date) => {
+  const start = Math.floor(startDate.getTime() / 1000);
+  let end = Math.floor(endDate.getTime() / 1000);
+  if (
+    endDate.getHours() === 0 &&
+    endDate.getMinutes() === 0 &&
+    endDate.getSeconds() === 0
+  ) {
+    end += 86400;
+  }
+  return { start, end };
+};
+
+const getConnectedEventColor = (provider?: string) => {
+  if (provider === "outlook") {
+    return "#0078D4";
+  }
+  if (provider === "google") {
+    return "#4285F4";
+  }
+  return "#5f6368";
+};
+
 const calendarModalOptions = {
   view: "modal" as const,
   width: "small" as const,
   height: "auto" as const,
   position: "center" as const,
+};
+
+const SHOW_CONNECTED_CALENDAR_EVENTS_STORAGE_KEY =
+  "wbk_calendar_show_connected_events";
+
+const readShowConnectedCalendarEventsPreference = (): boolean => {
+  try {
+    return (
+      window.localStorage.getItem(SHOW_CONNECTED_CALENDAR_EVENTS_STORAGE_KEY) ===
+      "1"
+    );
+  } catch {
+    return false;
+  }
+};
+
+const writeShowConnectedCalendarEventsPreference = (enabled: boolean) => {
+  try {
+    window.localStorage.setItem(
+      SHOW_CONNECTED_CALENDAR_EVENTS_STORAGE_KEY,
+      enabled ? "1" : "0"
+    );
+  } catch {
+    // Ignore storage errors (private mode, quota, etc.).
+  }
 };
 
 export const CalendarScreen = () => {
@@ -136,6 +200,12 @@ export const CalendarScreen = () => {
   const [unlockingTimes, setUnlockingTimes] = useState<Record<number, boolean>>({});
   const [advanceScheduleToolsEnabled, setAdvanceScheduleToolsEnabled] =
     useState(false);
+  const [showConnectedCalendarEvents, setShowConnectedCalendarEvents] =
+    useState(readShowConnectedCalendarEventsPreference);
+  const [connectedCalendarEvents, setConnectedCalendarEvents] = useState<
+    ConnectedCalendarEventPayload[]
+  >([]);
+  const [connectedEventsLoading, setConnectedEventsLoading] = useState(false);
   const [pendingServiceFilterValue, setPendingServiceFilterValue] = useState<
     TCalendarServiceFilterValue | undefined
   >(undefined);
@@ -191,6 +261,13 @@ export const CalendarScreen = () => {
       });
     },
     [weekStart]
+  );
+
+  const [visibleRangeUnix, setVisibleRangeUnix] = useState(() =>
+    getVisibleRangeUnix(
+      customStartOfWeek(startOfMonth(new Date())),
+      customEndOfWeek(endOfMonth(new Date()))
+    )
   );
 
   const localizer = useMemo(
@@ -308,6 +385,15 @@ export const CalendarScreen = () => {
     return values.length === 1 ? values[0] : null;
   }, [advanceScheduleToolsEnabled, customFilter]);
 
+  const selectedServiceIdsForConnectedEvents = useMemo(() => {
+    const fromFilter = getServiceFilterValues(customFilter).filter((serviceId) =>
+      serviceIds.includes(serviceId)
+    );
+    return fromFilter.length ? fromFilter : serviceIds;
+  }, [customFilter, serviceIds]);
+  const selectedServiceIdsForConnectedEventsKey =
+    selectedServiceIdsForConnectedEvents.slice().sort().join(",");
+
   useEffect(() => {
     if (pendingServiceFilterValue === undefined) {
       return;
@@ -327,6 +413,62 @@ export const CalendarScreen = () => {
 
     return () => window.clearTimeout(timeoutId);
   }, [isModeSwitching, advanceScheduleToolsEnabled]);
+
+  useEffect(() => {
+    if (!showConnectedCalendarEvents) {
+      setConnectedCalendarEvents([]);
+      setConnectedEventsLoading(false);
+      return;
+    }
+
+    if (!selectedServiceIdsForConnectedEventsKey || !visibleRangeUnix) {
+      setConnectedCalendarEvents([]);
+      setConnectedEventsLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    setConnectedEventsLoading(true);
+
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        const result = (await apiFetch({
+          path: addQueryArgs("/wbk/v2/get-connected-calendar-events/", {
+            service_ids: selectedServiceIdsForConnectedEventsKey,
+            start: visibleRangeUnix.start,
+            end: visibleRangeUnix.end,
+          }),
+          signal: controller.signal,
+        })) as { events?: ConnectedCalendarEventPayload[] };
+
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        setConnectedCalendarEvents(Array.isArray(result?.events) ? result.events : []);
+      } catch (error: any) {
+        if (controller.signal.aborted || error?.name === "AbortError") {
+          return;
+        }
+        console.error(error);
+        setConnectedCalendarEvents([]);
+      } finally {
+        if (!controller.signal.aborted) {
+          setConnectedEventsLoading(false);
+        }
+      }
+    }, 250);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [
+    showConnectedCalendarEvents,
+    selectedServiceIdsForConnectedEventsKey,
+    visibleRangeUnix.start,
+    visibleRangeUnix.end,
+  ]);
 
   const handleAdvanceScheduleToolsChange = (enabled: boolean) => {
     const currentValues = getServiceFilterValues(customFilter);
@@ -573,10 +715,19 @@ export const CalendarScreen = () => {
   }, []);
 
   const handleEventClick = useCallback(
-    (event: IEvent & { isLockedSlot?: boolean }) => {
+    (event: IEvent & { isLockedSlot?: boolean; isConnectedEvent?: boolean }) => {
       if (event.isLockedSlot) {
         return;
       }
+
+      if (event.isConnectedEvent) {
+        sidebar.open(
+          <ConnectedCalendarEventDetails event={event} settings={settings} />,
+          calendarModalOptions
+        );
+        return;
+      }
+
       sidebar.open(
         <Form
           id="edit-booking-form"
@@ -584,13 +735,13 @@ export const CalendarScreen = () => {
           defaultValue={getBookingFromEvent(event)}
           form={form}
           sections={menuSections}
-          onSubmit={(data) => onSubmit(data, event.id)}
-          onDelete={() => onDelete(event.id)}
+          onSubmit={(data) => onSubmit(data, Number(event.id))}
+          onDelete={() => onDelete(Number(event.id))}
           onDuplicate={() => onDuplicate(getBookingFromEvent(event))}
         />
       );
     },
-    [bookings]
+    [bookings, settings, sidebar, getBookingFromEvent, onSubmit, onDelete, onDuplicate]
   );
   const addBooking = async (data: any) => {
     try {
@@ -702,8 +853,28 @@ export const CalendarScreen = () => {
       };
     });
 
+    const importedEvents = showConnectedCalendarEvents
+      ? connectedCalendarEvents.map((event) => {
+          const color = getConnectedEventColor(event.provider);
+          return {
+            id: event.id,
+            title: event.title,
+            start: toZonedTime(fromUnixTime(event.start), timezone),
+            end: toZonedTime(fromUnixTime(event.end || event.start), timezone),
+            status: "connected_event",
+            color,
+            isLockedSlot: false,
+            isConnectedEvent: true,
+            description: event.description || "",
+            attendees: event.attendees || [],
+            provider: event.provider,
+            calendarName: event.calendar_name,
+          };
+        })
+      : [];
+
     if (!selectedServiceId) {
-      return bookingEvents;
+      return [...bookingEvents, ...importedEvents];
     }
 
     const service = services.find((item: any) => String(item?.id) === String(selectedServiceId));
@@ -724,13 +895,15 @@ export const CalendarScreen = () => {
       };
     });
 
-    return [...bookingEvents, ...lockedEvents];
+    return [...bookingEvents, ...lockedEvents, ...importedEvents];
   }, [
     bookings,
     services,
     settings,
     selectedServiceId,
     lockedTimesByDate,
+    showConnectedCalendarEvents,
+    connectedCalendarEvents,
   ]);
 
   const updateRange = useCallback(
@@ -741,6 +914,7 @@ export const CalendarScreen = () => {
 
       const query = generateFilterFromDateRange(formattedRange);
       setCustomFilter(query);
+      setVisibleRangeUnix(getVisibleRangeUnix(formattedRange[0], formattedRange[1]));
 
       filterItems("appointments", query);
     },
@@ -767,22 +941,36 @@ export const CalendarScreen = () => {
   );
 
   const EventWrapper = useCallback(
-    ({ event, children }: any) => (
-      <div
-        className={classNames(
-          "wbk_calendar__eventWrapper",
-          event.status && `wbk_calendar__eventWrapper--${event.status}`,
-          { "wbk_calendar__eventWrapper--lockedSlot": event.isLockedSlot }
-        )}
-        style={{
-          backgroundColor: event.isLockedSlot
-            ? "rgba(254, 6, 6, 0.22)"
-            : increaseOpacity(event.color, 0.5),
-        }}
-      >
-        {children}
-      </div>
-    ),
+    ({ event, children }: any) => {
+      const tooltipParts = [event.title, event.description].filter(Boolean);
+      if (Array.isArray(event.attendees) && event.attendees.length) {
+        const attendeeLabels = event.attendees
+          .map((attendee: IConnectedCalendarAttendee) => attendee.displayName || attendee.email)
+          .filter(Boolean);
+        if (attendeeLabels.length) {
+          tooltipParts.push(attendeeLabels.join(", "));
+        }
+      }
+
+      return (
+        <div
+          className={classNames(
+            "wbk_calendar__eventWrapper",
+            event.status && `wbk_calendar__eventWrapper--${event.status}`,
+            { "wbk_calendar__eventWrapper--lockedSlot": event.isLockedSlot },
+            { "wbk_calendar__eventWrapper--connected": event.isConnectedEvent }
+          )}
+          title={tooltipParts.join("\n")}
+          style={{
+            backgroundColor: event.isLockedSlot
+              ? "rgba(254, 6, 6, 0.22)"
+              : increaseOpacity(event.color, 0.5),
+          }}
+        >
+          {children}
+        </div>
+      );
+    },
     []
   );
 
@@ -926,6 +1114,33 @@ export const CalendarScreen = () => {
             disabled={!firstServiceId}
             className="wbk_calendar__scheduleToolsToggle"
           />
+          <Toggle
+            name="wbk-connected-calendar-events"
+            label={__("Show connected calendar events", "webba-booking-lite")}
+            value={showConnectedCalendarEvents}
+            onChange={(enabled) => {
+              setShowConnectedCalendarEvents(enabled);
+              writeShowConnectedCalendarEventsPreference(enabled);
+            }}
+            disabled={!firstServiceId || connectedEventsLoading}
+            tooltip={__(
+              "Load and display events from Google and Outlook calendars connected to the selected services",
+              "webba-booking-lite"
+            )}
+            className={classNames("wbk_calendar__scheduleToolsToggle", {
+              "wbk_calendar__scheduleToolsToggle--loading": connectedEventsLoading,
+            })}
+          />
+          {connectedEventsLoading && (
+            <span
+              className="wbk_calendar__connectedEventsLoader"
+              aria-label={__(
+                "Loading connected calendar events",
+                "webba-booking-lite"
+              )}
+              role="status"
+            />
+          )}
         </div>
         <div
           className={classNames("wbk_calendar__scheduleNotice", {
@@ -1008,6 +1223,19 @@ export const CalendarScreen = () => {
                       />
                     )}
                   </button>
+                </div>
+              );
+            }
+
+            if (props.event.isConnectedEvent) {
+              return (
+                <div className="wbk_calendar__connectedEvent">
+                  <div className="wbk_calendar__connectedEventTitle">{props.event.title}</div>
+                  {props.event.calendarName && (
+                    <div className="wbk_calendar__connectedEventMeta">
+                      {props.event.calendarName}
+                    </div>
+                  )}
                 </div>
               );
             }

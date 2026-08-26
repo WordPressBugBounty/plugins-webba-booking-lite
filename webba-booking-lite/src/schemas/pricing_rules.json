@@ -64,6 +64,7 @@
             "title": "Date range",
             "tab": "",
             "misc": {
+                "tooltip": "Define the date range during which this pricing rule applies.",
                 "time_zone": "Europe/Warsaw"
             },
             "required": true,
@@ -84,6 +85,7 @@
             "title": "Minimum number of days before the booked date",
             "tab": "",
             "misc": {
+                "tooltip": "Minimum number of days before the booked date required for early booking discount.",
                 "sub_type": "positive_integer"
             },
             "required": true,
@@ -103,7 +105,9 @@
             "hidden": true,
             "title": "Custom field ID",
             "tab": "",
-            "misc": null,
+            "misc": {
+                "tooltip": "Enter the ID of the custom form field to match."
+            },
             "required": true,
             "dependency": [
                 [
@@ -122,6 +126,7 @@
             "title": "Operator",
             "tab": "",
             "misc": {
+                "tooltip": "Choose how to compare the custom field value.",
                 "options": {
                     "equals": "equals",
                     "more_than": "more than",
@@ -145,7 +150,9 @@
             "hidden": true,
             "title": "Custom field value",
             "tab": "",
-            "misc": null,
+            "misc": {
+                "tooltip": "Enter the value to compare against the custom field."
+            },
             "required": true,
             "dependency": [
                 [
@@ -164,6 +171,7 @@
             "title": "Operator",
             "tab": "",
             "misc": {
+                "tooltip": "Choose how to compare the number of seats booked.",
                 "options": {
                     "equals": "equals",
                     "more_than": "more than",
@@ -187,7 +195,9 @@
             "hidden": true,
             "title": "Number of seats",
             "tab": "",
-            "misc": null,
+            "misc": {
+                "tooltip": "Enter the number of seats to compare against."
+            },
             "required": true,
             "dependency": [
                 [
@@ -206,6 +216,7 @@
             "title": "Operator",
             "tab": "",
             "misc": {
+                "tooltip": "Choose how to compare the number of timeslots booked.",
                 "options": {
                     "equals": "equals",
                     "more_than": "more than",
@@ -229,7 +240,9 @@
             "hidden": true,
             "title": "Number of timeslots",
             "tab": "",
-            "misc": null,
+            "misc": {
+                "tooltip": "Enter the number of timeslots to compare against."
+            },
             "required": true,
             "dependency": [
                 [
@@ -268,7 +281,9 @@
             "hidden": true,
             "title": "Day of week and time range",
             "tab": "",
-            "misc": null,
+            "misc": {
+                "tooltip": "Select the days of the week and time range for this pricing rule."
+            },
             "required": false,
             "dependency": [
                 [
@@ -287,6 +302,7 @@
             "title": "Action",
             "tab": "",
             "misc": {
+                "tooltip": "Choose whether to increase, reduce, or replace the service price.",
                 "options": {
                     "increase": "increase",
                     "reduce": "reduce",
@@ -300,7 +316,7 @@
         },
         "pricing_rule_amount": {
             "type": "string",
-            "input_type": "text",
+            "input_type": "price",
             "hidden": false,
             "title": "Amount",
             "tab": "",
@@ -320,6 +336,7 @@
             "title": "Fixed / percent",
             "tab": "",
             "misc": {
+                "tooltip": "Choose whether the amount is a fixed value or a percentage.",
                 "options": {
                     "fixed": "fixed",
                     "percent": "percent"
@@ -348,7 +365,8 @@
             "title": "Multiply amount by the field value",
             "tab": "",
             "misc": {
-                "yes": "Yes"
+                "yes": "Yes",
+                "tooltip": "Multiply the rule amount by the custom field value."
             },
             "required": false,
             "dependency": [
@@ -368,7 +386,8 @@
             "title": "The field is related to the number of seats booked",
             "tab": "",
             "misc": {
-                "yes": "Yes"
+                "yes": "Yes",
+                "tooltip": "Enable if the custom field value represents the number of seats booked."
             },
             "required": false,
             "dependency": [
@@ -388,7 +407,8 @@
             "title": "Apply the pricing rule to the entire order instead of individual time slots.",
             "tab": "",
             "misc": {
-                "yes": "Yes"
+                "yes": "Yes",
+                "tooltip": "Apply the pricing rule to the entire order instead of individual time slots."
             },
             "required": false,
             "dependency": [],

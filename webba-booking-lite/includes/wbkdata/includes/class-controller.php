@@ -157,19 +157,22 @@ class Controller
             if (trim(sanitize_text_field($request["model"])) === "connected_calendars") {
                 $connected_calendar = new \WBK_Connected_Calendar($id);
                 $current_provider = $connected_calendar->get_provider();
-                if($current_provider !== $fields["provider"] && $current_provider === 'google'){
+                if ($current_provider !== $fields["provider"] && $current_provider === "google") {
                     $google_calendar = new \WBK_Google_Calendar_Processor($id);
                     $google_calendar->clear_access_token();
-                    $fields["in_provider_id"] = '';
+                    $fields["in_provider_id"] = "";
                     $fields["access_token"] = "";
-                }elseif($current_provider !== $fields["provider"] && $current_provider === 'outlook'){
+                } elseif (
+                    $current_provider !== $fields["provider"] &&
+                    $current_provider === "outlook"
+                ) {
                     $outlook_calendar = new \WBK_Outlook_Calendar_Processor($id);
                     $outlook_calendar->clear_access_token();
-                    $fields["in_provider_id"] = '';
+                    $fields["in_provider_id"] = "";
                     $fields["access_token"] = "";
                 }
             }
-            
+
             $action_result = WbkData()->models->get_element_at($model)->update_item($fields, $id);
             if ($action_result[0] == true) {
                 return new \WP_REST_Response(
@@ -259,7 +262,10 @@ class Controller
             }
 
             if (trim(sanitize_text_field($params["model"])) === "appointments") {
-                $item->name = WBK_Model_Utils::backend_customer_name_processing($item->id, $item->name ?? '');
+                $item->name = WBK_Model_Utils::backend_customer_name_processing(
+                    $item->id,
+                    $item->name ?? "",
+                );
                 $item->extra_data = [
                     "dynamic_title" => WBK_Placeholder_Processor::process_placeholders(
                         get_option(
@@ -314,6 +320,8 @@ class Controller
                         $calendar->save();
                     }
                 }
+
+                unset($item->access_token);
             }
         }
 
@@ -399,7 +407,10 @@ class Controller
         if (false === WbkData()->models->get_element_at($model)) {
             return false;
         }
-
+        $user = wp_get_current_user();
+        if (current_user_can("manage_options") || current_user_can("manage_sites")) {
+            return true;
+        }
         $result = WbkData()->models->get_element_at($model)->сurrent_user_can_view();
         return $result;
     }

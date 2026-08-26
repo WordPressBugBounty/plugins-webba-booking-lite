@@ -1,0 +1,38 @@
+#wbk_booking_form_nav {
+    .accordion-section-content {
+        overflow: visible;
+        min-height: 80px;
+    }
+
+    .inside {
+        display: block !important;
+        height: auto;
+        overflow: visible;
+    }
+}
+
+#wbk_booking_form_nav-content {
+    overflow: visible;
+}
+
+#wbk_nav_menu_booking {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    label span {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    input[type='text'] {
+        width: 100%;
+    }
+
+    .button-controls {
+        display: block;
+        margin-top: 4px;
+    }
+}

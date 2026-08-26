@@ -27,7 +27,7 @@ import {
     isModelOptions,
     useOptions,
 } from './utils'
-import { useForm } from '../../lib/FormProvider'
+import { useForm, useShowValidation } from '../../lib/FormProvider'
 import { string } from 'zod'
 import { getFormState } from '../../lib/utils'
 import { checkForConditionalDisable } from '../../utils/utils'
@@ -36,6 +36,10 @@ import { useDispatch, useSelect } from '@wordpress/data'
 import { store, store_name } from '../../../../../store/backend'
 import { FieldDescription } from '../FieldDescription/FieldDescription'
 import { getAdminSelectStyles } from '../../../../utils/adminSelectStyles'
+import { useOptionalSidebar } from '../../../Sidebar/SidebarContext'
+import { getAddableModelName } from '../../../AddModelItemPopup/addableModelNames'
+import plusIcon from '../../../../../../public/images/plus-icon.svg'
+import { __ } from '@wordpress/i18n'
 
 const MAX_DISPLAYED_OPTIONS = 4
 
@@ -117,12 +121,14 @@ export const createGenericSelectField: FormComponentConstructor<any> = ({
     return ({ name, label, misc }: FormFieldProps) => {
         const { value, setValue, errors } = useField(field)
         const [touched, setTouched] = useState(false)
+        const showValidation = useShowValidation()
         const isValid = !errors?.length
-        const showErrors = !isValid && touched
+        const showErrors = !isValid && (touched || showValidation)
         const [firstError] = errors ?? []
         const multiple = misc?.multiple || false
         const form = useForm()
         const { setSourcedOptions } = useDispatch(store)
+        const sidebar = useOptionalSidebar()
         const selectRef = useRef<any>(null)
         const {
             maxHeight: maxMenuHeight,
@@ -142,6 +148,9 @@ export const createGenericSelectField: FormComponentConstructor<any> = ({
             nullValue: fieldConfig.misc?.null_value,
             misc: fieldConfig?.misc as FormFieldMisc,
         })
+        const addableModelName = sidebar
+            ? getAddableModelName((fieldConfig.misc as FormFieldMisc).options)
+            : null
 
         // enable dependency
         const isEnabled = useEnableLogic(
@@ -195,6 +204,11 @@ export const createGenericSelectField: FormComponentConstructor<any> = ({
                 })
             }
         }
+
+        const handleChangeRef = useRef(handleChange)
+        handleChangeRef.current = handleChange
+        const valueObjectRef = useRef(valueObject)
+        valueObjectRef.current = valueObject
 
         const isLoading = useSelect((select) => {
             if (
@@ -264,6 +278,57 @@ export const createGenericSelectField: FormComponentConstructor<any> = ({
             setHasEvaluated(true)
         }, [form.defaultValue, misc?.disable_condition, hasEvaluated])
 
+        const isAddButtonEnabled =
+            !!addableModelName &&
+            !isLoading &&
+            !conditionallyDisabled &&
+            isEnabled
+
+        const handleAddItem = async (
+            event: React.MouseEvent<HTMLButtonElement>
+        ) => {
+            event.preventDefault()
+            event.stopPropagation()
+
+            if (!addableModelName || !isAddButtonEnabled || !sidebar) {
+                return
+            }
+
+            const { openAddModelItemPopup } = await import(
+                '../../../AddModelItemPopup/AddModelItemPopup'
+            )
+
+            openAddModelItemPopup(sidebar, {
+                modelName: addableModelName,
+                onCreated: (item) => {
+                    const newId = String(item.id)
+                    const currentValueObject = valueObjectRef.current
+
+                    if (multiple) {
+                        const alreadySelected = currentValueObject.some(
+                            (option) => String(option.value) === newId
+                        )
+                        handleChangeRef.current(
+                            alreadySelected
+                                ? currentValueObject
+                                : [
+                                      ...currentValueObject,
+                                      {
+                                          value: newId,
+                                          label: item.name || newId,
+                                      },
+                                  ]
+                        )
+                    } else {
+                        handleChangeRef.current({
+                            value: newId,
+                            label: item.name || newId,
+                        })
+                    }
+                },
+            })
+        }
+
         // Dynamic styles with calculated max height
         const dynamicStyles = useMemo(
             () =>
@@ -293,53 +358,73 @@ export const createGenericSelectField: FormComponentConstructor<any> = ({
             >
                 <Label id={name} title={label} tooltip={misc?.tooltip} />
                 <div>
-                    <Select
-                        ref={selectRef}
-                        value={valueObject}
-                        options={options}
-                        onChange={(selectedOptions: IOption[] | unknown) =>
-                            handleChange(selectedOptions as IOption[])
-                        }
-                        classNames={{
-                            control: () => classNames('wbk_genericSelectField__selectInput', {
-                                'wbk_genericSelectField__selectInput--focused': isFocused,
-                            }),
-                        }}
-                        id={name}
-                        isMulti={multiple}
-                        onBlur={() => {
-                            setTouched(true)
-                            setIsFocused(false)
-                        }}
-                        onFocus={() => {
-                            recalculatePosition()
-                            setIsFocused(true)
-                        }}
-                        onMenuOpen={recalculatePosition}
-                        isSearchable={multiple || misc?.searchable || false}
-                        isDisabled={
-                            isLoading || conditionallyDisabled || !isEnabled
-                        }
-                        isLoading={isLoading}
-                        hideSelectedOptions={false}
-                        components={
-                            multiple
-                                ? { MultiValue: CustomMultiValue }
-                                : undefined
-                        }
-                        styles={dynamicStyles}
-                        menuPlacement={
-                            isLastField && hasSingleOption
-                                ? 'top'
-                                : menuPlacement
-                        }
-                        isOptionDisabled={(option: IOption) => {
-                            if (option.isDisabled === true) return true
-                            if (!misc?.disabled_options) return false
-                            return misc?.disabled_options.includes(option.value)
-                        }}
-                        maxMenuHeight={maxMenuHeight}
-                    />
+                    <div
+                        className={classNames('wbk_genericSelectField__controlRow', {
+                            'wbk_genericSelectField__controlRow--withAdd':
+                                !!addableModelName,
+                        })}
+                    >
+                        <div className="wbk_genericSelectField__selectWrap">
+                            <Select
+                                ref={selectRef}
+                                value={valueObject}
+                                options={options}
+                                onChange={(selectedOptions: IOption[] | unknown) =>
+                                    handleChange(selectedOptions as IOption[])
+                                }
+                                classNames={{
+                                    control: () => classNames('wbk_genericSelectField__selectInput', {
+                                        'wbk_genericSelectField__selectInput--focused': isFocused,
+                                    }),
+                                }}
+                                id={name}
+                                isMulti={multiple}
+                                onBlur={() => {
+                                    setTouched(true)
+                                    setIsFocused(false)
+                                }}
+                                onFocus={() => {
+                                    recalculatePosition()
+                                    setIsFocused(true)
+                                }}
+                                onMenuOpen={recalculatePosition}
+                                isSearchable={multiple || misc?.searchable || false}
+                                isDisabled={
+                                    isLoading || conditionallyDisabled || !isEnabled
+                                }
+                                isLoading={isLoading}
+                                hideSelectedOptions={false}
+                                components={
+                                    multiple
+                                        ? { MultiValue: CustomMultiValue }
+                                        : undefined
+                                }
+                                styles={dynamicStyles}
+                                menuPlacement={
+                                    isLastField && hasSingleOption
+                                        ? 'top'
+                                        : menuPlacement
+                                }
+                                isOptionDisabled={(option: IOption) => {
+                                    if (option.isDisabled === true) return true
+                                    if (!misc?.disabled_options) return false
+                                    return misc?.disabled_options.includes(option.value)
+                                }}
+                                maxMenuHeight={maxMenuHeight}
+                            />
+                        </div>
+                        {addableModelName && (
+                            <button
+                                type="button"
+                                className="wbk_genericSelectField__addButton"
+                                onClick={handleAddItem}
+                                disabled={!isAddButtonEnabled}
+                                aria-label={__('Add new', 'webba-booking-lite')}
+                            >
+                                <img src={plusIcon} alt="" />
+                            </button>
+                        )}
+                    </div>
                     {misc?.description && (
                         <FieldDescription description={misc.description} />
                     )}

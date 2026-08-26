@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n'
 
 import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers'
 import { RestrictToElement } from '@dnd-kit/dom/modifiers'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import closeIcon2 from '../../../../public/images/close-icon2.png'
 import { Button } from '../Button/Button'
 import { Validators } from '../Form/utils/validation'
@@ -118,6 +118,15 @@ export const FormBuilder = ({
     const [fieldOrder, setFieldOrder] = useState<number[]>([])
     const [showValidation, setShowValidation] = useState(false)
     const sidebar = useSidebar()
+    const closeSidebarRef = useRef(sidebar.close)
+    closeSidebarRef.current = sidebar.close
+    const registerCloseHandler = sidebar.registerCloseHandler
+
+    useEffect(() => {
+        return registerCloseHandler(() => {
+            closeSidebarRef.current()
+        })
+    }, [registerCloseHandler])
 
     return (
         <FormBuilderValidationProvider value={{ showValidation }}>

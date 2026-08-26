@@ -24,6 +24,7 @@
             "title": "Extra name",
             "tab": "details",
             "misc": {
+                "tooltip": "Enter a name for this extra.",
                 "required_plan": "premium"
             },
             "required": true,

@@ -106,8 +106,8 @@
             "tab": "",
             "misc": {
                 "tooltip": "Select the booking date.",
-                "date_format": "F j, Y",
-                "time_zone": "Asia/Dhaka"
+                "date_format": "m/d/y",
+                "time_zone": "Europe/Warsaw"
             },
             "required": true,
             "dependency": [],

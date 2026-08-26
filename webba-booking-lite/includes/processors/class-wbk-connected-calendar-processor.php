@@ -220,7 +220,8 @@ abstract class WBK_Connected_Calendar_Processor {
 
     /**
      * Abstract method: Fetch calendar events in a date range for availability blocking
-     * Returns array of WBK_Time_Slot objects representing busy time ranges
+     * Returns array of WBK_Time_Slot objects representing busy time ranges.
+     * Slots include title and description; Google slots also include attendees.
      *
      * @param string $start ISO 8601 formatted start datetime
      * @param string $end ISO 8601 formatted end datetime
@@ -500,6 +501,12 @@ abstract class WBK_Connected_Calendar_Processor {
             return [];
         }
         if ( !is_array( $calendar_ids ) || empty( $calendar_ids ) ) {
+            return [];
+        }
+        $calendar_ids = array_values( array_unique( array_filter( array_map( "intval", $calendar_ids ), function ( $calendar_id ) {
+            return $calendar_id > 0;
+        } ) ) );
+        if ( empty( $calendar_ids ) ) {
             return [];
         }
         $event_data_arr = [];

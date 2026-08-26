@@ -27,9 +27,7 @@ import { ReactComponent as ConnectIcon } from '../../../../public/images/icon-co
 
 export const ConnectedCalendarsScreen = () => {
     const columns = generateColumnDefsFromModel(connectedCalendarsModel, {
-        access_token: {
-            cell: GoogleAuthCell,
-        },
+
         in_provider_id: {
             cell: CalendarName,
         },
@@ -38,6 +36,10 @@ export const ConnectedCalendarsScreen = () => {
         },
         user_id: {
             cell: UserName,
+        },
+    }, {
+        access_token: {
+            cell: GoogleAuthCell,
         },
     })
 

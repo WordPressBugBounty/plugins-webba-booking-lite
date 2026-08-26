@@ -176,6 +176,58 @@ class Model
     public function get_items($filters = [])
     {
         global $wpdb;
+
+        $db_prefix = get_option("wbk_db_prefix", "");
+        if ($this->model_name == $db_prefix . "wbk_services") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "wbk_service_categories") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "wbk_gg_calendars") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "WBK_Outlook_Calendar_calendars") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "wbk_email_templates") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "wbk_coupons") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "wbk_pricing_rules") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "wbk_forms") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "wbk_locations") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "wbk_extras") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "wbk_units") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "wbk_staff_members") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        }
+
         $this->prepare_fields_to_view();
         if (0 === count($this->storage["fields_to_view"])) {
             $this->storage["rows"] = [];
@@ -221,12 +273,21 @@ class Model
         }
         if (count($filters) > 0) {
             foreach ($filters as $filter) {
+                if (!isset($filter["name"])) {
+                    continue;
+                }
+
                 $filter_name = $filter["name"];
 
                 if (isset($filter["value"]) && is_array($filter["value"])) {
                     $filter_value = $filter["value"];
                 } else {
                     $filter_value = isset($filter["value"]) ? [$filter["value"]] : [];
+                }
+
+                $filter_value = $this->normalize_filter_values($filter_value);
+                if (count($filter_value) === 0) {
+                    continue;
                 }
 
                 if ("appointment_service_categories" == $filter_name) {
@@ -253,9 +314,10 @@ class Model
                 }
 
                 $filter_value = apply_filters("wbkdata_filter_value", $filter_value, $filter_name);
+                $field = $this->fields->get_element_at($filter_name);
 
-                if (!empty($filter_value)) {
-                    $this->fields->get_element_at($filter_name)->set_filter_value($filter_value);
+                if (!empty($filter_value) && $field) {
+                    $field->set_filter_value($filter_value);
                 }
             }
         }
@@ -273,25 +335,12 @@ class Model
             $conditions = "";
         }
         // update conditions
-        $user = wp_get_current_user();
-        if ($this->model_name == get_option("wbk_db_prefix", "") . "wbk_appointments") {
-            if (
-                in_array("administrator", $user->roles, true) ||
-                (is_multisite() && !is_super_admin())
-            ) {
-            } else {
-                $services = \WBK_Model_Utils::get_service_ids(true);
-                if (count($services) > 0) {
-                    $condition_this = " AND service_id in (" . implode(",", $services) . ")";
-                    $conditions .= $condition_this;
-                }
-            }
-
+        if ($this->model_name == $db_prefix . "wbk_appointments") {
             if (WBK_Validator::checkStaffAccessToBookings()) {
                 $staff_member_id = $wpdb->get_var(
                     $wpdb->prepare(
                         "SELECT id FROM " .
-                            get_option("wbk_db_prefix", "") .
+                            $db_prefix .
                             "wbk_staff_members where wordpress_user = %d",
                         get_current_user_id(),
                     ),
@@ -300,49 +349,6 @@ class Model
                 if ($staff_member_id != 0 && $staff_member_id != null) {
                     $conditions .= " AND staff_member_id = " . $staff_member_id;
                 }
-            }
-        }
-        if ($this->model_name == get_option("wbk_db_prefix", "") . "wbk_services") {
-            if (
-                in_array("administrator", $user->roles, true) ||
-                (is_multisite() && !is_super_admin())
-            ) {
-            } else {
-                $services = \WBK_Model_Utils::get_service_ids(true, false);
-                $condition_this = " id in (" . implode(",", $services) . ")";
-                $conditions .= $condition_this;
-            }
-        }
-        if ($this->model_name == get_option("wbk_db_prefix", "") . "wbk_service_categories") {
-            if (
-                in_array("administrator", $user->roles, true) ||
-                (is_multisite() && !is_super_admin())
-            ) {
-            } else {
-                $conditions .= "10 < 1";
-            }
-        }
-        if ($this->model_name == get_option("wbk_db_prefix", "") . "wbk_gg_calendars") {
-            if (
-                in_array("administrator", $user->roles, true) ||
-                (is_multisite() && !is_super_admin())
-            ) {
-            } else {
-                $user = wp_get_current_user();
-                $conditions .= " user_id = " . $user->ID;
-            }
-        }
-        if (
-            $this->model_name ==
-            get_option("wbk_db_prefix", "") . "WBK_Outlook_Calendar_calendars"
-        ) {
-            if (
-                in_array("administrator", $user->roles, true) ||
-                (is_multisite() && !is_super_admin())
-            ) {
-            } else {
-                $user = wp_get_current_user();
-                $conditions .= " user_id = " . $user->ID;
             }
         }
 
@@ -369,6 +375,26 @@ class Model
 
         return $result;
     }
+
+    /**
+     * Remove empty and "all" placeholder values from a filter payload.
+     *
+     * @param array $filter_value Raw filter values.
+     * @return array
+     */
+    private function normalize_filter_values(array $filter_value): array
+    {
+        return array_values(
+            array_filter($filter_value, static function ($value) {
+                return $value !== "" &&
+                    $value !== null &&
+                    $value !== false &&
+                    $value !== 0 &&
+                    $value !== "0";
+            }),
+        );
+    }
+
     public function remove_slashes_from_properties($array)
     {
         foreach ($array as $key => $obj) {
@@ -565,6 +591,10 @@ class Model
                 case "limitation":
                     $type = "string";
                     $input_type = "limitation";
+                    break;
+                case "price":
+                    $type = "string";
+                    $input_type = "price";
                     break;
                 case "price_variant":
                     $type = "string";
@@ -917,13 +947,19 @@ class Model
 
                             break;
                         case "<":
-                            if (!isset($post_data[$field_key]) || $post_data[$field_key] >= $expected) {
+                            if (
+                                !isset($post_data[$field_key]) ||
+                                $post_data[$field_key] >= $expected
+                            ) {
                                 $rules_passed = false;
                             }
 
                             break;
                         case ">":
-                            if (!isset($post_data[$field_key]) || $post_data[$field_key] <= $expected) {
+                            if (
+                                !isset($post_data[$field_key]) ||
+                                $post_data[$field_key] <= $expected
+                            ) {
                                 $rules_passed = false;
                             }
 
@@ -1063,10 +1099,7 @@ class Model
             if (is_user_logged_in()) {
                 $user = wp_get_current_user();
 
-                $have_permission =
-                    current_user_can("manage_options") &&
-                    current_user_can("manage_sites") &&
-                    !is_multisite();
+                $have_permission = current_user_can("manage_options") && !is_multisite();
 
                 if (
                     isset($_REQUEST["model"]) &&
@@ -1080,6 +1113,16 @@ class Model
                 }
 
                 if ($have_permission) {
+                    $admin_passed = apply_filters(
+                        "wbkdata_admin_filter_by_role",
+                        true,
+                        $action,
+                        $field,
+                    );
+                    if (!$admin_passed) {
+                        continue;
+                    }
+                } else {
                     $role_found = false;
                     foreach ($user->roles as $role) {
                         switch ($action) {
@@ -1098,16 +1141,6 @@ class Model
                         }
                     }
                     if (!$role_found) {
-                        continue;
-                    }
-                } else {
-                    $admin_passed = apply_filters(
-                        "wbkdata_admin_filter_by_role",
-                        true,
-                        $action,
-                        $field,
-                    );
-                    if (!$admin_passed) {
                         continue;
                     }
                 }

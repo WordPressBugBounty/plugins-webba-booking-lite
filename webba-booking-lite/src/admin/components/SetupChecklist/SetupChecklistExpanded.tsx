@@ -3,12 +3,11 @@ import { __, sprintf } from '@wordpress/i18n'
 import { useDispatch, useSelect } from '@wordpress/data'
 import { store_name } from '../../../store/backend'
 import { SetupChecklistStepItem } from './SetupChecklistStepItem'
-import { SetupChecklistAssistancePanel } from './SetupChecklistAssistancePanel'
 import type { SetupChecklistState } from './types'
-import closeIcon from '../../../../public/images/icon-close.svg'
 import helpDocumentationIcon from '../../../../public/images/icon-help-documentation.svg'
 import helpEmailIcon from '../../../../public/images/icon-email.svg'
 import lockedIcon from '../../../../public/images/icon-pro-locked.svg'
+import wizardIcon from '../../../../public/images/icon-wizard.svg'
 import './SetupChecklist.scss'
 
 interface SetupChecklistExpandedProps {
@@ -32,7 +31,6 @@ export const SetupChecklistExpanded = ({
     onDismiss,
     onSkipStep,
 }: SetupChecklistExpandedProps) => {
-    const [showAssistance, setShowAssistance] = useState(false)
     const logoSrc = pluginUrl ? `${pluginUrl}/public/images/webba-icon.svg` : ''
     const scrollContainerRef = useRef<HTMLDivElement>(null)
     const previousActiveStepRef = useRef<string | null>(null)
@@ -41,12 +39,13 @@ export const SetupChecklistExpanded = ({
         fetchSetupChecklist: () => Promise<SetupChecklistState>
     }
 
-    const { plan_map, assistance_available } = useSelect(
+    const { plan_map, assistance_available, admin_url } = useSelect(
         (select: any) => select(store_name).getPreset(),
         []
     ) as {
         plan_map?: Record<string, boolean>
         assistance_available?: boolean
+        admin_url?: string
     }
 
     const showUpgradeCard =
@@ -114,13 +113,13 @@ export const SetupChecklistExpanded = ({
                         <p className="wbk_setupChecklist__expandedSubtitle">
                             {isReviewMode
                                 ? __(
-                                      'Review each setup step and revisit the related settings at any time.',
-                                      'webba-booking-lite'
-                                  )
+                                    'Review each setup step and revisit the related settings at any time.',
+                                    'webba-booking-lite'
+                                )
                                 : __(
-                                      'Complete these steps to fully configure your booking system.',
-                                      'webba-booking-lite'
-                                  )}
+                                    'Complete these steps to fully configure your booking system.',
+                                    'webba-booking-lite'
+                                )}
                         </p>
                     </div>
                 </div>
@@ -137,70 +136,58 @@ export const SetupChecklistExpanded = ({
 
             <div
                 ref={scrollContainerRef}
-                className={`wbk_setupChecklist__expandedBody${
-                    showAssistance
-                        ? ' wbk_setupChecklist__expandedBody--assistance'
-                        : ''
-                }`}
+                className="wbk_setupChecklist__expandedBody"
             >
-                {showAssistance ? (
-                    <SetupChecklistAssistancePanel
-                        onBack={() => setShowAssistance(false)}
-                        onSetupComplete={() => {
-                            fetchSetupChecklist()
-                        }}
-                    />
-                ) : (
-                    <>
-                <div className="wbk_setupChecklist__mainColumn">
-                    <div className="wbk_setupChecklist__progressSummary">
-                        <span>
-                            {sprintf(
-                                __('%1$d of %2$d steps completed', 'webba-booking-lite'),
-                                state.completed_count,
-                                state.total_count
+                <>
+                    <div className="wbk_setupChecklist__mainColumn">
+                        <div className="wbk_setupChecklist__progressSummary">
+                            <span>
+                                {sprintf(
+                                    __('%1$d of %2$d steps completed', 'webba-booking-lite'),
+                                    state.completed_count,
+                                    state.total_count
+                                )}
+                            </span>
+                            <span>{state.progress_percent}%</span>
+                        </div>
+                        <div
+                            className="wbk_setupChecklist__progressTrack"
+                            style={
+                                {
+                                    '--wbk-checklist-progress': `${state.progress_percent}%`,
+                                } as React.CSSProperties
+                            }
+                        >
+                            <div className="wbk_setupChecklist__progressFill" />
+                        </div>
+
+                        <div className="wbk_setupChecklist__steps">
+                            {state.steps.map((step) => (
+                                <SetupChecklistStepItem
+                                    key={step.id}
+                                    step={step}
+                                    shortcode={state.shortcode}
+                                    emailTemplates={state.email_templates || []}
+                                    isExpanded
+                                    isReviewMode={isReviewMode}
+                                    reviewActiveStepId={reviewActiveStepId}
+                                    onReviewStepChange={onReviewStepChange}
+                                    onSkipStep={onSkipStep}
+                                />
+                            ))}
+                        </div>
+
+                        <p className="wbk_setupChecklist__savedNote">
+                            {__(
+                                'Your progress is saved automatically.',
+                                'webba-booking-lite'
                             )}
-                        </span>
-                        <span>{state.progress_percent}%</span>
-                    </div>
-                    <div
-                        className="wbk_setupChecklist__progressTrack"
-                        style={
-                            {
-                                '--wbk-checklist-progress': `${state.progress_percent}%`,
-                            } as React.CSSProperties
-                        }
-                    >
-                        <div className="wbk_setupChecklist__progressFill" />
+                        </p>
                     </div>
 
-                    <div className="wbk_setupChecklist__steps">
-                        {state.steps.map((step) => (
-                            <SetupChecklistStepItem
-                                key={step.id}
-                                step={step}
-                                shortcode={state.shortcode}
-                                emailTemplates={state.email_templates || []}
-                                isExpanded
-                                isReviewMode={isReviewMode}
-                                reviewActiveStepId={reviewActiveStepId}
-                                onReviewStepChange={onReviewStepChange}
-                                onSkipStep={onSkipStep}
-                            />
-                        ))}
-                    </div>
-
-                    <p className="wbk_setupChecklist__savedNote">
-                        {__(
-                            'Your progress is saved automatically.',
-                            'webba-booking-lite'
-                        )}
-                    </p>
-                </div>
-
-                <aside className="wbk_setupChecklist__sidebar">
-                    {/* TODO: add video when it's ready */}
-                    {/* <div className="wbk_setupChecklist__sidebarSection">
+                    <aside className="wbk_setupChecklist__sidebar">
+                        {/* TODO: add video when it's ready */}
+                        {/* <div className="wbk_setupChecklist__sidebarSection">
                         <h2 className="wbk_setupChecklist__sidebarTitle">
                             {__('Setup Video', 'webba-booking-lite')}
                         </h2>
@@ -220,65 +207,96 @@ export const SetupChecklistExpanded = ({
                         </p>
                     </div> */}
 
-                    <div className="wbk_setupChecklist__sidebarSection">
-                        <h2 className="wbk_setupChecklist__sidebarTitle">
-                            {__('Resources', 'webba-booking-lite')}
-                        </h2>
-                        <a
-                            className="wbk_setupChecklist__resourceLink"
-                            href={state.resources.documentation_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <img src={helpDocumentationIcon} alt="" />
-                            <span>
-                                <strong>
-                                    {__('Documentation', 'webba-booking-lite')}
-                                </strong>
-                                <small>
-                                    {__(
-                                        'Guides, references & API docs',
-                                        'webba-booking-lite'
-                                    )}
-                                </small>
-                            </span>
-                        </a>
-                        <a
-                            className="wbk_setupChecklist__resourceLink"
-                            href={state.resources.support_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <img src={helpEmailIcon} alt="" />
-                            <span>
-                                <strong>{__('Support', 'webba-booking-lite')}</strong>
-                                <small>
-                                    {__(
-                                        'Our support team replies within 24h.',
-                                        'webba-booking-lite'
-                                    )}
-                                </small>
-                            </span>
-                        </a>
-                    </div>
-
-                    {showAssistanceCard && (
                         <div className="wbk_setupChecklist__sidebarSection">
                             <h2 className="wbk_setupChecklist__sidebarTitle">
-                                {__('AI Assistance', 'webba-booking-lite')}
+                                {__('Resources', 'webba-booking-lite')}
+                            </h2>
+                            <a
+                                className="wbk_setupChecklist__resourceLink"
+                                href={state.resources.documentation_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <img src={helpDocumentationIcon} alt="" />
+                                <span>
+                                    <strong>
+                                        {__('Documentation', 'webba-booking-lite')}
+                                    </strong>
+                                    <small>
+                                        {__(
+                                            'Guides, references & API docs',
+                                            'webba-booking-lite'
+                                        )}
+                                    </small>
+                                </span>
+                            </a>
+                            <a
+                                className="wbk_setupChecklist__resourceLink"
+                                href={state.resources.support_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <img src={helpEmailIcon} alt="" />
+                                <span>
+                                    <strong>{__('Support', 'webba-booking-lite')}</strong>
+                                    <small>
+                                        {__(
+                                            'Our support team replies within 24h.',
+                                            'webba-booking-lite'
+                                        )}
+                                    </small>
+                                </span>
+                            </a>
+                        </div>
+
+                        <div className="wbk_setupChecklist__sidebarSection">
+                            {showAssistanceCard && (
+                                <>
+                                    <h2 className="wbk_setupChecklist__sidebarTitle">
+                                        {__('AI Assistance', 'webba-booking-lite')}
+                                    </h2>
+                                    <div className="wbk_setupChecklist__assistanceCard">
+                                        {logoSrc && <img src={logoSrc} alt="" />}
+                                        <span>
+                                            <strong>
+                                                {__(
+                                                    'Need help setting up?',
+                                                    'webba-booking-lite'
+                                                )}
+                                            </strong>
+                                            <small>
+                                                {__(
+                                                    'Describe your business and let AI configure your booking setup.',
+                                                    'webba-booking-lite'
+                                                )}
+                                            </small>
+                                        </span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="wbk_setupChecklist__assistanceAction"
+                                        onClick={() => window.location.href = sprintf('%sadmin.php?page=wbk-options&tab=options&Assistance=true', admin_url)}
+                                    >
+                                        {__('Start AI Assistant', 'webba-booking-lite')}
+                                    </button>
+                                </>
+                            )}
+                            <div className="wbk_setupChecklist__separator"></div>
+                            <h2 className="wbk_setupChecklist__sidebarTitle">
+                                {__('Setup Wizard', 'webba-booking-lite')}
                             </h2>
                             <div className="wbk_setupChecklist__assistanceCard">
-                                {logoSrc && <img src={logoSrc} alt="" />}
+                                <img src={wizardIcon} alt="" />
                                 <span>
                                     <strong>
                                         {__(
-                                            'Need help setting up?',
+                                            'Want to start from the beginning?',
                                             'webba-booking-lite'
                                         )}
                                     </strong>
                                     <small>
                                         {__(
-                                            'Describe your business and let AI configure your booking setup.',
+                                            'Start over with a fresh setup.',
                                             'webba-booking-lite'
                                         )}
                                     </small>
@@ -286,34 +304,32 @@ export const SetupChecklistExpanded = ({
                             </div>
                             <button
                                 type="button"
-                                className="wbk_setupChecklist__assistanceAction"
-                                onClick={() => setShowAssistance(true)}
+                                className="wbk_setupChecklist__assistanceAction wbk_setupChecklist__assistanceAction--wizard"
+                                onClick={() => window.location.href = sprintf('%sadmin.php?page=wbk-options&wbk-activation=true', admin_url)}
                             >
-                                {__('Start AI Assistant', 'webba-booking-lite')}
+                                {__('Start Setup Wizard', 'webba-booking-lite')}
                             </button>
                         </div>
-                    )}
 
-                    {showUpgradeCard && (
-                    <a
-                        className="wbk_setupChecklist__upgradeCard"
-                        href={state.resources.pricing_url}
-                    >
-                        <img src={lockedIcon} alt="" />
-                        <span>
-                            <strong>{__('Upgrade to Pro', 'webba-booking-lite')}</strong>
-                            <small>
-                                {__(
-                                    'Unlock calendar sync & payments.',
-                                    'webba-booking-lite'
-                                )}
-                            </small>
-                        </span>
-                    </a>
-                    )}
-                </aside>
-                    </>
-                )}
+                        {showUpgradeCard && (
+                            <a
+                                className="wbk_setupChecklist__upgradeCard"
+                                href={state.resources.pricing_url}
+                            >
+                                <img src={lockedIcon} alt="" />
+                                <span>
+                                    <strong>{__('Upgrade to Pro', 'webba-booking-lite')}</strong>
+                                    <small>
+                                        {__(
+                                            'Unlock calendar sync & payments.',
+                                            'webba-booking-lite'
+                                        )}
+                                    </small>
+                                </span>
+                            </a>
+                        )}
+                    </aside>
+                </>
             </div>
 
         </div>

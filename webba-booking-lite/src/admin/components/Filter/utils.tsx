@@ -65,28 +65,75 @@ export const createFilterFields = (fields: any) => {
     return fieldsComponents
 }
 
+const getMeaningfulFilterValues = (values: unknown[]) =>
+    values.filter(
+        (item) =>
+            item !== undefined &&
+            item !== null &&
+            item !== '' &&
+            item !== 0 &&
+            item !== '0'
+    )
+
+const isPlaceholderFilterValue = (value: unknown): boolean => {
+    if (value === undefined || value === null || value === '') {
+        return true
+    }
+
+    if (value === 0 || value === '0') {
+        return true
+    }
+
+    if (Array.isArray(value)) {
+        return getMeaningfulFilterValues(value).length === 0
+    }
+
+    return false
+}
+
+const sanitizeFilterValue = (value: unknown) => {
+    if (Array.isArray(value)) {
+        return getMeaningfulFilterValues(value)
+    }
+
+    return value
+}
+
+const resolveFieldFilterValue = (field: IFilterField) => {
+    const hasExplicitValue = field.value !== undefined && field.value !== null
+
+    if (hasExplicitValue && !isPlaceholderFilterValue(field.value)) {
+        return sanitizeFilterValue(field.value)
+    }
+
+    if (hasExplicitValue) {
+        return ''
+    }
+
+    if (!isPlaceholderFilterValue(field.initialValue)) {
+        return sanitizeFilterValue(field.initialValue)
+    }
+
+    return ''
+}
+
 export const createFilterStructure = (
     fields: IFilterField[],
     customQuery?: TAllowedFilterValue<any>[]
 ) => {
-    let filters: TAllowedFilterValue<any>[] = []
-
-    filters = fields.map((field: IFilterField) => {
-        return {
+    let filters: TAllowedFilterValue<any>[] = fields.map(
+        (field: IFilterField) => ({
             name: field.name,
-            value:
-                (field?.value && field.value !== 0 && field.value) ||
-                field?.initialValue ||
-                '',
-        }
-    })
+            value: resolveFieldFilterValue(field),
+        })
+    )
 
     fields.forEach((field, i) => {
         if (field.type === 'date_range') {
-            const dateValue = (field.value && field.value.split(' - ')) || [
-                '',
-                '',
-            ]
+            const dateValue =
+                (typeof field.value === 'string' &&
+                    field.value.split(' - ')) ||
+                ['', '']
 
             filters[i].value = dateValue[0]
             filters.splice(i + 1, 0, {
@@ -97,8 +144,7 @@ export const createFilterStructure = (
     })
 
     filters = filters.filter(
-        (filter) =>
-            filter.value !== '' && filter.value !== '' && filter.value !== '0'
+        (filter) => !isPlaceholderFilterValue(filter.value)
     )
 
     filters = [
@@ -107,7 +153,8 @@ export const createFilterStructure = (
         ),
         ...(customQuery?.filter(
             (filter: TAllowedFilterValue<any>) =>
-                !fields.find((field) => field.name === filter.name)
+                !fields.find((field) => field.name === filter.name) &&
+                !isPlaceholderFilterValue(filter.value)
         ) as TAllowedFilterValue<any>[]),
     ]
 

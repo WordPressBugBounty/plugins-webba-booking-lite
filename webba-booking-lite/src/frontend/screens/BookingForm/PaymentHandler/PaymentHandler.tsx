@@ -85,7 +85,7 @@ export const PaymentHandler: React.FC<{
         costItems = names.map((name: string, idx: number) => {
             const price = Number(prices[idx] || 0)
             const quantity = Number(quantities[idx] || 1)
-            const totalPrice = price * quantity
+            const totalPrice = price 
             return {
                 name,
                 price: totalPrice,

@@ -6,6 +6,7 @@ import { BookingFormProvider } from './providers/BookingFormProvider/BookingForm
 import { LandingPage } from './screens/BookingForm/LandingPages/LandingPage'
 import { PaymentSuccess } from './screens/BookingForm/LandingPages/PaymentSuccess/PaymentSuccess'
 import { PaymentCancelled } from './screens/BookingForm/LandingPages/PaymentCancelled/PaymentCancelled'
+import { BookingFormPopup } from './screens/BookingForm/BookingFormPopup/BookingFormPopup'
 
 const mountedAttribute = 'data-wbk-react-mounted'
 
@@ -156,6 +157,121 @@ const mountBookingForms = (root = document) => {
     }
 }
 
+const BOOKING_FORM_TRIGGER_ID = 'webba-booking-form'
+const BOOKING_FORM_POPUP_ROOT_ID = 'wbk-booking-form-popup-root'
+
+let bookingFormPopupRoot = null
+let bookingFormPopupOpener = null
+
+const getBookingFormPopupRoot = () => {
+    if (bookingFormPopupRoot) {
+        return bookingFormPopupRoot
+    }
+
+    let popupHost = document.getElementById(BOOKING_FORM_POPUP_ROOT_ID)
+    if (!popupHost) {
+        popupHost = document.createElement('div')
+        popupHost.id = BOOKING_FORM_POPUP_ROOT_ID
+        document.body.appendChild(popupHost)
+    }
+
+    bookingFormPopupRoot = createRoot(popupHost)
+    return bookingFormPopupRoot
+}
+
+const closeBookingFormPopup = () => {
+    if (!bookingFormPopupRoot) {
+        return
+    }
+
+    bookingFormPopupRoot.render(null)
+
+    if (bookingFormPopupOpener && typeof bookingFormPopupOpener.focus === 'function') {
+        bookingFormPopupOpener.focus()
+    }
+
+    bookingFormPopupOpener = null
+}
+
+const BOOKING_FORM_DATA_ATTR_PROPS = {
+    service: 'attrService',
+    category: 'attrCategory',
+    location: 'attrLocation',
+    staff: 'attrStaff',
+    units: 'attrUnits',
+    hide_category: 'attrHideCategory',
+}
+
+const getBookingFormPopupAttrs = (trigger) => {
+    const dataAttrs = extractDataAttrs(trigger)
+    const formAttrs = {}
+
+    Object.keys(BOOKING_FORM_DATA_ATTR_PROPS).forEach((dataKey) => {
+        if (!Object.prototype.hasOwnProperty.call(dataAttrs, dataKey)) {
+            return
+        }
+
+        formAttrs[BOOKING_FORM_DATA_ATTR_PROPS[dataKey]] = dataAttrs[dataKey]
+    })
+
+    return formAttrs
+}
+
+const openBookingFormPopup = (trigger) => {
+    bookingFormPopupOpener = trigger
+
+    getBookingFormPopupRoot().render(
+        <BookingFormPopup
+            onClose={closeBookingFormPopup}
+            {...getBookingFormPopupAttrs(trigger)}
+        />
+    )
+}
+
+const getBookingFormPopupTrigger = (clickedElement) => {
+    if (!clickedElement?.closest) {
+        return null
+    }
+
+    const idTrigger = clickedElement.closest(`#${BOOKING_FORM_TRIGGER_ID}`)
+    if (idTrigger) {
+        return idTrigger
+    }
+
+    const linkTrigger = clickedElement.closest('a[href]')
+    if (!linkTrigger) {
+        return null
+    }
+
+    const href = linkTrigger.getAttribute('href') || ''
+    if (href.includes(`#${BOOKING_FORM_TRIGGER_ID}`)) {
+        return linkTrigger
+    }
+
+    return null
+}
+
+const startBookingFormPopupListener = () => {
+    if (typeof window === 'undefined' || !document.body) {
+        return
+    }
+
+    document.addEventListener('click', (event) => {
+        const clickedElement =
+            event.target instanceof Element
+                ? event.target
+                : event.target.parentElement
+        const trigger = getBookingFormPopupTrigger(clickedElement)
+        if (!trigger) {
+            return
+        }
+
+        event.preventDefault()
+        openBookingFormPopup(trigger)
+    }, true)
+}
+
+
 const mountWebbaBookingApps = (root = document) => {
     mountDashboard(root)
     mountBookingForms(root)
@@ -246,6 +362,7 @@ const registerElementorHooks = () => {
 
 mountWebbaBookingApps(document)
 startDynamicMountObserver()
+startBookingFormPopupListener()
 
 window.addEventListener('wbk:mount-react-app', () => mountWebbaBookingApps(document))
 

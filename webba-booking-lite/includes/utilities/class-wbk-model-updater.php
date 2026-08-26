@@ -34,6 +34,10 @@ class WBK_Model_Updater
     }
     public static function run_update()
     {
+        WBK_Model_Utils::ensure_db_prefix();
+        if (!WBK_Model_Utils::table_exists("wbk_services")) {
+            return;
+        }
         self::update_4_3_0_1();
         self::update_4_5_1();
         self::update_5_0_0_static();
@@ -126,18 +130,22 @@ class WBK_Model_Updater
     {
         global $wpdb;
         if (self::is_update_required("update_4_3_0_1")) {
-            $wpdb->query(
-                "ALTER TABLE " .
-                    get_option("wbk_db_prefix", "") .
-                    "wbk_services" .
-                    " ROW_FORMAT=DYNAMIC",
-            );
-            $wpdb->query(
-                "ALTER TABLE " .
-                    get_option("wbk_db_prefix", "") .
-                    "wbk_appointments" .
-                    " ROW_FORMAT=DYNAMIC",
-            );
+            if (WBK_Model_Utils::table_exists("wbk_services")) {
+                $wpdb->query(
+                    "ALTER TABLE " .
+                        get_option("wbk_db_prefix", "") .
+                        "wbk_services" .
+                        " ROW_FORMAT=DYNAMIC",
+                );
+            }
+            if (WBK_Model_Utils::table_exists("wbk_appointments")) {
+                $wpdb->query(
+                    "ALTER TABLE " .
+                        get_option("wbk_db_prefix", "") .
+                        "wbk_appointments" .
+                        " ROW_FORMAT=DYNAMIC",
+                );
+            }
 
             self::set_update_as_complete("update_4_3_0_1");
         }
@@ -193,6 +201,9 @@ class WBK_Model_Updater
     {
         global $wpdb;
         if (self::is_update_required("update_5_0_44_1")) {
+            if (!WBK_Model_Utils::table_exists("wbk_services")) {
+                return;
+            }
             $wpdb->query(
                 "ALTER TABLE " .
                     get_option("wbk_db_prefix", "") .
@@ -251,6 +262,9 @@ class WBK_Model_Updater
     {
         global $wpdb;
         if (self::is_update_required("update_5_1_0")) {
+            if (!WBK_Model_Utils::table_exists("wbk_services")) {
+                return;
+            }
             // update business hours format
             $table_name = get_option("wbk_db_prefix", "") . "wbk_services";
             $new_column = "business_hours";
@@ -328,6 +342,9 @@ class WBK_Model_Updater
     {
         global $wpdb;
         if (self::is_update_required("update_5_1_2")) {
+            if (!WBK_Model_Utils::table_exists("wbk_services")) {
+                return;
+            }
             $table_name = get_option("wbk_db_prefix", "") . "wbk_services";
             $wpdb->query(
                 " ALTER TABLE `$table_name` CHANGE `business_hours` `business_hours` MEDIUMTEXT",
@@ -959,6 +976,10 @@ class WBK_Model_Updater
 
     static function generate_email_templates(array $templates): void
     {
+        $model_name = WBK_Model_Utils::get_db_prefix() . "wbk_email_templates";
+        if (!WbkData()->models->get_element_at($model_name)) {
+            return;
+        }
         foreach ($templates as $template) {
             $triggers = explode(",", $template["trigger"]);
 
@@ -1038,6 +1059,9 @@ class WBK_Model_Updater
         if (!self::is_update_required("update_booking_status_v_5_1_15")) {
             return;
         }
+        if (!WBK_Model_Utils::table_exists("wbk_appointments")) {
+            return;
+        }
         global $wpdb;
         $table_name = get_option("wbk_db_prefix", "") . "wbk_appointments";
         $wpdb->query("
@@ -1063,6 +1087,9 @@ class WBK_Model_Updater
     public static function update_service_colors_v_5_1_18(): void
     {
         if (!self::is_update_required("update_service_colors_v_5_1_18")) {
+            return;
+        }
+        if (!WBK_Model_Utils::table_exists("wbk_services")) {
             return;
         }
 
@@ -1103,6 +1130,9 @@ class WBK_Model_Updater
     public static function merge_existing_service_to_en_v_5_1_18(): void
     {
         if (!self::is_update_required("merge_existing_service_to_en_v_5_1_18")) {
+            return;
+        }
+        if (!WBK_Model_Utils::table_exists("wbk_email_templates")) {
             return;
         }
 
@@ -1172,6 +1202,9 @@ class WBK_Model_Updater
     public static function update_default_templates_v_5_1_18(): void
     {
         if (!self::is_update_required("update_default_templates_v_5_1_18")) {
+            return;
+        }
+        if (!WBK_Model_Utils::table_exists("wbk_email_templates")) {
             return;
         }
 

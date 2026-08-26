@@ -1,0 +1,84 @@
+.wbk_shortcode_attribute_fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        label {
+            font-size: 13px;
+            color: colors.$text-grey;
+            font-weight: 600;
+        }
+    }
+
+    .wbk_select__control {
+        border: 1px solid colors.$field-border;
+        border-radius: 8px;
+        min-height: 40px;
+        box-shadow: none;
+        background-color: colors.$field-background;
+        color: colors.$input-text;
+    }
+
+    .wbk_select__control:hover {
+        border-color: colors.$border-dark;
+    }
+
+    .wbk_select__single-value,
+    .wbk_select__input-container {
+        color: colors.$input-text;
+    }
+
+    .wbk_select__placeholder {
+        color: colors.$light-grey;
+    }
+
+    .wbk_select__menu {
+        background-color: colors.$background-white;
+        border: 1px solid colors.$input-border;
+    }
+
+    .wbk_select__option {
+        background-color: transparent;
+        color: colors.$input-text;
+
+        &--is-focused {
+            background-color: colors.$background-offwhite;
+        }
+
+        &--is-selected {
+            background-color: colors.$primary;
+            color: colors.$text-white;
+        }
+    }
+
+    .wbk_select__multi-value {
+        background: colors.$background-offwhite;
+    }
+
+    .wbk_select__multi-value__label {
+        color: colors.$off-black;
+        font-size: 12px;
+    }
+
+    .wbk_select__multi-value__remove {
+        color: colors.$light-grey;
+
+        &:hover {
+            background-color: colors.$row-border;
+            color: colors.$off-black;
+        }
+    }
+
+    .wbk_select__indicatorSeparator {
+        display: none;
+    }
+
+    .wbk_select__dropdown-indicator {
+        color: colors.$light-grey;
+    }
+}

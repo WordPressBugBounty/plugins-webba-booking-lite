@@ -6,7 +6,16 @@ import { useSidebar } from './SidebarContext'
 import { useTheme } from '../../providers/ThemeProvider/ThemeProvider'
 
 export const Sidebar = () => {
-    const { element, shown, view, width, height, position, close } = useSidebar()
+    const {
+        element,
+        shown,
+        view,
+        width,
+        height,
+        position,
+        nestedLayers,
+        handleEscape,
+    } = useSidebar()
     const { theme } = useTheme()
     const sectionRef = useRef<HTMLElement | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null)
@@ -30,7 +39,7 @@ export const Sidebar = () => {
             }
 
             event.preventDefault()
-            close()
+            handleEscape()
         }
 
         document.addEventListener('keydown', handleKeyDown)
@@ -38,7 +47,7 @@ export const Sidebar = () => {
         return () => {
             document.removeEventListener('keydown', handleKeyDown)
         }
-    }, [shown, close])
+    }, [shown, handleEscape])
 
     useEffect(() => {
         if (!sectionRef.current || !containerRef.current) return
@@ -164,33 +173,74 @@ export const Sidebar = () => {
         return null
     }
 
+    const portalTarget = document.getElementById('wpwrap')
+
+    if (!portalTarget) {
+        return null
+    }
+
     return createPortal(
-        <div
-            id="sidebar"
-            className={classNames('wbk_sidebar__container', {
-                'wbk_sidebar__container--shown': shown,
-            })}
-            data-theme={theme}
-            ref={containerRef}
-        >
+        <>
             <div
-                className={classNames({
-                    'wbk_sidebar__view--sidebar': view === 'sidebar',
-                    'wbk_sidebar__view--modal': view === 'modal',
-                    ...(width && { [`wbk_sidebar__width--${width}`]: true }),
-                    ...(height && { [`wbk_sidebar__height--${height}`]: true }),
-                    ...(position && { [`wbk_sidebar__position--${position}`]: true }),
+                id="sidebar"
+                className={classNames('wbk_sidebar__container', {
+                    'wbk_sidebar__container--shown': shown,
                 })}
-                ref={sectionRef as any}
-                onClick={(e) => e.stopPropagation()}
+                data-theme={theme}
+                ref={containerRef}
             >
-                {view === 'modal' ? (
-                    <div className="wbk_sidebar__modalContent">{element}</div>
-                ) : (
-                    element
-                )}
+                <div
+                    className={classNames({
+                        'wbk_sidebar__view--sidebar': view === 'sidebar',
+                        'wbk_sidebar__view--modal': view === 'modal',
+                        ...(width && { [`wbk_sidebar__width--${width}`]: true }),
+                        ...(height && { [`wbk_sidebar__height--${height}`]: true }),
+                        ...(position && {
+                            [`wbk_sidebar__position--${position}`]: true,
+                        }),
+                    })}
+                    ref={sectionRef as any}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {view === 'modal' ? (
+                        <div className="wbk_sidebar__modalContent">{element}</div>
+                    ) : (
+                        element
+                    )}
+                </div>
             </div>
-        </div>,
-        document.getElementById('wpwrap')!
+            {nestedLayers.map((layer, index) => (
+                <div
+                    key={layer.id}
+                    className="wbk_sidebar__container wbk_sidebar__container--shown wbk_sidebar__container--nested"
+                    data-theme={theme}
+                    style={{ zIndex: 100010 + index }}
+                >
+                    <div
+                        className={classNames(
+                            'wbk_sidebar__panel--shown',
+                            {
+                                'wbk_sidebar__view--sidebar':
+                                    layer.view === 'sidebar',
+                                'wbk_sidebar__view--modal': layer.view === 'modal',
+                                [`wbk_sidebar__width--${layer.width}`]: true,
+                                [`wbk_sidebar__height--${layer.height}`]: true,
+                                [`wbk_sidebar__position--${layer.position}`]: true,
+                            }
+                        )}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {layer.view === 'modal' ? (
+                            <div className="wbk_sidebar__modalContent">
+                                {layer.element}
+                            </div>
+                        ) : (
+                            layer.element
+                        )}
+                    </div>
+                </div>
+            ))}
+        </>,
+        portalTarget
     )
 }

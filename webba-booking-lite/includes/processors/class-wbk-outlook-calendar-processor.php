@@ -213,7 +213,8 @@ class WBK_Outlook_Calendar_Processor extends WBK_Connected_Calendar_Processor {
 
     /**
      * Fetch calendar events in a date range for availability blocking
-     * Returns array of WBK_Time_Slot objects representing busy time ranges
+     * Returns array of WBK_Time_Slot objects representing busy time ranges,
+     * including title and description.
      * Mirrors Google Calendar behavior: ignores free events when wbk_gg_ignore_free is yes,
      * and supports all-day events.
      *

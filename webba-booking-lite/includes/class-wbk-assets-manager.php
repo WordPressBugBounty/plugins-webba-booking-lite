@@ -256,7 +256,8 @@ class WBK_Assets_Manager
             $this->has_shortcode('webba_email_landing') ||
             $this->has_shortcode('webbabooking') ||
             $this->has_shortcode('webba_multi_service_booking') ||
-            $this->has_shortcode('webba_user_dashboard')
+            $this->has_shortcode('webba_user_dashboard') ||
+            $this->has_booking_form_popup_trigger()
         ) {
             $has_shortcode = true;
         }
@@ -299,6 +300,12 @@ class WBK_Assets_Manager
             }
         }
     }
+    /**
+     * Checks whether the current post content contains a given shortcode.
+     *
+     * @param string $shortcode Shortcode tag without brackets.
+     * @return bool
+     */
     private function has_shortcode($shortcode = '')
     {
         if (get_option('wbk_check_short_code', '') == '') {
@@ -316,6 +323,74 @@ class WBK_Assets_Manager
             $found = true;
         }
         return $found;
+    }
+
+    /**
+     * Checks whether a booking form popup trigger exists in the current post, nav menus, or navigation blocks.
+     *
+     * @return bool
+     */
+    private function has_booking_form_popup_trigger()
+    {
+        $post_to_check = get_post(get_the_ID());
+        if (
+            $post_to_check &&
+            $this->content_has_booking_form_popup_trigger($post_to_check->post_content)
+        ) {
+            return true;
+        }
+
+        $menus = wp_get_nav_menus();
+        if (is_array($menus)) {
+            foreach ($menus as $menu) {
+                $items = wp_get_nav_menu_items($menu->term_id);
+                if (!is_array($items)) {
+                    continue;
+                }
+
+                foreach ($items as $item) {
+                    $url = isset($item->url) ? $item->url : '';
+                    if (stripos($url, '#webba-booking-form') !== false) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        $navigation_posts = get_posts([
+            'post_type' => 'wp_navigation',
+            'post_status' => 'publish',
+            'numberposts' => -1,
+        ]);
+
+        foreach ($navigation_posts as $navigation_post) {
+            if (
+                $this->content_has_booking_form_popup_trigger(
+                    $navigation_post->post_content
+                )
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks whether the given HTML contains a booking form popup trigger.
+     *
+     * @param string $content HTML or post content.
+     * @return bool
+     */
+    private function content_has_booking_form_popup_trigger($content)
+    {
+        if (!$content) {
+            return false;
+        }
+
+        return stripos($content, 'id="webba-booking-form"') !== false ||
+            stripos($content, "id='webba-booking-form'") !== false ||
+            stripos($content, '#webba-booking-form') !== false;
     }
 
     public function enqueue_block_editor_assets(): void

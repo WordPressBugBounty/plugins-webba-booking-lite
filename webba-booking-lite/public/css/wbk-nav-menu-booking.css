@@ -1,0 +1,13 @@
+#wbk_booking_form_nav .inside {
+    display: block !important;
+    height: auto;
+    overflow: visible;
+}
+
+#wbk_booking_form_nav-content {
+    overflow: visible;
+}
+
+#wbk_nav_menu_booking .button-controls {
+    display: block;
+}

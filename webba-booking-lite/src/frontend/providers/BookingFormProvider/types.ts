@@ -59,8 +59,8 @@ export interface IBookingFormContext extends IBookingFormObj {
 }
 
 export interface IBookingFormProviderProps {
-    attrService: unknown
-    attrCategory: unknown
+    attrService?: unknown
+    attrCategory?: unknown
     attrLocation?: unknown
     attrStaff?: unknown
     attrUnits?: unknown

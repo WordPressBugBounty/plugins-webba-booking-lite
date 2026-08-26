@@ -7,6 +7,7 @@ interface FormContextValue {
     form: FormFromModel<any>
     tooltipMode?: TooltipMode
     lockFieldsOnly?: boolean
+    showValidation?: boolean
 }
 
 export const FormContext = createContext<FormContextValue | null>(null)
@@ -31,13 +32,22 @@ export const useFormContext = () => {
     return ctx
 }
 
+export const useShowValidation = () => {
+    const ctx = useContext(FormContext)
+
+    return Boolean(ctx?.showValidation)
+}
+
 export const FormProvider = ({
     form,
     tooltipMode = 'tooltip',
     lockFieldsOnly = false,
+    showValidation = false,
     children,
 }: PropsWithChildren<FormContextValue>) => (
-    <FormContext.Provider value={{ form, tooltipMode, lockFieldsOnly }}>
+    <FormContext.Provider
+        value={{ form, tooltipMode, lockFieldsOnly, showValidation }}
+    >
         {children}
     </FormContext.Provider>
 )

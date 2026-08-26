@@ -115,6 +115,11 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "get_schedule"],
                 "permission_callback" => [$this, "get_schedule_permission"],
             ] );
+            register_rest_route( "wbk/v2", "/get-connected-calendar-events/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_connected_calendar_events"],
+                "permission_callback" => [$this, "get_connected_calendar_events_permission"],
+            ] );
             register_rest_route( "wbk/v2", "/lock-day/", [
                 "methods"             => "POST",
                 "callback"            => [$this, "lock_day"],
@@ -5988,6 +5993,161 @@ class WBK_Request_Manager {
             ], 500);
         } finally {
             date_default_timezone_set( "UTC" );
+        }
+    }
+
+    /**
+     * Permission for connected calendar events: admins or users with access to at least one requested service.
+     *
+     * @param WP_REST_Request $request
+     * @return bool
+     */
+    public function get_connected_calendar_events_permission( $request ) : bool {
+        if ( !is_user_logged_in() ) {
+            return false;
+        }
+        if ( current_user_can( "manage_options" ) ) {
+            return true;
+        }
+        $service_ids = $this->normalize_connected_calendar_service_ids( $request->get_param( "service_ids" ) );
+        foreach ( $service_ids as $service_id ) {
+            if ( WBK_Validator::check_access_to_service( $service_id ) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Normalize service_ids from a REST param (array, CSV string, or single value).
+     *
+     * @param mixed $raw
+     * @return int[]
+     */
+    private function normalize_connected_calendar_service_ids( $raw ) : array {
+        if ( $raw === null || $raw === "" ) {
+            return [];
+        }
+        if ( !is_array( $raw ) ) {
+            $raw = explode( ",", (string) $raw );
+        }
+        $service_ids = [];
+        foreach ( $raw as $service_id ) {
+            if ( !WBK_Validator::check_integer( $service_id, 1, 9999999 ) ) {
+                continue;
+            }
+            $service_ids[] = (int) $service_id;
+        }
+        return array_values( array_unique( $service_ids ) );
+    }
+
+    /**
+     * Fetch connected calendar events for the given services and date range.
+     * Shared calendars across services are fetched only once.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function get_connected_calendar_events( WP_REST_Request $request ) : WP_REST_Response {
+        $prev_time_zone = date_default_timezone_get();
+        try {
+            WBK_Translation_Processor::switch_to_locale_from_get_param();
+            date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+            if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+                return new WP_REST_Response([
+                    "events" => [],
+                ], 200);
+            }
+            $service_ids = $this->normalize_connected_calendar_service_ids( $request->get_param( "service_ids" ) );
+            if ( empty( $service_ids ) ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid service IDs",
+                ], 400);
+            }
+            $start = $request->get_param( "start" );
+            $end = $request->get_param( "end" );
+            if ( !WBK_Validator::check_integer( $start, 1, 32503680000 ) || !WBK_Validator::check_integer( $end, 1, 32503680000 ) ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid date range",
+                ], 400);
+            }
+            $start = (int) $start;
+            $end = (int) $end;
+            if ( $end <= $start ) {
+                return new WP_REST_Response([
+                    "error" => "Invalid date range",
+                ], 400);
+            }
+            $calendar_ids = [];
+            foreach ( $service_ids as $service_id ) {
+                if ( !current_user_can( "manage_options" ) && !WBK_Validator::check_access_to_service( $service_id ) ) {
+                    continue;
+                }
+                $service = new WBK_Service($service_id);
+                if ( !$service->is_loaded() ) {
+                    continue;
+                }
+                foreach ( $service->get_connected_calendars_for_import() as $calendar_id ) {
+                    $calendar_id = (int) $calendar_id;
+                    if ( $calendar_id > 0 ) {
+                        $calendar_ids[$calendar_id] = $calendar_id;
+                    }
+                }
+            }
+            $start_iso = date( "c", $start );
+            $end_iso = date( "c", $end );
+            $allowed_modes = ["One-way-import", "Two-ways", "One-way"];
+            $events = [];
+            $index = 0;
+            foreach ( $calendar_ids as $calendar_id ) {
+                $connected_calendar = new WBK_Connected_Calendar($calendar_id);
+                if ( !$connected_calendar->is_loaded() ) {
+                    continue;
+                }
+                $events_result = WBK_Connected_Calendar_Processor::fetch_events_for_calendar_id(
+                    $calendar_id,
+                    $start_iso,
+                    $end_iso,
+                    $allowed_modes
+                );
+                if ( is_wp_error( $events_result ) || !is_array( $events_result ) ) {
+                    continue;
+                }
+                $provider = $connected_calendar->get_provider();
+                $calendar_name = $connected_calendar->get_name();
+                foreach ( $events_result as $slot ) {
+                    if ( !$slot instanceof WBK_Time_Slot ) {
+                        continue;
+                    }
+                    $index++;
+                    $title = $slot->get_title();
+                    if ( !is_string( $title ) || $title === "" ) {
+                        $title = ( $calendar_name !== "" ? $calendar_name : __( "Busy", "webba-booking-lite" ) );
+                    }
+                    $description = $slot->get_description();
+                    $attendees = $slot->get_attendees();
+                    $events[] = [
+                        "id"            => "connected-" . $calendar_id . "-" . $index . "-" . $slot->get_start(),
+                        "title"         => $title,
+                        "description"   => ( is_string( $description ) ? $description : "" ),
+                        "start"         => (int) $slot->get_start(),
+                        "end"           => (int) $slot->get_end(),
+                        "attendees"     => ( is_array( $attendees ) ? array_values( $attendees ) : [] ),
+                        "calendar_id"   => $calendar_id,
+                        "calendar_name" => $calendar_name,
+                        "provider"      => $provider,
+                    ];
+                }
+            }
+            return new WP_REST_Response([
+                "events" => $events,
+            ], 200);
+        } catch ( \Exception $e ) {
+            return new WP_REST_Response([
+                "error" => "Internal server error",
+            ], 500);
+        } finally {
+            date_default_timezone_set( $prev_time_zone );
         }
     }
 

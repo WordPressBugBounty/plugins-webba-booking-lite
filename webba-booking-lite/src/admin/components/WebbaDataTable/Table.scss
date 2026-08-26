@@ -21,7 +21,7 @@ $menu-icon-size: 20px;
     border-bottom-right-radius: 12px;
 
     tbody {
-        > tr {
+        >tr {
             background-color: colors.$background-white;
             border: 1px solid colors.$row-border;
 
@@ -51,11 +51,9 @@ $menu-icon-size: 20px;
     padding: 15px;
     cursor: pointer;
     text-align: left;
-    @include typography.use-font(
-        $font: typography.$font-primary,
+    @include typography.use-font($font: typography.$font-primary,
         $size: 14px,
-        $weight: 300
-    );
+        $weight: 300);
     color: colors.$text-grey;
 }
 
@@ -76,11 +74,9 @@ $menu-icon-size: 20px;
 .wbk_table__cell {
     padding: 15px;
     text-align: left;
-    @include typography.use-font(
-        $font: typography.$font-primary,
+    @include typography.use-font($font: typography.$font-primary,
         $size: 16px,
-        $weight: 300
-    );
+        $weight: 300);
 
     &:first-child {
         max-width: 50px;
@@ -93,7 +89,7 @@ $menu-icon-size: 20px;
 }
 
 .wbk_table__rowExpanded {
-    > td {
+    >td {
         padding: 0;
     }
 }
@@ -169,10 +165,17 @@ $menu-icon-size: 20px;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    padding: 16px 24px 16px;
+    background-color: colors.$background-white;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom: 1px solid colors.$input-border;
+    color: colors.$text-black;
 
     @include mobile {
         flex-flow: column;
         align-items: flex-start;
+        padding: 16px 16px 10px;
     }
 }
 
@@ -189,8 +192,8 @@ $menu-icon-size: 20px;
 .wbk_table__title {
     font-family: typography.$font-primary;
     font-weight: 500;
-    font-size: 30px;
-    line-height: 40px;
+    font-size: 20px;
+    line-height: 30px;
     margin: 0;
     color: colors.$off-black;
 }
@@ -255,6 +258,7 @@ $menu-icon-size: 20px;
     align-items: center;
     justify-content: space-between;
     margin-top: 16px;
+    padding: 0 24px 20px;
 }
 
 .wbk_table__itemCountWrapper {
@@ -356,7 +360,6 @@ $menu-icon-size: 20px;
 .wbk_table__container {
     box-shadow: 0 0 15px rgba(161, 164, 182, 0.5);
     border-radius: 8px;
-    padding: 32px;
     margin: 20px;
     background: colors.$background-offwhite;
 
@@ -367,7 +370,6 @@ $menu-icon-size: 20px;
 
     @include mobile {
         margin: 10px;
-        padding: 25px;
     }
 }
 
@@ -393,6 +395,8 @@ $menu-icon-size: 20px;
 }
 
 .wbk_table__wrapper {
+    padding: 0 24px 0;
+
     @media (max-width: 1400px) {
         overflow-x: auto;
         overflow-y: clip;
@@ -400,6 +404,10 @@ $menu-icon-size: 20px;
 
     &.wbk_table__wrapper--horizontalOverflow {
         overflow-x: auto;
+    }
+
+    @include mobile {
+        padding: 16px 16px 0;
     }
 }
 
@@ -538,7 +546,22 @@ $menu-icon-size: 20px;
 
 .wbk_table__row {}
 
-.wbk_table__selectRowCheckbox {}
+.wbk_table__selectRowCheckbox {
+    border: 1px solid colors.$field-border;
+    accent-color: colors.$primary;
+    background-color: colors.$field-background;
+    color-scheme: light;
+
+    #wbk_spa_dashboard[data-theme='dark'] &,
+    .wbk_sidebar__container[data-theme='dark'] &,
+    body[data-wbk-theme='dark'] & {
+        color-scheme: dark;
+    }
+}
+
+.wbk_table__dataTable tbody > tr:nth-child(even) td {
+    background: colors.$background-offwhite;
+}
 
 .wbk_table__selectAllCheckbox {}
 
@@ -555,4 +578,8 @@ $menu-icon-size: 20px;
 
 .wbk_table__titleDescription {
     max-width: 60%;
+}
+
+.wbk_table__description{
+    margin: 10px 0px 0px 0;
 }

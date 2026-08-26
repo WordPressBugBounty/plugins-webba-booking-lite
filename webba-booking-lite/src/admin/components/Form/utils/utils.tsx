@@ -35,6 +35,7 @@ import { createLimitationField } from '../Fields/LimitationField/LimitationField
 import { createNoticeField } from '../Fields/NoticeField/NoticeField'
 import { createSelectCustomField } from '../Fields/SelectCustomField/SelectCustomField'
 import { createPriceVariantField } from '../Fields/PriceVariantField/PriceVariantField'
+import { createPriceField } from '../Fields/PriceField/PriceField'
 import { createAvailabilityRangesField } from '../Fields/AvailabilityRangesField/AvailabilityRangesField'
 import { createDateTimeRangesField } from '../Fields/DateTimeRangesField/DateTimeRangesField'
 import { createUnitPeopleField } from '../Fields/UnitPeopleField/UnitPeopleField'
@@ -120,6 +121,8 @@ export const getFieldComponentFromType = ({
             return createNoticeField(constructorConfig)
         case inputType === 'select_custom':
             return createSelectCustomField(constructorConfig)
+        case inputType === 'price':
+            return createPriceField(constructorConfig)
         case inputType === 'price_variant':
             return createPriceVariantField(constructorConfig)
         case inputType === 'availability_ranges':

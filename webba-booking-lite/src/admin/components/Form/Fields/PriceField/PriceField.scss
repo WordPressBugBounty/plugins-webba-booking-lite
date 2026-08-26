@@ -1,0 +1,74 @@
+.wbk_priceField {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    position: relative;
+}
+
+.wbk_priceField__inputWrapper {
+    position: relative;
+    width: 100%;
+}
+
+.wbk_priceField__input {
+    border: 1px solid colors.$field-border;
+    background: colors.$field-background;
+    border-radius: 8px;
+    height: 50px;
+    margin: 0;
+    padding: 0 20px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: colors.$input-text;
+    width: 100%;
+
+    &:focus {
+        @include fields.field-focused-state;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.wbk_priceField__input--currencyBefore {
+    padding-left: var(--wbk-price-symbol-inset, 36px);
+}
+
+.wbk_priceField__input--currencyAfter {
+    padding-right: var(--wbk-price-symbol-inset, 36px);
+}
+
+.wbk_priceField__currency {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: colors.$light-grey;
+    pointer-events: none;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+.wbk_priceField__currency--before {
+    left: 16px;
+}
+
+.wbk_priceField__currency--after {
+    right: 16px;
+}
+
+.wbk_priceField--invalid .wbk_priceField__input {
+    border-color: colors.$red;
+}
+
+.wbk_priceField__error {
+    color: colors.$red;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+}

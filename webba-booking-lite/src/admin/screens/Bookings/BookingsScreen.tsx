@@ -463,6 +463,7 @@ export const BookingsScreen = () => {
             model="appointments"
             onFiltersChange={setCurrentFilters}
             columnCount={5}
+            classes='wbk_bookings__filterForm'
         />
     )
     const searchField = (

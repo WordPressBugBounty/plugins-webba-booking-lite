@@ -19,6 +19,8 @@ class WBK_Time_Slot
     public $display;
     public $is_duplicated;
     public $title;
+    public $description;
+    public $attendees;
     public $backgroundColor;
     public $html;
 
@@ -153,6 +155,36 @@ class WBK_Time_Slot
     public function get_min_quantity()
     {
         return $this->min_quantity;
+    }
+
+    public function set_title($input)
+    {
+        $this->title = $input;
+    }
+
+    public function get_title()
+    {
+        return $this->title;
+    }
+
+    public function set_description($input)
+    {
+        $this->description = $input;
+    }
+
+    public function get_description()
+    {
+        return $this->description;
+    }
+
+    public function set_attendees($input)
+    {
+        $this->attendees = $input;
+    }
+
+    public function get_attendees()
+    {
+        return $this->attendees;
     }
 
 }

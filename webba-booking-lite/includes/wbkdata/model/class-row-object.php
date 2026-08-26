@@ -37,7 +37,7 @@ class Row_Object
             $this->fields = $wpdb->get_row($wpdb->prepare(" SELECT * FROM " . $this->table_name . " WHERE id = %d", $input), ARRAY_A);
         }
         if (is_array($input)) {
-            $fields = WbkData()->models->get_element_at($this->table_name)->fields->get_elements();
+            $fields = $this->get_model_fields();
             foreach ($fields as $field) {
                 if (isset($input[$field->get_name()])) {
                     $this->fields[$field->get_name()] = $input[$field->get_name()];
@@ -168,6 +168,20 @@ class Row_Object
     }
 
     /**
+     * Get field definitions for this object's model.
+     *
+     * @return array
+     */
+    protected function get_model_fields()
+    {
+        $model = WbkData()->models->get_element_at($this->table_name);
+        if (!$model) {
+            return [];
+        }
+        return $model->fields->get_elements();
+    }
+
+    /**
      * Insert new record or update current
      * @return mixed status information with details
      */
@@ -175,7 +189,10 @@ class Row_Object
     {
         global $wpdb;
 
-        $fields = WbkData()->models->get_element_at($this->table_name)->fields->get_elements();
+        $fields = $this->get_model_fields();
+        if (empty($fields)) {
+            return false;
+        }
         $values = array();
         $formats = array();
         foreach ($fields as $field) {

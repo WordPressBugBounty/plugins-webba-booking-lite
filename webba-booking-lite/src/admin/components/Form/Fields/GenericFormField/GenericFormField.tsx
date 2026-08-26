@@ -5,7 +5,7 @@ import { Label } from '../Label/Label'
 import { FormFieldMisc } from '../../types'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
-import { useForm } from '../../lib/FormProvider'
+import { useForm, useShowValidation } from '../../lib/FormProvider'
 import { checkForConditionalDisable } from '../../utils/utils'
 
 interface GenericFieldProps {
@@ -28,8 +28,9 @@ export const GenericFormField = ({
     misc,
 }: GenericFieldProps) => {
     const [touched, setTouched] = useState(false)
+    const showValidation = useShowValidation()
     const isValid = !errors.length
-    const showErrors = !isValid && touched
+    const showErrors = !isValid && (touched || showValidation)
     const [firstError] = errors
     const { plan_map } = useSelect(
         // @ts-ignore

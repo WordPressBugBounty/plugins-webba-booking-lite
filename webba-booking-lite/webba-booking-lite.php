@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.4.20
+ * Version: 6.4.21
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -26,16 +26,19 @@ if ( !function_exists( "wbk_fs" ) ) {
     // Create a helper function for easy SDK access.
     function wbk_fs() {
         global $wbk_fs;
-        $first_page = "admin.php?page=wbk-options&wbk-activation=true";
-        if ( get_option( "wbk_timezone" ) === false ) {
-            $first_page .= "&wbk-activation=true";
-        }
-        global $wpdb;
-        $services_exists = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->prefix}wbk_services" );
-        if ( $services_exists > 0 ) {
-            $first_page = "admin.php?page=wbk-services";
-        }
         if ( !isset( $wbk_fs ) ) {
+            $first_page = "admin.php?page=wbk-options&wbk-activation=true";
+            if ( get_option( "wbk_timezone" ) === false ) {
+                $first_page .= "&wbk-activation=true";
+            }
+            WBK_Model_Utils::ensure_db_prefix();
+            if ( WBK_Model_Utils::table_exists( "wbk_services" ) ) {
+                global $wpdb;
+                $services_exists = $wpdb->get_var( "SELECT COUNT(*) FROM " . WBK_Model_Utils::get_db_prefix() . "wbk_services" );
+                if ( $services_exists > 0 ) {
+                    $first_page = "admin.php?page=wbk-services";
+                }
+            }
             // Include Freemius SDK.
             require_once dirname( __FILE__ ) . "/freemius/start.php";
             $wbk_fs = fs_dynamic_init( [
@@ -71,7 +74,7 @@ if ( !defined( "WP_WEBBA_BOOKING__PLUGIN_DIR" ) ) {
     define( "WP_WEBBA_BOOKING__PLUGIN_URL", plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( "WP_WEBBA_BOOKING__VERSION" ) ) {
-    define( "WP_WEBBA_BOOKING__VERSION", "6.4.20" );
+    define( "WP_WEBBA_BOOKING__VERSION", "6.4.21" );
 }
 if ( !function_exists( "wbk_is_assistance_lab_available" ) ) {
     /**
@@ -212,6 +215,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     // Renderer
     include "includes/class-wbk-renderer.php";
     include "includes/class-wbk-gutenberg-booking-form-block.php";
+    include "includes/backend/class-wbk-nav-menu.php";
     // Frontend
     include "includes/class_wbk_frontend_booking.php";
     // Widgets
@@ -262,6 +266,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     $wizard = new WBK_Wizard();
     $setup_checklist = new WBK_Setup_Checklist();
     $feature_tour = new WBK_Feature_Tour();
+    $wbk_nav_menu = new WBK_Nav_Menu();
     $js_array = [[
         "backend",
         [
@@ -748,6 +753,11 @@ if ( !function_exists( "wbk_get_translation_string" ) ) {
 }
 if ( !function_exists( "wbk_activate" ) ) {
     function wbk_activate() {
+        WBK_Model_Utils::ensure_db_prefix();
+        WBK_Model::create_tables();
+        $model = new WBK_Model();
+        $model->initalize_model();
+        WBK_Model_Updater::run_update();
     }
 
 }

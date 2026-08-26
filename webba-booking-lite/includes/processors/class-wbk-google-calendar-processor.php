@@ -194,7 +194,8 @@ class WBK_Google_Calendar_Processor extends WBK_Connected_Calendar_Processor {
 
     /**
      * Fetch calendar events in a date range for availability blocking
-     * Returns array of WBK_Time_Slot objects representing busy time ranges
+     * Returns array of WBK_Time_Slot objects representing busy time ranges,
+     * including title, description, and attendees.
      *
      * @param string $start ISO 8601 formatted start datetime
      * @param string $end ISO 8601 formatted end datetime
