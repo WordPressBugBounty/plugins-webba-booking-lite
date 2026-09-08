@@ -153,10 +153,15 @@ export const extractOptionValues = (sections: IAppearanceSection[]) => {
  * Generates a CSS config string for appearance options (like PHP's WBK_Appearance_Utils::generate_css_config)
  * and injects or updates it inside <head> for live preview of CSS variable changes.
  */
+const NON_CSS_APPEARANCE_KEYS = new Set(['form_type'])
+
 export function injectCssConfigFromOptions(options: { [key: string]: any }) {
     // Generate CSS variables string for :root
     let cssVars = ''
     Object.entries(options).forEach(([key, value]) => {
+        if (NON_CSS_APPEARANCE_KEYS.has(key)) {
+            return
+        }
         // Convert camelCase or snake_case to dash-case
         const dashKey = key
             .replace(/_/g, '-')

@@ -65,6 +65,10 @@ $background-active: colors.$wbk-primary-50;
         }
     }
 
+    &--locked {
+        cursor: default;
+    }
+
     &__top-part {
         display: flex;
         gap: 16px;
@@ -166,7 +170,8 @@ $background-active: colors.$wbk-primary-50;
         color: #22292f;
         background-color: #ffffff;
         cursor: pointer;
-        appearance: auto;
+        -webkit-appearance: none!important;
+        appearance: none!important;
 
         &:focus {
             outline: none;

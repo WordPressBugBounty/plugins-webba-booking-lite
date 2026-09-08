@@ -307,6 +307,7 @@ class WBK_Booking_Factory {
         date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
         if ( $event == "on_booking" ) {
             WBK_Email_Processor::send( $notification_booking_ids, "booking_created_by_customer" );
+            WBK_Push_Processor::send( $notification_booking_ids, "booking_created_by_customer" );
         } else {
             WBK_Email_Processor::send( $notification_booking_ids, "booking_created_by_admin" );
         }
@@ -338,6 +339,7 @@ class WBK_Booking_Factory {
             if ( $by == "customer" ) {
                 WBK_Model_Utils::set_booking_status( $booking_id, "cancelled" );
                 WBK_Email_Processor::send( [$booking_id], "booking_cancelled_by_customer" );
+                WBK_Push_Processor::send( [$booking_id], "booking_cancelled_by_customer" );
             } elseif ( $by == "administrator" ) {
                 WBK_Model_Utils::set_booking_status( $booking_id, "rejected" );
                 WBK_Email_Processor::send( [$booking_id], "booking_cancelled_by_admin" );
@@ -448,6 +450,7 @@ class WBK_Booking_Factory {
         update_option( "wbk_email_current_invoice_number", $curent_invoice );
         if ( count( $booking_ids ) > 0 ) {
             WBK_Email_Processor::send( $booking_ids, "booking_paid" );
+            WBK_Push_Processor::send( $booking_ids, "booking_paid" );
         }
         do_action( "wbk_after_set_as_paid", $booking_ids );
         date_default_timezone_set( "UTC" );

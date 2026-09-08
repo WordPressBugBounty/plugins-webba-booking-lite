@@ -3,8 +3,8 @@ Contributors: Webba agency, freemius
 Donate link: https://webba-booking.com/
 Tags:  appointment, booking, booking calendar, scheduling, reservation
 Requires at least: 5.6
-Tested up to: 7.0
-Stable tag: 6.4.21
+Tested up to: 7.1
+Stable tag: 6.5.0
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -205,7 +205,22 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
  
 
 == Changelog ==
- 
+
+08/09/2026
+
+6.5.0
+
+- Improvement: waterfall themed booking form variant
+- Improvement: browser notifications
+- Improvement: PDF invoice attachment 
+- Improvement: added Gmail as email provider
+- Improvement: automatic select first available date in booking calendar
+- Improvement: option to redirect to a page on booking confirmation
+- Improvement: show applied coupon in the booking list
+- Improvement: improved user experience in booking form
+- Bug fix: fatal error with navigation in certain configurations
+- Bug fix: other minor fixes and improvements
+
 25/08/2026
 
 6.4.21

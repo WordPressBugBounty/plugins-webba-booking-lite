@@ -136,6 +136,22 @@
             "default_value": "yes",
             "editable": true
         },
+        "attach_invoice": {
+            "type": "string",
+            "input_type": "checkbox",
+            "hidden": true,
+            "title": "Attach PDF invoice",
+            "tab": "",
+            "misc": {
+                "yes": "Yes",
+                "tooltip": "Generate and attach the iCal file for each booking",
+                "required_plan": "premium"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
         "use_for_all_services": {
             "type": "string",
             "input_type": "checkbox",

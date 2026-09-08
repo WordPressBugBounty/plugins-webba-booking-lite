@@ -44,6 +44,42 @@
       "type": "object",
       "settings": {
         "advanced": {
+          "formType": {
+            "groupType": "group-item",
+            "item": {
+              "groupSlug": "contentMain",
+              "attrName": "content.advanced.formType",
+              "label": "Form layout",
+              "description": "Choose Classic or Waterfall booking form.",
+              "priority": 1,
+              "render": true,
+              "defaultAttr": {
+                "desktop": {
+                  "value": "classic"
+                }
+              },
+              "features": {
+                "responsive": false,
+                "hover": false,
+                "sticky": false,
+                "preset": "content"
+              },
+              "component": {
+                "type": "field",
+                "name": "divi/select",
+                "props": {
+                  "options": {
+                    "classic": {
+                      "label": "Webba 6 Classic form"
+                    },
+                    "waterfall": {
+                      "label": "Waterfall form"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "serviceType": {
             "groupType": "group-item",
             "item": {

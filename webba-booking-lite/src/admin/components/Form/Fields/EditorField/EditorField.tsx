@@ -108,6 +108,21 @@ const placeHolders: Record<"name" | "text" | "content", string | ((editor: any) 
     content: "#total_amount",
   },
   {
+    name: "wbk_deposit_amount",
+    text: __("Deposit amount", "webba-booking-lite"),
+    content: "#deposit_amount",
+  },
+  {
+    name: "wbk_remaining_amount",
+    text: __("Remaining amount", "webba-booking-lite"),
+    content: "#remaining_amount",
+  },
+  {
+    name: "wbk_service_fees",
+    text: __("Service fees", "webba-booking-lite"),
+    content: "#service_fees",
+  },
+  {
     name: "wbk_payment_link",
     text: __("Payment link", "webba-booking-lite"),
     content: "#payment_link",

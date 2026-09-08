@@ -17,6 +17,7 @@ import { useWording } from '../../hooks/useWording'
 import calendarRangeIcon from '../../../../public/images/icon-calendar.svg'
 import dayCountIcon from '../../../../public/images/icon-clock.svg'
 import { IExtraProps } from '../Extras/types'
+import { areAllSelectedPricesHidden } from '../../lib/hidePrice/areAllSelectedPricesHidden'
 
 const parseYmdLocal = (ymd: string): Date => {
     const parts = ymd.split('-').map(Number)
@@ -138,10 +139,11 @@ export const Sidebar: FC<ISidebarProps> = ({
         return undefined
     }
 
-    // Always sort selected services by selectedAt before rendering
     const sortedItems = items
         .slice()
         .sort((a, b) => (a.selectedAt || 0) - (b.selectedAt || 0))
+    const hideAllPrices = areAllSelectedPricesHidden(sortedItems)
+    const showCostBreakdown = !hideAllPrices
 
     const selectedExtras = useMemo(() => {
         return (extras || [])
@@ -262,11 +264,18 @@ export const Sidebar: FC<ISidebarProps> = ({
 
     const hasSummaryAmounts = useMemo(
         () =>
-            depositTotal > 0 ||
-            Number(amountData?.service_fees) > 0 ||
-            displayTax > 0 ||
-            Number(amountData?.left_to_pay) > 0,
-        [depositTotal, amountData?.service_fees, amountData?.left_to_pay, displayTax]
+            !hideAllPrices &&
+            (depositTotal > 0 ||
+                Number(amountData?.service_fees) > 0 ||
+                displayTax > 0 ||
+                Number(amountData?.left_to_pay) > 0),
+        [
+            hideAllPrices,
+            depositTotal,
+            amountData?.service_fees,
+            amountData?.left_to_pay,
+            displayTax,
+        ]
     )
 
     return (
@@ -444,9 +453,9 @@ export const Sidebar: FC<ISidebarProps> = ({
                                 })}
                             </div>
                         </div>
+                        {(showCostBreakdown || selectedExtras.length > 0) && (
                         <div className={'wbk_sidebar__items wbk_sidebar__items--less-gap'}>
-                            {/* discount */}
-                            {Number(amountData.discount) > 0 && (
+                            {showCostBreakdown && Number(amountData.discount) > 0 && (
                                 <div className={'wbk_sidebar__items__item'}>
                                     <h4
                                         className={
@@ -594,6 +603,7 @@ export const Sidebar: FC<ISidebarProps> = ({
                                                                 {extra.label}
                                                             </h4>
                                                         </div>
+                                                        {showCostBreakdown && (
                                                         <div
                                                             className={
                                                                 'wbk_sidebar__items__item__price'
@@ -610,6 +620,7 @@ export const Sidebar: FC<ISidebarProps> = ({
                                                                     'webba-booking-lite'
                                                                 )}
                                                         </div>
+                                                        )}
                                                     </div>
                                                 )
                                             })}
@@ -617,7 +628,7 @@ export const Sidebar: FC<ISidebarProps> = ({
                                     )}
                                 </div>
                             )}
-                            {/* total */}
+                            {showCostBreakdown && (
                             <div className={'wbk_sidebar__items__item'}>
                                 <h4
                                     className={
@@ -661,35 +672,7 @@ export const Sidebar: FC<ISidebarProps> = ({
                                     )}
                                 </div>
                             </div>
-                            {/* total end */}
-                            {/* left to pay */}
-                            {/* {Number(amountData?.left_to_pay) > 0 && (<div className={'wbk_sidebar__items__item'}>
-                                <h4
-                                    className={
-                                        'wbk_sidebar__items__item__title'
-                                    }
-                                >
-                                    {wording.left_to_pay ||
-                                        __('Left to pay', 'webba-booking-lite')}
-                                </h4>
-                                <div>
-                                    <p
-                                        className={
-                                            'wbk_sidebar__items__item__title'
-                                        }
-                                    >
-                                        {(amountData?.left_to_pay &&
-                                            amountData.left_to_pay > 0 &&
-                                            wbkFormatPrice(
-                                                amountData.left_to_pay,
-                                                priceFormat
-                                            )) ||
-                                            wording.free ||
-                                            __('Free', 'webba-booking-lite')}
-                                    </p>
-                                </div>
-                            </div>)} */}
-                            {/* left to pay end */}
+                            )}
                             {hasSummaryAmounts && (
                                 <div className={'wbk_sidebar__summary-toggle'}>
                                     <div
@@ -779,6 +762,7 @@ export const Sidebar: FC<ISidebarProps> = ({
                                 </div>
                             )}
                         </div>
+                        )}
                         {isAddMoreVisible && (
                             <div className={'wbk_sidebar__add-more'}>
                                 <Button

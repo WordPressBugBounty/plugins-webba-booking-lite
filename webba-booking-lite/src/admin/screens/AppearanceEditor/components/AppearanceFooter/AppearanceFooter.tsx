@@ -22,14 +22,17 @@ const SuccessNotification = ({
 }
 
 export const AppearanceFooter = () => {
-    const { sections } = useAppearance()
+    const { sections, formType } = useAppearance()
     const { updateAppearance } = useDispatch(store)
 
     return (
         <div className="wbk_appearanceFooter__wrapper">
             <Button
                 onClick={async () => {
-                    await updateAppearance(extractOptionValues(sections))
+                    await updateAppearance({
+                        ...extractOptionValues(sections),
+                        form_type: formType,
+                    })
                     toast.success(SuccessNotification, {
                         theme: 'colored',
                         autoClose: 2000,

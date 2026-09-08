@@ -44,6 +44,37 @@
             border-radius: colors.$wbk-border-radius;
         }
 
+        &--waterfall {
+            max-width: 480px;
+            width: 100%;
+            overflow-x: hidden;
+
+            // Waterfall form grows with content — no fixed height / inner scroll.
+            .wbk_thank_you__wrapper,
+            .wbk_thank_you__outer-wrapper {
+                min-height: 0;
+                max-height: none;
+                height: auto;
+                max-width: 100%;
+                overflow: visible;
+            }
+
+            .wbk_thank_you__native-scroll {
+                max-height: none;
+                overflow: visible;
+                scrollbar-gutter: auto;
+            }
+
+            .wbk_thank_you__inner-wrapper {
+                height: auto;
+            }
+
+            .wbk_waterfall_form__wrapper {
+                overflow: visible;
+                max-height: none;
+            }
+        }
+
         &__loading-wrapper {
             display: flex;
             align-items: center;

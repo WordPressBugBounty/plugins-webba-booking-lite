@@ -314,7 +314,7 @@ class WBK_Nav_Menu
      * @param int      $depth Menu depth.
      * @return array
      */
-    public function add_link_attributes($atts, $item, $args, $depth)
+    public function add_link_attributes($atts, $item, $args, $depth = 0)
     {
         unset($args, $depth);
 

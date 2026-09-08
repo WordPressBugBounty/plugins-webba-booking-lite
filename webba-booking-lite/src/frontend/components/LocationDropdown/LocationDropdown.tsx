@@ -1,4 +1,12 @@
-import { useRef, useEffect, useMemo, useState } from 'react'
+import {
+    CSSProperties,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react'
+import { createPortal } from 'react-dom'
 import { __ } from '@wordpress/i18n'
 import classNames from 'classnames'
 import { useBookingContext } from '../../providers/BookingFormProvider/BookingFormProvider'
@@ -6,6 +14,9 @@ import { getPlainTextFromHtml } from '../../lib/utils'
 import { getServiceAssociatedLocations } from '../../lib/locationFilter/getServiceAssociatedLocations'
 import { ILocationOption } from './types'
 import './LocationDropdown.scss'
+
+const MENU_MAX_HEIGHT = 280
+const MENU_GAP = 4
 
 const MapPinIcon = () => (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -57,10 +68,12 @@ const LocationCard = ({
 
 interface LocationDropdownProps {
     locations?: ILocationOption[] | null
+    onSelect?: (id: string | number) => void
 }
 
 export const LocationDropdown = ({
     locations: locationsOverride = undefined,
+    onSelect,
 }: LocationDropdownProps = {}) => {
     const { bookingMode, preset, formData, onLocationSelect, extractedAttrLocations } =
         useBookingContext()
@@ -89,17 +102,73 @@ export const LocationDropdown = ({
             String(loc.id) === selectedId || String(loc.value) === selectedId
     )
     const [isOpen, setIsOpen] = useState(false)
+    const [menuStyle, setMenuStyle] = useState<CSSProperties | null>(null)
     const wrapperRef = useRef<HTMLDivElement>(null)
+    const triggerRef = useRef<HTMLDivElement>(null)
+    const menuRef = useRef<HTMLDivElement>(null)
+
+    const updateMenuPosition = useCallback(() => {
+        if (!triggerRef.current) {
+            return
+        }
+
+        const rect = triggerRef.current.getBoundingClientRect()
+        const spaceBelow = window.innerHeight - rect.bottom - MENU_GAP
+        const spaceAbove = rect.top - MENU_GAP
+        const openUpward =
+            spaceBelow < Math.min(MENU_MAX_HEIGHT, 120) &&
+            spaceAbove > spaceBelow
+        const maxHeight = Math.max(
+            80,
+            Math.min(
+                MENU_MAX_HEIGHT,
+                openUpward ? spaceAbove : spaceBelow
+            )
+        )
+
+        setMenuStyle({
+            position: 'fixed',
+            left: rect.left,
+            width: rect.width,
+            top: openUpward ? undefined : rect.bottom + MENU_GAP,
+            bottom: openUpward
+                ? window.innerHeight - rect.top + MENU_GAP
+                : undefined,
+            maxHeight,
+            zIndex: 100000,
+        })
+    }, [])
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-                setIsOpen(false)
+            const target = event.target as Node
+            if (
+                wrapperRef.current?.contains(target) ||
+                menuRef.current?.contains(target)
+            ) {
+                return
             }
+            setIsOpen(false)
         }
         document.addEventListener('mousedown', handleClickOutside)
         return () => document.removeEventListener('mousedown', handleClickOutside)
     }, [])
+
+    useEffect(() => {
+        if (!isOpen) {
+            setMenuStyle(null)
+            return
+        }
+
+        updateMenuPosition()
+        window.addEventListener('resize', updateMenuPosition)
+        window.addEventListener('scroll', updateMenuPosition, true)
+
+        return () => {
+            window.removeEventListener('resize', updateMenuPosition)
+            window.removeEventListener('scroll', updateMenuPosition, true)
+        }
+    }, [isOpen, updateMenuPosition])
 
     const displayLabel = selected?.label ?? wording.select_location ?? __('Select location', 'webba-booking-lite')
     const displayDescription = selected?.description
@@ -112,6 +181,7 @@ export const LocationDropdown = ({
                 {wording.location ?? __('Location', 'webba-booking-lite')}
             </label>
             <div
+                ref={triggerRef}
                 className={classNames('wbk_location_dropdown__trigger', {
                     'wbk_location_dropdown__trigger--open': isOpen,
                 })}
@@ -137,26 +207,35 @@ export const LocationDropdown = ({
                     <ChevronDownIcon />
                 </span>
             </div>
-            {isOpen && (
-                <div
-                    className="wbk_location_dropdown__menu"
-                    role="listbox"
-                    aria-label={__('Location options', 'webba-booking-lite')}
-                >
-                    {locations.map((option) => (
-                        <div key={option.id} role="option" aria-selected={option.id === selectedId}>
-                            <LocationCard
-                                option={option}
-                                isSelected={option.id === selectedId || option.value === selectedId}
-                                onClick={() => {
-                                    onLocationSelect(option.id)
-                                    setIsOpen(false)
-                                }}
-                            />
-                        </div>
-                    ))}
-                </div>
-            )}
+            {isOpen &&
+                menuStyle &&
+                createPortal(
+                    <div
+                        ref={menuRef}
+                        className="wbk_location_dropdown__menu"
+                        role="listbox"
+                        aria-label={__('Location options', 'webba-booking-lite')}
+                        style={menuStyle}
+                    >
+                        {locations.map((option) => (
+                            <div key={option.id} role="option" aria-selected={option.id === selectedId}>
+                                <LocationCard
+                                    option={option}
+                                    isSelected={option.id === selectedId || option.value === selectedId}
+                                    onClick={() => {
+                                        if (onSelect) {
+                                            onSelect(option.id)
+                                        } else {
+                                            onLocationSelect(option.id)
+                                        }
+                                        setIsOpen(false)
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </div>,
+                    document.body
+                )}
         </div>
     )
 }

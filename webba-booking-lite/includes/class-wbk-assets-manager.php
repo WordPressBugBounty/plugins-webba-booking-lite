@@ -399,6 +399,9 @@ class WBK_Assets_Manager
             'wbk-frontend-style-config',
             content_url() . '/webba_booking_style/wbk6-frontend-config.css'
         );
+        if (class_exists('WBK_Gutenberg_Booking_Form_Block')) {
+            WBK_Gutenberg_Booking_Form_Block::enqueue_editor_appearance_defaults();
+        }
     }
 }
 

@@ -37,6 +37,7 @@ export const Settings = () => {
         const openSection = params.get('open_section')
         const openTab = params.get('open_tab') || undefined
         const mailer = params.get('wbk_mailer')
+        const fromEmail = params.get('wbk_from_email')
 
         if (!openSection) {
             return
@@ -50,6 +51,9 @@ export const Settings = () => {
         if (mailer) {
             fieldOverrides.wbk_mailer = mailer
         }
+        if (fromEmail !== null) {
+            fieldOverrides.wbk_from_email = fromEmail
+        }
 
         hasOpenedFromUrl.current = true
         openSettingsSection(
@@ -61,6 +65,7 @@ export const Settings = () => {
         params.delete('open_section')
         params.delete('open_tab')
         params.delete('wbk_mailer')
+        params.delete('wbk_from_email')
         const nextSearch = params.toString()
         const nextUrl =
             window.location.pathname +

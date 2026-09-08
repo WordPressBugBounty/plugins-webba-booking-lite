@@ -231,7 +231,7 @@ export const bookingScenarios: IScenario[] = [
                 const { stripeObj, amountData, preset, formData } =
                     useBookingContext()
                 if (
-                    preset?.settings.coupons_enabled &&
+                    preset?.settings?.coupons_enabled &&
                     String(formData?.coupon).length > 0 &&
                     amountData.to_pay_total <= 0
                 ) {
@@ -269,7 +269,7 @@ export const bookingScenarios: IScenario[] = [
             if (
                 paymentMethods &&
                 paymentMethods.length === 1 &&
-                preset?.settings.coupons_enabled === false &&
+                preset?.settings?.coupons_enabled === false &&
                 !stripeMethods.includes(paymentMethods[0].id)
             ) {
                 return false

@@ -12,5 +12,5 @@ export const Form = () => {
         [fields, anyTouched]
     )
 
-    return <form className={'wbk_form'}>{components}</form>
+    return <form className={'wbk_form'} onSubmit={(e) => e.preventDefault()}>{components}</form>
 }

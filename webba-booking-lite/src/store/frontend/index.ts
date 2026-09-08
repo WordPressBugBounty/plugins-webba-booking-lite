@@ -10,7 +10,8 @@ import { IFormData } from '../../frontend/screens/BookingForm/types'
 import { IField } from '../../frontend/components/Form/types'
 import { IPaymentMethod } from '../../frontend/components/PaymentSelector/types'
 import { wbkDecodeString } from '../../frontend/lib/stringSanitizer'
-import { serializePlacesForApi } from '../../frontend/providers/BookingFormProvider/utils'
+import { startOfMonth, startOfWeek, subDays } from 'date-fns'
+import { serializePlacesForApi, wbkBackendDate, wbkExtractBackendDate } from '../../frontend/providers/BookingFormProvider/utils'
 
 interface Booking {
     id: string | number
@@ -281,20 +282,30 @@ const actions = {
     fetchServiceAvailability: (
         service_id: Number,
         start_date: string,
-        end_date: string
+        end_date: string,
+        location_id: number | null = null,
+        staff_member_id: string | null = null
     ) => {
         return async ({ select, dispatch }: any) => {
             try {
                 dispatch.setLoading('serviceAvailability', true, service_id)
 
+                const queryParams: Record<string, any> = {
+                    service_id,
+                    start_date,
+                    end_date,
+                }
+                if (location_id != null) {
+                    queryParams.location_id = location_id
+                }
+                if (staff_member_id != null && staff_member_id !== '') {
+                    queryParams.staff_member_id = staff_member_id
+                }
+
                 const response = await apiFetch({
                     path: addLangToQueryArgs(
                         `webba-booking/v1/get-service-availability/`,
-                        {
-                            service_id,
-                            start_date,
-                            end_date,
-                        }
+                        queryParams
                     ),
                     method: 'GET',
                 })
@@ -303,6 +314,59 @@ const actions = {
                     type: 'SET_SERVICE_AVAILABILITY',
                     data: response,
                 })
+            } finally {
+                dispatch.setLoading('serviceAvailability', false, service_id)
+            }
+        }
+    },
+    fetchFirstAvailableDate: (
+        service_id: Number,
+        location_id: number | string | null,
+        staff_member_id: string | null,
+        weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 1
+    ) => {
+        return async ({ dispatch }: any) => {
+            dispatch.setLoading('serviceAvailability', true, service_id)
+            try {
+                const startDate = wbkBackendDate(new Date())
+                const queryParams: Record<string, any> = {
+                    service_id,
+                    start_date: startDate,
+                    end_date: startDate,
+                    first_only: true,
+                }
+                if (location_id != null && location_id !== '') {
+                    queryParams.location_id = location_id
+                }
+                if (staff_member_id != null && staff_member_id !== '') {
+                    queryParams.staff_member_id = staff_member_id
+                }
+                const response = (await apiFetch({
+                    path: addLangToQueryArgs(
+                        `webba-booking/v1/get-service-availability/`,
+                        queryParams
+                    ),
+                    method: 'GET',
+                })) as { dates?: string[]; service_id?: number | string }
+
+                const dates = response?.dates || []
+                const monthAnchor = dates[0]
+                    ? startOfMonth(wbkExtractBackendDate(dates[0]))
+                    : startOfMonth(new Date())
+                const cacheStart = wbkBackendDate(
+                    subDays(startOfWeek(monthAnchor, { weekStartsOn }), 1)
+                )
+
+                dispatch({
+                    type: 'SET_SERVICE_AVAILABILITY',
+                    data: {
+                        service_id,
+                        start_date: cacheStart,
+                        dates,
+                    },
+                })
+
+                return dates
             } finally {
                 dispatch.setLoading('serviceAvailability', false, service_id)
             }
@@ -717,24 +781,30 @@ const actions = {
                     body: formDataModified,
                 })
 
-                dispatch({
-                    type: 'UPDATE_BOOKING_DATA',
-                    data: response,
-                })
+                const bookingResult =
+                    response && typeof response === 'object'
+                        ? {
+                              ...response,
+                              payment_required:
+                                  response.payment_required === true
+                                      ? true
+                                      : false,
+                          }
+                        : response
 
-                return response
+                dispatch.setBookingData(bookingResult)
+
+                return bookingResult
             } finally {
                 dispatch.setLoading('createBooking', false)
             }
         },
-    setBookingData:
-        (data: any) =>
-        async ({ dispatch }: any) => {
-            dispatch({
-                type: 'UPDATE_BOOKING_DATA',
-                data,
-            })
-        },
+    setBookingData(data: any) {
+        return {
+            type: 'UPDATE_BOOKING_DATA',
+            data,
+        }
+    },
     submitStripePayment:
         (payment_intent_id: string, payment_method: string) =>
         async ({ dispatch }: any) => {
@@ -1087,45 +1157,71 @@ export const store: StoreDescriptor = createReduxStore(
                     getPresetRequestInFlight = requestPromise
                     await requestPromise
                 },
-            getServiceAvailability:
-                (service_id: Number, start_date: string, end_date: string, location_id: number | null, staff_member_id: string | null) =>
-                async ({ dispatch }: any) => {
-                    dispatch.setLoading('serviceAvailability', true, service_id)
-                    try {
-                        const queryParams: Record<string, any> = {
-                            service_id,
-                            start_date,
-                            end_date,
-                        }
-                        if (location_id != null) {
-                            queryParams.location_id = location_id
-                        }
-                        // Note: staff_member_id=0 means "Any Available" and returns staff_member_ids per slot.
-                        if (staff_member_id != null && staff_member_id !== '') {
-                            queryParams.staff_member_id = staff_member_id
-                        }
-                        const response = (await apiFetch({
-                            path: addLangToQueryArgs(
-                                `webba-booking/v1/get-service-availability/`,
-                                queryParams
-                            ),
-                            method: 'GET',
-                        })) as { dates: any }
-
-                        dispatch({
-                            type: 'SET_SERVICE_AVAILABILITY',
-                            data: response,
-                        })
-
-                        return response?.dates || []
-                    } finally {
+            getServiceAvailability: {
+                isFulfilled: (
+                    state: State,
+                    service_id: number,
+                    start_date: string
+                ) =>
+                    Boolean(
+                        state.serviceUnavailableDates?.[service_id] &&
+                            Object.prototype.hasOwnProperty.call(
+                                state.serviceUnavailableDates[service_id],
+                                start_date
+                            )
+                    ),
+                fulfill:
+                    (
+                        service_id: Number,
+                        start_date: string,
+                        end_date: string,
+                        location_id: number | null,
+                        staff_member_id: string | null
+                    ) =>
+                    async ({ dispatch }: any) => {
                         dispatch.setLoading(
                             'serviceAvailability',
-                            false,
+                            true,
                             service_id
                         )
-                    }
-                },
+                        try {
+                            const queryParams: Record<string, any> = {
+                                service_id,
+                                start_date,
+                                end_date,
+                            }
+                            if (location_id != null) {
+                                queryParams.location_id = location_id
+                            }
+                            if (
+                                staff_member_id != null &&
+                                staff_member_id !== ''
+                            ) {
+                                queryParams.staff_member_id = staff_member_id
+                            }
+                            const response = (await apiFetch({
+                                path: addLangToQueryArgs(
+                                    `webba-booking/v1/get-service-availability/`,
+                                    queryParams
+                                ),
+                                method: 'GET',
+                            })) as { dates: any }
+
+                            dispatch({
+                                type: 'SET_SERVICE_AVAILABILITY',
+                                data: response,
+                            })
+
+                            return response?.dates || []
+                        } finally {
+                            dispatch.setLoading(
+                                'serviceAvailability',
+                                false,
+                                service_id
+                            )
+                        }
+                    },
+            },
             getBookingDetails: (
                 token: string,
                 token_type: 'customer_token' | 'admin_token'

@@ -28,6 +28,11 @@ import {
     getPickerAllowedSets,
 } from './utils/bookingPresetFilters.js'
 import { buildScopeInlineStyleObject } from './utils/buildScopeInlineStyle.js'
+import {
+    APPEARANCE_ATTRIBUTE_DEFAULTS,
+    getEditorAppearanceDefaults,
+    mergeSavedAppearance,
+} from './appearanceDefaults.js'
 
 const FONT_OPTIONS = [
     {
@@ -79,6 +84,32 @@ const ADVANCED_COLOR_FIELDS = [
     ['color_border_selected', '#15B8A9', __('Selected elements — border', 'webba-booking-lite')],
 ]
 
+const CLASSIC_ONLY_APPEARANCE_KEYS = new Set([
+    'bg_button_selected',
+    'color_button_selected',
+    'bg_button_selected_hover',
+    'color_button_selected_hover',
+    'bg_button_selected_selected',
+    'color_button_selected_selected',
+    'bg_button_secondary',
+    'color_button_secondary',
+    'bg_button_secondary_hover',
+    'color_button_secondary_hover',
+    'bg_sidebar',
+    'color_sidebar',
+])
+
+const FORM_TYPE_OPTIONS = [
+    {
+        label: __('Webba 6 Classic form', 'webba-booking-lite'),
+        value: 'classic',
+    },
+    {
+        label: __('Waterfall form', 'webba-booking-lite'),
+        value: 'waterfall',
+    },
+]
+
 const labelsToIds = (tokens, pairs) => {
     return tokens
         .map((label) => {
@@ -97,11 +128,34 @@ const idsToLabels = (ids, pairs) => {
         .filter(Boolean)
 }
 
-export default function Edit({ attributes, setAttributes }) {
+export default function Edit({ attributes, setAttributes, clientId }) {
     const data = useSelect(
         (select) => select(store_name).getPreset(),
         [store_name]
     )
+    const wasJustInserted = useSelect(
+        (select) => {
+            const blockEditor = select('core/block-editor')
+            if (
+                !clientId ||
+                !blockEditor ||
+                typeof blockEditor.wasBlockJustInserted !== 'function'
+            ) {
+                return false
+            }
+            return !!blockEditor.wasBlockJustInserted(clientId)
+        },
+        [clientId]
+    )
+    const editorAppearanceDefaults = useMemo(
+        () =>
+            mergeSavedAppearance({
+                ...getEditorAppearanceDefaults(),
+                ...(data?.appearance_options || {}),
+            }),
+        [data?.appearance_options]
+    )
+    const appearanceSeeded = useRef(false)
 
     const normalizedPreset = useMemo(() => {
         if (!data) {
@@ -116,6 +170,34 @@ export default function Edit({ attributes, setAttributes }) {
     }, [data])
 
     const isDailyServiceType = attributes.serviceType === 'daily'
+    const formType =
+        attributes.formType === 'waterfall' ? 'waterfall' : 'classic'
+
+    useEffect(() => {
+        if (appearanceSeeded.current || !wasJustInserted) {
+            return
+        }
+
+        appearanceSeeded.current = true
+        const next = {}
+        Object.keys(APPEARANCE_ATTRIBUTE_DEFAULTS).forEach((key) => {
+            const nextValue = editorAppearanceDefaults[key]
+            if (!nextValue || nextValue === attributes[key]) {
+                return
+            }
+            next[key] = nextValue
+        })
+        if (
+            editorAppearanceDefaults.formType &&
+            editorAppearanceDefaults.formType !==
+                (attributes.formType || 'classic')
+        ) {
+            next.formType = editorAppearanceDefaults.formType
+        }
+        if (Object.keys(next).length > 0) {
+            setAttributes(next)
+        }
+    }, [wasJustInserted, editorAppearanceDefaults, attributes, setAttributes])
 
     const categoryPairs = useMemo(() => {
         return (data?.categories || []).map((c) => ({
@@ -256,13 +338,19 @@ export default function Edit({ attributes, setAttributes }) {
         () => buildScopeInlineStyleObject(attributes),
         [attributes]
     )
-    const advancedColorSettings = ADVANCED_COLOR_FIELDS.map(
-        ([attributeKey, fallbackValue, label]) => ({
+    const advancedColorSettings = ADVANCED_COLOR_FIELDS.filter(
+        ([attributeKey]) =>
+            formType === 'classic' ||
+            !CLASSIC_ONLY_APPEARANCE_KEYS.has(attributeKey)
+    ).map(([attributeKey, fallbackValue, label]) => ({
             key: attributeKey,
             value: attributes[attributeKey],
             onChange: (value) =>
                 setAttributes({
-                    [attributeKey]: value || fallbackValue,
+                    [attributeKey]:
+                        value ||
+                        editorAppearanceDefaults[attributeKey] ||
+                        fallbackValue,
                 }),
             label,
         })
@@ -287,6 +375,7 @@ export default function Edit({ attributes, setAttributes }) {
         (attributes.location || []).join(','),
         (attributes.staff || []).join(','),
         attributes.categoryList ? '1' : '0',
+        formType,
     ].join('|')
 
     const blockProps = useBlockProps({
@@ -302,6 +391,19 @@ export default function Edit({ attributes, setAttributes }) {
                             title={__('Booking context', 'webba-booking-lite')}
                             initialOpen={true}
                         >
+                            <SelectControl
+                                label={__('Form layout', 'webba-booking-lite')}
+                                value={formType}
+                                options={FORM_TYPE_OPTIONS}
+                                onChange={(nextFormType) =>
+                                    setAttributes({
+                                        formType:
+                                            nextFormType === 'waterfall'
+                                                ? 'waterfall'
+                                                : 'classic',
+                                    })
+                                }
+                            />
                             <SelectControl
                                 label={__('Service type', 'webba-booking-lite')}
                                 value={attributes.serviceType || 'hourly'}
@@ -448,7 +550,10 @@ export default function Edit({ attributes, setAttributes }) {
                                         value: attributes.bg_accent,
                                         onChange: (v) =>
                                             setAttributes({
-                                                bg_accent: v || '#15B8A9',
+                                                bg_accent:
+                                                    v ||
+                                                    editorAppearanceDefaults.bg_accent ||
+                                                    '#15B8A9',
                                             }),
                                         label: __(
                                             'Accent color',
@@ -485,7 +590,14 @@ export default function Edit({ attributes, setAttributes }) {
                             />
                         </PanelBody>
                         <PanelBody
-                            title={__('Buttons and sidebar', 'webba-booking-lite')}
+                            title={
+                                formType === 'classic'
+                                    ? __(
+                                          'Buttons and sidebar',
+                                          'webba-booking-lite'
+                                      )
+                                    : __('Buttons', 'webba-booking-lite')
+                            }
                             initialOpen={false}
                         >
                             <div
@@ -581,8 +693,11 @@ export default function Edit({ attributes, setAttributes }) {
                                 : '0'
                         }
                         attrUnits={isDailyServiceType ? 'yes' : 'no'}
+                        attrHideCategory={
+                            attributes.categoryList ? 'no' : 'yes'
+                        }
                     >
-                        <BookingForm />
+                        <BookingForm formType={formType} />
                     </BookingFormProvider>
                 </div>
             </div>

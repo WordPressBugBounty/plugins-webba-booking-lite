@@ -1,0 +1,67 @@
+.wbk_pushSubscribeField {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wbk_pushSubscribeField__label {
+    color: #212121;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.wbk_pushSubscribeField__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.wbk_pushSubscribeField__button {
+    height: 40px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 8px;
+    background: #1f6763;
+    color: #fff;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) {
+        background: #155350;
+    }
+
+    &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+}
+
+.wbk_pushSubscribeField__button--secondary {
+    background: #fff;
+    color: #1f6763;
+    border: 1px solid #1f6763;
+
+    &:hover:not(:disabled) {
+        background: #f3f8f8;
+    }
+}
+
+.wbk_pushSubscribeField__status {
+    margin: 0;
+    font-family: typography.$font-primary;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.wbk_pushSubscribeField__status--success {
+    color: #1f6763;
+}
+
+.wbk_pushSubscribeField__status--error {
+    color: #c0392b;
+}

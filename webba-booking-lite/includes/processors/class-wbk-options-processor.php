@@ -84,6 +84,10 @@ final class WBK_Options_Processor
                 $render_callback = 'render_smtp_test';
                 $validation_callback = 'validate_smtp_test';
                 break;
+            case 'push_subscribe':
+                $render_callback = 'render_push_subscribe';
+                $validation_callback = 'validate_push_subscribe';
+                break;
             case 'this_domain_url':
                 $render_callback = 'render_text';
                 $validation_callback = 'validate_this_domain_url';
@@ -99,6 +103,10 @@ final class WBK_Options_Processor
             case 'google_connect':
                 $render_callback = 'render_google_connect';
                 $validation_callback = 'validate_google_connect';
+                break;
+            case 'file':
+                $render_callback = 'render_file';
+                $validation_callback = 'validate_file';
                 break;
 
             default:
@@ -224,6 +232,10 @@ final class WBK_Options_Processor
     {
         return '';
     }
+    public function validate_push_subscribe($input)
+    {
+        return '';
+    }
     public function render_text($args)
     {
         $html = WBK_Renderer::load_template('options/text_field', $args, false);
@@ -288,6 +300,30 @@ final class WBK_Options_Processor
     public function render_smtp_test($args)
     {
         echo '';
+    }
+    public function render_push_subscribe($args)
+    {
+        echo '';
+    }
+
+    /**
+     * Whether a settings field is UI-only and must not be written by save-options.
+     *
+     * @param array $field WordPress settings field descriptor.
+     * @return bool
+     */
+    public static function is_non_persistent_field($field): bool
+    {
+        $callback = "";
+        if (isset($field["callback"][1]) && is_string($field["callback"][1])) {
+            $callback = $field["callback"][1];
+        }
+
+        return in_array(
+            $callback,
+            ["render_push_subscribe", "render_smtp_test", "render_notice"],
+            true,
+        );
     }
     public function render_radio($args)
     {

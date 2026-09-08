@@ -9,6 +9,8 @@ if (!defined("ABSPATH")) {
 }
 class WBK_Backend_Options
 {
+    private static $page_list = [];
+
     public function __construct()
     {
         //set component-specific properties
@@ -23,6 +25,12 @@ class WBK_Backend_Options
         add_filter("tiny_mce_before_init", [$this, "customizeEditor"], 1000);
         // save options
         add_action("wp_ajax_wbk_save_options", [$this, "save_options"]);
+        self::$page_list = array_map(function ($page) {
+            return [
+                'label' => $page->post_title,
+                'value' => $page->ID,
+            ];
+        }, get_pages());
     }
 
     public function save_options()
@@ -37,6 +45,9 @@ class WBK_Backend_Options
         parse_str($_POST["form_data"], $options);
         $settings_fields = $wp_settings_fields["wbk-options"];
         foreach ($settings_fields[$options["section"]] as $field) {
+            if (WBK_Options_Processor::is_non_persistent_field($field)) {
+                continue;
+            }
             if (isset($options[$field["id"]])) {
                 update_option($field["id"], $options[$field["id"]]);
             } else {
@@ -163,12 +174,16 @@ class WBK_Backend_Options
             [
                 "icon" => "notifications",
                 "description" => __(
-                    "Configure email and SMS notification settings.",
+                    "Configure email, SMS, and browser notification settings.",
                     "webba-booking-lite",
                 ),
                 "tabs" => [
                     "general" => [
                         "title" => __("General", "webba-booking-lite"),
+                        "lock_fields_only" => true,
+                    ],
+                    "push" => [
+                        "title" => __("Browser Notification", "webba-booking-lite"),
                         "lock_fields_only" => true,
                     ],
                 ],
@@ -286,6 +301,54 @@ class WBK_Backend_Options
                     "0" => __("Sunday", "webba-booking-lite"),
                     "1" => __("Monday", "webba-booking-lite"),
                 ],
+                "tab" => "general",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_company_logo",
+            "file",
+            __("Company Logo", "webba-booking-lite"),
+            "wbk_general_settings_section",
+            [
+                "not_translated_title" => "Company Logo",
+                "popup" => __(
+                    "The logo will be shown in the PDF invoice and email notifications.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "general",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_company_name",
+            "text",
+            __("Company Name", "webba-booking-lite"),
+            "wbk_general_settings_section",
+            [
+                "not_translated_title" => "Company Name",
+                "popup" => __(
+                    "The name will be shown in the PDF invoice and email notifications.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "general",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_company_address",
+            "textarea",
+            __("Company Address", "webba-booking-lite"),
+            "wbk_general_settings_section",
+            [
+                "not_translated_title" => "Company Address",
+                "popup" => __(
+                    "The address will be shown in the PDF invoice and email notifications.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
                 "tab" => "general",
             ],
         );
@@ -937,6 +1000,45 @@ OLD: When one service is booked, it will automatically lock another one on the s
         );
 
         wbk_opt()->add_option(
+            "wbk_booking_redirect_enabled",
+            "checkbox",
+            __("Redirect to a page after booking is made", "webba-booking-lite"),
+            "wbk_advanced_booking_rules_section",
+            [
+                'default' => '',
+                'checkbox_value' => 'yes',
+                'not_translated_title' => 'Redirect to a page after booking is made',
+                'popup' => __(
+                    'Turn on to redirect to a page after booking is made. You can select a page from the dropdown menu.',
+                    'webba-booking-lite'
+                ),
+                'tab' => 'booking-form',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_booking_redirect_page",
+            "select",
+            __("Redirect to a page after booking is made", "webba-booking-lite"),
+            "wbk_advanced_booking_rules_section",
+            [
+                'extra' => self::$page_list,
+                'not_translated_title' => 'Redirect to a page after booking is made',
+                'popup' => __(
+                    'Select a page to redirect to after booking is made.',
+                    'webba-booking-lite'
+                ),
+                'tab' => 'booking-form',
+                'dependency' => [["wbk_booking_redirect_enabled", "=", "yes"]],
+                'dependent_value' => [
+                    'condition' => ['wbk_booking_redirect_enabled', '!=', 'yes'],
+                    'value' => '',
+                ],
+                'default' => '',
+            ],
+        );
+
+        wbk_opt()->add_option(
             "wbk_global_timeslot_interval",
             "select",
             __("Global timeslot interval (step)", "webba-booking-lite"),
@@ -973,6 +1075,20 @@ OLD: When one service is booked, it will automatically lock another one on the s
                 "checkbox_value" => "yes",
                 "default" => "yes",
                 "tab" => "booking-form",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_show_endtime',
+            'checkbox',
+            __('Show end time in timeslots', 'webba-booking-lite'),
+            'wbk_advanced_booking_rules_section',
+            [
+                'not_translated_title' => 'Show end time in timeslots',
+                'popup' => __('Turn on to show the end time in timeslots. It will show the timeslots as range, for example: 10:00 AM - 11:00 AM.', 'webba-booking-lite'),
+                'checkbox_value' => 'yes',
+                'default' => '',
+                'tab' => 'booking-form',
             ],
         );
 
@@ -1248,26 +1364,25 @@ OLD: When one service is booked, it will automatically lock another one on the s
                 "default" => $mailer_default,
                 "extra" => [
                     [
-                        'value' => 'default',
-                        'title' => __("Default WordPress mailer", "webba-booking-lite"),
-                        'icon' => 'icon-wordpress.svg',
+                        "value" => "default",
+                        "title" => __("Default WordPress mailer", "webba-booking-lite"),
+                        "icon" => "icon-wordpress.svg",
                     ],
                     [
-                        'value' => 'smtp',
-                        'title' => __("SMTP", "webba-booking-lite"),
-                        'icon' => 'icon-mail-inbox.svg',
+                        "value" => "smtp",
+                        "title" => __("SMTP", "webba-booking-lite"),
+                        "icon" => "icon-mail-inbox.svg",
                     ],
-                    // [
-                    //     'value' => 'gmail',
-                    //     'title' => __("Gmail", "webba-booking-lite"),
-                    //     'icon' => 'icon-gmail.svg',
-                    //     'required_plan' => 'premium'
-                    // ],
                     [
-                        'value' => 'sendgrid',
-                        'title' => __("SendGrid", "webba-booking-lite"),
-                        'icon' => 'icon-sendgrid.svg',
-                        'required_plan' => 'premium'
+                        "value" => "gmail",
+                        "title" => __("Gmail", "webba-booking-lite"),
+                        "icon" => "icon-gmail.svg",
+                    ],
+                    [
+                        "value" => "sendgrid",
+                        "title" => __("SendGrid", "webba-booking-lite"),
+                        "icon" => "icon-sendgrid.svg",
+                        "required_plan" => "premium",
                     ],
                 ],
                 "radio_type" => "icon",
@@ -1396,10 +1511,7 @@ OLD: When one service is booked, it will automatically lock another one on the s
             __("SMTP username", "webba-booking-lite"),
             "wbk_notifications_settings_section",
             [
-                "dependency" => [
-                    ["wbk_mailer", "=", "smtp"],
-                    ["wbk_smtp_auth", "=", "yes"],
-                ],
+                "dependency" => [["wbk_mailer", "=", "smtp"], ["wbk_smtp_auth", "=", "yes"]],
                 "dependent_value" => [
                     "condition" => ["wbk_smtp_auth", "!=", "yes"],
                     "value" => "",
@@ -1417,10 +1529,7 @@ OLD: When one service is booked, it will automatically lock another one on the s
             __("SMTP password", "webba-booking-lite"),
             "wbk_notifications_settings_section",
             [
-                "dependency" => [
-                    ["wbk_mailer", "=", "smtp"],
-                    ["wbk_smtp_auth", "=", "yes"],
-                ],
+                "dependency" => [["wbk_mailer", "=", "smtp"], ["wbk_smtp_auth", "=", "yes"]],
                 "dependent_value" => [
                     "condition" => ["wbk_smtp_auth", "!=", "yes"],
                     "value" => "",
@@ -1580,13 +1689,13 @@ OLD: When one service is booked, it will automatically lock another one on the s
             [
                 "not_translated_title" => "From: email",
                 "popup" => __(
-                    "Enter the email that will be displayed as the sender in the email notifications. When Gmail is selected as the mailer, this field is locked to the authorized Gmail account.",
+                    "Enter the email that will be displayed as the sender in the email notifications.",
                     "webba-booking-lite",
                 ),
                 "default" => "demo@webba-booking.com",
                 "tab" => "email",
                 "sub_type" => "email",
-                "disable_condition" => ["wbk_mailer" => "gmail"],
+                "required" => true,
             ],
         );
 
@@ -3601,6 +3710,314 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             ],
         );
 
+        // ========== NOTIFICATIONS - Browser Notification Tab ==========
+        $push_enabled_dependency = [["wbk_push_enabled", "=", "true"]];
+        $push_placeholder_title_popup =
+            __(
+                'Notification title. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">',
+                "webba-booking-lite",
+            ) .
+            __("List of available placeholders", "webba-booking-lite") .
+            "</a>";
+        $push_placeholder_body_popup =
+            __(
+                'Notification body. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">',
+                "webba-booking-lite",
+            ) .
+            __("List of available placeholders", "webba-booking-lite") .
+            "</a>";
+
+        wbk_opt()->add_option(
+            "wbk_push_notice",
+            "notice",
+            __("Browser Notification", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "not_translated_title" => "Browser Notification",
+                "popup" => __(
+                    "Send browser notifications to administrators and staff who enable alerts on this device. Administrators receive every enabled trigger. Staff receive alerts only for services they are connected to. HTTPS is required.",
+                    "webba-booking-lite",
+                ),
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_enabled",
+            "push_subscribe",
+            __("This browser", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "true",
+                "not_translated_title" => "This browser",
+                "popup" => __(
+                    "Enable browser notifications for this browser, or disable them. Administrators and staff must enable alerts on each device they use.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_send_on_booking_admin",
+            "checkbox",
+            __("Notify administrators when a customer makes a booking", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "true",
+                "not_translated_title" => "Notify administrators when a customer makes a booking",
+                "popup" => __(
+                    "Turn on to send a browser notification to administrators when a customer creates a booking.",
+                    "webba-booking-lite",
+                ),
+                "default" => get_option("wbk_push_send_on_booking", "true"),
+                "dependency" => $push_enabled_dependency,
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_send_on_booking_staff",
+            "checkbox",
+            __("Notify staff when a customer makes a booking", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "true",
+                "not_translated_title" => "Notify staff when a customer makes a booking",
+                "popup" => __(
+                    "Turn on to send a browser notification to staff connected to the booked service.",
+                    "webba-booking-lite",
+                ),
+                "default" => "true",
+                "dependency" => $push_enabled_dependency,
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_title_on_booking",
+            "text",
+            __("New booking title", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => $push_enabled_dependency,
+                "default" => __("New booking: #service_name", "webba-booking-lite"),
+                "not_translated_title" => "New booking title",
+                "popup" => $push_placeholder_title_popup,
+                "required_plan" => "premium",
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_message_on_booking",
+            "textarea",
+            __("New booking message", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => $push_enabled_dependency,
+                "default" => __(
+                    "#customer_name, #appointment_day #appointment_time",
+                    "webba-booking-lite",
+                ),
+                "not_translated_title" => "New booking message",
+                "popup" => $push_placeholder_body_popup,
+                "required_plan" => "premium",
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_send_on_cancellation_admin",
+            "checkbox",
+            __("Notify administrators when a customer cancels a booking", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "true",
+                "not_translated_title" => "Notify administrators when a customer cancels a booking",
+                "popup" => __(
+                    "Turn on to send a browser notification to administrators when a customer cancels a booking.",
+                    "webba-booking-lite",
+                ),
+                "default" => get_option("wbk_push_send_on_cancellation", "true"),
+                "dependency" => $push_enabled_dependency,
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_send_on_cancellation_staff",
+            "checkbox",
+            __("Notify staff when a customer cancels a booking", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "true",
+                "not_translated_title" => "Notify staff when a customer cancels a booking",
+                "popup" => __(
+                    "Turn on to send a browser notification to staff connected to the cancelled service.",
+                    "webba-booking-lite",
+                ),
+                "default" => "true",
+                "dependency" => $push_enabled_dependency,
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_title_on_cancellation",
+            "text",
+            __("Cancellation title", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => $push_enabled_dependency,
+                "default" => __("Booking cancelled: #service_name", "webba-booking-lite"),
+                "not_translated_title" => "Cancellation title",
+                "popup" => $push_placeholder_title_popup,
+                "required_plan" => "premium",
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_message_on_cancellation",
+            "textarea",
+            __("Cancellation message", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => $push_enabled_dependency,
+                "default" => __(
+                    "#customer_name cancelled #appointment_day #appointment_time",
+                    "webba-booking-lite",
+                ),
+                "not_translated_title" => "Cancellation message",
+                "popup" => $push_placeholder_body_popup,
+                "required_plan" => "premium",
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_send_on_payment_admin",
+            "checkbox",
+            __("Notify administrators when a booking is paid", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "true",
+                "not_translated_title" => "Notify administrators when a booking is paid",
+                "popup" => __(
+                    "Turn on to send a browser notification to administrators when a booking payment is received.",
+                    "webba-booking-lite",
+                ),
+                "default" => get_option("wbk_push_send_on_payment", "true"),
+                "dependency" => $push_enabled_dependency,
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_send_on_payment_staff",
+            "checkbox",
+            __("Notify staff when a booking is paid", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "true",
+                "not_translated_title" => "Notify staff when a booking is paid",
+                "popup" => __(
+                    "Turn on to send a browser notification to staff connected to the paid service.",
+                    "webba-booking-lite",
+                ),
+                "default" => "true",
+                "dependency" => $push_enabled_dependency,
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_title_on_payment",
+            "text",
+            __("Payment received title", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => $push_enabled_dependency,
+                "default" => __("Payment received: #service_name", "webba-booking-lite"),
+                "not_translated_title" => "Payment received title",
+                "popup" => $push_placeholder_title_popup,
+                "required_plan" => "premium",
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_message_on_payment",
+            "textarea",
+            __("Payment received message", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => $push_enabled_dependency,
+                "default" => __(
+                    "#customer_name paid for #appointment_day #appointment_time",
+                    "webba-booking-lite",
+                ),
+                "not_translated_title" => "Payment received message",
+                "popup" => $push_placeholder_body_popup,
+                "required_plan" => "premium",
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_send_reminder_admin",
+            "checkbox",
+            __("Notify administrators with booking reminders", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "true",
+                "not_translated_title" => "Notify administrators with booking reminders",
+                "popup" => __(
+                    "Turn on to send a browser notification reminder to administrators at the same time as the admin email reminder.",
+                    "webba-booking-lite",
+                ),
+                "default" => get_option("wbk_push_send_reminder", "true"),
+                "dependency" => $push_enabled_dependency,
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_send_reminder_staff",
+            "checkbox",
+            __("Notify staff with booking reminders", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "checkbox_value" => "true",
+                "not_translated_title" => "Notify staff with booking reminders",
+                "popup" => __(
+                    "Turn on to send a browser notification reminder to staff connected to the service at the same time as the admin email reminder.",
+                    "webba-booking-lite",
+                ),
+                "default" => "true",
+                "dependency" => $push_enabled_dependency,
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_title_reminder",
+            "text",
+            __("Reminder title", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => $push_enabled_dependency,
+                "default" => __("Reminder: #service_name", "webba-booking-lite"),
+                "not_translated_title" => "Reminder title",
+                "popup" => $push_placeholder_title_popup,
+                "required_plan" => "premium",
+                "tab" => "push",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_push_message_reminder",
+            "textarea",
+            __("Reminder message", "webba-booking-lite"),
+            "wbk_notifications_settings_section",
+            [
+                "dependency" => $push_enabled_dependency,
+                "default" => __(
+                    "#customer_name, #appointment_day #appointment_time",
+                    "webba-booking-lite",
+                ),
+                "not_translated_title" => "Reminder message",
+                "popup" => $push_placeholder_body_popup,
+                "required_plan" => "premium",
+                "tab" => "push",
+            ],
+        );
+
         // ========== WORDING/TRANSLATIONS - PAYMENTS Subsection ==========
         wbk_opt()->add_option(
             "wbk_payment_step_title",
@@ -3663,6 +4080,18 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "default" => __("Submit", "webba-booking-lite"),
                 "not_translated_title" => "Submit",
                 "popup" => __("Label for the submit button.", "webba-booking-lite"),
+                "tab" => "buttons-ui",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_proceed_to_checkout",
+            "text",
+            __("Proceed to checkout", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Proceed to checkout", "webba-booking-lite"),
+                "not_translated_title" => "Proceed to checkout",
+                "popup" => __("Label for the proceed to checkout button on the waterfall booking form.", "webba-booking-lite"),
                 "tab" => "buttons-ui",
             ],
         );
@@ -5533,6 +5962,45 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "not_translated_title" => "Select location",
                 "popup" => __("Label for Select location.", "webba-booking-lite"),
                 "tab" => "form-fields",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_category",
+            "text",
+            __("Category", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Category", "webba-booking-lite"),
+                "not_translated_title" => "Category",
+                "popup" => __("Label for Category on the waterfall booking form.", "webba-booking-lite"),
+                "tab" => "form-fields",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_service",
+            "text",
+            __("Service", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Service", "webba-booking-lite"),
+                "not_translated_title" => "Service",
+                "popup" => __("Label for Service on the waterfall booking form.", "webba-booking-lite"),
+                "tab" => "form-fields",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_unit",
+            "text",
+            __("Unit", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Unit", "webba-booking-lite"),
+                "not_translated_title" => "Unit",
+                "popup" => __("Label for Unit on the waterfall booking form.", "webba-booking-lite"),
+                "tab" => "units",
             ],
         );
 

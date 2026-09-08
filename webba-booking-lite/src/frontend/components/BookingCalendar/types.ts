@@ -15,6 +15,14 @@ export interface IBookingCalendarProps {
     restrictToAvailableDates?: boolean
     hideIndications?: boolean
     showLoader?: boolean
+    hideEmptyMonthOverlay?: boolean
+    showNavigation?: boolean
+}
+
+export interface IEmptyMonthOverlayProps {
+    monthName: string
+    onNextMonth: () => void
+    showNavigation?: boolean
 }
 
 export interface IIndicationProps {

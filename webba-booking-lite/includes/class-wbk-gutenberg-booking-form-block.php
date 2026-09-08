@@ -28,6 +28,12 @@ class WBK_Gutenberg_Booking_Form_Block
         $units = $service_type === 'daily' ? 'yes' : 'no';
         $category_list = !empty($attributes['categoryList']) ? 'yes' : 'no';
         $hide_category = !empty($attributes['categoryList']) ? 'no' : 'yes';
+        $form_type_attribute = $attributes['formType'] ?? '';
+        $form_type = $form_type_attribute === ''
+            ? self::sanitize_form_type(
+                self::get_editor_appearance_defaults()['formType'] ?? 'classic'
+            )
+            : self::sanitize_form_type($form_type_attribute);
         $category = self::format_id_csv($attributes['category'] ?? []);
         $location = self::format_id_csv($attributes['location'] ?? []);
         $staff = $service_type === 'daily'
@@ -45,7 +51,7 @@ class WBK_Gutenberg_Booking_Form_Block
         $html = '<div class="wbk_elementor_booking_form_scope"' . $style_attr . '>';
         $html .= WBK_Renderer::load_template(
             'frontend_v6/booking_form',
-            [$service, $category_list, $category, $location, $staff, $units, $hide_category],
+            [$service, $category_list, $category, $location, $staff, $units, $hide_category, $form_type],
             false
         );
         $html .= '</div>';
@@ -106,6 +112,7 @@ class WBK_Gutenberg_Booking_Form_Block
             'font' => '"Ubuntu", sans-serif',
             'border_radius' => '8px',
             'shadow' => '0px 0px 16px 0px #3f3f4629',
+            'form_type' => 'classic',
             'button_border_radius' => '8px',
             'bg_button_primary' => '#15B8A9',
             'color_button_primary' => '#ffffff',
@@ -152,6 +159,72 @@ class WBK_Gutenberg_Booking_Form_Block
     }
 
     /**
+     * Returns appearance values used as Gutenberg editor defaults.
+     *
+     * @return array
+     */
+    public static function get_editor_appearance_defaults()
+    {
+        $defaults = self::get_appearance_defaults();
+        $font = isset($defaults['font']) ? (string) $defaults['font'] : '';
+        if ($font === '' || $font === 'default') {
+            $defaults['font'] = '"Ubuntu", sans-serif';
+        }
+
+        $form_type = isset($defaults['form_type']) ? (string) $defaults['form_type'] : 'classic';
+        $defaults['formType'] = $form_type === 'waterfall' ? 'waterfall' : 'classic';
+        unset($defaults['form_type']);
+
+        return $defaults;
+    }
+
+    /**
+     * Applies saved appearance values as block attribute defaults.
+     *
+     * @param array  $args       Block type args.
+     * @param string $block_name Block name.
+     *
+     * @return array
+     */
+    public static function filter_block_type_args($args, $block_name)
+    {
+        if ($block_name !== 'webba-booking/form' || !is_array($args)) {
+            return $args;
+        }
+        if (!isset($args['attributes']) || !is_array($args['attributes'])) {
+            return $args;
+        }
+
+        $defaults = self::get_editor_appearance_defaults();
+        foreach ($defaults as $key => $value) {
+            if (!isset($args['attributes'][$key]) || !is_array($args['attributes'][$key])) {
+                continue;
+            }
+            $args['attributes'][$key]['default'] = $value;
+        }
+
+        return $args;
+    }
+
+    /**
+     * Exposes saved appearance values to the Gutenberg editor script.
+     *
+     * @return void
+     */
+    public static function enqueue_editor_appearance_defaults()
+    {
+        $script =
+            'window.wbkGutenbergAppearanceDefaults = ' .
+            wp_json_encode(self::get_editor_appearance_defaults()) .
+            ';';
+
+        wp_add_inline_script('wp-blocks', $script, 'before');
+        if (wp_script_is('webba-booking-form-editor-script', 'registered')) {
+            wp_add_inline_script('webba-booking-form-editor-script', $script, 'before');
+        }
+    }
+
+    /**
      * Merges block appearance attributes with defaults.
      *
      * @param array $attributes Block attributes.
@@ -160,7 +233,7 @@ class WBK_Gutenberg_Booking_Form_Block
      */
     private static function resolve_appearance_from_attributes(array $attributes)
     {
-        $defaults = self::get_appearance_defaults();
+        $defaults = self::get_editor_appearance_defaults();
         $keys = [
             'bg_accent',
             'font',
@@ -330,6 +403,20 @@ class WBK_Gutenberg_Booking_Form_Block
         }
 
         return is_numeric($value) ? (string) intval($value) : '0';
+    }
+
+    /**
+     * Sanitizes the booking form layout type.
+     *
+     * @param mixed $value Raw form type value.
+     *
+     * @return string
+     */
+    private static function sanitize_form_type($value)
+    {
+        $form_type = is_string($value) ? $value : '';
+
+        return $form_type === 'waterfall' ? 'waterfall' : 'classic';
     }
 
     /**

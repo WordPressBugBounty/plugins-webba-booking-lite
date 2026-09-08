@@ -57,6 +57,7 @@ const mountBookingForms = (root = document) => {
             payment_intent,
             redirect_status,
             hide_category,
+            form_type,
         } = extractDataAttrs(bookingFormContainer)
 
         // If payerid and paymentid are defined, show PaypalSuccess screen
@@ -149,7 +150,7 @@ const mountBookingForms = (root = document) => {
                     attrUnits={units || null}
                     attrHideCategory={hide_category || null}
                 >
-                    <App />
+                    <App formType={form_type || undefined} />
                 </BookingFormProvider>,
                 bookingFormContainer
             )

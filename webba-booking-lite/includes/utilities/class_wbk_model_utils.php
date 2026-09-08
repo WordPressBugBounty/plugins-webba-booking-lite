@@ -1054,11 +1054,75 @@ class WBK_Model_Utils {
         return $result;
     }
 
+    /**
+     * Number of days to scan when looking for the first available date.
+     *
+     * Uses the service date range and the global days-in-advance limit when set.
+     *
+     * @param WBK_Service $service Service model.
+     * @return int
+     */
+    static function get_availability_search_day_count( $service ) {
+        $max_days = 730;
+        $start = strtotime( "today midnight" );
+        $end = $start + $max_days * 86400;
+        if ( !is_null( $service->get_availability_range() ) && is_array( $service->get_availability_range() ) && count( $service->get_availability_range() ) == 2 ) {
+            $availability_range = $service->get_availability_range();
+            $limit_end = strtotime( trim( $availability_range[1] ) );
+            if ( $limit_end !== false ) {
+                $end = min( $end, $limit_end );
+            }
+        }
+        if ( WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+            $days_in_advance = get_option( "wbk_allow_book_days_in_advance", "0" );
+        } else {
+            $days_in_advance = "0";
+        }
+        if ( trim( (string) $days_in_advance ) !== "" && $days_in_advance !== "0" ) {
+            $advance_end = time() + intval( $days_in_advance ) * 24 * 60 * 60;
+            $end = min( $end, $advance_end );
+        }
+        return max( 1, (int) ceil( ($end - $start) / 86400 ) + 1 );
+    }
+
+    /**
+     * Return the earliest date string from availability date values.
+     *
+     * @param array $dates Dates in Y,zero-based-month,day format.
+     * @return string|null
+     */
+    static function get_earliest_availability_date( $dates ) {
+        if ( !is_array( $dates ) || count( $dates ) === 0 ) {
+            return null;
+        }
+        usort( $dates, function ( $left, $right ) {
+            $left_parts = array_map( "intval", explode( ",", (string) $left ) );
+            $right_parts = array_map( "intval", explode( ",", (string) $right ) );
+            return $left_parts <=> $right_parts;
+        } );
+        return $dates[0];
+    }
+
+    /**
+     * Get available dates for a service in a range.
+     *
+     * Days with no remaining bookable time slots are omitted.
+     *
+     * @param int         $service_id       Service ID.
+     * @param string      $start_date       Start date (Y-m-d).
+     * @param int         $number_of_days   Number of days to scan.
+     * @param int|null    $staff_member_id  Optional staff member ID.
+     * @param bool        $stop_after_first Stop after the first available date.
+     * @param bool        $stop_after_month Stop after the month that contains the first available date.
+     * @return array
+     */
     static function get_service_availability_in_range(
         $service_id,
         $start_date,
         $number_of_days,
-        $staff_member_id = null
+        $staff_member_id = null,
+        $stop_after_first = false,
+        $stop_after_month = false
     ) {
         $service = new WBK_Service($service_id);
         if ( !$service->is_loaded() ) {
@@ -1070,6 +1134,7 @@ class WBK_Model_Utils {
         $prepare_time = round( $service->get_prepare_time() / 1440 );
         $arr_disabled = [];
         $day_to_render = strtotime( $start_date );
+        $first_available_month_end = null;
         $connected_events = [];
         if ( !is_null( $service->get_availability_range() ) && is_array( $service->get_availability_range() ) && count( $service->get_availability_range() ) == 2 ) {
             $availability_range = $service->get_availability_range();
@@ -1077,6 +1142,9 @@ class WBK_Model_Utils {
             $limit_end = strtotime( trim( $availability_range[1] ) );
         }
         for ($i = 1; $i <= $number_of_days; $i++) {
+            if ( $stop_after_month && $first_available_month_end !== null && $day_to_render > $first_available_month_end ) {
+                break;
+            }
             // check if current day is inside the limit
             if ( $day_to_render < strtotime( "today midnight" ) ) {
                 $day_to_render = strtotime( "tomorrow", $day_to_render );
@@ -1111,27 +1179,22 @@ class WBK_Model_Utils {
             if ( $day_status == 0 || $day_status == 2 ) {
                 $day_to_render = strtotime( "tomorrow", $day_to_render );
                 continue;
-            } else {
-                if ( get_option( "wbk_disable_day_on_all_booked", "disabled" ) == "enabled" || get_option( "wbk_disable_day_on_all_booked", "disabled" ) == "enabled_plus" ) {
-                    $sp->get_time_slots_by_day(
-                        $day_to_render,
-                        $service_id,
-                        [
-                            "calculate_availability" => true,
-                            "calculate_night_hours"  => false,
-                            "skip_gg_calendar"       => true,
-                            null,
-                            null,
-                        ],
-                        null,
-                        false,
-                        $staff_member_id
-                    );
-                    if ( !$sp->has_free_time_slots() ) {
-                        $day_to_render = strtotime( "tomorrow", $day_to_render );
-                        continue;
-                    }
-                }
+            }
+            $sp->get_time_slots_by_day(
+                $day_to_render,
+                $service_id,
+                [
+                    "calculate_availability" => true,
+                    "calculate_night_hours"  => false,
+                    "skip_gg_calendar"       => true,
+                ],
+                null,
+                false,
+                $staff_member_id
+            );
+            if ( !$sp->has_free_time_slots() ) {
+                $day_to_render = strtotime( "tomorrow", $day_to_render );
+                continue;
             }
             $valid = apply_filters(
                 "wbk_check_date_availability",
@@ -1144,6 +1207,12 @@ class WBK_Model_Utils {
                 continue;
             }
             $arr_disabled[] = date( "Y", $day_to_render ) . "," . intval( date( "n", $day_to_render ) - 1 ) . "," . date( "j", $day_to_render );
+            if ( $stop_after_first ) {
+                break;
+            }
+            if ( $stop_after_month && $first_available_month_end === null ) {
+                $first_available_month_end = strtotime( date( "Y-m-t", $day_to_render ) );
+            }
             $day_to_render = strtotime( "tomorrow", $day_to_render );
         }
         return $arr_disabled;

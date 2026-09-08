@@ -2,11 +2,11 @@ import { CellContext, flexRender } from '@tanstack/react-table'
 import './BookingDetail.scss'
 import { __ } from '@wordpress/i18n'
 import { Button } from '../../../Button/Button'
-import { useCallback, useLayoutEffect, useMemo } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo } from 'react'
 import { useState } from 'react'
 import apiFetch from '@wordpress/api-fetch'
-import { useDispatch, useSelect } from '@wordpress/data'
-import { store_name } from '../../../../../store/backend'
+import { select, useDispatch, useSelect } from '@wordpress/data'
+import { store, store_name } from '../../../../../store/backend'
 import { wbkFormat } from '../../../Form/utils/dateTime'
 import { decodeHtmlEntities, mapServiceCategories } from '../../utils'
 import classNames from 'classnames'
@@ -74,6 +74,7 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
         id,
         service_id,
         amount_paid,
+        coupon,
         phone,
         payment_method,
         moment_price,
@@ -89,6 +90,8 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
     const [emailType, setEmailType] = useState<string>(
         'booking_created_by_customer'
     )
+    const coupons = useSelect((select) => select(store).getItems('coupons'), [])
+
     const [message, setMessage] = useState<string | null>(null)
     const sendEmail = useCallback(async () => {
         await apiFetch({
@@ -136,6 +139,51 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
         })
         return map
     }, [extras])
+
+    const [couponDetail, setCouponDetail] = useState<{
+        name: string
+        type: string
+        amount: number
+        couponValue: number
+    } | null>(null);
+
+    useEffect(() => {
+        // Wait until coupons are loaded (not falsy and is array), then compute couponDetail
+        if (!coupon || !Array.isArray(coupons) || coupons.length === 0) {
+            setCouponDetail(null);
+            return;
+        }
+
+        const couponData = coupons.find((item: any) => Number(item.id) === Number(coupon));
+        if (!couponData) {
+            setCouponDetail(null);
+            return;
+        }
+
+        let couponType: string | null = null, couponAmount = 0, couponValue = 0;
+
+        if (couponData.amount_fixed && couponData.amount_fixed > 0) {
+            couponType = 'fixed';
+            couponAmount = couponData.amount_fixed;
+            couponValue = couponData.amount_fixed;
+        } else if (couponData.amount_percentage && couponData.amount_percentage > 0) {
+            couponType = 'percentage';
+            couponAmount = couponData.amount_percentage * (Number(moment_price) * Number(quantity)) / 100;
+            couponValue = couponData.amount_percentage;
+        }
+
+        if (couponType === null) {
+            setCouponDetail(null);
+            return;
+        }
+
+        setCouponDetail({
+            name: couponData?.name,
+            type: couponType,
+            amount: couponAmount,
+            couponValue,
+        });
+    }, [coupon, moment_price, quantity, coupons]);
 
     return (
         <div className="wbk_bookingDetail__wrapper">
@@ -296,6 +344,35 @@ export const BookingDetail = ({ cell, row }: CellContext<any, any>) => {
                                             __('Free', 'webba-booking-lite')}
                                     </p>
                                 </div>
+                                {couponDetail && couponDetail !== null && (
+                                    <div
+                                        className={classNames(
+                                            'wbk_bookingDetail__columnItem',
+                                            'wbk_bookingDetail__columnItem--wrapMobile'
+                                        )}
+                                    >
+                                        <span>
+                                            {__(
+                                                'Coupon',
+                                                'webba-booking-lite'
+                                            )}
+                                        </span>
+                                        <p>
+                                            {formatPrice(
+                                                couponDetail?.amount || 0,
+                                                settings?.price_format,
+                                                settings?.price_separator,
+                                                settings?.price_fractional
+                                            )
+                                                + ' |  ' +
+                                                couponDetail?.name
+                                                + ' |  ' +
+                                                `${String(couponDetail?.type).toUpperCase()}(${couponDetail?.type === 'fixed' ? formatPrice(couponDetail?.amount, settings?.price_format, settings?.price_separator, settings?.price_fractional) : couponDetail?.couponValue
+                                                }%) `
+                                            }
+                                        </p>
+                                    </div>
+                                )}
                                 <div
                                     className={classNames(
                                         'wbk_bookingDetail__columnItem',

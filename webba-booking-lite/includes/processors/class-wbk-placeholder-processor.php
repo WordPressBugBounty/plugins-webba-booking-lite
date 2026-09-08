@@ -9,6 +9,7 @@ class WBK_Placeholder_Processor
 {
     public static function process_placeholders($message, $bookings)
     {
+        $tax = WBK_Options_Utils::get_tax();
         if (is_numeric($bookings)) {
             $booking = new WBK_Booking($bookings);
             if (!$booking->is_loaded()) {
@@ -19,7 +20,6 @@ class WBK_Placeholder_Processor
                 return self::process_placeholders_unit($message, [(int) $bookings]);
             }
 
-            $tax = WBK_Options_Utils::get_tax();
             $payment_details = WBK_Price_Processor::get_payment_items(
                 [$bookings],
                 $tax,
@@ -382,10 +382,16 @@ class WBK_Placeholder_Processor
             $tax_amount = WBK_Format_Utils::format_price($payment_details["tax_to_pay"]);
             $subtotal_amount = WBK_Format_Utils::format_price($payment_details["subtotal"]);
             $total_amount = WBK_Format_Utils::format_price($payment_details["total"]);
+            $deposit_amount = WBK_Format_Utils::format_price($payment_details["to_pay_total"] ?? 0);
+            $remaining_amount = WBK_Format_Utils::format_price($payment_details["left_to_pay"] ?? 0);
+            $service_fees = WBK_Format_Utils::format_price($payment_details["service_fees"] ?? 0);
         } else {
             $subtotal_amount = "";
             $tax_amount = "";
             $total_amount = "";
+            $deposit_amount = "";
+            $remaining_amount = "";
+            $service_fees = "";
         }
 
         // Custom form fields
@@ -568,6 +574,9 @@ class WBK_Placeholder_Processor
         $message = str_replace("#total_amount", $total_amount, $message);
         $message = str_replace("#subtotal_amount", $subtotal_amount, $message);
         $message = str_replace("#tax_amount", $tax_amount, $message);
+        $message = str_replace("#deposit_amount", $deposit_amount, $message);
+        $message = str_replace("#remaining_amount", $remaining_amount, $message);
+        $message = str_replace("#service_fees", $service_fees, $message);
 
         $message = str_replace("#customer_name", $booking->get_name(), $message);
         $message = str_replace("#customer_phone", $booking->get_phone(), $message);
@@ -1334,6 +1343,20 @@ class WBK_Placeholder_Processor
             $price_format,
         );
         $message = str_replace("#appprice", $moment_price, $message);
+
+        if($payment_details) {
+            $deposit_amount = WBK_Format_Utils::format_price($payment_details["to_pay_total"]);
+            $remaining_amount = WBK_Format_Utils::format_price($payment_details["left_to_pay"]);
+            $service_fees = WBK_Format_Utils::format_price($payment_details["service_fees"]);
+        }else{
+            $deposit_amount = "";
+            $remaining_amount = "";
+            $service_fees = "";
+        }
+
+        $message = str_replace("#deposit_amount", $deposit_amount, $message);
+        $message = str_replace("#remaining_amount", $remaining_amount, $message);
+        $message = str_replace("#service_fees", $service_fees, $message);
 
         $user_dashboard_page_link = sprintf(
             '<a href="%s" target="_blank">%s</a>',

@@ -38,6 +38,10 @@
 			"type": "boolean",
 			"default": true
 		},
+		"formType": {
+			"type": "string",
+			"default": "classic"
+		},
 		"bg_accent": { "type": "string", "default": "#15B8A9" },
 		"font": { "type": "string", "default": "\"Ubuntu\", sans-serif" },
 		"border_radius": { "type": "string", "default": "8px" },

@@ -24,6 +24,7 @@ export interface IUseScenario extends IScenario {
     goNext: () => void
     stepInto: (index: number) => void
     nextStepError?: string | null
+    filteredScenarios: IScenario[]
 }
 
 export interface IScenarioState {

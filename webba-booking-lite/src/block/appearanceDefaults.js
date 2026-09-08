@@ -24,3 +24,56 @@ export const APPEARANCE_ATTRIBUTE_DEFAULTS = {
     color_sidebar: '#22292F',
     color_border_selected: '#15B8A9',
 }
+
+const DEFAULT_FORM_TYPE = 'classic'
+const DEFAULT_WEBBA_FONT = '"Ubuntu", sans-serif'
+
+const getSavedAppearanceSource = () => {
+    if (typeof window === 'undefined') {
+        return null
+    }
+    const saved = window.wbkGutenbergAppearanceDefaults
+    if (!saved || typeof saved !== 'object') {
+        return null
+    }
+    return saved
+}
+
+export const normalizeAppearanceFont = (font) => {
+    if (!font || font === 'default') {
+        return DEFAULT_WEBBA_FONT
+    }
+    return String(font)
+}
+
+export const normalizeAppearanceFormType = (formType) => {
+    return formType === 'waterfall' ? 'waterfall' : DEFAULT_FORM_TYPE
+}
+
+export const mergeSavedAppearance = (saved) => {
+    const merged = { ...APPEARANCE_ATTRIBUTE_DEFAULTS }
+
+    if (!saved || typeof saved !== 'object') {
+        return { ...merged, formType: DEFAULT_FORM_TYPE }
+    }
+
+    Object.keys(APPEARANCE_ATTRIBUTE_DEFAULTS).forEach((key) => {
+        const value = saved[key]
+        if (value === null || value === undefined || value === '') {
+            return
+        }
+        merged[key] =
+            key === 'font' ? normalizeAppearanceFont(value) : String(value)
+    })
+
+    const savedFormType = saved.formType || saved.form_type
+
+    return {
+        ...merged,
+        formType: normalizeAppearanceFormType(savedFormType),
+    }
+}
+
+export const getEditorAppearanceDefaults = () => {
+    return mergeSavedAppearance(getSavedAppearanceSource())
+}

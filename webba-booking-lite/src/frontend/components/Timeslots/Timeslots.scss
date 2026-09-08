@@ -40,6 +40,10 @@
             white-space: normal;
         }
 
+        &--rangemode {
+            padding: 9px 8px;
+        }
+
         &--max-reached,
         &--disabled {
             background-color: #f8f9fa;

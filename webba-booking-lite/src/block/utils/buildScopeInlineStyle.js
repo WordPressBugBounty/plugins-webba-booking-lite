@@ -1,14 +1,15 @@
-import { APPEARANCE_ATTRIBUTE_DEFAULTS } from '../appearanceDefaults.js'
+import { APPEARANCE_ATTRIBUTE_DEFAULTS, getEditorAppearanceDefaults } from '../appearanceDefaults.js'
 
 const APPEARANCE_KEYS = Object.keys(APPEARANCE_ATTRIBUTE_DEFAULTS)
 
 const resolveAppearance = (attributes) => {
+    const defaults = getEditorAppearanceDefaults()
     const out = {}
     APPEARANCE_KEYS.forEach((key) => {
         const value = attributes[key]
         out[key] =
             value === null || value === undefined || value === ''
-                ? APPEARANCE_ATTRIBUTE_DEFAULTS[key]
+                ? defaults[key]
                 : String(value)
     })
     return out

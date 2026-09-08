@@ -1,34 +1,38 @@
 import React from 'react'
 import { __, sprintf } from '@wordpress/i18n'
+import classNames from 'classnames'
 import { Button } from '../Button/Button'
 import arrowIcon from '../../../../public/images/icon-arrow-right.svg'
 import { useWording } from '../../hooks/useWording'
+import { IBottomSummaryProps } from './types'
 
-interface BottomSummaryProps {
-    total: string
-    onShowSummary: () => void
-}
-
-export const BottomSummary: React.FC<BottomSummaryProps> = ({
+export const BottomSummary: React.FC<IBottomSummaryProps> = ({
     total,
+    hideCost,
     onShowSummary,
 }) => {
     const wording = useWording()
     return (
-        <div className={'wbk_sidebar__bottom-summary__wrapper'}>
-            <div className={'wbk_sidebar__bottom-summary__total-section'}>
-                <span className={'wbk_sidebar__bottom-summary__label'}>
-                    {sprintf(
-                        '%s: %s',
-                        wording.total || __('Total', 'webba-booking-lite'),
-                        total
-                    )}
-                </span>
-                <span className={'wbk_sidebar__bottom-summary__subline'}>
-                    {wording.tax_included ||
-                        __('Tax incl.', 'webba-booking-lite')}
-                </span>
-            </div>
+        <div
+            className={classNames('wbk_sidebar__bottom-summary__wrapper', {
+                'wbk_sidebar__bottom-summary__wrapper--no-cost': hideCost,
+            })}
+        >
+            {!hideCost && (
+                <div className={'wbk_sidebar__bottom-summary__total-section'}>
+                    <span className={'wbk_sidebar__bottom-summary__label'}>
+                        {sprintf(
+                            '%s: %s',
+                            wording.total || __('Total', 'webba-booking-lite'),
+                            total
+                        )}
+                    </span>
+                    <span className={'wbk_sidebar__bottom-summary__subline'}>
+                        {wording.tax_included ||
+                            __('Tax incl.', 'webba-booking-lite')}
+                    </span>
+                </div>
+            )}
             <Button
                 onClick={onShowSummary}
                 type="generic"

@@ -9,8 +9,9 @@ import { useWording } from '../../hooks/useWording'
 import { useLocale } from '../../hooks/useLocale'
 import { useBookingContext } from '../../providers/BookingFormProvider/BookingFormProvider'
 import type { CalendarType } from 'react-calendar/dist/esm/shared/types.js'
-import { addDays, isSameDay, startOfDay, startOfMonth } from 'date-fns'
+import { addDays, addMonths, isSameDay, isSameMonth, startOfDay, startOfMonth } from 'date-fns'
 import classNames from 'classnames'
+import { EmptyMonthOverlay } from './EmptyMonthOverlay'
 
 const getCalendarType = (startOfWeek?: number): CalendarType | undefined => {
     if (startOfWeek === undefined) {
@@ -43,6 +44,8 @@ export const BookingCalendar = ({
     restrictToAvailableDates = false,
     hideIndications = false,
     showLoader = true,
+    hideEmptyMonthOverlay = false,
+    showNavigation = true,
 }: IBookingCalendarProps) => {
     const wording = useWording()
     const { locale } = useLocale()
@@ -51,6 +54,23 @@ export const BookingCalendar = ({
     const calendarType = getCalendarType(startOfWeek)
     const activeStartDate = startOfMonth(viewMonth)
     const todayStart = startOfDay(new Date())
+    const isAvailabilityLoading =
+        selectionMode === 'single'
+            ? Boolean(loading?.serviceAvailability?.[serviceId])
+            : Boolean(loading?.unitAvailability?.[serviceId])
+    const usesAvailableDatesFilter =
+        selectionMode === 'single' || restrictToAvailableDates
+    const availableDaysInViewMonth = availableDates.filter((date) =>
+        isSameMonth(date, activeStartDate)
+    )
+    const showEmptyMonthOverlay =
+        !hideEmptyMonthOverlay &&
+        usesAvailableDatesFilter &&
+        !isAvailabilityLoading &&
+        availableDaysInViewMonth.length === 0
+    const monthName = activeStartDate.toLocaleString(locale || 'en-US', {
+        month: 'long',
+    })
     const hasAvailableDatesFilter =
         selectionMode === 'single'
             ? availableDates.length > 0
@@ -87,21 +107,20 @@ export const BookingCalendar = ({
         <div
             className={classNames('wbk_booking_calendar', {
                 'wbk_booking_calendar--range': selectionMode === 'range',
+                'wbk_booking_calendar--hide-navigation': !showNavigation,
             })}
         >
-            {showLoader &&
-                loading &&
-                ((selectionMode === 'single' &&
-                    loading?.serviceAvailability &&
-                    loading?.serviceAvailability[serviceId]) ||
-                    (selectionMode === 'range' &&
-                        loading?.unitAvailability &&
-                        loading?.unitAvailability[serviceId])) && (
-                    <div className="wbk_booking_calendar__loader">
-                        <div className="wbk_booking_calendar__loader__spinner"></div>
-                    </div>
-                )}
-            <div className={'wbk_booking_calendar__wrapper'}>
+            {showLoader && isAvailabilityLoading && (
+                <div className="wbk_booking_calendar__loader">
+                    <div className="wbk_booking_calendar__loader__spinner"></div>
+                </div>
+            )}
+            <div
+                className={classNames('wbk_booking_calendar__wrapper', {
+                    'wbk_booking_calendar__wrapper--empty-month':
+                        showEmptyMonthOverlay,
+                })}
+            >
                 <Calendar
                     activeStartDate={activeStartDate}
                     onChange={(value: Value) => setValue(value)}
@@ -162,7 +181,16 @@ export const BookingCalendar = ({
                     className={'wbk_booking_calendar__calendar-wrapper'}
                     locale={locale || 'en-US'}
                     calendarType={calendarType}
+                    showNavigation={showNavigation}
                 />
+                {showEmptyMonthOverlay && (
+                    <EmptyMonthOverlay
+                        monthName={monthName}
+                        onNextMonth={() =>
+                            setMonth(addMonths(activeStartDate, 1))
+                        }
+                    />
+                )}
             </div>
             {!hideIndications && (
                 <div className={'wbk_booking_calendar__indications'}>

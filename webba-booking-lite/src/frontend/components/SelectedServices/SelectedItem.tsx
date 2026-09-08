@@ -15,6 +15,7 @@ import {
     fromUnixTime,
     getUnixTime,
     isSameDay,
+    isSameMonth,
     startOfMonth,
     startOfWeek,
     subDays,
@@ -210,7 +211,7 @@ export const SelectedItem = ({
 
     // general
     const {
-        fetchServiceAvailability,
+        fetchFirstAvailableDate,
         fetchServiceTimeslots,
         fetchBookingAmounts,
     } = useDispatch(store_name)
@@ -289,23 +290,164 @@ export const SelectedItem = ({
         String(selectedServiceLevelStaffId ?? '0') === '0'
     const blockCalendarUntilStaffSelected =
         mustPickStaffBeforeCalendar && !isStaffChosenForService
+    const hasSelectedPlaces = Array.isArray(places) && places.length > 0
+    const selectedMonthRef = useRef(selectedMonth)
+    selectedMonthRef.current = selectedMonth
+    const onUpdateRef = useRef(onUpdate)
+    onUpdateRef.current = onUpdate
+    const initialMonthSearchKey = `${id}:${String(staffIdForApi)}:${String(
+        formData?.location ?? ''
+    )}`
+    const initialMonthSearchKeyRef = useRef<string | null>(null)
+    const pendingFirstMonthRef = useRef<Date | null>(null)
+    const [initialMonthAvailability, setInitialMonthAvailability] = useState<{
+        month: Date
+        dates: string[]
+    } | null>(null)
+    const [isResolvingInitialMonth, setIsResolvingInitialMonth] = useState(
+        () => !hasSelectedPlaces
+    )
+
+    useEffect(() => {
+        if (blockCalendarUntilStaffSelected) {
+            return
+        }
+
+        if (hasSelectedPlaces) {
+            initialMonthSearchKeyRef.current = initialMonthSearchKey
+            pendingFirstMonthRef.current = null
+            setIsResolvingInitialMonth(false)
+            return
+        }
+
+        if (initialMonthSearchKeyRef.current === initialMonthSearchKey) {
+            if (!pendingFirstMonthRef.current) {
+                setIsResolvingInitialMonth(false)
+            }
+            return
+        }
+
+        let cancelled = false
+        setIsResolvingInitialMonth(true)
+        setInitialMonthAvailability(null)
+
+        const resolveInitialMonth = async () => {
+            let keepResolving = false
+            try {
+                const dates = await fetchFirstAvailableDate(
+                    id,
+                    formData?.location ?? null,
+                    staffIdForApi,
+                    weekStartsOn
+                )
+                if (cancelled) {
+                    return
+                }
+
+                initialMonthSearchKeyRef.current = initialMonthSearchKey
+                const firstDateString = Array.isArray(dates)
+                    ? dates[0]
+                    : undefined
+                if (firstDateString) {
+                    const firstAvailableMonth = startOfMonth(
+                        wbkExtractBackendDate(firstDateString)
+                    )
+                    setInitialMonthAvailability({
+                        month: firstAvailableMonth,
+                        dates,
+                    })
+                    if (
+                        !isSameMonth(
+                            firstAvailableMonth,
+                            selectedMonthRef.current
+                        )
+                    ) {
+                        keepResolving = true
+                        pendingFirstMonthRef.current = firstAvailableMonth
+                        onUpdateRef.current({
+                            selectedMonth: firstAvailableMonth,
+                        })
+                    }
+                } else {
+                    setInitialMonthAvailability({
+                        month: startOfMonth(selectedMonthRef.current),
+                        dates: [],
+                    })
+                }
+            } finally {
+                if (!cancelled && !keepResolving) {
+                    pendingFirstMonthRef.current = null
+                    setIsResolvingInitialMonth(false)
+                }
+            }
+        }
+
+        resolveInitialMonth()
+
+        return () => {
+            cancelled = true
+        }
+    }, [
+        blockCalendarUntilStaffSelected,
+        hasSelectedPlaces,
+        initialMonthSearchKey,
+        id,
+        formData?.location,
+        staffIdForApi,
+        fetchFirstAvailableDate,
+        weekStartsOn,
+    ])
+
+    useEffect(() => {
+        if (!isResolvingInitialMonth || !pendingFirstMonthRef.current) {
+            return
+        }
+        if (!isSameMonth(selectedMonth, pendingFirstMonthRef.current)) {
+            return
+        }
+        pendingFirstMonthRef.current = null
+        setIsResolvingInitialMonth(false)
+    }, [selectedMonth, isResolvingInitialMonth])
+
+    const shouldUseInitialDates =
+        !isResolvingInitialMonth &&
+        !blockCalendarUntilStaffSelected &&
+        initialMonthAvailability !== null &&
+        isSameMonth(selectedMonth, initialMonthAvailability.month)
+
     const availableDates = useSelect(
         (select: any) =>
-            select(store_name).getServiceAvailability(
-                id,
-                wbkBackendDate(availabilityStart),
-                wbkBackendDate(currentRange[1]),
-                formData?.location,
-                staffIdForApi
-            ),
-        [id, availabilityStart, currentRange, formData?.location, staffIdForApi]
+            isResolvingInitialMonth ||
+            blockCalendarUntilStaffSelected ||
+            shouldUseInitialDates
+                ? []
+                : select(store_name).getServiceAvailability(
+                      id,
+                      wbkBackendDate(availabilityStart),
+                      wbkBackendDate(currentRange[1]),
+                      formData?.location,
+                      staffIdForApi
+                  ),
+        [
+            id,
+            availabilityStart,
+            currentRange,
+            formData?.location,
+            staffIdForApi,
+            isResolvingInitialMonth,
+            blockCalendarUntilStaffSelected,
+            shouldUseInitialDates,
+        ]
     )
+    const calendarAvailableDates = shouldUseInitialDates
+        ? initialMonthAvailability?.dates ?? []
+        : availableDates
 
     const actualSelectedDate = useMemo(() => {
         if (blockCalendarUntilStaffSelected) {
             return null
         }
-        const formattedAvailableDates = availableDates.map((date: string) =>
+        const formattedAvailableDates = calendarAvailableDates.map((date: string) =>
             wbkExtractBackendDate(date)
         )
 
@@ -334,7 +476,7 @@ export const SelectedItem = ({
         }
 
         return formattedAvailableDates[0]
-    }, [selectedDate, availableDates, blockCalendarUntilStaffSelected])
+    }, [selectedDate, calendarAvailableDates, blockCalendarUntilStaffSelected])
 
     const effectiveStaffIdForApi = staffIdForApi
 
@@ -732,7 +874,7 @@ export const SelectedItem = ({
                     availableDates={
                         blockCalendarUntilStaffSelected
                             ? []
-                            : availableDates.map((date: string) =>
+                            : calendarAvailableDates.map((date: string) =>
                                   wbkExtractBackendDate(date)
                               )
                     }
@@ -740,6 +882,10 @@ export const SelectedItem = ({
                     setValue={handleSetDate}
                     setMonth={handleSetMonth}
                     serviceId={id}
+                    hideEmptyMonthOverlay={
+                        blockCalendarUntilStaffSelected ||
+                        isResolvingInitialMonth
+                    }
                 />
                 {hasQuantityRange &&
                     attrService !== null &&

@@ -147,7 +147,7 @@ export const Timeslots = ({
             })}
         >
             {timeslots.map(
-                ({ start_time, free_places }, index) => {
+                ({ start_time, end_time, free_places }, index) => {
                     const slotNum = Number(start_time)
                     const isSelected = selectedSlots.includes(slotNum)
                     const isDisabled =
@@ -191,6 +191,7 @@ export const Timeslots = ({
                                         isDisabled || isConsecutiveDisabled,
                                     'wbk_timeslots__item--max-reached':
                                         isMaxReached,
+                                    'wbk_timeslots__item--rangemode': preset?.settings?.show_endtime,
                                 }
                             )}
                             style={{ animationDelay: `${index * 80}ms` }}
@@ -210,6 +211,11 @@ export const Timeslots = ({
                                 {wbkFormat(start_time, timeFormat, userTimezone, {
                                     locale: dateFnsLocale,
                                 })}
+                                {preset?.settings?.show_endtime &&
+                                    ' - ' + wbkFormat(end_time, timeFormat, userTimezone, {
+                                        locale: dateFnsLocale,
+                                    })
+                                }
                             </span>
                             {recurringBookingEnabled &&
                                 isSelected &&
@@ -269,14 +275,14 @@ export const Timeslots = ({
                                                                 (p.date?.getDate() ===
                                                                     selectedDate.getDate() &&
                                                                     p.date?.getMonth() ===
-                                                                        selectedDate.getMonth() &&
+                                                                    selectedDate.getMonth() &&
                                                                     p.date?.getFullYear() ===
-                                                                        selectedDate.getFullYear()))
+                                                                    selectedDate.getFullYear()))
                                                     )
                                                 const isStaffSelected =
                                                     String(
                                                         selectedPlace?.staff_member_id ||
-                                                            ''
+                                                        ''
                                                     ) === String(staffId)
                                                 const initials = String(
                                                     staff?.label || ''

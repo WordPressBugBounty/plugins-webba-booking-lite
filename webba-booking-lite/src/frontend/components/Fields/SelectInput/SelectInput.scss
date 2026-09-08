@@ -21,7 +21,7 @@
             max-width: unset !important;
             margin: 0 !important;
             padding: 4px 8px 4px 12px !important;
-            border-radius: 8px !important;
+            border-radius: colors.$wbk-border-radius !important;
             border: 1px solid #d4dde2 !important;
             outline: none !important;
             box-shadow: none !important;
@@ -139,7 +139,7 @@
             margin: 0 !important;
             padding: 4px 0 !important;
             border: 1px solid #d4dde2 !important;
-            border-radius: 8px !important;
+            border-radius: colors.$wbk-border-radius !important;
             background: #ffffff !important;
             box-shadow: 0 8px 24px rgba(34, 41, 47, 0.12) !important;
             overflow: hidden;

@@ -69,6 +69,10 @@ class WBK_Email_Processor {
             $recipients = array_map( "strval", $recipients );
             $group_enabled = in_array( "group", $recipients, true );
             $customer_group_handled = false;
+            $invoice_pdf = "";
+            if ( $et->get( "attach_invoice" ) == "yes" && WBK_Feature_Gate::have_required_plan( "premium" ) ) {
+                $invoice_pdf = self::generate_pdf_invoice( $bookings );
+            }
             foreach ( $recipients as $recipient ) {
                 $attachments = [];
                 $item_header = [];
@@ -119,6 +123,9 @@ class WBK_Email_Processor {
                     if ( $pdf_file != false ) {
                         $attachments[] = $pdf_file;
                     }
+                }
+                if ( $invoice_pdf !== "" ) {
+                    $attachments[] = $invoice_pdf;
                 }
                 foreach ( $recipient_addresses as $email ) {
                     $item_attachments = $attachments;
@@ -242,6 +249,10 @@ class WBK_Email_Processor {
             $message = WBK_Placeholder_Processor::process_agenda_placehoder( $message, $bookings );
         }
         $recipients = json_decode( $template->get( "recipients" ) );
+        $invoice_pdf = "";
+        if ( $template->get( "attach_invoice" ) == "yes" && WBK_Feature_Gate::have_required_plan( "premium" ) ) {
+            $invoice_pdf = self::generate_pdf_invoice( $bookings );
+        }
         foreach ( $recipients as $recipient ) {
             $attachments = [];
             if ( $recipient == "admin" ) {
@@ -262,6 +273,9 @@ class WBK_Email_Processor {
                 if ( $pdf_file != false ) {
                     $attachments[] = $pdf_file;
                 }
+            }
+            if ( $invoice_pdf !== "" ) {
+                $attachments[] = $invoice_pdf;
             }
             $queue_item = [
                 "address" => $email,
@@ -295,6 +309,331 @@ class WBK_Email_Processor {
                 remove_filter( "wp_mail_content_type", "wbk_wp_mail_content_type" );
             }
         }
+    }
+
+    /**
+     * Generate a PDF invoice for the given booking IDs.
+     *
+     * @param array $bookings_ids Booking IDs included on the invoice.
+     * @return string Absolute path to the generated PDF, or an empty string on failure.
+     */
+    public static function generate_pdf_invoice( array $bookings_ids ) : string {
+        $booking_objects = [];
+        $normalized_ids = [];
+        foreach ( $bookings_ids as $booking_id ) {
+            $booking = new WBK_Booking($booking_id);
+            if ( !$booking->is_loaded() ) {
+                continue;
+            }
+            $booking_objects[] = $booking;
+            $normalized_ids[] = (int) $booking->get_id();
+        }
+        if ( count( $booking_objects ) === 0 ) {
+            return "";
+        }
+        $first_booking = $booking_objects[0];
+        $company_name = trim( (string) get_option( "wbk_company_name", "" ) );
+        if ( $company_name === "" ) {
+            $company_name = get_bloginfo( "name" );
+        }
+        $company_email = trim( (string) get_option( "wbk_sidebar_help_email", "" ) );
+        if ( $company_email === "" ) {
+            $company_email = (string) get_option( "wbk_from_email", get_option( "admin_email" ) );
+        }
+        $company_information = [
+            "name"    => $company_name,
+            "address" => trim( (string) get_option( "wbk_company_address", "" ) ),
+            "phone"   => trim( (string) get_option( "wbk_sidebar_help_phone", "" ) ),
+            "email"   => $company_email,
+            "logo"    => self::resolve_company_logo_src( get_option( "wbk_company_logo", "" ) ),
+        ];
+        $customer = [
+            "name"  => (string) $first_booking->get_name(),
+            "email" => (string) $first_booking->get( "email" ),
+            "phone" => (string) $first_booking->get_phone(),
+        ];
+        $invoice_number = str_pad(
+            (string) get_option( "wbk_email_current_invoice_number", "1" ),
+            6,
+            "0",
+            STR_PAD_LEFT
+        );
+        $date_format = WBK_Format_Utils::get_date_format();
+        $previous_timezone = date_default_timezone_get();
+        date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+        $timezone = new DateTimeZone(date_default_timezone_get());
+        $invoice_date = wp_date( $date_format, time(), $timezone );
+        $line_items = self::build_invoice_line_items( $booking_objects, $timezone );
+        date_default_timezone_set( $previous_timezone );
+        $payment_details = self::get_invoice_payment_details( $normalized_ids, $first_booking );
+        $amount_paid = 0.0;
+        foreach ( $booking_objects as $booking_object ) {
+            $amount_paid += (float) $booking_object->get( "amount_paid" );
+        }
+        $subtotal = ( is_array( $payment_details ) ? (float) $payment_details["subtotal"] : 0.0 );
+        $tax_amount = ( is_array( $payment_details ) ? (float) $payment_details["tax_to_pay"] : 0.0 );
+        $discount_amount = ( is_array( $payment_details ) ? (float) $payment_details["discount"] : 0.0 );
+        $service_fees = ( is_array( $payment_details ) ? (float) $payment_details["service_fees"] : 0.0 );
+        $total = ( is_array( $payment_details ) ? (float) $payment_details["total"] : 0.0 );
+        if ( !is_array( $payment_details ) ) {
+            foreach ( $booking_objects as $booking_object ) {
+                $subtotal += (float) $booking_object->get_price();
+            }
+            $total = $subtotal;
+        }
+        $items_subtotal = $subtotal - $service_fees + $discount_amount;
+        if ( $items_subtotal < 0 ) {
+            $items_subtotal = 0.0;
+        }
+        $balance_due = max( 0, $total - $amount_paid );
+        $is_paid = $total <= 0 || $balance_due <= 0;
+        $payment_method = (string) $first_booking->get( "payment_method" );
+        if ( $payment_method === "" || $payment_method === "false" ) {
+            $payment_method = "";
+        }
+        $totals = [
+            "subtotal"         => WBK_Format_Utils::format_price( $items_subtotal ),
+            "tax"              => WBK_Format_Utils::format_price( $tax_amount ),
+            "tax_label"        => get_option( "wbk_tax_label", __( "Sales tax", "webba-booking-lite" ) ),
+            "show_tax"         => $tax_amount > 0,
+            "discount"         => WBK_Format_Utils::format_price( $discount_amount ),
+            "discount_label"   => get_option( "wbk_payment_discount_item", __( "Discount (-)", "webba-booking-lite" ) ),
+            "show_discount"    => $discount_amount > 0,
+            "fees"             => WBK_Format_Utils::format_price( $service_fees ),
+            "show_fees"        => $service_fees > 0,
+            "total"            => WBK_Format_Utils::format_price( $total ),
+            "amount_paid"      => WBK_Format_Utils::format_price( $amount_paid ),
+            "show_amount_paid" => $amount_paid > 0,
+            "balance_due"      => WBK_Format_Utils::format_price( $balance_due ),
+            "show_balance_due" => $balance_due > 0,
+        ];
+        $invoice_meta = [
+            "number"            => $invoice_number,
+            "date"              => $invoice_date,
+            "status"            => ( $is_paid ? __( "Paid", "webba-booking-lite" ) : __( "Unpaid", "webba-booking-lite" ) ),
+            "is_paid"           => $is_paid,
+            "payment_method"    => $payment_method,
+            "booking_reference" => implode( ", ", $normalized_ids ),
+        ];
+        ob_start();
+        include WP_WEBBA_BOOKING__PLUGIN_DIR . "/templates/emails/pdf-invoice.php";
+        $content = ob_get_clean();
+        if ( !is_string( $content ) || trim( $content ) === "" ) {
+            return "";
+        }
+        return WBK_Pdf_Processor::process( $content, [] );
+    }
+
+    /**
+     * Convert a stored company logo option into a data URI for DOMPDF.
+     *
+     * @param mixed $logo_option Attachment ID, URL, or filesystem path.
+     * @return string
+     */
+    private static function resolve_company_logo_src( $logo_option ) : string {
+        if ( $logo_option === null || $logo_option === false || $logo_option === "" ) {
+            return "";
+        }
+        $path = "";
+        $mime = "";
+        if ( is_numeric( $logo_option ) && (int) $logo_option > 0 ) {
+            $attachment_id = (int) $logo_option;
+            $path = (string) get_attached_file( $attachment_id );
+            $mime = (string) get_post_mime_type( $attachment_id );
+        } elseif ( is_string( $logo_option ) && filter_var( $logo_option, FILTER_VALIDATE_URL ) ) {
+            $uploads = wp_get_upload_dir();
+            if ( !empty( $uploads["baseurl"] ) && strpos( $logo_option, $uploads["baseurl"] ) === 0 ) {
+                $path = $uploads["basedir"] . substr( $logo_option, strlen( $uploads["baseurl"] ) );
+            }
+        } elseif ( is_string( $logo_option ) && file_exists( $logo_option ) ) {
+            $path = $logo_option;
+        }
+        if ( $path === "" || !is_readable( $path ) ) {
+            return "";
+        }
+        if ( $mime === "" ) {
+            $file_type = wp_check_filetype( $path );
+            $mime = ( isset( $file_type["type"] ) && $file_type["type"] !== false ? $file_type["type"] : "image/png" );
+        }
+        $binary = file_get_contents( $path );
+        if ( $binary === false ) {
+            return "";
+        }
+        return "data:" . $mime . ";base64," . base64_encode( $binary );
+    }
+
+    /**
+     * Load payment totals for invoice bookings.
+     *
+     * @param int[] $booking_ids Booking IDs.
+     * @param WBK_Booking $first_booking First booking in the set.
+     * @return array|int
+     */
+    private static function get_invoice_payment_details( array $booking_ids, WBK_Booking $first_booking ) {
+        if ( $first_booking->get_booking_target_type() === WBK_Booking::BOOKING_TARGET_UNIT ) {
+            $payment_details = WBK_Price_Processor::get_unit_payment_items_post_booked( $booking_ids );
+        } else {
+            $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );
+        }
+        if ( !is_array( $payment_details ) ) {
+            return 0;
+        }
+        return $payment_details;
+    }
+
+    /**
+     * Build invoice line items from loaded booking objects.
+     *
+     * @param WBK_Booking[] $booking_objects Loaded bookings.
+     * @param DateTimeZone $timezone Business timezone.
+     * @return array
+     */
+    private static function build_invoice_line_items( array $booking_objects, DateTimeZone $timezone ) : array {
+        $date_format = WBK_Format_Utils::get_date_format();
+        $time_format = WBK_Format_Utils::get_time_format();
+        $line_items = [];
+        foreach ( $booking_objects as $booking ) {
+            $is_unit = $booking->get_booking_target_type() === WBK_Booking::BOOKING_TARGET_UNIT;
+            $title = "";
+            $staff_name = "";
+            if ( $is_unit ) {
+                $unit = new WBK_Unit($booking->get_unit_id());
+                if ( $unit->is_loaded() ) {
+                    $title = (string) $unit->get_name();
+                }
+            } else {
+                $service = new WBK_Service($booking->get_service());
+                if ( $service->is_loaded() ) {
+                    $title = (string) $service->get_name();
+                }
+            }
+            $staff_id = $booking->get_staff_member();
+            if ( !empty( $staff_id ) ) {
+                $staff_member = new WBK_Staff_Member($staff_id);
+                if ( $staff_member->is_loaded() ) {
+                    $staff_name = (string) $staff_member->get_name();
+                }
+            }
+            $line_items[] = [
+                "title"    => ( $title !== "" ? $title : __( "Booking", "webba-booking-lite" ) ),
+                "schedule" => self::format_invoice_item_schedule(
+                    $booking,
+                    $is_unit,
+                    $date_format,
+                    $time_format,
+                    $timezone
+                ),
+                "duration" => self::format_invoice_duration( (int) $booking->get( "duration" ), $is_unit ),
+                "extras"   => self::format_invoice_item_extras( $booking ),
+                "staff"    => $staff_name,
+                "quantity" => max( 1, $booking->get_quantity() ),
+                "amount"   => WBK_Format_Utils::format_price( (float) $booking->get_price() ),
+            ];
+        }
+        return $line_items;
+    }
+
+    /**
+     * Format the date and time shown for an invoice line.
+     *
+     * @param WBK_Booking $booking Booking.
+     * @param bool $is_unit Whether the booking targets a unit.
+     * @param string $date_format Date format.
+     * @param string $time_format Time format.
+     * @param DateTimeZone $timezone Business timezone.
+     * @return string
+     */
+    private static function format_invoice_item_schedule(
+        WBK_Booking $booking,
+        bool $is_unit,
+        string $date_format,
+        string $time_format,
+        DateTimeZone $timezone
+    ) : string {
+        $start = (int) $booking->get_start();
+        if ( $is_unit ) {
+            $duration_minutes = (int) $booking->get( "duration" );
+            $end = $start + $duration_minutes * 60;
+            $check_in = wp_date( $date_format, $start, $timezone );
+            $check_out = wp_date( $date_format, $end, $timezone );
+            if ( $check_in === $check_out ) {
+                return $check_in;
+            }
+            return $check_in . " – " . $check_out;
+        }
+        $end = (int) $booking->get_end();
+        return wp_date( $date_format, $start, $timezone ) . ", " . wp_date( $time_format, $start, $timezone ) . " – " . wp_date( $time_format, $end, $timezone );
+    }
+
+    /**
+     * Format booking duration for the invoice.
+     *
+     * @param int $minutes Duration in minutes.
+     * @param bool $is_unit Whether the booking targets a unit.
+     * @return string
+     */
+    private static function format_invoice_duration( int $minutes, bool $is_unit ) : string {
+        if ( $minutes < 1 ) {
+            return "";
+        }
+        if ( $is_unit ) {
+            $nights = max( 1, (int) intdiv( $minutes, 1440 ) );
+            return sprintf( _n(
+                "%d night",
+                "%d nights",
+                $nights,
+                "webba-booking-lite"
+            ), $nights );
+        }
+        $hours = (int) intdiv( $minutes, 60 );
+        $remaining_minutes = $minutes % 60;
+        $parts = [];
+        if ( $hours > 0 ) {
+            $parts[] = sprintf( _n(
+                "%d hour",
+                "%d hours",
+                $hours,
+                "webba-booking-lite"
+            ), $hours );
+        }
+        if ( $remaining_minutes > 0 ) {
+            $parts[] = sprintf( _n(
+                "%d minute",
+                "%d minutes",
+                $remaining_minutes,
+                "webba-booking-lite"
+            ), $remaining_minutes );
+        }
+        return implode( " ", $parts );
+    }
+
+    /**
+     * Format extras selected on a booking.
+     *
+     * @param WBK_Booking $booking Booking.
+     * @return string
+     */
+    private static function format_invoice_item_extras( WBK_Booking $booking ) : string {
+        $raw = $booking->get( "booking_extra" );
+        if ( $raw === "" || $raw === null || $raw === false ) {
+            return "";
+        }
+        $decoded = json_decode( (string) $raw, true );
+        if ( !is_array( $decoded ) || count( $decoded ) === 0 ) {
+            return "";
+        }
+        $parts = [];
+        foreach ( $decoded as $extra_id_key => $quantity ) {
+            $extra_id = (int) $extra_id_key;
+            $extra_quantity = (int) $quantity;
+            if ( $extra_id < 1 || $extra_quantity < 1 ) {
+                continue;
+            }
+            $extra = new WBK_Extra($extra_id);
+            $extra_name = ( $extra->is_loaded() ? (string) $extra->get_name() : sprintf( __( "Extra #%d", "webba-booking-lite" ), $extra_id ) );
+            $parts[] = $extra_name . " × " . $extra_quantity;
+        }
+        return implode( ", ", $parts );
     }
 
 }

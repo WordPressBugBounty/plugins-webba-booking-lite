@@ -1,4 +1,4 @@
-import { IUnitAttendees, IUnitProps } from './types'
+import { IUnitAttendees, IUnitItemProps } from './types'
 import './Services.scss'
 import { useCallback, useMemo, useState } from 'react'
 import classNames from 'classnames'
@@ -115,7 +115,8 @@ export const UnitItem = ({
     attendee_type_child,
     attendee_type_infant,
     attendees,
-}: IUnitProps) => {
+    lockSelection = false,
+}: IUnitItemProps) => {
     const { priceFormat } = useBookingContext()
     const wording = useWording()
     const [descriptionExpanded, setDescriptionExpanded] = useState(false)
@@ -204,17 +205,21 @@ export const UnitItem = ({
     )
 
     const toggleSelectUnit = useCallback(() => {
+        if (lockSelection) {
+            return
+        }
         onUpdate({
             selected: !selected,
         })
-    }, [selected, onUpdate])
+    }, [selected, onUpdate, lockSelection])
 
     return (
         <div
             className={classNames('wbk_service_item', `id__${id}`, {
-                ['wbk_service_item--selected']: selected,
+                ['wbk_service_item--selected']: selected && !lockSelection,
+                ['wbk_service_item--locked']: lockSelection,
             })}
-            onClick={toggleSelectUnit}
+            onClick={lockSelection ? undefined : toggleSelectUnit}
         >
             <div className={'wbk_service_item__top-part'}>
                 {image && (
@@ -525,17 +530,19 @@ export const UnitItem = ({
                     )}
                 </div>
             </div>
-            <Button
-                classes={classNames('wbk_service_item__mobile-select-button', {
-                    ['wbk_service_item__mobile-select-button--selected']: selected,
-                })}
-                type={'custom'}
-                svgIcon={selected && (CheckIcon as any)}
-            >
-                {selected
-                    ? wording.selected || __('Selected', 'webba-booking-lite')
-                    : wording.select || __('+ Select', 'webba-booking-lite')}
-            </Button>
+            {!lockSelection && (
+                <Button
+                    classes={classNames('wbk_service_item__mobile-select-button', {
+                        ['wbk_service_item__mobile-select-button--selected']: selected,
+                    })}
+                    type={'custom'}
+                    svgIcon={selected && (CheckIcon as any)}
+                >
+                    {selected
+                        ? wording.selected || __('Selected', 'webba-booking-lite')
+                        : wording.select || __('+ Select', 'webba-booking-lite')}
+                </Button>
+            )}
         </div>
     )
 }

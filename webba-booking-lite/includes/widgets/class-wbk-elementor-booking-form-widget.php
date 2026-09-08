@@ -20,6 +20,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
             'font' => '"Ubuntu", sans-serif',
             'border_radius' => '8px',
             'shadow' => '0px 0px 16px 0px #3f3f4629',
+            'form_type' => 'classic',
             'button_border_radius' => '8px',
             'bg_button_primary' => '#15B8A9',
             'color_button_primary' => '#ffffff',
@@ -486,18 +487,34 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
     }
 
     /**
+     * Sanitizes the booking form layout type.
+     *
+     * @param mixed $value Raw form type value.
+     *
+     * @return string
+     */
+    private function sanitize_form_type($value): string
+    {
+        $form_type = is_string($value) ? $value : '';
+
+        return $form_type === 'waterfall' ? 'waterfall' : 'classic';
+    }
+
+    /**
      * Adds a subsection title in the Style tab (with optional top separator).
      *
      * @param string $control_id Unique control id.
      * @param string $label      Subsection title.
      * @param bool   $with_separator_before Whether to show a line above the heading.
+     * @param array  $condition  Elementor visibility condition.
      *
      * @return void
      */
     private function add_style_subsection_heading(
         string $control_id,
         string $label,
-        bool $with_separator_before = true
+        bool $with_separator_before = true,
+        array $condition = []
     ): void {
         $config = [
             'type' => \Elementor\Controls_Manager::HEADING,
@@ -505,6 +522,9 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
         ];
         if ($with_separator_before) {
             $config['separator'] = 'before';
+        }
+        if ($condition !== []) {
+            $config['condition'] = $condition;
         }
         $this->add_control($control_id, $config);
     }
@@ -532,6 +552,24 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
             'wbk_booking_context',
             [
                 'label' => __('Booking Context', 'webba-booking-lite'),
+            ]
+        );
+
+        $form_type_default = $this->sanitize_form_type($defaults['form_type'] ?? 'classic');
+        $classic_form_condition = [
+            'form_type' => 'classic',
+        ];
+
+        $this->add_control(
+            'form_type',
+            [
+                'label' => __('Form layout', 'webba-booking-lite'),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'options' => [
+                    'classic' => __('Webba 6 Classic form', 'webba-booking-lite'),
+                    'waterfall' => __('Waterfall form', 'webba-booking-lite'),
+                ],
+                'default' => $form_type_default,
             ]
         );
 
@@ -777,7 +815,8 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'Selected Button (when selecting service in mobile)',
                 'webba-booking-lite'
             ),
-            true
+            true,
+            $classic_form_condition
         );
 
         $this->add_control(
@@ -788,6 +827,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'default' => $defaults['bg_button_selected'],
                 'render_type' => 'ui',
                 'selectors' => $this->get_variable_selectors('--wbk-bg-button-selected'),
+                'condition' => $classic_form_condition,
             ]
         );
         $this->add_control(
@@ -798,6 +838,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'default' => $defaults['color_button_selected'],
                 'render_type' => 'ui',
                 'selectors' => $this->get_variable_selectors('--wbk-color-button-selected'),
+                'condition' => $classic_form_condition,
             ]
         );
         $this->add_control(
@@ -808,6 +849,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'default' => $defaults['bg_button_selected_hover'],
                 'render_type' => 'ui',
                 'selectors' => $this->get_variable_selectors('--wbk-bg-button-selected-hover'),
+                'condition' => $classic_form_condition,
             ]
         );
         $this->add_control(
@@ -818,6 +860,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'default' => $defaults['color_button_selected_hover'],
                 'render_type' => 'ui',
                 'selectors' => $this->get_variable_selectors('--wbk-color-button-selected-hover'),
+                'condition' => $classic_form_condition,
             ]
         );
         $this->add_control(
@@ -828,6 +871,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'default' => $defaults['bg_button_selected_selected'],
                 'render_type' => 'ui',
                 'selectors' => $this->get_variable_selectors('--wbk-bg-button-selected-selected'),
+                'condition' => $classic_form_condition,
             ]
         );
         $this->add_control(
@@ -838,13 +882,15 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'default' => $defaults['color_button_selected_selected'],
                 'render_type' => 'ui',
                 'selectors' => $this->get_variable_selectors('--wbk-color-button-selected-selected'),
+                'condition' => $classic_form_condition,
             ]
         );
 
         $this->add_style_subsection_heading(
             'wbk_style_heading_button_secondary',
             __('+Add More Button (in the Sidebar)', 'webba-booking-lite'),
-            true
+            true,
+            $classic_form_condition
         );
 
         $this->add_control(
@@ -855,6 +901,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'default' => $defaults['bg_button_secondary'],
                 'render_type' => 'ui',
                 'selectors' => $this->get_variable_selectors('--wbk-bg-button-secondary'),
+                'condition' => $classic_form_condition,
             ]
         );
         $this->add_control(
@@ -865,6 +912,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'default' => $defaults['color_button_secondary'],
                 'render_type' => 'ui',
                 'selectors' => $this->get_variable_selectors('--wbk-color-button-secondary'),
+                'condition' => $classic_form_condition,
             ]
         );
         $this->add_control(
@@ -875,6 +923,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'default' => $defaults['bg_button_secondary_hover'],
                 'render_type' => 'ui',
                 'selectors' => $this->get_variable_selectors('--wbk-bg-button-secondary-hover'),
+                'condition' => $classic_form_condition,
             ]
         );
         $this->add_control(
@@ -885,13 +934,15 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'default' => $defaults['color_button_secondary_hover'],
                 'render_type' => 'ui',
                 'selectors' => $this->get_variable_selectors('--wbk-color-button-secondary-hover'),
+                'condition' => $classic_form_condition,
             ]
         );
 
         $this->add_style_subsection_heading(
             'wbk_style_heading_sidebar',
             __('Sidebar styling', 'webba-booking-lite'),
-            true
+            true,
+            $classic_form_condition
         );
 
         $this->add_control(
@@ -902,6 +953,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'default' => $defaults['bg_sidebar'],
                 'render_type' => 'ui',
                 'selectors' => $this->get_sidebar_selectors(),
+                'condition' => $classic_form_condition,
             ]
         );
         $this->add_control(
@@ -912,6 +964,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'default' => $defaults['color_sidebar'],
                 'render_type' => 'ui',
                 'selectors' => $this->get_variable_selectors('--wbk-color-sidebar'),
+                'condition' => $classic_form_condition,
             ]
         );
 
@@ -958,6 +1011,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
             : $this->get_attribute_value($settings['staff'] ?? [], true);
         $category_list = !empty($settings['category_list']) ? 'yes' : 'no';
         $hide_category = !empty($settings['category_list']) ? 'no' : 'yes';
+        $form_type = $this->sanitize_form_type($settings['form_type'] ?? 'classic');
 
         if (!class_exists('WBK_Renderer')) {
             return;
@@ -967,7 +1021,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
 
         echo WBK_Renderer::load_template(
             'frontend_v6/booking_form',
-            [$service, $category_list, $category, $location, $staff, $units, $hide_category],
+            [$service, $category_list, $category, $location, $staff, $units, $hide_category, $form_type],
             false
         );
 

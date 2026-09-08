@@ -219,7 +219,7 @@ export const PaymentStep = () => {
 
                 <div className={'wbk_step__separator'}></div>
 
-                {preset?.settings.coupons_enabled && (
+                {preset?.settings?.coupons_enabled && (
                     <>
                         <div className={'wbk_coupon__wrapper'}>
                             <input

@@ -10,6 +10,10 @@ $location = isset($data[3]) ? $data[3] : '0';
 $staff = isset($data[4]) ? $data[4] : '0';
 $units = isset($data[5]) ? $data[5] : 'no';
 $hide_category = isset($data[6]) ? $data[6] : 'no';
+$form_type = isset($data[7]) ? $data[7] : '';
+if ($form_type !== 'classic' && $form_type !== 'waterfall') {
+    $form_type = '';
+}
 
 $allowed_params = [
     'admin_approve',
@@ -39,5 +43,9 @@ foreach ($allowed_params as $param) {
         $category_list
     ); ?>" data-category="<?php echo esc_attr($category); ?>"
     data-location="<?php echo esc_attr($location); ?>" data-staff="<?php echo esc_attr($staff); ?>"
-    data-units="<?php echo esc_attr($units); ?>" data-hide_category="<?php echo esc_attr($hide_category); ?>" <?php echo $extra_data_attrs; ?>></div>
+    data-units="<?php echo esc_attr($units); ?>" data-hide_category="<?php echo esc_attr($hide_category); ?>"<?php
+    if ($form_type !== '') {
+        echo ' data-form_type="' . esc_attr($form_type) . '"';
+    }
+    ?> <?php echo $extra_data_attrs; ?>></div>
     

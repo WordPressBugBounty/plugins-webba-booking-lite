@@ -245,6 +245,26 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "send_test_smtp"],
                 "permission_callback" => [$this, "send_test_smtp_permission"],
             ] );
+            register_rest_route( "wbk/v2", "/push/config", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_push_config"],
+                "permission_callback" => [$this, "push_subscribe_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/push/subscribe", [
+                "methods"             => "POST",
+                "callback"            => [$this, "save_push_subscription"],
+                "permission_callback" => [$this, "push_subscribe_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/push/unsubscribe", [
+                "methods"             => "POST",
+                "callback"            => [$this, "delete_push_subscription"],
+                "permission_callback" => [$this, "push_subscribe_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/push/test", [
+                "methods"             => "POST",
+                "callback"            => [$this, "send_test_push"],
+                "permission_callback" => [$this, "send_test_push_permission"],
+            ] );
             register_rest_route( "webba-booking/v1", "/get-timezones/", [
                 "methods"             => "GET",
                 "callback"            => [$this, "get_timezones"],
@@ -1756,6 +1776,12 @@ class WBK_Request_Manager {
         }
         // Minutes east of UTC as negative values (Date.getTimezoneOffset / wbkGetTimezoneOffset).
         $timezone_offset_minutes = (int) round( $timezone_obj->getOffset( new DateTime("now", $timezone_obj) ) * -1 / 60 );
+        $booking_redirect_page_id = intval( get_option( "wbk_booking_redirect_page", "" ) );
+        $booking_redirect_page = "";
+        if ( $booking_redirect_page_id > 0 ) {
+            $booking_redirect_permalink = get_post_permalink( $booking_redirect_page_id );
+            $booking_redirect_page = ( is_string( $booking_redirect_permalink ) ? $booking_redirect_permalink : "" );
+        }
         $data = [
             "services"                    => $services_arr,
             "categories"                  => $categories_arr,
@@ -1797,16 +1823,26 @@ class WBK_Request_Manager {
                 "stripe_redirect_url"                => WBK_Options_Utils::get_stripe_redirect_url(),
                 "stripe_fields"                      => get_option( "wbk_stripe_additional_fields", [] ),
                 "timezone_picker_enabled"            => get_option( "wbk_enable_timezone_picker", "yes" ) === "yes",
-                "show_post_booking_instructions"     => get_option( "wbk_enable_booking_instructions", "yes" ) === "yes",
+                "show_post_booking_instructions"     => get_option( "wbk_enable_booking_instructions", "" ) === "yes",
                 "admin_email"                        => get_option( "wbk_super_admin_email", get_option( "admin_email" ) ),
                 "wbk_global_working_hours"           => get_option( "wbk_global_working_hours", "" ),
                 "wbk_holydays"                       => get_option( "wbk_holydays", "" ),
                 "currency_symbol"                    => get_option( "wbk_payment_price_format_new", '$' ),
                 "currency_symbol_position"           => get_option( "wbk_currency_symbol_position", "before" ),
+                "booking_redirect_enabled"           => get_option( "wbk_booking_redirect_enabled", "" ),
+                "booking_redirect_page"              => $booking_redirect_page,
+                'show_endtime'                       => get_option( "wbk_show_endtime", "" ) === "yes",
             ],
             "wording"                     => [
                 "service_label"                           => get_option( "wbk_service_label", __( "Select a service", "webba-booking-lite" ) ),
                 "category_label"                          => get_option( "wbk_category_label", __( "Select category", "webba-booking-lite" ) ),
+                "category"                                => get_option( "wbk_wording_category", __( "Category", "webba-booking-lite" ) ),
+                "select_category"                         => get_option( "wbk_category_label", __( "Select category", "webba-booking-lite" ) ),
+                "service"                                 => get_option( "wbk_wording_service", __( "Service", "webba-booking-lite" ) ),
+                "select_service"                          => get_option( "wbk_wording_select_services", get_option( "wbk_service_label", __( "Select service", "webba-booking-lite" ) ) ),
+                "unit"                                    => get_option( "wbk_wording_unit", __( "Unit", "webba-booking-lite" ) ),
+                "select_unit"                             => get_option( "wbk_wording_select_units", __( "Select unit(s)", "webba-booking-lite" ) ),
+                "proceed_to_checkout"                     => get_option( "wbk_wording_proceed_to_checkout", __( "Proceed to checkout", "webba-booking-lite" ) ),
                 "date_label"                              => get_option( "wbk_date_basic_label", __( "Book an appointment on", "webba-booking-lite" ) ),
                 "date_placeholder"                        => get_option( "wbk_date_input_placeholder", __( "date", "webba-booking-lite" ) ),
                 "cancel"                                  => get_option( "wbk_user_dashboard_link_text_cancel", __( "Cancel booking", "webba-booking-lite" ) ),
@@ -1852,6 +1888,7 @@ class WBK_Request_Manager {
                 "unit_days"                               => get_option( "wbk_wording_unit_days", __( "days", "webba-booking-lite" ) ),
                 "unit_available_date_ranges"              => get_option( "wbk_wording_unit_available_date_ranges", __( "Available Date Ranges", "webba-booking-lite" ) ),
                 "unit_available"                          => get_option( "wbk_wording_unit_available", __( "Available", "webba-booking-lite" ) ),
+                "unit_no_available_offers"                => get_option( "wbk_wording_unit_no_available_offers", __( "No available offers found for the selected range.", "webba-booking-lite" ) ),
                 "select_date_time_services"               => get_option( "wbk_wording_select_date_time_services", __( "Select date & time for services", "webba-booking-lite" ) ),
                 "choose_preferred_appointment_slot"       => get_option( "wbk_wording_choose_preferred_appointment_slot", __( "Choose your preferred appointment slot", "webba-booking-lite" ) ),
                 "personal_details"                        => get_option( "wbk_wording_personal_details", __( "Personal details", "webba-booking-lite" ) ),
@@ -2749,6 +2786,7 @@ class WBK_Request_Manager {
             $start_date = $request->get_param( "start_date" );
             $end_date = $request->get_param( "end_date" );
             $staff_member_id = $request->get_param( "staff_member_id" );
+            $first_only = rest_sanitize_boolean( $request->get_param( "first_only" ) );
             if ( !is_numeric( $service_id ) ) {
                 return new WP_REST_Response([
                     "error" => "Invalid service ID",
@@ -2762,17 +2800,25 @@ class WBK_Request_Manager {
             }
             $start_timestamp = strtotime( $start_date ?? "1970-01-01" );
             $end_timestamp = strtotime( $end_date ?? "1970-01-01" );
-            if ( $start_timestamp === false || $end_timestamp === false ) {
-                return new WP_REST_Response([
-                    "error" => "Invalid date format",
-                ], 400);
+            if ( $first_only ) {
+                if ( $start_timestamp === false ) {
+                    return new WP_REST_Response([
+                        "error" => "Invalid date format",
+                    ], 400);
+                }
+            } else {
+                if ( $start_timestamp === false || $end_timestamp === false ) {
+                    return new WP_REST_Response([
+                        "error" => "Invalid date format",
+                    ], 400);
+                }
+                if ( $start_timestamp > $end_timestamp ) {
+                    return new WP_REST_Response([
+                        "error" => "Start date must be before end date",
+                    ], 400);
+                }
             }
-            if ( $start_timestamp > $end_timestamp ) {
-                return new WP_REST_Response([
-                    "error" => "Start date must be before end date",
-                ], 400);
-            }
-            $days_difference = ceil( ($end_timestamp - $start_timestamp) / 86400 ) + 1;
+            $days_difference = ( $first_only ? WBK_Model_Utils::get_availability_search_day_count( $service ) : ceil( ($end_timestamp - $start_timestamp) / 86400 ) + 1 );
             if ( $staff_member_id !== null && (int) $staff_member_id === 0 ) {
                 $staff_member_ids = WBK_Model_Utils::get_staff_member_ids_by_service( $service_id );
                 $available_dates = [];
@@ -2781,7 +2827,9 @@ class WBK_Request_Manager {
                         $service_id,
                         $start_date,
                         $days_difference,
-                        $staff_id
+                        $staff_id,
+                        false,
+                        $first_only
                     );
                     $available_dates = array_merge( $available_dates, $dates );
                 }
@@ -2791,29 +2839,49 @@ class WBK_Request_Manager {
                     $service_id,
                     $start_date,
                     $days_difference,
-                    $staff_member_id
+                    $staff_member_id,
+                    false,
+                    $first_only
                 );
             }
-            // Filter dates based on the date parts in the format YYYY,M,D
-            $filtered_dates = array_filter( $available_dates, function ( $date ) use($start_timestamp, $end_timestamp) {
-                $date_parts = explode( ",", $date );
-                if ( count( $date_parts ) !== 3 ) {
-                    return false;
+            if ( $first_only ) {
+                $earliest_date = WBK_Model_Utils::get_earliest_availability_date( $available_dates );
+                if ( !$earliest_date ) {
+                    $filtered_dates = [];
+                } else {
+                    $earliest_parts = array_map( "intval", explode( ",", $earliest_date ) );
+                    $filtered_dates = array_values( array_filter( $available_dates, function ( $date ) use($earliest_parts) {
+                        $date_parts = array_map( "intval", explode( ",", (string) $date ) );
+                        return count( $date_parts ) === 3 && $date_parts[0] === $earliest_parts[0] && $date_parts[1] === $earliest_parts[1];
+                    } ) );
+                    usort( $filtered_dates, function ( $left, $right ) {
+                        $left_parts = array_map( "intval", explode( ",", (string) $left ) );
+                        $right_parts = array_map( "intval", explode( ",", (string) $right ) );
+                        return $left_parts <=> $right_parts;
+                    } );
                 }
-                $year = intval( $date_parts[0] );
-                $month = intval( $date_parts[1] ) + 1;
-                // Month is 0-based in the data
-                $day = intval( $date_parts[2] );
-                $date_timestamp = mktime(
-                    0,
-                    0,
-                    0,
-                    $month,
-                    $day,
-                    $year
-                );
-                return $date_timestamp >= $start_timestamp && $date_timestamp <= $end_timestamp;
-            } );
+            } else {
+                // Filter dates based on the date parts in the format YYYY,M,D
+                $filtered_dates = array_filter( $available_dates, function ( $date ) use($start_timestamp, $end_timestamp) {
+                    $date_parts = explode( ",", $date );
+                    if ( count( $date_parts ) !== 3 ) {
+                        return false;
+                    }
+                    $year = intval( $date_parts[0] );
+                    $month = intval( $date_parts[1] ) + 1;
+                    // Month is 0-based in the data
+                    $day = intval( $date_parts[2] );
+                    $date_timestamp = mktime(
+                        0,
+                        0,
+                        0,
+                        $month,
+                        $day,
+                        $year
+                    );
+                    return $date_timestamp >= $start_timestamp && $date_timestamp <= $end_timestamp;
+                } );
+            }
             return new WP_REST_Response([
                 "service_id" => $service_id,
                 "start_date" => $start_date,
@@ -4322,7 +4390,8 @@ class WBK_Request_Manager {
                 WBK_Price_Processor::apply_ordered_extras_to_payment_data( $payment_details, $ordered_extras_lines, "services" );
             }
             $response_data = array_merge( $response_data, [
-                "payment_details" => $payment_details,
+                "payment_details"  => $payment_details,
+                "payment_required" => false,
             ] );
         }
         date_default_timezone_set( "UTC" );
@@ -4651,7 +4720,8 @@ class WBK_Request_Manager {
             $response_data = array_merge( $response_data, $payment_response );
         } else {
             $response_data = array_merge( $response_data, [
-                "payment_details" => $payment_details,
+                "payment_details"  => $payment_details,
+                "payment_required" => false,
             ] );
         }
         date_default_timezone_set( "UTC" );
@@ -5053,6 +5123,115 @@ class WBK_Request_Manager {
         return current_user_can( "manage_options" );
     }
 
+    /**
+     * Whether the current user can subscribe to push notifications.
+     *
+     * @param WP_REST_Request $request REST request.
+     * @return bool
+     */
+    public function push_subscribe_permission( $request ) : bool {
+        return is_user_logged_in() && (current_user_can( "manage_options" ) || current_user_can( "read" ));
+    }
+
+    /**
+     * Whether the current user can send a test push notification.
+     *
+     * @param WP_REST_Request $request REST request.
+     * @return bool
+     */
+    public function send_test_push_permission( $request ) : bool {
+        return $this->push_subscribe_permission( $request );
+    }
+
+    /**
+     * Return public Web Push configuration for the current user.
+     *
+     * @param WP_REST_Request $request REST request.
+     * @return WP_REST_Response
+     */
+    public function get_push_config( $request ) : WP_REST_Response {
+        return new WP_REST_Response(WBK_Push_Processor::get_public_config(), 200);
+    }
+
+    /**
+     * Save a browser push subscription for the current user.
+     *
+     * @param WP_REST_Request $request REST request.
+     * @return WP_REST_Response
+     */
+    public function save_push_subscription( $request ) : WP_REST_Response {
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        $endpoint = ( isset( $params["endpoint"] ) ? esc_url_raw( $params["endpoint"] ) : "" );
+        $keys = ( isset( $params["keys"] ) && is_array( $params["keys"] ) ? $params["keys"] : [] );
+        $p256dh = ( isset( $keys["p256dh"] ) ? WBK_Push_Processor::sanitize_subscription_key( $keys["p256dh"] ) : "" );
+        $auth = ( isset( $keys["auth"] ) ? WBK_Push_Processor::sanitize_subscription_key( $keys["auth"] ) : "" );
+        if ( $endpoint === "" || $p256dh === "" || $auth === "" ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => __( "Invalid browser notification subscription.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $saved = WBK_Push_Processor::save_subscription(
+            $endpoint,
+            $p256dh,
+            $auth,
+            get_current_user_id()
+        );
+        if ( !$saved ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => __( "Failed to save the browser notification subscription.", "webba-booking-lite" ),
+            ], 500);
+        }
+        return new WP_REST_Response([
+            "status"  => "success",
+            "message" => __( "Browser notifications enabled for this browser.", "webba-booking-lite" ),
+        ], 200);
+    }
+
+    /**
+     * Remove a browser push subscription.
+     *
+     * @param WP_REST_Request $request REST request.
+     * @return WP_REST_Response
+     */
+    public function delete_push_subscription( $request ) : WP_REST_Response {
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        $endpoint = ( isset( $params["endpoint"] ) ? esc_url_raw( $params["endpoint"] ) : "" );
+        if ( $endpoint === "" ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => __( "Invalid browser notification subscription.", "webba-booking-lite" ),
+            ], 400);
+        }
+        WBK_Push_Processor::delete_subscription( $endpoint );
+        return new WP_REST_Response([
+            "status"  => "success",
+            "message" => __( "Browser notifications disabled for this browser.", "webba-booking-lite" ),
+        ], 200);
+    }
+
+    /**
+     * Send a test push notification to the current user.
+     *
+     * @param WP_REST_Request $request REST request.
+     * @return WP_REST_Response
+     */
+    public function send_test_push( $request ) : WP_REST_Response {
+        $result = WBK_Push_Processor::send_test( get_current_user_id() );
+        $status_code = ( $result["success"] ? 200 : 400 );
+        return new WP_REST_Response([
+            "status"  => ( $result["success"] ? "success" : "error" ),
+            "message" => $result["message"],
+        ], $status_code);
+    }
+
     public function send_test_smtp( $request ) : WP_REST_Response {
         $params = $request->get_json_params();
         if ( !is_array( $params ) ) {
@@ -5147,6 +5326,9 @@ class WBK_Request_Manager {
         }
         $settings_fields = $wp_settings_fields["wbk-options"][$options["section"]];
         foreach ( $settings_fields as $field ) {
+            if ( WBK_Options_Processor::is_non_persistent_field( $field ) ) {
+                continue;
+            }
             if ( isset( $options[$field["id"]] ) ) {
                 update_option( $field["id"], $options[$field["id"]] );
             } else {
@@ -5278,6 +5460,7 @@ class WBK_Request_Manager {
                     "tab"                   => ( isset( $field_args["tab"] ) ? $field_args["tab"] : "" ),
                     "subsection"            => ( isset( $field_args["subsection"] ) ? $field_args["subsection"] : "" ),
                     "sub_type"              => ( isset( $field_args["sub_type"] ) ? $field_args["sub_type"] : "" ),
+                    "required"              => !empty( $field_args["required"] ),
                     "dependent_value"       => ( isset( $field_args["dependent_value"] ) ? $field_args["dependent_value"] : "" ),
                     "searchable"            => ( isset( $field_args["searchable"] ) ? $field_args["searchable"] : false ),
                     "radio_type"            => ( isset( $field_args["radio_type"] ) ? $field_args["radio_type"] : "" ),
@@ -5337,6 +5520,8 @@ class WBK_Request_Manager {
             "render_notice"          => "notice",
             "render_password"        => "password",
             "render_smtp_test"       => "smtp_test",
+            "render_push_subscribe"  => "push_subscribe",
+            "render_file"            => "file",
         ];
         return $type_map[$callback_method] ?? "text";
     }
@@ -5587,7 +5772,8 @@ class WBK_Request_Manager {
             "bg_accent",
             "font",
             "border_radius",
-            "shadow"
+            "shadow",
+            "form_type"
         ];
         $required_plans = [
             "standard",
@@ -5628,6 +5814,12 @@ class WBK_Request_Manager {
         $default_values = WBK_Appearance_Utils::get_default_appearance_values();
         foreach ( $data["options"] as $key => $value ) {
             if ( in_array( $key, $appearance_fields ) ) {
+                if ( $key === "form_type" ) {
+                    $allowed_form_types = ["classic", "waterfall"];
+                    $sanitized_form_type = sanitize_text_field( $value );
+                    $appearance_options[$key] = ( in_array( $sanitized_form_type, $allowed_form_types, true ) ? $sanitized_form_type : $default_values["form_type"] ?? "classic" );
+                    continue;
+                }
                 $appearance_options[sanitize_key( $key )] = sanitize_text_field( $value );
             } elseif ( isset( $default_values[sanitize_key( $key )] ) ) {
                 $appearance_options[sanitize_key( $key )] = $default_values[sanitize_key( $key )];

@@ -237,6 +237,7 @@ export const buildModelFromSettingsFields = ({
                 type: 'string',
                 editable: true,
                 hidden: false,
+                required: Boolean(field.required),
                 value: field.value,
                 default_value: field.default || '',
             }

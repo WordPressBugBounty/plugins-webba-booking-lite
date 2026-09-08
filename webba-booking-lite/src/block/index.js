@@ -5,7 +5,22 @@ import './editor.scss'
 import Edit from './edit'
 import save from './save'
 import metadata from './block.json'
-import { APPEARANCE_ATTRIBUTE_DEFAULTS } from './appearanceDefaults.js'
+import {
+    APPEARANCE_ATTRIBUTE_DEFAULTS,
+    getEditorAppearanceDefaults,
+} from './appearanceDefaults.js'
+
+const editorAppearanceDefaults = getEditorAppearanceDefaults()
+const blockAttributes = { ...metadata.attributes }
+Object.keys(editorAppearanceDefaults).forEach((key) => {
+    if (!blockAttributes[key]) {
+        return
+    }
+    blockAttributes[key] = {
+        ...blockAttributes[key],
+        default: editorAppearanceDefaults[key],
+    }
+})
 
 const deprecatedLegacySave = ({ attributes }) => {
     const isNumeric = (value) =>
@@ -46,6 +61,7 @@ const deprecatedLegacySave = ({ attributes }) => {
 
 registerBlockType(metadata.name, {
     ...metadata,
+    attributes: blockAttributes,
     edit: Edit,
     save,
     deprecated: [
@@ -76,11 +92,13 @@ registerBlockType(metadata.name, {
                 const location = (attributes.locationIds || []).map(String)
                 return {
                     ...APPEARANCE_ATTRIBUTE_DEFAULTS,
+                    ...editorAppearanceDefaults,
                     service,
                     category,
                     location,
                     staff: [],
                     categoryList: !!attributes.showCategoryList,
+                    formType: editorAppearanceDefaults.formType || 'classic',
                 }
             },
             save: deprecatedLegacySave,

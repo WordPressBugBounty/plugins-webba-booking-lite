@@ -4,6 +4,9 @@
 			<key name="wbk_date_extended_label"/>
             <key name="wbk_date_basic_label"/>
             <key name="wbk_category_label"/>
+            <key name="wbk_wording_category"/>
+            <key name="wbk_wording_service"/>
+            <key name="wbk_wording_unit"/>
             <key name="wbk_time_slot_available_text"/>
 			<key name="wbk_date_input_placeholder"/>
 			<key name="wbk_book_text_timeslot"/>
@@ -99,6 +102,9 @@
             <key name="wbk_available_label"/>  
 			<key name="wbk_service_label"/>
 			<key name="wbk_category_label"/>
+			<key name="wbk_wording_category"/>
+			<key name="wbk_wording_service"/>
+			<key name="wbk_wording_unit"/>
 			<key name="wbk_date_basic_label"/>
 			<key name="wbk_date_input_placeholder"/>
 			<key name="wbk_user_dashboard_link_text_cancel"/>
@@ -131,6 +137,7 @@
 			<key name="wbk_back_button_text"/>
 			<key name="wbk_next_button_text"/>
 			<key name="wbk_wording_submit"/>
+			<key name="wbk_wording_proceed_to_checkout"/>
 			<key name="wbk_wording_appointment_confirmed"/>
 			<key name="wbk_wording_look_forward_seeing_you"/>
 			<key name="wbk_wording_payment_information"/>

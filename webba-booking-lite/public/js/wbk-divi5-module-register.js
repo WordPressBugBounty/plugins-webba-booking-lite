@@ -44,6 +44,25 @@
         'Sidebar Styling',
         'Selected Elements Styling',
     ]
+    var classicOnlyAppearanceKeys = [
+        'bg_button_selected',
+        'color_button_selected',
+        'bg_button_selected_hover',
+        'color_button_selected_hover',
+        'bg_button_selected_selected',
+        'color_button_selected_selected',
+        'bg_button_secondary',
+        'color_button_secondary',
+        'bg_button_secondary_hover',
+        'color_button_secondary_hover',
+        'bg_sidebar',
+        'color_sidebar',
+    ]
+    var classicOnlyGroupSlugs = [
+        'designSelectedButton',
+        'designSecondaryButton',
+        'designSidebar',
+    ]
 
     var getHooks = function () {
         if (window.vendor && window.vendor.wp && window.vendor.wp.hooks) {
@@ -583,6 +602,26 @@
         }
     }
 
+    var toggleClassicAppearanceVisibility = function (isClassic) {
+        if (!metadata || !metadata.attributes || !metadata.attributes.content) {
+            return
+        }
+        var advanced = metadata.attributes.content.settings.advanced
+        classicOnlyAppearanceKeys.forEach(function (key) {
+            if (advanced[key] && advanced[key].item) {
+                advanced[key].item.render = isClassic
+            }
+        })
+        if (metadata.settings && metadata.settings.groups) {
+            classicOnlyGroupSlugs.forEach(function (slug) {
+                var group = metadata.settings.groups[slug]
+                if (group) {
+                    group.render = isClassic
+                }
+            })
+        }
+    }
+
     var applyFilteredOptions = function (selection) {
         if (!pickerData || !metadata || !metadata.attributes || !metadata.attributes.content) {
             return
@@ -640,6 +679,11 @@
                 getNested(attrs, ['content', 'advanced', 'categoryList'])
             )
             var categoryList = categoryListToggle === 'on' ? 'yes' : 'no'
+            var hideCategory = categoryListToggle === 'on' ? 'no' : 'yes'
+            var formTypeValue = unwrapDiviValue(
+                getNested(attrs, ['content', 'advanced', 'formType'])
+            )
+            var formType = formTypeValue === 'waterfall' ? 'waterfall' : 'classic'
             var categoryIds = normalizeIds(getNested(attrs, ['content', 'advanced', 'category']))
             var locationIds = normalizeIds(getNested(attrs, ['content', 'advanced', 'location']))
             var staffIds = isDaily
@@ -656,6 +700,7 @@
                 locationIds: locationIds,
                 staffIds: staffIds,
             })
+            toggleClassicAppearanceVisibility(formType === 'classic')
 
             return React.createElement(
                 'div',
@@ -671,6 +716,8 @@
                     'data-location': location || '0',
                     'data-staff': staff || '0',
                     'data-units': isDaily ? 'yes' : 'no',
+                    'data-hide_category': hideCategory,
+                    'data-form_type': formType,
                 })
             )
         }

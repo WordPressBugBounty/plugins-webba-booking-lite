@@ -2,7 +2,7 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './BookingForm.scss'
 import { ToastContainer } from 'react-toastify'
-import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { bookingScenarios } from './scenarios'
 import { Progressbar } from '../../components/Progressbar/Progressbar'
 import classNames from 'classnames'
@@ -17,12 +17,18 @@ import { useBookingContext } from '../../providers/BookingFormProvider/BookingFo
 import { useWording } from '../../hooks/useWording'
 import { Loading } from '../../components/Loading/Loading'
 import { BottomSummary } from '../../components/Sidebar/BottomSummary'
-import { wbkFormatPrice } from '../../providers/BookingFormProvider/utils'
-import { __ } from '@wordpress/i18n'
 import { FormProvider } from '../../components/Form/FormProvider'
 import { stripeMethods } from './PaymentHandler/payments/Stripe/StripeMethods'
+import { WaterfallForm } from './WaterfallForm/WaterfallForm'
+import { useBookingSummaryTotal } from '../../hooks/useBookingSummaryTotal'
 
-export const BookingForm = () => {
+const FORM_TYPE_WATERFALL = 'waterfall'
+
+type BookingFormProps = {
+    formType?: string
+}
+
+export const BookingForm = ({ formType: formTypeProp }: BookingFormProps) => {
     const {
         Screen,
         canGoNext,
@@ -35,8 +41,10 @@ export const BookingForm = () => {
         stepInto,
         nextStepError,
     } = useScenario(bookingScenarios)
-    const { fields, setFields, formData, preset, setPopupPortalElement } =
+    const { fields, setFields, preset, setPopupPortalElement } =
         useBookingContext()
+    const formType =
+        formTypeProp || preset?.appearance_options?.form_type || 'classic'
     const handlePopupPortalRef = useCallback(
         (node: HTMLDivElement | null) => {
             setPopupPortalElement(node)
@@ -70,17 +78,27 @@ export const BookingForm = () => {
     const paymentMethod =
         bookingData?.payment_method || bookingData?.details?.payment_method
 
+    const hasCompletedBooking = Boolean(
+        bookingData &&
+            (bookingData.success === true ||
+                (Array.isArray(bookingData.booking_ids) &&
+                    bookingData.booking_ids.length > 0) ||
+                bookingData.payment_required === false ||
+                (Array.isArray(bookingData.payment_details?.items) &&
+                    bookingData.payment_details.items.length > 0))
+    )
+
     // Payment methods that require a payment step
     const needsPaymentHandler =
-        bookingData &&
+        hasCompletedBooking &&
         (paymentMethod === 'paypal' || paymentMethod === 'woocommerce')
 
     // Payment methods that go straight to ThankYou
     const isDirectThankYou =
-        bookingData && bookingData.payment_required === false
+        hasCompletedBooking && bookingData.payment_required === false
     // Show Thank You if there is no payment method and payment is not required (or not set)
     const isNoPaymentMethodThankYou =
-        bookingData &&
+        hasCompletedBooking &&
         (!paymentMethod || paymentMethod === '') &&
         (bookingData.payment_required === false ||
             bookingData.payment_required === undefined)
@@ -89,80 +107,16 @@ export const BookingForm = () => {
         stripeExecutedResult &&
         stripeExecutedResult?.status === 'success'
 
-    // Use the same context and logic as Sidebar for total calculation
-    const { services, units, bookingMode, priceFormat, amountData } =
-        useBookingContext()
-    const items = useMemo(
-        () =>
-            bookingMode === 'units'
-                ? (units || []).filter((unit: any) => unit.selected)
-                : services.filter((s: any) => s.selected),
-        [services, units, bookingMode]
-    )
-    const sortedItems = useMemo(
-        () =>
-            items
-                .slice()
-                .sort(
-                    (a: any, b: any) =>
-                        (a.selectedAt || 0) - (b.selectedAt || 0)
-                ),
-        [items]
-    )
+    const showThankYouScreen =
+        showThankYou ||
+        isDirectThankYou ||
+        isNoPaymentMethodThankYou ||
+        showThankYouFromStripeWallets ||
+        (hasCompletedBooking &&
+            !needsPaymentHandler &&
+            bookingData?.payment_required !== true)
 
-    // Fallback calculation for total (same as Sidebar)
-    const localCalculatedTotal = useMemo(() => {
-        let total = 0
-        sortedItems.forEach((service: any) => {
-            const matchedItems = Array.isArray(amountData.items)
-                ? amountData.items.filter((item: any) => item.id === service.id)
-                : []
-            if (matchedItems.length > 0) {
-                total += matchedItems.reduce(
-                    (sum: number, item: any) => sum + (item.price || 0),
-                    0
-                )
-            } else {
-                const numericPrice = Number(service.price)
-                const itemQuantity = Math.max(1, Number(service.quantity) || 1)
-                if (numericPrice > 0 && itemQuantity > 0) {
-                    total += numericPrice * itemQuantity
-                }
-            }
-        })
-        return total
-    }, [amountData, sortedItems])
-
-    // Fallback tax calculation logic (copied from Sidebar)
-    const apiTax = Number(amountData.tax_to_pay)
-    let displayTax = 0
-    let useApiTax = false
-    if (!isNaN(apiTax) && apiTax > 0) {
-        displayTax = apiTax
-        useApiTax = true
-    } else {
-        const presetTax = Number(preset?.settings?.tax)
-        if (!isNaN(presetTax) && presetTax > 0) {
-            // Calculate tax based on localCalculatedTotal
-            displayTax = (localCalculatedTotal * presetTax) / 100
-        }
-    }
-
-    // Use API total if available, otherwise fallback
-    // Only add tax if using fallback tax, not if API tax is present (since API total is assumed to include tax)
-    const apiTotal = Number(amountData.to_pay_total)
-    const displayTotal =
-        !isNaN(apiTotal) && apiTotal > 0
-            ? apiTotal
-            : localCalculatedTotal + displayTax
-
-    let totalFormatted = ''
-    if (sortedItems.length > 0) {
-        totalFormatted =
-            (displayTotal > 0 && wbkFormatPrice(displayTotal, priceFormat)) ||
-            wording.free ||
-            __('Free', 'webba-booking-lite')
-    }
+    const { totalFormatted, hideAllPrices } = useBookingSummaryTotal()
 
     useEffect(() => {
         if (isNarrowForm) {
@@ -201,6 +155,58 @@ export const BookingForm = () => {
         )
     }
 
+    if (formType === FORM_TYPE_WATERFALL) {
+        let waterfallContent: ReactNode = (
+            <WaterfallForm
+                onBookingComplete={() => {
+                    setShowThankYou(true)
+                }}
+            />
+        )
+
+        if (needsPaymentHandler && !showThankYou) {
+            waterfallContent = (
+                <PaymentHandler
+                    bookingData={bookingData}
+                    onPaid={() => setShowThankYou(true)}
+                />
+            )
+        } else if (showThankYouScreen && !isStripePaymentRequired) {
+            waterfallContent = <ThankYou />
+        } else if (isStripePaymentRequired) {
+            waterfallContent = (
+                <WaterfallForm
+                    onBookingComplete={() => {
+                        setShowThankYou(true)
+                    }}
+                />
+            )
+        }
+
+        return (
+            <>
+                <ToastContainer limit={1} position="top-right" />
+                <div
+                    className={classNames(
+                        'wbk_booking_form__wrapper',
+                        'wbk_booking_form__wrapper--waterfall',
+                        {
+                            ['wbk_booking_form__wrapper--compact-form']:
+                                needsPaymentHandler || showThankYouScreen,
+                        }
+                    )}
+                    ref={wrapperRef}
+                >
+                    {waterfallContent}
+                    <div
+                        ref={handlePopupPortalRef}
+                        className="wbk_booking_form__popup-portal"
+                    />
+                </div>
+            </>
+        )
+    }
+
     return (
         <FormProvider fields={fields} setFields={setFields}>
             <ToastContainer limit={1} position="top-right" />
@@ -209,7 +215,7 @@ export const BookingForm = () => {
                     ['wbk_booking_form__wrapper--expanded']: sidebarOpen,
                     ['wbk_booking_form__wrapper--narrow-form']: isNarrowForm,
                     ['wbk_booking_form__wrapper--compact-form']:
-                        needsPaymentHandler || showThankYou || isDirectThankYou,
+                        needsPaymentHandler || showThankYouScreen,
                 })}
                 ref={wrapperRef}
             >
@@ -259,6 +265,7 @@ export const BookingForm = () => {
                         {!sidebarOpen && (
                             <BottomSummary
                                 total={totalFormatted}
+                                hideCost={hideAllPrices}
                                 onShowSummary={() => setSidebarOpen(true)}
                             />
                         )}
@@ -270,10 +277,7 @@ export const BookingForm = () => {
                             onPaid={() => setShowThankYou(true)}
                         />
                     )) ||
-                    ((isDirectThankYou ||
-                        showThankYou ||
-                        isNoPaymentMethodThankYou ||
-                        showThankYouFromStripeWallets) && <ThankYou />)}
+                    (showThankYouScreen && <ThankYou />)}
                 <div
                     ref={handlePopupPortalRef}
                     className="wbk_booking_form__popup-portal"

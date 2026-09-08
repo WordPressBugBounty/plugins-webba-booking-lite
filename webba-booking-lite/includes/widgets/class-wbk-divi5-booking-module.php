@@ -127,6 +127,9 @@ class WBK_Divi5_Booking_Module
         $category_list_toggle = self::get_attr_value($attrs, ["content", "advanced", "categoryList"], "off");
         $category_list = $category_list_toggle === "on" ? "yes" : "no";
         $hide_category = $category_list_toggle === "on" ? "no" : "yes";
+        $form_type = self::sanitize_form_type(
+            self::get_attr_value($attrs, ["content", "advanced", "formType"], "classic")
+        );
 
         $category = count($category_ids) > 0 ? implode(",", $category_ids) : "0";
         $location = count($location_ids) > 0 ? implode(",", $location_ids) : "0";
@@ -142,7 +145,7 @@ class WBK_Divi5_Booking_Module
         $output = '<div class="wbk_divi_booking_form_scope"' . $style_attr . '>';
         $output .= WBK_Renderer::load_template(
             "frontend_v6/booking_form",
-            [$service, $category_list, $category, $location, $staff, $units, $hide_category],
+            [$service, $category_list, $category, $location, $staff, $units, $hide_category, $form_type],
             false
         );
         $output .= "</div>";
@@ -274,6 +277,7 @@ class WBK_Divi5_Booking_Module
             $staff_options;
 
         $attributes = self::inject_appearance_controls_into_attributes($attributes);
+        $attributes = self::apply_form_type_default($attributes);
 
         return $attributes;
     }
@@ -290,6 +294,7 @@ class WBK_Divi5_Booking_Module
             "font" => '"Ubuntu", sans-serif',
             "border_radius" => "8px",
             "shadow" => "0px 0px 16px 0px #3f3f4629",
+            "form_type" => "classic",
             "button_border_radius" => "8px",
             "bg_button_primary" => "#15B8A9",
             "color_button_primary" => "#ffffff",
@@ -333,6 +338,40 @@ class WBK_Divi5_Booking_Module
         }
 
         return $merged;
+    }
+
+    /**
+     * Sanitizes the booking form layout type.
+     *
+     * @param mixed $value Raw form type value.
+     *
+     * @return string
+     */
+    private static function sanitize_form_type($value)
+    {
+        $form_type = is_string($value) ? $value : "";
+
+        return $form_type === "waterfall" ? "waterfall" : "classic";
+    }
+
+    /**
+     * Applies the saved appearance form type as the module default.
+     *
+     * @param array $attributes Module attributes.
+     *
+     * @return array
+     */
+    private static function apply_form_type_default($attributes)
+    {
+        if (!isset($attributes["content"]["settings"]["advanced"]["formType"]["item"]["defaultAttr"]["desktop"])) {
+            return $attributes;
+        }
+
+        $defaults = self::get_appearance_defaults();
+        $attributes["content"]["settings"]["advanced"]["formType"]["item"]["defaultAttr"]["desktop"]["value"] =
+            self::sanitize_form_type($defaults["form_type"] ?? "classic");
+
+        return $attributes;
     }
 
     /**

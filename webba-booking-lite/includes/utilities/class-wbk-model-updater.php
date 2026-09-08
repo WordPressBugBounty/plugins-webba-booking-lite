@@ -72,6 +72,23 @@ class WBK_Model_Updater
         self::update_services_6_3_11();
         self::update_email_notifications_6_3_11();
         self::create_default_booking_form_6_4_20();
+        self::flush_push_service_worker_rewrite_6_4_21();
+        self::enable_email_templates_v_6_5_0();
+    }
+
+    /**
+     * Flush rewrite rules so the push service worker URL is registered.
+     *
+     * @return void
+     */
+    public static function flush_push_service_worker_rewrite_6_4_21(): void
+    {
+        if (!self::is_update_required("flush_push_service_worker_rewrite_6_4_21")) {
+            return;
+        }
+
+        flush_rewrite_rules(false);
+        self::set_update_as_complete("flush_push_service_worker_rewrite_6_4_21");
     }
 
     /**
@@ -1903,6 +1920,56 @@ class WBK_Model_Updater
         }
 
         self::set_update_as_complete('update_email_notifications_6_3_11');
+    }
+
+    public static function enable_email_templates_v_6_5_0(): void
+    {
+        if(!self::is_update_required('enable_email_templates_v_6_5_0')) {
+            return;
+        }
+
+        global $wpdb;
+        $table_name = get_option('wbk_db_prefix', '') . "wbk_email_templates";
+
+        $total_templates_count = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name}");
+        $additional_templates_count = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name} WHERE is_default != 'yes'");
+        $default_templates_count = $wpdb->get_var("SELECT COUNT(id) FROM {$table_name} WHERE is_default = 'yes'");
+        $services_count = $wpdb->get_var("SELECT COUNT(id) FROM " . get_option('wbk_db_prefix', '') . "wbk_services");
+
+        // set update as complete and return if this is not the first time installation
+        $is_new_install = function_exists('wbk_fs')
+            && is_object(wbk_fs())
+            && method_exists(wbk_fs(), 'is_plugin_new_install')
+            && wbk_fs()->is_plugin_new_install();
+        if (!$is_new_install) {
+            self::set_update_as_complete('enable_email_templates_v_6_5_0');
+            return;
+        }
+
+        if(
+            $total_templates_count == $default_templates_count && 
+            $additional_templates_count == 0 &&
+            $services_count == 0
+        ){
+            $wpdb->update(
+                $table_name,
+                [
+                    'use_for_all_services' => 'yes'
+                ],
+                [
+                    'is_default' => 'yes'
+                ],
+                [
+                    '%s'
+                ],
+                [
+                    '%s'
+                ]
+            );
+        }
+
+
+        self::set_update_as_complete('enable_email_templates_v_6_5_0');
     }
 }
 ?>

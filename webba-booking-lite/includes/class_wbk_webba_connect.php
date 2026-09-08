@@ -109,12 +109,7 @@ class WBK_Webba_Connect
      */
     private function prepare_auth_parameters($return_path = "", $endpoint = "", $calendar_id = "")
     {
-        return $this->prepare_signed_auth_parameters(
-            "GET",
-            $endpoint,
-            $return_path,
-            $calendar_id,
-        );
+        return $this->prepare_signed_auth_parameters("GET", $endpoint, $return_path, $calendar_id);
     }
 
     /**
@@ -136,14 +131,18 @@ class WBK_Webba_Connect
         $fs = wbk_fs();
 
         if (!$fs) {
-            error_log("[WBK_AUTH_DEBUG] prepare_auth_parameters failed: wbk_fs() returned null/empty");
+            error_log(
+                "[WBK_AUTH_DEBUG] prepare_auth_parameters failed: wbk_fs() returned null/empty",
+            );
             return false;
         }
 
         // Get license information
         $license = $fs->_get_license();
         if (!$license) {
-            error_log("[WBK_AUTH_DEBUG] prepare_auth_parameters failed: No license found from Freemius");
+            error_log(
+                "[WBK_AUTH_DEBUG] prepare_auth_parameters failed: No license found from Freemius",
+            );
             return false;
         }
 
@@ -153,7 +152,10 @@ class WBK_Webba_Connect
         if (!$license_id || !$license_secret) {
             error_log(
                 "[WBK_AUTH_DEBUG] prepare_auth_parameters failed: license_id or license_secret missing. " .
-                    "license_id=" . ($license_id ?: "[empty]") . ", secret_present=" . ($license_secret ? "yes" : "no"),
+                    "license_id=" .
+                    ($license_id ?: "[empty]") .
+                    ", secret_present=" .
+                    ($license_secret ? "yes" : "no"),
             );
             return false;
         }
@@ -163,7 +165,9 @@ class WBK_Webba_Connect
 
         // Validate site URL format
         if (!filter_var($site, FILTER_VALIDATE_URL)) {
-            error_log("[WBK_AUTH_DEBUG] prepare_auth_parameters failed: Invalid site URL: " . $site);
+            error_log(
+                "[WBK_AUTH_DEBUG] prepare_auth_parameters failed: Invalid site URL: " . $site,
+            );
             return false;
         }
 
@@ -211,8 +215,14 @@ class WBK_Webba_Connect
         ];
 
         error_log(
-            "[WBK_AUTH_DEBUG] prepare_auth_parameters success: endpoint=" . $endpoint .
-                ", site=" . $site . ", license_id=" . $license_id . ", calendar_id=" . $calendar_id,
+            "[WBK_AUTH_DEBUG] prepare_auth_parameters success: endpoint=" .
+                $endpoint .
+                ", site=" .
+                $site .
+                ", license_id=" .
+                $license_id .
+                ", calendar_id=" .
+                $calendar_id,
         );
 
         return http_build_query($query_params);
@@ -228,9 +238,7 @@ class WBK_Webba_Connect
             if (function_exists("wp_generate_uuid4")) {
                 $id = wp_generate_uuid4();
             } else {
-                $id = (string) wp_hash(
-                    home_url("/") . (defined("ABSPATH") ? ABSPATH : ""),
-                );
+                $id = (string) wp_hash(home_url("/") . (defined("ABSPATH") ? ABSPATH : ""));
             }
             update_option("wbk_connect_install_id", $id, true);
         }
@@ -261,10 +269,8 @@ class WBK_Webba_Connect
      * @param string $endpoint Endpoint path without leading slash (e.g. assistance/tasks)
      * @return string|false
      */
-    private function prepare_assistance_auth_parameters(
-        $method = "GET",
-        $endpoint = ""
-    ) {
+    private function prepare_assistance_auth_parameters($method = "GET", $endpoint = "")
+    {
         $site_url = get_site_url();
 
         if (!filter_var($site_url, FILTER_VALIDATE_URL)) {
@@ -322,10 +328,7 @@ class WBK_Webba_Connect
      */
     private function register_assistance_install(): bool
     {
-        $backend_url = apply_filters(
-            "wbk_assistance_connect_api_url",
-            self::get_connect_api_url(),
-        );
+        $backend_url = apply_filters("wbk_assistance_connect_api_url", self::get_connect_api_url());
         if ($backend_url && substr($backend_url, -1) !== "/") {
             $backend_url .= "/";
         }
@@ -334,7 +337,11 @@ class WBK_Webba_Connect
         $site_url = get_site_url();
         $install_secret = self::get_connect_install_secret();
 
-        if ($website_id === "" || $install_secret === "" || !filter_var($site_url, FILTER_VALIDATE_URL)) {
+        if (
+            $website_id === "" ||
+            $install_secret === "" ||
+            !filter_var($site_url, FILTER_VALIDATE_URL)
+        ) {
             return false;
         }
 
@@ -390,10 +397,7 @@ class WBK_Webba_Connect
         if (!$query) {
             return [
                 "success" => false,
-                "message" => __(
-                    "Could not authenticate with Webba Connect.",
-                    "webba-booking-lite",
-                ),
+                "message" => __("Could not authenticate with Webba Connect.", "webba-booking-lite"),
             ];
         }
 
@@ -461,7 +465,9 @@ class WBK_Webba_Connect
 
         $query = $this->prepare_auth_parameters($return_path, "start", $calendar_id);
         if (!$query) {
-            error_log("[WBK_AUTH_DEBUG] get_google_authorization_url failed: prepare_auth_parameters returned false");
+            error_log(
+                "[WBK_AUTH_DEBUG] get_google_authorization_url failed: prepare_auth_parameters returned false",
+            );
             return false;
         }
 
@@ -507,13 +513,17 @@ class WBK_Webba_Connect
                 : "/wp-admin/admin.php?page=wbk-connected-calendars";
 
         error_log(
-            "[WBK_AUTH_DEBUG] fetch_access_token_from_webba_connect: provider=" . $provider .
-                ", calendar_id=" . $calendar_id,
+            "[WBK_AUTH_DEBUG] fetch_access_token_from_webba_connect: provider=" .
+                $provider .
+                ", calendar_id=" .
+                $calendar_id,
         );
 
         $query = $this->prepare_auth_parameters($return_path, "get-access-token", $calendar_id);
         if (!$query) {
-            error_log("[WBK_AUTH_DEBUG] fetch_access_token failed: prepare_auth_parameters returned false");
+            error_log(
+                "[WBK_AUTH_DEBUG] fetch_access_token failed: prepare_auth_parameters returned false",
+            );
             return false;
         }
 
@@ -536,8 +546,10 @@ class WBK_Webba_Connect
 
         if (is_wp_error($response)) {
             error_log(
-                "[WBK_AUTH_DEBUG] fetch_access_token wp_remote_get error: " . $response->get_error_code() .
-                    " - " . $response->get_error_message(),
+                "[WBK_AUTH_DEBUG] fetch_access_token wp_remote_get error: " .
+                    $response->get_error_code() .
+                    " - " .
+                    $response->get_error_message(),
             );
             return false;
         }
@@ -546,22 +558,30 @@ class WBK_Webba_Connect
         $body = wp_remote_retrieve_body($response);
 
         error_log(
-            "[WBK_AUTH_DEBUG] fetch_access_token response: code=" . $response_code .
-                ", body_len=" . strlen($body) . ", body_preview=" . substr($body, 0, 500),
+            "[WBK_AUTH_DEBUG] fetch_access_token response: code=" .
+                $response_code .
+                ", body_len=" .
+                strlen($body) .
+                ", body_preview=" .
+                substr($body, 0, 500),
         );
 
         $data = json_decode($body, true);
 
         if (!$data) {
-            error_log("[WBK_AUTH_DEBUG] fetch_access_token failed: JSON decode failed or empty body");
+            error_log(
+                "[WBK_AUTH_DEBUG] fetch_access_token failed: JSON decode failed or empty body",
+            );
             return false;
         }
 
         // Check HTTP response code - non-2xx codes indicate failure
         if ($response_code < 200 || $response_code >= 300) {
             error_log(
-                "[WBK_AUTH_DEBUG] fetch_access_token failed: HTTP " . $response_code .
-                    ", error=" . (isset($data["error"]) ? $data["error"] : "no error in body"),
+                "[WBK_AUTH_DEBUG] fetch_access_token failed: HTTP " .
+                    $response_code .
+                    ", error=" .
+                    (isset($data["error"]) ? $data["error"] : "no error in body"),
             );
             return false;
         }
@@ -569,13 +589,18 @@ class WBK_Webba_Connect
         // Check if the response indicates an error in the JSON body
         if (isset($data["error"]) && (!isset($data["success"]) || $data["success"] !== true)) {
             error_log(
-                "[WBK_AUTH_DEBUG] fetch_access_token failed: API error=" . $data["error"] .
-                    ", status=" . (isset($data["status"]) ? $data["status"] : "n/a"),
+                "[WBK_AUTH_DEBUG] fetch_access_token failed: API error=" .
+                    $data["error"] .
+                    ", status=" .
+                    (isset($data["status"]) ? $data["status"] : "n/a"),
             );
             return false;
         }
 
-        error_log("[WBK_AUTH_DEBUG] fetch_access_token success: has_access_token=" . (isset($data["access_token"]) ? "yes" : "no"));
+        error_log(
+            "[WBK_AUTH_DEBUG] fetch_access_token success: has_access_token=" .
+                (isset($data["access_token"]) ? "yes" : "no"),
+        );
         return $data;
     }
 
@@ -616,7 +641,9 @@ class WBK_Webba_Connect
 
         $query = $this->prepare_auth_parameters($return_path, "start", $calendar_id);
         if (!$query) {
-            error_log("[WBK_AUTH_DEBUG] get_outlook_authorization_url failed: prepare_auth_parameters returned false");
+            error_log(
+                "[WBK_AUTH_DEBUG] get_outlook_authorization_url failed: prepare_auth_parameters returned false",
+            );
             return false;
         }
 
@@ -658,13 +685,13 @@ class WBK_Webba_Connect
     public function fetch_outlook_access_token_from_webba_connect($calendar_id = "")
     {
         $return_path = "/wp-admin/admin.php?page=wbk-connected-calendars";
-        error_log(
-            "[WBK_AUTH_DEBUG] fetch_outlook_access_token: calendar_id=" . $calendar_id,
-        );
+        error_log("[WBK_AUTH_DEBUG] fetch_outlook_access_token: calendar_id=" . $calendar_id);
 
         $query = $this->prepare_auth_parameters($return_path, "get-access-token", $calendar_id);
         if (!$query) {
-            error_log("[WBK_AUTH_DEBUG] fetch_outlook_access_token failed: prepare_auth_parameters returned false");
+            error_log(
+                "[WBK_AUTH_DEBUG] fetch_outlook_access_token failed: prepare_auth_parameters returned false",
+            );
             return false;
         }
 
@@ -688,7 +715,9 @@ class WBK_Webba_Connect
         if (is_wp_error($response)) {
             error_log(
                 "[WBK_AUTH_DEBUG] fetch_outlook_access_token wp_remote_get error: " .
-                    $response->get_error_code() . " - " . $response->get_error_message(),
+                    $response->get_error_code() .
+                    " - " .
+                    $response->get_error_message(),
             );
             return false;
         }
@@ -697,8 +726,10 @@ class WBK_Webba_Connect
         $body = wp_remote_retrieve_body($response);
 
         error_log(
-            "[WBK_AUTH_DEBUG] fetch_outlook_access_token response: code=" . $response_code .
-                ", body_preview=" . substr($body, 0, 500),
+            "[WBK_AUTH_DEBUG] fetch_outlook_access_token response: code=" .
+                $response_code .
+                ", body_preview=" .
+                substr($body, 0, 500),
         );
 
         $data = json_decode($body, true);
@@ -711,13 +742,18 @@ class WBK_Webba_Connect
         // Check if the response indicates an error
         if (isset($data["error"])) {
             error_log(
-                "[WBK_AUTH_DEBUG] fetch_outlook_access_token API error: " . $data["error"] .
-                    ", status=" . (isset($data["status"]) ? $data["status"] : "n/a"),
+                "[WBK_AUTH_DEBUG] fetch_outlook_access_token API error: " .
+                    $data["error"] .
+                    ", status=" .
+                    (isset($data["status"]) ? $data["status"] : "n/a"),
             );
             return false;
         }
 
-        error_log("[WBK_AUTH_DEBUG] fetch_outlook_access_token success: has_access_token=" . (isset($data["access_token"]) ? "yes" : "no"));
+        error_log(
+            "[WBK_AUTH_DEBUG] fetch_outlook_access_token success: has_access_token=" .
+                (isset($data["access_token"]) ? "yes" : "no"),
+        );
         return $data;
     }
 
@@ -814,7 +850,8 @@ class WBK_Webba_Connect
      */
     public function get_gmail_revoke_url($resource_id = "gmail")
     {
-        $return_path = "/wp-admin/admin.php?page=wbk-options&revoke-gmail=" . rawurlencode($resource_id);
+        $return_path =
+            "/wp-admin/admin.php?page=wbk-options&revoke-gmail=" . rawurlencode($resource_id);
 
         $query = $this->prepare_auth_parameters($return_path, "revoke-token", $resource_id);
 
@@ -839,7 +876,7 @@ class WBK_Webba_Connect
     /**
      * Get Gmail authorization status and action URLs for the options UI
      *
-     * @return array{isAuthenticated: bool, internalError: bool, authUrl?: string|null, revokeUrl?: string|null, email?: string}
+     * @return array{isAuthenticated: bool, internalError: bool, authUrl?: string|null, revokeUrl?: string|null}
      */
     public function get_gmail_auth_parameters()
     {
@@ -866,78 +903,14 @@ class WBK_Webba_Connect
             ];
         }
 
-        if (!empty($token_response["email"])) {
-            update_option("wbk_gmail_email", sanitize_email($token_response["email"]));
-            if (WBK_Mailer::get_active_transport() === "gmail") {
-                update_option(
-                    "wbk_from_email",
-                    sanitize_email($token_response["email"]),
-                );
-            }
-        }
-
         $revoke_url = $this->get_gmail_revoke_url();
-
-        $email = "";
-        if (!empty($token_response["email"])) {
-            $email = sanitize_email((string) $token_response["email"]);
-        }
-        if ($email === "") {
-            $email = sanitize_email((string) get_option("wbk_gmail_email", ""));
-        }
-
-        if (
-            $email === "" &&
-            !empty($token_response["access_token"])
-        ) {
-            $profile_response = wp_remote_get(
-                "https://gmail.googleapis.com/gmail/v1/users/me/profile",
-                [
-                    "timeout" => 15,
-                    "headers" => [
-                        "Authorization" =>
-                            "Bearer " . $token_response["access_token"],
-                    ],
-                ],
-            );
-
-            if (!is_wp_error($profile_response)) {
-                $profile_code = (int) wp_remote_retrieve_response_code(
-                    $profile_response,
-                );
-                $profile_body = json_decode(
-                    (string) wp_remote_retrieve_body($profile_response),
-                    true,
-                );
-                if (
-                    $profile_code >= 200 &&
-                    $profile_code < 300 &&
-                    is_array($profile_body) &&
-                    !empty($profile_body["emailAddress"])
-                ) {
-                    $email = sanitize_email((string) $profile_body["emailAddress"]);
-                    if ($email !== "") {
-                        update_option("wbk_gmail_email", $email);
-                    }
-                }
-            }
-        }
-
-        if (
-            $email !== "" &&
-            WBK_Mailer::get_active_transport() === "gmail"
-        ) {
-            update_option("wbk_from_email", $email);
-        }
 
         return [
             "isAuthenticated" => true,
             "internalError" => false,
             "revokeUrl" => $revoke_url !== false ? $revoke_url : null,
-            "email" => $email,
         ];
     }
-    
 
     /**
      * Create an async assistance task on Webba Connect.
@@ -962,10 +935,7 @@ class WBK_Webba_Connect
             return false;
         }
 
-        return $this->request_assistance_api(
-            "GET",
-            "assistance/tasks/" . rawurlencode($task_id),
-        );
+        return $this->request_assistance_api("GET", "assistance/tasks/" . rawurlencode($task_id));
     }
 
     /**
@@ -976,11 +946,7 @@ class WBK_Webba_Connect
      */
     public function complete_assistance_chat_history(array $payload)
     {
-        return $this->request_assistance_api(
-            "POST",
-            "assistance/chat-history/complete",
-            $payload,
-        );
+        return $this->request_assistance_api("POST", "assistance/chat-history/complete", $payload);
     }
 
     /**
@@ -1012,10 +978,7 @@ class WBK_Webba_Connect
             ];
         }
 
-        $backend_url = apply_filters(
-            "wbk_assistance_connect_api_url",
-            self::get_connect_api_url(),
-        );
+        $backend_url = apply_filters("wbk_assistance_connect_api_url", self::get_connect_api_url());
         if ($backend_url && substr($backend_url, -1) !== "/") {
             $backend_url .= "/";
         }

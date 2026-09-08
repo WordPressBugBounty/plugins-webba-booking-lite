@@ -56,7 +56,7 @@ class WBK_Backend
             "wbk-service-categories",
             "wbk-email-templates",
             "wbk-dashboard",
-            ...(wbk_is_assistance_lab_available() ? ["wbk-assistance-lab"] : []),
+            ...wbk_is_assistance_lab_available() ? ["wbk-assistance-lab"] : [],
             "wbk-spa",
             "wbk-locations",
         ];
@@ -146,8 +146,8 @@ class WBK_Backend
             );
             add_submenu_page(
                 "wbk-main",
-                __("Services & Units", "webba-booking-lite"),
-                __("Services & Units", "webba-booking-lite"),
+                __("Services", "webba-booking-lite"),
+                __("Services", "webba-booking-lite"),
                 "read",
                 "wbk-services",
                 ["WBK_Renderer", "render_backend_page"],
@@ -286,7 +286,7 @@ class WBK_Backend
             "wbk-pricing-rules",
             "wbk-coupons",
             "wbk-gg-calendars",
-            ...(wbk_is_assistance_lab_available() ? ["wbk-assistance-lab"] : []),
+            ...wbk_is_assistance_lab_available() ? ["wbk-assistance-lab"] : [],
         ];
         $ordered = [];
         foreach ($order as $slug) {
@@ -364,12 +364,8 @@ class WBK_Backend
 
             $gmail_auth = sanitize_text_field(wp_unslash($_GET["gmail_auth"]));
 
-            if ($gmail_auth === "success" && isset($_GET["gmail_email"])) {
-                $email = sanitize_email(wp_unslash($_GET["gmail_email"]));
-                if ($email !== "") {
-                    update_option("wbk_gmail_email", $email);
-                    update_option("wbk_from_email", $email);
-                }
+            if ($gmail_auth === "success") {
+                update_option("wbk_from_email", "");
                 if (class_exists("WBK_Mailer")) {
                     WBK_Mailer::clear_gmail_token_cache();
                 }
@@ -384,7 +380,7 @@ class WBK_Backend
 
             wp_redirect(
                 admin_url(
-                    "admin.php?page=wbk-options&open_section=wbk_notifications_settings_section&open_tab=email&wbk_mailer=gmail",
+                    "admin.php?page=wbk-options&open_section=wbk_notifications_settings_section&open_tab=email&wbk_mailer=gmail&wbk_from_email=",
                 ),
             );
             exit();

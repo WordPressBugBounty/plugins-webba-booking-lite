@@ -15,10 +15,9 @@ class WBK_Pdf_Processor {
     /**
      * Convert HTML/CSS to PDF
      *
-     * @param string $filename
      * @param string $content
      * @param array $bookings
-     * @return void
+     * @return string
      */
     public static function process( string $content, $bookings = [] ) : string {
         $file_path = '';

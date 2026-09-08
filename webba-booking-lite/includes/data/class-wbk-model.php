@@ -62,6 +62,12 @@ class WBK_Model
                 "/includes/migrations/class-wbk-migration-ai-tasks.php";
         }
         WBK_Migration_Ai_Tasks::run();
+
+        if (!class_exists("WBK_Migration_Push_Subscriptions")) {
+            require_once WP_WEBBA_BOOKING__PLUGIN_DIR .
+                "/includes/migrations/class-wbk-migration-push-subscriptions.php";
+        }
+        WBK_Migration_Push_Subscriptions::run();
     }
 
     /**
@@ -1498,7 +1504,7 @@ class WBK_Model
         $table->add_field(
             "list",
             "list",
-            __("Services", "webba-booking-lite"),
+            __("Hourly services", "webba-booking-lite"),
             "select",
             "general",
             [
@@ -1517,7 +1523,7 @@ class WBK_Model
         $table->add_field(
             "units",
             "units",
-            __("Units", "webba-booking-lite"),
+            __("Daily services", "webba-booking-lite"),
             "select",
             "general",
             [
@@ -1692,6 +1698,22 @@ class WBK_Model
             true,
             false,
             false,
+        );
+        $table->add_field(
+            'attach_invoice',
+            'attach_invoice',
+            __('Attach PDF invoice', 'webba-booking-lite'),
+            'checkbox',
+            '',
+            [
+                'yes' => __('Yes', 'webba-booking-lite'),
+                'tooltip' => __('Generate and attach the PDF invoice for bookings.', 'webba-booking-lite'),
+                'required_plan' => 'premium'
+            ],
+            '',
+            true,
+            false,
+            false
         );
         $tooltip = __(
             "Select the services for which this notification is used.",

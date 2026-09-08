@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.4.21
+ * Version: 6.5.0
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -74,7 +74,7 @@ if ( !defined( "WP_WEBBA_BOOKING__PLUGIN_DIR" ) ) {
     define( "WP_WEBBA_BOOKING__PLUGIN_URL", plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( "WP_WEBBA_BOOKING__VERSION" ) ) {
-    define( "WP_WEBBA_BOOKING__VERSION", "6.4.21" );
+    define( "WP_WEBBA_BOOKING__VERSION", "6.5.0" );
 }
 if ( !function_exists( "wbk_is_assistance_lab_available" ) ) {
     /**
@@ -129,7 +129,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     include "includes/class_wbk_webba_connect.php";
     include "includes/class-wbk-feature-gate.php";
     include "includes/class-wbk-remote-config.php";
-    if ( get_option( "wbk_stripe_publishable_key", "" ) != "" ) {
+    if ( get_option( "wbk_stripe_publishable_key", "" ) != "" || get_option( "wbk_stripe_sandbox_publishable_key", "" ) != null ) {
         require "includes/third-parties/class_wbk_stripe.php";
     } else {
         require "includes/third-parties/class_wbk_stripe_blank.php";
@@ -194,6 +194,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     include "includes/processors/class-wbk-placeholder-processor.php";
     include "includes/processors/class-wbk-options-processor.php";
     include "includes/processors/class-wbk-email-processor.php";
+    include "includes/processors/class-wbk-push-processor.php";
     include "includes/utilities/class-wbk-mailer.php";
     include "includes/processors/class-wbk-pdf-processor.php";
     include "includes/processors/class-wbk-qr-code-processor.php";
@@ -233,6 +234,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     add_action( "wbk_daily_event", "wbk_daily" );
     WBK_Remote_Config::init();
     WBK_Mailer::init();
+    WBK_Push_Processor::init();
     add_action( "plugins_loaded", "wbk_plugins_loaded", 10 );
     add_action( "init", "wbk_regular_routine", 40 );
     add_filter(
@@ -772,6 +774,7 @@ if ( !function_exists( "wbk_daily" ) ) {
             foreach ( $service_ids as $service_id ) {
                 $booking_ids = WBK_Model_Utils::get_future_bookings_for_service( $service_id, 1 );
                 WBK_Email_Processor::send( $booking_ids, "admin_reminder" );
+                WBK_Push_Processor::send( $booking_ids, "admin_reminder" );
                 if ( $days_before == 1 ) {
                     $booking_groups = WBK_Model_Utils::group_bookings_by_email( $booking_ids );
                     foreach ( $booking_groups as $booking_group ) {
@@ -800,6 +803,12 @@ if ( !function_exists( "wbk_init" ) ) {
     function wbk_init() {
         WBK_Model_Updater::create_ht_file();
         WBK_Model_Updater::run_update();
+        add_filter(
+            "register_block_type_args",
+            ["WBK_Gutenberg_Booking_Form_Block", "filter_block_type_args"],
+            10,
+            2
+        );
         register_block_type( __DIR__ . DIRECTORY_SEPARATOR . "build" . DIRECTORY_SEPARATOR . "block", [
             "render_callback" => ["WBK_Gutenberg_Booking_Form_Block", "render"],
         ] );
@@ -990,4 +999,4 @@ if ( !function_exists( "wbk_get_installed_at" ) ) {
     }
 
 }
-// build push 4
+// build push 6

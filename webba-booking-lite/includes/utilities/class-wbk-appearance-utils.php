@@ -423,8 +423,12 @@ class WBK_Appearance_Utils
      */
     public static function generate_css_config(array $options): string
     {
+        $non_css_keys = ['form_type'];
         $config = '';
         foreach ($options as $key => $value) {
+            if (in_array($key, $non_css_keys, true)) {
+                continue;
+            }
             $key = str_replace('_', '-', $key);
             $config .= "\t--wbk-{$key}: {$value};\n";
         }
@@ -475,6 +479,7 @@ class WBK_Appearance_Utils
             'font' => 'default',
             'border_radius' => '8px',
             'shadow' => '0px 0px 16px 0px #3f3f4629',
+            'form_type' => 'classic',
             'button_border_radius' => '8px',
             'bg_button_primary' => '#15B8A9',
             'color_button_primary' => '#ffffff',

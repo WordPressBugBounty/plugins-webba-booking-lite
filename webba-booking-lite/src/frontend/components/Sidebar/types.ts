@@ -11,3 +11,9 @@ export interface ISidebarProps {
     toggle: boolean
     onToggle: (toggle: boolean) => void
 }
+
+export interface IBottomSummaryProps {
+    total: string
+    hideCost?: boolean
+    onShowSummary: () => void
+}

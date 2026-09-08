@@ -10,7 +10,7 @@ export interface IAppearanceField {
     default?: TValue
     value?: TValue
     type: TAllowedTypes
-    setValue: (value: TValue) => void
+    setValue?: (value: TValue) => void
     warning?: string
 }
 
@@ -18,6 +18,8 @@ export interface IAppearanceSubsection {
     id: string
     title?: string
     fields: IAppearanceField[]
+    /** When set, subsection is only shown for these form types */
+    applicableFormTypes?: string[]
 }
 
 export interface IAppearanceSection {

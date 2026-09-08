@@ -85,3 +85,11 @@ export interface IUnitProps {
     attendees?: IUnitAttendees
     extra_ids?: number[]
 }
+
+export interface IServiceItemProps extends IServiceProps {
+    lockSelection?: boolean
+}
+
+export interface IUnitItemProps extends IUnitProps {
+    lockSelection?: boolean
+}

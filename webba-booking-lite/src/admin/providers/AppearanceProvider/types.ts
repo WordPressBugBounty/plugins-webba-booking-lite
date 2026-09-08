@@ -1,3 +1,7 @@
+import { IAppearanceSection } from '../../components/AppearanceEditor/types'
+
 export interface IAppearanceContext {
-    sections: any
+    sections: IAppearanceSection[]
+    formType: string
+    setFormType: (value: string) => void
 }

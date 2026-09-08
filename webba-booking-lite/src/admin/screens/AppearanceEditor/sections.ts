@@ -87,6 +87,20 @@ const borderRadiusOptions = [
     },
 ]
 
+export const FORM_TYPE_CLASSIC = 'classic'
+export const FORM_TYPE_WATERFALL = 'waterfall'
+
+export const formTypeOptions = [
+    {
+        value: FORM_TYPE_CLASSIC,
+        label: __('Webba 6 Classic form', 'webba-booking-lite'),
+    },
+    {
+        value: FORM_TYPE_WATERFALL,
+        label: __('Waterfall form', 'webba-booking-lite'),
+    },
+]
+
 export const sections = [
     // MAIN SETTINGS
     {
@@ -212,6 +226,7 @@ export const sections = [
                     'Selected Button (when selecting service in mobile)',
                     'webba-booking-lite'
                 ),
+                applicableFormTypes: [FORM_TYPE_CLASSIC],
                 fields: [
                     {
                         id: 'bg_button_selected',
@@ -257,6 +272,7 @@ export const sections = [
                     '+Add More Button (in the Sidebar)',
                     'webba-booking-lite'
                 ),
+                applicableFormTypes: [FORM_TYPE_CLASSIC],
                 fields: [
                     {
                         id: 'bg_button_secondary',
@@ -287,6 +303,7 @@ export const sections = [
             {
                 id: 'sidebar',
                 title: __('Sidebar styling', 'webba-booking-lite'),
+                applicableFormTypes: [FORM_TYPE_CLASSIC],
                 fields: [
                     {
                         id: 'bg_sidebar',
