@@ -19,7 +19,9 @@ export const WelcomeStep = ({
         assistance_available?: boolean
     }
     const logoSrc = plugin_url ? `${plugin_url}/public/images/logo-main.svg` : ''
-    const showAiSetup = assistance_available === true && typeof onLaunchAi === 'function'
+    const presetReady = Boolean(plugin_url)
+    const showAiSetup =
+        assistance_available === true && typeof onLaunchAi === 'function'
 
     return (
         <div className="wbk_welcomeStep__wrapper">
@@ -41,32 +43,33 @@ export const WelcomeStep = ({
                     )}
                 </p>
                 <div className="wbk_welcomeStep__actions">
-                    {showAiSetup ? (
-                        <>
+                    {presetReady &&
+                        (showAiSetup ? (
+                            <>
+                                <button
+                                    type="button"
+                                    className="wbk_welcomeStep__launchButton"
+                                    onClick={onLaunchAi}
+                                >
+                                    {__('AI-assisted setup', 'webba-booking-lite')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className="wbk_welcomeStep__manualButton"
+                                    onClick={onLaunchManual}
+                                >
+                                    {__('Regular Setup Wizard', 'webba-booking-lite')}
+                                </button>
+                            </>
+                        ) : (
                             <button
                                 type="button"
                                 className="wbk_welcomeStep__launchButton"
-                                onClick={onLaunchAi}
-                            >
-                                {__('AI-assisted setup', 'webba-booking-lite')}
-                            </button>
-                            <button
-                                type="button"
-                                className="wbk_welcomeStep__manualButton"
                                 onClick={onLaunchManual}
                             >
-                                {__('Regular Setup Wizard', 'webba-booking-lite')}
+                                {__('Launch wizard', 'webba-booking-lite')}
                             </button>
-                        </>
-                    ) : (
-                        <button
-                            type="button"
-                            className="wbk_welcomeStep__launchButton"
-                            onClick={onLaunchManual}
-                        >
-                            {__('Launch wizard', 'webba-booking-lite')}
-                        </button>
-                    )}
+                        ))}
                     <div className="wbk_welcomeStep__skipLinkWrapper">
                         <a
                             href={skipUrl}

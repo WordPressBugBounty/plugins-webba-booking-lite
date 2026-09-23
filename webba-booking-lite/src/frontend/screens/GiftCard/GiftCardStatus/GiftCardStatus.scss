@@ -1,0 +1,109 @@
+.wbk_gift_card_status {
+    width: 100%;
+    max-width: 500px;
+    padding: 32px 24px;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 0 16px 0 #3f3f4629;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.wbk_gift_card_status__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.wbk_gift_card_status__title {
+    margin: 0;
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 400;
+    color: #22292f;
+    font-family: colors.$wbk-font;
+}
+
+.wbk_gift_card_status__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    font-family: colors.$wbk-font;
+}
+
+.wbk_gift_card_status__badge--active {
+    background: #e8f6ee;
+    color: #0b7a3b;
+}
+
+.wbk_gift_card_status__badge--expired {
+    background: #fdecec;
+    color: #b42318;
+}
+
+.wbk_gift_card_status__balance {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wbk_gift_card_status__balance-label {
+    margin: 0;
+    font-size: 14px;
+    line-height: 18px;
+    color: #668091;
+    font-family: colors.$wbk-font;
+}
+
+.wbk_gift_card_status__balance-value {
+    margin: 0;
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: 500;
+    color: #22292f;
+    font-family: colors.$wbk-font;
+}
+
+.wbk_gift_card_status__details {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wbk_gift_card_status__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    dt {
+        margin: 0;
+        font-size: 14px;
+        line-height: 20px;
+        color: #668091;
+        font-family: colors.$wbk-font;
+    }
+
+    dd {
+        margin: 0;
+        font-size: 14px;
+        line-height: 20px;
+        color: #22292f;
+        font-family: colors.$wbk-font;
+    }
+}
+
+.wbk_gift_card_status__error {
+    margin: 0;
+    font-size: 14px;
+    line-height: 20px;
+    color: #b42318;
+    font-family: colors.$wbk-font;
+}

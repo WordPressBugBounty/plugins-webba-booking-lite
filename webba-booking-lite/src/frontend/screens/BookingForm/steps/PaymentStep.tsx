@@ -165,6 +165,8 @@ export const PaymentStep = () => {
                 return wording?.pay_on_arrival_message || ''
             case 'paypal':
                 return wording?.paypal_message || ''
+            case 'mollie':
+                return wording?.mollie_message || ''
             case 'woocommerce':
                 return wording?.woocommerce_message || ''
             default:
@@ -188,7 +190,7 @@ export const PaymentStep = () => {
                     />
                 )}
 
-                {['bank', 'arrival', 'woocommerce', 'paypal'].includes(
+                {['bank', 'arrival', 'woocommerce', 'paypal', 'mollie'].includes(
                     formData.payment_method
                 ) &&
                     paymentMessage.length > 0 && (

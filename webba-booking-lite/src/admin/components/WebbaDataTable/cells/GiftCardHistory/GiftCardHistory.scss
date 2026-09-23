@@ -1,0 +1,40 @@
+.wbk_giftCardHistory {
+    padding: 8px 8px 16px;
+    text-align: left;
+}
+
+.wbk_giftCardHistory__title {
+    margin: 0 0 12px;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    font-weight: 500;
+    color: colors.$off-black;
+}
+
+.wbk_giftCardHistory__empty {
+    margin: 0;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    color: colors.$light-grey;
+}
+
+.wbk_giftCardHistory__table {
+    width: 100%;
+    max-width: 480px;
+    border-collapse: collapse;
+
+    th,
+    td {
+        padding: 8px 12px 8px 0;
+        text-align: left;
+        font-family: typography.$font-primary;
+        font-size: 14px;
+        font-weight: 400;
+        color: colors.$off-black;
+    }
+
+    th {
+        color: colors.$light-grey;
+        font-weight: 400;
+    }
+}

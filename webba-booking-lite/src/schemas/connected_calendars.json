@@ -14,8 +14,7 @@
                     {
                         "value": "google",
                         "title": "Google Calendar",
-                        "icon": "icon-google.svg",
-                        "required_plan": "start"
+                        "icon": "icon-google.svg"
                     },
                     {
                         "value": "outlook",

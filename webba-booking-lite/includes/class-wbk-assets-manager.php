@@ -43,6 +43,7 @@ class WBK_Assets_Manager
             'wbk-service-categories',
             'wbk-appointments',
             'wbk-coupons',
+            'wbk-gift-cards',
             'wbk-gg-calendars',
             'wbk-connected-calendars',
             'wbk-pricing-rules',
@@ -218,6 +219,7 @@ class WBK_Assets_Manager
             'wbk-service-categories',
             'wbk-appointments',
             'wbk-coupons',
+            'wbk-gift-cards',
             'wbk-gg-calendars',
             'wbk-connected-calendars',
             'wbk-pricing-rules',
@@ -257,6 +259,7 @@ class WBK_Assets_Manager
             $this->has_shortcode('webbabooking') ||
             $this->has_shortcode('webba_multi_service_booking') ||
             $this->has_shortcode('webba_user_dashboard') ||
+            $this->has_shortcode('webba_gc') ||
             $this->has_booking_form_popup_trigger()
         ) {
             $has_shortcode = true;

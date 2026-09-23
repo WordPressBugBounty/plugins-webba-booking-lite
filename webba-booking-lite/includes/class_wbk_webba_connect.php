@@ -913,6 +913,399 @@ class WBK_Webba_Connect
     }
 
     /**
+     * Create Facebook / WhatsApp authorization URL.
+     *
+     * @param string $resource_id Site-level Facebook resource id.
+     * @return string|false
+     */
+    public function get_facebook_authorization_url($resource_id = "whatsapp")
+    {
+        $return_path = "/wp-admin/admin.php?page=wbk-options";
+
+        $query = $this->prepare_auth_parameters($return_path, "start", $resource_id);
+        if (!$query) {
+            return false;
+        }
+
+        return self::get_backend_url_for_browser() . "facebook/start?" . $query;
+    }
+
+    /**
+     * Fetches a Facebook / WhatsApp access token from Connect (Google-style restore).
+     *
+     * @param string $resource_id Site-level Facebook resource id.
+     * @return array|false
+     */
+    public function fetch_facebook_access_token_from_webba_connect($resource_id = "whatsapp")
+    {
+        $data = $this->fetch_access_token_from_webba_connect($resource_id, "facebook");
+        if (!$data || empty($data["access_token"])) {
+            return false;
+        }
+
+        $this->apply_facebook_token_response_to_local_cache($data);
+
+        return $data;
+    }
+
+    /**
+     * Returns whether Connect currently has Facebook / WhatsApp tokens for this site.
+     *
+     * @param string $resource_id Site-level Facebook resource id.
+     * @return bool
+     */
+    public function has_facebook_access_token_on_webba_connect($resource_id = "whatsapp")
+    {
+        $data = $this->fetch_access_token_from_webba_connect($resource_id, "facebook");
+        return is_array($data) && !empty($data["access_token"]);
+    }
+
+    /**
+     * Caches Connect Facebook token metadata in site options (short-lived local mirror).
+     *
+     * @param array $data Connect get-access-token response.
+     * @return void
+     */
+    public function apply_facebook_token_response_to_local_cache($data)
+    {
+        if (!is_array($data) || empty($data["access_token"])) {
+            return;
+        }
+
+        $this->save_local_facebook_access_token(
+            (string) $data["access_token"],
+            isset($data["expiry_date"]) ? $data["expiry_date"] : null,
+        );
+
+        if (isset($data["waba_ids"]) && is_array($data["waba_ids"])) {
+            $saved_waba_ids = $this->save_discovered_waba_ids($data["waba_ids"]);
+            if (
+                !empty($saved_waba_ids) &&
+                trim((string) get_option("wbk_whatsapp_business_account_id", "")) === ""
+            ) {
+                update_option(
+                    "wbk_whatsapp_business_account_id",
+                    sanitize_text_field((string) $saved_waba_ids[0]),
+                );
+            }
+        }
+
+        if (!empty($data["phone_number_id"])) {
+            update_option(
+                "wbk_whatsapp_phone_number_id",
+                sanitize_text_field((string) $data["phone_number_id"]),
+            );
+        }
+    }
+
+    /**
+     * Create Facebook / WhatsApp revoke URL.
+     *
+     * @param string $resource_id Site-level Facebook resource id.
+     * @return string|false
+     */
+    public function get_facebook_revoke_url($resource_id = "whatsapp")
+    {
+        $return_path =
+            "/wp-admin/admin.php?page=wbk-options&revoke-whatsapp=" .
+            rawurlencode($resource_id);
+
+        $query = $this->prepare_auth_parameters($return_path, "revoke-token", $resource_id);
+        if (!$query) {
+            return false;
+        }
+
+        $url = self::get_backend_url_for_browser() . "facebook/revoke-token?" . $query;
+        $token = trim((string) get_option("wbk_whatsapp_access_token", ""));
+        if ($token !== "") {
+            $url .= "&current_token=" . rawurlencode($token);
+        }
+
+        return $url;
+    }
+
+    /**
+     * Decrypts the Facebook token payload from Connect and stores it in wp_options.
+     *
+     * @param string $payload Encrypted callback payload from Connect.
+     * @return bool
+     */
+    public function store_facebook_token_from_callback($payload)
+    {
+        $payload = is_string($payload) ? trim($payload) : "";
+        if ($payload === "") {
+            return false;
+        }
+
+        $license_secret = $this->get_freemius_license_secret();
+        if (!$license_secret) {
+            return false;
+        }
+
+        $raw = $this->b64url_decode($payload);
+        if (!is_string($raw) || strlen($raw) < 28) {
+            return false;
+        }
+
+        $iv = substr($raw, 0, 12);
+        $tag = substr($raw, 12, 16);
+        $ciphertext = substr($raw, 28);
+        $key = hash("sha256", $license_secret, true);
+        $plaintext = openssl_decrypt(
+            $ciphertext,
+            "aes-256-gcm",
+            $key,
+            OPENSSL_RAW_DATA,
+            $iv,
+            $tag,
+        );
+        if (!is_string($plaintext) || $plaintext === "") {
+            return false;
+        }
+
+        $data = json_decode($plaintext, true);
+        if (!is_array($data) || empty($data["access_token"])) {
+            return false;
+        }
+
+        $this->save_local_facebook_access_token(
+            (string) $data["access_token"],
+            isset($data["expiry_date"]) ? $data["expiry_date"] : null,
+        );
+
+        if (isset($data["waba_ids"]) && is_array($data["waba_ids"])) {
+            $saved_waba_ids = $this->save_discovered_waba_ids($data["waba_ids"]);
+            if (
+                !empty($saved_waba_ids) &&
+                trim((string) get_option("wbk_whatsapp_business_account_id", "")) === ""
+            ) {
+                update_option(
+                    "wbk_whatsapp_business_account_id",
+                    sanitize_text_field((string) $saved_waba_ids[0]),
+                );
+            }
+        }
+
+        if (!empty($data["phone_number_id"])) {
+            update_option(
+                "wbk_whatsapp_phone_number_id",
+                sanitize_text_field((string) $data["phone_number_id"]),
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Asks Connect to inspect a Facebook token and return WABA IDs.
+     * Uses the Connect-stored token when $current_token is empty.
+     *
+     * @param string $current_token Optional current WhatsApp / Facebook access token.
+     * @return string[]
+     */
+    public function inspect_facebook_access_token($current_token = "")
+    {
+        $query = $this->prepare_auth_parameters(
+            "/wp-admin/admin.php?page=wbk-options",
+            "inspect-token",
+            "whatsapp",
+        );
+        if (!$query) {
+            return [];
+        }
+
+        $backend_url = self::get_backend_url();
+        if ($backend_url && substr($backend_url, -1) !== "/") {
+            $backend_url .= "/";
+        }
+
+        $url = $backend_url . "facebook/inspect-token?" . $query;
+        $current_token = trim((string) $current_token);
+        if ($current_token !== "") {
+            $url .= "&current_token=" . rawurlencode($current_token);
+        }
+
+        $response = wp_remote_get($url, [
+            "timeout" => 30,
+            "sslverify" => strpos($backend_url, "https://") === 0,
+        ]);
+        if (is_wp_error($response)) {
+            return [];
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+        if (
+            $response_code < 200 ||
+            $response_code >= 300 ||
+            !is_array($data)
+        ) {
+            return [];
+        }
+
+        if (!empty($data["phone_number_id"])) {
+            update_option(
+                "wbk_whatsapp_phone_number_id",
+                sanitize_text_field((string) $data["phone_number_id"]),
+            );
+        }
+
+        if (empty($data["waba_ids"]) || !is_array($data["waba_ids"])) {
+            return [];
+        }
+
+        return $this->save_discovered_waba_ids($data["waba_ids"]);
+    }
+
+    /**
+     * Asks Connect to refresh the site Facebook access token stored on Connect.
+     *
+     * @param string $current_token Optional current token override.
+     * @return bool
+     */
+    public function refresh_facebook_access_token($current_token = "")
+    {
+        $query = $this->prepare_auth_parameters(
+            "/wp-admin/admin.php?page=wbk-options",
+            "refresh-token",
+            "whatsapp",
+        );
+        if (!$query) {
+            return false;
+        }
+
+        $backend_url = self::get_backend_url();
+        if ($backend_url && substr($backend_url, -1) !== "/") {
+            $backend_url .= "/";
+        }
+
+        $url = $backend_url . "facebook/refresh-token?" . $query;
+        $current_token = trim((string) $current_token);
+        if ($current_token !== "") {
+            $url .= "&current_token=" . rawurlencode($current_token);
+        }
+
+        $response = wp_remote_get($url, [
+            "timeout" => 30,
+            "sslverify" => strpos($backend_url, "https://") === 0,
+        ]);
+        if (is_wp_error($response)) {
+            return false;
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+        if (
+            $response_code < 200 ||
+            $response_code >= 300 ||
+            !is_array($data) ||
+            empty($data["access_token"])
+        ) {
+            return false;
+        }
+
+        $this->apply_facebook_token_response_to_local_cache($data);
+
+        return true;
+    }
+
+    /**
+     * Clears locally stored Facebook / WhatsApp credentials.
+     *
+     * @return void
+     */
+    public function clear_local_facebook_access_token()
+    {
+        update_option("wbk_whatsapp_access_token", "");
+        delete_option("wbk_whatsapp_token_expiry");
+        update_option("wbk_whatsapp_business_account_id", "");
+        update_option("wbk_whatsapp_phone_number_id", "");
+        delete_option("wbk_whatsapp_discovered_waba_ids");
+    }
+
+    /**
+     * Stores the Facebook / WhatsApp access token in site options.
+     *
+     * @param string     $access_token Access token.
+     * @param int|string $expiry_date  Optional expiry timestamp in milliseconds.
+     * @return void
+     */
+    private function save_local_facebook_access_token($access_token, $expiry_date = null)
+    {
+        update_option(
+            "wbk_whatsapp_access_token",
+            sanitize_text_field((string) $access_token),
+        );
+
+        if ($expiry_date !== null && $expiry_date !== "" && intval($expiry_date) > 0) {
+            update_option("wbk_whatsapp_token_expiry", (string) intval($expiry_date));
+            return;
+        }
+
+        delete_option("wbk_whatsapp_token_expiry");
+    }
+
+    /**
+     * Stores WABA IDs discovered from Facebook token inspection.
+     *
+     * @param array $waba_ids Raw WABA IDs.
+     * @return string[]
+     */
+    private function save_discovered_waba_ids($waba_ids)
+    {
+        $normalized = [];
+        if (is_array($waba_ids)) {
+            foreach ($waba_ids as $waba_id) {
+                $value = sanitize_text_field((string) $waba_id);
+                if ($value !== "") {
+                    $normalized[] = $value;
+                }
+            }
+        }
+
+        $normalized = array_values(array_unique($normalized));
+        update_option("wbk_whatsapp_discovered_waba_ids", $normalized);
+
+        return $normalized;
+    }
+
+    /**
+     * Returns the Freemius license secret for this site.
+     *
+     * @return string|false
+     */
+    private function get_freemius_license_secret()
+    {
+        $fs = wbk_fs();
+        if (!$fs) {
+            return false;
+        }
+
+        $license = $fs->_get_license();
+        if (!$license || empty($license->secret_key)) {
+            return false;
+        }
+
+        return (string) $license->secret_key;
+    }
+
+    /**
+     * Decodes a base64url string.
+     *
+     * @param string $data Encoded payload.
+     * @return string|false
+     */
+    private function b64url_decode($data)
+    {
+        $remainder = strlen($data) % 4;
+        if ($remainder) {
+            $data .= str_repeat("=", 4 - $remainder);
+        }
+
+        return base64_decode(strtr($data, "-_", "+/"), true);
+    }
+
+    /**
      * Create an async assistance task on Webba Connect.
      *
      * @param array<string, mixed> $payload

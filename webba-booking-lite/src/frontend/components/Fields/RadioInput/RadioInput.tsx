@@ -31,26 +31,33 @@ export const RadioInput = ({ fieldConstructor, anyTouched }: IFieldProps) => {
                     {placeholder}
                 </label>
                 <div className={'wbk_input__radio__buttons'}>
-                    {options?.map((option: string, index) => (
-                        <label
-                            htmlFor={slug + index}
-                            key={index}
-                            className={'wbk_input__radio__item-wrapper'}
-                        >
-                            <input
-                                id={slug + index}
-                                type="radio"
-                                name={slug}
-                                value={option}
-                                checked={option === value}
-                                onChange={() => {
-                                    setValue(option)
-                                    setTouched(true)
-                                }}
-                            />
-                            <span>{option}</span>
-                        </label>
-                    ))}
+                    {options?.map((option, index) => {
+                        const optionValue =
+                            typeof option === 'string' ? option : option.value
+                        const optionLabel =
+                            typeof option === 'string' ? option : option.label
+
+                        return (
+                            <label
+                                htmlFor={slug + index}
+                                key={`${optionValue}-${index}`}
+                                className={'wbk_input__radio__item-wrapper'}
+                            >
+                                <input
+                                    id={slug + index}
+                                    type="radio"
+                                    name={slug}
+                                    value={optionValue}
+                                    checked={optionValue === value}
+                                    onChange={() => {
+                                        setValue(optionValue)
+                                        setTouched(true)
+                                    }}
+                                />
+                                <span>{optionLabel}</span>
+                            </label>
+                        )
+                    })}
                 </div>
             </div>
             {showError && <div className={'wbk_input__error'}>{errors[0]}</div>}

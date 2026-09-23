@@ -179,8 +179,7 @@
             "misc": {
                 "tooltip": "Set the minimum and maximum number of spots a single customer can reserve in one transaction. E.g. if you require minimum 4 spots for a slot to be booked, enter 4 in the \"min\" field.",
                 "min_field": "min_quantity",
-                "max_field": "max_quantity",
-                "required_plan": "standard"
+                "max_field": "max_quantity"
             },
             "required": true,
             "dependency": [],
@@ -196,8 +195,7 @@
             "misc": {
                 "tooltip": "Set the maximum number of spots available for this service per time slot. Once this limit is reached, the slot will close for everyone.",
                 "sub_type": "positive_integer",
-                "hidden": true,
-                "required_plan": "standard"
+                "hidden": true
             },
             "required": true,
             "dependency": [],
@@ -212,8 +210,7 @@
             "tab": "availability",
             "misc": {
                 "tooltip": "Set the maximum number of spots available for this service per time slot. Once this limit is reached, the slot will close for everyone.",
-                "sub_type": "positive_integer",
-                "required_plan": "standard"
+                "sub_type": "positive_integer"
             },
             "required": true,
             "dependency": [],
@@ -348,8 +345,8 @@
                         "yes"
                     ]
                 ],
-                "date_format": "m/d/y",
-                "time_zone": "Europe/Warsaw",
+                "date_format": "F j, Y",
+                "time_zone": "Europe/London",
                 "required_plan": "standard"
             },
             "required": false,
@@ -365,8 +362,8 @@
             "tab": "availability",
             "misc": {
                 "tooltip": "Specify a date range if the service is only valid for a specific period of time.",
-                "date_format": "m/d/y",
-                "time_zone": "Europe/Warsaw",
+                "date_format": "F j, Y",
+                "time_zone": "Europe/London",
                 "required_plan": "start",
                 "available_in_old_free": true
             },
@@ -746,8 +743,7 @@
             "misc": {
                 "tooltip": "Select the Google Calendar(s) that should sync with this service's bookings. (Available after connecting your Google account.)",
                 "multiple": true,
-                "options": "connected_calendars",
-                "required_plan": "start"
+                "options": "connected_calendars"
             },
             "required": false,
             "dependency": [],

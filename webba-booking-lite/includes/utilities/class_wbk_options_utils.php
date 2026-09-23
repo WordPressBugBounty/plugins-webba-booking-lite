@@ -88,6 +88,63 @@ class WBK_Options_Utils
     }
 
     /**
+     * Get the Mollie API key and test mode flag.
+     *
+     * @return array{0: string, 1: bool}
+     */
+    public static function get_mollie_credentials(): array
+    {
+        $test_mode = get_option('wbk_mollie_test_mode', '');
+        if ($test_mode === 'yes') {
+            return [
+                trim(get_option('wbk_mollie_test_api_key', '')),
+                true,
+            ];
+        }
+
+        return [
+            trim(get_option('wbk_mollie_live_api_key', '')),
+            false,
+        ];
+    }
+
+    /**
+     * Get the Mollie redirect URL after successful payment.
+     *
+     * @return string
+     */
+    public static function get_mollie_redirect_url(): string
+    {
+        $redirect_url = get_option('wbk_mollie_redirect_url_new', '');
+
+        if ($redirect_url && is_numeric($redirect_url)) {
+            return get_permalink($redirect_url);
+        }
+
+        return '';
+    }
+
+    /**
+     * Mollie checkout notice shown on the payment method step.
+     *
+     * @return string
+     */
+    public static function get_mollie_message(): string
+    {
+        $default =
+            'After you confirm your booking, you will be redirected to Mollie to complete payment.';
+        $message = get_option('wbk_mollie_message', $default);
+        $legacy =
+            'You will be redirected to Mollie in the next screen.';
+
+        if ($message === $legacy) {
+            return $default;
+        }
+
+        return is_string($message) && $message !== '' ? $message : $default;
+    }
+
+    /**
      * Get the tax amount
      *
      * @return float
@@ -246,6 +303,24 @@ class WBK_Options_Utils
         $email_landing_page_link = get_option('wbk_email_landing_new', '');
         if ($email_landing_page_link && is_numeric($email_landing_page_link)) {
             return get_permalink($email_landing_page_link);
+        }
+
+        return '';
+    }
+
+    /**
+     * Get the gift card QR landing page URL.
+     *
+     * @return string
+     */
+    public static function get_gift_card_landing_page_link(): string
+    {
+        $landing_page = get_option('wbk_gift_card_landing_page', '');
+        if ($landing_page && is_numeric($landing_page)) {
+            $permalink = get_permalink((int) $landing_page);
+            if (is_string($permalink) && $permalink !== '') {
+                return $permalink;
+            }
         }
 
         return '';

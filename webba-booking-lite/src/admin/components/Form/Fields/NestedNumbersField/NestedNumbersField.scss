@@ -1,0 +1,94 @@
+.wbk_nestedNumbersField {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wbk_nestedNumbersField__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.wbk_nestedNumbersField__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wbk_nestedNumbersField__handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 50px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: colors.$light-grey;
+    cursor: grab;
+    flex-shrink: 0;
+}
+
+.wbk_nestedNumbersField__input {
+    flex: 1;
+    border: 1px solid colors.$field-border;
+    background: colors.$field-background;
+    border-radius: 8px;
+    height: 50px;
+    margin: 0;
+    padding: 0 20px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    color: colors.$input-text;
+    width: 100%;
+
+    &:focus {
+        @include fields.field-focused-state;
+    }
+}
+
+.wbk_nestedNumbersField__remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 50px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    img {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.wbk_nestedNumbersField__add {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #1f6763;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+
+    img {
+        width: 16px;
+        height: 16px;
+    }
+
+    &:hover {
+        color: #155350;
+    }
+}

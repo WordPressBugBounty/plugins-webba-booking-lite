@@ -67,6 +67,7 @@ export interface FormFieldMisc {
     hidden?: boolean
     radio_type?: 'generic' | 'icon' | 'dots'
     column_count?: number
+    max_length?: number
     source_filter?: [string, string, string][]
     at_least_one_checked_rule?: IAtLeastOneCheckedRule
 }

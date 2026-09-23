@@ -40,7 +40,7 @@ export const useShowValidation = () => {
 
 export const FormProvider = ({
     form,
-    tooltipMode = 'tooltip',
+    tooltipMode = 'description',
     lockFieldsOnly = false,
     showValidation = false,
     children,

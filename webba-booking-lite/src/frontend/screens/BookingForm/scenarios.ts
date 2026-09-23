@@ -241,6 +241,7 @@ export const bookingScenarios: IScenario[] = [
                 const accepetedMethods = [
                     'stripe',
                     'paypal',
+                    'mollie',
                     'bank',
                     'arrival',
                     'woocommerce',

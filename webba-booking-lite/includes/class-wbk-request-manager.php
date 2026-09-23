@@ -160,6 +160,42 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "save_admin_theme"],
                 "permission_callback" => [$this, "save_admin_theme_permission"],
             ] );
+            register_rest_route( "wbk/v2", "/check-gift-card-code/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "check_gift_card_code"],
+                "permission_callback" => [$this, "check_gift_card_code_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/generate-gift-card-code/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "generate_gift_card_code"],
+                "permission_callback" => [$this, "check_gift_card_code_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/gift-card-stripe-intent/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "create_gift_card_stripe_intent"],
+                "permission_callback" => [$this, "create_gift_card_stripe_intent_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/purchase-gift-card/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "purchase_gift_card"],
+                "permission_callback" => [$this, "purchase_gift_card_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/gift-card-payment-details/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_gift_card_payment_details"],
+                "permission_callback" => "__return_true",
+            ] );
+            register_rest_route( "wbk/v2", "/gift-card-status/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_gift_card_status"],
+                "permission_callback" => "__return_true",
+                "args"                => [
+                    "id" => [
+                        "required" => true,
+                        "type"     => "integer",
+                    ],
+                ],
+            ] );
             register_rest_route( "webba-booking/v1", "/get-service-availability/", [
                 "methods"             => "GET",
                 "callback"            => [$this, "get_service_availability"],
@@ -220,6 +256,16 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "execute_paypal_payment"],
                 "permission_callback" => [$this, "execute_paypal_payment_permission"],
             ] );
+            register_rest_route( "webba-booking/v1", "/mollie-webhook", [
+                "methods"             => "POST",
+                "callback"            => [$this, "mollie_webhook"],
+                "permission_callback" => "__return_true",
+            ] );
+            register_rest_route( "webba-booking/v1", "/execute-mollie-payment", [
+                "methods"             => "POST",
+                "callback"            => [$this, "execute_mollie_payment"],
+                "permission_callback" => [$this, "execute_mollie_payment_permission"],
+            ] );
             register_rest_route( "webba-booking/v1", "/execute-stripe-payment", [
                 "methods"             => "POST",
                 "callback"            => [$this, "execute_stripe_payment"],
@@ -244,6 +290,36 @@ class WBK_Request_Manager {
                 "methods"             => "POST",
                 "callback"            => [$this, "send_test_smtp"],
                 "permission_callback" => [$this, "send_test_smtp_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/whatsapp-templates/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_whatsapp_templates"],
+                "permission_callback" => [$this, "whatsapp_templates_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/whatsapp-templates/create/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "create_whatsapp_template"],
+                "permission_callback" => [$this, "whatsapp_templates_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/whatsapp-templates/update/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "update_whatsapp_template"],
+                "permission_callback" => [$this, "whatsapp_templates_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/whatsapp-validate-token/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "validate_whatsapp_token"],
+                "permission_callback" => [$this, "whatsapp_templates_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/whatsapp-auth-data/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_whatsapp_auth_data"],
+                "permission_callback" => [$this, "whatsapp_templates_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/remove-whatsapp-auth/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "remove_whatsapp_auth"],
+                "permission_callback" => [$this, "whatsapp_templates_permission"],
             ] );
             register_rest_route( "wbk/v2", "/push/config", [
                 "methods"             => "GET",
@@ -336,6 +412,8 @@ class WBK_Request_Manager {
         $response_data = [];
         switch ( $payment_method ) {
             case "paypal":
+                break;
+            case "mollie":
                 break;
             case "stripe":
             case "google_pay":
@@ -529,11 +607,11 @@ class WBK_Request_Manager {
     }
 
     /**
-     * Calculate discount amount from coupon code
+     * Calculate discount amount from coupon or gift card code
      *
-     * @param string $coupon Coupon code
+     * @param string $coupon Coupon or gift card code
      * @param float $amount Amount to apply discount to
-     * @param array $service_ids Array of service IDs for coupon validation
+     * @param array $service_ids Array of service IDs for validation
      * @return float Discount amount
      */
     private function calculate_coupon_discount( $coupon, $amount, $service_ids ) {
@@ -542,8 +620,7 @@ class WBK_Request_Manager {
         }
         $coupon = esc_html( sanitize_text_field( trim( $coupon ) ) );
         $service_ids = array_unique( $service_ids );
-        // Validate coupon
-        $coupon_result = WBK_Validator::check_coupon( $coupon, $service_ids );
+        $coupon_result = WBK_Validator::check_coupon_or_gift_card( $coupon, $service_ids );
         if ( !is_array( $coupon_result ) ) {
             return 0;
         }
@@ -557,8 +634,11 @@ class WBK_Request_Manager {
                 // Percentage discount
                 return $amount * $coupon_result[2] / 100;
             } elseif ( $coupon_result[1] > 0 ) {
-                // Fixed amount discount
-                return $coupon_result[1];
+                $fixed = (float) $coupon_result[1];
+                if ( isset( $coupon_result[3] ) && $coupon_result[3] === 'gift_card' ) {
+                    return min( $fixed, $amount );
+                }
+                return $fixed;
             }
         }
         return 0;
@@ -628,7 +708,7 @@ class WBK_Request_Manager {
             }
             $coupon_result = null;
             if ( isset( $params["coupon"] ) && !empty( trim( $params["coupon"] ) ) ) {
-                $coupon_result = WBK_Validator::check_coupon( $params["coupon"], [] );
+                $coupon_result = WBK_Validator::check_coupon_or_gift_card( $params["coupon"], [] );
                 if ( $coupon_result === false ) {
                     $coupon_result = null;
                 }
@@ -726,7 +806,7 @@ class WBK_Request_Manager {
             $service_ids = array_unique( $service_ids );
             $coupon_result = null;
             if ( isset( $params["coupon"] ) && !empty( trim( $params["coupon"] ) ) ) {
-                $coupon_result = WBK_Validator::check_coupon( $params["coupon"], $service_ids );
+                $coupon_result = WBK_Validator::check_coupon_or_gift_card( $params["coupon"], $service_ids );
                 if ( $coupon_result === false ) {
                     $coupon_result = null;
                 }
@@ -774,7 +854,9 @@ class WBK_Request_Manager {
         if ( isset( $params["payment_method"] ) && in_array( $params["payment_method"], $stripe_payment_methods ) ) {
             $payment_data["email"] = $params["email"] ?? "";
             $should_generate_stripe_intent = !isset( $params["generate_stripe_intent"] ) || $params["generate_stripe_intent"] === true || $params["generate_stripe_intent"] === "true" || $params["generate_stripe_intent"] === 1;
-            if ( $should_generate_stripe_intent && $payment_data["to_pay_total"] > 0 && (!isset( $params["stripe_details"] ) || $params["stripe_details"]["service_ids"] !== $stripe_scope_ids || $params["stripe_details"]["coupon_id"] !== $params["coupon"] || $params["stripe_details"]["payment_method"] !== $params["payment_method"]) && !empty( $params["email"] ) && filter_var( $params["email"], FILTER_VALIDATE_EMAIL ) ) {
+            $existing_stripe_amount = ( isset( $params["stripe_details"]["amount"] ) ? floatval( $params["stripe_details"]["amount"] ) : null );
+            $stripe_amount_changed = $existing_stripe_amount === null || abs( $existing_stripe_amount - floatval( $payment_data["to_pay_total"] ) ) > 0.008999999999999999;
+            if ( $should_generate_stripe_intent && $payment_data["to_pay_total"] > 0 && (!isset( $params["stripe_details"] ) || $params["stripe_details"]["service_ids"] !== $stripe_scope_ids || ($params["stripe_details"]["coupon_id"] ?? null) !== ($params["coupon"] ?? null) || $params["stripe_details"]["payment_method"] !== $params["payment_method"] || $stripe_amount_changed) && !empty( $params["email"] ) && filter_var( $params["email"], FILTER_VALIDATE_EMAIL ) ) {
                 $stripe = new WBK_Stripe();
                 $stripe->init( $stripe_init_service_id );
                 $intent_data = $stripe->create_payment_intent( $params["payment_method"], $params["email"], $payment_data );
@@ -1765,6 +1847,7 @@ class WBK_Request_Manager {
                 "max_quantity"    => $extra->get_max_quantity(),
             ];
         }
+        $remote_config = WBK_Remote_Config::get_config();
         $admin_theme = get_option( 'wbk_admin_theme', 'light' );
         $admin_theme = ( $admin_theme === 'dark' ? 'dark' : 'light' );
         $timezone_string = get_option( "wbk_timezone", "UTC" );
@@ -1796,7 +1879,11 @@ class WBK_Request_Manager {
             "plan_map"                    => WBK_Feature_Gate::get_plan_map(),
             "is_pro"                      => !wbk_fs()->is_free_plan(),
             "current_plan"                => WBK_Feature_Gate::get_current_plan(),
-            "feature_display_config"      => WBK_Remote_Config::get_config(),
+            "feature_display_config"      => [
+                "hide_fields"        => (bool) $remote_config["hide_fields"],
+                "hide_tables"        => (bool) $remote_config["hide_tables"],
+                "table_message_type" => $remote_config["table_message_type"],
+            ],
             "assistance_available"        => wbk_is_assistance_available(),
             "multiservice"                => WBK_Feature_Gate::have_required_plan( "start", "only_old_users" ),
             "admin_theme"                 => $admin_theme,
@@ -1822,6 +1909,15 @@ class WBK_Request_Manager {
                 "tax"                                => WBK_Options_Utils::get_tax(),
                 "stripe_redirect_url"                => WBK_Options_Utils::get_stripe_redirect_url(),
                 "stripe_fields"                      => get_option( "wbk_stripe_additional_fields", [] ),
+                "gift_card_preset_amounts"           => WBK_Options_Processor::sanitize_nested_numbers( get_option( "wbk_gift_card_preset_amounts", [
+                    50,
+                    75,
+                    100,
+                    150,
+                    200
+                ] ) ),
+                "gift_card_allow_custom_amount"      => get_option( "wbk_gift_card_allow_custom_amount", "yes" ) === "yes",
+                "gift_card_policy"                   => WBK_Gift_Card::get_policy_html(),
                 "timezone_picker_enabled"            => get_option( "wbk_enable_timezone_picker", "yes" ) === "yes",
                 "show_post_booking_instructions"     => get_option( "wbk_enable_booking_instructions", "" ) === "yes",
                 "admin_email"                        => get_option( "wbk_super_admin_email", get_option( "admin_email" ) ),
@@ -1834,183 +1930,189 @@ class WBK_Request_Manager {
                 'show_endtime'                       => get_option( "wbk_show_endtime", "" ) === "yes",
             ],
             "wording"                     => [
-                "service_label"                           => get_option( "wbk_service_label", __( "Select a service", "webba-booking-lite" ) ),
-                "category_label"                          => get_option( "wbk_category_label", __( "Select category", "webba-booking-lite" ) ),
-                "category"                                => get_option( "wbk_wording_category", __( "Category", "webba-booking-lite" ) ),
-                "select_category"                         => get_option( "wbk_category_label", __( "Select category", "webba-booking-lite" ) ),
-                "service"                                 => get_option( "wbk_wording_service", __( "Service", "webba-booking-lite" ) ),
-                "select_service"                          => get_option( "wbk_wording_select_services", get_option( "wbk_service_label", __( "Select service", "webba-booking-lite" ) ) ),
-                "unit"                                    => get_option( "wbk_wording_unit", __( "Unit", "webba-booking-lite" ) ),
-                "select_unit"                             => get_option( "wbk_wording_select_units", __( "Select unit(s)", "webba-booking-lite" ) ),
-                "proceed_to_checkout"                     => get_option( "wbk_wording_proceed_to_checkout", __( "Proceed to checkout", "webba-booking-lite" ) ),
-                "date_label"                              => get_option( "wbk_date_basic_label", __( "Book an appointment on", "webba-booking-lite" ) ),
-                "date_placeholder"                        => get_option( "wbk_date_input_placeholder", __( "date", "webba-booking-lite" ) ),
-                "cancel"                                  => get_option( "wbk_user_dashboard_link_text_cancel", __( "Cancel booking", "webba-booking-lite" ) ),
-                "confirm_cancel"                          => get_option( "wbk_user_dashboard_link_text_confirm_cancellation", __( "Confirm cancellation", "webba-booking-lite" ) ),
-                "bookings"                                => get_option( "wbk_user_dashboard_section_bookings_label", __( "My Bookings", "webba-booking-lite" ) ),
-                "booking_history"                         => get_option( "wbk_user_dashboard_section_past_bookings_label", __( "History", "webba-booking-lite" ) ),
-                "reschedule"                              => get_option( "wbk_user_dashboard_link_text_reschedule", __( "Reschedule", "webba-booking-lite" ) ),
-                "loading"                                 => get_option( "wbk_user_dashboard_please_wait_state", __( "Please wait...", "webba-booking-lite" ) ),
-                "total_amount"                            => get_option( "wbk_total_amount_label", __( "Total amount", "webba-booking-lite" ) ),
-                "tax"                                     => get_option( "wbk_tax_label", __( "Tax", "webba-booking-lite" ) ),
-                "discount"                                => get_option( "wbk_payment_discount_item", __( "Discount (-)", "webba-booking-lite" ) ),
-                "after_booking_instructions"              => get_option( "wbk_after_booking_instructions", "<h4>Important Information</h4><ul><li>Please arrive 10 minutes before your scheduled appointment time</li><li>Cancellations must be made at least 24 hours in advance</li><li>Bring valid ID for verification at check-in</li></ul>" ),
-                "label_login_user"                        => get_option( "wbk_wording_label_login_user", __( "Username or Email Address", "webba-booking-lite" ) ),
-                "label_login_password"                    => get_option( "wbk_wording_label_login_password", __( "Password", "webba-booking-lite" ) ),
-                "label_login_button"                      => get_option( "wbk_wording_label_login_button", __( "Login", "webba-booking-lite" ) ),
-                "no_booking"                              => get_option( "wbk_user_dashboard_no_bookings_available", __( "No bookings available", "webba-booking-lite" ) ),
-                "label_login_title"                       => get_option( "wbk_user_dashboard_login_title", __( "Login to your booking manager", "webba-booking-lite" ) ),
-                "label_login_description"                 => get_option( "wbk_wording_label_login_description", __( "Access your booking dashboard", "webba-booking-lite" ) ),
-                "label_logout"                            => get_option( "wbk_wording_label_logout", __( "Logout", "webba-booking-lite" ) ),
-                "label_manage_appointments_title"         => get_option( "wbk_user_dashboard_manage_appointments_title", __( "Manage your appointments and reservations", "webba-booking-lite" ) ),
-                "label_upcoming_bookings_title"           => get_option( "wbk_user_dashboard_upcoming_bookings_title", __( "Upcoming", "webba-booking-lite" ) ),
-                "label_past_bookings_title"               => get_option( "wbk_user_dashboard_past_bookings_title", __( "Past", "webba-booking-lite" ) ),
-                "label_new_booking_title"                 => get_option( "wbk_user_dashboard_new_booking_title", __( "+ New Booking", "webba-booking-lite" ) ),
-                "help_title"                              => get_option( "wbk_sidebar_help_title", __( "Need help?", "webba-booking-lite" ) ),
-                "help_phone"                              => get_option( "wbk_sidebar_help_phone", "" ),
-                "help_email"                              => get_option( "wbk_sidebar_help_email", "" ),
-                "summary"                                 => get_option( "wbk_wording_summary", __( "Summary", "webba-booking-lite" ) ),
-                "select_services"                         => get_option( "wbk_wording_select_services", __( "Select service(s)", "webba-booking-lite" ) ),
-                "select_units"                            => get_option( "wbk_wording_select_units", __( "Select unit(s)", "webba-booking-lite" ) ),
-                "choose_service_proceed"                  => get_option( "wbk_wording_choose_service_proceed", __( "Choose a service to proceed", "webba-booking-lite" ) ),
-                "choose_unit_proceed"                     => get_option( "wbk_wording_choose_unit_proceed", __( "Choose a unit to proceed", "webba-booking-lite" ) ),
-                "unit_adult"                              => get_option( "wbk_wording_unit_adult", __( "Adult", "webba-booking-lite" ) ),
-                "unit_child"                              => get_option( "wbk_wording_unit_child", __( "Child", "webba-booking-lite" ) ),
-                "unit_infant"                             => get_option( "wbk_wording_unit_infant", __( "Infant", "webba-booking-lite" ) ),
-                "unit_max_attendees"                      => get_option( "wbk_wording_unit_max_attendees", __( "Max attendees", "webba-booking-lite" ) ),
-                "unit_select_suitable_range"              => get_option( "wbk_wording_unit_select_suitable_range", __( "Select suitable range", "webba-booking-lite" ) ),
-                "unit_date_flexibility"                   => get_option( "wbk_wording_unit_date_flexibility", __( "Date Flexibility", "webba-booking-lite" ) ),
-                "unit_exact_match"                        => get_option( "wbk_wording_unit_exact_match", __( "Exact match", "webba-booking-lite" ) ),
-                "unit_plus_minus_1_day"                   => get_option( "wbk_wording_unit_plus_minus_1_day", __( "+/- 1 day", "webba-booking-lite" ) ),
-                "unit_plus_minus_2_day"                   => get_option( "wbk_wording_unit_plus_minus_2_day", __( "+/- 2 days", "webba-booking-lite" ) ),
-                "unit_plus_minus_3_day"                   => get_option( "wbk_wording_unit_plus_minus_3_day", __( "+/- 3 days", "webba-booking-lite" ) ),
-                "unit_no_date_selected"                   => get_option( "wbk_wording_unit_no_date_selected", __( "No date selected", "webba-booking-lite" ) ),
-                "unit_days"                               => get_option( "wbk_wording_unit_days", __( "days", "webba-booking-lite" ) ),
-                "unit_available_date_ranges"              => get_option( "wbk_wording_unit_available_date_ranges", __( "Available Date Ranges", "webba-booking-lite" ) ),
-                "unit_available"                          => get_option( "wbk_wording_unit_available", __( "Available", "webba-booking-lite" ) ),
-                "unit_no_available_offers"                => get_option( "wbk_wording_unit_no_available_offers", __( "No available offers found for the selected range.", "webba-booking-lite" ) ),
-                "select_date_time_services"               => get_option( "wbk_wording_select_date_time_services", __( "Select date & time for services", "webba-booking-lite" ) ),
-                "choose_preferred_appointment_slot"       => get_option( "wbk_wording_choose_preferred_appointment_slot", __( "Choose your preferred appointment slot", "webba-booking-lite" ) ),
-                "personal_details"                        => get_option( "wbk_wording_personal_details", __( "Personal details", "webba-booking-lite" ) ),
-                "fill_contact_information"                => get_option( "wbk_wording_fill_contact_information", __( "Please fill in your contact information", "webba-booking-lite" ) ),
-                "payment_method"                          => get_option( "wbk_payment_methods_title", __( "Payment method", "webba-booking-lite" ) ),
-                "select_preferred_payment_method"         => get_option( "wbk_wording_select_preferred_payment_method", __( "Select your preferred payment method", "webba-booking-lite" ) ),
-                "back"                                    => get_option( "wbk_back_button_text", __( "Back", "webba-booking-lite" ) ),
-                "continue"                                => get_option( "wbk_next_button_text", __( "Continue", "webba-booking-lite" ) ),
-                "submit"                                  => get_option( "wbk_wording_submit", __( "Submit", "webba-booking-lite" ) ),
-                "appointment_confirmed"                   => get_option( "wbk_wording_appointment_confirmed", __( "Thank you for your booking!", "webba-booking-lite" ) ),
-                "look_forward_seeing_you"                 => get_option( "wbk_wording_look_forward_seeing_you", __( "We look forward to seeing you.", "webba-booking-lite" ) ),
-                "payment_information"                     => get_option( "wbk_wording_payment_information", __( "Payment Information", "webba-booking-lite" ) ),
-                "add_to_calendar"                         => get_option( "wbk_wording_add_to_calendar", __( "+ Add to Calendar", "webba-booking-lite" ) ),
-                "cost_breakdown"                          => get_option( "wbk_wording_cost_breakdown", __( "Cost Breakdown", "webba-booking-lite" ) ),
-                "total_amount_paid"                       => get_option( "wbk_wording_total_amount_paid", __( "Total amount", "webba-booking-lite" ) ),
-                "booking_success"                         => get_option( "wbk_wording_booking_success", __( "Booking success", "webba-booking-lite" ) ),
-                "loading_payment_form"                    => get_option( "wbk_wording_loading_payment_form", __( "Loading payment form...", "webba-booking-lite" ) ),
-                "processing"                              => get_option( "wbk_wording_processing", __( "Processing...", "webba-booking-lite" ) ),
-                "pay"                                     => get_option( "wbk_wording_pay", __( "Pay", "webba-booking-lite" ) ),
-                "pay_with"                                => get_option( "wbk_wording_pay_with", __( "Pay with", "webba-booking-lite" ) ),
-                "payment"                                 => get_option( "wbk_payment_step_title", __( "Payment", "webba-booking-lite" ) ),
-                "please_complete_payment_confirm_booking" => get_option( "wbk_wording_please_complete_payment_confirm_booking", __( "Please complete your payment to confirm your booking.", "webba-booking-lite" ) ),
-                "payment_successful"                      => get_option( "wbk_wording_payment_successful", __( "Payment successful", "webba-booking-lite" ) ),
-                "thank_you_payment"                       => get_option( "wbk_wording_thank_you_payment", __( "Thank you for your payment.", "webba-booking-lite" ) ),
-                "total_amount_due"                        => get_option( "wbk_wording_total_amount_due", __( "Total amount due", "webba-booking-lite" ) ),
-                "loading_booking_details"                 => get_option( "wbk_wording_loading_booking_details", __( "Loading booking details...", "webba-booking-lite" ) ),
-                "complete_your_payment"                   => get_option( "wbk_wording_complete_your_payment", __( "Complete Your Payment", "webba-booking-lite" ) ),
-                "select_payment_method_complete_payment"  => get_option( "wbk_wording_select_payment_method_complete_payment", __( "Please select a payment method and complete your payment to confirm your booking.", "webba-booking-lite" ) ),
-                "appointment_approved"                    => get_option( "wbk_wording_appointment_approved", __( "Appointment Approved", "webba-booking-lite" ) ),
-                "appointment_approved_message"            => get_option( "wbk_wording_appointment_approved_message", __( "You have approved this appointment. The customer has been notified.", "webba-booking-lite" ) ),
-                "appointment_cancelled"                   => get_option( "wbk_wording_appointment_cancelled", __( "Appointment Cancelled", "webba-booking-lite" ) ),
-                "appointment_cancelled_admin_message"     => get_option( "wbk_wording_appointment_cancelled_admin_message", __( "You have cancelled this appointment. The customer has been notified of the cancellation.", "webba-booking-lite" ) ),
-                "appointment_cancelled_customer_message"  => get_option( "wbk_wording_appointment_cancelled_customer_message", __( "You have cancelled your appointment. We hope to see you again soon.", "webba-booking-lite" ) ),
-                "booking_approved"                        => get_option( "wbk_wording_booking_approved", __( "Booking approved", "webba-booking-lite" ) ),
-                "booking_cancelled"                       => get_option( "wbk_wording_booking_cancelled", __( "Booking cancelled", "webba-booking-lite" ) ),
-                "approve_appointment"                     => get_option( "wbk_wording_approve_appointment", __( "Approve Appointment", "webba-booking-lite" ) ),
-                "cancel_appointment"                      => get_option( "wbk_cancel_button_text", __( "Cancel Booking", "webba-booking-lite" ) ),
-                "bank_transfer_message"                   => __( get_option( "wbk_bank_transfer_message", "Pay by bank transfer" ), "webba-booking-lite" ),
-                "pay_on_arrival_message"                  => __( get_option( "wbk_pay_on_arrival_message", "Pay on arrival" ), "webba-booking-lite" ),
-                "paypal_message"                          => __( get_option( "wbk_paypal_message", "You will be redirected to PayPal in the next screen." ), "webba-booking-lite" ),
-                "woocommerce_message"                     => __( get_option( "wbk_woo_message", "You will be able to checkout in the next screen." ), "webba-booking-lite" ),
-                "show_more"                               => get_option( "wbk_wording_show_more", __( "Show more", "webba-booking-lite" ) ),
-                "show_less"                               => get_option( "wbk_wording_show_less", __( "Show less", "webba-booking-lite" ) ),
-                "toggle_description"                      => get_option( "wbk_wording_toggle_description", __( "Toggle description", "webba-booking-lite" ) ),
-                "for_group_bookings_only"                 => get_option( "wbk_wording_for_group_bookings_only", __( "For group bookings only:", "webba-booking-lite" ) ),
-                "number_of_people"                        => get_option( "wbk_wording_number_of_people", __( "Number of people:", "webba-booking-lite" ) ),
-                "reduce_item"                             => get_option( "wbk_wording_reduce_item", __( "Reduce item", "webba-booking-lite" ) ),
-                "increase_item"                           => get_option( "wbk_wording_increase_item", __( "Increase item", "webba-booking-lite" ) ),
-                "no_time_selected"                        => get_option( "wbk_wording_no_time_selected", __( "No time selected", "webba-booking-lite" ) ),
-                "remove_item"                             => get_option( "wbk_wording_remove_item", __( "Remove item", "webba-booking-lite" ) ),
-                "empty_summary"                           => get_option( "wbk_wording_empty_summary", __( "Please select a service and slot to see a summary here.", "webba-booking-lite" ) ),
-                "phone"                                   => get_option( "wbk_phone_label", __( "Phone", "webba-booking-lite" ) ),
-                "email"                                   => get_option( "wbk_email_label", __( "Email", "webba-booking-lite" ) ),
-                "no_services_found"                       => get_option( "wbk_wording_no_services_found", __( "No services found!", "webba-booking-lite" ) ),
-                "no_units_found"                          => get_option( "wbk_wording_no_units_found", __( "No units found!", "webba-booking-lite" ) ),
-                "show_summary"                            => get_option( "wbk_wording_show_summary", __( "Show summary", "webba-booking-lite" ) ),
-                "total"                                   => get_option( "wbk_payment_total_title", __( "Total", "webba-booking-lite" ) ),
-                "free"                                    => get_option( "wbk_wording_free", __( "Free", "webba-booking-lite" ) ),
-                "select_date_time"                        => get_option( "wbk_wording_select_date_time", __( "Select date & time", "webba-booking-lite" ) ),
-                "choosing_timeslot_for"                   => get_option( "wbk_wording_choosing_timeslot_for", __( "Choosing time slot for", "webbab-booking-lite" ) ),
-                "available"                               => get_option( "wbk_wording_available", __( "Available", "webba-booking-lite" ) ),
-                "booked"                                  => get_option( "wbk_wording_booked", __( "Booked", "webba-booking-lite" ) ),
-                "today"                                   => get_option( "wbk_wording_today", __( "Today", "webba-booking-lite" ) ),
-                "add_more"                                => get_option( "wbk_wording_add_more", __( "Add more", "webba-booking-lite" ) ),
-                "slots"                                   => get_option( "wbk_wording_slots", __( "slots", "webba-booking-lite" ) ),
-                "enter_coupon_code"                       => get_option( "wbk_wording_enter_coupon_code", __( "Enter coupon code", "webba-booking-lite" ) ),
-                "apply"                                   => get_option( "wbk_wording_apply", __( "Apply", "webba-booking-lite" ) ),
-                "please_select_service"                   => get_option( "wbk_wording_please_select_service", __( "Please select at least one service.", "webba-booking-lite" ) ),
-                "please_select_timeslot"                  => get_option( "wbk_wording_please_select_timeslot", __( "Please select a time slot for each selected service.", "webba-booking-lite" ) ),
-                "please_fill_out_all_fields"              => get_option( "wbk_wording_please_fill_out_all_fields", __( "Please fill out all required fields.", "webba-booking-lite" ) ),
-                "please_select_payment_method"            => get_option( "wbk_wording_please_select_payment_method", __( "Please select a payment method.", "webba-booking-lite" ) ),
-                "please_fill_out_payment_form"            => get_option( "wbk_wording_please_fill_out_payment_form", __( "Please fill out payment form.", "webba-booking-lite" ) ),
-                "duration"                                => get_option( "wbk_wording_duration", __( "Duration", "webba-booking-lite" ) ),
-                "tax_included"                            => get_option( "wbk_wording_tax_included", __( "Tax incl.", "webba-booking-lite" ) ),
-                "select"                                  => get_option( "wbk_wording_select", __( "+ Select", "webba-booking-lite" ) ),
-                "selected"                                => get_option( "wbk_wording_selected", __( "Selected", "webba-booking-lite" ) ),
-                "no_available_timeslots"                  => get_option( "wbk_wording_no_available_timeslots", __( "No available time slots", "webba-booking-lite" ) ),
-                "hour"                                    => get_option( "wbk_wording_hour", __( "h", "webba-booking-lite" ) ),
-                "minute"                                  => get_option( "wbk_wording_minute", __( "min", "webba-booking-lite" ) ),
-                "this_field_is_required"                  => get_option( "wbk_wording_this_field_is_required", __( "This field is required", "webba-booking-lite" ) ),
-                "the_entered_email_is_invalid"            => get_option( "wbk_wording_the_entered_email_is_invalid", __( "The entered email is invalid", "webba-booking-lite" ) ),
-                "please_enter_a_valid_phone_number"       => get_option( "wbk_wording_please_enter_a_valid_phone_number", __( "Please enter a valid phone number", "webba-booking-lite" ) ),
-                "the_entered_number_is_invalid"           => get_option( "wbk_wording_the_entered_number_is_invalid", __( "The entered number is invalid", "webba-booking-lite" ) ),
-                "plan_required_message"                   => WBK_Feature_Gate::get_plan_limit_message( "", false ),
-                "no_bookings_found"                       => get_option( "wbk_wording_no_bookings_found", __( "No bookings found for the provided token", "webba-booking-lite" ) ),
-                "service_fees"                            => get_option( "wbk_wording_service_fees", __( "Service Fees", "webba-booking-lite" ) ),
-                "full_price"                              => get_option( "wbk_wording_full_price", __( "Full price", "webba-booking-lite" ) ),
-                "pay_now"                                 => get_option( "wbk_wording_pay_now", __( "Pay now", "webba-booking-lite" ) ),
-                "left_to_pay"                             => get_option( "wbk_wording_left_to_pay", __( "Left to pay", "webba-booking-lite" ) ),
-                "show_details"                            => get_option( "wbk_wording_show_details", __( "Show details", "webba-booking-lite" ) ),
-                "price"                                   => get_option( "wbk_wording_price", __( "Price", "webba-booking-lite" ) ),
-                "to_pay"                                  => get_option( "wbk_wording_to_pay", __( "To pay now", "webba-booking-lite" ) ),
-                "total_amount_tax_incl"                   => get_option( "wbk_wording_total_amount_tax_incl", __( "Total Amount (tax incl.)", "webba-booking-lite" ) ),
-                "hide_details"                            => get_option( "wbk_wording_hide_details", __( "Hide details", "webba-booking-lite" ) ),
-                "location"                                => get_option( "wbk_wording_location", __( "Location", "webba-booking-lite" ) ),
-                "select_location"                         => get_option( "wbk_wording_select_location", __( "Select location", "webba-booking-lite" ) ),
-                "please_select_location"                  => get_option( "wbk_wording_please_select_location", __( "Please select a location first to choose services.", "webba-booking-lite" ) ),
-                "please_select_location_units"            => get_option( "wbk_wording_please_select_location_units", __( "Please select a location first to choose units.", "webba-booking-lite" ) ),
-                "select_staff_member"                     => get_option( "wbk_wording_select_staff_member", __( "SELECT STAFF MEMBER", "webba-booking-lite" ) ),
-                "any_available"                           => get_option( "wbk_wording_any_available", __( "Any Available", "webba-booking-lite" ) ),
-                "best_available_time"                     => get_option( "wbk_wording_best_available_time", __( "Best available time.", "webba-booking-lite" ) ),
-                "select_extras"                           => get_option( "wbk_wording_select_extras", __( "Select extras", "webba-booking-lite" ) ),
-                "choose_additional_services"              => get_option( "wbk_wording_choose_additional_services", __( "Choose additional items", "webba-booking-lite" ) ),
-                "additional_items"                        => get_option( "wbk_wording_additional_items", __( "Additional items", "webba-booking-lite" ) ),
-                "pay_full_amount"                         => get_option( 'wbk_wording_pay_full_amount', __( 'I want to pay full amount', 'webba-booking-lite' ) ),
-                "left_to_pay_later"                       => get_option( 'wbk_wording_left_to_pay_later', __( 'Left to pay later', 'webba-booking-lite' ) ),
-                "deposits"                                => get_option( 'wbk_wording_deposits', __( 'Deposits', 'webba-booking-lite' ) ),
-                "hide_summary"                            => get_option( 'wbk_wording_hide_summary', __( 'Hide summary', 'webba-booking-lite' ) ),
-                "total_booked_items"                      => get_option( "wbk_total_booked_items_label", __( "Total booked items", "webba-booking-lite" ) ),
-                "grand_total"                             => get_option( "wbk_grand_total_label", __( "Grand total", "webba-booking-lite" ) ),
-                "recurring_booking"                       => get_option( "wbk_wording_recurring_booking", __( "Recurring booking", "webba-booking-lite" ) ),
-                "recurring_booking_hint"                  => get_option( "wbk_wording_recurring_booking_hint", __( "This series exceeds the maximum number of slots allowed for this service.", "webba-booking-lite" ) ),
-                "recurring_booking_repeat_every"          => get_option( "wbk_wording_recurring_booking_repeat_every", __( "Repeat every", "webba-booking-lite" ) ),
-                "recurring_booking_interval"              => get_option( "wbk_wording_recurring_booking_interval", __( "Interval", "webba-booking-lite" ) ),
-                "recurring_booking_number_of_time_slots"  => get_option( "wbk_wording_recurring_booking_number_of_time_slots", __( "Number of time slots", "webba-booking-lite" ) ),
-                "loading_appointments"                    => get_option( "wbk_wording_loading_appointments", __( "Loading appointments...", "webba-booking-lite" ) ),
-                "no_appointments_selected"                => get_option( "wbk_wording_no_appointments_selected", __( "No appointments selected. Add slots using the controls above or close the popup.", "webba-booking-lite" ) ),
-                "unavailable"                             => get_option( "wbk_wording_unavailable", __( "unavailable", "webba-booking-lite" ) ),
-                "choose_another_time"                     => get_option( "wbk_wording_choose_another_time", __( "Choose another time", "webba-booking-lite" ) ),
-                "select_a_time"                           => get_option( "wbk_wording_select_a_time", __( "Select a time", "webba-booking-lite" ) ),
-                "adjusted"                                => get_option( "wbk_wording_adjusted", __( "adjusted", "webba-booking-lite" ) ),
-                "remove_appointment"                      => get_option( "wbk_wording_remove_appointment", __( "Remove appointment", "webba-booking-lite" ) ),
+                "service_label"                             => get_option( "wbk_service_label", __( "Select a service", "webba-booking-lite" ) ),
+                "category_label"                            => get_option( "wbk_category_label", __( "Select category", "webba-booking-lite" ) ),
+                "category"                                  => get_option( "wbk_wording_category", __( "Category", "webba-booking-lite" ) ),
+                "select_category"                           => get_option( "wbk_category_label", __( "Select category", "webba-booking-lite" ) ),
+                "service"                                   => get_option( "wbk_wording_service", __( "Service", "webba-booking-lite" ) ),
+                "select_service"                            => get_option( "wbk_wording_select_services", get_option( "wbk_service_label", __( "Select service", "webba-booking-lite" ) ) ),
+                "unit"                                      => get_option( "wbk_wording_unit", __( "Unit", "webba-booking-lite" ) ),
+                "select_unit"                               => get_option( "wbk_wording_select_units", __( "Select unit(s)", "webba-booking-lite" ) ),
+                "proceed_to_checkout"                       => get_option( "wbk_wording_proceed_to_checkout", __( "Proceed to checkout", "webba-booking-lite" ) ),
+                "date_label"                                => get_option( "wbk_date_basic_label", __( "Book an appointment on", "webba-booking-lite" ) ),
+                "date_placeholder"                          => get_option( "wbk_date_input_placeholder", __( "date", "webba-booking-lite" ) ),
+                "cancel"                                    => get_option( "wbk_user_dashboard_link_text_cancel", __( "Cancel booking", "webba-booking-lite" ) ),
+                "confirm_cancel"                            => get_option( "wbk_user_dashboard_link_text_confirm_cancellation", __( "Confirm cancellation", "webba-booking-lite" ) ),
+                "bookings"                                  => get_option( "wbk_user_dashboard_section_bookings_label", __( "My Bookings", "webba-booking-lite" ) ),
+                "booking_history"                           => get_option( "wbk_user_dashboard_section_past_bookings_label", __( "History", "webba-booking-lite" ) ),
+                "reschedule"                                => get_option( "wbk_user_dashboard_link_text_reschedule", __( "Reschedule", "webba-booking-lite" ) ),
+                "loading"                                   => get_option( "wbk_user_dashboard_please_wait_state", __( "Please wait...", "webba-booking-lite" ) ),
+                "total_amount"                              => get_option( "wbk_total_amount_label", __( "Total amount", "webba-booking-lite" ) ),
+                "tax"                                       => get_option( "wbk_tax_label", __( "Tax", "webba-booking-lite" ) ),
+                "discount"                                  => get_option( "wbk_payment_discount_item", __( "Discount (-)", "webba-booking-lite" ) ),
+                "after_booking_instructions"                => get_option( "wbk_after_booking_instructions", "<h4>Important Information</h4><ul><li>Please arrive 10 minutes before your scheduled appointment time</li><li>Cancellations must be made at least 24 hours in advance</li><li>Bring valid ID for verification at check-in</li></ul>" ),
+                "label_login_user"                          => get_option( "wbk_wording_label_login_user", __( "Username or Email Address", "webba-booking-lite" ) ),
+                "label_login_password"                      => get_option( "wbk_wording_label_login_password", __( "Password", "webba-booking-lite" ) ),
+                "label_login_button"                        => get_option( "wbk_wording_label_login_button", __( "Login", "webba-booking-lite" ) ),
+                "no_booking"                                => get_option( "wbk_user_dashboard_no_bookings_available", __( "No bookings available", "webba-booking-lite" ) ),
+                "label_login_title"                         => get_option( "wbk_user_dashboard_login_title", __( "Login to your booking manager", "webba-booking-lite" ) ),
+                "label_login_description"                   => get_option( "wbk_wording_label_login_description", __( "Access your booking dashboard", "webba-booking-lite" ) ),
+                "label_logout"                              => get_option( "wbk_wording_label_logout", __( "Logout", "webba-booking-lite" ) ),
+                "label_manage_appointments_title"           => get_option( "wbk_user_dashboard_manage_appointments_title", __( "Manage your appointments and reservations", "webba-booking-lite" ) ),
+                "label_upcoming_bookings_title"             => get_option( "wbk_user_dashboard_upcoming_bookings_title", __( "Upcoming", "webba-booking-lite" ) ),
+                "label_past_bookings_title"                 => get_option( "wbk_user_dashboard_past_bookings_title", __( "Past", "webba-booking-lite" ) ),
+                "label_new_booking_title"                   => get_option( "wbk_user_dashboard_new_booking_title", __( "+ New Booking", "webba-booking-lite" ) ),
+                "help_title"                                => get_option( "wbk_sidebar_help_title", __( "Need help?", "webba-booking-lite" ) ),
+                "help_phone"                                => get_option( "wbk_sidebar_help_phone", "" ),
+                "help_email"                                => get_option( "wbk_sidebar_help_email", "" ),
+                "summary"                                   => get_option( "wbk_wording_summary", __( "Summary", "webba-booking-lite" ) ),
+                "select_services"                           => get_option( "wbk_wording_select_services", __( "Select service(s)", "webba-booking-lite" ) ),
+                "select_units"                              => get_option( "wbk_wording_select_units", __( "Select unit(s)", "webba-booking-lite" ) ),
+                "choose_service_proceed"                    => get_option( "wbk_wording_choose_service_proceed", __( "Choose a service to proceed", "webba-booking-lite" ) ),
+                "choose_unit_proceed"                       => get_option( "wbk_wording_choose_unit_proceed", __( "Choose a unit to proceed", "webba-booking-lite" ) ),
+                "unit_adult"                                => get_option( "wbk_wording_unit_adult", __( "Adult", "webba-booking-lite" ) ),
+                "unit_child"                                => get_option( "wbk_wording_unit_child", __( "Child", "webba-booking-lite" ) ),
+                "unit_infant"                               => get_option( "wbk_wording_unit_infant", __( "Infant", "webba-booking-lite" ) ),
+                "unit_max_attendees"                        => get_option( "wbk_wording_unit_max_attendees", __( "Max attendees", "webba-booking-lite" ) ),
+                "unit_select_suitable_range"                => get_option( "wbk_wording_unit_select_suitable_range", __( "Select suitable range", "webba-booking-lite" ) ),
+                "unit_date_flexibility"                     => get_option( "wbk_wording_unit_date_flexibility", __( "Date Flexibility", "webba-booking-lite" ) ),
+                "unit_exact_match"                          => get_option( "wbk_wording_unit_exact_match", __( "Exact match", "webba-booking-lite" ) ),
+                "unit_plus_minus_1_day"                     => get_option( "wbk_wording_unit_plus_minus_1_day", __( "+/- 1 day", "webba-booking-lite" ) ),
+                "unit_plus_minus_2_day"                     => get_option( "wbk_wording_unit_plus_minus_2_day", __( "+/- 2 days", "webba-booking-lite" ) ),
+                "unit_plus_minus_3_day"                     => get_option( "wbk_wording_unit_plus_minus_3_day", __( "+/- 3 days", "webba-booking-lite" ) ),
+                "unit_no_date_selected"                     => get_option( "wbk_wording_unit_no_date_selected", __( "No date selected", "webba-booking-lite" ) ),
+                "unit_days"                                 => get_option( "wbk_wording_unit_days", __( "days", "webba-booking-lite" ) ),
+                "unit_available_date_ranges"                => get_option( "wbk_wording_unit_available_date_ranges", __( "Available Date Ranges", "webba-booking-lite" ) ),
+                "unit_available"                            => get_option( "wbk_wording_unit_available", __( "Available", "webba-booking-lite" ) ),
+                "unit_no_available_offers"                  => get_option( "wbk_wording_unit_no_available_offers", __( "No available offers found for the selected range.", "webba-booking-lite" ) ),
+                "select_date_time_services"                 => get_option( "wbk_wording_select_date_time_services", __( "Select date & time for services", "webba-booking-lite" ) ),
+                "choose_preferred_appointment_slot"         => get_option( "wbk_wording_choose_preferred_appointment_slot", __( "Choose your preferred appointment slot", "webba-booking-lite" ) ),
+                "personal_details"                          => get_option( "wbk_wording_personal_details", __( "Personal details", "webba-booking-lite" ) ),
+                "fill_contact_information"                  => get_option( "wbk_wording_fill_contact_information", __( "Please fill in your contact information", "webba-booking-lite" ) ),
+                "payment_method"                            => get_option( "wbk_payment_methods_title", __( "Payment method", "webba-booking-lite" ) ),
+                "select_preferred_payment_method"           => get_option( "wbk_wording_select_preferred_payment_method", __( "Select your preferred payment method", "webba-booking-lite" ) ),
+                "back"                                      => get_option( "wbk_back_button_text", __( "Back", "webba-booking-lite" ) ),
+                "continue"                                  => get_option( "wbk_next_button_text", __( "Continue", "webba-booking-lite" ) ),
+                "submit"                                    => get_option( "wbk_wording_submit", __( "Submit", "webba-booking-lite" ) ),
+                "appointment_confirmed"                     => get_option( "wbk_wording_appointment_confirmed", __( "Thank you for your booking!", "webba-booking-lite" ) ),
+                "look_forward_seeing_you"                   => get_option( "wbk_wording_look_forward_seeing_you", __( "We look forward to seeing you.", "webba-booking-lite" ) ),
+                "payment_information"                       => get_option( "wbk_wording_payment_information", __( "Payment Information", "webba-booking-lite" ) ),
+                "add_to_calendar"                           => get_option( "wbk_wording_add_to_calendar", __( "+ Add to Calendar", "webba-booking-lite" ) ),
+                "cost_breakdown"                            => get_option( "wbk_wording_cost_breakdown", __( "Cost Breakdown", "webba-booking-lite" ) ),
+                "total_amount_paid"                         => get_option( "wbk_wording_total_amount_paid", __( "Total amount", "webba-booking-lite" ) ),
+                "booking_success"                           => get_option( "wbk_wording_booking_success", __( "Booking success", "webba-booking-lite" ) ),
+                "loading_payment_form"                      => get_option( "wbk_wording_loading_payment_form", __( "Loading payment form...", "webba-booking-lite" ) ),
+                "processing"                                => get_option( "wbk_wording_processing", __( "Processing...", "webba-booking-lite" ) ),
+                "pay"                                       => get_option( "wbk_wording_pay", __( "Pay", "webba-booking-lite" ) ),
+                "pay_with"                                  => get_option( "wbk_wording_pay_with", __( "Pay with", "webba-booking-lite" ) ),
+                "payment"                                   => get_option( "wbk_payment_step_title", __( "Payment", "webba-booking-lite" ) ),
+                "please_complete_payment_confirm_booking"   => get_option( "wbk_wording_please_complete_payment_confirm_booking", __( "Please complete your payment to confirm your booking.", "webba-booking-lite" ) ),
+                "payment_successful"                        => get_option( "wbk_wording_payment_successful", __( "Payment successful", "webba-booking-lite" ) ),
+                "thank_you_payment"                         => get_option( "wbk_wording_thank_you_payment", __( "Thank you for your payment.", "webba-booking-lite" ) ),
+                "gift_card"                                 => get_option( "wbk_wording_gift_card", __( "Gift card", "webba-booking-lite" ) ),
+                "gift_card_for"                             => get_option( "wbk_wording_gift_card_for", __( "Gift card for #recipient_name", "webba-booking-lite" ) ),
+                "gift_card_code"                            => get_option( "wbk_wording_gift_card_code", __( "Gift card code", "webba-booking-lite" ) ),
+                "gift_card_thank_you_message"               => get_option( "wbk_wording_gift_card_thank_you_message", __( "Thank you for your gift card purchase. A confirmation email will be sent to you, and the recipient will receive their gift on the selected date.", "webba-booking-lite" ) ),
+                "please_complete_payment_confirm_gift_card" => get_option( "wbk_wording_please_complete_payment_confirm_gift_card", __( "Please complete your payment to confirm your gift card purchase.", "webba-booking-lite" ) ),
+                "total_amount_due"                          => get_option( "wbk_wording_total_amount_due", __( "Total amount due", "webba-booking-lite" ) ),
+                "loading_booking_details"                   => get_option( "wbk_wording_loading_booking_details", __( "Loading booking details...", "webba-booking-lite" ) ),
+                "complete_your_payment"                     => get_option( "wbk_wording_complete_your_payment", __( "Complete Your Payment", "webba-booking-lite" ) ),
+                "select_payment_method_complete_payment"    => get_option( "wbk_wording_select_payment_method_complete_payment", __( "Please select a payment method and complete your payment to confirm your booking.", "webba-booking-lite" ) ),
+                "appointment_approved"                      => get_option( "wbk_wording_appointment_approved", __( "Appointment Approved", "webba-booking-lite" ) ),
+                "appointment_approved_message"              => get_option( "wbk_wording_appointment_approved_message", __( "You have approved this appointment. The customer has been notified.", "webba-booking-lite" ) ),
+                "appointment_cancelled"                     => get_option( "wbk_wording_appointment_cancelled", __( "Appointment Cancelled", "webba-booking-lite" ) ),
+                "appointment_cancelled_admin_message"       => get_option( "wbk_wording_appointment_cancelled_admin_message", __( "You have cancelled this appointment. The customer has been notified of the cancellation.", "webba-booking-lite" ) ),
+                "appointment_cancelled_customer_message"    => get_option( "wbk_wording_appointment_cancelled_customer_message", __( "You have cancelled your appointment. We hope to see you again soon.", "webba-booking-lite" ) ),
+                "booking_approved"                          => get_option( "wbk_wording_booking_approved", __( "Booking approved", "webba-booking-lite" ) ),
+                "booking_cancelled"                         => get_option( "wbk_wording_booking_cancelled", __( "Booking cancelled", "webba-booking-lite" ) ),
+                "approve_appointment"                       => get_option( "wbk_wording_approve_appointment", __( "Approve Appointment", "webba-booking-lite" ) ),
+                "cancel_appointment"                        => get_option( "wbk_cancel_button_text", __( "Cancel Booking", "webba-booking-lite" ) ),
+                "bank_transfer_message"                     => __( get_option( "wbk_bank_transfer_message", "Pay by bank transfer" ), "webba-booking-lite" ),
+                "pay_on_arrival_message"                    => __( get_option( "wbk_pay_on_arrival_message", "Pay on arrival" ), "webba-booking-lite" ),
+                "paypal_message"                            => __( get_option( "wbk_paypal_message", "You will be redirected to PayPal in the next screen." ), "webba-booking-lite" ),
+                "mollie_message"                            => __( WBK_Options_Utils::get_mollie_message(), "webba-booking-lite" ),
+                "woocommerce_message"                       => __( get_option( "wbk_woo_message", "You will be able to checkout in the next screen." ), "webba-booking-lite" ),
+                "show_more"                                 => get_option( "wbk_wording_show_more", __( "Show more", "webba-booking-lite" ) ),
+                "show_less"                                 => get_option( "wbk_wording_show_less", __( "Show less", "webba-booking-lite" ) ),
+                "toggle_description"                        => get_option( "wbk_wording_toggle_description", __( "Toggle description", "webba-booking-lite" ) ),
+                "for_group_bookings_only"                   => get_option( "wbk_wording_for_group_bookings_only", __( "For group bookings only:", "webba-booking-lite" ) ),
+                "number_of_people"                          => get_option( "wbk_wording_number_of_people", __( "Number of people:", "webba-booking-lite" ) ),
+                "reduce_item"                               => get_option( "wbk_wording_reduce_item", __( "Reduce item", "webba-booking-lite" ) ),
+                "increase_item"                             => get_option( "wbk_wording_increase_item", __( "Increase item", "webba-booking-lite" ) ),
+                "no_time_selected"                          => get_option( "wbk_wording_no_time_selected", __( "No time selected", "webba-booking-lite" ) ),
+                "remove_item"                               => get_option( "wbk_wording_remove_item", __( "Remove item", "webba-booking-lite" ) ),
+                "empty_summary"                             => get_option( "wbk_wording_empty_summary", __( "Please select a service and slot to see a summary here.", "webba-booking-lite" ) ),
+                "phone"                                     => get_option( "wbk_phone_label", __( "Phone", "webba-booking-lite" ) ),
+                "email"                                     => get_option( "wbk_email_label", __( "Email", "webba-booking-lite" ) ),
+                "no_services_found"                         => get_option( "wbk_wording_no_services_found", __( "No services found!", "webba-booking-lite" ) ),
+                "no_units_found"                            => get_option( "wbk_wording_no_units_found", __( "No units found!", "webba-booking-lite" ) ),
+                "show_summary"                              => get_option( "wbk_wording_show_summary", __( "Show summary", "webba-booking-lite" ) ),
+                "total"                                     => get_option( "wbk_payment_total_title", __( "Total", "webba-booking-lite" ) ),
+                "free"                                      => get_option( "wbk_wording_free", __( "Free", "webba-booking-lite" ) ),
+                "select_date_time"                          => get_option( "wbk_wording_select_date_time", __( "Select date & time", "webba-booking-lite" ) ),
+                "choosing_timeslot_for"                     => get_option( "wbk_wording_choosing_timeslot_for", __( "Choosing time slot for", "webbab-booking-lite" ) ),
+                "available"                                 => get_option( "wbk_wording_available", __( "Available", "webba-booking-lite" ) ),
+                "booked"                                    => get_option( "wbk_wording_booked", __( "Booked", "webba-booking-lite" ) ),
+                "today"                                     => get_option( "wbk_wording_today", __( "Today", "webba-booking-lite" ) ),
+                "add_more"                                  => get_option( "wbk_wording_add_more", __( "Add more", "webba-booking-lite" ) ),
+                "slots"                                     => get_option( "wbk_wording_slots", __( "slots", "webba-booking-lite" ) ),
+                "enter_coupon_code"                         => get_option( "wbk_wording_enter_coupon_code", __( "Enter coupon code", "webba-booking-lite" ) ),
+                "apply"                                     => get_option( "wbk_wording_apply", __( "Apply", "webba-booking-lite" ) ),
+                "please_select_service"                     => get_option( "wbk_wording_please_select_service", __( "Please select at least one service.", "webba-booking-lite" ) ),
+                "please_select_timeslot"                    => get_option( "wbk_wording_please_select_timeslot", __( "Please select a time slot for each selected service.", "webba-booking-lite" ) ),
+                "please_fill_out_all_fields"                => get_option( "wbk_wording_please_fill_out_all_fields", __( "Please fill out all required fields.", "webba-booking-lite" ) ),
+                "please_select_payment_method"              => get_option( "wbk_wording_please_select_payment_method", __( "Please select a payment method.", "webba-booking-lite" ) ),
+                "please_fill_out_payment_form"              => get_option( "wbk_wording_please_fill_out_payment_form", __( "Please fill out payment form.", "webba-booking-lite" ) ),
+                "duration"                                  => get_option( "wbk_wording_duration", __( "Duration", "webba-booking-lite" ) ),
+                "tax_included"                              => get_option( "wbk_wording_tax_included", __( "Tax incl.", "webba-booking-lite" ) ),
+                "select"                                    => get_option( "wbk_wording_select", __( "+ Select", "webba-booking-lite" ) ),
+                "selected"                                  => get_option( "wbk_wording_selected", __( "Selected", "webba-booking-lite" ) ),
+                "no_available_timeslots"                    => get_option( "wbk_wording_no_available_timeslots", __( "No available time slots", "webba-booking-lite" ) ),
+                "hour"                                      => get_option( "wbk_wording_hour", __( "h", "webba-booking-lite" ) ),
+                "minute"                                    => get_option( "wbk_wording_minute", __( "min", "webba-booking-lite" ) ),
+                "this_field_is_required"                    => get_option( "wbk_wording_this_field_is_required", __( "This field is required", "webba-booking-lite" ) ),
+                "the_entered_email_is_invalid"              => get_option( "wbk_wording_the_entered_email_is_invalid", __( "The entered email is invalid", "webba-booking-lite" ) ),
+                "please_enter_a_valid_phone_number"         => get_option( "wbk_wording_please_enter_a_valid_phone_number", __( "Please enter a valid phone number", "webba-booking-lite" ) ),
+                "the_entered_number_is_invalid"             => get_option( "wbk_wording_the_entered_number_is_invalid", __( "The entered number is invalid", "webba-booking-lite" ) ),
+                "plan_required_message"                     => WBK_Feature_Gate::get_plan_limit_message( "", false ),
+                "no_bookings_found"                         => get_option( "wbk_wording_no_bookings_found", __( "No bookings found for the provided token", "webba-booking-lite" ) ),
+                "service_fees"                              => get_option( "wbk_wording_service_fees", __( "Service Fees", "webba-booking-lite" ) ),
+                "full_price"                                => get_option( "wbk_wording_full_price", __( "Full price", "webba-booking-lite" ) ),
+                "pay_now"                                   => get_option( "wbk_wording_pay_now", __( "Pay now", "webba-booking-lite" ) ),
+                "left_to_pay"                               => get_option( "wbk_wording_left_to_pay", __( "Left to pay", "webba-booking-lite" ) ),
+                "show_details"                              => get_option( "wbk_wording_show_details", __( "Show details", "webba-booking-lite" ) ),
+                "price"                                     => get_option( "wbk_wording_price", __( "Price", "webba-booking-lite" ) ),
+                "to_pay"                                    => get_option( "wbk_wording_to_pay", __( "To pay now", "webba-booking-lite" ) ),
+                "total_amount_tax_incl"                     => get_option( "wbk_wording_total_amount_tax_incl", __( "Total Amount (tax incl.)", "webba-booking-lite" ) ),
+                "hide_details"                              => get_option( "wbk_wording_hide_details", __( "Hide details", "webba-booking-lite" ) ),
+                "location"                                  => get_option( "wbk_wording_location", __( "Location", "webba-booking-lite" ) ),
+                "select_location"                           => get_option( "wbk_wording_select_location", __( "Select location", "webba-booking-lite" ) ),
+                "please_select_location"                    => get_option( "wbk_wording_please_select_location", __( "Please select a location first to choose services.", "webba-booking-lite" ) ),
+                "please_select_location_units"              => get_option( "wbk_wording_please_select_location_units", __( "Please select a location first to choose units.", "webba-booking-lite" ) ),
+                "select_staff_member"                       => get_option( "wbk_wording_select_staff_member", __( "SELECT STAFF MEMBER", "webba-booking-lite" ) ),
+                "any_available"                             => get_option( "wbk_wording_any_available", __( "Any Available", "webba-booking-lite" ) ),
+                "best_available_time"                       => get_option( "wbk_wording_best_available_time", __( "Best available time.", "webba-booking-lite" ) ),
+                "select_extras"                             => get_option( "wbk_wording_select_extras", __( "Select extras", "webba-booking-lite" ) ),
+                "choose_additional_services"                => get_option( "wbk_wording_choose_additional_services", __( "Choose additional items", "webba-booking-lite" ) ),
+                "additional_items"                          => get_option( "wbk_wording_additional_items", __( "Additional items", "webba-booking-lite" ) ),
+                "pay_full_amount"                           => get_option( 'wbk_wording_pay_full_amount', __( 'I want to pay full amount', 'webba-booking-lite' ) ),
+                "left_to_pay_later"                         => get_option( 'wbk_wording_left_to_pay_later', __( 'Left to pay later', 'webba-booking-lite' ) ),
+                "deposits"                                  => get_option( 'wbk_wording_deposits', __( 'Deposits', 'webba-booking-lite' ) ),
+                "hide_summary"                              => get_option( 'wbk_wording_hide_summary', __( 'Hide summary', 'webba-booking-lite' ) ),
+                "total_booked_items"                        => get_option( "wbk_total_booked_items_label", __( "Total booked items", "webba-booking-lite" ) ),
+                "grand_total"                               => get_option( "wbk_grand_total_label", __( "Grand total", "webba-booking-lite" ) ),
+                "recurring_booking"                         => get_option( "wbk_wording_recurring_booking", __( "Recurring booking", "webba-booking-lite" ) ),
+                "recurring_booking_hint"                    => get_option( "wbk_wording_recurring_booking_hint", __( "This series exceeds the maximum number of slots allowed for this service.", "webba-booking-lite" ) ),
+                "recurring_booking_repeat_every"            => get_option( "wbk_wording_recurring_booking_repeat_every", __( "Repeat every", "webba-booking-lite" ) ),
+                "recurring_booking_interval"                => get_option( "wbk_wording_recurring_booking_interval", __( "Interval", "webba-booking-lite" ) ),
+                "recurring_booking_number_of_time_slots"    => get_option( "wbk_wording_recurring_booking_number_of_time_slots", __( "Number of time slots", "webba-booking-lite" ) ),
+                "loading_appointments"                      => get_option( "wbk_wording_loading_appointments", __( "Loading appointments...", "webba-booking-lite" ) ),
+                "no_appointments_selected"                  => get_option( "wbk_wording_no_appointments_selected", __( "No appointments selected. Add slots using the controls above or close the popup.", "webba-booking-lite" ) ),
+                "unavailable"                               => get_option( "wbk_wording_unavailable", __( "unavailable", "webba-booking-lite" ) ),
+                "choose_another_time"                       => get_option( "wbk_wording_choose_another_time", __( "Choose another time", "webba-booking-lite" ) ),
+                "select_a_time"                             => get_option( "wbk_wording_select_a_time", __( "Select a time", "webba-booking-lite" ) ),
+                "adjusted"                                  => get_option( "wbk_wording_adjusted", __( "adjusted", "webba-booking-lite" ) ),
+                "remove_appointment"                        => get_option( "wbk_wording_remove_appointment", __( "Remove appointment", "webba-booking-lite" ) ),
             ],
             "appearance"                  => WBK_Model_Utils::get_appearance_data(),
             "appearance_options"          => get_option( "wbk_appearance_options", [] ),
@@ -2045,7 +2147,16 @@ class WBK_Request_Manager {
         $params = $request->get_params();
         $model = ( isset( $params["model"] ) ? sanitize_text_field( $params["model"] ) : "" );
         $field = ( isset( $params["field"] ) ? sanitize_text_field( $params["field"] ) : "" );
-        $form = ( isset( $params["form"] ) ? array_map( "sanitize_text_field", $params["form"] ) : "" );
+        $form = [];
+        if ( isset( $params["form"] ) && is_array( $params["form"] ) ) {
+            foreach ( $params["form"] as $form_key => $form_value ) {
+                if ( is_array( $form_value ) ) {
+                    $form[sanitize_text_field( (string) $form_key )] = wp_json_encode( $form_value );
+                    continue;
+                }
+                $form[sanitize_text_field( (string) $form_key )] = sanitize_text_field( (string) $form_value );
+            }
+        }
         if ( $model === "services" ) {
             switch ( $field ) {
                 case "form":
@@ -2241,6 +2352,8 @@ class WBK_Request_Manager {
                 case "wbk_user_dashboard_page_link_new":
                 case "wbk_stripe_redirect_url_new":
                 case "wbk_paypal_redirect_url_new":
+                case "wbk_mollie_redirect_url_new":
+                case "wbk_gift_card_landing_page":
                     $pages = get_pages();
                     $pages_array = [];
                     foreach ( $pages as $page ) {
@@ -2260,6 +2373,53 @@ class WBK_Request_Manager {
                         $options[$slug] = $label;
                     }
                     $data[$model][$field] = $options;
+                    break;
+                case "wbk_whatsapp_template_booking":
+                case "wbk_whatsapp_template_reminder":
+                case "wbk_whatsapp_template_payment":
+                case "wbk_whatsapp_template_approval":
+                    if ( class_exists( "WBK_WhatsApp" ) ) {
+                        $data[$model][$field] = WBK_WhatsApp::get_approved_template_options();
+                    } else {
+                        $data[$model][$field] = [
+                            "wbk_null" => __( "WhatsApp is not available", "webba-booking-lite" ),
+                        ];
+                    }
+                    break;
+                case "wbk_whatsapp_business_account_id":
+                    if ( class_exists( "WBK_WhatsApp" ) ) {
+                        $options = WBK_WhatsApp::get_business_account_options();
+                        $data[$model][$field] = ( is_wp_error( $options ) ? [
+                            "wbk_null" => $options->get_error_message(),
+                        ] : $options );
+                        $waba_id = "";
+                        if ( is_array( $form ) && isset( $form["wbk_whatsapp_business_account_id"] ) ) {
+                            $waba_id = sanitize_text_field( $form["wbk_whatsapp_business_account_id"] );
+                        }
+                        if ( $waba_id === "" || $waba_id === "wbk_null" ) {
+                            $waba_id = (string) get_option( "wbk_whatsapp_business_account_id", "" );
+                        }
+                        $phone_options = WBK_WhatsApp::get_phone_number_options( ( $waba_id !== "" ? $waba_id : null ) );
+                        $data[$model]["wbk_whatsapp_phone_number_id"] = ( is_wp_error( $phone_options ) ? [
+                            "wbk_null" => $phone_options->get_error_message(),
+                        ] : $phone_options );
+                    } else {
+                        $data[$model][$field] = [];
+                    }
+                    break;
+                case "wbk_whatsapp_phone_number_id":
+                    if ( class_exists( "WBK_WhatsApp" ) ) {
+                        $waba_id = "";
+                        if ( is_array( $form ) && isset( $form["wbk_whatsapp_business_account_id"] ) ) {
+                            $waba_id = sanitize_text_field( $form["wbk_whatsapp_business_account_id"] );
+                        }
+                        $options = WBK_WhatsApp::get_phone_number_options( ( $waba_id !== "" ? $waba_id : null ) );
+                        $data[$model][$field] = ( is_wp_error( $options ) ? [
+                            "wbk_null" => $options->get_error_message(),
+                        ] : $options );
+                    } else {
+                        $data[$model][$field] = [];
+                    }
                     break;
                 default:
                     break;
@@ -3768,12 +3928,42 @@ class WBK_Request_Manager {
     public function get_payment_methods( WP_REST_Request $request ) {
         try {
             WBK_Translation_Processor::switch_to_locale_from_get_param();
+            $scope = sanitize_text_field( (string) $request->get_param( "scope" ) );
             $unit_id_param = $request->get_param( "unit_id" );
             $use_unit = $unit_id_param !== null && $unit_id_param !== "";
+            $use_gift_card = $scope === "gift_card";
             $payment_methods_result = [];
             $found_payment_methods = false;
             $service_ids = null;
             $unit_id = null;
+            if ( $use_gift_card ) {
+                $payment_methods_available = WBK_Model_Utils::get_configured_gift_card_payment_methods();
+                $payment_methods_result = array_keys( $payment_methods_available );
+                $found_payment_methods = !empty( $payment_methods_result );
+                if ( !$found_payment_methods ) {
+                    return new WP_REST_Response([
+                        "success" => false,
+                        "message" => "No payment methods found for gift cards",
+                    ], 404);
+                }
+                $payment_methods_formatted = [];
+                foreach ( $payment_methods_result as $method ) {
+                    if ( isset( $payment_methods_available[$method] ) ) {
+                        $payment_methods_formatted[] = [
+                            "id"   => $method,
+                            "name" => $payment_methods_available[$method],
+                            "icon" => WP_WEBBA_BOOKING__PLUGIN_URL . "/public/images/payments/" . $method . ".svg",
+                        ];
+                    }
+                }
+                return new WP_REST_Response([
+                    "success" => true,
+                    "data"    => [
+                        "payment_methods" => $payment_methods_formatted,
+                        "scope"           => "gift_card",
+                    ],
+                ], 200);
+            }
             if ( $use_unit ) {
                 if ( !is_numeric( $unit_id_param ) || $unit_id_param <= 0 ) {
                     return new WP_REST_Response([
@@ -3835,7 +4025,12 @@ class WBK_Request_Manager {
             // Filter to only include available payment methods
             $payment_methods_result = array_intersect( $payment_methods_result, array_keys( $payment_methods_available ) );
             if ( get_option( "wbk_appointments_default_status", "" ) == "pending" && get_option( "wbk_appointments_allow_payments", "" ) == "enabled" && WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
-                $payment_methods_result = array_diff( $payment_methods_result, ["paypal", "stripe", "woocommerce"] );
+                $payment_methods_result = array_diff( $payment_methods_result, [
+                    "paypal",
+                    "mollie",
+                    "stripe",
+                    "woocommerce"
+                ] );
             }
             if ( empty( $payment_methods_result ) ) {
                 return new WP_REST_Response([
@@ -3855,10 +4050,11 @@ class WBK_Request_Manager {
             $payment_methods_formatted = [];
             foreach ( $payment_methods_result as $method ) {
                 if ( isset( $payment_methods_all[$method] ) ) {
+                    $icon_file = WP_WEBBA_BOOKING__PLUGIN_DIR . "/public/images/payments/" . $method . ".svg";
                     $payment_methods_formatted[] = [
                         "id"   => $method,
                         "name" => $payment_methods_all[$method],
-                        "icon" => WP_WEBBA_BOOKING__PLUGIN_URL . "/public/images/payments/" . $method . ".svg",
+                        "icon" => ( file_exists( $icon_file ) ? WP_WEBBA_BOOKING__PLUGIN_URL . "/public/images/payments/" . $method . ".svg" : "" ),
                     ];
                 }
             }
@@ -4113,7 +4309,7 @@ class WBK_Request_Manager {
         $coupon_status = "not_provided";
         if ( isset( $params["coupon"] ) && !empty( trim( $params["coupon"] ) ) ) {
             $coupon = esc_html( sanitize_text_field( trim( $params["coupon"] ) ) );
-            $coupon_result = WBK_Validator::check_coupon( $coupon, $params["services"] );
+            $coupon_result = WBK_Validator::check_coupon_or_gift_card( $coupon, $params["services"] );
             if ( $coupon_result === false ) {
                 $coupon_status = "invalid";
             } else {
@@ -4327,11 +4523,11 @@ class WBK_Request_Manager {
         $booking_factory->post_production( $booking_ids, "on_booking" );
         if ( $coupon_result !== false && is_array( $coupon_result ) ) {
             $tax = WBK_Options_Utils::get_tax();
-            $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );
+            $payment_details = WBK_Price_Processor::get_payment_items( $booking_ids, $tax, $coupon_result );
             if ( !empty( $ordered_extras_lines ) ) {
                 WBK_Price_Processor::apply_ordered_extras_to_payment_data( $payment_details, $ordered_extras_lines, "services" );
             }
-            if ( $coupon_result[2] == 100 || $payment_details["subtotal"] <= 0 ) {
+            if ( is_array( $payment_details ) && (float) $payment_details["to_pay_total"] <= 0 ) {
                 $booking_factory->set_as_paid( $booking_ids, "coupon", 0 );
             }
         }
@@ -4528,7 +4724,7 @@ class WBK_Request_Manager {
         $coupon_status = "not_provided";
         if ( isset( $params["coupon"] ) && !empty( trim( (string) $params["coupon"] ) ) ) {
             $coupon = esc_html( sanitize_text_field( trim( (string) $params["coupon"] ) ) );
-            $coupon_result = WBK_Validator::check_coupon( $coupon, [] );
+            $coupon_result = WBK_Validator::check_coupon_or_gift_card( $coupon, [] );
             if ( $coupon_result === false ) {
                 $coupon_status = "invalid";
             } else {
@@ -4673,7 +4869,7 @@ class WBK_Request_Manager {
         }
         $booking_factory->post_production( $booking_ids, "on_booking" );
         if ( $coupon_result !== false && is_array( $coupon_result ) ) {
-            if ( is_array( $pre_booking_payment_details ) && ($coupon_result[2] == 100 || (float) $pre_booking_payment_details["subtotal"] <= 0) ) {
+            if ( is_array( $pre_booking_payment_details ) && (float) $pre_booking_payment_details["to_pay_total"] <= 0 ) {
                 $booking_factory->set_as_paid( $booking_ids, "coupon", 0 );
             }
         }
@@ -4801,6 +4997,36 @@ class WBK_Request_Manager {
      */
     public function execute_paypal_payment( $request ) {
         WBK_Translation_Processor::switch_to_locale_from_get_param();
+    }
+
+    public function execute_mollie_payment_permission( $request ) {
+        return true;
+    }
+
+    /**
+     * Completes a Mollie payment after the customer returns from checkout.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function execute_mollie_payment( $request ) {
+        WBK_Translation_Processor::switch_to_locale_from_get_param();
+        return new WP_REST_Response([
+            "status"  => "error",
+            "message" => "Mollie payment processing not available",
+        ], 403);
+    }
+
+    /**
+     * Mollie webhook. Body contains id=tr_...; status is verified via the Mollie API.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function mollie_webhook( $request ) {
+        return new WP_REST_Response([
+            "status" => "ok",
+        ], 200);
     }
 
     /**
@@ -5070,6 +5296,7 @@ class WBK_Request_Manager {
         // Validate payment method
         $allowed_payment_methods = [
             "paypal",
+            "mollie",
             "stripe",
             "woocommerce",
             "arrival",
@@ -5121,6 +5348,231 @@ class WBK_Request_Manager {
 
     public function send_test_smtp_permission( $request ) : bool {
         return current_user_can( "manage_options" );
+    }
+
+    /**
+        /**
+    * Permission check for WhatsApp template management endpoints.
+    *
+    * @param WP_REST_Request $request Request object.
+    * @return bool
+    */
+    public function whatsapp_templates_permission( $request ) : bool {
+        return current_user_can( "manage_options" );
+    }
+
+    /**
+     * Lists WhatsApp templates for the admin template field.
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response
+     */
+    public function get_whatsapp_templates( WP_REST_Request $request ) : WP_REST_Response {
+        if ( !class_exists( "WBK_WhatsApp" ) ) {
+            return new WP_REST_Response([
+                "status"    => "error",
+                "message"   => __( "WhatsApp is not available.", "webba-booking-lite" ),
+                "templates" => [],
+            ], 400);
+        }
+        $business_account_id = sanitize_text_field( (string) $request->get_param( "business_account_id" ) );
+        $templates = WBK_WhatsApp::get_templates_for_admin( ( $business_account_id !== "" ? $business_account_id : null ) );
+        if ( is_wp_error( $templates ) ) {
+            return new WP_REST_Response([
+                "status"    => "error",
+                "message"   => $templates->get_error_message(),
+                "templates" => [],
+            ], 400);
+        }
+        return new WP_REST_Response([
+            "status"              => "success",
+            "templates"           => $templates,
+            "business_account_id" => ( $business_account_id !== "" ? $business_account_id : (string) get_option( "wbk_whatsapp_business_account_id", "" ) ),
+        ], 200);
+    }
+
+    /**
+     * Creates a WhatsApp template and submits it for Meta approval.
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response
+     */
+    public function create_whatsapp_template( WP_REST_Request $request ) : WP_REST_Response {
+        if ( !class_exists( "WBK_WhatsApp" ) ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => __( "WhatsApp is not available.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        $template_name = ( isset( $params["name"] ) ? sanitize_text_field( $params["name"] ) : "" );
+        $language_code = ( isset( $params["language"] ) ? sanitize_text_field( $params["language"] ) : "en_US" );
+        $category = ( isset( $params["category"] ) ? sanitize_text_field( $params["category"] ) : "UTILITY" );
+        $body_text = ( isset( $params["body_text"] ) ? sanitize_textarea_field( $params["body_text"] ) : "" );
+        $result = WBK_WhatsApp::create_template(
+            $template_name,
+            $language_code,
+            $category,
+            $body_text
+        );
+        if ( is_wp_error( $result ) || $result === false ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => ( is_wp_error( $result ) ? $result->get_error_message() : __( "Failed to create WhatsApp template.", "webba-booking-lite" ) ),
+            ], 400);
+        }
+        return new WP_REST_Response([
+            "status"   => "success",
+            "message"  => __( "Template submitted for approval.", "webba-booking-lite" ),
+            "template" => $result,
+        ], 200);
+    }
+
+    /**
+     * Updates a WhatsApp template and resubmits it for Meta approval.
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response
+     */
+    public function update_whatsapp_template( WP_REST_Request $request ) : WP_REST_Response {
+        if ( !class_exists( "WBK_WhatsApp" ) ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => __( "WhatsApp is not available.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        $template_id = ( isset( $params["id"] ) ? sanitize_text_field( $params["id"] ) : "" );
+        $body_text = ( isset( $params["body_text"] ) ? sanitize_textarea_field( $params["body_text"] ) : "" );
+        $category = ( isset( $params["category"] ) ? sanitize_text_field( $params["category"] ) : "" );
+        $components = ( isset( $params["components"] ) && is_array( $params["components"] ) ? $params["components"] : [] );
+        $result = WBK_WhatsApp::update_template(
+            $template_id,
+            $body_text,
+            $components,
+            $category
+        );
+        if ( is_wp_error( $result ) || $result === false ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => ( is_wp_error( $result ) ? $result->get_error_message() : __( "Failed to update WhatsApp template.", "webba-booking-lite" ) ),
+            ], 400);
+        }
+        return new WP_REST_Response([
+            "status"   => "success",
+            "message"  => __( "Template update submitted for approval.", "webba-booking-lite" ),
+            "template" => $result,
+        ], 200);
+    }
+
+    /**
+     * Validates a WhatsApp access token and returns WABA/phone dropdown options.
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response
+     */
+    public function validate_whatsapp_token( WP_REST_Request $request ) : WP_REST_Response {
+        if ( !class_exists( "WBK_WhatsApp" ) ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => __( "WhatsApp is not available.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        $access_token = ( isset( $params["access_token"] ) ? sanitize_text_field( $params["access_token"] ) : "" );
+        $result = WBK_WhatsApp::validate_access_token( $access_token );
+        if ( is_wp_error( $result ) || $result === false ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => ( is_wp_error( $result ) ? $result->get_error_message() : __( "Failed to validate WhatsApp access token.", "webba-booking-lite" ) ),
+            ], 400);
+        }
+        return new WP_REST_Response([
+            "status"  => "success",
+            "message" => __( "Access token validated successfully.", "webba-booking-lite" ),
+            "data"    => $result,
+        ], 200);
+    }
+
+    /**
+     * Returns WhatsApp OAuth status and Connect URLs.
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response
+     */
+    public function get_whatsapp_auth_data( WP_REST_Request $request ) : WP_REST_Response {
+        unset($request);
+        if ( !class_exists( "WBK_Webba_Connect" ) ) {
+            return new WP_REST_Response([
+                "isAuthenticated" => false,
+                "internalError"   => true,
+            ], 200);
+        }
+        $webba_connect = new WBK_Webba_Connect();
+        $token_data = $webba_connect->fetch_facebook_access_token_from_webba_connect( "whatsapp" );
+        $access_token = ( is_array( $token_data ) && !empty( $token_data["access_token"] ) ? trim( (string) $token_data["access_token"] ) : trim( (string) get_option( "wbk_whatsapp_access_token", "" ) ) );
+        $is_authenticated = $access_token !== "";
+        if ( $is_authenticated ) {
+            return new WP_REST_Response([
+                "isAuthenticated" => true,
+                "internalError"   => false,
+                "access_token"    => $access_token,
+                "revokeUrl"       => $webba_connect->get_facebook_revoke_url( "whatsapp" ),
+            ], 200);
+        }
+        if ( $webba_connect->check_backend_health() === false ) {
+            return new WP_REST_Response([
+                "isAuthenticated" => false,
+                "internalError"   => true,
+            ], 200);
+        }
+        return new WP_REST_Response([
+            "isAuthenticated" => false,
+            "internalError"   => false,
+            "access_token"    => "",
+            "authUrl"         => $webba_connect->get_facebook_authorization_url( "whatsapp" ),
+        ], 200);
+    }
+
+    /**
+     * Revokes WhatsApp authorization on Connect and clears the local token.
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return WP_REST_Response
+     */
+    public function remove_whatsapp_auth( WP_REST_Request $request ) : WP_REST_Response {
+        unset($request);
+        if ( class_exists( "WBK_Webba_Connect" ) ) {
+            $webba_connect = new WBK_Webba_Connect();
+            $revoke_url = $webba_connect->get_facebook_revoke_url( "whatsapp" );
+            if ( is_string( $revoke_url ) && $revoke_url !== "" ) {
+                wp_remote_get( $revoke_url, [
+                    "timeout"     => 15,
+                    "redirection" => 0,
+                    "sslverify"   => strpos( $revoke_url, "https://" ) === 0,
+                ] );
+            }
+            $webba_connect->clear_local_facebook_access_token();
+        } else {
+            update_option( "wbk_whatsapp_access_token", "" );
+            delete_option( "wbk_whatsapp_token_expiry" );
+            update_option( "wbk_whatsapp_business_account_id", "" );
+            update_option( "wbk_whatsapp_phone_number_id", "" );
+            delete_option( "wbk_whatsapp_discovered_waba_ids" );
+        }
+        return new WP_REST_Response([
+            "status"  => "success",
+            "message" => __( "WhatsApp authorization removed successfully.", "webba-booking-lite" ),
+        ], 200);
     }
 
     /**
@@ -5189,31 +5641,6 @@ class WBK_Request_Manager {
         return new WP_REST_Response([
             "status"  => "success",
             "message" => __( "Browser notifications enabled for this browser.", "webba-booking-lite" ),
-        ], 200);
-    }
-
-    /**
-     * Remove a browser push subscription.
-     *
-     * @param WP_REST_Request $request REST request.
-     * @return WP_REST_Response
-     */
-    public function delete_push_subscription( $request ) : WP_REST_Response {
-        $params = $request->get_json_params();
-        if ( !is_array( $params ) ) {
-            $params = $request->get_params();
-        }
-        $endpoint = ( isset( $params["endpoint"] ) ? esc_url_raw( $params["endpoint"] ) : "" );
-        if ( $endpoint === "" ) {
-            return new WP_REST_Response([
-                "status"  => "error",
-                "message" => __( "Invalid browser notification subscription.", "webba-booking-lite" ),
-            ], 400);
-        }
-        WBK_Push_Processor::delete_subscription( $endpoint );
-        return new WP_REST_Response([
-            "status"  => "success",
-            "message" => __( "Browser notifications disabled for this browser.", "webba-booking-lite" ),
         ], 200);
     }
 
@@ -5330,7 +5757,12 @@ class WBK_Request_Manager {
                 continue;
             }
             if ( isset( $options[$field["id"]] ) ) {
-                update_option( $field["id"], $options[$field["id"]] );
+                $option_value = $options[$field["id"]];
+                $callback = $field["callback"][1] ?? "";
+                if ( $callback === "render_nested_numbers" ) {
+                    $option_value = WBK_Options_Processor::sanitize_nested_numbers( $option_value );
+                }
+                update_option( $field["id"], $option_value );
             } else {
                 update_option( $field["id"], "" );
             }
@@ -5465,6 +5897,7 @@ class WBK_Request_Manager {
                     "searchable"            => ( isset( $field_args["searchable"] ) ? $field_args["searchable"] : false ),
                     "radio_type"            => ( isset( $field_args["radio_type"] ) ? $field_args["radio_type"] : "" ),
                     "column_count"          => ( isset( $field_args["column_count"] ) ? intval( $field_args["column_count"] ) : null ),
+                    "max_length"            => ( isset( $field_args["max_length"] ) ? intval( $field_args["max_length"] ) : null ),
                 ];
                 // Add extra field-specific data
                 if ( isset( $field_args["extra"] ) ) {
@@ -5503,27 +5936,459 @@ class WBK_Request_Manager {
         $callback_method = $field["callback"][1] ?? "";
         // Map render callbacks to field types
         $type_map = [
-            "render_text"            => "text",
-            "render_pass"            => "password",
-            "render_textarea"        => "textarea",
-            "render_checkbox"        => "checkbox",
-            "render_select"          => "select",
-            "render_radio"           => "radio",
-            "render_select_multiple" => "select_multiple",
-            "render_editor"          => "editor",
-            "render_google_connect"  => "google_connect",
-            "render_zoom_auth"       => "zoom_auth",
-            "render_gmail_auth"      => "gmail_auth",
-            "render_duration"        => "duration",
-            "render_date_multiple"   => "date_multiple",
-            "render_business_hours"  => "business_hours",
-            "render_notice"          => "notice",
-            "render_password"        => "password",
-            "render_smtp_test"       => "smtp_test",
-            "render_push_subscribe"  => "push_subscribe",
-            "render_file"            => "file",
+            "render_text"              => "text",
+            "render_pass"              => "password",
+            "render_textarea"          => "textarea",
+            "render_checkbox"          => "checkbox",
+            "render_select"            => "select",
+            "render_radio"             => "radio",
+            "render_select_multiple"   => "select_multiple",
+            "render_editor"            => "editor",
+            "render_google_connect"    => "google_connect",
+            "render_zoom_auth"         => "zoom_auth",
+            "render_gmail_auth"        => "gmail_auth",
+            "render_duration"          => "duration",
+            "render_date_multiple"     => "date_multiple",
+            "render_business_hours"    => "business_hours",
+            "render_notice"            => "notice",
+            "render_password"          => "password",
+            "render_smtp_test"         => "smtp_test",
+            "render_whatsapp_template" => "whatsapp_template",
+            "render_whatsapp_validate" => "whatsapp_validate",
+            "render_whatsapp_auth"     => "whatsapp_auth",
+            "render_push_subscribe"    => "push_subscribe",
+            "render_file"              => "file",
+            "render_nested_numbers"    => "nested_numbers",
         ];
         return $type_map[$callback_method] ?? "text";
+    }
+
+    /**
+     * Returns permission for gift card code endpoints.
+     *
+     * @param WP_REST_Request $request
+     * @return boolean
+     */
+    public function check_gift_card_code_permission( WP_REST_Request $request ) : bool {
+        return current_user_can( "manage_options" );
+    }
+
+    /**
+     * Check whether a gift card code is already used.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function check_gift_card_code( WP_REST_Request $request ) : WP_REST_Response {
+        $params = $request->get_params();
+        $code = ( isset( $params["code"] ) ? trim( sanitize_text_field( $params["code"] ) ) : "" );
+        $exclude_id = ( isset( $params["exclude_id"] ) ? intval( $params["exclude_id"] ) : 0 );
+        if ( $code === "" ) {
+            $response = new \WP_REST_Response([
+                "available" => false,
+                "message"   => __( "Gift card code is required.", "webba-booking-lite" ),
+            ]);
+            $response->set_status( 400 );
+            return $response;
+        }
+        $exists = WBK_Gift_Card::code_exists( $code, ( $exclude_id > 0 ? $exclude_id : null ) );
+        $response = new \WP_REST_Response([
+            "available" => !$exists,
+            "code"      => $code,
+            "message"   => ( $exists ? __( "This gift card code is already used.", "webba-booking-lite" ) : __( "This gift card code is available.", "webba-booking-lite" ) ),
+        ]);
+        $response->set_status( 200 );
+        return $response;
+    }
+
+    /**
+     * Generate a unique unused gift card code.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function generate_gift_card_code( WP_REST_Request $request ) : WP_REST_Response {
+        $code = WBK_Gift_Card::generate_unique_code();
+        $response = new \WP_REST_Response([
+            "code"      => $code,
+            "available" => true,
+        ]);
+        $response->set_status( 200 );
+        return $response;
+    }
+
+    /**
+     * Public endpoint — gift card purchase form can create a Stripe intent.
+     *
+     * @param WP_REST_Request $request
+     * @return boolean
+     */
+    public function create_gift_card_stripe_intent_permission( WP_REST_Request $request ) : bool {
+        return true;
+    }
+
+    /**
+     * Create a Stripe payment intent for a gift card purchase amount.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function create_gift_card_stripe_intent( WP_REST_Request $request ) : WP_REST_Response {
+        $params = $request->get_params();
+        $amount = ( isset( $params["amount"] ) ? floatval( str_replace( ",", ".", (string) $params["amount"] ) ) : 0 );
+        $email = ( isset( $params["email"] ) ? sanitize_email( (string) $params["email"] ) : "" );
+        $payment_method = ( isset( $params["payment_method"] ) ? sanitize_text_field( (string) $params["payment_method"] ) : "stripe" );
+        $stripe_methods = [
+            "stripe",
+            "stripe_others",
+            "google_pay",
+            "apple_pay"
+        ];
+        $configured = WBK_Model_Utils::get_configured_gift_card_payment_methods();
+        if ( !in_array( $payment_method, $stripe_methods, true ) ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => __( "Invalid payment method.", "webba-booking-lite" ),
+            ], 400);
+        }
+        if ( !isset( $configured[$payment_method] ) ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => __( "This payment method is not available for gift cards.", "webba-booking-lite" ),
+            ], 400);
+        }
+        if ( $amount <= 0 ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => __( "Please enter a valid amount", "webba-booking-lite" ),
+            ], 400);
+        }
+        if ( $email === "" || !filter_var( $email, FILTER_VALIDATE_EMAIL ) ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => __( "Please enter a valid email address", "webba-booking-lite" ),
+            ], 400);
+        }
+        $stripe = new WBK_Stripe();
+        if ( !$stripe->init( 0 ) ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => __( "Stripe is not configured.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $intent_data = $stripe->create_payment_intent( $payment_method, $email, [
+            "to_pay_total" => $amount,
+            "description"  => __( "Gift card", "webba-booking-lite" ),
+            "items"        => [],
+        ] );
+        if ( empty( $intent_data["success"] ) ) {
+            return new WP_REST_Response([
+                "success"        => false,
+                "message"        => $intent_data["error"] ?? __( "Unable to initialize Stripe payment.", "webba-booking-lite" ),
+                "stripe_details" => [
+                    "error" => $intent_data["error"] ?? __( "Unable to initialize Stripe payment.", "webba-booking-lite" ),
+                ],
+            ], 400);
+        }
+        return new WP_REST_Response([
+            "success" => true,
+            "data"    => [
+                "to_pay_total"   => $amount,
+                "stripe_details" => [
+                    "client_secret"  => $intent_data["client_secret"],
+                    "intent_id"      => $intent_data["intent_id"],
+                    "amount"         => $amount,
+                    "payment_method" => $payment_method,
+                ],
+            ],
+        ], 200);
+    }
+
+    /**
+     * Public endpoint — gift card purchase form.
+     *
+     * @param WP_REST_Request $request
+     * @return boolean
+     */
+    public function purchase_gift_card_permission( WP_REST_Request $request ) : bool {
+        return true;
+    }
+
+    /**
+     * Purchase a gift card: charge via the selected method, then create the DB row
+     * only after payment is completed (or after redirect/cart completion for PayPal/Mollie/Woo).
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function purchase_gift_card( WP_REST_Request $request ) : WP_REST_Response {
+        WBK_Translation_Processor::switch_to_locale_from_get_param();
+        $params = $request->get_params();
+        $payment_method = ( isset( $params["payment_method"] ) ? sanitize_text_field( (string) $params["payment_method"] ) : "" );
+        $configured = WBK_Model_Utils::get_configured_gift_card_payment_methods();
+        if ( $payment_method === "" || !isset( $configured[$payment_method] ) ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => __( "This payment method is not available for gift cards.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $sanitized = WBK_Gift_Card::sanitize_purchase_payload( $params );
+        if ( empty( $sanitized["success"] ) ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => $sanitized["message"] ?? __( "Invalid gift card data.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $gift_card_data = $sanitized["data"];
+        $amount = floatval( $gift_card_data["amount"] );
+        $stripe_methods = [
+            "stripe",
+            "stripe_others",
+            "google_pay",
+            "apple_pay"
+        ];
+        if ( in_array( $payment_method, $stripe_methods, true ) ) {
+            if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Stripe is not available.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $stripe_details = ( isset( $params["stripe_details"] ) ? $params["stripe_details"] : [] );
+            if ( is_string( $stripe_details ) ) {
+                $stripe_details = json_decode( $stripe_details, true );
+            }
+            if ( !is_array( $stripe_details ) ) {
+                $stripe_details = [];
+            }
+            $intent_id = ( isset( $stripe_details["intent_id"] ) ? sanitize_text_field( (string) $stripe_details["intent_id"] ) : "" );
+            if ( $intent_id === "" && isset( $params["payment_intent_id"] ) ) {
+                $intent_id = sanitize_text_field( (string) $params["payment_intent_id"] );
+            }
+            if ( $intent_id === "" ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Missing Stripe payment intent.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $stripe = new WBK_Stripe();
+            if ( !$stripe->init( 0 ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Stripe is not configured.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $payment_intent = $stripe->get_payment_intent( $intent_id );
+            if ( !$payment_intent || empty( $payment_intent->status ) || $payment_intent->status !== "succeeded" ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Payment has not been completed.", "webba-booking-lite" ),
+                ], 400);
+            }
+            if ( WBK_Stripe::is_currency_zero_decimal( get_option( "wbk_stripe_currency", "" ) ) ) {
+                $expected = intval( $amount );
+            } else {
+                $expected = intval( round( $amount * 100 ) );
+            }
+            if ( intval( $payment_intent->amount ) !== $expected ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Paid amount does not match the gift card amount.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $created = WBK_Gift_Card::create_from_paid_order( $gift_card_data, $payment_method, $intent_id );
+            if ( empty( $created["success"] ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => $created["message"] ?? __( "Unable to create gift card.", "webba-booking-lite" ),
+                ], 500);
+            }
+            return new WP_REST_Response([
+                "success"          => true,
+                "payment_required" => false,
+                "payment_method"   => $payment_method,
+                "gift_card"        => $created["gift_card"],
+                "message"          => __( "Gift card purchased successfully.", "webba-booking-lite" ),
+            ], 200);
+        }
+        if ( $payment_method === "paypal" ) {
+            if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "PayPal is not available.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $paypal = new WBK_PayPal();
+            $referer = explode( "?", wp_get_referer() );
+            $base_url = ( !empty( $referer[0] ) ? $referer[0] : home_url( "/" ) );
+            if ( !$paypal->init( $base_url, [] ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Unable to initialize PayPal.", "webba-booking-lite" ),
+                ], 500);
+            }
+            $paypal_result = $paypal->create_gift_card_payment( $gift_card_data );
+            if ( $paypal_result === false || empty( $paypal_result["payment_url"] ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Unable to create PayPal payment.", "webba-booking-lite" ),
+                ], 500);
+            }
+            return new WP_REST_Response([
+                "success"          => true,
+                "payment_required" => true,
+                "payment_method"   => "paypal",
+                "payment_url"      => $paypal_result["payment_url"],
+                "payment_id"       => $paypal_result["payment_id"],
+                "payment_details"  => [
+                    "item_names"   => [__( "Gift card", "webba-booking-lite" )],
+                    "prices"       => [$amount],
+                    "quantities"   => [1],
+                    "to_pay_total" => $amount,
+                    "tax_to_pay"   => 0,
+                ],
+                "message"          => __( "Please complete your PayPal payment.", "webba-booking-lite" ),
+            ], 200);
+        }
+        if ( $payment_method === "mollie" ) {
+            if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Mollie is not available.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $mollie = new WBK_Mollie();
+            $referer = explode( "?", wp_get_referer() );
+            $base_url = ( !empty( $referer[0] ) ? $referer[0] : home_url( "/" ) );
+            if ( !$mollie->init( $base_url, [] ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Unable to initialize Mollie.", "webba-booking-lite" ),
+                ], 500);
+            }
+            $mollie_result = $mollie->create_gift_card_payment( $gift_card_data );
+            if ( $mollie_result === false || empty( $mollie_result["payment_url"] ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Unable to create Mollie payment.", "webba-booking-lite" ),
+                ], 500);
+            }
+            return new WP_REST_Response([
+                "success"          => true,
+                "payment_required" => true,
+                "payment_method"   => "mollie",
+                "payment_url"      => $mollie_result["payment_url"],
+                "payment_id"       => $mollie_result["payment_id"],
+                "payment_details"  => [
+                    "item_names"   => [__( "Gift card", "webba-booking-lite" )],
+                    "prices"       => [$amount],
+                    "quantities"   => [1],
+                    "to_pay_total" => $amount,
+                    "tax_to_pay"   => 0,
+                ],
+                "message"          => __( "Please complete your Mollie payment.", "webba-booking-lite" ),
+            ], 200);
+        }
+        if ( $payment_method === "woocommerce" ) {
+            if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "WooCommerce is not available.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $result = WBK_WooCommerce::add_gift_card_to_cart( $gift_card_data );
+            $result = json_decode( $result, true );
+            if ( !is_array( $result ) || intval( $result["status"] ?? 0 ) !== 1 ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => $result["details"] ?? __( "Unable to add gift card to cart.", "webba-booking-lite" ),
+                ], 500);
+            }
+            return new WP_REST_Response([
+                "success"          => true,
+                "payment_required" => true,
+                "payment_method"   => "woocommerce",
+                "payment_url"      => $result["details"],
+                "payment_details"  => [
+                    "item_names"   => [__( "Gift card", "webba-booking-lite" )],
+                    "prices"       => [$amount],
+                    "quantities"   => [1],
+                    "to_pay_total" => $amount,
+                    "tax_to_pay"   => 0,
+                ],
+                "message"          => __( "Gift card added to cart. Please complete checkout.", "webba-booking-lite" ),
+            ], 200);
+        }
+        return new WP_REST_Response([
+            "success" => false,
+            "message" => __( "Unsupported payment method.", "webba-booking-lite" ),
+        ], 400);
+    }
+
+    /**
+     * Fetch gift card details after a completed redirect payment (PayPal, Mollie).
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function get_gift_card_payment_details( WP_REST_Request $request ) : WP_REST_Response {
+        $payment_id = sanitize_text_field( (string) $request->get_param( "payment_id" ) );
+        if ( $payment_id === "" ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => __( "Missing payment id.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $gift_card = WBK_Gift_Card::find_by_payment_id( $payment_id );
+        if ( !$gift_card ) {
+            // Payment may still be processing — also check pending (not yet created).
+            $pending = WBK_Gift_Card::get_pending_order( $payment_id );
+            if ( $pending ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "pending" => true,
+                    "message" => __( "Payment is still being processed.", "webba-booking-lite" ),
+                ], 202);
+            }
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => __( "Gift card not found for this payment.", "webba-booking-lite" ),
+            ], 404);
+        }
+        return new WP_REST_Response([
+            "success"         => true,
+            "gift_card"       => $gift_card,
+            "payment_method"  => $gift_card["payment_method"] ?? "paypal",
+            "payment_details" => [
+                "item_names"   => [__( "Gift card", "webba-booking-lite" )],
+                "prices"       => [floatval( $gift_card["amount"] ?? 0 )],
+                "quantities"   => [1],
+                "to_pay_total" => floatval( $gift_card["amount"] ?? 0 ),
+                "tax_to_pay"   => 0,
+            ],
+        ], 200);
+    }
+
+    /**
+     * Public gift card details for the QR landing page.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function get_gift_card_status( WP_REST_Request $request ) : WP_REST_Response {
+        WBK_Translation_Processor::switch_to_locale_from_get_param();
+        $gift_card_id = intval( $request->get_param( "id" ) );
+        $status = WBK_Gift_Card::get_public_status( $gift_card_id );
+        if ( $status === null ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => __( "Gift card not found.", "webba-booking-lite" ),
+            ], 404);
+        }
+        return new WP_REST_Response([
+            "success"   => true,
+            "gift_card" => $status,
+        ], 200);
     }
 
     /**

@@ -29,6 +29,18 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            cursor: pointer;
+
+            input[type='radio'] {
+                width: 18px;
+                height: 18px;
+                margin: 0;
+                flex-shrink: 0;
+                accent-color: #0c4057;
+                cursor: pointer;
+                outline: none !important;
+                box-shadow: none !important;
+            }
         }
 
         &--half-width {

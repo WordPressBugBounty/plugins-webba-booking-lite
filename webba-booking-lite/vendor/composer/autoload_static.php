@@ -24,21 +24,21 @@ class ComposerStaticInitdfea04b17febe8992e644534304b530a
     );
 
     public static $prefixLengthsPsr4 = array (
-        'v' => 
+        'v' =>
         array (
             'voku\\helper\\' => 12,
             'voku\\' => 5,
         ),
-        'W' => 
+        'W' =>
         array (
             'Webba\\Booking\\Tests\\' => 20,
             'Webba\\Booking\\' => 14,
         ),
-        'T' => 
+        'T' =>
         array (
             'Twilio\\' => 7,
         ),
-        'S' => 
+        'S' =>
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
@@ -53,18 +53,19 @@ class ComposerStaticInitdfea04b17febe8992e644534304b530a
             'SendGrid\\Contacts\\' => 18,
             'SendGrid\\' => 9,
         ),
-        'P' => 
+        'P' =>
         array (
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
             'PhpParser\\' => 10,
         ),
-        'M' => 
+        'M' =>
         array (
+            'Mollie\\Api\\' => 11,
             'Minishlink\\WebPush\\' => 19,
         ),
-        'J' => 
+        'J' =>
         array (
             'Jose\\Component\\Signature\\Algorithm\\' => 35,
             'Jose\\Component\\Signature\\' => 25,
@@ -72,28 +73,32 @@ class ComposerStaticInitdfea04b17febe8992e644534304b530a
             'Jose\\Component\\Core\\Util\\Ecc\\' => 29,
             'Jose\\Component\\Core\\' => 20,
         ),
-        'G' => 
+        'G' =>
         array (
             'GuzzleHttp\\Psr7\\' => 16,
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
         ),
-        'F' => 
+        'F' =>
         array (
             'FG\\' => 3,
         ),
-        'E' => 
+        'E' =>
         array (
             'Eluceo\\iCal\\' => 12,
             'EllipticCurve\\' => 14,
         ),
-        'D' => 
+        'D' =>
         array (
             'Doctrine\\Instantiator\\' => 22,
             'DeepCopy\\' => 9,
             'DASPRiD\\Enum\\' => 13,
         ),
-        'B' => 
+        'C' =>
+        array (
+            'Composer\\CaBundle\\' => 18,
+        ),
+        'B' =>
         array (
             'Brick\\Math\\' => 11,
             'Base64Url\\' => 10,
@@ -102,177 +107,185 @@ class ComposerStaticInitdfea04b17febe8992e644534304b530a
     );
 
     public static $prefixDirsPsr4 = array (
-        'voku\\helper\\' => 
+        'voku\\helper\\' =>
         array (
             0 => __DIR__ . '/..' . '/voku/anti-xss/src/voku/helper',
         ),
-        'voku\\' => 
+        'voku\\' =>
         array (
             0 => __DIR__ . '/..' . '/voku/portable-utf8/src/voku',
             1 => __DIR__ . '/..' . '/voku/portable-ascii/src/voku',
         ),
-        'Webba\\Booking\\Tests\\' => 
+        'Webba\\Booking\\Tests\\' =>
         array (
             0 => __DIR__ . '/../..' . '/tests',
         ),
-        'Webba\\Booking\\' => 
+        'Webba\\Booking\\' =>
         array (
             0 => __DIR__ . '/../..' . '/includes',
         ),
-        'Twilio\\' => 
+        'Twilio\\' =>
         array (
             0 => __DIR__ . '/..' . '/twilio/sdk/src/Twilio',
         ),
-        'Symfony\\Polyfill\\Php80\\' => 
+        'Symfony\\Polyfill\\Php80\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
         ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
+        'Symfony\\Polyfill\\Mbstring\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
-        'Symfony\\Polyfill\\Intl\\Normalizer\\' => 
+        'Symfony\\Polyfill\\Intl\\Normalizer\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer',
         ),
-        'Symfony\\Polyfill\\Intl\\Grapheme\\' => 
+        'Symfony\\Polyfill\\Intl\\Grapheme\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme',
         ),
-        'Symfony\\Polyfill\\Iconv\\' => 
+        'Symfony\\Polyfill\\Iconv\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-iconv',
         ),
-        'Stripe\\' => 
+        'Stripe\\' =>
         array (
             0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
         ),
-        'SendGrid\\Stats\\' => 
+        'SendGrid\\Stats\\' =>
         array (
             0 => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/stats',
         ),
-        'SendGrid\\Mail\\' => 
+        'SendGrid\\Mail\\' =>
         array (
             0 => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/mail',
         ),
-        'SendGrid\\Helper\\' => 
+        'SendGrid\\Helper\\' =>
         array (
             0 => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/helper',
         ),
-        'SendGrid\\EventWebhook\\' => 
+        'SendGrid\\EventWebhook\\' =>
         array (
             0 => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/eventwebhook',
         ),
-        'SendGrid\\Contacts\\' => 
+        'SendGrid\\Contacts\\' =>
         array (
             0 => __DIR__ . '/..' . '/sendgrid/sendgrid/lib/contacts',
         ),
-        'SendGrid\\' => 
+        'SendGrid\\' =>
         array (
             0 => __DIR__ . '/..' . '/sendgrid/php-http-client/lib',
         ),
-        'Psr\\Log\\' => 
+        'Psr\\Log\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/log/Psr/Log',
         ),
-        'Psr\\Http\\Message\\' => 
+        'Psr\\Http\\Message\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'Psr\\Http\\Client\\' => 
+        'Psr\\Http\\Client\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
-        'PhpParser\\' => 
+        'PhpParser\\' =>
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
-        'Minishlink\\WebPush\\' => 
+        'Mollie\\Api\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/mollie/mollie-api-php/src',
+        ),
+        'Minishlink\\WebPush\\' =>
         array (
             0 => __DIR__ . '/..' . '/minishlink/web-push/src',
         ),
-        'Jose\\Component\\Signature\\Algorithm\\' => 
+        'Jose\\Component\\Signature\\Algorithm\\' =>
         array (
             0 => __DIR__ . '/..' . '/web-token/jwt-signature-algorithm-ecdsa',
         ),
-        'Jose\\Component\\Signature\\' => 
+        'Jose\\Component\\Signature\\' =>
         array (
             0 => __DIR__ . '/..' . '/web-token/jwt-signature',
         ),
-        'Jose\\Component\\KeyManagement\\' => 
+        'Jose\\Component\\KeyManagement\\' =>
         array (
             0 => __DIR__ . '/..' . '/web-token/jwt-key-mgmt',
         ),
-        'Jose\\Component\\Core\\Util\\Ecc\\' => 
+        'Jose\\Component\\Core\\Util\\Ecc\\' =>
         array (
             0 => __DIR__ . '/..' . '/web-token/jwt-util-ecc',
         ),
-        'Jose\\Component\\Core\\' => 
+        'Jose\\Component\\Core\\' =>
         array (
             0 => __DIR__ . '/..' . '/web-token/jwt-core',
         ),
-        'GuzzleHttp\\Psr7\\' => 
+        'GuzzleHttp\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'GuzzleHttp\\Promise\\' => 
+        'GuzzleHttp\\Promise\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/promises/src',
         ),
-        'GuzzleHttp\\' => 
+        'GuzzleHttp\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
         ),
-        'FG\\' => 
+        'FG\\' =>
         array (
             0 => __DIR__ . '/..' . '/fgrosse/phpasn1/lib',
         ),
-        'Eluceo\\iCal\\' => 
+        'Eluceo\\iCal\\' =>
         array (
             0 => __DIR__ . '/..' . '/eluceo/ical/src',
         ),
-        'EllipticCurve\\' => 
+        'EllipticCurve\\' =>
         array (
             0 => __DIR__ . '/..' . '/starkbank/ecdsa/src',
         ),
-        'Doctrine\\Instantiator\\' => 
+        'Doctrine\\Instantiator\\' =>
         array (
             0 => __DIR__ . '/..' . '/doctrine/instantiator/src/Doctrine/Instantiator',
         ),
-        'DeepCopy\\' => 
+        'DeepCopy\\' =>
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
         ),
-        'DASPRiD\\Enum\\' => 
+        'DASPRiD\\Enum\\' =>
         array (
             0 => __DIR__ . '/..' . '/dasprid/enum/src',
         ),
-        'Brick\\Math\\' => 
+        'Composer\\CaBundle\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/composer/ca-bundle/src',
+        ),
+        'Brick\\Math\\' =>
         array (
             0 => __DIR__ . '/..' . '/brick/math/src',
         ),
-        'Base64Url\\' => 
+        'Base64Url\\' =>
         array (
             0 => __DIR__ . '/..' . '/spomky-labs/base64url/src',
         ),
-        'BaconQrCode\\' => 
+        'BaconQrCode\\' =>
         array (
             0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
         ),
     );
 
     public static $prefixesPsr0 = array (
-        'P' => 
+        'P' =>
         array (
-            'PayPal' => 
+            'PayPal' =>
             array (
                 0 => __DIR__ . '/..' . '/paypal/rest-api-sdk-php/lib',
             ),
         ),
-        'I' => 
+        'I' =>
         array (
-            'ICal' => 
+            'ICal' =>
             array (
                 0 => __DIR__ . '/..' . '/johngrogg/ics-parser/src',
             ),

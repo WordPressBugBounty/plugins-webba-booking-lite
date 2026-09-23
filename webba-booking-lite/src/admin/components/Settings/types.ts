@@ -40,6 +40,7 @@ export interface ISettingsField {
     searchable?: boolean
     radio_type?: string
     column_count?: number
+    max_length?: number
 }
 
 export interface ISettingsSectionProps {

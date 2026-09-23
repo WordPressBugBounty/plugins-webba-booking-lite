@@ -71,13 +71,16 @@
             text-align: center;
         }
 
-        svg {
+        svg,
+        img {
             width: 88px;
             height: 88px;
             max-width: 88px;
             max-height: 88px;
             object-fit: contain;
+        }
 
+        svg {
             path {
                 fill: colors.$wbk-bg-accent !important;
             }

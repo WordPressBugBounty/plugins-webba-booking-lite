@@ -37,10 +37,17 @@ import { createNoticeField } from '../Fields/NoticeField/NoticeField'
 import { createSelectCustomField } from '../Fields/SelectCustomField/SelectCustomField'
 import { createPriceVariantField } from '../Fields/PriceVariantField/PriceVariantField'
 import { createPriceField } from '../Fields/PriceField/PriceField'
+import { createNestedNumbersField } from '../Fields/NestedNumbersField/NestedNumbersField'
 import { createAvailabilityRangesField } from '../Fields/AvailabilityRangesField/AvailabilityRangesField'
 import { createDateTimeRangesField } from '../Fields/DateTimeRangesField/DateTimeRangesField'
 import { createUnitPeopleField } from '../Fields/UnitPeopleField/UnitPeopleField'
 import { createExtrasSelectorField } from '../Fields/ExtrasSelectorField/ExtrasSelectorField'
+import { createWhatsAppTemplateField } from '../Fields/WhatsAppTemplateField/WhatsAppTemplateField'
+import { createWhatsAppValidateField } from '../Fields/WhatsAppValidateField/WhatsAppValidateField'
+import { createWhatsAppAuthField } from '../Fields/WhatsAppAuthField/WhatsAppAuthField'
+import { createGiftCardCodeField } from '../Fields/GiftCardCodeField/GiftCardCodeField'
+import { createGiftCardDesignPickerField } from '../Fields/GiftCardDesignPickerField/GiftCardDesignPickerField'
+import { createPdfAttachmentField } from '../Fields/PdfAttachmentField/PdfAttachmentField'
 
 interface CustomFieldConfig {
     title?: string
@@ -73,6 +80,13 @@ export const getFieldComponentFromType = ({
     switch (true) {
         case name === 'email':
             return createEmailField(constructorConfig)
+        case fieldConfig.misc?.sub_type === 'gift_card_code':
+            return createGiftCardCodeField(constructorConfig)
+        case name === 'gift_card_design':
+        case inputType === 'gift_card_design':
+            return createGiftCardDesignPickerField(constructorConfig)
+        case name === 'pdf_attachment':
+            return createPdfAttachmentField(constructorConfig)
         case inputType === 'select':
         case inputType === 'select_multiple':
             return createGenericSelectField(constructorConfig)
@@ -126,6 +140,8 @@ export const getFieldComponentFromType = ({
             return createSelectCustomField(constructorConfig)
         case inputType === 'price':
             return createPriceField(constructorConfig)
+        case inputType === 'nested_numbers':
+            return createNestedNumbersField(constructorConfig)
         case inputType === 'price_variant':
             return createPriceVariantField(constructorConfig)
         case inputType === 'availability_ranges':
@@ -136,6 +152,12 @@ export const getFieldComponentFromType = ({
             return createUnitPeopleField(constructorConfig)
         case inputType === 'extras_selector':
             return createExtrasSelectorField(constructorConfig)
+        case inputType === 'whatsapp_template':
+            return createWhatsAppTemplateField(constructorConfig)
+        case inputType === 'whatsapp_validate':
+            return createWhatsAppValidateField(constructorConfig)
+        case inputType === 'whatsapp_auth':
+            return createWhatsAppAuthField(constructorConfig)
         default:
             return ({ name, label }) => {
                 const { value, setValue } = useField(field)

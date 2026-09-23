@@ -28,6 +28,7 @@ const DEFAULT_STATE = {
   service_categories: null,
   email_templates: null,
   coupons: null,
+  gift_cards: null,
   pricing_rules: null,
   gg_calendars: null,
   outlook_calendars: null,
@@ -66,6 +67,7 @@ const DEFAULT_STATE = {
     service_categories: false,
     email_templates: false,
     coupons: false,
+    gift_cards: false,
     pricing_rules: false,
     gg_calendars: false,
     connected_calendars: false,
@@ -505,6 +507,20 @@ const actions = {
 
   return result;
 };
+  },
+  removeWhatsAppAuth: () => {
+    return async ({ dispatch }) => {
+      const result = await apiFetch({
+        path: "/wbk/v2/remove-whatsapp-auth/",
+        method: "POST",
+      });
+
+      dispatch({
+        type: "REMOVE_WHATSAPP_AUTH",
+      });
+
+      return result;
+    };
   },
   setSourcedOptions: (model, field, options) => {
     return {

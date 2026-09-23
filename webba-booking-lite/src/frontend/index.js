@@ -26,6 +26,54 @@ const mountDashboard = (root = document) => {
     createRoot(dashboardContainer).render(<UserDashboard />)
 }
 
+const mountGiftCard = (root = document) => {
+    const giftCardContainer = root.querySelector('#wbk_gift_card')
+    if (!giftCardContainer || isMounted(giftCardContainer)) {
+        return
+    }
+
+    markAsMounted(giftCardContainer)
+
+    const { payerid, paymentid, paypal_status, mollie_status, gift_card_id } =
+        extractDataAttrs(giftCardContainer)
+
+    if (gift_card_id) {
+        import(
+            /* webpackMode: "eager" */ './screens/GiftCard/GiftCardStatus/GiftCardStatus'
+        ).then(({ GiftCardStatus }) => {
+            createRoot(giftCardContainer).render(
+                <BookingFormProvider
+                    attrService={null}
+                    attrCategory={null}
+                    attrLocation={null}
+                >
+                    <GiftCardStatus giftCardId={gift_card_id} />
+                </BookingFormProvider>
+            )
+        })
+        return
+    }
+
+    import(/* webpackMode: "eager" */ './screens/GiftCard/GiftCard').then(
+        ({ GiftCard }) => {
+            createRoot(giftCardContainer).render(
+                <BookingFormProvider
+                    attrService={null}
+                    attrCategory={null}
+                    attrLocation={null}
+                >
+                    <GiftCard
+                        paymentId={paymentid || null}
+                        payerId={payerid || null}
+                        paypalStatus={paypal_status || null}
+                        mollieStatus={mollie_status || null}
+                    />
+                </BookingFormProvider>
+            )
+        }
+    )
+}
+
 const mountBookingForms = (root = document) => {
     const bookingFormContainers = root.querySelectorAll('.webba_booking_form_v6')
 
@@ -54,6 +102,7 @@ const mountBookingForms = (root = document) => {
             cancelation,
             order_payment,
             paypal_status,
+            mollie_status,
             payment_intent,
             redirect_status,
             hide_category,
@@ -63,7 +112,8 @@ const mountBookingForms = (root = document) => {
         // If payerid and paymentid are defined, show PaypalSuccess screen
         if (
             (payerid && paymentid) ||
-            (payment_intent && redirect_status === 'succeeded')
+            (payment_intent && redirect_status === 'succeeded') ||
+            (paymentid && (mollie_status === 'paid' || mollie_status === 'return'))
         ) {
             createRoot(bookingFormContainer).render(
                 <BookingFormProvider attrService={null} attrCategory={null} attrLocation={null}>
@@ -75,7 +125,8 @@ const mountBookingForms = (root = document) => {
 
         if (
             (paypal_status && paypal_status === '5') ||
-            redirect_status === 'failed'
+            redirect_status === 'failed' ||
+            mollie_status === 'canceled'
         ) {
             createRoot(bookingFormContainer).render(
                 <BookingFormProvider attrService={null} attrCategory={null} attrLocation={null}>
@@ -275,6 +326,7 @@ const startBookingFormPopupListener = () => {
 
 const mountWebbaBookingApps = (root = document) => {
     mountDashboard(root)
+    mountGiftCard(root)
     mountBookingForms(root)
 }
 
@@ -299,8 +351,12 @@ const startDynamicMountObserver = () => {
                 const addedNode = mutation.addedNodes[j]
                 if (
                     addedNode.nodeType === 1 &&
-                    (addedNode.matches?.('.webba_booking_form_v6, #wbk_user_dashboard') ||
-                        addedNode.querySelector?.('.webba_booking_form_v6, #wbk_user_dashboard'))
+                    (addedNode.matches?.(
+                        '.webba_booking_form_v6, #wbk_user_dashboard, #wbk_gift_card'
+                    ) ||
+                        addedNode.querySelector?.(
+                            '.webba_booking_form_v6, #wbk_user_dashboard, #wbk_gift_card'
+                        ))
                 ) {
                     shouldRun = true
                     break

@@ -122,6 +122,20 @@ function wbk_order_cancelled_refunded(  $order_id  ) {
 
 function wbk_display_booking_data_text_cart(  $item_data, $cart_item  ) {
     date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
+    if ( !empty( $cart_item['wbk_gift_card_data'] ) && is_array( $cart_item['wbk_gift_card_data'] ) ) {
+        $gc = $cart_item['wbk_gift_card_data'];
+        $item_data[] = [
+            'key'     => __( 'Gift card', 'webba-booking-lite' ),
+            'value'   => sprintf( 
+                /* translators: 1: recipient name, 2: amount */
+                __( 'For %1$s', 'webba-booking-lite' ),
+                sanitize_text_field( $gc['recipient_name'] ?? '' )
+             ),
+            'display' => '',
+        ];
+        date_default_timezone_set( 'UTC' );
+        return $item_data;
+    }
     if ( empty( $cart_item['wbk_appointment_ids'] ) ) {
         return $item_data;
     }
@@ -129,7 +143,12 @@ function wbk_display_booking_data_text_cart(  $item_data, $cart_item  ) {
     if ( count( $booking_ids ) == 0 ) {
         return $item_data;
     }
-    $payment_details = WBK_Price_Processor::get_payment_items( $booking_ids, 0 );
+    $first_booking = new WBK_Booking($booking_ids[0]);
+    if ( $first_booking->is_loaded() && (int) $first_booking->get( 'unit_id' ) > 0 ) {
+        $payment_details = WBK_Price_Processor::get_unit_payment_items_post_booked( $booking_ids );
+    } else {
+        $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );
+    }
     if ( !is_array( $payment_details ) ) {
         return $item_data;
     }
@@ -156,6 +175,13 @@ function wbk_display_booking_data_text_cart(  $item_data, $cart_item  ) {
 function wbk_calculate_booking_product_price(  $cart_object  ) {
     if ( !WC()->session->__isset( 'reload_checkout' ) ) {
         foreach ( $cart_object->cart_contents as $key => $value ) {
+            if ( !empty( $value['wbk_gift_card_data'] ) && is_array( $value['wbk_gift_card_data'] ) ) {
+                $price = floatval( $value['wbk_gift_card_data']['amount'] ?? 0 );
+                if ( $price > 0 ) {
+                    $value['data']->set_price( $price );
+                }
+                continue;
+            }
             if ( !isset( $value['wbk_appointment_ids'] ) ) {
                 continue;
             }
@@ -184,7 +210,12 @@ function wbk_calculate_booking_product_price(  $cart_object  ) {
                     if ( $stored_payment_details !== null && is_array( $stored_payment_details ) ) {
                         $price = floatval( $stored_payment_details['woo_total'] ) / count( $booking_ids_list );
                     } else {
-                        $all_payment_details = WBK_Price_Processor::get_payment_items( $booking_ids_list, 0 );
+                        $first_list_booking = new WBK_Booking($booking_ids_list[0]);
+                        if ( $first_list_booking->is_loaded() && (int) $first_list_booking->get( 'unit_id' ) > 0 ) {
+                            $all_payment_details = WBK_Price_Processor::get_unit_payment_items_post_booked( $booking_ids_list );
+                        } else {
+                            $all_payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids_list );
+                        }
                         $payment_items = $all_payment_details['items'] ?? [];
                         $have_one_deposit_item = false;
                         if ( count( $payment_items ) > 0 ) {
@@ -195,7 +226,12 @@ function wbk_calculate_booking_product_price(  $cart_object  ) {
                                 }
                             }
                         }
-                        $payment_details = WBK_Price_Processor::get_payment_items( [$booking_id], 0 );
+                        $single_booking = new WBK_Booking($booking_id);
+                        if ( $single_booking->is_loaded() && (int) $single_booking->get( 'unit_id' ) > 0 ) {
+                            $payment_details = WBK_Price_Processor::get_unit_payment_items_post_booked( [$booking_id] );
+                        } else {
+                            $payment_details = WBK_Price_Processor::get_payment_items_post_booked( [$booking_id] );
+                        }
                         $price = $all_payment_details['woo_total'] / count( $booking_ids_list );
                     }
                     // disabled because of no purpose in this case
@@ -222,6 +258,12 @@ function wbk_add_booking_text_to_order_items(
     $values,
     $order
 ) {
+    if ( !empty( $values['wbk_gift_card_data'] ) && is_array( $values['wbk_gift_card_data'] ) ) {
+        $gc = $values['wbk_gift_card_data'];
+        $item->add_meta_data( __( 'Gift card', 'webba-booking-lite' ), sprintf( __( 'For %s', 'webba-booking-lite' ), sanitize_text_field( $gc['recipient_name'] ?? '' ) ) );
+        $item->add_meta_data( '_wbk_gift_card_data', wp_json_encode( $gc ) );
+        return;
+    }
     if ( empty( $values['wbk_appointment_ids'] ) ) {
         return;
     }
@@ -235,7 +277,7 @@ function wbk_add_booking_text_to_order_items(
     if ( $is_unit_booking ) {
         $payment_details = WBK_Price_Processor::get_unit_payment_items_post_booked( $booking_ids );
     } else {
-        $payment_details = WBK_Price_Processor::get_payment_items( $booking_ids, 0 );
+        $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );
     }
     $booking_order_text = get_option( 'wbk_woo_cart_title', '' );
     if ( $booking_order_text != '' ) {
@@ -308,6 +350,20 @@ function wbk_init_woocommerce_cart_session() {
 
 class WBK_WooCommerce {
     static function add_to_cart( $booking_ids, $payment_details = null ) {
+        return json_encode( [
+            'status'  => 0,
+            'details' => __( 'Payment method not supported', 'webba-booking-lite' ),
+        ] );
+    }
+
+    /**
+     * Add a gift card purchase to the WooCommerce cart.
+     * Gift card is created only after WooCommerce payment completes.
+     *
+     * @param array $gift_card_data Sanitized gift card payload.
+     * @return string JSON { status, details }
+     */
+    static function add_gift_card_to_cart( $gift_card_data ) {
         return json_encode( [
             'status'  => 0,
             'details' => __( 'Payment method not supported', 'webba-booking-lite' ),
@@ -474,6 +530,29 @@ function wbk_woocommerce_coupon_get_discount_amount(
 
 function wbk_complete_payment(  $order_id  ) {
     $order = wc_get_order( $order_id );
+    if ( !$order ) {
+        return;
+    }
+    // Create gift cards from paid WooCommerce order line items.
+    foreach ( $order->get_items() as $item_id => $item ) {
+        if ( !is_object( $item ) ) {
+            continue;
+        }
+        $gc_raw = wc_get_order_item_meta( $item_id, '_wbk_gift_card_data', true );
+        if ( empty( $gc_raw ) ) {
+            continue;
+        }
+        $gc_data = ( is_string( $gc_raw ) ? json_decode( $gc_raw, true ) : $gc_raw );
+        if ( !is_array( $gc_data ) || empty( $gc_data['amount'] ) ) {
+            continue;
+        }
+        $payment_ref = 'woo_' . $order_id . '_' . $item_id;
+        $created = WBK_Gift_Card::find_by_payment_id( $payment_ref );
+        if ( $created ) {
+            continue;
+        }
+        WBK_Gift_Card::create_from_paid_order( $gc_data, 'woocommerce', $payment_ref );
+    }
     $booking_ids = [];
     foreach ( $order->get_items() as $item_id => $item ) {
         if ( !is_object( $item ) ) {

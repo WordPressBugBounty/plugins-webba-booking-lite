@@ -1,210 +1,342 @@
-=== Easy Appointment Booking & Scheduling System - Webba Booking Calendar ===
+=== Easy Appointment Booking & Scheduling Plugin - Webba Booking Calendar ===
 Contributors: Webba agency, freemius
 Donate link: https://webba-booking.com/
-Tags:  appointment, booking, booking calendar, scheduling, reservation
+Tags: appointment, appointments, booking, booking calendar, reservation
 Requires at least: 5.6
 Tested up to: 7.1
-Stable tag: 6.5.0
+Stable tag: 6.5.2
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Free Appointment Booking Plugin 🗓️ Hourly or full-day bookings,  booking management, calendar sync, notifications, 5* support = powerful booking system!
+WordPress appointment booking & scheduling plugin with booking calendar, reservations, notifications, calendar sync and powerful PRO features.
 
-== DESCRIPTION ==
-= Appointment Booking, Reservation & Scheduling Calendar Plugin =
+== Description ==
 
-**[Webba Appointments Booking](https://webba-booking.com/) is a powerful appointment booking system and scheduling plugin.**
+= WordPress Appointment Booking, Scheduling & Reservation Plugin =
 
-Choose Webba Booking if you are looking for:
+**[Webba Booking](https://webba-booking.com/) is a flexible WordPress appointment booking plugin and scheduling system for accepting and managing online appointments, reservations, hourly bookings and full-day bookings.**
 
-* Booking Plugin for hourly or full-day bookings, appointment or rentals
-* Easy, but super flexible creation of services
-* Syncing with your calendar for you and your staff
-* Accepting payments for your services
-* Advanced pricing rules where you can charge different prices depending on day, hour or service
-* Modern looking booking form and great user experience for your customers
-* and more than 50 other customisable settings
+Create an easy-to-use **appointment booking calendar** for your website, let customers book available times online, and manage appointments from WordPress. Webba Booking is designed for service businesses, professionals, rentals, classes and other businesses that need a reliable online booking system.
 
-Webba Booking was created to help businesses like yours to focus on running it while our plugin takes care of accepting and managing the bookings.
+Use Webba Booking if you need:
 
-AND THE BEST PART:
+* A **WordPress appointment booking plugin** for hourly or full-day bookings
+* An online **appointment scheduling** system for services and professionals
+* A modern **booking calendar** and customizable booking form
+* Easy appointment and booking management from WordPress
+* Google Calendar sync to help avoid double bookings
+* Customer self-service for editing, cancelling or rescheduling appointments
+* Online payments for your services
+* Advanced pricing and availability rules
+* Booking forms for appointments, reservations, rentals, classes and events
+* A flexible booking system with more than 50 customizable settings
 
-Even non tech-savy people can set it up. And if you run into any issues or have questions - our support heroes (rated 5-stars) are here to help you fast!
+Webba Booking was created to help businesses focus on their customers while the plugin takes care of **appointment booking, scheduling and reservation management**.
 
-== FREE version comes with lots of powerful features already: ==
+Setup is simple even if you are not technical. If you run into any issues or have questions, our highly rated support team is ready to help.
 
-* **Unlimited Services and Bookings:** hourly or full-day - add as many bookable services/events as you want.
-* **Modern booking calendar form:** clean and modern booking form design that looks great on all devices.
-* **Easy bookings management:** approve, add, edit, cancel any bookings with a few clicks.
-* **Google Calendar Sync** avoid double bookings - integrate with Google Calendar.
-* **Customer portal:** your customers can edit, cancel or reschedule bookings by themselves
-* **Adjustable business hours & holidays:** have complete control on your own availability with our powerful schedule tools.
-* **Buffer/preparation time:** add extra time before or after an appointment for preparation.
-* **Email notifications:** automatically send confirmation emails to you and your customers.
-* **Translation ready:** Webba offers built-in translations and WPML compatibility.
-* **GDPR (EU) ready:** we offer advanced privacy and data protection settings.
-* **Elementor, Divi, Gutenberg blocks:** add the booking form to your website using your favorite page builder.
-* **Manage Taxes:** enable tax calculation.
+== FREE APPOINTMENT BOOKING FEATURES ==
 
+The **FREE version of Webba Booking** includes the core tools needed to create and manage an online appointment booking system:
 
-Webba allows businesses to accept and manage appointment bookings, reservations, hourly bookings for variety of services, rentals, spaces.
-It offers the essential features that will make **accepting and managing online bookings** and reservations on your website super easy.
+* **Unlimited Services & Bookings:** Create and manage unlimited bookable services and appointments.
+* **Simple Booking Management:** Approve, add, edit or cancel bookings from your WordPress dashboard.
+* **Two Booking Form Flows:** Choose between a classic step-by-step booking form and a waterfall-style booking flow.
+* **Automatic Thank-You Page Redirect:** Redirect customers automatically after they complete a booking.
+* **Modern & Responsive Booking Form:** Give customers a clean booking experience across desktop and mobile devices.
+* **Single & Multiple Booking Modes:** Let customers book one or multiple services and time slots.
+* **Shopping Cart Mode:** Allow customers to add multiple services to a cart and book them together.
+* **Hourly & Full-Day Bookings:** Support appointment time slots as well as services spanning full or multiple days.
+* **Group & Chain Booking:** Handle multiple attendees and linked services across calendars.
+* **Minimum / Maximum Bookings per Time Slot:** Control booking capacity for each available time.
+* **Buffer / Preparation Time:** Add extra time before or after appointments.
+* **Holiday & Schedule Management:** Configure business hours, holidays and schedules.
+* **Advanced Availability Management:** Customize working hours, breaks and availability.
+* **Timezone Adjustment:** Automatically adjust booking times to customer timezones.
+* **Customer Portal:** Let customers view, reschedule and cancel their own bookings.
+* **Google Calendar Sync:** Sync appointments with Google Calendar.
+* **iCal Support:** Let customers add appointments to their calendars.
+* **Email Notifications:** Send customizable booking emails and notifications.
+* **iCal Email Attachments:** Include calendar files in booking emails.
+* **Browser Booking Notifications:** Get browser notifications when new bookings are made.
+* **Elementor & Divi Integration:** Add Webba Booking to pages built with Elementor or Divi.
+* **Built-In Translations:** Translate booking form wording using built-in language tools.
+* **Custom Booking Form Styling:** Basic styling controls are available in the FREE version.
+* **Custom Form Fields:** Basic custom form field functionality is available in the FREE version.
+* **Tax Calculation:** Configure and apply taxes to bookings.
+* **GDPR Compliance:** Use privacy and data-handling settings designed for GDPR compliance.
+* **Forum & Community Support:** Get help through the WordPress.org support community.
 
-Setup in 5 minutes and start accepting bookings and reservations without any coding or design skills!
-**Join thousands of businesses** that use Webba to accept and manage bookings through their Wordpress website.
-Our **world-class support** is ready to help you have the best experience with Webba.
+Webba Booking makes it easy to accept and manage **online appointment bookings**, reservations, hourly bookings, rentals and bookable spaces. The booking calendar helps customers find available dates and time slots while the WordPress dashboard gives you the tools to manage your schedule.
 
-[TRY PREMIUM VERSION](https://webba-booking.com/pricing/ "Pricing of Webba Booking") | [USE CASES & DEMOS](https://webba-booking.com/demos-use-cases/ "Demo of Webba Booking") |
-[FEATURES](https://webba-booking.com/features/ "Features Overview of Webba Booking") | [DOCUMENTATION](https://webba-booking.com/documentation/ "Documentation of Webba Booking")
+Set up your **WordPress appointment booking system** in minutes and start accepting bookings without coding or design skills.
 
-[youtube https://www.youtube.com/watch?v=TGGBEMmXHl8]
+**Join thousands of businesses** using Webba Booking to accept and manage bookings through WordPress.
 
-== WHO IS THE WEBBA BOOKING PLUGIN FOR? ==
+[TRY PRO VERSION](https://webba-booking.com/pricing/ "Webba Booking PRO") | [USE CASES & DEMOS](https://webba-booking.com/demos-use-cases/ "Webba Booking demos") |
+[FEATURES](https://webba-booking.com/features/ "Webba Booking features") | [DOCUMENTATION](https://webba-booking.com/documentation/ "Webba Booking documentation")
 
-Webba Booking is a powerful WordPress booking plugin built for businesses and professionals who need a reliable appointment booking, scheduling, and reservation system.
-Whether you provide services online or in person, Webba helps you accept bookings 24/7, avoid double-bookings, and manage your schedule with ease.
+https://www.youtube.com/watch?v=TGGBEMmXHl8
 
-* **Rental businesses:** golf simulators, bike rentals, equipment rentals, lodging, short-term rentals.
-Webba’s straightforward booking system, calendar view, and automated notifications handle scheduling so providers can focus on delivering quality service.
-* **Consultants and Business Professionals:** Coaches, lawyers, psychologists, bookkeepers, financial advisors, wedding planners.
-Consultants love features like recurring appointments for regular clients, group bookings to handle sessions efficiently, and Zoom integration for virtual meetings.
-* **Healthcare and Medical Providers:** Doctors, dentists, therapists, nutritionists, clinics, physiotherapists, homeopaths.
-Healthcare professionals use custom booking forms and secure data management to handle appointments while staying GDPR compliant.
-* **Education and Training:** Tutors, language schools, play rooms, private teachers, driving schools, music instructors.
-Education providers benefit from availability calendars, group class bookings, and automated reminders to manage lessons and keep students informed.
-* **Fitness, Sports and Gyms:** Yoga instructors, personal trainers, dance studios, fitness classes, golf lessons, sports coaches.
-With Webba, fitness professionals can accept bookings around the clock, offer discount coupons, and send reminders to maximize attendance.
-* **Coaching and Online Services:** Life coaches, online consultants, therapists, digital service providers.
-Coaches appreciate Webba’s virtual session booking, secure payment integrations, and easy-to-use scheduler that lets clients book from anywhere.
-* **Salons and Beauty Professionals:** Hair salons, nail salons, yoga studios, pilates studios, barbershops, spas, massage therapists, tattoo and piercing studios, tanning salons, cosmetologists.
-Webba provides automated reminders so clients never miss appointments, secure online payments to confirm bookings, and calendar synchronization to avoid double-bookings.
-* **Personal and Professional Services:** Photographers, cleaning services, catering, automotive repairs, event planners, musicians.
-Webba’s straightforward booking system, calendar view, and automated notifications handle scheduling so providers can focus on delivering quality service.
+== WORDPRESS APPOINTMENT BOOKING FOR DIFFERENT BUSINESSES ==
 
-Unlock PREMIUM features with [Webba Booking Premium](https://webba-booking.com/pricing/).
+Webba Booking is a multi-purpose **WordPress appointment booking and scheduling plugin** for businesses and professionals that accept appointments, reservations or other time-based bookings.
 
+Whether you provide services online or in person, Webba helps customers schedule appointments 24/7, helps prevent double bookings and makes appointment management easier.
 
+= Appointment Scheduling for Consultants & Professionals =
 
-== MAIN PREMIUM FEATURES INCLUDED IN WEBBA PREMIUM: ==
+Use Webba as an **appointment scheduling plugin** for coaches, lawyers, bookkeepers, financial advisors, wedding planners and other professional services. Recurring appointments, group bookings and Zoom integration help professionals organize regular and virtual sessions.
 
-* **Recurring Bookings:** allow customers to schedule recurring appointments automatically.
-* **Multiple locations:** if you have multiple locations of your business, allow your customers to choose a location to book from.
-* **Staff management:** have more than 1 employee? Assign services, schedules and bookings to multiple staff members
-* **Advanced Booking & Pricing Rules:** set dynamic pricing and dynamic availability based on time, day, demand, and more.
-* **Appointment Reminders:** reduce no-shows by sending automated email reminders to your customers.
-* **Two-way Calendar sync:** sync Webba with Outlook, Apple or Google calendar and manage your appointments without any double-bookings.
-* **Accept payments:** secure online payment integrations with Apple Pay, Google Pay, Paypal, Stripe, or Woocommerce (with 100+ payment gateways).
-* **Conversion Tracking with Google Analytics:** automatically track bookings and conversion events with GA4 integration.
-* **Custom Form Fields:** enhance your booking form with variety of different form fields (comments, drop downs, checkmarks, file upload etc.) using our Custom Form Builder.
-* **Zoom Integration:** create automatic zoom video conferencing events and attach them to the booking confirmation.
-* **Track performance through statistics:** track and visualize how many bookings you get over time.
-* **Offer Coupons:** whether it's Black Friday or your Birthday sale - offer promotional coupons through Webba!
-* **Send SMS reminders:** send appointment confirmations and reminders using SMS provider Twilio.
-* **WooCommerce Integration:** integrate with WooCommerce directly and offer your own checkout experience.
+= Healthcare & Medical Appointment Booking =
 
-Unlock PREMIUM features with [Webba Booking PREMIUM tps://webba-booking.com/pricing/).
+Doctors, dentists, therapists, nutritionists, clinics, physiotherapists and other healthcare providers can use Webba as an **appointment booking system** with custom booking forms and privacy settings. Customers can choose an available appointment from the booking calendar while providers manage schedules in WordPress.
 
-Explore the full list of [Webba Booking features](https://webba-booking.com/features/).
+= Salon, Spa & Beauty Appointment Booking =
 
-== OUR CUSTOMERS LOVE US!==
+Create an online **appointment booking calendar** for hair salons, nail salons, barbershops, spas, massage therapists, tattoo studios, tanning salons and other beauty businesses. Automated reminders, online payments and calendar synchronization help manage customer appointments.
 
-We are proud to have near perfect 5/5 score on both [Wordpress](https://wordpress.org/plugins/webba-booking-lite/#reviews "reviews of Webba Booking"): and [Trustpilot](https://www.trustpilot.com/review/webba-booking.com "reviews of Webba Booking"):
+= Fitness, Sports & Class Booking =
 
-* "The customer service for this **plugin is phenomenal!**
-The customer service for this plugin is absolutely second-to-none. I'm blown away by how good they are!" - R.Tyrrell
+Yoga instructors, personal trainers, dance studios, fitness classes, golf lessons and sports coaches can use Webba for **appointment booking and class scheduling**. Accept bookings around the clock, offer coupons and send appointment reminders.
 
-* "I’ve been using the plugin quite some time now and I’d say it’s **the most user-friendly booking-plugin on the market.** Easy to setup and a nice clean, modern layout! Support is also great. I had an issue with locking dates and it was solved within a few hours. Good job guys!" - losboeros
+= Education & Training Scheduling =
 
-* "Webba support is nothing like what you have experienced in your earlier life and everything you are hoping to have with a product. The response times, the professionalism, the friendliness... you name it, they have it. **Easiest seven star review I have given!"** - Webba Customer
+Tutors, language schools, play rooms, private teachers, driving schools and music instructors can manage lessons with availability calendars, group bookings and automated reminders.
+
+= Coaching & Online Appointment Scheduling =
+
+Life coaches, online consultants, therapists and digital service providers can offer **online appointment booking** with payment integrations and an easy scheduler that lets customers book from anywhere.
+
+= Rental & Reservation Booking =
+
+Webba works as a flexible **reservation plugin for WordPress** for golf simulators, bike rentals, equipment rentals, lodging, short-term rentals and bookable spaces. Use hourly or full-day booking depending on the service.
+
+= Event Booking & Group Reservations =
+
+Use Webba for **event booking**, classes, workshops and other group reservations. Group booking features help manage sessions where multiple customers can reserve places.
+
+= Personal & Professional Services =
+
+Photographers, cleaning services, caterers, automotive repair businesses, event planners, musicians and other service providers can use Webba as a **service booking plugin for WordPress**. The booking calendar, automated notifications and appointment management tools keep schedules organized.
+
+== APPOINTMENT BOOKING & SCHEDULING FEATURES ==
+
+= Booking Calendar & Booking Form =
+
+Create a responsive **appointment booking form** that customers can use to select a service, available date and time. Webba's booking calendar is designed for both hourly and full-day bookings and works across desktop and mobile devices.
+
+= Appointment Management =
+
+Manage customer **appointments and bookings** from your WordPress dashboard. Add, approve, edit or cancel bookings and keep your schedule organized in one place.
+
+= Calendar Synchronization =
+
+Sync bookings with Google Calendar in the free version. PRO adds additional calendar and integration options, including Apple Calendar, to help keep appointments organized.
+
+= Customer Appointment Management =
+
+The customer portal lets customers manage their own appointments, including editing, cancelling or rescheduling bookings.
+
+= Booking Notifications =
+
+Send confirmation emails for appointments and bookings. PRO features include appointment reminders and SMS reminders through Twilio.
+
+= Flexible Availability =
+
+Configure business hours, holidays, buffer time and other scheduling rules to control when customers can make an appointment booking.
+
+== WEBBA BOOKING PRO FEATURES ==
+
+**Webba Booking PRO** includes everything in the FREE version plus advanced scheduling, payments, integrations, automation and business tools.
+
+* **Gift Cards:** Allow customers to purchase gift cards for your services.
+* **PDF Invoices:** Automatically generate PDF invoices for bookings and attach them to customer emails.
+* **Gmail as Email Provider:** Send Webba Booking emails through Gmail.
+* **Recurring Bookings:** Allow customers to schedule recurring appointments automatically.
+* **Multiple Locations:** Manage bookings across multiple business locations.
+* **Multi-Employee Management:** Manage multiple employees, schedules and appointments.
+* **Advanced Pricing & Booking Rules:** Set pricing and booking rules based on time, demand, capacity and other conditions.
+* **Appointment Reminders:** Automatically remind customers about upcoming appointments.
+* **CSV Export:** Export booking data for reporting or analysis.
+* **Advanced Booking Form Styling:** Get more control over the appearance of your booking form.
+* **Advanced Custom Form Fields:** Collect additional customer information with advanced form fields.
+* **Booking Statistics Dashboard:** View booking trends and key statistics.
+* **GA4 Event Tracking:** Track booking form events and conversions in Google Analytics 4.
+* **Coupons & Discount Codes:** Create promotional codes customers can apply during booking.
+* **PayPal Payments:** Accept payments through PayPal.
+* **Stripe Payments:** Accept secure credit and debit card payments through Stripe.
+* **100+ Stripe Payment Methods:** Offer supported global payment methods through Stripe.
+* **Apple Pay & Google Pay:** Accept fast wallet payments.
+* **WooCommerce Integration & Payments:** Connect bookings to WooCommerce and its supported payment methods.
+* **Service Fees:** Add an extra fee to an order total.
+* **Deposits:** Let customers pay a partial deposit when booking.
+* **Apple Calendar Integration:** Sync bookings with Apple Calendar.
+* **Zoom Meetings:** Automatically create Zoom links for online appointments.
+* **Google Meet Integration:** Automatically create Google Meet links for online appointments.
+* **Twilio SMS Notifications:** Send SMS booking notifications and reminders.
+* **PDF Email Attachments:** Attach PDF booking details to customer emails.
+* **PRO Email Support:** Get direct assistance from the Webba Booking team.
+* **Full Setup Assistance:** Get help setting up Webba Booking.
+
+Explore the complete list of [Webba Booking features](https://webba-booking.com/features/).
+
+== WHY CHOOSE WEBBA FOR WORDPRESS APPOINTMENT BOOKING? ==
+
+= Flexible Appointment Booking =
+
+Webba supports hourly and full-day bookings, making it suitable for traditional appointments, classes, rentals, reservations and other booking scenarios.
+
+= Easy Appointment Scheduling =
+
+Customers can see your availability and schedule an appointment online. You control services, business hours, holidays and booking rules from WordPress.
+
+= Modern Booking Calendar =
+
+The responsive booking calendar and booking form are designed to provide a clear booking experience on desktop and mobile devices.
+
+= Calendar Sync =
+
+Connect your booking schedule with external calendars to help keep appointments organized and reduce double bookings.
+
+= Payments & Pricing =
+
+Webba PRO supports online payments and advanced pricing rules for businesses that need to charge customers during the booking process.
+
+= Customer Self-Service =
+
+Customers can manage their appointments through the customer portal, reducing manual scheduling work for your team.
+
+== OUR CUSTOMERS LOVE US! ==
+
+We are proud to have a near-perfect rating on both [WordPress.org](https://wordpress.org/plugins/webba-booking-lite/#reviews "Webba Booking reviews") and [Trustpilot](https://www.trustpilot.com/review/webba-booking.com "Webba Booking Trustpilot reviews").
+
+* "The customer service for this **plugin is phenomenal!** The customer service for this plugin is absolutely second-to-none. I'm blown away by how good they are!" - R. Tyrrell
+
+* "I've been using the plugin quite some time now and I'd say it's **the most user-friendly booking-plugin on the market.** Easy to setup and a nice clean, modern layout! Support is also great. I had an issue with locking dates and it was solved within a few hours. Good job guys!" - losboeros
+
+* "Webba support is nothing like what you have experienced in your earlier life and everything you are hoping to have with a product. The response times, the professionalism, the friendliness... you name it, they have it. **Easiest seven star review I have given!**" - Webba Customer
 
 * "This plugin is awesome and it can accomplish anything your business needs! OMG the support is NUMBER 1!!!! I will refer this plugin to everyone and let them know **the support is just awesome**. I am very pleased with everything!" - jbiento
 
-
 == Installation ==
 
-Automatic installation is the easiest option as WordPress handles the file transfers itself and you don't even need to leave your web browser.
+Automatic installation is the easiest option because WordPress handles the file transfers and you do not need to leave your web browser.
 
-To do an automatic install of Webba Booking, log in to your WordPress dashboard, navigate to the Plugins page and click Add New.
+= Automatic Installation =
 
-In the search field type "Webba Booking" and click Search Plugins. Once you have found our plugin you can install it by simply clicking Install Now.
+1. Log in to your WordPress dashboard.
+2. Navigate to Plugins > Add New.
+3. Search for "Webba Booking".
+4. Click "Install Now".
+5. Click "Activate" and follow the setup wizard.
 
-After clicking that link you will be asked if you are sure you want to install the plugin. Click yes and WordPress will automatically complete the installation.
+= Manual Installation =
 
-After installing, click "Activate" to activate Webba Booking and follow the setup wizard to get going.
+1. Download the plugin file to your computer and unzip it.
+2. Using an FTP program or your hosting control panel, upload the unzipped plugin folder to your WordPress installation's `wp-content/plugins/` directory.
+3. Activate the plugin from the Plugins menu in WordPress.
 
-**Manual installation**
-The manual installation method involves downloading our plugin and uploading it to your web server via your favorite FTP application.
+= Getting Started =
 
-1. Download the plugin file to your computer and unzip it
-2. Using an FTP program, or your hosting control panel, upload the unzipped plugin folder to your WordPress installations wp-content/plugins/ directory.
-3. Activate the plugin from the Plugins menu within the WordPress admin.
+1. When you activate Webba Booking, the setup wizard will guide you through the initial appointment booking setup. You can exit the wizard at any time and configure services and settings manually.
+2. Configure your services, schedules and booking settings.
+3. Add the booking form to any page using the Gutenberg block or shortcode. See the [detailed booking form instructions](https://webba-booking.com/documentation/how-to-add-booking-form/).
 
-**Getting started**
+= Upgrade to PRO =
 
-1. When you activate the Webba Booking plugin, the setup wizard will start and help you set up the plugin step by step. You can exit the setup wizard anytime and add your desired services and settings manually. 
-2. When you have configured Webba Booking to your liking, you can now embed the booking form in any page you'd like.
-3. To add a booking form, simply use our Gutenberg block from the block selector or use a shortcode. Follow [detailed instructions here](https://webba-booking.com/documentation/how-to-add-booking-form/).
+1. Deactivate the free version.
+2. Install and activate the PRO version.
 
-**Upgrade to premium version**
+Unlock PRO appointment booking features with [Webba Booking PRO](https://webba-booking.com/pricing/).
 
-1. Deactivate free version.
-2. Install and activate premium version.
+== Screenshots ==
 
-Unlock PREMIUM features with [Webba Booking Premium](https://webba-booking.com/pricing/).
-
-== Screenshots == 
-
-1. Easy Setup using Setup Wizard
-2. Modern looking booking form
-3. Allow to book multiple services or time slots in one booking session
-4. Connect to PayPal, Stripe or WooCommerce for online payments [PRO VERSION ONLY]
-5. Customers able to add bookings to the Calendar
-6. Manage your bookings easily
-7. Add Custom Form Fields [PREMIUM VERSION ONLY] 
-8. Translate your form in any language you want
+1. Easy setup using the Setup Wizard
+2. Modern appointment booking form and booking calendar
+3. Allow customers to book multiple services or time slots in one booking session
+4. Connect PayPal, Stripe or WooCommerce for online payments [PRO VERSION ONLY]
+5. Let customers add appointments to their calendar
+6. Manage appointments and bookings easily
+7. Add Custom Form Fields [PRO VERSION ONLY]
+8. Translate your appointment booking form
 9. Set up pricing rules based on day, early booking and more
-10. Customize your email notifications and trigger points
-11. Access comprehensive documentation for a seamless setup
-
+10. Customize booking and appointment email notifications and trigger points
+11. Access comprehensive documentation for setup and appointment scheduling
 
 == Frequently Asked Questions ==
 
-**Can I see how Webba Booking works before installation?**
-Yes! Check out our [online demos](https://webba-booking.com/demos-use-cases) to see how the frontend and backend of Webba Booking works.
+= Can I see how Webba Booking works before installation? =
 
-**How do I add booking form to my website?**
-You can add Webba Booking form by using our Gutenberg block or if you are using any of the pagebuilders like Elementor or Divi- add a [shortcode](https://webba-booking.com/documentation/how-to-add-booking-form/#shortcode).
+Yes. Check out our [online appointment booking demos](https://webba-booking.com/demos-use-cases) to see how the frontend and backend of Webba Booking work.
 
-Here we have prepared [detailed instructions](https://webba-booking.com/documentation/how-to-add-booking-form/) on how to add the booking form.
+= How do I add an appointment booking form to my WordPress website? =
 
-**Does Webba Booking offer payment integrations?**
-Yes, [Webba Booking PREMIUM](https://webba-booking.com/pricing/) offers integrations with Paypal, Stripe, and Woocommerce (with 100+ gateways) to provide secure online payment options for your customers.
+You can add the Webba Booking form using our Gutenberg block. If you use a page builder such as Elementor or Divi, you can also add the booking form using a [shortcode](https://webba-booking.com/documentation/how-to-add-booking-form/#shortcode).
 
-**How can I sync bookings with my calendar?**
-In a Free version, you can sync with Google Calendar. If you need Outlook or other type of calendar integrations, it's available when using [Webba Booking PRO](https://webba-booking.com/pricing/). This allows you to sync directly with your Google Calendar or other calendar using iCal attachements.
+See our [detailed booking form instructions](https://webba-booking.com/documentation/how-to-add-booking-form/).
 
-**Can I translate Webba to other languages?**
-Yes, Webba Booking has in-built wording/translation feature for the booking form and it is also compatible with translation plugins like Loco Translate, Polyland and WPML if you want to offer more than 1 language on your website.
+= Is Webba an appointment scheduling plugin? =
 
-**How to upgrade to Webba PREMIUM version?**
-If you have a Webba Booking Lite version, just go to your WP dashboard, click on Webba and in the left menu youâ€™ll see â€œPricingâ€  menu item. Click on it and choose the plan you want.
-Alternatively, you can go to [our website](https://webba-booking.com/pricing/) and upgrade right there.
+Yes. Webba Booking can be used as a WordPress **appointment scheduling plugin** for service businesses and professionals. Configure your services and availability, then let customers select an available appointment online.
 
-**Can email notifications be customized?**
-Yes, Webba Booking offers great email customization features including different placeholders for variable elements. We also offer different email notification trigger scenarios, so you have full control on when and which email who receives.
+= Can Webba be used as a reservation plugin? =
 
-**Is Webba Booking compatible with my theme and/or page builder?**
-Yes, Webba Booking is compatible with most themes and page builders (Elementor, Divi, Gutenberg). In case of any conflicts, our support team will be happy to help you out.
+Yes. Webba supports appointments, hourly bookings and full-day bookings, so it can also be used as a **reservation plugin** for rentals, spaces and other bookable services.
 
-**How can I contact Webba Booking support?**
-Visit our WordPress plugin [support forum](https://wordpress.org/support/plugin/webba-booking-lite/) or send us a message on our [website's contact form](https://webba-booking.com/contact-us/). Our team will be happy to answer any of your questions!
+= Can I use Webba for event booking? =
 
-** How can I report security bugs? **
-You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/webba-booking-lite)
- 
+Webba supports group bookings and can be used for **event booking**, classes and other sessions where customers reserve available places.
+
+= Does Webba Booking offer payment integrations? =
+
+Yes. [Webba Booking PRO](https://webba-booking.com/pricing/) offers PayPal, Stripe and WooCommerce payment integrations, including 100+ supported Stripe payment methods, providing secure online payment options for customers.
+
+= How can I sync appointments and bookings with my calendar? =
+
+The free version can sync with Google Calendar. Outlook and additional calendar integration options are available with [Webba Booking PRO](https://webba-booking.com/pricing/). PRO also supports two-way calendar synchronization.
+
+= Can customers reschedule or cancel appointments? =
+
+Yes. The customer portal lets customers edit, cancel or reschedule their bookings.
+
+= Can I translate the appointment booking form? =
+
+Yes. Webba Booking has a built-in wording and translation feature for the booking form and is compatible with translation plugins including Loco Translate, Polylang and WPML.
+
+= Can email notifications be customized? =
+
+Yes. Webba Booking includes email customization features with placeholders for variable information and different notification trigger scenarios.
+
+= Is Webba Booking compatible with my theme or page builder? =
+
+Webba Booking is compatible with most themes and page builders, including Elementor, Divi and Gutenberg. If you experience a conflict, our support team can help.
+
+= How can I contact Webba Booking support? =
+
+Visit the WordPress.org [Webba Booking support forum](https://wordpress.org/support/plugin/webba-booking-lite/) or send us a message using the [Webba Booking contact form](https://webba-booking.com/contact-us/).
+
+= How can I report security bugs? =
+
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle security vulnerabilities. [Report a security vulnerability](https://patchstack.com/database/vdp/webba-booking-lite).
 
 == Changelog ==
+
+22/09/2026
+
+6.5.2
+
+- Improvement: Mollie payment gateway
+- Improvement: gift cards
+- Bug fix: other minor fixes and improvements
+
+17/09/2026
+
+6.5.1
+
+- Bug fix: category attribute in waterfall booking form not working
+- Bug fix: group booking disabled on certain configurations
 
 08/09/2026
 

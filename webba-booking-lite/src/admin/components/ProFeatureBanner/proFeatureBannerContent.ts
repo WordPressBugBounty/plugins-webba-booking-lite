@@ -116,6 +116,33 @@ export const PRO_FEATURE_BANNER_CONTENT: Record<
         ],
         previewType: 'coupons',
     },
+    gift_cards: {
+        icon: 'gift-card-bow.jpg',
+        title: __('Gift Cards', 'webba-booking-lite'),
+        headline: __(
+            'Create and send gift cards to your customers',
+            'webba-booking-lite'
+        ),
+        description: __(
+            'Create and send gift cards to your customers, allowing them to purchase services for someone else.',
+            'webba-booking-lite'
+        ),
+        features: [
+            __(
+                'Create gift cards with a specific amount and expiration date',
+                'webba-booking-lite'
+            ),
+            __(
+                'Send gift cards to your customers via email',
+                'webba-booking-lite'
+            ),
+            __(
+                'Track gift card usage and performance',
+                'webba-booking-lite'
+            ),
+        ],
+        previewType: 'gift_cards',
+    },
     forms: {
         icon: 'icon-clipboard.svg',
         title: __('Booking forms', 'webba-booking-lite'),

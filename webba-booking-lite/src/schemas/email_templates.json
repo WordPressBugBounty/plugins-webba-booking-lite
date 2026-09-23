@@ -144,7 +144,7 @@
             "tab": "",
             "misc": {
                 "yes": "Yes",
-                "tooltip": "Generate and attach the iCal file for each booking",
+                "tooltip": "Generate and attach the PDF invoice for bookings.",
                 "required_plan": "premium"
             },
             "required": false,

@@ -13,7 +13,7 @@ import {
     isConnectedField,
 } from '../GenericSelectField/utils'
 import { getFormState } from '../../lib/utils'
-import { useForm } from '../../lib/FormProvider'
+import { useForm, useShowValidation } from '../../lib/FormProvider'
 import { toZonedTime } from 'date-fns-tz'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
@@ -31,11 +31,15 @@ export const createDateField: FormComponentConstructor<any> = ({
             []
         )
         const { value, setValue, errors } = useField(field)
+        const showValidation = useShowValidation()
         const [touched, setTouched] = useState(false)
-        const [date, setDate] = useState<Date | null>(new Date())
+        const [date, setDate] = useState<Date | null>(
+            fieldConfig.required ? new Date() : null
+        )
         const [open, setOpen] = useState(false)
         const form = useMemo(() => useForm(), [date])
         const [initialized, setInitialized] = useState(false)
+        const showErrors = errors.length > 0 && (touched || showValidation)
 
         useLayoutEffect(() => {
             if (value && !isNaN(value) && !initialized) {
@@ -55,6 +59,8 @@ export const createDateField: FormComponentConstructor<any> = ({
         useLayoutEffect(() => {
             if (date && typeof date === 'object') {
                 setValue(format(date, 'yyyy-MM-dd'))
+            } else if (date === null && !fieldConfig.required) {
+                setValue('')
             }
 
             if (isConnectedField(fieldConfig?.modelName as string, name)) {
@@ -69,6 +75,7 @@ export const createDateField: FormComponentConstructor<any> = ({
             <div
                 className={classNames('wbk_formDateField__inputWrapper', {
                     'wbk_formDateField__inputWrapper--open': open,
+                    'wbk_formDateField__inputWrapper--invalid': showErrors,
                 })}
             >
                 <Label title={label} id={name} tooltip={misc?.tooltip} />
@@ -88,6 +95,7 @@ export const createDateField: FormComponentConstructor<any> = ({
                     selected={date}
                     onChange={(dateParam: any) => {
                         setOpen(false)
+                        setTouched(true)
                         setDate(dateParam)
                     }}
                     onBlur={() => setTouched(true)}
@@ -95,7 +103,7 @@ export const createDateField: FormComponentConstructor<any> = ({
                     onClickOutside={() => setOpen(false)}
                     onInputClick={() => setOpen(true)}
                 />
-                {errors.length > 0 && touched && (
+                {showErrors && (
                     <div className="wbk_formDateField__error">{errors[0]}</div>
                 )}
             </div>

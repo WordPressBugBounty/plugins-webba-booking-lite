@@ -183,6 +183,71 @@ const placeHolders: Record<"name" | "text" | "content", string | ((editor: any) 
     content: "#google_meet_link",
   },
   {
+    name: "wbk_site_url",
+    text: __("Site URL", "webba-booking-lite"),
+    content: "#site_url",
+  },
+  {
+    name: "wbk_site_name",
+    text: __("Site name", "webba-booking-lite"),
+    content: "#site_name",
+  },
+  {
+    name: "wbk_site_logo",
+    text: __("Site logo", "webba-booking-lite"),
+    content: "#site_logo",
+  },
+  {
+    name: "wbk_gift_card_code",
+    text: __("Gift card code", "webba-booking-lite"),
+    content: "#gift_card_code",
+  },
+  {
+    name: "wbk_qr_gift_code",
+    text: __("Gift card QR code", "webba-booking-lite"),
+    content: "#qr_gift_code",
+  },
+  {
+    name: "wbk_gift_card_buyer_name",
+    text: __("Gift card buyer name", "webba-booking-lite"),
+    content: "#gift_card_buyer_name",
+  },
+  {
+    name: "wbk_gift_card_buyer_email",
+    text: __("Gift card buyer email", "webba-booking-lite"),
+    content: "#gift_card_buyer_email",
+  },
+  {
+    name: "wbk_gift_card_recipient_name",
+    text: __("Gift card recipient name", "webba-booking-lite"),
+    content: "#gift_card_recipient_name",
+  },
+  {
+    name: "wbk_gift_card_recipient_email",
+    text: __("Gift card recipient email", "webba-booking-lite"),
+    content: "#gift_card_recipient_email",
+  },
+  {
+    name: "wbk_gift_card_amount",
+    text: __("Gift card amount", "webba-booking-lite"),
+    content: "#gift_card_amount",
+  },
+  {
+    name: "wbk_gift_card_expiration_date",
+    text: __("Gift card expiration date", "webba-booking-lite"),
+    content: "#gift_card_expiration_date",
+  },
+  {
+    name: "wbk_gift_card_message",
+    text: __("Gift card message", "webba-booking-lite"),
+    content: "#gift_card_message",
+  },
+  {
+    name: "wbk_gift_card_policy",
+    text: __("Gift card policy", "webba-booking-lite"),
+    content: "#gift_card_policy",
+  },
+  {
     name: "wbk_multiple_loop",
     text: __("Create loop", "webba-booking-lite"),
     content: (editor) => {

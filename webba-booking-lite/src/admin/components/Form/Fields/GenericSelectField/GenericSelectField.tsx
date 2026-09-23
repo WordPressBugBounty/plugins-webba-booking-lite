@@ -230,15 +230,23 @@ export const createGenericSelectField: FormComponentConstructor<any> = ({
         }, [])
 
         useLayoutEffect(() => {
+            const modelName = fieldConfig?.modelName as string
+            const formValues = {
+                ...form.defaultValue,
+                ...getFormState(form).values,
+            } as Record<string, string>
+            const fieldValue = formValues[name]
+            const canFetchWithoutEntityId = modelName === 'settings'
+
             if (
-                isConnectedField(fieldConfig?.modelName as string, name) &&
-                !isDependentField(fieldConfig?.modelName as string, name) &&
-                form.defaultValue.id &&
-                form.defaultValue[name]
+                isConnectedField(modelName, name) &&
+                !isDependentField(modelName, name) &&
+                fieldValue &&
+                (canFetchWithoutEntityId || form.defaultValue?.id)
             ) {
-                fetchConnectedOptions(fieldConfig?.modelName as string, name, {
-                    ...getFormState(form).values,
-                    id: form.defaultValue.id,
+                fetchConnectedOptions(modelName, name, {
+                    ...formValues,
+                    id: form.defaultValue?.id,
                 })
             }
         }, [options, form.fields[name].value])

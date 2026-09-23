@@ -235,7 +235,7 @@ export const CustomerPayment = ({
             initializedPayment?.payment_result?.payment_method
         const bookingData =
             initializedPayment?.payment_result || initializedPayment
-        if (method === 'paypal' || method === 'woocommerce') {
+        if (method === 'paypal' || method === 'woocommerce' || method === 'mollie') {
             return (
                 <PaymentHandler
                     bookingData={{ ...bookingDetails, ...bookingData }}

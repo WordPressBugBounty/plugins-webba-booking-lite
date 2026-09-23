@@ -120,8 +120,6 @@ export const WaterfallForm = ({
 } = {}) => {
     const {
         attrService,
-        attrCategory,
-        attrLocation,
         attrHideCategory,
         bookingMode,
         categories,
@@ -133,6 +131,8 @@ export const WaterfallForm = ({
         setFormData,
         onLocationSelect,
         onStaffSelect,
+        extractedAttrCats,
+        extractedAttrLocations,
         extractedAttrStaff,
         loading,
         fields,
@@ -157,10 +157,9 @@ export const WaterfallForm = ({
         staffId: string
     } | null>(null)
     const [completedBooking, setCompletedBooking] = useState<any>(null)
-    const noShortcodeAttrs =
-        isUnsetAttr(attrService) &&
-        isUnsetAttr(attrCategory) &&
-        isUnsetAttr(attrLocation)
+    const hasPresetService = !isUnsetAttr(attrService)
+    const hasPresetCategory = extractedAttrCats.length > 0
+    const hasPresetLocation = extractedAttrLocations.length > 0
 
     const bookableItems = bookingMode === 'units' ? units || [] : services || []
 
@@ -181,8 +180,20 @@ export const WaterfallForm = ({
     const locationId =
         formData?.location != null ? String(formData.location) : ''
     const locationSelected = locationId !== ''
-    const selectedCategory = (categories || []).find(({ selected }) => selected)
-    const categorySelected = !!selectedCategory
+    const selectedCategoryFromUi = (categories || []).find(
+        ({ selected }) => selected
+    )
+    const presetCategories = useMemo(
+        () =>
+            (categories || []).filter((category) =>
+                extractedAttrCats.includes(Number(category.id))
+            ),
+        [categories, extractedAttrCats]
+    )
+    const selectedCategory =
+        selectedCategoryFromUi ||
+        (presetCategories.length === 1 ? presetCategories[0] : undefined)
+    const categorySelected = !!selectedCategory || hasPresetCategory
     const categoryId = selectedCategory ? String(selectedCategory.id) : ''
 
     const clearCategorySelection = () => {
@@ -263,13 +274,19 @@ export const WaterfallForm = ({
             )
         }
 
-        if (selectedCategory) {
+        const categoryFilterSource = selectedCategory
+            ? [selectedCategory]
+            : presetCategories
+
+        if (categoryFilterSource.length > 0) {
             const linkedIds = new Set(
-                (
-                    bookingMode === 'units'
-                        ? selectedCategory.units || []
-                        : selectedCategory.services || []
-                ).map((id) => String(id))
+                categoryFilterSource.flatMap((category) =>
+                    (
+                        bookingMode === 'units'
+                            ? category.units || []
+                            : category.services || []
+                    ).map((id) => String(id))
+                )
             )
             filtered = filtered.filter((item) => linkedIds.has(String(item.id)))
         }
@@ -285,20 +302,26 @@ export const WaterfallForm = ({
         bookableItems,
         bookingMode,
         locationSelected,
+        presetCategories,
         selectedCategory,
         serviceIdsInSelectedLocation,
     ])
 
     // Reveal each dropdown under the previous one once the prior selection is made
-    const showLocation = noShortcodeAttrs && hasLocations
+    const showLocation =
+        !hasPresetService &&
+        !hasPresetCategory &&
+        !hasPresetLocation &&
+        hasLocations
     const showCategory =
-        noShortcodeAttrs &&
+        !hasPresetService &&
+        !hasPresetCategory &&
         hasCategories &&
         (!hasLocations || locationSelected)
     const showService =
-        noShortcodeAttrs &&
+        !hasPresetService &&
         hasServices &&
-        (!hasLocations || locationSelected) &&
+        (!hasLocations || locationSelected || hasPresetCategory) &&
         (!hasCategories || categorySelected)
 
     const selectedService =
@@ -468,10 +491,16 @@ export const WaterfallForm = ({
             return false
         }
 
+        const onlyMethod = paymentMethods[0]?.id
+        const hostedCheckoutMethods = ['paypal', 'woocommerce']
+
+        // Keep the payment UI for hosted gateways even when it is the only method.
+        // Bank / arrival can still skip the selector when coupons are off.
         if (
             paymentMethods.length === 1 &&
             preset?.settings?.coupons_enabled === false &&
-            !stripeMethods.includes(paymentMethods[0].id)
+            !stripeMethods.includes(onlyMethod) &&
+            !hostedCheckoutMethods.includes(onlyMethod)
         ) {
             return false
         }
@@ -493,6 +522,18 @@ export const WaterfallForm = ({
         }
 
         if (!showPaymentStep) {
+            if (
+                Number(amountData?.to_pay_total) > 0 &&
+                (!paymentMethods || paymentMethods.length === 0)
+            ) {
+                return {
+                    canSubmit: false,
+                    submitError:
+                        checkoutWording?.please_select_payment_method ||
+                        __('Please select a payment method', 'webba-booking-lite'),
+                }
+            }
+
             return { canSubmit: true, submitError: null as string | null }
         }
 
@@ -500,6 +541,7 @@ export const WaterfallForm = ({
         const acceptedMethods = [
             'stripe',
             'paypal',
+            'mollie',
             'bank',
             'arrival',
             'woocommerce',
@@ -542,6 +584,7 @@ export const WaterfallForm = ({
         stripeObj?.isValidated,
         amountData?.to_pay_total,
         checkoutWording,
+        paymentMethods,
     ])
 
     const isSubmitting = Boolean(loading?.createBooking)
@@ -553,6 +596,16 @@ export const WaterfallForm = ({
 
         try {
             const response = await processBooking()
+            const method = response?.payment_method
+            const needsHostedCheckout =
+                response?.payment_required === true &&
+                (method === 'paypal' || method === 'woocommerce')
+
+            if (needsHostedCheckout) {
+                onBookingComplete?.(response)
+                return
+            }
+
             setCompletedBooking(response || { success: true })
             onBookingComplete?.(response)
         } catch {

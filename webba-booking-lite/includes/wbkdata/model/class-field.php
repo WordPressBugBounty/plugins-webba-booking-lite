@@ -706,6 +706,9 @@ class Field
             case "extras_selector":
                 $arr_sql_parts = ["text", "", "", "%s"];
                 break;
+            case "gift_card_design":
+                $arr_sql_parts = ["text", "", "", "%s"];
+                break;
             default:
                 break;
         }

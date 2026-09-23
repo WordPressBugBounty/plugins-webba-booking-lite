@@ -1,0 +1,55 @@
+.wbk_giftCardDesignPickerField {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wbk_giftCardDesignPickerField__variants {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+
+    @media screen and (min-width: 640px) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+.wbk_giftCardDesignPickerField__variant {
+    appearance: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    border: 2px solid colors.$field-border;
+    border-radius: 8px;
+    background: colors.$field-background;
+    cursor: pointer;
+    text-align: left;
+
+    &:hover,
+    &:focus {
+        border-color: colors.$primary;
+        outline: none;
+        background: colors.$primary-soft;
+    }
+}
+
+.wbk_giftCardDesignPickerField__variant--selected {
+    border-color: colors.$primary;
+}
+
+.wbk_giftCardDesignPickerField__image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    background: colors.$background-offwhite;
+}
+
+.wbk_giftCardDesignPickerField__label {
+    display: block;
+    padding: 8px;
+    font-size: 12px;
+    line-height: 16px;
+    color: colors.$off-black;
+}

@@ -71,7 +71,7 @@ class WBK_Gutenberg_Booking_Form_Block
                 'wbk-frontend-v6-script',
                 WP_WEBBA_BOOKING__PLUGIN_URL . '/build/frontend/index.js',
                 ['wp-element', 'wp-api-fetch', 'wp-data'],
-                WP_WEBBA_BOOKING__VERSION,
+                wbk_get_react_frontend_asset_version(),
                 true
             );
         }
@@ -81,7 +81,7 @@ class WBK_Gutenberg_Booking_Form_Block
                 'wbk-frontend6',
                 WP_WEBBA_BOOKING__PLUGIN_URL . '/build/frontend/index.css',
                 [],
-                WP_WEBBA_BOOKING__VERSION
+                wbk_get_react_frontend_asset_version()
             );
         }
 

@@ -1,0 +1,112 @@
+.wbk_giftCardDesignField {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wbk_giftCardDesignField__variants {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.wbk_giftCardDesignField__variant {
+    width: 118px;
+    padding: 0;
+    border: 2px solid colors.$field-border;
+    border-radius: 8px;
+    background: colors.$field-background;
+    cursor: pointer;
+    overflow: hidden;
+    text-align: left;
+}
+
+.wbk_giftCardDesignField__variant--selected {
+    border-color: colors.$primary;
+}
+
+.wbk_giftCardDesignField__variantThumb {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+}
+
+.wbk_giftCardDesignField__variantThumb--botanical_green {
+    aspect-ratio: 1149 / 1369;
+}
+
+.wbk_giftCardDesignField__variantThumb--spa_wellness,
+.wbk_giftCardDesignField__variantThumb--gold_ribbon,
+.wbk_giftCardDesignField__variantThumb--black_gold {
+    aspect-ratio: 1536 / 1024;
+}
+
+.wbk_giftCardDesignField__variantLabel {
+    display: block;
+    padding: 8px;
+    font-size: 12px;
+    color: colors.$off-black;
+}
+
+.wbk_giftCardDesignField__editorShell {
+    .mce-toolbar-grp,
+    .tox-editor-header {
+        border-bottom: 1px solid colors.$input-border !important;
+    }
+
+    .mce-edit-area,
+    .tox-edit-area {
+        background: #f7f4ea !important;
+    }
+
+    .mce-edit-area iframe,
+    .tox-edit-area__iframe {
+        background-color: #f7f4ea !important;
+    }
+}
+
+.wbk_giftCardDesignField__textToolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    background: colors.$background-offwhite;
+    border-bottom: 1px solid colors.$input-border;
+}
+
+.wbk_giftCardDesignField__placeholderSelect {
+    height: 32px;
+    max-width: 220px;
+    padding: 0 8px;
+    border: 1px solid colors.$field-border;
+    border-radius: 4px;
+    background: colors.$field-background;
+    color: colors.$input-text;
+    font-size: 13px;
+}
+
+.wbk_giftCardDesignField__resetButton {
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid colors.$field-border;
+    border-radius: 4px;
+    background: colors.$field-background;
+    color: colors.$input-text;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.wbk_giftCardDesignField__rawEditor {
+    height: auto;
+    min-height: 420px;
+    padding: 12px 16px;
+    border: none;
+    border-radius: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    resize: vertical;
+}

@@ -17,6 +17,7 @@ export type ProFeatureBannerKey =
     | 'staff_members'
     | 'extras'
     | 'coupons'
+    | 'gift_cards'
     | 'forms'
     | 'connected_calendars'
     | 'daily_services'

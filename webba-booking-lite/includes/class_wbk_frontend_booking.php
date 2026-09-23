@@ -33,6 +33,7 @@ class WBK_Frontend_Booking
             $this,
             'wbk_user_dashboard_shortcode',
         ]);
+        add_shortcode('webba_gc', [$this, 'wbk_gift_card_shortcode']);
     }
 
     // deprecated shortcodes
@@ -155,10 +156,74 @@ class WBK_Frontend_Booking
                     $cancel_token = str_replace('/', '', $cancel_token);
                     $cancel_token = str_replace('\\', '', $cancel_token);
                     WBK_Model_Utils::clear_payment_id_by_token($cancel_token);
+                    if (class_exists('WBK_Gift_Card')) {
+                        WBK_Gift_Card::clear_pending_by_cancel_token(
+                            $cancel_token
+                        );
+                    }
                 }
                 wp_redirect(get_permalink() . '?paypal_status=5');
                 exit();
             }
+        }
+
+        if (isset($_GET['mollie_status']) && $_GET['mollie_status'] === 'return') {
+            $payment_id = isset($_GET['paymentId'])
+                ? sanitize_text_field(wp_unslash($_GET['paymentId']))
+                : '';
+
+            $landing_url = $this->get_request_url_without_params([
+                'mollie_status',
+                'paymentId',
+            ]);
+
+            if ($payment_id === '') {
+                $this->set_mollie_payment_session('canceled');
+                wp_redirect(add_query_arg('mollie_status', 'canceled', $landing_url));
+                exit();
+            }
+
+            $mollie = new WBK_Mollie();
+            $booking_ids = WBK_Model_Utils::get_booking_ids_by_payment_id($payment_id);
+            $init_result = $mollie->init(false, $booking_ids);
+            if ($init_result === false) {
+                $this->set_mollie_payment_session('canceled');
+                wp_redirect(add_query_arg('mollie_status', 'canceled', $landing_url));
+                exit();
+            }
+
+            $status = $mollie->complete_if_paid($payment_id);
+            if ($status === 'paid' || $status === 'pending') {
+                $this->set_mollie_payment_session('paid', $payment_id);
+                $is_gift_card_payment =
+                    class_exists('WBK_Gift_Card') &&
+                    WBK_Gift_Card::has_payment($payment_id);
+                $custom_redirect = trim(WBK_Options_Utils::get_mollie_redirect_url());
+                if (
+                    !$is_gift_card_payment &&
+                    $status === 'paid' &&
+                    $custom_redirect !== '' &&
+                    filter_var($custom_redirect, FILTER_VALIDATE_URL) !== false
+                ) {
+                    wp_redirect($custom_redirect);
+                    exit();
+                }
+
+                wp_redirect(
+                    add_query_arg(
+                        [
+                            'mollie_status' => 'paid',
+                            'paymentId' => $payment_id,
+                        ],
+                        $landing_url
+                    )
+                );
+                exit();
+            }
+
+            $this->set_mollie_payment_session('canceled');
+            wp_redirect(add_query_arg('mollie_status', 'canceled', $landing_url));
+            exit();
         }
 
         // process stripe payment result
@@ -183,21 +248,36 @@ class WBK_Frontend_Booking
                 $stripe->init($service_id);
                 $payment_intent = $stripe->get_payment_intent($payment_intent_id);
 
+                $paid_total = is_array($payment_details)
+                    ? floatval($payment_details['to_pay_total'] ?? 0)
+                    : 0;
+                if (is_object($payment_intent) && isset($payment_intent->amount)) {
+                    if (
+                        WBK_Stripe::is_currency_zero_decimal(
+                            get_option('wbk_stripe_currency', '')
+                        )
+                    ) {
+                        $paid_total = floatval($payment_intent->amount);
+                    } else {
+                        $paid_total = floatval($payment_intent->amount) / 100;
+                    }
+                }
+
                 if (
                     WBK_Stripe::is_currency_zero_decimal(
                         get_option('wbk_stripe_currency', '')
                     )
                 ) {
-                    $to_pay_total = $payment_details['to_pay_total'];
+                    $to_pay_total = $paid_total;
                 } else {
-                    $to_pay_total = round($payment_details['to_pay_total'] * 100);
+                    $to_pay_total = round($paid_total * 100);
                 }
                 $is_to_pay_valid = !empty($payment_intent->amount) && intval($payment_intent->amount) === intval($to_pay_total);
 
                 if ($is_to_pay_valid && count($booking_ids) > 0 && $payment_intent->status === 'succeeded') {
                     $payment_method = isset($_GET['paymentMethod']) ? $_GET['paymentMethod'] : 'stripe';
                     $booking_factory = new WBK_Booking_Factory();
-                    $booking_factory->set_as_paid($booking_ids, $payment_method, $payment_details['to_pay_total']);
+                    $booking_factory->set_as_paid($booking_ids, $payment_method, $paid_total);
                 }else{
                     wp_redirect($failed_redirect_url);
                     exit();
@@ -334,12 +414,60 @@ class WBK_Frontend_Booking
             [],
             false
         );
+    }
 
-        // if (wbk_fs()->is__premium_only()) {
-        //     if (wbk_fs()->can_use_premium_code()) {
-                
-        //     }
-        // }
+    protected function start_frontend_session()
+    {
+        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+            session_start();
+        }
+    }
+
+    protected function set_mollie_payment_session($status, $payment_id = '')
+    {
+        $this->start_frontend_session();
+        $_SESSION['wbk_mollie_status'] = $status;
+        if ($payment_id !== '') {
+            $_SESSION['wbk_mollie_payment_id'] = $payment_id;
+        } else {
+            unset($_SESSION['wbk_mollie_payment_id']);
+        }
+    }
+
+    protected function get_request_url_without_params($keys)
+    {
+        $scheme = is_ssl() ? 'https' : 'http';
+        $host = isset($_SERVER['HTTP_HOST'])
+            ? sanitize_text_field(wp_unslash($_SERVER['HTTP_HOST']))
+            : wp_parse_url(home_url(), PHP_URL_HOST);
+        $request_uri = isset($_SERVER['REQUEST_URI'])
+            ? wp_unslash($_SERVER['REQUEST_URI'])
+            : '/';
+        $path = strtok($request_uri, '?');
+        if ($path === false || $path === '') {
+            $path = '/';
+        }
+
+        $query = $_GET;
+        foreach ((array) $keys as $key) {
+            unset($query[$key]);
+        }
+
+        $url = $scheme . '://' . $host . $path;
+        if (!empty($query)) {
+            $url = add_query_arg($query, $url);
+        }
+
+        return $url;
+    }
+
+    public function wbk_gift_card_shortcode()
+    {
+        return WBK_Renderer::load_template(
+            'frontend_v6/gift_card',
+            [],
+            false
+        );
     }
 }
 ?>

@@ -32,7 +32,12 @@ export const createPriceField: FormComponentConstructor<string> = ({
     field,
     fieldConfig,
 }) => {
-    field.setValidators([Validators.noneNegativeFloat])
+    const amountValidator =
+        fieldConfig.misc?.sub_type === 'positive_float'
+            ? Validators.positiveFloat
+            : Validators.noneNegativeFloat
+
+    field.setValidators([amountValidator])
 
     return ({ name, label, misc }: FormFieldProps) => {
         const { value, setValue, errors } = useField(field)

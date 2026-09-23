@@ -37,6 +37,12 @@ export const settingsSections = [
         isPro: true
     },
     {
+        id: 'mollie',
+        title: 'Mollie',
+        icon: 'credit-card',
+        isPro: true
+    },
+    {
         id: 'stripe',
         title: 'Stripe',
         icon: 'credit-card-timer',

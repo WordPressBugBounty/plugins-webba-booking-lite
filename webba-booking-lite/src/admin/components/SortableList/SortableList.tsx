@@ -49,6 +49,7 @@ export function SortableList<T extends Item>({
         >
             {items.map((item, index) => (
                 <SortableItem
+                    key={item.id}
                     item={item}
                     id={item.id}
                     index={index}

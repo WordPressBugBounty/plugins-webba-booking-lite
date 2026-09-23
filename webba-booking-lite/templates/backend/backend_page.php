@@ -99,6 +99,7 @@ if (isset($_GET["test"])) {
             WBK_Renderer::load_template("backend/react_app", [], true);
             break;
         case "wbk-coupons":
+        case "wbk-gift-cards":
             WBK_Renderer::load_template("backend/react_app", [], true);
             break;
         case "wbk-pricing-rules":

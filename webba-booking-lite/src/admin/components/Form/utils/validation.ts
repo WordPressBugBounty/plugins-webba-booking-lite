@@ -200,6 +200,23 @@ export const Validators = {
 
         return null
     },
+    positiveFloat: (value: string) => {
+        if (!value && value !== '0') return null
+
+        if (isNaN(parseFloat(value))) {
+            return __('Value must be a number', 'webba-booking-lite')
+        }
+
+        if (parseFloat(value) <= 0) {
+            return __('Value must be greater than zero', 'webba-booking-lite')
+        }
+
+        if (String(value).replace(/[0-9.]/g, '').length) {
+            return __('Value must be a valid number', 'webba-booking-lite')
+        }
+
+        return null
+    },
     optionIncluded:
         (selected: any, options: Record<string, string>[]) => (value) => {
             const values = options.map(

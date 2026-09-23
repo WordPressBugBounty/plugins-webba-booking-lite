@@ -4,6 +4,7 @@ const METHODS_WITHOUT_BOOKING_REDIRECT = [
     'google_pay',
     'apple_pay',
     'paypal',
+    'mollie',
     'woocommerce',
 ]
 

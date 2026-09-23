@@ -1,0 +1,36 @@
+.wbk_input {
+    &__price {
+        position: relative;
+        width: 100%;
+
+        .wbk_input__main--currency-before {
+            padding-left: var(--wbk-price-symbol-inset, 36px) !important;
+        }
+
+        .wbk_input__main--currency-after {
+            padding-right: var(--wbk-price-symbol-inset, 36px) !important;
+        }
+    }
+
+    &__currency {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 22px;
+        color: #668091;
+        pointer-events: none;
+        z-index: 1;
+        white-space: nowrap;
+        font-family: inherit;
+
+        &--before {
+            left: 16px;
+        }
+
+        &--after {
+            right: 16px;
+        }
+    }
+}

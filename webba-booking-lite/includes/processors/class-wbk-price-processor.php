@@ -457,11 +457,11 @@ class WBK_Price_Processor
     }
 
     /**
-     * Calculate discount amount from coupon code
+     * Calculate discount amount from coupon or gift card code
      *
-     * @param string $coupon Coupon code
+     * @param string $coupon Coupon or gift card code
      * @param float $amount Amount to apply discount to
-     * @param array $service_ids Array of service IDs for coupon validation
+     * @param array $service_ids Array of service IDs for validation
      * @return float Discount amount
      */
     static function calculate_coupon_discount($coupon, $amount, $service_ids)
@@ -473,8 +473,7 @@ class WBK_Price_Processor
         $coupon = esc_html(sanitize_text_field(trim($coupon)));
         $service_ids = array_unique($service_ids);
 
-        // Validate coupon
-        $coupon_result = WBK_Validator::check_coupon($coupon, $service_ids);
+        $coupon_result = WBK_Validator::check_coupon_or_gift_card($coupon, $service_ids);
 
         if (!is_array($coupon_result)) {
             return 0;
@@ -490,8 +489,11 @@ class WBK_Price_Processor
                 // Percentage discount
                 return ($amount * $coupon_result[2]) / 100;
             } elseif ($coupon_result[1] > 0) {
-                // Fixed amount discount
-                return $coupon_result[1];
+                $fixed = (float) $coupon_result[1];
+                if (isset($coupon_result[3]) && $coupon_result[3] === 'gift_card') {
+                    return min($fixed, $amount);
+                }
+                return $fixed;
             }
         }
 
@@ -636,19 +638,34 @@ class WBK_Price_Processor
             $booking_ids
         );
 
-        // Apply fixed coupon discount to subtotal if applicable
+        // Apply fixed coupon / gift card discount to subtotal if applicable
         if ($is_coupon_fixed && $coupon_result != null) {
-            $subtotal -= $coupon_result[1];
-            $discount_total += $coupon_result[1];
+            $fixed_discount = (float) $coupon_result[1];
+            $is_gift_card =
+                isset($coupon_result[3]) && $coupon_result[3] === 'gift_card';
+            if ($is_gift_card) {
+                $fixed_discount = min(
+                    $fixed_discount,
+                    max(0, (float) $subtotal)
+                );
+            }
+            $subtotal -= $fixed_discount;
+            if ($subtotal < 0) {
+                $subtotal = 0;
+            }
+            $discount_total += $fixed_discount;
             $tax_total = self::get_tax_amount($subtotal, $tax_rate);
 
-            // if order has no deposited item, subtract discount from to pay total
-            // if order has deposited item, subtract discount from to pay total only if discount is greater than to pay total
-            if (!$has_deposited_item) {
-                if ($to_pay_total > $coupon_result[1]) {
+            if ($is_gift_card) {
+                $to_pay_total = $subtotal + $tax_total;
+            } elseif (!$has_deposited_item) {
+                if ($to_pay_total > $fixed_discount) {
                     $to_pay_total -=
-                        $coupon_result[1] +
+                        $fixed_discount +
                         self::get_tax_amount($discount_total, $tax_rate);
+                    if ($to_pay_total < 0) {
+                        $to_pay_total = 0;
+                    }
                 } else {
                     $to_pay_total = 0;
                 }
@@ -946,6 +963,43 @@ class WBK_Price_Processor
         ];
     }
 
+    /**
+     * Resolve a stored booking discount id as a coupon or gift card result.
+     *
+     * @param mixed $discount_id
+     * @return array|false
+     */
+    static function coupon_result_from_discount_id($discount_id)
+    {
+        if (!is_numeric($discount_id) || intval($discount_id) <= 0) {
+            return false;
+        }
+        $discount_id = intval($discount_id);
+
+        $coupon = new WBK_Coupon($discount_id);
+        if ($coupon->is_loaded()) {
+            return [
+                $discount_id,
+                $coupon->get('amount_fixed'),
+                $coupon->get('amount_percentage'),
+            ];
+        }
+
+        if (class_exists('WBK_Gift_Card')) {
+            $gift_card = new WBK_Gift_Card($discount_id);
+            $code = $gift_card->get('code');
+            $amount = WBK_Gift_Card::remaining_amount_from_row([
+                'amount' => $gift_card->get('amount'),
+                'history' => $gift_card->get('history'),
+            ]);
+            if ($code !== false && $code !== '' && $amount > 0) {
+                return [$discount_id, $amount, 0, 'gift_card'];
+            }
+        }
+
+        return false;
+    }
+
     static function get_payment_items_post_booked($booking_ids)
     {
         if (!is_array($booking_ids) || count($booking_ids) == 0) {
@@ -953,18 +1007,9 @@ class WBK_Price_Processor
         }
         $booking = new WBK_Booking($booking_ids[0]);
         $tax = WBK_Options_Utils::get_tax();
-        $coupon_id = $booking->get('coupon');
-        $coupon_result = false;
-        if (!is_null($coupon_id) && is_numeric($coupon_id) && $coupon_id > 0) {
-            $coupon = new WBK_Coupon($coupon_id);
-            if ($coupon->is_loaded()) {
-                $coupon_result = [
-                    $coupon_id,
-                    $coupon->get('amount_fixed'),
-                    $coupon->get('amount_percentage'),
-                ];
-            }
-        }
+        $coupon_result = self::coupon_result_from_discount_id(
+            $booking->get('coupon')
+        );
 
         return self::get_payment_items($booking_ids, $tax, $coupon_result);
     }
@@ -980,18 +1025,9 @@ class WBK_Price_Processor
             return -4;
         }
 
-        $coupon_id = $first_booking->get('coupon');
-        $coupon_result = false;
-        if (!is_null($coupon_id) && is_numeric($coupon_id) && $coupon_id > 0) {
-            $coupon = new WBK_Coupon($coupon_id);
-            if ($coupon->is_loaded()) {
-                $coupon_result = [
-                    $coupon_id,
-                    $coupon->get('amount_fixed'),
-                    $coupon->get('amount_percentage'),
-                ];
-            }
-        }
+        $coupon_result = self::coupon_result_from_discount_id(
+            $first_booking->get('coupon')
+        );
 
         $unit_bookings = [];
         foreach ($booking_ids as $booking_id) {
@@ -1172,6 +1208,9 @@ class WBK_Price_Processor
                 $discount_total = ($subtotal * (float) $coupon_result[2]) / 100;
             } elseif (isset($coupon_result[1]) && (float) $coupon_result[1] > 0) {
                 $discount_total = (float) $coupon_result[1];
+                if (isset($coupon_result[3]) && $coupon_result[3] === 'gift_card') {
+                    $discount_total = min($discount_total, $subtotal);
+                }
             }
         }
         if ($discount_total > 0) {

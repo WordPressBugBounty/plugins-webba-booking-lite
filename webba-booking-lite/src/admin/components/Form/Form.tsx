@@ -82,7 +82,7 @@ export const Form = function <T extends Model>({
     onReset,
     onDuplicate,
     subsectionTitles,
-    tooltipMode = 'tooltip',
+    tooltipMode = 'description',
     tabs,
     editorView = 'form',
     showTabularSearch = false,

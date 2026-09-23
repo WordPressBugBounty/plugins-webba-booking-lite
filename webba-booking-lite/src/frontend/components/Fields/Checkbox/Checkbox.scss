@@ -12,7 +12,13 @@
         color: #668091;
     }
 
-    input {
+    input[type='checkbox'] {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        flex-shrink: 0;
+        accent-color: #0c4057;
+        cursor: pointer;
         outline: none;
     }
 }

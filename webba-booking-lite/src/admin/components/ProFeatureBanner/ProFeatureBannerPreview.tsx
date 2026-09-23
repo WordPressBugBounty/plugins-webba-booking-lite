@@ -34,6 +34,12 @@ const PREVIEW_ROWS: Record<ProFeatureBannerKey, PreviewRow[]> = {
         { id: '3', name: 'VIP15', detail: '15%', status: __('Expired', 'webba-booking-lite') },
         { id: '4', name: 'NEWYEAR', detail: '20%', status: __('Active', 'webba-booking-lite') },
     ],
+    gift_cards: [
+        { id: '1', name: 'GIFT10', detail: '10%', status: __('Active', 'webba-booking-lite') },
+        { id: '2', name: 'GIFT25', detail: '$25.00', status: __('Active', 'webba-booking-lite') },
+        { id: '3', name: 'GIFT15', detail: '15%', status: __('Expired', 'webba-booking-lite') },
+        { id: '4', name: 'GIFT20', detail: '20%', status: __('Active', 'webba-booking-lite') },
+    ],
     forms: [
         { id: '1', name: __('Default form', 'webba-booking-lite'), detail: '8 fields', status: __('Active', 'webba-booking-lite') },
         { id: '2', name: __('Corporate booking', 'webba-booking-lite'), detail: '12 fields', status: __('Active', 'webba-booking-lite') },

@@ -23,6 +23,7 @@ $allowed_params = [
     'PayerID',
     'paymentId',
     'paypal_status',
+    'mollie_status',
     'payment_intent',
     'redirect_status',
 ];
@@ -34,6 +35,28 @@ foreach ($allowed_params as $param) {
         $attr_name = 'data-' . $param;
         $extra_data_attrs .= ' ' . $attr_name . '="' . esc_attr($value) . '"';
     }
+}
+
+if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+    session_start();
+}
+if (!empty($_SESSION['wbk_mollie_status'])) {
+    if (!isset($_GET['mollie_status'])) {
+        $extra_data_attrs .=
+            ' data-mollie_status="' .
+            esc_attr(sanitize_text_field($_SESSION['wbk_mollie_status'])) .
+            '"';
+    }
+    if (
+        !isset($_GET['paymentId']) &&
+        !empty($_SESSION['wbk_mollie_payment_id'])
+    ) {
+        $extra_data_attrs .=
+            ' data-paymentId="' .
+            esc_attr(sanitize_text_field($_SESSION['wbk_mollie_payment_id'])) .
+            '"';
+    }
+    unset($_SESSION['wbk_mollie_status'], $_SESSION['wbk_mollie_payment_id']);
 }
 
 

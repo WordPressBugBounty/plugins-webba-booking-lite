@@ -1,5 +1,6 @@
 <?php
 
+use WebbaBooking\Utilities\WBK_Options_Utils;
 if ( !defined( "ABSPATH" ) ) {
     exit;
 }
@@ -442,6 +443,20 @@ class WBK_Booking_Factory {
                 $used++;
                 $coupon->set( "used", $used );
                 $coupon->save();
+            } elseif ( class_exists( "WBK_Gift_Card" ) ) {
+                $gift_card = new WBK_Gift_Card($coupon_id);
+                if ( $gift_card->is_loaded() ) {
+                    $coupon_result = WBK_Price_Processor::coupon_result_from_discount_id( $coupon_id );
+                    $tax = WBK_Options_Utils::get_tax();
+                    $payment_details = WBK_Price_Processor::get_payment_items( $booking_ids, $tax, $coupon_result );
+                    $used_amount = 0.0;
+                    if ( is_array( $payment_details ) && isset( $payment_details["discount"] ) ) {
+                        $used_amount = abs( floatval( $payment_details["discount"] ) );
+                    }
+                    if ( $used_amount > 0 ) {
+                        $gift_card->record_usage( $used_amount );
+                    }
+                }
             }
         }
         // send invoice (email notification)

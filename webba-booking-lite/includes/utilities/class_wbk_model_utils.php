@@ -397,6 +397,48 @@ class WBK_Model_Utils {
     }
 
     /**
+     * Email templates that apply to a gift card for the given trigger.
+     *
+     * @param string         $trigger
+     * @param WBK_Gift_Card $gift_card
+     * @return array<int,string>
+     */
+    public static function get_gift_card_email_templates( $trigger, $gift_card ) {
+        global $wpdb;
+        $table = get_option( "wbk_db_prefix", "" ) . "wbk_email_templates";
+        $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE enabled=%s AND type=%s", "yes", $trigger ), ARRAY_A );
+        if ( !is_array( $rows ) ) {
+            return [];
+        }
+        $gift_card_all = $gift_card->get( "applicable_for_all_services" ) === "yes";
+        $gift_card_services = json_decode( (string) $gift_card->get( "services" ), true );
+        if ( !is_array( $gift_card_services ) ) {
+            $gift_card_services = [];
+        }
+        $gift_card_services = array_map( "intval", $gift_card_services );
+        $result = [];
+        foreach ( $rows as $item ) {
+            if ( isset( $item["use_for_all_services"] ) && $item["use_for_all_services"] == "yes" ) {
+                $result[$item["id"]] = $item["name"];
+                continue;
+            }
+            if ( $gift_card_all ) {
+                $result[$item["id"]] = $item["name"];
+                continue;
+            }
+            $template_services = json_decode( ( isset( $item["services"] ) ? $item["services"] : "[]" ), true );
+            if ( !is_array( $template_services ) ) {
+                continue;
+            }
+            $template_services = array_map( "intval", $template_services );
+            if ( count( array_intersect( $gift_card_services, $template_services ) ) > 0 ) {
+                $result[$item["id"]] = $item["name"];
+            }
+        }
+        return $result;
+    }
+
+    /**
      * get pairs of google calendars id - name
      * @return array  of id-name pair
      */
@@ -1416,6 +1458,7 @@ class WBK_Model_Utils {
         ];
         if ( WBK_Feature_Gate::have_required_plan( "standard" ) ) {
             $payment_methods["paypal"] = __( get_option( "wbk_payment_pay_with_paypal_btn_text", "PayPal" ), "webba-booking-lite" );
+            $payment_methods["mollie"] = __( get_option( "wbk_mollie_button_text", "Mollie" ), "webba-booking-lite" );
             $payment_methods["stripe"] = __( get_option( "wbk_stripe_button_text", "Credit card" ), "webba-booking-lite" );
             if ( class_exists( "WooCommerce" ) ) {
                 $payment_methods["woocommerce"] = __( get_option( "wbk_woo_button_text", "WooCommerce" ), "webba-booking-lite" );
@@ -1437,6 +1480,7 @@ class WBK_Model_Utils {
             $pro_version_suffix = " (" . WBK_Feature_Gate::get_plan_limit_message( "Standard" ) . ")";
         }
         $payment_methods_all["paypal"] = __( get_option( "wbk_payment_pay_with_paypal_btn_text", "PayPal" ) . $pro_version_suffix );
+        $payment_methods_all["mollie"] = __( get_option( "wbk_mollie_button_text", "Mollie" ) . $pro_version_suffix );
         $payment_methods_all["stripe"] = __( get_option( "wbk_stripe_button_text", "Credit card" ) . $pro_version_suffix );
         if ( class_exists( "WooCommerce" ) ) {
             $payment_methods_all["woocommerce"] = __( get_option( "wbk_woo_button_text", "WooCommerce" ) . $pro_version_suffix );
@@ -1445,6 +1489,44 @@ class WBK_Model_Utils {
         $payment_methods_all["apple_pay"] = __( get_option( "wbk_apple_pay_button_text", "Apple Pay" ) . $pro_version_suffix );
         $payment_methods_all["stripe_others"] = __( get_option( "wbk_stripe_other_button_text", "Other Payments" ) . $pro_version_suffix );
         return $payment_methods_all;
+    }
+
+    /**
+     * Payment methods that can be offered for gift card purchases.
+     * Pay on arrival and bank transfer are excluded.
+     *
+     * @param bool $available_only When true, only methods available for the current plan.
+     * @return array
+     */
+    public static function get_gift_card_payment_methods( $available_only = false ) {
+        $payment_methods = ( $available_only ? self::get_available_payment_methods() : self::get_all_payment_methods() );
+        unset($payment_methods["arrival"], $payment_methods["bank"]);
+        return $payment_methods;
+    }
+
+    /**
+     * Gift card payment methods selected in settings, intersected with currently available methods.
+     * Falls back to all allowed gift card methods when nothing is configured.
+     *
+     * @return array
+     */
+    public static function get_configured_gift_card_payment_methods() {
+        $available = self::get_gift_card_payment_methods( true );
+        $configured = get_option( "wbk_gift_card_payment_methods", [] );
+        if ( is_string( $configured ) && $configured !== "" ) {
+            $decoded = json_decode( $configured, true );
+            $configured = ( is_array( $decoded ) ? $decoded : array_filter( array_map( "trim", explode( ",", $configured ) ) ) );
+        }
+        if ( !is_array( $configured ) || empty( $configured ) ) {
+            return $available;
+        }
+        $result = [];
+        foreach ( $configured as $method ) {
+            if ( isset( $available[$method] ) ) {
+                $result[$method] = $available[$method];
+            }
+        }
+        return $result;
     }
 
     static function get_payment_methods_for_bookings_intersected( $booking_ids ) {
@@ -2061,9 +2143,11 @@ class WBK_Model_Utils {
             "booking_updated_by_customer"   => __( "Booking updated by customer", "webba-booking-lite" ),
             "booking_paid"                  => __( "Booking is paid", "webba-booking-lite" ),
             "admin_reminder"                => __( "Booking reminder to admin" . $pro_version_suffix, "webba-booking-lite" ),
-            "customer_reminder"             => __( "Booking reminder to customer" . $pro_version_suffix, $pro_version_suffix, "webba-booking-lite" ),
+            "customer_reminder"             => __( "Booking reminder to customer" . $pro_version_suffix, "webba-booking-lite" ),
             "user_registered"               => __( "New user is created", "webba-booking-lite" ),
             "booking_finished"              => __( "Booking is finished", "webba-booking-lite" ),
+            "gift_card_purchased"           => __( "Gift card is purchased", "webba-booking-lite" ),
+            "gift_card_sent"                => __( "Gift card is sent", "webba-booking-lite" ),
         ];
         return $notification_types;
     }

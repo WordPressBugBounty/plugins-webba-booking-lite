@@ -8,6 +8,7 @@ import { PhoneInput } from '../Fields/PhoneInput/PhoneInput'
 import { EmailInput } from '../Fields/EmailInput/EmailInput'
 import { FileInput } from '../Fields/FileInput/FileInput'
 import { NumberInput } from '../Fields/NumberInput/NumberInput'
+import { PriceInput } from '../Fields/PriceInput/PriceInput'
 import { TextArea } from '../Fields/TextArea/TextArea'
 import { Checkbox } from '../Fields/Checkbox/Checkbox'
 import { TextInput } from '../Fields/TextInput/TextInput'
@@ -59,6 +60,15 @@ export const createFormFields = (
             case 'number':
                 fieldsElements.push(
                     <NumberInput
+                        key={fieldConstructor.slug}
+                        fieldConstructor={fieldConstructor}
+                        anyTouched={anyTouched}
+                    />
+                )
+                break
+            case 'price':
+                fieldsElements.push(
+                    <PriceInput
                         key={fieldConstructor.slug}
                         fieldConstructor={fieldConstructor}
                         anyTouched={anyTouched}

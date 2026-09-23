@@ -1,6 +1,7 @@
 <?php
 namespace WbkData;
 
+use WBK_Gift_Card_Design;
 use WBK_User_Utils;
 use WBK_Validator;
 
@@ -199,6 +200,10 @@ class Model
                 return [];
             }
         } elseif ($this->model_name == $db_prefix . "wbk_coupons") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "wbk_gift_cards") {
             if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
                 return [];
             }
@@ -615,6 +620,10 @@ class Model
                 case "extras_selector":
                     $type = "string";
                     $input_type = "extras_selector";
+                    break;
+                case "gift_card_design":
+                    $type = "string";
+                    $input_type = "gift_card_design";
                     break;
                 default:
                     $type = "not_defined";
@@ -1059,10 +1068,17 @@ class Model
                         if (false === $format) {
                             continue;
                         }
-                        $valid_fields[$field->get_name()] =
-                            $field->get_type() !== "wbk_app_custom_data"
-                                ? $this->clean_up_value($validation_result[1])
-                                : $validation_result[1];
+                        $validated_value = $validation_result[1];
+                        $skip_cleanup =
+                            $field->get_type() === "wbk_app_custom_data" ||
+                            (
+                                $field->get_name() === "pdf_attachment" &&
+                                class_exists("WBK_Gift_Card_Design") &&
+                                WBK_Gift_Card_Design::parse($validated_value)
+                            );
+                        $valid_fields[$field->get_name()] = $skip_cleanup
+                            ? $validated_value
+                            : $this->clean_up_value($validated_value);
                         $field_formats[] = $format;
                     } else {
                         $invalid_fields[] = [$slug, $validation_result[1]];

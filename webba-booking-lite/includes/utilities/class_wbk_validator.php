@@ -328,6 +328,75 @@ class WBK_Validator
             $result['amount_percentage'],
         ];
     }
+
+    /**
+     * Check if a gift card code is applicable.
+     *
+     * Returns the same shape as check_coupon so gift cards can be applied
+     * as a fixed-amount discount: [id, amount_fixed, amount_percentage].
+     *
+     * @param string $code
+     * @param array  $service_ids
+     * @return array|false
+     */
+    public static function check_gift_card($code, $service_ids)
+    {
+        if (!WBK_Feature_Gate::have_required_plan('premium')) {
+            return false;
+        }
+        if (!class_exists('WBK_Gift_Card')) {
+            return false;
+        }
+
+        $result = WBK_Gift_Card::find_by_code($code);
+        if ($result === null) {
+            return false;
+        }
+
+        $expiration = intval($result['expiration_date'] ?? 0);
+        if ($expiration > 0 && time() > $expiration + DAY_IN_SECONDS - 1) {
+            return false;
+        }
+
+        $applicable_for_all =
+            isset($result['applicable_for_all_services']) &&
+            $result['applicable_for_all_services'] === 'yes';
+        if (!$applicable_for_all && !empty($result['services'])) {
+            $services = json_decode($result['services']);
+            if (is_array($services) && count($services) > 0) {
+                foreach ((array) $service_ids as $service_id) {
+                    if (!in_array($service_id, $services)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        $amount = WBK_Gift_Card::remaining_amount_from_row($result);
+        if ($amount <= 0) {
+            return false;
+        }
+
+        return [$result['id'], $amount, 0, 'gift_card'];
+    }
+
+    /**
+     * Validate a code as a coupon first, then as a gift card.
+     *
+     * @param string $code
+     * @param array  $service_ids
+     * @return array|false
+     */
+    public static function check_coupon_or_gift_card($code, $service_ids)
+    {
+        $coupon_result = self::check_coupon($code, $service_ids);
+        if (is_array($coupon_result)) {
+            return $coupon_result;
+        }
+
+        return self::check_gift_card($code, $service_ids);
+    }
+
     public function getCouponData($coupon_id)
     {
         global $wpdb;

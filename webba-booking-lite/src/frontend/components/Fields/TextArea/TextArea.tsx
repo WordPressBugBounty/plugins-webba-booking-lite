@@ -15,6 +15,7 @@ export const TextArea = ({ fieldConstructor, anyTouched }: IFieldProps) => {
         setTouched,
         width,
         defaultValue,
+        maxLength,
     } = useField(fieldConstructor)
     const showError = errors && errors.length > 0 && (anyTouched || touched)
     return (
@@ -34,6 +35,7 @@ export const TextArea = ({ fieldConstructor, anyTouched }: IFieldProps) => {
                     }
                 )}
                 onBlur={() => setTouched(true)}
+                maxLength={maxLength ?? undefined}
             >
                 {(value as string) || (defaultValue as string)}
             </textarea>

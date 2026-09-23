@@ -116,11 +116,11 @@ class WBK_Email_Processor {
                 } else {
                     continue;
                 }
-                $pdf_attachement = strip_tags( $et->get( "pdf_attachment" ) );
+                $pdf_attachement = WBK_Gift_Card_Design::resolve_attachment_html( $et->get( "pdf_attachment" ) );
                 if ( $pdf_attachement != "" && WBK_Feature_Gate::have_required_plan( "premium" ) ) {
                     $pdf_attachement = WBK_Translation_Processor::translate_string( "webba_email_template_pdf_" . $id, $pdf_attachement );
                     $pdf_file = WBK_Pdf_Processor::process( $pdf_attachement, $bookings );
-                    if ( $pdf_file != false ) {
+                    if ( $pdf_file != false && $pdf_file != "" ) {
                         $attachments[] = $pdf_file;
                     }
                 }
@@ -245,7 +245,7 @@ class WBK_Email_Processor {
         );
         $message = WBK_Placeholder_Processor::process( $message, $bookings );
         $subject = WBK_Placeholder_Processor::process( $subject, $bookings );
-        if ( $template->get( "trigger" ) == "admin_reminder" ) {
+        if ( $template->get( "type" ) == "admin_reminder" ) {
             $message = WBK_Placeholder_Processor::process_agenda_placehoder( $message, $bookings );
         }
         $recipients = json_decode( $template->get( "recipients" ) );
@@ -258,7 +258,7 @@ class WBK_Email_Processor {
             if ( $recipient == "admin" ) {
             } elseif ( $recipient == "customer" || $recipient == "group" ) {
             }
-            $pdf_attachement = strip_tags( $template->get( "pdf_attachment" ) );
+            $pdf_attachement = WBK_Gift_Card_Design::resolve_attachment_html( $template->get( "pdf_attachment" ) );
             if ( $pdf_attachement != "" ) {
                 if ( function_exists( "pll__" ) ) {
                     $pdf_attachement = pll__( $pdf_attachement );
@@ -270,7 +270,7 @@ class WBK_Email_Processor {
                     "webba_email_template_pdf_" . $template->get_id()
                 );
                 $pdf_file = WBK_Pdf_Processor::process( $pdf_attachement, $bookings );
-                if ( $pdf_file != false ) {
+                if ( $pdf_file != false && $pdf_file != "" ) {
                     $attachments[] = $pdf_file;
                 }
             }
@@ -296,7 +296,7 @@ class WBK_Email_Processor {
                         $notification["subject"],
                         $notification["message"],
                         $headers,
-                        ${$notification}["attachments"]
+                        $notification["attachments"]
                     );
                 } else {
                     wp_mail(
@@ -312,11 +312,12 @@ class WBK_Email_Processor {
     }
 
     /**
-     * Generate a PDF invoice for the given booking IDs.
-     *
-     * @param array $bookings_ids Booking IDs included on the invoice.
-     * @return string Absolute path to the generated PDF, or an empty string on failure.
-     */
+        /**
+    * Generate a PDF invoice for the given booking IDs.
+    *
+    * @param array $bookings_ids Booking IDs included on the invoice.
+    * @return string Absolute path to the generated PDF, or an empty string on failure.
+    */
     public static function generate_pdf_invoice( array $bookings_ids ) : string {
         $booking_objects = [];
         $normalized_ids = [];
@@ -634,6 +635,182 @@ class WBK_Email_Processor {
             $parts[] = $extra_name . " × " . $extra_quantity;
         }
         return implode( ", ", $parts );
+    }
+
+    /**
+     * Send the purchase receipt and, if Send card on is today, the delivery email.
+     *
+     * @param int $gift_card_id
+     * @return void
+     */
+    public static function on_gift_card_purchased( $gift_card_id ) {
+        $gift_card_id = intval( $gift_card_id );
+        if ( $gift_card_id <= 0 ) {
+            return;
+        }
+        self::send_gift_card( $gift_card_id, "gift_card_purchased" );
+        self::maybe_send_gift_card_delivery( $gift_card_id );
+    }
+
+    /**
+     * Send due gift card delivery emails (daily cron).
+     *
+     * @return void
+     */
+    public static function send_scheduled_gift_cards() {
+        foreach ( WBK_Gift_Card::get_ids_due_for_delivery() as $gift_card_id ) {
+            self::maybe_send_gift_card_delivery( $gift_card_id );
+        }
+    }
+
+    /**
+     * Send the recipient email when Send card on is due and it has not been sent yet.
+     *
+     * @param int $gift_card_id
+     * @return void
+     */
+    public static function maybe_send_gift_card_delivery( $gift_card_id ) {
+        $gift_card = new WBK_Gift_Card(intval( $gift_card_id ));
+        if ( !$gift_card->is_loaded() || $gift_card->is_recipient_notified() ) {
+            return;
+        }
+        if ( !$gift_card->is_delivery_due() ) {
+            return;
+        }
+        if ( self::send_gift_card( intval( $gift_card_id ), "gift_card_sent" ) ) {
+            $gift_card->mark_recipient_notified();
+        }
+    }
+
+    /**
+     * Send gift card email templates for a trigger.
+     *
+     * @param int    $gift_card_id
+     * @param string $trigger gift_card_purchased|gift_card_sent
+     * @return bool True when at least one email was dispatched.
+     */
+    public static function send_gift_card( $gift_card_id, $trigger ) {
+        $gift_card = new WBK_Gift_Card(intval( $gift_card_id ));
+        if ( !$gift_card->is_loaded() ) {
+            return false;
+        }
+        $email_templates = WBK_Model_Utils::get_gift_card_email_templates( $trigger, $gift_card );
+        if ( count( $email_templates ) === 0 ) {
+            return false;
+        }
+        $headers = ["From: " . stripslashes( get_option( "wbk_from_name" ) ) . " <" . get_option( "wbk_from_email" ) . ">"];
+        $queue = [];
+        $sent_any = false;
+        foreach ( $email_templates as $id => $name ) {
+            $et = new WBK_Email_Template($id);
+            if ( !$et->is_loaded() ) {
+                continue;
+            }
+            $message = $et->get( "template" );
+            $subject = $et->get( "subject" );
+            $message = WBK_Translation_Processor::translate_string( "webba_email_template_message_" . $id, $message );
+            $subject = WBK_Translation_Processor::translate_string( "webba_email_template_subject_" . $id, $subject );
+            $raw_message = $gift_card->get( "message" );
+            $personal_message = ( is_string( $raw_message ) ? trim( $raw_message ) : "" );
+            if ( $trigger == "gift_card_sent" && $personal_message !== "" && strpos( $message, "#gift_card_message" ) === false ) {
+                $message .= "#gift_card_message";
+            }
+            if ( $trigger == "gift_card_sent" && strpos( $message, "#gift_card_policy" ) === false && WBK_Gift_Card::get_policy_html() !== "" ) {
+                $message .= "#gift_card_policy";
+            }
+            $message = WBK_Placeholder_Processor::process_gift_card_placeholders( $message, intval( $gift_card_id ) );
+            $subject = WBK_Placeholder_Processor::process_gift_card_placeholders( $subject, intval( $gift_card_id ) );
+            $recipients = json_decode( $et->get( "recipients" ) );
+            if ( is_string( $recipients ) ) {
+                $recipients = json_decode( $recipients );
+            }
+            if ( !$recipients || !is_array( $recipients ) ) {
+                continue;
+            }
+            $recipients = array_map( "strval", $recipients );
+            foreach ( $recipients as $recipient ) {
+                $attachments = [];
+                $item_header = [];
+                $recipient_addresses = [];
+                if ( $recipient == "admin" ) {
+                    $recipient_addresses[] = get_option( "wbk_super_admin_email", get_option( "admin_email" ) );
+                    if ( get_option( "wbk_email_override_replyto", "true" ) == "true" ) {
+                        $item_header[] = "Reply-To: " . $gift_card->get( "buyer_name" ) . " <" . $gift_card->get( "buyer_email" ) . ">";
+                    }
+                } elseif ( $recipient == "customer" || $recipient == "group" ) {
+                    if ( $trigger == "gift_card_sent" ) {
+                        $recipient_addresses[] = $gift_card->get( "recipient_email" );
+                    } else {
+                        $recipient_addresses[] = $gift_card->get( "buyer_email" );
+                    }
+                    if ( get_option( "wbk_email_override_replyto", "true" ) == "true" ) {
+                        if ( $trigger == "gift_card_sent" ) {
+                            $item_header[] = "Reply-To: " . $gift_card->get( "buyer_name" ) . " <" . $gift_card->get( "buyer_email" ) . ">";
+                        }
+                    }
+                } else {
+                    continue;
+                }
+                $recipient_addresses = array_values( array_filter( array_map( "sanitize_email", $recipient_addresses ), function ( $email ) {
+                    return $email !== "" && is_email( $email );
+                } ) );
+                if ( count( $recipient_addresses ) === 0 ) {
+                    continue;
+                }
+                $buyer_design = $gift_card->get( "design" );
+                $buyer_design = ( is_string( $buyer_design ) ? $buyer_design : "" );
+                if ( $trigger == "gift_card_sent" ) {
+                    $pdf_html = WBK_Gift_Card_Design::resolve_delivery_html( $et->get( "pdf_attachment" ), $buyer_design );
+                } else {
+                    $pdf_html = WBK_Gift_Card_Design::resolve_attachment_html( $et->get( "pdf_attachment" ) );
+                }
+                if ( $pdf_html != "" && WBK_Feature_Gate::have_required_plan( "premium" ) ) {
+                    $pdf_html = WBK_Translation_Processor::translate_string( "webba_email_template_pdf_" . $id, $pdf_html );
+                    $pdf_html = WBK_Placeholder_Processor::process_gift_card_placeholders( $pdf_html, intval( $gift_card_id ) );
+                    $pdf_file = WBK_Pdf_Processor::process( $pdf_html, [] );
+                    if ( $pdf_file != false && $pdf_file != "" ) {
+                        $attachments[] = $pdf_file;
+                    }
+                }
+                foreach ( $recipient_addresses as $email ) {
+                    $queue_item = [
+                        "address" => $email,
+                        "message" => $message,
+                        "subject" => $subject,
+                        "headers" => $item_header,
+                    ];
+                    if ( count( $attachments ) > 0 ) {
+                        $queue_item["attachments"] = $attachments;
+                    }
+                    $queue[] = $queue_item;
+                }
+            }
+        }
+        foreach ( $queue as $notification ) {
+            if ( !WBK_Validator::check_string_size( $notification["message"], 1, 50000 ) || !WBK_Validator::check_string_size( $notification["subject"], 1, 200 ) ) {
+                continue;
+            }
+            add_filter( "wp_mail_content_type", "wbk_wp_mail_content_type" );
+            if ( isset( $notification["attachments"] ) && count( $notification["attachments"] ) > 0 ) {
+                wp_mail(
+                    $notification["address"],
+                    $notification["subject"],
+                    $notification["message"],
+                    array_merge( $headers, $notification["headers"] ),
+                    $notification["attachments"]
+                );
+            } else {
+                wp_mail(
+                    $notification["address"],
+                    $notification["subject"],
+                    $notification["message"],
+                    array_merge( $headers, $notification["headers"] )
+                );
+            }
+            remove_filter( "wp_mail_content_type", "wbk_wp_mail_content_type" );
+            $sent_any = true;
+        }
+        return $sent_any;
     }
 
 }

@@ -193,11 +193,6 @@ class WBK_Service extends WBK_Model_Object
     public function get_quantity($time = null)
     {
         if (
-            !WBK_Feature_Gate::have_required_plan('standard', 'only_old_users')
-        ) {
-            return 1;
-        }
-        if (
             !isset($this->fields['quantity']) ||
             empty($this->fields['quantity'])
         ) {

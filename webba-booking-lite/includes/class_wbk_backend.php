@@ -53,6 +53,7 @@ class WBK_Backend
             "wbk-appointments",
             "wbk-calendar",
             "wbk-coupons",
+            "wbk-gift-cards",
             "wbk-service-categories",
             "wbk-email-templates",
             "wbk-dashboard",
@@ -230,6 +231,16 @@ class WBK_Backend
                 "wbk-coupons",
                 ["WBK_Renderer", "render_backend_page"],
             );
+
+            add_submenu_page(
+                'wbk-main',
+                __('Gift Cards', 'webba-booking-lite'),
+                __('Gift Cards', 'webba-booking-lite'),
+                'manage_options',
+                'wbk-gift-cards',
+                ['WBK_Renderer', 'render_backend_page'],
+            );
+
             add_submenu_page(
                 "wbk-main",
                 __("Connected calendars", "webba-booking-lite"),
@@ -285,6 +296,7 @@ class WBK_Backend
             "wbk-email-templates",
             "wbk-pricing-rules",
             "wbk-coupons",
+            'wbk-gift-cards',
             "wbk-gg-calendars",
             ...wbk_is_assistance_lab_available() ? ["wbk-assistance-lab"] : [],
         ];
@@ -412,6 +424,53 @@ class WBK_Backend
             $outlook->clear_access_token();
 
             wp_redirect(admin_url("admin.php?page=wbk-connected-calendars"));
+            exit();
+        }
+
+        if (!current_user_can("manage_options") || !class_exists("WBK_Webba_Connect")) {
+            return;
+        }
+
+        $webba_connect = new WBK_Webba_Connect();
+        $options_url = admin_url("admin.php?page=wbk-options");
+
+        if (isset($_GET["facebook_auth"]) && $_GET["facebook_auth"] === "success") {
+            $payload = isset($_GET["fb_payload"])
+                ? wp_unslash((string) $_GET["fb_payload"])
+                : "";
+
+            // Legacy encrypted payload callback (kept for older Connect builds).
+            if ($payload !== "") {
+                $webba_connect->store_facebook_token_from_callback($payload);
+            }
+
+            // Google-style restore: tokens live on Connect; mirror a short-lived cache locally.
+            $token_data = $webba_connect->fetch_facebook_access_token_from_webba_connect(
+                "whatsapp",
+            );
+            if (is_array($token_data) && !empty($token_data["access_token"])) {
+                if (class_exists("WBK_WhatsApp")) {
+                    WBK_WhatsApp::validate_access_token(
+                        (string) $token_data["access_token"],
+                    );
+                }
+            } else {
+                $webba_connect->inspect_facebook_access_token();
+            }
+
+            wp_redirect($options_url);
+            exit();
+        }
+
+        if (isset($_GET["facebook_auth"]) && $_GET["facebook_auth"] === "revoked") {
+            $webba_connect->clear_local_facebook_access_token();
+            wp_redirect($options_url);
+            exit();
+        }
+
+        if (isset($_GET["revoke-whatsapp"])) {
+            $webba_connect->clear_local_facebook_access_token();
+            wp_redirect($options_url);
             exit();
         }
     }

@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.5.0
+ * Version: 6.5.2
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -12,7 +12,7 @@
 if ( !defined( "ABSPATH" ) ) {
     exit;
 }
-// Added for the capabilities with the old versions of WordPress
+// Added for the capabilities  with the old versions of WordPress
 if ( !function_exists( "wp_date" ) ) {
     function wp_date(  $format, $timestamp, $timezone  ) {
         return date_i18n( $format, $timestamp );
@@ -74,7 +74,7 @@ if ( !defined( "WP_WEBBA_BOOKING__PLUGIN_DIR" ) ) {
     define( "WP_WEBBA_BOOKING__PLUGIN_URL", plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( "WP_WEBBA_BOOKING__VERSION" ) ) {
-    define( "WP_WEBBA_BOOKING__VERSION", "6.5.0" );
+    define( "WP_WEBBA_BOOKING__VERSION", "6.5.2" );
 }
 if ( !function_exists( "wbk_is_assistance_lab_available" ) ) {
     /**
@@ -111,6 +111,18 @@ if ( !function_exists( "wbk_get_react_admin_asset_version" ) ) {
     }
 
 }
+if ( !function_exists( "wbk_get_react_frontend_asset_version" ) ) {
+    /**
+     * Cache-bust the React frontend bundle during local webpack rebuilds.
+     */
+    function wbk_get_react_frontend_asset_version() : string {
+        $build_dir = WP_WEBBA_BOOKING__PLUGIN_DIR . "/build/frontend";
+        $js_path = $build_dir . "/index.js";
+        $css_path = $build_dir . "/index.css";
+        return WP_WEBBA_BOOKING__VERSION . "." . max( ( file_exists( $js_path ) ? (int) filemtime( $js_path ) : 0 ), ( file_exists( $css_path ) ? (int) filemtime( $css_path ) : 0 ) );
+    }
+
+}
 if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_textdomain" ) ) {
     include "vendor/autoload.php";
     include "includes/wbkdata/autoload.php";
@@ -136,6 +148,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     }
     require "includes/third-parties/class_wbk_woocommerce.php";
     require "includes/third-parties/class_wbk_gg_blank.php";
+    require "includes/third-parties/class_wbk_mollie_blank.php";
     if ( version_compare( PHP_VERSION, "7.4.0" ) >= 0 ) {
         if ( WBK_Feature_Gate::have_required_plan( "premium" ) ) {
             include "includes/third-parties/class_wbk_zoom.php";
@@ -145,6 +158,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     } else {
         include "includes/third-parties/class_wbk_zoom_blank.php";
     }
+    include "includes/third-parties/class_wbk_whatsapp_blank.php";
     add_action( "template_redirect", "wbk_template_redirect" );
     function wbk_template_redirect() {
         if ( isset( $_GET["wbk_zoom_auth"] ) && isset( $_GET["code"] ) ) {
@@ -175,6 +189,8 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     include "includes/data/class-wbk-service-category.php";
     include "includes/data/class-wbk-extra.php";
     include "includes/data/class-wbk-coupon.php";
+    include "includes/data/class-wbk-gift-card.php";
+    include "includes/data/class-wbk-gift-card-design.php";
     include "includes/data/class-wbk-email-template.php";
     include "includes/data/class-wbk-pricing-rule.php";
     include "includes/data/class-wbk-booking.php";
@@ -232,6 +248,12 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     include "includes/class_wbk_mixpanel.php";
     add_action( "init", "wbk_init", 30 );
     add_action( "wbk_daily_event", "wbk_daily" );
+    add_action(
+        "wbk_gift_card_created_from_payment",
+        ["WBK_Email_Processor", "on_gift_card_purchased"],
+        10,
+        1
+    );
     WBK_Remote_Config::init();
     WBK_Mailer::init();
     WBK_Push_Processor::init();
@@ -276,6 +298,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
             "wbk-email-templates",
             "wbk-service-categories",
             "wbk-coupons",
+            "wbk-gift-cards",
             "wbk-pricing-rules"
         ],
         "wbk-tinymce",
@@ -289,6 +312,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
             "wbk-email-templates",
             "wbk-service-categories",
             "wbk-coupons",
+            "wbk-gift-cards",
             "wbk-pricing-rules"
         ],
         "jquery-repeater",
@@ -302,6 +326,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
             "wbk-email-templates",
             "wbk-service-categories",
             "wbk-coupons",
+            "wbk-gift-cards",
             "wbk-pricing-rules"
         ],
         "jquery-repeater",
@@ -403,7 +428,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
         "wbk-frontend-v6-script",
         WP_WEBBA_BOOKING__PLUGIN_URL . "/build/frontend/index.js",
         ["wp-element", "wp-api-fetch", "wp-data"],
-        WP_WEBBA_BOOKING__VERSION
+        wbk_get_react_frontend_asset_version()
     ];
     $css_array = [];
     $css_array[] = [
@@ -484,6 +509,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
             "wbk-appointments",
             "wbk-calendar",
             "wbk-coupons",
+            "wbk-gift-cards",
             "wbk-service-categories",
             "wbk-email-templates",
             "wbk-dashboard",
@@ -547,6 +573,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
             "wbk-email-templates",
             "wbk-appointments",
             "wbk-coupons",
+            "wbk-gift-cards",
             "wbk-gg-calendars",
             "wbk-connected-calendars",
             "wbk-pricing-rules",
@@ -571,6 +598,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
             "wbk-pricing-rules",
             "wbk-appointments",
             "wbk-coupons",
+            "wbk-gift-cards",
             "wbk-email-templates",
             "wbk-dashboard",
             "wbk-form-builder",
@@ -709,7 +737,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
         "wbk-frontend6",
         WP_WEBBA_BOOKING__PLUGIN_URL . "/build/frontend/index.css",
         [],
-        WP_WEBBA_BOOKING__VERSION
+        wbk_get_react_frontend_asset_version()
     ];
     $css_array[] = [
         "backend",
@@ -793,6 +821,7 @@ if ( !function_exists( "wbk_daily" ) ) {
                 }
             }
         }
+        WBK_Email_Processor::send_scheduled_gift_cards();
     }
 
 }
@@ -999,4 +1028,4 @@ if ( !function_exists( "wbk_get_installed_at" ) ) {
     }
 
 }
-// build push 6
+// build push 4

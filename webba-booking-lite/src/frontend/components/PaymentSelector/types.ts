@@ -2,6 +2,7 @@ export type TAllowedMethods =
     | 'arrival'
     | 'bank'
     | 'paypal'
+    | 'mollie'
     | 'stripe'
     | 'stripe_others'
     | 'google_pay'

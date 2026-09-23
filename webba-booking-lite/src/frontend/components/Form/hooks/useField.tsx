@@ -13,7 +13,7 @@ import { useBookingContext } from '../../../providers/BookingFormProvider/Bookin
 import { useWording } from '../../../hooks/useWording'
 
 export const useField = (fieldConfig: IFieldConstructor): IField => {
-    const { fields, setFields, setAnyTouched }: IFormContext =
+    const { fields, setFields }: IFormContext =
         useForm() as unknown as IFormContext
     const { formData } = useBookingContext()
     const wording = useWording()
@@ -34,11 +34,7 @@ export const useField = (fieldConfig: IFieldConstructor): IField => {
             ...(fieldConfig.validators || []),
         ],
     } as IField)
-    const [touched, _setTouched] = useState(false)
-    const setTouched = (val: boolean) => {
-        if (val) setAnyTouched(true)
-        _setTouched(val)
-    }
+    const [touched, setTouched] = useState(false)
 
     if (!field) {
         throw new Error('Field not found')

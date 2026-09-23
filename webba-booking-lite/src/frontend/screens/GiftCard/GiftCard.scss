@@ -1,0 +1,358 @@
+.wbk_gift_card {
+    &__header {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__title {
+        font-weight: 400 !important;
+        font-size: 20px !important;
+        line-height: 28px !important;
+        letter-spacing: 0.5%;
+        color: #22292f !important;
+        margin: 0 !important;
+        text-align: left !important;
+        font-family: colors.$wbk-font !important;
+    }
+
+    &__description {
+        font-weight: 300;
+        font-size: 14px;
+        line-height: 18px;
+        letter-spacing: 1%;
+        color: #668091;
+        margin: 0 !important;
+    }
+
+    &__form {
+        margin-top: 0;
+    }
+
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    &__section-title {
+        margin: 0;
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 500;
+        color: #22292f;
+        font-family: colors.$wbk-font;
+    }
+
+    &__amounts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    &__amount {
+        appearance: none;
+        padding: 10px 16px;
+        border: 1px solid #edeff2;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #22292f;
+        font-size: 14px;
+        line-height: 20px;
+        font-family: colors.$wbk-font;
+        cursor: pointer;
+
+        &:active,
+        &:focus,
+        &:hover {
+            border-color: #0c4057;
+            background: #f3f7f9;
+            font-weight: 500;
+            outline: none;
+            box-shadow: none;
+            color: #22292f;
+            font-size: 14px;
+            line-height: 20px;
+            font-family: colors.$wbk-font;
+        }
+
+        &:hover:not(&--selected) {
+            border-color: transparent !important;
+        }
+
+        &--selected {
+            border-color: #0c4057;
+            background: #f3f7f9;
+            font-weight: 500;
+        }
+    }
+
+    &__custom-amount {
+        width: 100%;
+    }
+
+    &__schedule {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow: visible;
+    }
+
+    &__schedule-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: flex-end;
+    }
+
+    &__schedule-field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+        flex: 0 1 160px;
+    }
+
+    &__schedule-timezone {
+        flex: 1 1 240px;
+        min-width: 220px;
+        position: relative;
+        z-index: 2;
+    }
+
+    &__schedule-error {
+        width: 100%;
+    }
+
+    &__designs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+
+        @media screen and (min-width: 640px) {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+
+    &__design {
+        appearance: none;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        overflow: hidden;
+        border: 2px solid #edeff2;
+        border-radius: 8px;
+        background: #ffffff;
+        cursor: pointer;
+        text-align: left;
+
+
+        &:active,
+        &:focus,
+        &:hover {
+            border-color: #0c4057;
+            background: #f3f7f9;
+            font-weight: 500;
+            outline: none;
+            box-shadow: none;
+            color: #22292f;
+            font-size: 14px;
+            line-height: 20px;
+            font-family: colors.$wbk-font;
+            border-radius: 8px;
+        }
+
+        &:hover:not(&--selected) {
+            border-color: transparent !important;
+            background: #f3f7f9;
+            font-weight: 500;
+            outline: none;
+            box-shadow: none;
+            color: #22292f;
+            font-size: 14px;
+            line-height: 20px;
+            font-family: colors.$wbk-font;
+            border-radius: 8px;
+        }
+
+        &--selected {
+            border-color: #0c4057;
+        }
+    }
+
+    &__design-image {
+        display: block;
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        object-fit: cover;
+        background: #f7f4ea;
+    }
+
+    &__design-label {
+        display: block;
+        padding: 8px;
+        font-size: 12px;
+        line-height: 16px;
+        color: #22292f;
+        font-family: colors.$wbk-font;
+    }
+
+    &__payment {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    &__amount-summary {
+        font-size: 16px;
+        line-height: 24px;
+        color: #668091;
+        font-family: colors.$wbk-font;
+
+        strong {
+            color: #22292f;
+            font-weight: 600;
+        }
+    }
+
+    &__checkout {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 24px 24px;
+
+        .wbk_navigation__wrapper {
+            margin-top: 4px;
+            margin-right: -24px;
+            margin-bottom: 0;
+            margin-left: -24px;
+            padding: 16px 24px;
+            border-top: 1px solid #edeff2;
+        }
+    }
+
+    &__checkout-bar {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+    }
+
+    &__checkout-note {
+        margin: 0 !important;
+        padding: 16px 24px;
+        font-size: 13px;
+        line-height: 18px;
+        color: #668091;
+        font-family: colors.$wbk-font;
+        text-align: center;
+        background-color: #f8f8f8;
+        border-bottom-left-radius: colors.$wbk-border-radius;
+        border-bottom-right-radius: colors.$wbk-border-radius;
+    }
+
+    &__policy {
+        margin: 0;
+        padding: 0;
+    }
+
+    &__policy-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        color: #668091;
+        font-size: 13px;
+        line-height: 18px;
+        text-decoration: underline;
+        font-family: colors.$wbk-font;
+        list-style: none;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        &::after {
+            content: '';
+            display: inline-block;
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 5px solid currentColor;
+            transform: translateY(1px);
+        }
+    }
+
+    &__policy[open] &__policy-toggle::after {
+        transform: translateY(-1px) rotate(180deg);
+    }
+
+    &__policy-content {
+        margin-top: 8px;
+        padding: 0;
+        border: none;
+        font-size: 13px;
+        line-height: 18px;
+        color: #22292f;
+        font-family: colors.$wbk-font;
+
+        p {
+            margin: 0 0 8px;
+            padding: 0;
+        }
+
+        p:last-child {
+            margin: 0;
+        }
+
+        a {
+            color: #0c4057;
+        }
+    }
+
+    &__wallet-hint {
+        margin: 0;
+        font-size: 13px;
+        line-height: 18px;
+        color: #668091;
+        font-family: colors.$wbk-font;
+    }
+
+    .wbk_input__radio .wbk_input__radio__buttons {
+        flex-flow: row;
+    }
+
+    .wbk_input__radio__inner-wrapper .wbk_input__label:empty {
+        display: none;
+    }
+}
+
+// Gift card uses BookingForm shell without sidebar — keep left panel full width.
+.wbk_booking_form__wrapper--gift-card {
+    overflow: visible;
+
+    .wbk_booking_form__left-panel {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .wbk_booking_form__body__inner-wrapper {
+        min-height: auto;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .wbk_booking_form__body__wrapper {
+        min-height: auto;
+        overflow: visible;
+    }
+
+    .wbk_booking_form__content {
+        height: auto;
+        flex: 0 0 auto;
+        overflow: visible;
+    }
+}

@@ -5,6 +5,13 @@ import '../Fields.scss'
 import './SelectInput.scss'
 import Select from 'react-select'
 
+const normalizeOption = (option: string | IOption): IOption => {
+    if (typeof option === 'string') {
+        return { value: option, label: option }
+    }
+    return option
+}
+
 export const SelectInput = ({ fieldConstructor, anyTouched }: IFieldProps) => {
     const {
         slug,
@@ -16,9 +23,12 @@ export const SelectInput = ({ fieldConstructor, anyTouched }: IFieldProps) => {
         touched,
         setTouched,
         width,
+        multiple,
     } = useField(fieldConstructor)
 
     const showError = errors && errors.length > 0 && (anyTouched || touched)
+    const selectOptions = (options || []).map(normalizeOption)
+    const isMulti = Boolean(multiple)
 
     return (
         <div
@@ -28,21 +38,22 @@ export const SelectInput = ({ fieldConstructor, anyTouched }: IFieldProps) => {
             })}
         >
             <Select
-                options={options?.map((option) => {
-                    return {
-                        value: option,
-                        label: option,
+                options={selectOptions}
+                value={value as IOption | IOption[] | null}
+                onChange={(selectedOptions) => {
+                    if (isMulti) {
+                        setValue((selectedOptions as IOption[]) || [])
+                        return
                     }
-                })}
-                value={value}
-                onChange={(selectedOptions: IOption[] | unknown) =>
-                    setValue(selectedOptions as IOption[])
-                }
+                    setValue((selectedOptions as IOption) || null)
+                }}
                 placeholder={placeholder}
                 name={slug}
                 onBlur={() => setTouched(true)}
                 className="wbk_input__select"
                 classNamePrefix="wbk_input__select"
+                isMulti={isMulti}
+                closeMenuOnSelect={!isMulti}
                 unstyled
             />
             {showError && <div className={'wbk_input__error'}>{errors[0]}</div>}

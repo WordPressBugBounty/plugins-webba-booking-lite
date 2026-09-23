@@ -1,0 +1,248 @@
+.wbk_whatsappTemplateField {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.wbk_whatsappTemplateField__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wbk_whatsappTemplateField__selectWrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.wbk_whatsappTemplateField__select,
+.wbk_whatsappTemplateField__categorySelect {
+  width: 100%;
+}
+
+.wbk_whatsappTemplateFieldSelect__control {
+  min-height: 44px;
+  border-radius: 8px;
+  border-color: #d5dcdc;
+  box-shadow: none;
+  font-family: typography.$font-primary;
+  font-size: 14px;
+}
+
+.wbk_whatsappTemplateFieldSelect__control--is-focused {
+  border-color: #1f6763;
+  box-shadow: none;
+}
+
+.wbk_whatsappTemplateFieldSelect__indicator-separator {
+  display: none;
+}
+
+.wbk_whatsappTemplateField__addButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #d5dcdc;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  img {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: #1f6763;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.wbk_whatsappTemplateField__createPanel,
+.wbk_whatsappTemplateField__editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e4eaea;
+  border-radius: 10px;
+  background: #fafcfc;
+}
+
+.wbk_whatsappTemplateField__createGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.wbk_whatsappTemplateField__fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wbk_whatsappTemplateField__fieldLabel {
+  color: #212121;
+  font-family: typography.$font-primary;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.wbk_whatsappTemplateField__input,
+.wbk_whatsappTemplateField__textarea {
+  width: 100%;
+  border: 1px solid #d5dcdc;
+  border-radius: 8px;
+  font-family: typography.$font-primary;
+  font-size: 14px;
+  color: #212121;
+  background: #fff;
+
+  &:focus {
+    border-color: #1f6763;
+    outline: none;
+  }
+
+  &:disabled {
+    background: #f5f7f7;
+    cursor: not-allowed;
+  }
+}
+
+.wbk_whatsappTemplateField__input {
+  height: 40px;
+  padding: 0 12px;
+}
+
+.wbk_whatsappTemplateField__textarea {
+  min-height: 120px;
+  padding: 10px 12px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.wbk_whatsappTemplateField__metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.wbk_whatsappTemplateField__statusBadge,
+.wbk_whatsappTemplateField__metaChip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-family: typography.$font-primary;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.wbk_whatsappTemplateField__statusBadge--approved {
+  background: #e7f6f0;
+  color: #1f6763;
+}
+
+.wbk_whatsappTemplateField__statusBadge--pending {
+  background: #fff6e5;
+  color: #9a6b00;
+}
+
+.wbk_whatsappTemplateField__statusBadge--rejected {
+  background: #fdecea;
+  color: #c0392b;
+}
+
+.wbk_whatsappTemplateField__statusBadge--neutral {
+  background: #eef1f1;
+  color: #4d5a5a;
+}
+
+.wbk_whatsappTemplateField__metaChip {
+  background: #eef4f4;
+  color: #355555;
+}
+
+.wbk_whatsappTemplateField__metaHint {
+  color: #6b7a7a;
+  font-family: typography.$font-primary;
+  font-size: 12px;
+}
+
+.wbk_whatsappTemplateField__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wbk_whatsappTemplateField__primaryButton,
+.wbk_whatsappTemplateField__secondaryButton {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-family: typography.$font-primary;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.wbk_whatsappTemplateField__primaryButton {
+  border: none;
+  background: #1f6763;
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background: #155350;
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+.wbk_whatsappTemplateField__secondaryButton {
+  border: 1px solid #d5dcdc;
+  background: #fff;
+  color: #212121;
+
+  &:hover:not(:disabled) {
+    border-color: #1f6763;
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+.wbk_whatsappTemplateField__message {
+  margin: 0;
+  font-family: typography.$font-primary;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.wbk_whatsappTemplateField__message--success {
+  color: #1f6763;
+}
+
+.wbk_whatsappTemplateField__message--error {
+  color: #c0392b;
+}
+
+@media (max-width: 900px) {
+  .wbk_whatsappTemplateField__createGrid {
+    grid-template-columns: 1fr;
+  }
+}

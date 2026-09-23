@@ -174,7 +174,7 @@ class WBK_Backend_Options
             [
                 "icon" => "notifications",
                 "description" => __(
-                    "Configure email, SMS, and browser notification settings.",
+                    "Configure email, SMS, Whatsapp and browser notifications settings.",
                     "webba-booking-lite",
                 ),
                 "tabs" => [
@@ -215,7 +215,7 @@ class WBK_Backend_Options
                 "pro" => true,
                 "minimal_plan" => "standard",
                 "description" => __(
-                    "Configure payment settings, currency, tax, and payment gateway integrations (PayPal, Stripe, WooCommerce).",
+                    "Configure payment settings, currency, tax, and payment gateway integrations (PayPal, Stripe, Mollie, WooCommerce).",
                     "webba-booking-lite",
                 ),
             ],
@@ -1937,7 +1937,120 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 ),
                 "checkbox_value" => "yes",
                 "default" => "",
-                "tab" => "general",
+                "tab" => "gift-cards",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_gift_card_partial_redemption",
+            "checkbox",
+            __("Allow partial redemption of gift cards", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Allow partial redemption of gift cards",
+                "popup" => __(
+                    "Turn on to allow gift cards to be redeemed partially across multiple bookings.",
+                    "webba-booking-lite",
+                ),
+                "checkbox_value" => "yes",
+                "default" => "yes",
+                "required_plan" => "premium",
+                "tab" => "gift-cards",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_gift_card_payment_methods",
+            "select_multiple",
+            __("Gift card payment methods", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Gift card payment methods",
+                "popup" => __(
+                    "Select the payment methods available when purchasing a gift card. Pay on arrival and bank transfer are not available for gift cards.",
+                    "webba-booking-lite",
+                ),
+                "default" => [],
+                "extra" => WBK_Model_Utils::get_gift_card_payment_methods(),
+                "required_plan" => "premium",
+                "tab" => "gift-cards",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_gift_card_preset_amounts',
+            'nested_numbers',
+            __('Preset gift card amounts', 'webba-booking-lite'),
+            'wbk_payment_settings_section',
+            [
+                'not_translated_title' => 'Preset gift card amounts',
+                'popup' => __('Set preset gift card amounts. The first number is the minimum amount, the second is the maximum amount, and the third is the step.', 'webba-booking-lite'),
+                'default' => [
+                    50, 75, 100, 150, 200
+                ],
+                'max_length' => 5,
+                'tab' => 'gift-cards',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_gift_card_allow_custom_amount',
+            'checkbox',
+            __('Allow custom amount', 'webba-booking-lite'),
+            'wbk_payment_settings_section',
+            [
+                'not_translated_title' => 'Allow custom amount',
+                'popup' => __('Allow gift card buyers to enter custom value amount.', 'webba-booking-lite'),
+                'checkbox_value' => 'yes',
+                'default' => 'yes',
+                'tab' => 'gift-cards',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_gift_card_default_validity',
+            'select',
+            __('Default gift card validity', 'webba-booking-lite'),
+            'wbk_payment_settings_section',
+            [
+                'not_translated_title' => 'Default gift card validity',
+                'popup' => __('Set the default validity period for gift cards.', 'webba-booking-lite'),
+                'tab' => 'gift-cards',
+                'default' => '12',
+                'extra' => [
+                    '3'  => __('3 months', 'webba-booking-lite'),
+                    '6'  => __('6 months', 'webba-booking-lite'),
+                    '12' => __('1 year', 'webba-booking-lite'),
+                    '24' => __('2 years', 'webba-booking-lite'),
+                    '36' => __('3 years', 'webba-booking-lite'),
+                ],
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_gift_card_policy',
+            'editor',
+            __('Gift card policy', 'webba-booking-lite'),
+            'wbk_payment_settings_section',
+            [
+                'not_translated_title' => 'Gift card policy',
+                'popup' => __('Add information customers should know about using your gift cards, such as validity, eligible services, refunds, transfers, or other restrictions. This policy will be shown to customers during checkout and included in the gift card email.', 'webba-booking-lite'),
+                'default' => '',
+                'tab' => 'gift-cards',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_gift_card_landing_page',
+            'select',
+            __('Gift card landing page', 'webba-booking-lite'),
+            'wbk_payment_settings_section',
+            [
+                'not_translated_title' => 'Gift card landing page',
+                'popup' => __('Select the page that will be used as the QR code landing page for gift cards. This page should include the [webba_gc] shortcode.', 'webba-booking-lite'),
+                'default' => '',
+                'tab' => 'gift-cards',
+                'extra' => 'backend'
             ],
         );
 
@@ -2034,6 +2147,38 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "not_translated_title" => "PayPal message",
                 "popup" => __(
                     "Message that appears when the user selects PayPal as the payment method.",
+                    "webba-booking-lite",
+                ),
+                "tab" => "payments",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_mollie_button_text",
+            "text_alfa_numeric",
+            __("Mollie option label", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Mollie", "webba-booking-lite"),
+                "not_translated_title" => "Mollie option label",
+                "popup" => __("Label for Mollie payment method", "webba-booking-lite"),
+                "tab" => "payments",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_mollie_message",
+            "text",
+            __("Mollie message", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __(
+                    "After you confirm your booking, you will be redirected to Mollie to complete payment.",
+                    "webba-booking-lite",
+                ),
+                "not_translated_title" => "Mollie message",
+                "popup" => __(
+                    "Message that appears when the user selects Mollie as the payment method.",
                     "webba-booking-lite",
                 ),
                 "tab" => "payments",
@@ -2736,6 +2881,112 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "sub_type" => "none_negative_float",
             ],
         );
+
+        // ========== PAYMENTS - Mollie Tab ==========
+        wbk_opt()->add_option(
+            "wbk_mollie_notice",
+            "notice",
+            __("Mollie Integration Documentation ->", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Mollie Integration Documentation ->",
+                "popup" => __(
+                    '<a href="https://docs.mollie.com/" target="_blank">Mollie Integration Documentation -></a>',
+                    "webba-booking-lite",
+                ),
+                "required_plan" => "standard",
+                "tab" => "mollie",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_mollie_test_mode",
+            "checkbox",
+            __("TEST Mode", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "default" => "",
+                "not_translated_title" => "TEST Mode",
+                "checkbox_value" => "yes",
+                "popup" => __(
+                    'Enable to use Mollie test API keys. Disable for live payment processing.',
+                    "webba-booking-lite",
+                ),
+                "required_plan" => "standard",
+                "tab" => "mollie",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_mollie_test_api_key",
+            "password",
+            __("Mollie Test API Key", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Mollie Test API Key",
+                "popup" => __(
+                    'Enter the Mollie test API key (starts with test_). Find it in your Mollie Dashboard under Developers → API keys.',
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "required_plan" => "standard",
+                "tab" => "mollie",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_mollie_live_api_key",
+            "password",
+            __("Mollie Live API Key", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Mollie Live API Key",
+                "popup" => __(
+                    'Enter the Mollie live API key (starts with live_). Find it in your Mollie Dashboard under Developers → API keys.',
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "required_plan" => "standard",
+                "tab" => "mollie",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_mollie_currency",
+            "select",
+            __("Mollie currency", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Mollie currency",
+                "popup" => __(
+                    "Select the currency to use for Mollie payments.",
+                    "webba-booking-lite",
+                ),
+                "default" => "EUR",
+                "extra" => WBK_Mollie::get_currencies(),
+                "required_plan" => "standard",
+                "tab" => "mollie",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_mollie_redirect_url_new",
+            "select",
+            __("Redirect to page when payment is successful", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Redirect to page when payment is successful",
+                "popup" => __(
+                    "Enter the URL where customers should be redirected after a successful payment. If left empty, customers will stay on the booking form page after completing the payment.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "required_plan" => "standard",
+                "tab" => "mollie",
+                "extra" => "backend",
+            ],
+        );
+
         wbk_opt()->add_option(
             "wbk_zoom_link_text",
             "text",
@@ -3709,6 +3960,331 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "tab" => "SMS",
             ],
         );
+
+        // ========== NOTIFICATIONS - WhatsApp Tab ==========
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_notice",
+        //     "notice",
+        //     __("WhatsApp Cloud API setup", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "not_translated_title" => "WhatsApp Cloud API setup",
+        //         "popup" => __(
+        //             'Connect WhatsApp through Webba Connect, then choose a business account and phone number. Business-initiated messages require approved templates.',
+        //             "webba-booking-lite",
+        //         ),
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     'wbk_whatsapp_enabled',
+        //     "checkbox",
+        //     __("Enable WhatsApp notifications", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "checkbox_value" => "true",
+        //         'popup' => __(
+        //             'Turn on to send WhatsApp notifications to customers when they make a booking.',
+        //             'webba-booking-lite',
+        //         ),
+        //         'required_plan' => 'premium',
+        //         'tab' => 'WhatsApp',
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_access_token",
+        //     "whatsapp_auth",
+        //     __("WhatsApp authorization", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "not_translated_title" => "WhatsApp authorization",
+        //         "popup" => __(
+        //             "Connect WhatsApp with Facebook. The access token is issued by Webba Connect and stored in the plugin automatically.",
+        //             "webba-booking-lite",
+        //         ),
+        //         "default" => "",
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_business_account_id",
+        //     "select",
+        //     __("WhatsApp business account", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "not_translated_title" => "WhatsApp business account",
+        //         "popup" => __(
+        //             "Loaded from the connected WhatsApp account. The first account is selected by default.",
+        //             "webba-booking-lite",
+        //         ),
+        //         "default" => "",
+        //         "extra" => "backend",
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_phone_number_id",
+        //     "select",
+        //     __("WhatsApp phone number", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "not_translated_title" => "WhatsApp phone number",
+        //         "popup" => __(
+        //             "Loaded from the selected WhatsApp business account. The first phone number is selected by default.",
+        //             "webba-booking-lite",
+        //         ),
+        //         "default" => "",
+        //         "extra" => "backend",
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_send_on_booking",
+        //     "checkbox",
+        //     __("Send WhatsApp after customer makes a booking", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "checkbox_value" => "true",
+        //         "not_translated_title" => "Send WhatsApp after customer makes a booking",
+        //         "popup" => __(
+        //             "Turn on to send a WhatsApp template when a customer creates a booking.",
+        //             "webba-booking-lite",
+        //         ),
+        //         "default" => "",
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_template_booking",
+        //     "whatsapp_template",
+        //     __("Booking WhatsApp template", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "default" => "",
+        //         "not_translated_title" => "Booking WhatsApp template",
+        //         "popup" => __(
+        //             "Choose an existing WhatsApp template, edit its body text, or create a new one and submit it for Meta approval.",
+        //             "webba-booking-lite",
+        //         ),
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"], ["wbk_whatsapp_send_on_booking", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_template_params_booking",
+        //     "text",
+        //     __("Booking WhatsApp template parameters", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "default" =>
+        //             "#customer_name,#service_name,#appointment_day,#appointment_time",
+        //         "not_translated_title" => "Booking WhatsApp template parameters",
+        //         "popup" =>
+        //             __(
+        //                 'Comma-separated placeholders mapped to template variables {{1}}, {{2}}, and so on. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">',
+        //                 "webba-booking-lite",
+        //             ) .
+        //             __("List of available placeholders", "webba-booking-lite") .
+        //             "</a>",
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"], ["wbk_whatsapp_send_on_booking", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_send_on_reminder",
+        //     "checkbox",
+        //     __("Send booking reminder WhatsApp", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "checkbox_value" => "true",
+        //         "not_translated_title" => "Send booking reminder WhatsApp",
+        //         "popup" => __(
+        //             "Turn on to send a WhatsApp reminder template to customers.",
+        //             "webba-booking-lite",
+        //         ),
+        //         "default" => "",
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_template_reminder",
+        //     "whatsapp_template",
+        //     __("Reminder WhatsApp template", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "default" => "",
+        //         "not_translated_title" => "Reminder WhatsApp template",
+        //         "popup" => __(
+        //             "Choose an existing WhatsApp template, edit its body text, or create a new one and submit it for Meta approval.",
+        //             "webba-booking-lite",
+        //         ),
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"], ["wbk_whatsapp_send_on_reminder", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_template_params_reminder",
+        //     "text",
+        //     __("Reminder WhatsApp template parameters", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "default" =>
+        //             "#customer_name,#service_name,#appointment_day,#appointment_time",
+        //         "not_translated_title" => "Reminder WhatsApp template parameters",
+        //         "popup" =>
+        //             __(
+        //                 'Comma-separated placeholders mapped to template variables {{1}}, {{2}}, and so on. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">',
+        //                 "webba-booking-lite",
+        //             ) .
+        //             __("List of available placeholders", "webba-booking-lite") .
+        //             "</a>",
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"], ["wbk_whatsapp_send_on_reminder", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_send_on_payment",
+        //     "checkbox",
+        //     __("Send payment received WhatsApp", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "checkbox_value" => "true",
+        //         "default" => "",
+        //         "not_translated_title" => "Send payment received WhatsApp",
+        //         "popup" => __(
+        //             "Turn on to send a WhatsApp template after a booking is paid.",
+        //             "webba-booking-lite",
+        //         ),
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_template_payment",
+        //     "whatsapp_template",
+        //     __("Payment WhatsApp template", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "default" => "",
+        //         "not_translated_title" => "Payment WhatsApp template",
+        //         "popup" => __(
+        //             "Choose an existing WhatsApp template, edit its body text, or create a new one and submit it for Meta approval.",
+        //             "webba-booking-lite",
+        //         ),
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"], ["wbk_whatsapp_send_on_payment", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_template_params_payment",
+        //     "text",
+        //     __("Payment WhatsApp template parameters", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "default" =>
+        //             "#customer_name,#service_name,#appointment_day,#appointment_time",
+        //         "not_translated_title" => "Payment WhatsApp template parameters",
+        //         "popup" =>
+        //             __(
+        //                 'Comma-separated placeholders mapped to template variables {{1}}, {{2}}, and so on. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">',
+        //                 "webba-booking-lite",
+        //             ) .
+        //             __("List of available placeholders", "webba-booking-lite") .
+        //             "</a>",
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"], ["wbk_whatsapp_send_on_payment", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_send_on_approval",
+        //     "checkbox",
+        //     __("Send booking approval WhatsApp", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "checkbox_value" => "true",
+        //         "not_translated_title" => "Send booking approval WhatsApp",
+        //         "popup" => __(
+        //             "Turn on to send a WhatsApp template when a booking is approved.",
+        //             "webba-booking-lite",
+        //         ),
+        //         "default" => "",
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_template_approval",
+        //     "whatsapp_template",
+        //     __("Approval WhatsApp template", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "default" => "",
+        //         "not_translated_title" => "Approval WhatsApp template",
+        //         "popup" => __(
+        //             "Choose an existing WhatsApp template, edit its body text, or create a new one and submit it for Meta approval.",
+        //             "webba-booking-lite",
+        //         ),
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"], ["wbk_whatsapp_send_on_approval", "=", "true"]],
+        //     ],
+        // );
+
+        // wbk_opt()->add_option(
+        //     "wbk_whatsapp_template_params_approval",
+        //     "text",
+        //     __("Approval WhatsApp template parameters", "webba-booking-lite"),
+        //     "wbk_notifications_settings_section",
+        //     [
+        //         "default" =>
+        //             "#customer_name,#service_name,#appointment_day,#appointment_time",
+        //         "not_translated_title" => "Approval WhatsApp template parameters",
+        //         "popup" =>
+        //             __(
+        //                 'Comma-separated placeholders mapped to template variables {{1}}, {{2}}, and so on. <a rel="noopener" target="_blank" href="https://webba-booking.com/documentation/placeholders/">',
+        //                 "webba-booking-lite",
+        //             ) .
+        //             __("List of available placeholders", "webba-booking-lite") .
+        //             "</a>",
+        //         "required_plan" => "premium",
+        //         "tab" => "WhatsApp",
+        //         "dependency" => [["wbk_whatsapp_enabled", "=", "true"], ["wbk_whatsapp_send_on_approval", "=", "true"]],
+        //     ],
+        // );
 
         // ========== NOTIFICATIONS - Browser Notification Tab ==========
         $push_enabled_dependency = [["wbk_push_enabled", "=", "true"]];
@@ -6483,6 +7059,98 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 'not_translated_title' => 'Remove appointment',
                 'popup' => __('Label for Remove appointment.', 'webba-booking-lite'),
                 'tab' => 'recurring',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_gift_card",
+            "text",
+            __("Gift card", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Gift card", "webba-booking-lite"),
+                "not_translated_title" => "Gift card",
+                "popup" => __(
+                    "Label for a gift card item in payment and confirmation screens.",
+                    "webba-booking-lite"
+                ),
+                "tab" => "gift-cards",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_gift_card_for",
+            "text",
+            __("Gift card for #recipient_name", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __(
+                    "Gift card for #recipient_name",
+                    "webba-booking-lite"
+                ),
+                "not_translated_title" => "Gift card for recipient",
+                "popup" => __(
+                    "Label for a gift card item when a recipient name is available. Placeholder: #recipient_name.",
+                    "webba-booking-lite"
+                ),
+                "tab" => "gift-cards",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_gift_card_code",
+            "text",
+            __("Gift card code", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Gift card code", "webba-booking-lite"),
+                "not_translated_title" => "Gift card code",
+                "popup" => __(
+                    "Label for the gift card code on the confirmation screen.",
+                    "webba-booking-lite"
+                ),
+                "tab" => "gift-cards",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_gift_card_thank_you_message",
+            "text",
+            __(
+                "Thank you for your gift card purchase. A confirmation email will be sent to you, and the recipient will receive their gift on the selected date.",
+                "webba-booking-lite"
+            ),
+            "wbk_translation_settings_section",
+            [
+                "default" => __(
+                    "Thank you for your gift card purchase. A confirmation email will be sent to you, and the recipient will receive their gift on the selected date.",
+                    "webba-booking-lite"
+                ),
+                "not_translated_title" => "Gift card thank you message",
+                "popup" => __(
+                    "Message shown after a successful gift card payment.",
+                    "webba-booking-lite"
+                ),
+                "tab" => "gift-cards",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_wording_please_complete_payment_confirm_gift_card",
+            "text",
+            __(
+                "Please complete your payment to confirm your gift card purchase.",
+                "webba-booking-lite"
+            ),
+            "wbk_translation_settings_section",
+            [
+                "default" => __(
+                    "Please complete your payment to confirm your gift card purchase.",
+                    "webba-booking-lite"
+                ),
+                "not_translated_title" =>
+                    "Please complete payment to confirm gift card",
+                "popup" => __(
+                    "Message shown before the customer completes gift card payment.",
+                    "webba-booking-lite"
+                ),
+                "tab" => "gift-cards",
             ],
         );
 

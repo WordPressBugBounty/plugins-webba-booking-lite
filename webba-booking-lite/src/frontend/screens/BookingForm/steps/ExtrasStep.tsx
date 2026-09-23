@@ -14,20 +14,24 @@ export const ExtrasStep = () => {
                 ? (units || [])
                       .filter(({ selected }) => selected)
                       .flatMap((unit) =>
-                          Array.isArray(unit.extra_ids) ? unit.extra_ids : []
+                          Array.isArray(unit.extra_ids)
+                              ? unit.extra_ids.map((id) => Number(id))
+                              : []
                       )
                 : services
                       .filter(({ selected }) => selected)
                       .flatMap((service) =>
                           Array.isArray(service.extra_ids)
-                              ? service.extra_ids
+                              ? service.extra_ids.map((id) => Number(id))
                               : []
                       ),
         [bookingMode, units, services]
     )
 
     const selectedExtras = useMemo(() => {
-        return (extras || []).filter(({ id }: any) => selectedExtrasIds.includes(id))
+        return (extras || []).filter(({ id }: any) =>
+            selectedExtrasIds.includes(Number(id))
+        )
     }, [extras, selectedExtrasIds])
 
     return (

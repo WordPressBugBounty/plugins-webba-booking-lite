@@ -84,6 +84,18 @@ final class WBK_Options_Processor
                 $render_callback = 'render_smtp_test';
                 $validation_callback = 'validate_smtp_test';
                 break;
+            case 'whatsapp_template':
+                $render_callback = 'render_whatsapp_template';
+                $validation_callback = 'validate_whatsapp_template';
+                break;
+            case 'whatsapp_validate':
+                $render_callback = 'render_whatsapp_validate';
+                $validation_callback = 'validate_whatsapp_validate';
+                break;
+            case 'whatsapp_auth':
+                $render_callback = 'render_whatsapp_auth';
+                $validation_callback = 'validate_whatsapp_auth';
+                break;
             case 'push_subscribe':
                 $render_callback = 'render_push_subscribe';
                 $validation_callback = 'validate_push_subscribe';
@@ -107,6 +119,10 @@ final class WBK_Options_Processor
             case 'file':
                 $render_callback = 'render_file';
                 $validation_callback = 'validate_file';
+                break;
+            case 'nested_numbers':
+                $render_callback = 'render_nested_numbers';
+                $validation_callback = 'validate_nested_numbers';
                 break;
 
             default:
@@ -232,6 +248,18 @@ final class WBK_Options_Processor
     {
         return '';
     }
+    public function validate_whatsapp_template($input)
+    {
+        return sanitize_text_field($input);
+    }
+    public function validate_whatsapp_validate($input)
+    {
+        return '';
+    }
+    public function validate_whatsapp_auth($input)
+    {
+        return $input;
+    }
     public function validate_push_subscribe($input)
     {
         return '';
@@ -301,9 +329,71 @@ final class WBK_Options_Processor
     {
         echo '';
     }
+    public function render_whatsapp_template($args)
+    {
+        echo '';
+    }
+    public function render_whatsapp_validate($args)
+    {
+        echo '';
+    }
+    public function render_whatsapp_auth($args)
+    {
+        echo '';
+    }
     public function render_push_subscribe($args)
     {
         echo '';
+    }
+
+    /**
+     * Settings field is rendered by the React admin UI.
+     *
+     * @param array $args Field arguments.
+     * @return void
+     */
+    public function render_nested_numbers($args)
+    {
+        echo '';
+    }
+
+    /**
+     * Keep a nested numbers option as an ordered list of numbers.
+     *
+     * @param mixed $input Submitted value.
+     * @return array
+     */
+    public function validate_nested_numbers($input)
+    {
+        return self::sanitize_nested_numbers($input);
+    }
+
+    /**
+     * Normalize a nested numbers value to a list of numbers.
+     *
+     * @param mixed $input Submitted value.
+     * @return array
+     */
+    public static function sanitize_nested_numbers($input): array
+    {
+        $items = $input;
+        if (is_string($input)) {
+            $decoded = json_decode($input, true);
+            $items = is_array($decoded) ? $decoded : [];
+        }
+        if (!is_array($items)) {
+            return [];
+        }
+
+        $numbers = [];
+        foreach ($items as $item) {
+            if ($item === '' || $item === null || !is_numeric($item)) {
+                continue;
+            }
+            $numbers[] = $item + 0;
+        }
+
+        return $numbers;
     }
 
     /**
@@ -329,6 +419,7 @@ final class WBK_Options_Processor
     {
         echo '';
     }
+
     public function wbk_settings_section_callback($arg) {}
 
     /**

@@ -161,7 +161,10 @@ export const EmailTemplateScreen = () => {
                                     await onDuplicate()
                                     sidebar.close()
                                 }}
-                            />
+                            />,
+                            {
+                                width: 'medium'
+                            }
                         )
                     }}
                 />

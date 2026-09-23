@@ -1,0 +1,89 @@
+.wbk_whatsappAuthField__fieldWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wbk_whatsappAuthField__messageHolder {
+    margin-top: 4px;
+}
+
+.wbk_whatsappAuthField__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    text-decoration: none;
+
+    &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+}
+
+.wbk_whatsappAuthField__button--connect {
+    background: #25d366;
+
+    &:hover:not(:disabled) {
+        background: #1ebe5d;
+    }
+}
+
+.wbk_whatsappAuthField__button--disconnect {
+    background: #e53935;
+
+    &:hover:not(:disabled) {
+        background: #c62828;
+    }
+}
+
+.wbk_whatsappAuthField__icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.wbk_whatsappAuthField__error {
+    color: #dc3545;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    margin: 0;
+}
+
+.wbk_whatsappAuthField__description {
+    color: #8a9393;
+    font-family: typography.$font-primary;
+    font-size: 12px;
+    margin: 0;
+    margin-top: 4px;
+}
+
+.wbk_whatsappAuthField__spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: wbk_whatsappAuthField_spin 1s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes wbk_whatsappAuthField_spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

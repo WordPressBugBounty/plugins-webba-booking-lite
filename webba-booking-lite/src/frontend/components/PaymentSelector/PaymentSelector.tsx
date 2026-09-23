@@ -127,6 +127,7 @@ export const PaymentSelector = ({
         'google_pay',
         'apple_pay',
         'paypal',
+        'mollie',
         'woocommerce',
         'arrival',
         'bank',

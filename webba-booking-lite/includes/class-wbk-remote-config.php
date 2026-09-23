@@ -31,6 +31,8 @@ class WBK_Remote_Config
         "hide_fields" => true,
         "hide_tables" => false,
         "table_message_type" => "banner",
+        "whatsapp_graph_version" => "v22.0",
+        "whatsapp_template_language" => "en_US",
     ];
 
     /**
@@ -51,7 +53,11 @@ class WBK_Remote_Config
      */
     public static function maybe_bootstrap_config(): void
     {
-        if (get_option(self::OPTION_KEY, false) === false) {
+        $stored = get_option(self::OPTION_KEY, false);
+        if (
+            $stored === false ||
+            (is_array($stored) && !isset($stored["whatsapp_graph_version"]))
+        ) {
             self::sync();
         }
     }
@@ -137,6 +143,86 @@ class WBK_Remote_Config
             }
         }
 
+        if (isset($data["whatsapp_graph_version"])) {
+            $graph_version = self::normalize_graph_version(
+                (string) $data["whatsapp_graph_version"]
+            );
+            if ($graph_version !== "") {
+                $config["whatsapp_graph_version"] = $graph_version;
+            }
+        }
+
+        if (isset($data["whatsapp_template_language"])) {
+            $language = self::normalize_template_language(
+                (string) $data["whatsapp_template_language"]
+            );
+            if ($language !== "") {
+                $config["whatsapp_template_language"] = $language;
+            }
+        }
+
         return $config;
+    }
+
+    /**
+     * Returns the WhatsApp Graph API version from Connect.
+     *
+     * @return string
+     */
+    public static function get_whatsapp_graph_version(): string
+    {
+        $config = self::get_config();
+        $version = isset($config["whatsapp_graph_version"])
+            ? trim((string) $config["whatsapp_graph_version"])
+            : "";
+
+        return $version !== "" ? $version : "v22.0";
+    }
+
+    /**
+     * Returns the WhatsApp template language fallback from Connect.
+     *
+     * @return string
+     */
+    public static function get_whatsapp_template_language(): string
+    {
+        $config = self::get_config();
+        $language = isset($config["whatsapp_template_language"])
+            ? trim((string) $config["whatsapp_template_language"])
+            : "";
+
+        return $language !== "" ? $language : "en_US";
+    }
+
+    /**
+     * Normalizes a Graph API version string.
+     *
+     * @param string $value Raw version value.
+     * @return string
+     */
+    private static function normalize_graph_version(string $value): string
+    {
+        $value = trim($value);
+        if (!preg_match('/^v?(\d+(?:\.\d+)?)$/i', $value, $matches)) {
+            return "";
+        }
+
+        return "v" . $matches[1];
+    }
+
+    /**
+     * Normalizes a WhatsApp template language code.
+     *
+     * @param string $value Raw language value.
+     * @return string
+     */
+    private static function normalize_template_language(string $value): string
+    {
+        $value = trim($value);
+        if (!preg_match('/^[a-z]{2}(?:_[A-Z]{2})?$/', $value)) {
+            return "";
+        }
+
+        return $value;
     }
 }

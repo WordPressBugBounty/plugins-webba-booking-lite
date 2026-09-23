@@ -230,6 +230,7 @@ export const buildModelFromSettingsFields = ({
                     searchable: field.searchable || false,
                     radio_type: field.radio_type || '',
                     column_count: field.column_count || undefined,
+                    max_length: field.max_length || undefined,
                 },
                 tab: field.tab || '',
                 dependency: field.dependency || [],

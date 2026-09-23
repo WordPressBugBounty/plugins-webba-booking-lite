@@ -74,6 +74,8 @@ class WBK_Model_Updater
         self::create_default_booking_form_6_4_20();
         self::flush_push_service_worker_rewrite_6_4_21();
         self::enable_email_templates_v_6_5_0();
+        self::create_gift_card_email_templats_6_5_1();
+        self::update_mollie_message_6_5_1();
     }
 
     /**
@@ -1046,6 +1048,30 @@ class WBK_Model_Updater
                     $email->set("recipients", json_encode($template["recipients"]));
                 }
 
+                if (isset($template["use_for_all_services"])) {
+                    $email->set(
+                        "use_for_all_services",
+                        $template["use_for_all_services"] === true ||
+                        $template["use_for_all_services"] === "yes"
+                            ? "yes"
+                            : "",
+                    );
+                }
+
+                if (isset($template["pdf_attachment"])) {
+                    $email->set("pdf_attachment", $template["pdf_attachment"]);
+                }
+
+                if (isset($template["calendar_event"])) {
+                    $email->set(
+                        "calendar_event",
+                        $template["calendar_event"] === true ||
+                        $template["calendar_event"] === "yes"
+                            ? "yes"
+                            : "",
+                    );
+                }
+
                 $email->set("type", $trigger);
                 $email->save();
             }
@@ -1968,8 +1994,110 @@ class WBK_Model_Updater
             );
         }
 
-
         self::set_update_as_complete('enable_email_templates_v_6_5_0');
     }
+
+    /**
+     * Plain-text HTML body for the recipient gift card email.
+     *
+     * @return string
+     */
+    private static function get_gift_card_recipient_email_html(): string
+    {
+        return "<p>" .
+            __("Hello #gift_card_recipient_name,", "webba-booking-lite") .
+            "</p><p>" .
+            __(
+                "#gift_card_buyer_name has sent you a gift card for #gift_card_amount.",
+                "webba-booking-lite",
+            ) .
+            "</p>#gift_card_message<p>" .
+            __(
+                'Your gift card is attached to this email as a PDF. Use code <strong>#gift_card_code</strong> when you book to redeem your gift at <a href="#site_url" target="_blank">#site_name</a>.',
+                "webba-booking-lite",
+            ) .
+            "</p><p>" .
+            __("Valid until #gift_card_expiration_date.", "webba-booking-lite") .
+            "</p>#gift_card_policy";
+    }
+
+    /**
+     * Create default gift card email templates for the buyer receipt and recipient card.
+     *
+     * @return void
+     */
+    public static function create_gift_card_email_templats_6_5_1(): void
+    {
+        if (!self::is_update_required("create_gift_card_email_templats_6_5_1")) {
+            return;
+        }
+
+        $accent_color = get_option('wbk_appearance_options', WBK_Appearance_Utils::get_default_appearance_values());
+        $accent_color = $accent_color['bg_accent'];
+
+        $templates = [
+            [
+                "name" => __("Gift Card Purchase Receipt", "webba-booking-lite"),
+                "subject" => __(
+                    "Receipt: Gift card purchase of #gift_card_amount",
+                    "webba-booking-lite",
+                ),
+                "enabled" => true,
+                "recipients" => ["customer"],
+                "trigger" => "gift_card_purchased",
+                "use_for_all_services" => "yes",
+                "default" => true,
+                "template" => __(
+                    '<p>Hello #gift_card_buyer_name,</p><p>Thank you for purchasing a gift card. Please find your receipt below.</p><table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;border:1px solid #e5e7eb;border-collapse:collapse;"><tr><td colspan="2" style="background-color: ' . $accent_color . ';color:#ffffff;padding:16px 20px;font-size:18px;font-weight:bold;">Gift Card Receipt</td></tr><tr><td style="padding:12px 20px;border-bottom:1px solid #e5e7eb;color:#6b7280;">Gift card code</td><td style="padding:12px 20px;border-bottom:1px solid #e5e7eb;text-align:right;font-weight:bold;">#gift_card_code</td></tr><tr><td style="padding:12px 20px;border-bottom:1px solid #e5e7eb;color:#6b7280;">Amount paid</td><td style="padding:12px 20px;border-bottom:1px solid #e5e7eb;text-align:right;font-weight:bold;">#gift_card_amount</td></tr><tr><td style="padding:12px 20px;border-bottom:1px solid #e5e7eb;color:#6b7280;">Billed to</td><td style="padding:12px 20px;border-bottom:1px solid #e5e7eb;text-align:right;">#gift_card_buyer_name<br>#gift_card_buyer_email</td></tr><tr><td style="padding:12px 20px;border-bottom:1px solid #e5e7eb;color:#6b7280;">Recipient</td><td style="padding:12px 20px;border-bottom:1px solid #e5e7eb;text-align:right;">#gift_card_recipient_name<br>#gift_card_recipient_email</td></tr><tr><td style="padding:12px 20px;color:#6b7280;">Expiration date</td><td style="padding:12px 20px;text-align:right;">#gift_card_expiration_date</td></tr></table><p>This gift card will be sent to #gift_card_recipient_name at #gift_card_recipient_email.</p><p>If you have any questions, please contact us.</p><p>Thank you!</p>',
+                    "webba-booking-lite",
+                ),
+            ],
+            [
+                "name" => __("Gift Card Delivery", "webba-booking-lite"),
+                "subject" => __(
+                    "You have received a gift card from #gift_card_buyer_name",
+                    "webba-booking-lite",
+                ),
+                "enabled" => true,
+                "recipients" => ["customer"],
+                "trigger" => "gift_card_sent",
+                "use_for_all_services" => "yes",
+                "calendar_event" => "",
+                "default" => true,
+                "template" => self::get_gift_card_recipient_email_html(),
+                "pdf_attachment" => WBK_Gift_Card_Design::get_default_payload(),
+            ],
+        ];
+
+        global $wpdb;
+
+        $email_templates_table = WBK_Model_Utils::get_db_prefix() . "wbk_email_templates";
+        $existing_templates = $wpdb->get_col(
+            "SELECT name FROM {$email_templates_table} WHERE is_default='yes'",
+        );
+
+        $templates = array_filter($templates, function ($template) use ($existing_templates) {
+            return !in_array($template["name"], $existing_templates);
+        });
+
+        self::generate_email_templates($templates);
+        self::set_update_as_complete("create_gift_card_email_templats_6_5_1");
+    }
+
+    public static function update_mollie_message_6_5_1(): void
+    {
+        if (!self::is_update_required("update_mollie_message_6_5_1")) {
+            return;
+        }
+
+        $old_message = "You will be redirected to Mollie in the next screen.";
+        $new_message =
+            "After you confirm your booking, you will be redirected to Mollie to complete payment.";
+
+        if (get_option("wbk_mollie_message", "") === $old_message) {
+            update_option("wbk_mollie_message", $new_message);
+        }
+
+        self::set_update_as_complete("update_mollie_message_6_5_1");
+    }
 }
-?>

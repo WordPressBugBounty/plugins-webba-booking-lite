@@ -10,6 +10,7 @@ class WBK_Placeholder_Processor
     public static function process_placeholders($message, $bookings)
     {
         $tax = WBK_Options_Utils::get_tax();
+        $message = self::process_site_placeholders($message);
         if (is_numeric($bookings)) {
             $booking = new WBK_Booking($bookings);
             if (!$booking->is_loaded()) {
@@ -1409,6 +1410,123 @@ class WBK_Placeholder_Processor
         }
 
         return $message;
+    }
+
+    /**
+     * Replace site-level placeholders with the current site URL, name, and logo.
+     *
+     * @param string $message
+     * @return string
+     */
+    public static function process_site_placeholders($message)
+    {
+        $site_url = home_url("/");
+        $site_name = wp_specialchars_decode(get_bloginfo("name"), ENT_QUOTES);
+        $logo_id = (int) get_theme_mod("custom_logo");
+        $site_logo = "";
+        if ($logo_id > 0) {
+            $logo_url = wp_get_attachment_image_url($logo_id, "full");
+            if (is_string($logo_url) && $logo_url !== "") {
+                $site_logo = $logo_url;
+            }
+        }
+        if ($site_logo === "") {
+            $site_logo = (string) get_site_icon_url(256);
+        }
+
+        $message = str_replace("#site_url", esc_url($site_url), $message);
+        $message = str_replace("#site_name", esc_html($site_name), $message);
+        $message = str_replace("#site_logo", esc_url($site_logo), $message);
+
+        return $message;
+    }
+
+
+    /**
+     * Process gift card placeholders.
+     *
+     * @param string $message
+     * @param integer $gift_card_id
+     * @return string
+     */
+    public static function process_gift_card_placeholders(string $message, int $gift_card_id): string
+    {
+        $gift_card = new WBK_Gift_Card($gift_card_id);
+
+        if (!$gift_card->is_loaded()) {
+            return $message;
+        }
+
+        $expiration = intval($gift_card->get("expiration_date"));
+        $expiration_label = "";
+        if ($expiration > 0) {
+            $expiration_label = wp_date(
+                WBK_Format_Utils::get_date_format(),
+                $expiration,
+                wp_timezone(),
+            );
+        }
+
+        $message = self::replace_gift_card_qr_placeholder($message, $gift_card_id);
+        $message = str_replace("#gift_card_code", $gift_card->get("code"), $message);
+        $message = str_replace(
+            "#gift_card_amount",
+            WBK_Format_Utils::format_price($gift_card->get("amount")),
+            $message,
+        );
+        $message = str_replace("#gift_card_expiration_date", $expiration_label, $message);
+        $message = str_replace("#gift_card_recipient_name", $gift_card->get("recipient_name"), $message);
+        $message = str_replace("#gift_card_recipient_email", $gift_card->get("recipient_email"), $message);
+        $message = str_replace("#gift_card_buyer_name", $gift_card->get("buyer_name"), $message);
+        $message = str_replace("#gift_card_buyer_email", $gift_card->get("buyer_email"), $message);
+
+        $raw_message = $gift_card->get("message");
+        $personal_message = is_string($raw_message) ? trim($raw_message) : "";
+        $personal_html = "";
+        if ($personal_message !== "") {
+            $personal_html =
+                '<blockquote style="margin:16px 0;padding:12px 16px;border-left:3px solid #e5e7eb;color:#374151;">' .
+                nl2br(esc_html($personal_message)) .
+                "</blockquote>";
+        }
+        $message = str_replace("#gift_card_message", $personal_html, $message);
+        $message = str_replace(
+            "#gift_card_policy",
+            WBK_Gift_Card::get_policy_email_html(),
+            $message,
+        );
+
+        $message = self::process_site_placeholders($message);
+
+        return $message;
+    }
+
+    /**
+     * Replace the gift card QR placeholder with a QR image that opens the landing page.
+     *
+     * @param string $message
+     * @param int    $gift_card_id
+     * @return string
+     */
+    private static function replace_gift_card_qr_placeholder($message, $gift_card_id)
+    {
+        if (strpos($message, "#qr_gift_code") === false) {
+            return $message;
+        }
+
+        $landing_url = WBK_Gift_Card::get_landing_url((int) $gift_card_id);
+        $url = $landing_url !== "" ? WBK_Qr_Code_Processor::process($landing_url) : "";
+        $html = "";
+        if ($url !== "") {
+            $html =
+                '<span style="display:inline-block;width:100%;max-width:180px;background-color:#ffffff;border-radius:8px;padding:6px;box-sizing:border-box;line-height:0;overflow:hidden;">' .
+                '<img src="' .
+                esc_url($url) .
+                '" alt="" style="display:block;width:100%;height:auto;border:0;" />' .
+                "</span>";
+        }
+
+        return str_replace("#qr_gift_code", $html, $message);
     }
 
     public static function process($message, $bookings)

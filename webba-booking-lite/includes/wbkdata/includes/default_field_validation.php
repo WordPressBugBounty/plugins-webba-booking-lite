@@ -370,7 +370,24 @@ add_filter(
 );
 function wbkdata_property_field_editor_validator($input, $value, $slug, $field)
 {
-    $value = WBK_Validator::wbk_kses(trim($value));
+    $value = is_string($value) ? trim($value) : '';
+
+    $gift_card_payload = null;
+    if (class_exists('WBK_Gift_Card_Design')) {
+        $gift_card_payload = WBK_Gift_Card_Design::sanitize_stored_payload($value);
+        if ($gift_card_payload === null && $value !== '') {
+            $gift_card_payload = WBK_Gift_Card_Design::sanitize_stored_payload(
+                wp_unslash($value)
+            );
+        }
+    }
+
+    if ($gift_card_payload !== null) {
+        $value = $gift_card_payload;
+    } else {
+        $value = WBK_Validator::wbk_kses($value);
+    }
+
     if ($field->get_required() && $value == '') {
         return [
             false,
@@ -380,7 +397,8 @@ function wbkdata_property_field_editor_validator($input, $value, $slug, $field)
             ),
         ];
     }
-    if (strlen($value) > 65535) {
+    $max_length = $gift_card_payload !== null ? 16777215 : 65535;
+    if (strlen($value) > $max_length) {
         return [
             false,
             sprintf(
@@ -457,6 +475,18 @@ add_filter(
 );
 function validate_wbk_date($input, $value, $slug, $field)
 {
+    if ($value === '' || $value === null) {
+        if ($field->get_required()) {
+            return [
+                false,
+                sprintf(
+                    wbkdata_translate_string('%s is required'),
+                    $field->get_title()
+                ),
+            ];
+        }
+        return [true, 0];
+    }
     if (is_numeric($value)) {
         return [true, $value];
     }
@@ -647,7 +677,49 @@ add_filter(
 );
 function validate_price($input, $value, $slug, $field)
 {
-    return [true, $value];
+    $extra = $field->get_extra_data();
+    $sub_type = isset($extra['sub_type']) ? $extra['sub_type'] : '';
+    $raw = is_string($value) ? trim($value) : $value;
+
+    if ($raw === '' || $raw === null) {
+        if ($field->get_required()) {
+            return [
+                false,
+                sprintf(
+                    wbkdata_translate_string('%s is required'),
+                    $field->get_title()
+                ),
+            ];
+        }
+        return [true, $raw];
+    }
+
+    if (!is_numeric($raw)) {
+        return [
+            false,
+            sprintf(
+                wbkdata_translate_string('%s must be a number'),
+                $field->get_title()
+            ),
+        ];
+    }
+
+    $amount = floatval($raw);
+    if ($sub_type === 'positive_float' && $amount <= 0) {
+        return [
+            false,
+            __('Value must be greater than zero', 'webba-booking-lite'),
+        ];
+    }
+
+    if ($sub_type === 'none_negative_float' && $amount < 0) {
+        return [
+            false,
+            __('Value must be a positive number or zero', 'webba-booking-lite'),
+        ];
+    }
+
+    return [true, $raw];
 }
 
 // price variant
@@ -708,5 +780,88 @@ add_filter(
 function validate_extras_selector($input, $value, $slug, $field)
 {
     return [true, $value];
+}
+
+add_filter(
+    'wbkdata_property_field_validation_gift_card_design',
+    'wbkdata_property_field_gift_card_design_validator',
+    10,
+    4
+);
+
+/**
+ * Validate a stored gift card design variant id.
+ *
+ * @param array  $input Incoming validation result.
+ * @param mixed  $value Submitted field value.
+ * @param string $slug  Field slug.
+ * @param mixed  $field Field object.
+ * @return array
+ */
+function wbkdata_property_field_gift_card_design_validator($input, $value, $slug, $field)
+{
+    $value = sanitize_text_field((string) $value);
+    if ($value === '') {
+        return [true, 'botanical_green'];
+    }
+
+    if (
+        class_exists('WBK_Gift_Card_Design') &&
+        !WBK_Gift_Card_Design::get_variant($value)
+    ) {
+        return [
+            false,
+            sprintf(
+                wbkdata_translate_string('Value of %s is not acceptable'),
+                $field->get_title()
+            ),
+        ];
+    }
+
+    return [true, $value];
+}
+
+// Gift card code uniqueness
+add_filter(
+    'wbkdata_property_field_validation_text',
+    'wbkdata_property_field_gift_card_code_validator',
+    20,
+    4
+);
+function wbkdata_property_field_gift_card_code_validator($input, $value, $slug, $field)
+{
+    if ($slug !== 'gift_card_code') {
+        return $input;
+    }
+
+    if (!is_array($input) || empty($input[0])) {
+        return $input;
+    }
+
+    $code = trim(sanitize_text_field((string) $value));
+    if ($code === '') {
+        return $input;
+    }
+
+    $exclude_id = 0;
+    $raw = '';
+    if (class_exists('WP_REST_Server')) {
+        $raw = WP_REST_Server::get_raw_data();
+    }
+    if (!empty($raw)) {
+        $payload = json_decode($raw, true);
+        if (is_array($payload) && isset($payload['data']['id'])) {
+            $exclude_id = intval($payload['data']['id']);
+        }
+    }
+
+    if (class_exists('WBK_Gift_Card') && WBK_Gift_Card::code_exists($code, $exclude_id > 0 ? $exclude_id : null)) {
+        return [
+            false,
+            __('This gift card code is already used.', 'webba-booking-lite'),
+        ];
+    }
+
+    return [true, $code];
 }
 ?>

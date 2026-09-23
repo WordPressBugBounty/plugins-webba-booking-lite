@@ -234,6 +234,9 @@ export const fieldConnection: Record<string, Record<string, string[]>> = {
   connected_calendars: {
     in_provider_id: ["provider"],
   },
+  settings: {
+    wbk_whatsapp_phone_number_id: ["wbk_whatsapp_business_account_id"],
+  },
 };
 
 export const sourcedFields: Record<string, Record<string, string[]>> = {
@@ -408,7 +411,12 @@ export const fetchConnectedOptions = async (
 
   for (const dependentField of dependentFields) {
     const isValid = resolveDependencyMet(model, dependentField, formData);
-    const requestField = resolveRequestField(field, dependentField);
+    // Settings fields return only the requested field's options. Appointment
+    // parent endpoints return multiple dependent maps in one response.
+    const requestField =
+      model === "settings"
+        ? mapRequestField(dependentField)
+        : resolveRequestField(field, dependentField);
     const formPayload = normalizeFormDataForRequest(formData);
 
     try {

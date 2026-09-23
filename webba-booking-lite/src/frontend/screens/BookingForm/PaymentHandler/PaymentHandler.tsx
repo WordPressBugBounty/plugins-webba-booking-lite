@@ -139,6 +139,11 @@ export const PaymentHandler: React.FC<{
                 setButtonLoading(false)
                 return
             }
+            if (paymentMethod === 'mollie' && paymentUrl) {
+                window.location.href = paymentUrl
+                setButtonLoading(false)
+                return
+            }
             if (paymentMethod === 'woocommerce' && paymentUrl) {
                 window.location.href = paymentUrl
                 setButtonLoading(false)
@@ -173,11 +178,13 @@ export const PaymentHandler: React.FC<{
                         <div className={'wbk_thank_you__header'}>
                             {!paymentSuccess && (
                                 <>
-                                    <img
-                                        src={paymentIcon}
-                                        alt={paymentMethod}
-                                        style={{ width: 56, height: 56 }}
-                                    />
+                                    {paymentIcon && (
+                                        <img
+                                            src={paymentIcon}
+                                            alt={paymentMethod}
+                                            style={{ width: 56, height: 56 }}
+                                        />
+                                    )}
                                     <div
                                         className={'wbk_thank_you__header__content'}
                                     >

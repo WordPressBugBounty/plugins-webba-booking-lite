@@ -189,49 +189,49 @@ export const ConnectedCalendarsScreen = () => {
 
     return (
         <>
-            <LockedTableSection
+            {/* <LockedTableSection
                 isLocked={!isStartPlan}
                 requiredPlans={['start']}
                 featureKey="connected_calendars"
                 className="wbk_connectedCalendars__wrapper"
             >
-                <Table
-                    title={__('Connected Calendars', 'webba-booking-lite')}
-                    addButtonTitle={__(
-                        'Add Calendar',
-                        'webba-booking-lite'
-                    )}
-                    table={table}
-                    loading={isLoading}
-                    onDeleteSelected={onDeleteSelected}
-                    onAdd={() =>
-                        sidebar.open(
-                            <Form
-                                name={__(
-                                    'Add Calendar',
-                                    'webba-booking-lite'
-                                )}
-                                id="add-connected-calendar-form"
-                                form={form}
-                                sections={formSections}
-                                onSubmit={async (data) => {
-                                    return await addModelItem(data)
-                                }}
-                                submitButtonText={__(
-                                    'Connect Calendar',
-                                    'webba-booking-lite'
-                                )}
-                                submitButtonIcon={<ConnectIcon />}
-                                tooltipMode='description'
-                            />
-                        )
-                    }
-                    noItemsImageUrl={
-                        noItemsImage
-                    }
-                    className="wbk_connectedCalendars__table"
-                />
-            </LockedTableSection>
+            </LockedTableSection> */}
+            <Table
+                title={__('Connected Calendars', 'webba-booking-lite')}
+                addButtonTitle={__(
+                    'Add Calendar',
+                    'webba-booking-lite'
+                )}
+                table={table}
+                loading={isLoading}
+                onDeleteSelected={onDeleteSelected}
+                onAdd={() =>
+                    sidebar.open(
+                        <Form
+                            name={__(
+                                'Add Calendar',
+                                'webba-booking-lite'
+                            )}
+                            id="add-connected-calendar-form"
+                            form={form}
+                            sections={formSections}
+                            onSubmit={async (data) => {
+                                return await addModelItem(data)
+                            }}
+                            submitButtonText={__(
+                                'Connect Calendar',
+                                'webba-booking-lite'
+                            )}
+                            submitButtonIcon={<ConnectIcon />}
+                            tooltipMode='description'
+                        />
+                    )
+                }
+                noItemsImageUrl={
+                    noItemsImage
+                }
+                className="wbk_connectedCalendars__table"
+            />
 
             {currentAuth && (
                 <AuthPopup data={currentAuth} setData={setCurrentAuth} />

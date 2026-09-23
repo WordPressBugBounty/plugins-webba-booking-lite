@@ -41,6 +41,28 @@ class WBK_PayPal {
     public function create_payment_v5( $booking_ids ) {
     }
 
+    /**
+     * Create a PayPal payment for a gift card purchase (no booking rows yet).
+     * Pending gift card data must already be stored under the returned payment id after this call.
+     *
+     * @param array $gift_card_data Sanitized gift card payload (must include amount).
+     * @return array|false { payment_url, payment_id, cancel_token } or false
+     */
+    public function create_gift_card_payment( $gift_card_data ) {
+        return false;
+    }
+
+    /**
+     * Execute a PayPal payment for a pending gift card order and create the gift card.
+     *
+     * @param string $paymentId
+     * @param string $payerId
+     * @return array|false Gift card result or false
+     */
+    public function execute_gift_card_payment( $paymentId, $payerId ) {
+        return false;
+    }
+
     public function create_payment_v6( $booking_ids, $payment_details = null ) {
     }
 
@@ -105,18 +127,12 @@ class WBK_PayPal {
             if ( empty( $booking_ids ) ) {
                 return false;
             }
-            // Check for coupon
+            // Check for coupon or gift card
             $coupon_result = false;
             if ( count( $booking_ids ) > 0 ) {
                 $booking = new WBK_Booking($booking_ids[0]);
                 if ( $booking->is_loaded() ) {
-                    $coupon_id = $booking->get( 'coupon' );
-                    if ( !is_null( $coupon_id ) && is_numeric( $coupon_id ) && $coupon_id > 0 ) {
-                        $coupon = new WBK_Coupon($coupon_id);
-                        if ( $coupon->is_loaded() ) {
-                            $coupon_result = [$coupon_id, $coupon->get( 'amount_fixed' ), $coupon->get( 'amount_percentage' )];
-                        }
-                    }
+                    $coupon_result = WBK_Price_Processor::coupon_result_from_discount_id( $booking->get( 'coupon' ) );
                 }
             }
             // Get payment details

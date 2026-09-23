@@ -31,6 +31,7 @@ import { SetupChecklist } from "./components/SetupChecklist/SetupChecklist";
 import { FeatureTour } from "./components/FeatureTour/FeatureTour";
 import { AssistanceScreen } from "./screens/Assistance/AssistanceScreen";
 import { useAnalytics } from "./hooks/useAnalytics";
+import { GiftCardsScreen } from "./screens/GiftCardsScreen/GiftCardsScreen";
 
 const tabToScreenMap: RouterConfig = {
   services: <ServicesScreen />,
@@ -41,6 +42,7 @@ const tabToScreenMap: RouterConfig = {
   "pricing-rules": <PricingRulesScreen />,
   "email-templates": <EmailTemplateScreen />,
   coupons: <CouponsScreen />,
+  'gift-cards': <GiftCardsScreen />,
   bookings: <BookingsScreen />,
   calendar: <CalendarScreen />,
   "cancelled-bookings": <CanecelledBookingsScreen />,
@@ -76,6 +78,10 @@ const pageToRoutesMap: Record<Page, RouterConfig> = {
   },
   "wbk-coupons": {
     coupons: <CouponsScreen />,
+    ...tabToScreenMap,
+  },
+  "wbk-gift-cards": {
+    'gift-cards': <GiftCardsScreen />,
     ...tabToScreenMap,
   },
   "wbk-connected-calendars": {

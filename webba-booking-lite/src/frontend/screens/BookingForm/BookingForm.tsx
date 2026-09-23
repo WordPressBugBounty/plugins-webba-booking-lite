@@ -23,6 +23,10 @@ import { WaterfallForm } from './WaterfallForm/WaterfallForm'
 import { useBookingSummaryTotal } from '../../hooks/useBookingSummaryTotal'
 
 const FORM_TYPE_WATERFALL = 'waterfall'
+const HOSTED_CHECKOUT_METHODS = ['paypal', 'woocommerce', 'mollie']
+
+const isHostedCheckoutMethod = (method?: string | null) =>
+    !!method && HOSTED_CHECKOUT_METHODS.includes(method)
 
 type BookingFormProps = {
     formType?: string
@@ -88,10 +92,9 @@ export const BookingForm = ({ formType: formTypeProp }: BookingFormProps) => {
                     bookingData.payment_details.items.length > 0))
     )
 
-    // Payment methods that require a payment step
+    // Hosted checkout methods that require PaymentHandler after booking
     const needsPaymentHandler =
-        hasCompletedBooking &&
-        (paymentMethod === 'paypal' || paymentMethod === 'woocommerce')
+    hasCompletedBooking && isHostedCheckoutMethod(paymentMethod)
 
     // Payment methods that go straight to ThankYou
     const isDirectThankYou =
@@ -156,12 +159,20 @@ export const BookingForm = ({ formType: formTypeProp }: BookingFormProps) => {
     }
 
     if (formType === FORM_TYPE_WATERFALL) {
+        const handleWaterfallBookingComplete = (response?: any) => {
+            const method =
+                response?.payment_method || response?.details?.payment_method
+            if (
+                isHostedCheckoutMethod(method) &&
+                response?.payment_required === true
+            ) {
+                return
+            }
+            setShowThankYou(true)
+        }
+
         let waterfallContent: ReactNode = (
-            <WaterfallForm
-                onBookingComplete={() => {
-                    setShowThankYou(true)
-                }}
-            />
+            <WaterfallForm onBookingComplete={handleWaterfallBookingComplete} />
         )
 
         if (needsPaymentHandler && !showThankYou) {
@@ -176,9 +187,7 @@ export const BookingForm = ({ formType: formTypeProp }: BookingFormProps) => {
         } else if (isStripePaymentRequired) {
             waterfallContent = (
                 <WaterfallForm
-                    onBookingComplete={() => {
-                        setShowThankYou(true)
-                    }}
+                    onBookingComplete={handleWaterfallBookingComplete}
                 />
             )
         }

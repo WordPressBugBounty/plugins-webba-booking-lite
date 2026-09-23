@@ -28,7 +28,7 @@ export const useScenario = (scenarios: IScenario[]) => {
                 if (isVisible === undefined) return true
                 return isVisible()
             }),
-        [scenarios, paymentMethods]
+        [scenarios, paymentMethods, services, units, bookingMode, preset]
     )
 
     // Always keep the latest filteredScenarios in a ref

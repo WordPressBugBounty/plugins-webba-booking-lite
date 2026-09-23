@@ -19,6 +19,7 @@ export type TAcceptedInputTypes =
     | 'email'
     | 'phone'
     | 'number'
+    | 'price'
     | 'file'
     | 'textarea'
     | 'checkbox'
@@ -41,9 +42,11 @@ export interface IFieldConfig {
     width: 'full-width' | 'half-width'
     checkboxText?: string
     defaultValue?: TAcceptedInputValues
-    options?: string[]
+    options?: Array<string | IOption>
+    multiple?: boolean
     quantityFields?: Array<string | IQuantityFieldOption>
     validators?: ValidatorFn<TAcceptedInputValues>[]
+    maxLength?: number
 }
 
 export interface IFieldConstructor

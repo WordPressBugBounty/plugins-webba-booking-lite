@@ -564,7 +564,9 @@ const actions = {
         }
     },
     fetchPaymentMethods: (
-        payload: number[] | { ids?: number[]; unit_id?: number }
+        payload:
+            | number[]
+            | { ids?: number[]; unit_id?: number; scope?: string }
     ) => {
         return async ({ dispatch }: any) => {
             try {
@@ -575,6 +577,7 @@ const actions = {
                           ...(payload.unit_id != null
                               ? { unit_id: payload.unit_id }
                               : {}),
+                          ...(payload.scope ? { scope: payload.scope } : {}),
                       }
                 const response = await apiFetch({
                     path: addLangToQueryArgs(
