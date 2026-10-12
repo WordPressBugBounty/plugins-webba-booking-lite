@@ -20,6 +20,8 @@ import { getNamedTimezoneFromOffset } from '../../../../../admin/components/Form
 import { stripeMethods } from '../../PaymentHandler/payments/Stripe/StripeMethods'
 import { Stripe } from '../../PaymentHandler/payments/Stripe/Stripe'
 import { StripeWrapper } from '../../PaymentHandler/payments/Stripe/StripeWrapper'
+import { SquareCard } from '../../PaymentHandler/payments/Square/Square'
+import { chargeSquarePayment } from '../../../../lib/chargeSquarePayment'
 import { useBookingContext } from '../../../../providers/BookingFormProvider/BookingFormProvider'
 
 export const CustomerPayment = ({
@@ -30,6 +32,7 @@ export const CustomerPayment = ({
         fetchBookingDetails,
         fetchPaymentMethods,
         submitStripePayment,
+        submitSquarePayment,
         initializePaymentMethod,
     } = useDispatch(store_name)
     const wording = useWording()
@@ -155,6 +158,13 @@ export const CustomerPayment = ({
             return await handleStripePayment()
         }
 
+        if (
+            selectedMethod === 'square' &&
+            initializedPayment?.payment_result?.payment_id
+        ) {
+            return await handleSquarePayment()
+        }
+
         try {
             // @ts-ignore
             const response = await initializePaymentMethod(
@@ -169,7 +179,7 @@ export const CustomerPayment = ({
         }
     }
 
-    const { stripeObj } = useBookingContext()
+    const { stripeObj, squareObj } = useBookingContext()
     const handleStripePayment = useCallback(async () => {
         if (!stripeMethods.includes(selectedMethod) || !stripeObj) {
             return false
@@ -212,8 +222,54 @@ export const CustomerPayment = ({
         preset,
     ])
 
+    const handleSquarePayment = useCallback(async () => {
+        if (selectedMethod !== 'square' || !squareObj) {
+            return false
+        }
+
+        const firstBooking = bookingDetails?.booking_data
+            ? (Object.values(bookingDetails.booking_data)[0] as {
+                  email?: string
+                  name?: string
+              })
+            : undefined
+
+        const paymentResponse = await chargeSquarePayment({
+            squareObj,
+            amount: totalAmount,
+            currency: preset?.settings?.square_currency || 'USD',
+            email: firstBooking?.email,
+            givenName: firstBooking?.name,
+            paymentId: initializedPayment?.payment_result?.payment_id,
+            submitSquarePayment,
+        })
+
+        if (paymentResponse.status === 'success') {
+            setLoading(false)
+            setError(null)
+            setShowThankYou(true)
+            return true
+        }
+
+        setError(paymentResponse.message || 'Unknown error')
+        setLoading(false)
+        return false
+    }, [
+        bookingDetails,
+        initializedPayment,
+        selectedMethod,
+        squareObj,
+        submitSquarePayment,
+        preset,
+        totalAmount,
+    ])
+
     useEffect(() => {
-        if (selectedMethod && stripeMethods.includes(selectedMethod)) {
+        if (
+            selectedMethod &&
+            (stripeMethods.includes(selectedMethod) ||
+                selectedMethod === 'square')
+        ) {
             handlePay()
         }
     }, [selectedMethod])
@@ -243,7 +299,10 @@ export const CustomerPayment = ({
                     onPaid={() => setShowThankYou(true)}
                 />
             )
-        } else if (!stripeMethods.includes(selectedMethod)) {
+        } else if (
+            !stripeMethods.includes(selectedMethod) &&
+            selectedMethod !== 'square'
+        ) {
             return <ThankYou bookingDetails={bookingDetails} />
         }
     }
@@ -376,6 +435,12 @@ export const CustomerPayment = ({
                                     </StripeWrapper>
                                 </div>
                             )}
+                        {selectedMethod === 'square' &&
+                            initializedPayment?.payment_result?.payment_id && (
+                                <div className={'wbk_customer_panel__stripe'}>
+                                    <SquareCard />
+                                </div>
+                            )}
                         <Button
                             onClick={handlePay}
                             type="primary"
@@ -385,7 +450,11 @@ export const CustomerPayment = ({
                                 (stripeMethods.includes(selectedMethod) &&
                                     (!initializedPayment?.payment_result
                                         ?.client_secret ||
-                                        !stripeObj?.isValidated))
+                                        !stripeObj?.isValidated)) ||
+                                (selectedMethod === 'square' &&
+                                    (!initializedPayment?.payment_result
+                                        ?.payment_id ||
+                                        !squareObj?.isValidated))
                             }
                         >
                             {wording?.pay || __('Pay', 'webba-booking-lite')}

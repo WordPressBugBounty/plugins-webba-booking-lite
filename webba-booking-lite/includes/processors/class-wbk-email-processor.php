@@ -67,8 +67,6 @@ class WBK_Email_Processor {
                 continue;
             }
             $recipients = array_map( "strval", $recipients );
-            $group_enabled = in_array( "group", $recipients, true );
-            $customer_group_handled = false;
             $invoice_pdf = "";
             if ( $et->get( "attach_invoice" ) == "yes" && WBK_Feature_Gate::have_required_plan( "premium" ) ) {
                 $invoice_pdf = self::generate_pdf_invoice( $bookings );
@@ -90,10 +88,6 @@ class WBK_Email_Processor {
                     }
                     $recipient_addresses[] = ( $notification_service ? $notification_service->get_email() : get_option( "wbk_super_admin_email", get_option( "admin_email" ) ) );
                 } elseif ( $recipient == "customer" || $recipient == "group" ) {
-                    if ( $customer_group_handled ) {
-                        continue;
-                    }
-                    $customer_group_handled = true;
                     if ( get_option( "wbk_email_override_replyto", "true" ) == "true" ) {
                         if ( $notification_service ) {
                             $item_header[] = "Reply-To: " . $notification_service->get( "name" ) . " <" . $notification_service->get( "email" ) . ">";
@@ -101,9 +95,11 @@ class WBK_Email_Processor {
                             $item_header[] = "Reply-To: " . $notification_unit->get( "name" ) . " <" . get_option( "wbk_super_admin_email", get_option( "admin_email" ) ) . ">";
                         }
                     }
-                    $recipient_addresses[] = $booking->get( "email" );
-                    if ( $group_enabled ) {
-                        $recipient_addresses = array_merge( $recipient_addresses, WBK_Form_Builder_Utils::get_additional_email_field_values( $booking ) );
+                    if ( $recipient == "customer" ) {
+                        $recipient_addresses[] = $booking->get( "email" );
+                    } else {
+                        // Group: only additional email-type fields from the service/unit form.
+                        $recipient_addresses = WBK_Form_Builder_Utils::get_additional_email_field_values( $booking );
                     }
                     $normalized_addresses = [];
                     foreach ( $recipient_addresses as $address ) {
@@ -113,6 +109,9 @@ class WBK_Email_Processor {
                         }
                     }
                     $recipient_addresses = array_values( array_unique( $normalized_addresses ) );
+                    if ( count( $recipient_addresses ) === 0 ) {
+                        continue;
+                    }
                 } else {
                     continue;
                 }

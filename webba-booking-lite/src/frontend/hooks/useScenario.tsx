@@ -3,9 +3,10 @@ import { toast } from 'react-toastify'
 import { IScenario, IUseScenario } from '../screens/BookingForm/types'
 import { useBookingContext } from '../providers/BookingFormProvider/BookingFormProvider'
 import { useWording } from './useWording'
-import { useDispatch } from '@wordpress/data'
+import { useDispatch, useSelect } from '@wordpress/data'
 import { store_name } from '../../store/frontend'
 import { stripeMethods } from '../screens/BookingForm/PaymentHandler/payments/Stripe/StripeMethods'
+import { runSquareCheckout } from '../lib/chargeSquarePayment'
 import { trackBookingFormSubmitted } from '../utils/frontendAnalytics'
 import { redirectAfterBooking } from '../lib/bookingRedirect'
 
@@ -18,6 +19,7 @@ export const useScenario = (scenarios: IScenario[]) => {
         paymentMethods,
         preset,
         stripeObj,
+        squareObj,
         amountData,
         loading,
     } = useBookingContext()
@@ -44,8 +46,12 @@ export const useScenario = (scenarios: IScenario[]) => {
     }, [currentIndex])
 
     const currentScenario = filteredScenarios[currentIndex]
-    const { placeBooking, setLoading, submitStripePayment, setBookingData } =
+    const { placeBooking, setLoading, submitStripePayment, submitSquarePayment, setBookingData } =
         useDispatch(store_name)
+    const bookingData = useSelect(
+        (select: any) => select(store_name).getBookingData(),
+        []
+    )
 
     const title =
         typeof currentScenario.title === 'string'
@@ -95,7 +101,7 @@ export const useScenario = (scenarios: IScenario[]) => {
                 (typeof firstError === 'string' && wording?.[firstError]) ||
                 firstError,
         }
-    }, [formData, currentScenario, stripeObj?.isValidated, amountData, loading?.bookingFields])
+    }, [formData, currentScenario, stripeObj?.isValidated, squareObj?.isValidated, amountData, loading?.bookingFields])
 
     const canGoNextRef = useRef(canGoNext)
     const formDataRef = useRef(formData)
@@ -158,11 +164,40 @@ export const useScenario = (scenarios: IScenario[]) => {
             has_coupon: Boolean(submittedFormData.coupon?.trim()),
             total_amount: amountData?.to_pay_total,
         }
+        const isSquarePayment =
+            submittedFormData.payment_method === 'square' &&
+            Number(amountData?.to_pay_total) > 0
 
         let response: any
+        if (isSquarePayment) {
+            setLoading('createBooking', true)
+        }
+
         try {
-            response = await placeBooking(submittedFormData)
+            const wasSquareRetry =
+                isSquarePayment &&
+                bookingData?.payment_required === true &&
+                Boolean(bookingData?.payment_id)
+
+            response = await runSquareCheckout({
+                formData: submittedFormData,
+                squareObj,
+                amount: amountData?.to_pay_total,
+                currency: preset?.settings?.square_currency || 'USD',
+                bookingData,
+                submitSquarePayment,
+                createBooking: placeBooking,
+            })
+
+            if (wasSquareRetry) {
+                setBookingData(response)
+                setLoading('createBooking', false)
+            }
         } catch (e: any) {
+            if (isSquarePayment) {
+                setLoading('createBooking', false)
+            }
+
             const message =
                 e?.message ??
                 e?.data?.message ??
@@ -268,6 +303,8 @@ export const useScenario = (scenarios: IScenario[]) => {
         return response
     }, [
         stripeObj,
+        squareObj,
+        bookingData,
         placeBooking,
         stripeMethods,
         formDataRef,
@@ -276,6 +313,7 @@ export const useScenario = (scenarios: IScenario[]) => {
         preset,
         setLoading,
         submitStripePayment,
+        submitSquarePayment,
         setBookingData,
     ])
 
@@ -325,5 +363,6 @@ export const useScenario = (scenarios: IScenario[]) => {
         goNext,
         stepInto,
         nextStepError,
-    } as IUseScenario
+        filteredScenarios,
+    }
 }

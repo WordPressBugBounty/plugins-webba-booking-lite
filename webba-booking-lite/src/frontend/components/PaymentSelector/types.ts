@@ -4,6 +4,7 @@ export type TAllowedMethods =
     | 'paypal'
     | 'mollie'
     | 'stripe'
+    | 'square'
     | 'stripe_others'
     | 'google_pay'
     | 'apple_pay'

@@ -15,7 +15,7 @@ if ( get_option( 'wbk_sms_setup_required', '' ) == 'true' ) {
     }
 }
 if ( get_option( 'wbk_payments_setup_required', '' ) == 'true' ) {
-    if ( get_option( 'wbk_stripe_publishable_key', '' ) == '' && get_option( 'wbk_paypal_sandbox_clientid', '' ) == '' && get_option( 'wbk_woo_product_id', '' ) == '' ) {
+    if ( get_option( 'wbk_stripe_publishable_key', '' ) == '' && get_option( 'wbk_paypal_sandbox_clientid', '' ) == '' && get_option( 'wbk_woo_product_id', '' ) == '' && get_option( 'wbk_square_application_id', '' ) == '' && get_option( 'wbk_square_sandbox_application_id', '' ) == '' ) {
         $what_to_do[] = 'online payments';
     }
 }

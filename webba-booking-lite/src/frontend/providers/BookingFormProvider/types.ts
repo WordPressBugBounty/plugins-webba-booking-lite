@@ -4,6 +4,7 @@ import { IFieldConfig } from '../../components/Form/types'
 import { IPaymentMethod } from '../../components/PaymentSelector/types'
 import { IServiceProps, IUnitProps } from '../../components/Services/types'
 import { IStripeObj } from '../../screens/BookingForm/PaymentHandler/payments/Stripe/types'
+import { ISquareObj } from '../../screens/BookingForm/PaymentHandler/payments/Square/types'
 import { IAmountData, IFormData } from '../../screens/BookingForm/types'
 
 export interface IBookingFormObj {
@@ -32,6 +33,7 @@ export interface IBookingFormObj {
     extractedAttrLocations: string[]
     extractedAttrStaff: string[]
     stripeObj: IStripeObj
+    squareObj: ISquareObj
     disableCustomScroll: boolean
     attrHideCategory: 'yes' | 'no'
 }

@@ -88,24 +88,46 @@ class WBK_Options_Utils
     }
 
     /**
-     * Get the Mollie API key and test mode flag.
+    /**
+     * Get Square credentials.
      *
-     * @return array{0: string, 1: bool}
+     * @return array {0: application_id, 1: access_token, 2: location_id, 3: test_mode}
      */
-    public static function get_mollie_credentials(): array
+    public static function get_square_credentials(): array
     {
-        $test_mode = get_option('wbk_mollie_test_mode', '');
+        $test_mode = get_option('wbk_square_test_mode', '');
         if ($test_mode === 'yes') {
             return [
-                trim(get_option('wbk_mollie_test_api_key', '')),
+                trim((string) get_option('wbk_square_sandbox_application_id', '')),
+                trim((string) get_option('wbk_square_sandbox_access_token', '')),
+                trim((string) get_option('wbk_square_sandbox_location_id', '')),
                 true,
             ];
         }
 
         return [
-            trim(get_option('wbk_mollie_live_api_key', '')),
+            trim((string) get_option('wbk_square_application_id', '')),
+            trim((string) get_option('wbk_square_access_token', '')),
+            trim((string) get_option('wbk_square_location_id', '')),
             false,
         ];
+    }
+
+    /**
+    /**
+     * Get the Square redirect URL.
+     *
+     * @return string
+     */
+    public static function get_square_redirect_url(): string
+    {
+        $redirect_url = get_option('wbk_square_redirect_url_new', '');
+
+        if ($redirect_url && is_numeric($redirect_url)) {
+            return get_permalink($redirect_url);
+        }
+
+        return '';
     }
 
     /**

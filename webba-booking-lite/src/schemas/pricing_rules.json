@@ -65,7 +65,7 @@
             "tab": "",
             "misc": {
                 "tooltip": "Define the date range during which this pricing rule applies.",
-                "time_zone": "Europe/London"
+                "time_zone": "Europe/Warsaw"
             },
             "required": true,
             "dependency": [

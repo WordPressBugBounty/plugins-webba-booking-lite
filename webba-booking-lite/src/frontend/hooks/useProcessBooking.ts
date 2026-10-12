@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
 import apiFetch from '@wordpress/api-fetch'
-import { useDispatch } from '@wordpress/data'
+import { useDispatch, useSelect } from '@wordpress/data'
 import { store_name } from '../../store/frontend'
 import { useBookingContext } from '../providers/BookingFormProvider/BookingFormProvider'
 import { serializePlacesForApi } from '../providers/BookingFormProvider/utils'
 import { stripeMethods } from '../screens/BookingForm/PaymentHandler/payments/Stripe/StripeMethods'
+import { runSquareCheckout } from '../lib/chargeSquarePayment'
 import { trackBookingFormSubmitted } from '../utils/frontendAnalytics'
 import { redirectAfterBooking } from '../lib/bookingRedirect'
 import { IFormData } from '../screens/BookingForm/types'
@@ -54,7 +55,7 @@ const buildBookingFormData = (formData: IFormData) => {
             formDataModified.append(
                 key,
                 serializePlacesForApi(
-                    value as Record<number, unknown[]>,
+                    value as IFormData['places'],
                     placesOrder
                 )
             )
@@ -69,11 +70,15 @@ const buildBookingFormData = (formData: IFormData) => {
 }
 
 export const useProcessBooking = () => {
-    const { formData, bookingMode, preset, stripeObj, amountData } =
+    const { formData, bookingMode, preset, stripeObj, squareObj, amountData } =
         useBookingContext()
     const formDataRef = useRef(formData)
-    const { setLoading, submitStripePayment, setBookingData } =
+    const { setLoading, submitStripePayment, submitSquarePayment, setBookingData } =
         useDispatch(store_name)
+    const bookingData = useSelect(
+        (select: any) => select(store_name).getBookingData(),
+        []
+    )
 
     useEffect(() => {
         formDataRef.current = formData
@@ -95,11 +100,22 @@ export const useProcessBooking = () => {
 
         let response: any
         setLoading('createBooking', true)
+
         try {
-            response = await apiFetch({
-                path: `/webba-booking/v1/create-booking`,
-                method: 'POST',
-                body: buildBookingFormData(submittedFormData),
+            response = await runSquareCheckout({
+                formData: submittedFormData,
+                squareObj,
+                amount: amountData?.to_pay_total,
+                currency: preset?.settings?.square_currency || 'USD',
+                bookingData,
+                submitSquarePayment,
+                onPaymentDeclined: setBookingData,
+                createBooking: (bookingPayload) =>
+                    apiFetch({
+                        path: `/webba-booking/v1/create-booking`,
+                        method: 'POST',
+                        body: buildBookingFormData(bookingPayload),
+                    }),
             })
         } catch (e: any) {
             setLoading('createBooking', false)
@@ -221,11 +237,14 @@ export const useProcessBooking = () => {
         return bookingResult
     }, [
         stripeObj,
+        squareObj,
+        bookingData,
         bookingMode,
         amountData,
         preset,
         setLoading,
         submitStripePayment,
+        submitSquarePayment,
         setBookingData,
     ])
 }

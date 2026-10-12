@@ -8,7 +8,7 @@ $allowed_params = [
     'paymentId',
     'paypal_status',
     'mollie_status',
-    'gift_card_id',
+    'gift_card_token',
 ];
 
 $extra_data_attrs = '';

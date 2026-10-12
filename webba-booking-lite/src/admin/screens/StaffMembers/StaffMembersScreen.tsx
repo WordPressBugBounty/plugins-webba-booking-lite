@@ -9,6 +9,7 @@ import { getCellActions } from '../../components/WebbaDataTable/helpers/getCellA
 import { useWbkTable } from '../../components/WebbaDataTable/hooks/useWbkTable'
 import { Menu } from '../../components/WebbaDataTable/Menu'
 import { Table } from '../../components/WebbaDataTable/Table'
+import { getTableDocumentationLink } from '../../components/WebbaDataTable/documentationLinks'
 import { generateColumnDefsFromModel } from '../../components/WebbaDataTable/utils'
 import { staffMembersModel } from './model'
 import './StaffMembersScreen.scss'
@@ -139,7 +140,9 @@ export const StaffMembersScreen = () => {
             >
                 <Table
                     title={__('Staff Members', 'webba-booking-lite')}
+                    documentationLink={getTableDocumentationLink('staffMembers')}
                     addButtonTitle={__('Add staff member', 'webba-booking-lite')}
+                    description={__('Manage and add staff members to your business.', 'webba-booking-lite')}
                     table={table}
                     loading={isLoading}
                     onDeleteSelected={onDeleteSelected}

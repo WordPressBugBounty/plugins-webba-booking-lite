@@ -288,6 +288,9 @@ class WBK_Booking_Factory {
             }
             // *** Add event to the connected calendars (all types: Google, Outlook, etc.)
             if ( WBK_Connected_Calendar_Processor::booking_has_connected_calendars_for_export( $booking ) && get_option( "wbk_connected_calendars_when_add", "onbooking" ) == "onbooking" ) {
+                if ( !WBK_Connected_Calendar_Processor::is_event_added_to_connected_calendars( $booking_id ) ) {
+                    WBK_Connected_Calendar_Processor::process_adding_all_types( $booking_id );
+                }
             }
             // add to Zoom
             if ( $service_loaded && get_option( "wbk_zoom_when_add", "onbooking" ) == "onbooking" ) {
@@ -333,6 +336,7 @@ class WBK_Booking_Factory {
             return false;
         }
         date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+        WBK_Connected_Calendar_Processor::delete_event_from_connected_calendars( $booking_id );
         do_action( "webba_before_cancel_booking", $booking_id );
         if ( $force_deletion ) {
             WBK_Model_Utils::delete_booking( $booking_id );
@@ -376,8 +380,14 @@ class WBK_Booking_Factory {
                 }
                 if ( get_option( "wbk_connected_calendars_when_add", "onbooking" ) == "onpaymentorapproval" ) {
                     if ( !WBK_Connected_Calendar_Processor::is_event_added_to_connected_calendars( $booking_id ) ) {
+                        date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+                        WBK_Connected_Calendar_Processor::process_adding_all_types( $booking_id );
+                        date_default_timezone_set( "UTC" );
                     }
                 } else {
+                    date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+                    WBK_Connected_Calendar_Processor::update_event_from_connected_calendars( $booking_id );
+                    date_default_timezone_set( "UTC" );
                 }
             }
         }
@@ -429,6 +439,9 @@ class WBK_Booking_Factory {
                 $booking->save();
                 $coupon_id = $booking->get( "coupon" );
                 if ( get_option( "wbk_connected_calendars_when_add", "onbooking" ) == "onpaymentorapproval" ) {
+                    if ( !WBK_Connected_Calendar_Processor::is_event_added_to_connected_calendars( $booking_id ) ) {
+                        WBK_Connected_Calendar_Processor::process_adding_all_types( $booking_id );
+                    }
                 }
             }
         }
@@ -503,6 +516,9 @@ class WBK_Booking_Factory {
                     }
                     if ( get_option( "wbk_connected_calendars_when_add", "onbooking" ) == "onpaymentorapproval" ) {
                         if ( !WBK_Connected_Calendar_Processor::is_event_added_to_connected_calendars( $booking_id ) ) {
+                            date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+                            WBK_Connected_Calendar_Processor::process_adding_all_types( $booking_id );
+                            date_default_timezone_set( "UTC" );
                         }
                     }
                 }
@@ -516,9 +532,11 @@ class WBK_Booking_Factory {
             }
             if ( $current_status == "cancelled" && $prev_status != "cancelled" || $current_status == "rejected" && $prev_status != "rejected" ) {
                 WBK_Email_Processor::send( [$booking_id], "booking_cancelled_by_admin" );
+                WBK_Connected_Calendar_Processor::delete_event_from_connected_calendars( $booking_id );
             }
             $service = new WBK_Service($service_id);
             date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+            WBK_Connected_Calendar_Processor::update_event_from_connected_calendars( $booking_id );
             WBK_Model_Utils::update_booking_data_at_gg_calendar( $booking_id );
             date_default_timezone_set( "UTC" );
             WBK_Model_Utils::set_booking_end( $booking_id );

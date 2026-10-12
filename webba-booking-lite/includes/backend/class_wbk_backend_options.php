@@ -25,12 +25,10 @@ class WBK_Backend_Options
         add_filter("tiny_mce_before_init", [$this, "customizeEditor"], 1000);
         // save options
         add_action("wp_ajax_wbk_save_options", [$this, "save_options"]);
-        self::$page_list = array_map(function ($page) {
-            return [
-                'label' => $page->post_title,
-                'value' => $page->ID,
-            ];
-        }, get_pages());
+        // Keyed by page ID so select extras match formatOptions (value => label).
+        foreach (get_pages() as $page) {
+            self::$page_list[$page->ID] = $page->post_title;
+        }
     }
 
     public function save_options()
@@ -215,7 +213,7 @@ class WBK_Backend_Options
                 "pro" => true,
                 "minimal_plan" => "standard",
                 "description" => __(
-                    "Configure payment settings, currency, tax, and payment gateway integrations (PayPal, Stripe, Mollie, WooCommerce).",
+                    "Configure payment settings, currency, tax, and payment gateway integrations (PayPal, Stripe, Square, Mollie, WooCommerce).",
                     "webba-booking-lite",
                 ),
             ],
@@ -1005,14 +1003,14 @@ OLD: When one service is booked, it will automatically lock another one on the s
             __("Redirect to a page after booking is made", "webba-booking-lite"),
             "wbk_advanced_booking_rules_section",
             [
-                'default' => '',
-                'checkbox_value' => 'yes',
-                'not_translated_title' => 'Redirect to a page after booking is made',
-                'popup' => __(
-                    'Turn on to redirect to a page after booking is made. You can select a page from the dropdown menu.',
-                    'webba-booking-lite'
+                "default" => "",
+                "checkbox_value" => "yes",
+                "not_translated_title" => "Redirect to a page after booking is made",
+                "popup" => __(
+                    "Turn on to redirect to a page after booking is made. You can select a page from the dropdown menu.",
+                    "webba-booking-lite",
                 ),
-                'tab' => 'booking-form',
+                "tab" => "booking-form",
             ],
         );
 
@@ -1022,19 +1020,19 @@ OLD: When one service is booked, it will automatically lock another one on the s
             __("Redirect to a page after booking is made", "webba-booking-lite"),
             "wbk_advanced_booking_rules_section",
             [
-                'extra' => self::$page_list,
-                'not_translated_title' => 'Redirect to a page after booking is made',
-                'popup' => __(
-                    'Select a page to redirect to after booking is made.',
-                    'webba-booking-lite'
+                "extra" => self::$page_list,
+                "not_translated_title" => "Redirect to a page after booking is made",
+                "popup" => __(
+                    "Select a page to redirect to after booking is made.",
+                    "webba-booking-lite",
                 ),
-                'tab' => 'booking-form',
-                'dependency' => [["wbk_booking_redirect_enabled", "=", "yes"]],
-                'dependent_value' => [
-                    'condition' => ['wbk_booking_redirect_enabled', '!=', 'yes'],
-                    'value' => '',
+                "tab" => "booking-form",
+                "dependency" => [["wbk_booking_redirect_enabled", "=", "yes"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_booking_redirect_enabled", "!=", "yes"],
+                    "value" => "",
                 ],
-                'default' => '',
+                "default" => "",
             ],
         );
 
@@ -1079,16 +1077,19 @@ OLD: When one service is booked, it will automatically lock another one on the s
         );
 
         wbk_opt()->add_option(
-            'wbk_show_endtime',
-            'checkbox',
-            __('Show end time in timeslots', 'webba-booking-lite'),
-            'wbk_advanced_booking_rules_section',
+            "wbk_show_endtime",
+            "checkbox",
+            __("Show end time in timeslots", "webba-booking-lite"),
+            "wbk_advanced_booking_rules_section",
             [
-                'not_translated_title' => 'Show end time in timeslots',
-                'popup' => __('Turn on to show the end time in timeslots. It will show the timeslots as range, for example: 10:00 AM - 11:00 AM.', 'webba-booking-lite'),
-                'checkbox_value' => 'yes',
-                'default' => '',
-                'tab' => 'booking-form',
+                "not_translated_title" => "Show end time in timeslots",
+                "popup" => __(
+                    "Turn on to show the end time in timeslots. It will show the timeslots as range, for example: 10:00 AM - 11:00 AM.",
+                    "webba-booking-lite",
+                ),
+                "checkbox_value" => "yes",
+                "default" => "",
+                "tab" => "booking-form",
             ],
         );
 
@@ -1978,79 +1979,92 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
         );
 
         wbk_opt()->add_option(
-            'wbk_gift_card_preset_amounts',
-            'nested_numbers',
-            __('Preset gift card amounts', 'webba-booking-lite'),
-            'wbk_payment_settings_section',
+            "wbk_gift_card_preset_amounts",
+            "nested_numbers",
+            __("Preset gift card amounts", "webba-booking-lite"),
+            "wbk_payment_settings_section",
             [
-                'not_translated_title' => 'Preset gift card amounts',
-                'popup' => __('Set preset gift card amounts. The first number is the minimum amount, the second is the maximum amount, and the third is the step.', 'webba-booking-lite'),
-                'default' => [
-                    50, 75, 100, 150, 200
+                "not_translated_title" => "Preset gift card amounts",
+                "popup" => __(
+                    "Set preset gift card amounts. The first number is the minimum amount, the second is the maximum amount, and the third is the step.",
+                    "webba-booking-lite",
+                ),
+                "default" => [50, 75, 100, 150, 200],
+                "max_length" => 5,
+                "tab" => "gift-cards",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_gift_card_allow_custom_amount",
+            "checkbox",
+            __("Allow custom amount", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Allow custom amount",
+                "popup" => __(
+                    "Allow gift card buyers to enter custom value amount.",
+                    "webba-booking-lite",
+                ),
+                "checkbox_value" => "yes",
+                "default" => "yes",
+                "tab" => "gift-cards",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_gift_card_default_validity",
+            "select",
+            __("Default gift card validity", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Default gift card validity",
+                "popup" => __(
+                    "Set the default validity period for gift cards.",
+                    "webba-booking-lite",
+                ),
+                "tab" => "gift-cards",
+                "default" => "12",
+                "extra" => [
+                    "3" => __("3 months", "webba-booking-lite"),
+                    "6" => __("6 months", "webba-booking-lite"),
+                    "12" => __("1 year", "webba-booking-lite"),
+                    "24" => __("2 years", "webba-booking-lite"),
+                    "36" => __("3 years", "webba-booking-lite"),
                 ],
-                'max_length' => 5,
-                'tab' => 'gift-cards',
             ],
         );
 
         wbk_opt()->add_option(
-            'wbk_gift_card_allow_custom_amount',
-            'checkbox',
-            __('Allow custom amount', 'webba-booking-lite'),
-            'wbk_payment_settings_section',
+            "wbk_gift_card_policy",
+            "editor",
+            __("Gift card policy", "webba-booking-lite"),
+            "wbk_payment_settings_section",
             [
-                'not_translated_title' => 'Allow custom amount',
-                'popup' => __('Allow gift card buyers to enter custom value amount.', 'webba-booking-lite'),
-                'checkbox_value' => 'yes',
-                'default' => 'yes',
-                'tab' => 'gift-cards',
+                "not_translated_title" => "Gift card policy",
+                "popup" => __(
+                    "Add information customers should know about using your gift cards, such as validity, eligible services, refunds, transfers, or other restrictions. This policy will be shown to customers during checkout and included in the gift card email.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "gift-cards",
             ],
         );
 
         wbk_opt()->add_option(
-            'wbk_gift_card_default_validity',
-            'select',
-            __('Default gift card validity', 'webba-booking-lite'),
-            'wbk_payment_settings_section',
+            "wbk_gift_card_landing_page",
+            "select",
+            __("Gift card landing page", "webba-booking-lite"),
+            "wbk_payment_settings_section",
             [
-                'not_translated_title' => 'Default gift card validity',
-                'popup' => __('Set the default validity period for gift cards.', 'webba-booking-lite'),
-                'tab' => 'gift-cards',
-                'default' => '12',
-                'extra' => [
-                    '3'  => __('3 months', 'webba-booking-lite'),
-                    '6'  => __('6 months', 'webba-booking-lite'),
-                    '12' => __('1 year', 'webba-booking-lite'),
-                    '24' => __('2 years', 'webba-booking-lite'),
-                    '36' => __('3 years', 'webba-booking-lite'),
-                ],
-            ],
-        );
-
-        wbk_opt()->add_option(
-            'wbk_gift_card_policy',
-            'editor',
-            __('Gift card policy', 'webba-booking-lite'),
-            'wbk_payment_settings_section',
-            [
-                'not_translated_title' => 'Gift card policy',
-                'popup' => __('Add information customers should know about using your gift cards, such as validity, eligible services, refunds, transfers, or other restrictions. This policy will be shown to customers during checkout and included in the gift card email.', 'webba-booking-lite'),
-                'default' => '',
-                'tab' => 'gift-cards',
-            ],
-        );
-
-        wbk_opt()->add_option(
-            'wbk_gift_card_landing_page',
-            'select',
-            __('Gift card landing page', 'webba-booking-lite'),
-            'wbk_payment_settings_section',
-            [
-                'not_translated_title' => 'Gift card landing page',
-                'popup' => __('Select the page that will be used as the QR code landing page for gift cards. This page should include the [webba_gc] shortcode.', 'webba-booking-lite'),
-                'default' => '',
-                'tab' => 'gift-cards',
-                'extra' => 'backend'
+                "not_translated_title" => "Gift card landing page",
+                "popup" => __(
+                    "Select the page that will be used as the QR code landing page for gift cards. This page should include the [webba_gc] shortcode.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "tab" => "gift-cards",
+                "extra" => "backend",
             ],
         );
 
@@ -2195,6 +2209,38 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "not_translated_title" => "Credit card option label",
                 "popup" => __("Label for Stripe payment method", "webba-booking-lite"),
                 "tab" => "payments",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_square_button_text",
+            "text_alfa_numeric",
+            __("Square Credit Card option label", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Credit Card", "webba-booking-lite"),
+                "not_translated_title" => "Square Credit Card option label",
+                "popup" => __(
+                    "Label for Square payment method on the booking form",
+                    "webba-booking-lite",
+                ),
+                "tab" => "payments",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_square_api_error_message",
+            "text",
+            __("Square API error message", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Payment failed: #response", "webba-booking-lite"),
+                "not_translated_title" => "Square API error message",
+                "popup" => __(
+                    "Square API error message during payment processing. Placeholders: #response.",
+                    "webba-booking-lite",
+                ),
+                "tab" => "validation",
             ],
         );
 
@@ -2414,7 +2460,10 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "default" => __("Total booked items", "webba-booking-lite"),
                 "not_translated_title" => "Total booked items label",
-                "popup" => __("Label for the total booked items in payment details", "webba-booking-lite"),
+                "popup" => __(
+                    "Label for the total booked items in payment details",
+                    "webba-booking-lite",
+                ),
                 "tab" => "payments",
             ],
         );
@@ -2909,7 +2958,7 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "not_translated_title" => "TEST Mode",
                 "checkbox_value" => "yes",
                 "popup" => __(
-                    'Enable to use Mollie test API keys. Disable for live payment processing.',
+                    "Enable to use Mollie test API keys. Disable for live payment processing.",
                     "webba-booking-lite",
                 ),
                 "required_plan" => "standard",
@@ -2925,7 +2974,7 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "not_translated_title" => "Mollie Test API Key",
                 "popup" => __(
-                    'Enter the Mollie test API key (starts with test_). Find it in your Mollie Dashboard under Developers → API keys.',
+                    "Enter the Mollie test API key (starts with test_). Find it in your Mollie Dashboard under Developers → API keys.",
                     "webba-booking-lite",
                 ),
                 "default" => "",
@@ -2942,7 +2991,7 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "not_translated_title" => "Mollie Live API Key",
                 "popup" => __(
-                    'Enter the Mollie live API key (starts with live_). Find it in your Mollie Dashboard under Developers → API keys.',
+                    "Enter the Mollie live API key (starts with live_). Find it in your Mollie Dashboard under Developers → API keys.",
                     "webba-booking-lite",
                 ),
                 "default" => "",
@@ -3245,6 +3294,174 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 ],
                 "required_plan" => "standard",
                 "tab" => "stripe",
+            ],
+        );
+
+        // ========== PAYMENTS - Square Tab ==========
+        wbk_opt()->add_option(
+            "wbk_square_notice",
+            "notice",
+            __("Square Integration Documentation ->", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Square Integration Documentation ->",
+                "popup" => __(
+                    '<a href="https://developer.squareup.com/docs/web-payments/overview" target="_blank">Square Web Payments Documentation -></a>',
+                    "webba-booking-lite",
+                ),
+                "required_plan" => "standard",
+                "tab" => "square",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_square_test_mode",
+            "checkbox",
+            __("TEST Mode", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "TEST Mode",
+                "popup" => __(
+                    "Select sandbox to test the integration, and live for actual payment processing.",
+                    "webba-booking-lite",
+                ),
+                "checkbox_value" => "yes",
+                "default" => "",
+                "required_plan" => "standard",
+                "tab" => "square",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_square_sandbox_application_id",
+            "text",
+            __("Square Sandbox Application ID", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Square Sandbox Application ID",
+                "popup" => __(
+                    "Enter the SANDBOX Application ID from your Square Developer Dashboard.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "required_plan" => "standard",
+                "tab" => "square",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_square_sandbox_access_token",
+            "password",
+            __("Square Sandbox Access Token", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Square Sandbox Access Token",
+                "popup" => __(
+                    "Enter the SANDBOX Access Token from your Square Developer Dashboard.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "required_plan" => "standard",
+                "tab" => "square",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_square_sandbox_location_id",
+            "text",
+            __("Square Sandbox Location ID", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Square Sandbox Location ID",
+                "popup" => __(
+                    "Enter the SANDBOX Location ID from your Square Developer Dashboard.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "required_plan" => "standard",
+                "tab" => "square",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_square_application_id",
+            "text",
+            __("Square Live Application ID", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Square Live Application ID",
+                "popup" => __(
+                    "Enter the live Application ID from your Square Developer Dashboard.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "required_plan" => "standard",
+                "tab" => "square",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_square_access_token",
+            "password",
+            __("Square Live Access Token", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Square Live Access Token",
+                "popup" => __(
+                    "Enter the live Access Token from your Square Developer Dashboard.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "required_plan" => "standard",
+                "tab" => "square",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_square_location_id",
+            "text",
+            __("Square Live Location ID", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Square Live Location ID",
+                "popup" => __(
+                    "Enter the live Location ID from your Square Developer Dashboard.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "required_plan" => "standard",
+                "tab" => "square",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_square_currency",
+            "select",
+            __("Square currency", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "default" => "USD",
+                "not_translated_title" => "Square currency",
+                "popup" => __(
+                    "Select the currency to use for Square payments.",
+                    "webba-booking-lite",
+                ),
+                "extra" => array_combine(
+                    WBK_Square::get_currencies(),
+                    WBK_Square::get_currencies(),
+                ),
+                "required_plan" => "standard",
+                "tab" => "square",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_square_redirect_url_new",
+            "select",
+            __("Redirect to page when payment is successful", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Redirect to page when payment is successful",
+                "popup" => __(
+                    "Enter the URL where customers should be redirected after successful payment. If left empty, customers will stay on the booking form page after completing the payment.",
+                    "webba-booking-lite",
+                ),
+                "default" => "",
+                "required_plan" => "standard",
+                "tab" => "square",
+                "extra" => "backend",
             ],
         );
 
@@ -4667,7 +4884,10 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "default" => __("Proceed to checkout", "webba-booking-lite"),
                 "not_translated_title" => "Proceed to checkout",
-                "popup" => __("Label for the proceed to checkout button on the waterfall booking form.", "webba-booking-lite"),
+                "popup" => __(
+                    "Label for the proceed to checkout button on the waterfall booking form.",
+                    "webba-booking-lite",
+                ),
                 "tab" => "buttons-ui",
             ],
         );
@@ -6549,7 +6769,10 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "default" => __("Category", "webba-booking-lite"),
                 "not_translated_title" => "Category",
-                "popup" => __("Label for Category on the waterfall booking form.", "webba-booking-lite"),
+                "popup" => __(
+                    "Label for Category on the waterfall booking form.",
+                    "webba-booking-lite",
+                ),
                 "tab" => "form-fields",
             ],
         );
@@ -6562,7 +6785,10 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "default" => __("Service", "webba-booking-lite"),
                 "not_translated_title" => "Service",
-                "popup" => __("Label for Service on the waterfall booking form.", "webba-booking-lite"),
+                "popup" => __(
+                    "Label for Service on the waterfall booking form.",
+                    "webba-booking-lite",
+                ),
                 "tab" => "form-fields",
             ],
         );
@@ -6575,7 +6801,10 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "default" => __("Unit", "webba-booking-lite"),
                 "not_translated_title" => "Unit",
-                "popup" => __("Label for Unit on the waterfall booking form.", "webba-booking-lite"),
+                "popup" => __(
+                    "Label for Unit on the waterfall booking form.",
+                    "webba-booking-lite",
+                ),
                 "tab" => "units",
             ],
         );
@@ -6812,7 +7041,10 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             [
                 "default" => __("To pay now", "webba-booking-lite"),
                 "not_translated_title" => "To pay now",
-                "popup" => __("Label for the To pay now option in payment details", "webba-booking-lite"),
+                "popup" => __(
+                    "Label for the To pay now option in payment details",
+                    "webba-booking-lite",
+                ),
                 "tab" => "payments",
             ],
         );
@@ -6907,158 +7139,178 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
         );
 
         wbk_opt()->add_option(
-            'wbk_wording_recurring_booking',
-            'text',
-            __('Recurring booking', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_recurring_booking",
+            "text",
+            __("Recurring booking", "webba-booking-lite"),
+            "wbk_translation_settings_section",
             [
-                'default' => __('Recurring booking', 'webba-booking-lite'),
-                'not_translated_title' => 'Recurring booking',
-                'popup' => __('Label for Recurring booking.', 'webba-booking-lite'),
-                'tab' => 'recurring',
+                "default" => __("Recurring booking", "webba-booking-lite"),
+                "not_translated_title" => "Recurring booking",
+                "popup" => __("Label for Recurring booking.", "webba-booking-lite"),
+                "tab" => "recurring",
             ],
         );
 
         wbk_opt()->add_option(
-            'wbk_wording_recurring_booking_hint',
-            'text',
-            __('This series exceeds the maximum number of slots allowed for this service.', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_recurring_booking_hint",
+            "text",
+            __(
+                "This series exceeds the maximum number of slots allowed for this service.",
+                "webba-booking-lite",
+            ),
+            "wbk_translation_settings_section",
             [
-                'default' => __('This series exceeds the maximum number of slots allowed for this service.', 'webba-booking-lite'),
-                'not_translated_title' => 'This series exceeds the maximum number of slots allowed for this service.',
-                'popup' => __('Label for This series exceeds the maximum number of slots allowed for this service.', 'webba-booking-lite'),
-                'tab' => 'recurring',
+                "default" => __(
+                    "This series exceeds the maximum number of slots allowed for this service.",
+                    "webba-booking-lite",
+                ),
+                "not_translated_title" =>
+                    "This series exceeds the maximum number of slots allowed for this service.",
+                "popup" => __(
+                    "Label for This series exceeds the maximum number of slots allowed for this service.",
+                    "webba-booking-lite",
+                ),
+                "tab" => "recurring",
             ],
         );
 
         wbk_opt()->add_option(
-            'wbk_wording_recurring_booking_repeat_every',
-            'text',
-            __('Repeat every', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_recurring_booking_repeat_every",
+            "text",
+            __("Repeat every", "webba-booking-lite"),
+            "wbk_translation_settings_section",
             [
-                'default' => __('Repeat every', 'webba-booking-lite'),
-                'not_translated_title' => 'Repeat every',
-                'popup' => __('Label for Repeat every.', 'webba-booking-lite'),
-                'tab' => 'recurring',
+                "default" => __("Repeat every", "webba-booking-lite"),
+                "not_translated_title" => "Repeat every",
+                "popup" => __("Label for Repeat every.", "webba-booking-lite"),
+                "tab" => "recurring",
             ],
         );
 
         wbk_opt()->add_option(
-            'wbk_wording_recurring_booking_interval',
-            'text',
-            __('Interval', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_recurring_booking_interval",
+            "text",
+            __("Interval", "webba-booking-lite"),
+            "wbk_translation_settings_section",
             [
-                'default' => __('Interval', 'webba-booking-lite'),
-                'not_translated_title' => 'Interval',
-                'popup' => __('Label for Interval.', 'webba-booking-lite'),
-                'tab' => 'recurring',
+                "default" => __("Interval", "webba-booking-lite"),
+                "not_translated_title" => "Interval",
+                "popup" => __("Label for Interval.", "webba-booking-lite"),
+                "tab" => "recurring",
             ],
         );
 
         wbk_opt()->add_option(
-            'wbk_wording_recurring_booking_number_of_time_slots',
-            'text',
-            __('Number of time slots', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_recurring_booking_number_of_time_slots",
+            "text",
+            __("Number of time slots", "webba-booking-lite"),
+            "wbk_translation_settings_section",
             [
-                'default' => __('Number of time slots', 'webba-booking-lite'),
-                'not_translated_title' => 'Number of time slots',
-                'popup' => __('Label for Number of time slots.', 'webba-booking-lite'),
-                'tab' => 'recurring',
+                "default" => __("Number of time slots", "webba-booking-lite"),
+                "not_translated_title" => "Number of time slots",
+                "popup" => __("Label for Number of time slots.", "webba-booking-lite"),
+                "tab" => "recurring",
             ],
         );
 
         wbk_opt()->add_option(
-            'wbk_wording_loading_appointments',
-            'text',
-            __('Loading appointments...', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_loading_appointments",
+            "text",
+            __("Loading appointments...", "webba-booking-lite"),
+            "wbk_translation_settings_section",
             [
-                'default' => __('Loading appointments...', 'webba-booking-lite'),
-                'not_translated_title' => 'Loading appointments...',
-                'popup' => __('Label for Loading appointments....', 'webba-booking-lite'),
-                'tab' => 'recurring',
+                "default" => __("Loading appointments...", "webba-booking-lite"),
+                "not_translated_title" => "Loading appointments...",
+                "popup" => __("Label for Loading appointments....", "webba-booking-lite"),
+                "tab" => "recurring",
             ],
         );
 
         wbk_opt()->add_option(
-            'wbk_wording_no_appointments_selected',
-            'text',
-            __('No appointments selected. Add slots using the controls above or close the popup.', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_no_appointments_selected",
+            "text",
+            __(
+                "No appointments selected. Add slots using the controls above or close the popup.",
+                "webba-booking-lite",
+            ),
+            "wbk_translation_settings_section",
             [
-                'default' => __('No appointments selected. Add slots using the controls above or close the popup.', 'webba-booking-lite'),
-                'not_translated_title' => 'No appointments selected. Add slots using the controls above or close the popup.',
-                'popup' => __('Label for No appointments selected. Add slots using the controls above or close the popup.', 'webba-booking-lite'),
-                'tab' => 'recurring',
+                "default" => __(
+                    "No appointments selected. Add slots using the controls above or close the popup.",
+                    "webba-booking-lite",
+                ),
+                "not_translated_title" =>
+                    "No appointments selected. Add slots using the controls above or close the popup.",
+                "popup" => __(
+                    "Label for No appointments selected. Add slots using the controls above or close the popup.",
+                    "webba-booking-lite",
+                ),
+                "tab" => "recurring",
             ],
         );
 
         wbk_opt()->add_option(
-            'wbk_wording_unavailable',
-            'text',
-            __('unavailable', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_unavailable",
+            "text",
+            __("unavailable", "webba-booking-lite"),
+            "wbk_translation_settings_section",
             [
-                'default' => __('unavailable', 'webba-booking-lite'),
-                'not_translated_title' => 'unavailable',
-                'popup' => __('Label for unavailable.', 'webba-booking-lite'),
-                'tab' => 'recurring',
+                "default" => __("unavailable", "webba-booking-lite"),
+                "not_translated_title" => "unavailable",
+                "popup" => __("Label for unavailable.", "webba-booking-lite"),
+                "tab" => "recurring",
             ],
         );
 
         wbk_opt()->add_option(
-            'wbk_wording_choose_another_time',
-            'text',
-            __('Choose another time', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_choose_another_time",
+            "text",
+            __("Choose another time", "webba-booking-lite"),
+            "wbk_translation_settings_section",
             [
-                'default' => __('Choose another time', 'webba-booking-lite'),
-                'not_translated_title' => 'Choose another time',
-                'popup' => __('Label for Choose another time.', 'webba-booking-lite'),
-                'tab' => 'recurring',
+                "default" => __("Choose another time", "webba-booking-lite"),
+                "not_translated_title" => "Choose another time",
+                "popup" => __("Label for Choose another time.", "webba-booking-lite"),
+                "tab" => "recurring",
             ],
         );
 
         wbk_opt()->add_option(
-            'wbk_wording_select_a_time',
-            'text',
-            __('Select a time', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_select_a_time",
+            "text",
+            __("Select a time", "webba-booking-lite"),
+            "wbk_translation_settings_section",
             [
-                'default' => __('Select a time', 'webba-booking-lite'),
-                'not_translated_title' => 'Select a time',
-                'popup' => __('Label for Select a time.', 'webba-booking-lite'),
-                'tab' => 'recurring',
+                "default" => __("Select a time", "webba-booking-lite"),
+                "not_translated_title" => "Select a time",
+                "popup" => __("Label for Select a time.", "webba-booking-lite"),
+                "tab" => "recurring",
             ],
         );
 
         wbk_opt()->add_option(
-            'wbk_wording_adjusted',
-            'text',
-            __('adjusted', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_adjusted",
+            "text",
+            __("adjusted", "webba-booking-lite"),
+            "wbk_translation_settings_section",
             [
-                'default' => __('adjusted', 'webba-booking-lite'),
-                'not_translated_title' => 'adjusted',
-                'popup' => __('Label for adjusted.', 'webba-booking-lite'),
-                'tab' => 'recurring',
+                "default" => __("adjusted", "webba-booking-lite"),
+                "not_translated_title" => "adjusted",
+                "popup" => __("Label for adjusted.", "webba-booking-lite"),
+                "tab" => "recurring",
             ],
         );
-        
+
         wbk_opt()->add_option(
-            'wbk_wording_remove_appointment',
-            'text',
-            __('Remove appointment', 'webba-booking-lite'),
-            'wbk_translation_settings_section',
+            "wbk_wording_remove_appointment",
+            "text",
+            __("Remove appointment", "webba-booking-lite"),
+            "wbk_translation_settings_section",
             [
-                'default' => __('Remove appointment', 'webba-booking-lite'),
-                'not_translated_title' => 'Remove appointment',
-                'popup' => __('Label for Remove appointment.', 'webba-booking-lite'),
-                'tab' => 'recurring',
+                "default" => __("Remove appointment", "webba-booking-lite"),
+                "not_translated_title" => "Remove appointment",
+                "popup" => __("Label for Remove appointment.", "webba-booking-lite"),
+                "tab" => "recurring",
             ],
         );
 
@@ -7072,7 +7324,7 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "not_translated_title" => "Gift card",
                 "popup" => __(
                     "Label for a gift card item in payment and confirmation screens.",
-                    "webba-booking-lite"
+                    "webba-booking-lite",
                 ),
                 "tab" => "gift-cards",
             ],
@@ -7083,14 +7335,11 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             __("Gift card for #recipient_name", "webba-booking-lite"),
             "wbk_translation_settings_section",
             [
-                "default" => __(
-                    "Gift card for #recipient_name",
-                    "webba-booking-lite"
-                ),
+                "default" => __("Gift card for #recipient_name", "webba-booking-lite"),
                 "not_translated_title" => "Gift card for recipient",
                 "popup" => __(
                     "Label for a gift card item when a recipient name is available. Placeholder: #recipient_name.",
-                    "webba-booking-lite"
+                    "webba-booking-lite",
                 ),
                 "tab" => "gift-cards",
             ],
@@ -7105,7 +7354,7 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "not_translated_title" => "Gift card code",
                 "popup" => __(
                     "Label for the gift card code on the confirmation screen.",
-                    "webba-booking-lite"
+                    "webba-booking-lite",
                 ),
                 "tab" => "gift-cards",
             ],
@@ -7115,18 +7364,18 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             "text",
             __(
                 "Thank you for your gift card purchase. A confirmation email will be sent to you, and the recipient will receive their gift on the selected date.",
-                "webba-booking-lite"
+                "webba-booking-lite",
             ),
             "wbk_translation_settings_section",
             [
                 "default" => __(
                     "Thank you for your gift card purchase. A confirmation email will be sent to you, and the recipient will receive their gift on the selected date.",
-                    "webba-booking-lite"
+                    "webba-booking-lite",
                 ),
                 "not_translated_title" => "Gift card thank you message",
                 "popup" => __(
                     "Message shown after a successful gift card payment.",
-                    "webba-booking-lite"
+                    "webba-booking-lite",
                 ),
                 "tab" => "gift-cards",
             ],
@@ -7136,19 +7385,18 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
             "text",
             __(
                 "Please complete your payment to confirm your gift card purchase.",
-                "webba-booking-lite"
+                "webba-booking-lite",
             ),
             "wbk_translation_settings_section",
             [
                 "default" => __(
                     "Please complete your payment to confirm your gift card purchase.",
-                    "webba-booking-lite"
+                    "webba-booking-lite",
                 ),
-                "not_translated_title" =>
-                    "Please complete payment to confirm gift card",
+                "not_translated_title" => "Please complete payment to confirm gift card",
                 "popup" => __(
                     "Message shown before the customer completes gift card payment.",
-                    "webba-booking-lite"
+                    "webba-booking-lite",
                 ),
                 "tab" => "gift-cards",
             ],

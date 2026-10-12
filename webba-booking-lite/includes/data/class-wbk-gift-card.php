@@ -87,6 +87,118 @@ class WBK_Gift_Card extends WBK_Model_Object
     }
 
     /**
+     * Check whether a card token is already used.
+     *
+     * @param string   $token
+     * @param int|null $exclude_id Optional gift card ID to ignore.
+     * @return bool
+     */
+    public static function card_token_exists($token, $exclude_id = null)
+    {
+        global $wpdb;
+
+        $token = sanitize_text_field((string) $token);
+        if ($token === "") {
+            return false;
+        }
+
+        $table = get_option("wbk_db_prefix", "") . "wbk_gift_cards";
+        if ($exclude_id !== null && intval($exclude_id) > 0) {
+            $found = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT id FROM {$table} WHERE card_token = %s AND id <> %d",
+                    $token,
+                    intval($exclude_id),
+                ),
+            );
+        } else {
+            $found = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT id FROM {$table} WHERE card_token = %s",
+                    $token,
+                ),
+            );
+        }
+
+        return !empty($found);
+    }
+
+    /**
+     * Find a gift card row by its public card token.
+     *
+     * @param string $token
+     * @return array|null
+     */
+    public static function find_by_card_token($token)
+    {
+        global $wpdb;
+
+        $token = sanitize_text_field((string) $token);
+        if ($token === "") {
+            return null;
+        }
+
+        $table = get_option("wbk_db_prefix", "") . "wbk_gift_cards";
+        $row = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT * FROM {$table} WHERE card_token = %s",
+                $token,
+            ),
+            ARRAY_A,
+        );
+
+        return is_array($row) ? $row : null;
+    }
+
+    /**
+     * Generate a unique public card token.
+     *
+     * @param int $length
+     * @param int $max_attempts
+     * @return string
+     */
+    public static function generate_unique_card_token(
+        $length = 32,
+        $max_attempts = 50
+    ) {
+        $length = max(16, intval($length));
+        $max_attempts = max(1, intval($max_attempts));
+
+        for ($i = 0; $i < $max_attempts; $i++) {
+            $token = wp_generate_password($length, false, false);
+            if (!self::card_token_exists($token)) {
+                return $token;
+            }
+        }
+
+        return wp_generate_password($length, false, false) .
+            substr(md5(uniqid((string) mt_rand(), true)), 0, 8);
+    }
+
+    /**
+     * Ensure this gift card has a card_token persisted.
+     *
+     * @return string
+     */
+    public function ensure_card_token()
+    {
+        $token = sanitize_text_field((string) $this->get("card_token"));
+        if ($token !== "") {
+            return $token;
+        }
+
+        if (!$this->is_loaded()) {
+            return "";
+        }
+
+        $token = self::generate_unique_card_token();
+        $this->set("card_token", $token);
+        $this->save();
+
+        return $token;
+    }
+
+    /**
      * Normalize gift card history to an array of time/amount entries.
      *
      * @param mixed $raw JSON string or array.
@@ -606,8 +718,10 @@ class WBK_Gift_Card extends WBK_Model_Object
         }
 
         $code = self::generate_unique_code();
+        $card_token = self::generate_unique_card_token();
         $fields = [
             "code" => $code,
+            "card_token" => $card_token,
             "buyer_name" => $data["buyer_name"],
             "buyer_email" => $data["buyer_email"],
             "recipient_name" => $data["recipient_name"],
@@ -895,7 +1009,7 @@ class WBK_Gift_Card extends WBK_Model_Object
     }
 
     /**
-     * Landing page URL for a gift card QR code, including the gift card id.
+     * Landing page URL for a gift card QR code, including the card token.
      *
      * @param int $gift_card_id
      * @return string
@@ -907,12 +1021,18 @@ class WBK_Gift_Card extends WBK_Model_Object
             return "";
         }
 
+        $gift_card = new self($gift_card_id);
+        $card_token = $gift_card->ensure_card_token();
+        if ($card_token === "") {
+            return "";
+        }
+
         $permalink = \WebbaBooking\Utilities\WBK_Options_Utils::get_gift_card_landing_page_link();
         if ($permalink === "") {
             return "";
         }
 
-        return add_query_arg("gift_card_id", $gift_card_id, $permalink);
+        return add_query_arg("gift_card_token", $card_token, $permalink);
     }
 
     /**
@@ -938,27 +1058,17 @@ class WBK_Gift_Card extends WBK_Model_Object
     /**
      * Public gift card details for the QR landing page.
      *
-     * @param int $gift_card_id
+     * @param string $card_token
      * @return array|null
      */
-    public static function get_public_status($gift_card_id)
+    public static function get_public_status($card_token)
     {
-        $gift_card_id = intval($gift_card_id);
-        if ($gift_card_id <= 0) {
+        $row = self::find_by_card_token($card_token);
+        if ($row === null) {
             return null;
         }
 
-        $gift_card = new self($gift_card_id);
-        if (!$gift_card->is_loaded()) {
-            return null;
-        }
-
-        $row = [
-            "amount" => $gift_card->get("amount"),
-            "history" => $gift_card->get("history"),
-            "expiration_date" => $gift_card->get("expiration_date"),
-        ];
-        $expiration = intval($row["expiration_date"]);
+        $expiration = intval($row["expiration_date"] ?? 0);
         $expiration_label = "";
         if ($expiration > 0) {
             $expiration_label = wp_date(
@@ -972,8 +1082,7 @@ class WBK_Gift_Card extends WBK_Model_Object
         $remaining = self::remaining_amount_from_row($row);
 
         return [
-            "id" => $gift_card->get_id(),
-            "code" => (string) $gift_card->get("code"),
+            "code" => (string) ($row["code"] ?? ""),
             "amount" => $amount,
             "remaining" => $remaining,
             "amount_formatted" => WBK_Format_Utils::format_price($amount),

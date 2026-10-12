@@ -34,10 +34,15 @@ const mountGiftCard = (root = document) => {
 
     markAsMounted(giftCardContainer)
 
-    const { payerid, paymentid, paypal_status, mollie_status, gift_card_id } =
-        extractDataAttrs(giftCardContainer)
+    const {
+        payerid,
+        paymentid,
+        paypal_status,
+        mollie_status,
+        gift_card_token,
+    } = extractDataAttrs(giftCardContainer)
 
-    if (gift_card_id) {
+    if (gift_card_token) {
         import(
             /* webpackMode: "eager" */ './screens/GiftCard/GiftCardStatus/GiftCardStatus'
         ).then(({ GiftCardStatus }) => {
@@ -47,7 +52,7 @@ const mountGiftCard = (root = document) => {
                     attrCategory={null}
                     attrLocation={null}
                 >
-                    <GiftCardStatus giftCardId={gift_card_id} />
+                    <GiftCardStatus giftCardToken={gift_card_token} />
                 </BookingFormProvider>
             )
         })

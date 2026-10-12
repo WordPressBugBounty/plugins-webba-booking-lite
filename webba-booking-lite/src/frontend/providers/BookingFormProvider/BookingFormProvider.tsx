@@ -191,8 +191,10 @@ export const BookingFormProvider = ({
                 client_secret: '',
                 intent_id: '',
             },
+            square_details: {},
         },
         stripeObj: {} as any,
+        squareObj: {} as any,
         colors: {
             primary: {},
             secondary: {},

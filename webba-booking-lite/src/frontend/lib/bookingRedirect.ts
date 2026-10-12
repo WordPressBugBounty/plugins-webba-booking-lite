@@ -3,6 +3,7 @@ const METHODS_WITHOUT_BOOKING_REDIRECT = [
     'stripe_others',
     'google_pay',
     'apple_pay',
+    'square',
     'paypal',
     'mollie',
     'woocommerce',

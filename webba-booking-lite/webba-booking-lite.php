@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.5.2
+ * Version: 6.5.3
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -74,7 +74,7 @@ if ( !defined( "WP_WEBBA_BOOKING__PLUGIN_DIR" ) ) {
     define( "WP_WEBBA_BOOKING__PLUGIN_URL", plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( "WP_WEBBA_BOOKING__VERSION" ) ) {
-    define( "WP_WEBBA_BOOKING__VERSION", "6.5.2" );
+    define( "WP_WEBBA_BOOKING__VERSION", "6.5.3" );
 }
 if ( !function_exists( "wbk_is_assistance_lab_available" ) ) {
     /**
@@ -145,6 +145,11 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
         require "includes/third-parties/class_wbk_stripe.php";
     } else {
         require "includes/third-parties/class_wbk_stripe_blank.php";
+    }
+    if ( get_option( "wbk_square_application_id", "" ) != "" || get_option( "wbk_square_sandbox_application_id", "" ) != "" ) {
+        require "includes/third-parties/class_wbk_square.php";
+    } else {
+        require "includes/third-parties/class_wbk_square_blank.php";
     }
     require "includes/third-parties/class_wbk_woocommerce.php";
     require "includes/third-parties/class_wbk_gg_blank.php";

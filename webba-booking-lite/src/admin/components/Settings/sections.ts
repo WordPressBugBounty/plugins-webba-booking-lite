@@ -49,6 +49,12 @@ export const settingsSections = [
         isPro: true
     },
     {
+        id: 'square',
+        title: 'Square',
+        icon: 'credit-card',
+        isPro: true
+    },
+    {
         id: 'google-calendar',
         title: 'Google Calendar',
         icon: 'calendar',

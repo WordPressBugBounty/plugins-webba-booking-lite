@@ -12,6 +12,7 @@ import { getCellActions } from '../../components/WebbaDataTable/helpers/getCellA
 import { useWbkTable } from '../../components/WebbaDataTable/hooks/useWbkTable'
 import { Menu } from '../../components/WebbaDataTable/Menu'
 import { Table } from '../../components/WebbaDataTable/Table'
+import { getTableDocumentationLink } from '../../components/WebbaDataTable/documentationLinks'
 import { generateColumnDefsFromModel } from '../../components/WebbaDataTable/utils'
 import { LockedTableSection } from '../../components/LockedTableSection/LockedTableSection'
 import noItemsImage from '../../../../public/images/bookings-empty.png'
@@ -281,6 +282,8 @@ export const GiftCardsScreen = () => {
         >
             <Table
                 title={__('Gift cards', 'webba-booking-lite')}
+                documentationLink={getTableDocumentationLink('giftCards')}
+                description={__('Create, manage and see purchase history of gift cards here.', 'webba-booking-lite')}
                 addButtonTitle={__('Add gift card', 'webba-booking-lite')}
                 table={table}
                 loading={isLoading}

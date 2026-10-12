@@ -4,7 +4,7 @@ Donate link: https://webba-booking.com/
 Tags: appointment, appointments, booking, booking calendar, reservation
 Requires at least: 5.6
 Tested up to: 7.1
-Stable tag: 6.5.2
+Stable tag: 6.5.3
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -322,6 +322,14 @@ Visit the WordPress.org [Webba Booking support forum](https://wordpress.org/supp
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage and handle security vulnerabilities. [Report a security vulnerability](https://patchstack.com/database/vdp/webba-booking-lite).
 
 == Changelog ==
+
+12/10/2026
+
+6.5.3
+
+- Improvement: Square payment gateway
+- Bug fix: Google calendar unavailable in certain configurations
+- Bug fix: other small fixes and improvements
 
 22/09/2026
 

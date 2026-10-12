@@ -2934,6 +2934,24 @@ class WBK_Model
         );
 
         $table->add_field(
+            "gift_card_card_token",
+            "card_token",
+            __("Card token", "webba-booking-lite"),
+            "text",
+            "",
+            [
+                "tooltip" => __(
+                    "Secret token used in the public gift card landing URL.",
+                    "webba-booking-lite",
+                ),
+            ],
+            "",
+            false,
+            false,
+            false,
+        );
+
+        $table->add_field(
             "gift_card_buyer_name",
             "buyer_name",
             __("Buyer name", "webba-booking-lite"),

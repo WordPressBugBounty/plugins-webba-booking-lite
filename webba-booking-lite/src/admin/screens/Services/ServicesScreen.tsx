@@ -10,6 +10,7 @@ import { getCellActions, syncConnectedTables } from '../../components/WebbaDataT
 import { useWbkTable } from '../../components/WebbaDataTable/hooks/useWbkTable'
 import { Menu } from '../../components/WebbaDataTable/Menu'
 import { Table } from '../../components/WebbaDataTable/Table'
+import { getTableDocumentationLink } from '../../components/WebbaDataTable/documentationLinks'
 import { generateColumnDefsFromModel } from '../../components/WebbaDataTable/utils'
 import { serviceCategoriesModel, servicesModel, unitsModel } from './model'
 import { ServiceDetail } from '../../components/WebbaDataTable/cells/ServiceDetail/ServiceDetail'
@@ -442,6 +443,8 @@ export const ServicesScreen = () => {
         <>
             <Table
                 title={__('Hourly Services / Rentals', 'webba-booking-lite')}
+                documentationLink={getTableDocumentationLink('services')}
+                description={__('Services that are available for hourly booking and the duration is below 24 hours.', 'webba-booking-lite')}
                 addButtonTitle={__('Add hourly service', 'webba-booking-lite')}
                 table={tableService}
                 loading={servicesLoading}
@@ -477,7 +480,9 @@ export const ServicesScreen = () => {
             >
                 <Table
                     title={__('Daily Services / Rentals', 'webba-booking-lite')}
+                    documentationLink={getTableDocumentationLink('dailyServices')}
                     addButtonTitle={__('Add daily service', 'webba-booking-lite')}
+                    description={__('Services that are available for daily booking and the duration is above 24 hours.', 'webba-booking-lite')}
                     table={tableUnit}
                     loading={unitsLoading}
                     onDeleteSelected={onDeleteSelectedUnit}
@@ -504,6 +509,8 @@ export const ServicesScreen = () => {
             </LockedTableSection>
             <Table
                 title={__('Categories', 'webba-booking-lite')}
+                documentationLink={getTableDocumentationLink('categories')}
+                description={__('Categories groups both thourly and daily services.', 'webba-booking-lite')}
                 addButtonTitle={__(
                     'Add service category',
                     'webba-booking-lite'

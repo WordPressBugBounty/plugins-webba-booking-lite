@@ -10,6 +10,7 @@ import { getCellActions } from '../../components/WebbaDataTable/helpers/getCellA
 import { Menu } from '../../components/WebbaDataTable/Menu'
 import { __ } from '@wordpress/i18n'
 import { Table } from '../../components/WebbaDataTable/Table'
+import { getTableDocumentationLink } from '../../components/WebbaDataTable/documentationLinks'
 import { useMemo } from 'react'
 import './FormBuilderScreen.scss'
 import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
@@ -227,6 +228,8 @@ export const FormBuilderScreen = () => {
             <div className="wbk_formBuilderScreen__wrapper">
                 <Table
                     title={__('Booking forms', 'webba-booking-lite')}
+                    documentationLink={getTableDocumentationLink('bookingForms')}
+                    description={__('Build and manage checkout forms for your services.', 'webba-booking-lite')}
                     addButtonTitle={__('Add Form', 'webba-booking-lite')}
                     table={table}
                     loading={isLoading}

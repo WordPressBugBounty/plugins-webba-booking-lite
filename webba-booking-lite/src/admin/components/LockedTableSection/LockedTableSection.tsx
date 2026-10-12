@@ -27,39 +27,51 @@ export const LockedTableSection = ({
     const isPresetLoaded =
         Boolean(plan_map) && typeof plan_map === 'object'
 
-    if (!isLocked) {
-        return <>{children}</>
-    }
-
     // Avoid locked-state flicker before preset/plan data is loaded.
-    if (!isPresetLoaded) {
-        return <>{children}</>
-    }
+    const showAsLocked = isLocked && isPresetLoaded
+    const showLockedOverlay =
+        showAsLocked &&
+        !featureDisplayConfig.hide_tables &&
+        featureDisplayConfig.table_message_type !== 'banner'
 
-    if (featureDisplayConfig.hide_tables) {
-        return null
-    }
+    let content: ReactNode = children
 
-    if (featureDisplayConfig.table_message_type === 'banner') {
-        return (
-            <div className={className}>
+    if (showAsLocked) {
+        if (featureDisplayConfig.hide_tables) {
+            content = null
+        } else if (featureDisplayConfig.table_message_type === 'banner') {
+            content = (
                 <ProFeatureBanner
                     featureKey={featureKey}
                     requiredPlans={requiredPlans}
                 />
-            </div>
-        )
+            )
+        } else {
+            content = (
+                <>
+                    <ProFeatuerWrapper requiredPlans={requiredPlans} />
+                    {children}
+                </>
+            )
+        }
+    }
+
+    // Keep a stable wrapper whenever a className is provided so plan/preset
+    // transitions do not remount table children (breaks Playwright scroll/click).
+    if (!className && !showLockedOverlay) {
+        return <>{content}</>
     }
 
     return (
         <div
             className={classNames(
-                'wbk_lockedTableSection',
+                {
+                    wbk_lockedTableSection: showLockedOverlay,
+                },
                 className
             )}
         >
-            <ProFeatuerWrapper requiredPlans={requiredPlans} />
-            {children}
+            {content}
         </div>
     )
 }

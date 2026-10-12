@@ -234,6 +234,7 @@ const DEFAULT_STATE: State = {
     bookingDetails: {},
     timezoneData: null,
     stripeExecutedResult: null,
+    squareExecutedResult: null,
 }
 
 const actions = {
@@ -822,6 +823,24 @@ const actions = {
             })
             return response
         },
+    submitSquarePayment:
+        (
+            payment_id: string,
+            source_id: string,
+            verification_token?: string
+        ) =>
+        async ({ dispatch }: any) => {
+            const response = await apiFetch({
+                path: '/webba-booking/v1/execute-square-payment',
+                method: 'POST',
+                data: { payment_id, source_id, verification_token },
+            })
+            dispatch({
+                type: 'SET_SQUARE_EXECUTED_RESULT',
+                result: response,
+            })
+            return response
+        },
     initializePaymentMethod:
         (token: string, payment_method: string) => async () => {
             const response = await apiFetch({
@@ -1013,6 +1032,11 @@ export const store: StoreDescriptor = createReduxStore(
                         ...state,
                         stripeExecutedResult: action.result,
                     }
+                case 'SET_SQUARE_EXECUTED_RESULT':
+                    return {
+                        ...state,
+                        squareExecutedResult: action.result,
+                    }
                 default:
                     return state
             }
@@ -1039,6 +1063,9 @@ export const store: StoreDescriptor = createReduxStore(
             },
             getStripeExecutedResult(state: State) {
                 return state.stripeExecutedResult
+            },
+            getSquareExecutedResult(state: State) {
+                return state.squareExecutedResult
             },
             getNextStep(state: State) {},
             getServiceAvailability(

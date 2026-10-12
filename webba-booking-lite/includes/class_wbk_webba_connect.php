@@ -105,11 +105,22 @@ class WBK_Webba_Connect
      * @param string $return_path Optional return path for authorization flow
      * @param string $endpoint The API endpoint (e.g., 'google/start', 'google/get-access-token')
      * @param string $calendar_id The internal calendar ID
+     * @param bool   $allow_assistance_fallback Google-only: allow free-tier Assistance install credentials
      * @return string|false The query string or false on failure
      */
-    private function prepare_auth_parameters($return_path = "", $endpoint = "", $calendar_id = "")
-    {
-        return $this->prepare_signed_auth_parameters("GET", $endpoint, $return_path, $calendar_id);
+    private function prepare_auth_parameters(
+        $return_path = "",
+        $endpoint = "",
+        $calendar_id = "",
+        $allow_assistance_fallback = false
+    ) {
+        return $this->prepare_signed_auth_parameters(
+            "GET",
+            $endpoint,
+            $return_path,
+            $calendar_id,
+            $allow_assistance_fallback,
+        );
     }
 
     /**
@@ -119,47 +130,16 @@ class WBK_Webba_Connect
      * @param string $endpoint Endpoint path without leading slash (e.g. assistance/tasks)
      * @param string $return_path Optional return path
      * @param string $calendar_id Optional calendar id
+     * @param bool   $allow_assistance_fallback Google-only: allow free-tier Assistance install credentials
      * @return string|false
      */
     private function prepare_signed_auth_parameters(
         $method = "GET",
         $endpoint = "",
         $return_path = "",
-        $calendar_id = ""
+        $calendar_id = "",
+        $allow_assistance_fallback = false
     ) {
-        // Get Freemius instance
-        $fs = wbk_fs();
-
-        if (!$fs) {
-            error_log(
-                "[WBK_AUTH_DEBUG] prepare_auth_parameters failed: wbk_fs() returned null/empty",
-            );
-            return false;
-        }
-
-        // Get license information
-        $license = $fs->_get_license();
-        if (!$license) {
-            error_log(
-                "[WBK_AUTH_DEBUG] prepare_auth_parameters failed: No license found from Freemius",
-            );
-            return false;
-        }
-
-        $license_id = $license->id;
-        $license_secret = $license->secret_key;
-
-        if (!$license_id || !$license_secret) {
-            error_log(
-                "[WBK_AUTH_DEBUG] prepare_auth_parameters failed: license_id or license_secret missing. " .
-                    "license_id=" .
-                    ($license_id ?: "[empty]") .
-                    ", secret_present=" .
-                    ($license_secret ? "yes" : "no"),
-            );
-            return false;
-        }
-
         // Get site URL
         $site = get_site_url();
 
@@ -169,6 +149,51 @@ class WBK_Webba_Connect
                 "[WBK_AUTH_DEBUG] prepare_auth_parameters failed: Invalid site URL: " . $site,
             );
             return false;
+        }
+
+        $license_id = "";
+        $auth_secret = "";
+        $auth_source = "freemius";
+
+        // Prefer Freemius license when available (premium / activated).
+        $fs = function_exists("wbk_fs") ? wbk_fs() : null;
+        if ($fs) {
+            $license = $fs->_get_license();
+            if ($license && !empty($license->id) && !empty($license->secret_key)) {
+                $license_id = (string) $license->id;
+                $auth_secret = (string) $license->secret_key;
+            }
+        }
+
+        // Google free / no Freemius license: reuse existing Assistance install credentials
+        // (wbk_connect_install_id + wbk_connect_install_secret). Sent as license_id
+        // so Connect token keys and query contract stay unchanged.
+        // Outlook, Gmail, and Facebook must keep requiring a Freemius license.
+        if ($license_id === "" || $auth_secret === "") {
+            if (!$allow_assistance_fallback) {
+                error_log(
+                    "[WBK_AUTH_DEBUG] prepare_auth_parameters failed: No Freemius license (assistance fallback disabled for this provider)",
+                );
+                return false;
+            }
+
+            if (!$this->ensure_assistance_install_registered()) {
+                error_log(
+                    "[WBK_AUTH_DEBUG] prepare_auth_parameters failed: Assistance install registration failed",
+                );
+                return false;
+            }
+
+            $license_id = self::get_connect_install_id();
+            $auth_secret = self::get_connect_install_secret();
+            $auth_source = "assistance_install";
+
+            if ($license_id === "" || $auth_secret === "") {
+                error_log(
+                    "[WBK_AUTH_DEBUG] prepare_auth_parameters failed: assistance install id/secret missing",
+                );
+                return false;
+            }
         }
 
         // Generate nonce and timestamp
@@ -200,7 +225,7 @@ class WBK_Webba_Connect
         ]);
 
         // Generate state using HMAC
-        $state = $this->hmac_b64url($canonical, $license_secret);
+        $state = $this->hmac_b64url($canonical, $auth_secret);
 
         // Build and return query parameters
         $query_params = [
@@ -222,7 +247,9 @@ class WBK_Webba_Connect
                 ", license_id=" .
                 $license_id .
                 ", calendar_id=" .
-                $calendar_id,
+                $calendar_id .
+                ", auth_source=" .
+                $auth_source,
         );
 
         return http_build_query($query_params);
@@ -463,7 +490,7 @@ class WBK_Webba_Connect
 
         error_log("[WBK_AUTH_DEBUG] get_google_authorization_url: calendar_id=" . $calendar_id);
 
-        $query = $this->prepare_auth_parameters($return_path, "start", $calendar_id);
+        $query = $this->prepare_auth_parameters($return_path, "start", $calendar_id, true);
         if (!$query) {
             error_log(
                 "[WBK_AUTH_DEBUG] get_google_authorization_url failed: prepare_auth_parameters returned false",
@@ -488,7 +515,7 @@ class WBK_Webba_Connect
             "/wp-admin/admin.php?page=wbk-connected-calendars&revoke-gg-calendar=" . $calendar_id;
 
         // Prepare authentication parameters including HMAC validation
-        $query = $this->prepare_auth_parameters($return_path, "revoke-token", $calendar_id);
+        $query = $this->prepare_auth_parameters($return_path, "revoke-token", $calendar_id, true);
         if (!$query) {
             return false;
         }
@@ -519,7 +546,13 @@ class WBK_Webba_Connect
                 $calendar_id,
         );
 
-        $query = $this->prepare_auth_parameters($return_path, "get-access-token", $calendar_id);
+        // Assistance install fallback is Google-only; Gmail still requires Freemius.
+        $query = $this->prepare_auth_parameters(
+            $return_path,
+            "get-access-token",
+            $calendar_id,
+            $provider === "google",
+        );
         if (!$query) {
             error_log(
                 "[WBK_AUTH_DEBUG] fetch_access_token failed: prepare_auth_parameters returned false",
@@ -820,6 +853,134 @@ class WBK_Webba_Connect
     }
 
     /**
+     * Get Google Calendar authorization status and action URLs via Webba Connect.
+     *
+     * @param string $calendar_id Internal connected calendar ID
+     * @return array{isAuthenticated: bool, internalError: bool, authUrl?: string|null, revokeUrl?: string|null, calendars?: array}
+     */
+    public function get_google_auth_parameters($calendar_id = "")
+    {
+        if ($this->check_backend_health() === false) {
+            return [
+                "isAuthenticated" => false,
+                "internalError" => true,
+            ];
+        }
+
+        $token_response = $this->get_google_access_token($calendar_id);
+
+        if (
+            $token_response === false ||
+            !isset($token_response["access_token"]) ||
+            empty($token_response["access_token"])
+        ) {
+            $auth_url = $this->get_google_authorization_url($calendar_id);
+
+            return [
+                "isAuthenticated" => false,
+                "internalError" => $auth_url === false,
+                "authUrl" => $auth_url !== false ? $auth_url : null,
+            ];
+        }
+
+        $revoke_url = $this->get_google_revoke_url($calendar_id);
+        $calendars = $this->fetch_google_calendars_list($token_response["access_token"]);
+
+        return [
+            "isAuthenticated" => true,
+            "internalError" => false,
+            "calendars" => is_array($calendars) ? $calendars : [],
+            "revokeUrl" => $revoke_url !== false ? $revoke_url : null,
+        ];
+    }
+
+    /**
+     * Google calendar options for admin selects (id => name) via Webba Connect.
+     *
+     * @param string $calendar_id Internal connected calendar ID
+     * @return array<string, string>
+     */
+    public function get_google_calendars_for_options($calendar_id = "")
+    {
+        $token_response = $this->get_google_access_token($calendar_id);
+        if (
+            $token_response === false ||
+            !isset($token_response["access_token"]) ||
+            empty($token_response["access_token"])
+        ) {
+            return [];
+        }
+
+        $calendars = $this->fetch_google_calendars_list($token_response["access_token"]);
+        return is_array($calendars) ? $calendars : [];
+    }
+
+    /**
+     * Fetch Google Calendar list for the given access token.
+     *
+     * @param string $access_token Google OAuth access token
+     * @return array<string, string>|false Map of calendar id => summary, or false on failure
+     */
+    private function fetch_google_calendars_list($access_token)
+    {
+        $access_token = trim((string) $access_token);
+        if ($access_token === "") {
+            return false;
+        }
+
+        $response = wp_remote_get("https://www.googleapis.com/calendar/v3/users/me/calendarList", [
+            "timeout" => 30,
+            "headers" => [
+                "Authorization" => "Bearer " . $access_token,
+                "Content-Type" => "application/json",
+            ],
+        ]);
+
+        if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) {
+            return false;
+        }
+
+        $calendars_data = json_decode(wp_remote_retrieve_body($response), true);
+        if (!is_array($calendars_data) || empty($calendars_data["items"]) || !is_array($calendars_data["items"])) {
+            return [];
+        }
+
+        $calendars = [];
+        $primary_summary = null;
+
+        $primary_response = wp_remote_get("https://www.googleapis.com/calendar/v3/calendars/primary", [
+            "timeout" => 30,
+            "headers" => [
+                "Authorization" => "Bearer " . $access_token,
+                "Content-Type" => "application/json",
+            ],
+        ]);
+
+        if (
+            !is_wp_error($primary_response) &&
+            wp_remote_retrieve_response_code($primary_response) === 200
+        ) {
+            $primary_data = json_decode(wp_remote_retrieve_body($primary_response), true);
+            if (is_array($primary_data) && isset($primary_data["summary"])) {
+                $primary_summary = $primary_data["summary"];
+                $calendars["primary"] = $primary_summary;
+            }
+        }
+
+        foreach ($calendars_data["items"] as $calendar) {
+            if (!isset($calendar["id"], $calendar["summary"])) {
+                continue;
+            }
+            if ($primary_summary !== null && $calendar["summary"] === $primary_summary) {
+                continue;
+            }
+            $calendars[$calendar["id"]] = $calendar["summary"];
+        }
+
+        return $calendars;
+    }
+
+    /**
     /**
      * Create Gmail authorization URL (tokens stored on Webba Connect).
      *
@@ -1007,8 +1168,7 @@ class WBK_Webba_Connect
     public function get_facebook_revoke_url($resource_id = "whatsapp")
     {
         $return_path =
-            "/wp-admin/admin.php?page=wbk-options&revoke-whatsapp=" .
-            rawurlencode($resource_id);
+            "/wp-admin/admin.php?page=wbk-options&revoke-whatsapp=" . rawurlencode($resource_id);
 
         $query = $this->prepare_auth_parameters($return_path, "revoke-token", $resource_id);
         if (!$query) {
@@ -1051,14 +1211,7 @@ class WBK_Webba_Connect
         $tag = substr($raw, 12, 16);
         $ciphertext = substr($raw, 28);
         $key = hash("sha256", $license_secret, true);
-        $plaintext = openssl_decrypt(
-            $ciphertext,
-            "aes-256-gcm",
-            $key,
-            OPENSSL_RAW_DATA,
-            $iv,
-            $tag,
-        );
+        $plaintext = openssl_decrypt($ciphertext, "aes-256-gcm", $key, OPENSSL_RAW_DATA, $iv, $tag);
         if (!is_string($plaintext) || $plaintext === "") {
             return false;
         }
@@ -1135,11 +1288,7 @@ class WBK_Webba_Connect
 
         $response_code = wp_remote_retrieve_response_code($response);
         $data = json_decode(wp_remote_retrieve_body($response), true);
-        if (
-            $response_code < 200 ||
-            $response_code >= 300 ||
-            !is_array($data)
-        ) {
+        if ($response_code < 200 || $response_code >= 300 || !is_array($data)) {
             return [];
         }
 
@@ -1232,10 +1381,7 @@ class WBK_Webba_Connect
      */
     private function save_local_facebook_access_token($access_token, $expiry_date = null)
     {
-        update_option(
-            "wbk_whatsapp_access_token",
-            sanitize_text_field((string) $access_token),
-        );
+        update_option("wbk_whatsapp_access_token", sanitize_text_field((string) $access_token));
 
         if ($expiry_date !== null && $expiry_date !== "" && intval($expiry_date) > 0) {
             update_option("wbk_whatsapp_token_expiry", (string) intval($expiry_date));

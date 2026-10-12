@@ -16,6 +16,7 @@ import { SearchField } from '../../components/Filter/Fields/SearchField/SearchFi
 import { FailedMessage } from '../../components/FailedMessage/FailedMessage'
 import { TableProvider } from '../../components/WebbaDataTable/context/TableProvider'
 import { Table } from '../../components/WebbaDataTable/Table'
+import { getTableDocumentationLink } from '../../components/WebbaDataTable/documentationLinks'
 import { isForbidden } from '../../utils/errors'
 import { wbkFormat } from '../../components/Form/utils/dateTime'
 import { ServiceName } from '../../components/WebbaDataTable/cells/ServiceName/ServiceName'
@@ -99,6 +100,7 @@ export const CanecelledBookingsScreen = () => {
                         'Cancelled Bookings (legacy)',
                         'webba-booking-lite'
                     )}
+                    documentationLink={getTableDocumentationLink('bookings')}
                     table={dynamicTable}
                     loading={loading}
                     noItemsImageUrl={

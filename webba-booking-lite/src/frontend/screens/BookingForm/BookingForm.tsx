@@ -144,6 +144,8 @@ export const BookingForm = ({ formType: formTypeProp }: BookingFormProps) => {
             stripeExecutedResult,
         ]
     )
+    const isSquarePaymentRequired =
+        bookingData?.payment_required === true && paymentMethod === 'square'
     // Show loading animation while preset is loading
     if (loading.preset) {
         return (
@@ -228,7 +230,9 @@ export const BookingForm = ({ formType: formTypeProp }: BookingFormProps) => {
                 })}
                 ref={wrapperRef}
             >
-                {((!bookingData || isStripePaymentRequired) && (
+                {((!bookingData ||
+                    isStripePaymentRequired ||
+                    isSquarePaymentRequired) && (
                     <div className={'wbk_booking_form__body__wrapper'}>
                         <div
                             className={classNames(

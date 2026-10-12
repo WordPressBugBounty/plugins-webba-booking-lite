@@ -139,6 +139,7 @@ export const WaterfallForm = ({
         setFields,
         paymentMethods,
         stripeObj,
+        squareObj,
         amountData,
     } = useBookingContext()
     const { fetchBookingFields, fetchBookingAmounts } = useDispatch(store_name)
@@ -500,6 +501,7 @@ export const WaterfallForm = ({
             paymentMethods.length === 1 &&
             preset?.settings?.coupons_enabled === false &&
             !stripeMethods.includes(onlyMethod) &&
+            onlyMethod !== 'square' &&
             !hostedCheckoutMethods.includes(onlyMethod)
         ) {
             return false
@@ -540,6 +542,7 @@ export const WaterfallForm = ({
         const paymentMethod = formData?.payment_method as string
         const acceptedMethods = [
             'stripe',
+            'square',
             'paypal',
             'mollie',
             'bank',
@@ -554,6 +557,19 @@ export const WaterfallForm = ({
             paymentMethod &&
             stripeMethods.includes(paymentMethod) &&
             !stripeObj?.isValidated &&
+            Number(amountData?.to_pay_total) > 0
+        ) {
+            return {
+                canSubmit: false,
+                submitError:
+                    checkoutWording?.please_fill_out_payment_form ||
+                    __('Please fill out payment form', 'webba-booking-lite'),
+            }
+        }
+
+        if (
+            paymentMethod === 'square' &&
+            !squareObj?.isValidated &&
             Number(amountData?.to_pay_total) > 0
         ) {
             return {
@@ -582,6 +598,7 @@ export const WaterfallForm = ({
         formData?.coupon,
         preset,
         stripeObj?.isValidated,
+        squareObj?.isValidated,
         amountData?.to_pay_total,
         checkoutWording,
         paymentMethods,

@@ -30,6 +30,12 @@ const PaymentStepStripeSection = lazy(() =>
     )
 )
 
+const PaymentStepSquareSection = lazy(() =>
+    import(
+        /* webpackMode: "eager" */ './PaymentStepSquareSection/PaymentStepSquareSection'
+    ).then((module) => ({ default: module.PaymentStepSquareSection }))
+)
+
 const scrollToElementInContainer = (element: HTMLElement | null) => {
     if (!element) return
 
@@ -63,6 +69,7 @@ export const PaymentStep = () => {
 
     const couponInputRef = useRef<HTMLInputElement>(null)
     const stripeWrapperRef = useRef<HTMLDivElement>(null)
+    const squareWrapperRef = useRef<HTMLDivElement>(null)
     const [applied, setApplied] = useState(false)
     const [showFeedback, setShowFeedback] = useState(false)
     const [paymentElementLoading, setPaymentElementLoading] = useState(false)
@@ -72,7 +79,9 @@ export const PaymentStep = () => {
         setPaymentElementLoading(loading)
         if (!loading) {
             setTimeout(() => {
-                scrollToElementInContainer(stripeWrapperRef.current)
+                scrollToElementInContainer(
+                    stripeWrapperRef.current || squareWrapperRef.current
+                )
             }, 100)
         }
     }, [])
@@ -132,6 +141,11 @@ export const PaymentStep = () => {
                 generate_stripe_intent: true,
             })
         }
+        if (formData.payment_method === 'square') {
+            fetchBookingAmounts({
+                ...formData,
+            })
+        }
     }, [formData.payment_method, fetchBookingAmounts])
 
     // Reset feedback when coupon changes
@@ -175,161 +189,188 @@ export const PaymentStep = () => {
     }, [wording, formData.payment_method])
 
     const content = (
-            <div className={'wbk_step__payment-step'}>
-                {paymentMethods.length > 1 && amountData?.to_pay_total > 0 && (
-                    <PaymentSelector
-                        selectedMethod={formData.payment_method as string}
-                        setSelectedMethod={handleSelectMethod}
-                        methods={paymentMethods}
-                        paymentElementLoading={
-                            stripeMethods.includes(
-                                formData.payment_method as string
-                            ) &&
-                            (paymentElementLoading || isBookingAmountsLoading)
-                        }
-                    />
+        <div className={'wbk_step__payment-step'}>
+            {paymentMethods.length > 1 && amountData?.to_pay_total > 0 && (
+                <PaymentSelector
+                    selectedMethod={formData.payment_method as string}
+                    setSelectedMethod={handleSelectMethod}
+                    methods={paymentMethods}
+                    paymentElementLoading={
+                        (stripeMethods.includes(
+                            formData.payment_method as string
+                        ) ||
+                            formData.payment_method === 'square') &&
+                        (paymentElementLoading || isBookingAmountsLoading)
+                    }
+                />
+            )}
+
+            {['bank', 'arrival', 'woocommerce', 'paypal', 'mollie'].includes(
+                formData.payment_method
+            ) &&
+                paymentMessage.length > 0 && (
+                    <FormNotice notice={paymentMessage} />
                 )}
 
-                {['bank', 'arrival', 'woocommerce', 'paypal', 'mollie'].includes(
-                    formData.payment_method
-                ) &&
-                    paymentMessage.length > 0 && (
-                        <FormNotice notice={paymentMessage} />
-                    )}
+            {(Number(amountData?.left_to_pay) > 0 || !!formData.pay_full_amount) && (
+                <label className={'wbk_step__pay-full-amount'}>
+                    <input
+                        type="checkbox"
+                        checked={!!formData.pay_full_amount}
+                        onChange={(e) => {
+                            const checked = e.target.checked
+                            setFormData('pay_full_amount', checked)
+                            fetchBookingAmounts({
+                                ...formData,
+                                pay_full_amount: checked,
+                                generate_stripe_intent: true,
+                            })
+                        }}
+                    />
+                    <span>
+                        {wording?.pay_full_amount ||
+                            __('I want to pay full amount', 'webba-booking-lite')}
+                    </span>
+                </label>
+            )}
 
-                {(Number(amountData?.left_to_pay) > 0 || !!formData.pay_full_amount) && (
-                    <label className={'wbk_step__pay-full-amount'}>
+            <div className={'wbk_step__separator'}></div>
+
+            {preset?.settings?.coupons_enabled && (
+                <>
+                    <div className={'wbk_coupon__wrapper'}>
                         <input
-                            type="checkbox"
-                            checked={!!formData.pay_full_amount}
+                            type="text"
+                            placeholder={
+                                wording?.enter_coupon_code ||
+                                __(
+                                    'Enter coupon code',
+                                    'webba-booking-lite'
+                                )
+                            }
+                            name="coupon"
+                            id="coupon"
+                            ref={couponInputRef}
+                            value={formData.coupon || ''}
                             onChange={(e) => {
-                                const checked = e.target.checked
-                                setFormData('pay_full_amount', checked)
-                                fetchBookingAmounts({
-                                    ...formData,
-                                    pay_full_amount: checked,
-                                    generate_stripe_intent: true,
-                                })
+                                setFormData('coupon', e.target.value)
                             }}
                         />
-                        <span>
-                            {wording?.pay_full_amount ||
-                                __('I want to pay full amount', 'webba-booking-lite')}
-                        </span>
-                    </label>
-                )}
-
-                <div className={'wbk_step__separator'}></div>
-
-                {preset?.settings?.coupons_enabled && (
-                    <>
-                        <div className={'wbk_coupon__wrapper'}>
-                            <input
-                                type="text"
-                                placeholder={
-                                    wording?.enter_coupon_code ||
-                                    __(
-                                        'Enter coupon code',
-                                        'webba-booking-lite'
-                                    )
-                                }
-                                name="coupon"
-                                id="coupon"
-                                ref={couponInputRef}
-                                value={formData.coupon || ''}
-                                onChange={(e) => {
-                                    setFormData('coupon', e.target.value)
-                                }}
-                            />
-                            <Button
-                                onClick={applyCoupon}
-                                type="secondary"
-                                disabled={applied && amountData.discount > 0}
-                                showLoading={isCouponLoading}
-                            >
-                                {applied && amountData.discount > 0
-                                    ? wording?.applied ||
-                                      __('Applied', 'webba-booking-lite')
-                                    : wording?.apply ||
-                                      __('Apply', 'webba-booking-lite')}
-                            </Button>
+                        <Button
+                            onClick={applyCoupon}
+                            type={formData.coupon.length == 0 ? 'secondary' : 'primary'}
+                            disabled={applied && amountData.discount > 0}
+                            showLoading={isCouponLoading}
+                            classes={classNames('wbk_coupon__apply-button', {
+                                'wbk_coupon__apply-button--disabled': formData.coupon.length == 0
+                            })}
+                        >
+                            {applied && amountData.discount > 0
+                                ? wording?.applied ||
+                                __('Applied', 'webba-booking-lite')
+                                : wording?.apply ||
+                                __('Apply', 'webba-booking-lite')}
+                        </Button>
+                    </div>
+                    {couponApplied && !isCouponLoading && (
+                        <div
+                            className={classNames(
+                                'wbk_coupon__feedback',
+                                'wbk_coupon__feedback--success'
+                            )}
+                        >
+                            {wording?.coupon_applied_success ||
+                                __(
+                                    'Coupon applied successfully!',
+                                    'webba-booking-lite'
+                                )}
                         </div>
-                        {couponApplied && !isCouponLoading && (
-                            <div
-                                className={classNames(
-                                    'wbk_coupon__feedback',
-                                    'wbk_coupon__feedback--success'
+                    )}
+                    {couponFailed && !isCouponLoading && (
+                        <div
+                            className={classNames(
+                                'wbk_coupon__feedback',
+                                'wbk_coupon__feedback--failed'
+                            )}
+                        >
+                            {wording?.coupon_failed ||
+                                __(
+                                    'Coupon did not apply. Please check your code.',
+                                    'webba-booking-lite'
                                 )}
-                            >
-                                {wording?.coupon_applied_success ||
-                                    __(
-                                        'Coupon applied successfully!',
-                                        'webba-booking-lite'
-                                    )}
-                            </div>
-                        )}
-                        {couponFailed && !isCouponLoading && (
-                            <div
-                                className={classNames(
-                                    'wbk_coupon__feedback',
-                                    'wbk_coupon__feedback--failed'
-                                )}
-                            >
-                                {wording?.coupon_failed ||
-                                    __(
-                                        'Coupon did not apply. Please check your code.',
-                                        'webba-booking-lite'
-                                    )}
-                            </div>
-                        )}
-                    </>
-                )}
+                        </div>
+                    )}
+                </>
+            )}
 
-                {showStripeError && amountData?.stripe_details?.error && (
+            {showStripeError && amountData?.stripe_details?.error && (
+                <div
+                    className={classNames(
+                        'wbk_coupon__feedback',
+                        'wbk_coupon__feedback--failed'
+                    )}
+                >
+                    {amountData.stripe_details.error}
+                </div>
+            )}
+
+            {formData?.payment_method === 'square' &&
+                amountData?.square_details?.error && (
                     <div
                         className={classNames(
                             'wbk_coupon__feedback',
                             'wbk_coupon__feedback--failed'
                         )}
                     >
-                        {amountData.stripe_details.error}
+                        {amountData.square_details.error}
                     </div>
                 )}
 
-                {stripeMethods.includes(formData?.payment_method) &&
-                    amountData?.stripe_details?.client_secret &&
-                    amountData?.to_pay_total > 0 && (
-                        <Suspense fallback={null}>
-                            <PaymentStepStripeSection
-                                clientSecret={
-                                    amountData?.stripe_details?.client_secret
-                                }
-                                selectedMethod={formData?.payment_method}
-                                onLoadingChange={handleLoadingChange}
-                                stripeWrapperRef={stripeWrapperRef}
-                                formData={formData}
-                                setFormData={setFormData}
-                                stripeFields={
-                                    preset?.settings?.stripe_fields
-                                }
-                            />
-                        </Suspense>
-                    )}
+            {formData?.payment_method === 'square' &&
+                preset?.settings?.square_application_id &&
+                amountData?.to_pay_total > 0 && (
+                    <Suspense fallback={null}>
+                        <PaymentStepSquareSection
+                            onLoadingChange={handleLoadingChange}
+                            squareWrapperRef={squareWrapperRef}
+                        />
+                    </Suspense>
+                )}
 
-                <div className={'wbk_step__certificates'}>
-                    <img
-                        src={sslPaymentLogo}
-                        alt={wording?.ssl || __('SSL', 'webba-booking-lite')}
-                    />
-                    <img
-                        src={protectedPrivacyLogo}
-                        alt={
-                            wording?.privacy ||
-                            __('Privacy', 'webba-booking-lite')
-                        }
-                    />
-                </div>
+            {stripeMethods.includes(formData?.payment_method) &&
+                amountData?.stripe_details?.client_secret &&
+                amountData?.to_pay_total > 0 && (
+                    <Suspense fallback={null}>
+                        <PaymentStepStripeSection
+                            clientSecret={
+                                amountData?.stripe_details?.client_secret
+                            }
+                            selectedMethod={formData?.payment_method}
+                            onLoadingChange={handleLoadingChange}
+                            stripeWrapperRef={stripeWrapperRef}
+                            formData={formData}
+                            setFormData={setFormData}
+                            stripeFields={
+                                preset?.settings?.stripe_fields
+                            }
+                        />
+                    </Suspense>
+                )}
+
+            <div className={'wbk_step__certificates'}>
+                <img
+                    src={sslPaymentLogo}
+                    alt={wording?.ssl || __('SSL', 'webba-booking-lite')}
+                />
+                <img
+                    src={protectedPrivacyLogo}
+                    alt={
+                        wording?.privacy ||
+                        __('Privacy', 'webba-booking-lite')
+                    }
+                />
             </div>
+        </div>
     )
 
     return (

@@ -1,5 +1,4 @@
 export interface GiftCardPublicStatus {
-    id: number
     code: string
     amount: number
     remaining: number
@@ -10,5 +9,5 @@ export interface GiftCardPublicStatus {
 }
 
 export interface GiftCardStatusProps {
-    giftCardId: string
+    giftCardToken: string
 }

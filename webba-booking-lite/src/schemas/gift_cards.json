@@ -132,8 +132,8 @@
             "tab": "",
             "misc": {
                 "tooltip": "Select the date when the gift card expires.",
-                "date_format": "F j, Y",
-                "time_zone": "Europe/London"
+                "date_format": "m/d/y",
+                "time_zone": "Europe/Warsaw"
             },
             "required": false,
             "dependency": [],
@@ -148,8 +148,8 @@
             "tab": "",
             "misc": {
                 "tooltip": "Select the date when the gift card should be sent. Must be earlier than the expiration date.",
-                "date_format": "F j, Y",
-                "time_zone": "Europe/London"
+                "date_format": "m/d/y",
+                "time_zone": "Europe/Warsaw"
             },
             "required": true,
             "dependency": [],

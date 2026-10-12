@@ -228,7 +228,7 @@ export const bookingScenarios: IScenario[] = [
         Screen: PaymentStep,
         validationRules: {
             payment_method: (value) => {
-                const { stripeObj, amountData, preset, formData } =
+                const { stripeObj, squareObj, amountData, preset, formData } =
                     useBookingContext()
                 if (
                     preset?.settings?.coupons_enabled &&
@@ -240,6 +240,7 @@ export const bookingScenarios: IScenario[] = [
 
                 const accepetedMethods = [
                     'stripe',
+                    'square',
                     'paypal',
                     'mollie',
                     'bank',
@@ -259,6 +260,14 @@ export const bookingScenarios: IScenario[] = [
                     return 'please_fill_out_payment_form'
                 }
 
+                if (
+                    value === 'square' &&
+                    !squareObj?.isValidated &&
+                    Number(amountData?.to_pay_total) > 0
+                ) {
+                    return 'please_fill_out_payment_form'
+                }
+
                 return !!value && accepetedMethods.includes(value)
                     ? true
                     : 'please_select_payment_method'
@@ -271,7 +280,8 @@ export const bookingScenarios: IScenario[] = [
                 paymentMethods &&
                 paymentMethods.length === 1 &&
                 preset?.settings?.coupons_enabled === false &&
-                !stripeMethods.includes(paymentMethods[0].id)
+                !stripeMethods.includes(paymentMethods[0].id) &&
+                paymentMethods[0].id !== 'square'
             ) {
                 return false
             }

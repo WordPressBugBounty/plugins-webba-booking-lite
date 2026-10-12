@@ -55,6 +55,7 @@ export interface IFormData {
     coupon: string
     attachments: File[]
     stripe_details?: IStripeDetails
+    square_details?: ISquareDetails
     generate_stripe_intent?: boolean
 }
 
@@ -76,6 +77,17 @@ export interface IAmountData {
     order_total: number
     to_pay_total: number
     stripe_details: IStripeDetails
+    square_details?: ISquareDetails
+}
+
+export interface ISquareDetails {
+    application_id?: string
+    location_id?: string
+    currency?: string
+    environment?: string
+    amount?: number
+    error?: string
+    payment_id?: string
 }
 
 export interface IStripeDetails {
@@ -106,4 +118,7 @@ export interface IPaymentStepStripeSectionProps {
 }
 
 export interface INavigationProps
-    extends Omit<IUseScenario, 'stepInto' | keyof IScenario> {}
+    extends Omit<
+        IUseScenario,
+        'stepInto' | 'filteredScenarios' | keyof IScenario
+    > {}

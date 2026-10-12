@@ -138,10 +138,12 @@ export const useOptions = ({
   return [];
 };
 
-type OptionInput = string | { label: string; is_disabled?: boolean };
+type OptionInput =
+  | string
+  | { label: string; value?: string | number; is_disabled?: boolean };
 
 export const formatOptions = (
-  options: Record<string, string> | Record<string, OptionInput>
+  options: Record<string, string> | Record<string, OptionInput> | OptionInput[]
 ): IOption[] => {
   const formattedOptions: IOption[] = [];
 
@@ -149,12 +151,14 @@ export const formatOptions = (
     if (key === "loading") {
       continue;
     }
-    const raw = options[key];
+    const raw = options[key as keyof typeof options];
     if (typeof raw === "string") {
       formattedOptions.push({ value: key, label: raw });
     } else if (raw && typeof raw === "object" && "label" in raw) {
+      const optionValue =
+        raw.value !== undefined && raw.value !== null ? String(raw.value) : key;
       formattedOptions.push({
-        value: key,
+        value: optionValue,
         label: raw.label,
         ...(raw.is_disabled !== undefined && { isDisabled: !!raw.is_disabled }),
       });

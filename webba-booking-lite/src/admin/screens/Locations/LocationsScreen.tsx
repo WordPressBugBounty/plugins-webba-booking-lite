@@ -9,6 +9,7 @@ import { getCellActions } from '../../components/WebbaDataTable/helpers/getCellA
 import { useWbkTable } from '../../components/WebbaDataTable/hooks/useWbkTable'
 import { Menu } from '../../components/WebbaDataTable/Menu'
 import { Table } from '../../components/WebbaDataTable/Table'
+import { getTableDocumentationLink } from '../../components/WebbaDataTable/documentationLinks'
 import { generateColumnDefsFromModel } from '../../components/WebbaDataTable/utils'
 import { locationsModel } from './model'
 import './LocationsScreen.scss'
@@ -134,7 +135,9 @@ export const LocationsScreen = () => {
             >
                 <Table
                     title={__('Locations', 'webba-booking-lite')}
+                    documentationLink={getTableDocumentationLink('locations')}
                     addButtonTitle={__('Add location', 'webba-booking-lite')}
+                    description={__('Setup and manage locations if your business operates from multiple locations.', 'webba-booking-lite')}
                     table={table}
                     loading={isLoading}
                     onDeleteSelected={onDeleteSelected}

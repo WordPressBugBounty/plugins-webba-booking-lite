@@ -12,6 +12,7 @@ import { TableProvider } from '../../components/WebbaDataTable/context/TableProv
 import { useWbkTable } from '../../components/WebbaDataTable/hooks/useWbkTable'
 import { Menu } from '../../components/WebbaDataTable/Menu'
 import { Table } from '../../components/WebbaDataTable/Table'
+import { getTableDocumentationLink } from '../../components/WebbaDataTable/documentationLinks'
 import {
     generateColumnDefsFromModel,
     minutesToText,
@@ -517,6 +518,8 @@ export const BookingsScreen = () => {
         <TableProvider table={dynamicTable}>
             <Table
                 title={__('Bookings', 'webba-booking-lite')}
+                documentationLink={getTableDocumentationLink('bookings')}
+                description={__('Manage, update and delete bookings for your services.', 'webba-booking-lite')}
                 collectionName="appointments"
                 addButtonTitle={__('Add booking', 'webba-booking-lite')}
                 table={dynamicTable}

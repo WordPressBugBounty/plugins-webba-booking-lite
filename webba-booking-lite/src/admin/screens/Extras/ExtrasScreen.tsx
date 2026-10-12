@@ -9,6 +9,7 @@ import { getCellActions, syncConnectedTables } from '../../components/WebbaDataT
 import { useWbkTable } from '../../components/WebbaDataTable/hooks/useWbkTable'
 import { Menu } from '../../components/WebbaDataTable/Menu'
 import { Table } from '../../components/WebbaDataTable/Table'
+import { getTableDocumentationLink } from '../../components/WebbaDataTable/documentationLinks'
 import { generateColumnDefsFromModel, removePrefixesFromModelFields } from '../../components/WebbaDataTable/utils'
 import { createFormFromModel } from '../../components/Form/lib/createForm'
 import { __ } from '@wordpress/i18n'
@@ -164,6 +165,7 @@ export const ExtrasScreen = () => {
             >
                 <Table
                     title={__('Extras', 'webba-booking-lite')}
+                    documentationLink={getTableDocumentationLink('extras')}
                     addButtonTitle={__('Add extra', 'webba-booking-lite')}
                     description={__('Enhance your booking by adding optional services or equipment to your service/rental. Your customers will be able to add these extras to their reservation during the booking process', 'webba-booking-lite')}
                     table={table}

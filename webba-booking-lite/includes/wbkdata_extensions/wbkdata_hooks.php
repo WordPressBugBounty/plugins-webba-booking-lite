@@ -72,6 +72,33 @@ function wbk_wbkdata_on_after_item_updated(
     }
 }
 
+add_filter('wbkdata_add_item_values', 'wbk_wbkdata_add_gift_card_token', 10, 2);
+function wbk_wbkdata_add_gift_card_token($values_and_format, $model_name)
+{
+    if ($model_name !== get_option('wbk_db_prefix', '') . 'wbk_gift_cards') {
+        return $values_and_format;
+    }
+
+    if (!is_array($values_and_format) || !isset($values_and_format[0]) || !is_array($values_and_format[0])) {
+        return $values_and_format;
+    }
+
+    $existing = isset($values_and_format[0]['card_token'])
+        ? sanitize_text_field((string) $values_and_format[0]['card_token'])
+        : '';
+    if ($existing !== '') {
+        return $values_and_format;
+    }
+
+    $values_and_format[0]['card_token'] = WBK_Gift_Card::generate_unique_card_token();
+    if (!isset($values_and_format[1]) || !is_array($values_and_format[1])) {
+        $values_and_format[1] = [];
+    }
+    $values_and_format[1][] = '%s';
+
+    return $values_and_format;
+}
+
 add_filter('wbkdata_field_can_view', 'wbk_wbkdata_field_can_view', 10, 3);
 function wbk_wbkdata_field_can_view($input, $field_name, $model_name)
 {

@@ -8,6 +8,7 @@ import { getCellActions } from '../../components/WebbaDataTable/helpers/getCellA
 import { useWbkTable } from '../../components/WebbaDataTable/hooks/useWbkTable'
 import { Menu } from '../../components/WebbaDataTable/Menu'
 import { Table } from '../../components/WebbaDataTable/Table'
+import { getTableDocumentationLink } from '../../components/WebbaDataTable/documentationLinks'
 import { generateColumnDefsFromModel } from '../../components/WebbaDataTable/utils'
 import { connectedCalendarsModel } from './model'
 import { createFormFromModel } from '../../components/Form/lib/createForm'
@@ -198,6 +199,8 @@ export const ConnectedCalendarsScreen = () => {
             </LockedTableSection> */}
             <Table
                 title={__('Connected Calendars', 'webba-booking-lite')}
+                documentationLink={getTableDocumentationLink('connectedCalendars')}
+                description={__('Connect Google and Outlook calendars and sync schedules between your calendar and Webba bookings.', 'webba-booking-lite')}
                 addButtonTitle={__(
                     'Add Calendar',
                     'webba-booking-lite'

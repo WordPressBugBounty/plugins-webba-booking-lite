@@ -8,6 +8,7 @@ import { getCellActions } from '../../components/WebbaDataTable/helpers/getCellA
 import { useWbkTable } from '../../components/WebbaDataTable/hooks/useWbkTable'
 import { Menu } from '../../components/WebbaDataTable/Menu'
 import { Table } from '../../components/WebbaDataTable/Table'
+import { getTableDocumentationLink } from '../../components/WebbaDataTable/documentationLinks'
 import { generateColumnDefsFromModel } from '../../components/WebbaDataTable/utils'
 import { emailTemplatesModel } from './model'
 import { createFormFromModel } from '../../components/Form/lib/createForm'
@@ -203,6 +204,8 @@ export const EmailTemplateScreen = () => {
         <>
             <Table
                 title={__('Email notifications', 'webba-booking-lite')}
+                documentationLink={getTableDocumentationLink('emailNotifications')}
+                description={__('Email notifications are bound by services, and can be sent when a booking is created, updated, or cancelled and so on. It supports multiple type of recipients.', 'webba-booking-lite')}
                 addButtonTitle={__('Add Email Template', 'webba-booking-lite')}
                 table={table}
                 loading={isLoading}

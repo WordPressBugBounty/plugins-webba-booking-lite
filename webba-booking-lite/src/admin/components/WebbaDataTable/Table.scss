@@ -235,7 +235,8 @@ $menu-icon-size: 20px;
 .wbk_table__toolPanel {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 16px;
 
     @include mobile {
@@ -257,8 +258,8 @@ $menu-icon-size: 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: 16px;
-    padding: 0 24px 20px;
+    padding: 12px 20px;
+    background-color: colors.$background-white;
 }
 
 .wbk_table__itemCountWrapper {

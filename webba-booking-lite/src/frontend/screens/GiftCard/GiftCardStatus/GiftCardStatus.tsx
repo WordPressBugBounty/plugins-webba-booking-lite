@@ -6,15 +6,15 @@ import { Loading } from '../../../components/Loading/Loading'
 import { GiftCardPublicStatus, GiftCardStatusProps } from './types'
 import './GiftCardStatus.scss'
 
-export const GiftCardStatus = ({ giftCardId }: GiftCardStatusProps) => {
+export const GiftCardStatus = ({ giftCardToken }: GiftCardStatusProps) => {
     const [status, setStatus] = useState<GiftCardPublicStatus | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
         let cancelled = false
-        const id = Number(giftCardId)
-        if (!Number.isFinite(id) || id <= 0) {
+        const token = String(giftCardToken || '').trim()
+        if (!token) {
             setLoading(false)
             setError(__('Gift card not found.', 'webba-booking-lite'))
             return
@@ -28,7 +28,7 @@ export const GiftCardStatus = ({ giftCardId }: GiftCardStatusProps) => {
             gift_card?: GiftCardPublicStatus
             message?: string
         }>({
-            path: `/wbk/v2/gift-card-status/?id=${id}`,
+            path: `/wbk/v2/gift-card-status/?token=${encodeURIComponent(token)}`,
         })
             .then((result) => {
                 if (cancelled) {
@@ -61,7 +61,7 @@ export const GiftCardStatus = ({ giftCardId }: GiftCardStatusProps) => {
         return () => {
             cancelled = true
         }
-    }, [giftCardId])
+    }, [giftCardToken])
 
     return (
         <div className="wbk_booking_form__wrapper">

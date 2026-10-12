@@ -8,6 +8,7 @@ import { TableProvider } from '../../components/WebbaDataTable/context/TableProv
 import { useWbkTable } from '../../components/WebbaDataTable/hooks/useWbkTable'
 import { Menu } from '../../components/WebbaDataTable/Menu'
 import { Table } from '../../components/WebbaDataTable/Table'
+import { getTableDocumentationLink } from '../../components/WebbaDataTable/documentationLinks'
 import {
     generateColumnDefsFromModel,
     removePrefixesFromModelFields,
@@ -223,6 +224,7 @@ export const RecentBookings = () => {
                         'Bookings made in the last 24 hours',
                         'webba-booking-lite'
                     )}
+                    documentationLink={getTableDocumentationLink('bookings')}
                     table={dynamicTable}
                     loading={loading}
                     onDeleteSelected={onDeleteSelected}

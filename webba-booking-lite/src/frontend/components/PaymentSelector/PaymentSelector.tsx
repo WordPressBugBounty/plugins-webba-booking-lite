@@ -124,6 +124,7 @@ export const PaymentSelector = ({
 
     const paymentsOrder: TAllowedMethods[] = [
         'stripe',
+        'square',
         'google_pay',
         'apple_pay',
         'paypal',

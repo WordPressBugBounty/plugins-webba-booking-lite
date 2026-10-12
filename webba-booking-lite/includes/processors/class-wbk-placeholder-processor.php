@@ -1610,11 +1610,6 @@ class WBK_Placeholder_Processor
                 continue;
             }
 
-            $skip_status = ["pending", "arrived"];
-            if (in_array($status, $skip_status)) {
-                continue;
-            }
-
             $service = new WBK_Service($booking->get_service());
             if (!$service->is_loaded()) {
                 continue;
@@ -1634,19 +1629,33 @@ class WBK_Placeholder_Processor
             $extra_content = "";
             if ($extra_data != "") {
                 $extra = json_decode($extra_data);
-                foreach ($extra as $item) {
-                    if (count($item) != 3) {
-                        continue;
+                if (is_array($extra)) {
+                    foreach ($extra as $item) {
+                        if (!is_array($item) || count($item) != 3) {
+                            continue;
+                        }
+                        $extra_content .= $item[1] . ": " . $item[2] . ". ";
                     }
-                    $extra_content .= $item[1] . ": " . $item[2] . ". ";
                 }
+            }
+
+            $comment = trim((string) $booking->get("description"));
+            if ($comment !== "") {
+                if ($extra_content !== "") {
+                    $extra_content .= " ";
+                }
+                $extra_content .=
+                    __("Comment", "webba-booking-lite") .
+                    ": " .
+                    stripslashes($comment) .
+                    ". ";
             }
 
             $status = $booking->get_status();
 
             $status_list = WBK_Model_Utils::get_booking_status_list();
             if (isset($status_list[$status])) {
-                $status = $status_list[$status][0];
+                $status = $status_list[$status];
             } else {
                 $status = "";
             }

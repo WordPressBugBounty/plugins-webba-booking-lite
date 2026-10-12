@@ -1460,6 +1460,11 @@ class WBK_Model_Utils {
             $payment_methods["paypal"] = __( get_option( "wbk_payment_pay_with_paypal_btn_text", "PayPal" ), "webba-booking-lite" );
             $payment_methods["mollie"] = __( get_option( "wbk_mollie_button_text", "Mollie" ), "webba-booking-lite" );
             $payment_methods["stripe"] = __( get_option( "wbk_stripe_button_text", "Credit card" ), "webba-booking-lite" );
+            $square_button_text = get_option( "wbk_square_button_text", "Credit card" );
+            if ( $square_button_text === "Square" ) {
+                $square_button_text = "Credit card";
+            }
+            $payment_methods["square"] = __( $square_button_text, "webba-booking-lite" );
             if ( class_exists( "WooCommerce" ) ) {
                 $payment_methods["woocommerce"] = __( get_option( "wbk_woo_button_text", "WooCommerce" ), "webba-booking-lite" );
             }
@@ -1482,6 +1487,7 @@ class WBK_Model_Utils {
         $payment_methods_all["paypal"] = __( get_option( "wbk_payment_pay_with_paypal_btn_text", "PayPal" ) . $pro_version_suffix );
         $payment_methods_all["mollie"] = __( get_option( "wbk_mollie_button_text", "Mollie" ) . $pro_version_suffix );
         $payment_methods_all["stripe"] = __( get_option( "wbk_stripe_button_text", "Credit card" ) . $pro_version_suffix );
+        $payment_methods_all["square"] = __( "Credit Card (Square)", "webba-booking-lite" ) . $pro_version_suffix;
         if ( class_exists( "WooCommerce" ) ) {
             $payment_methods_all["woocommerce"] = __( get_option( "wbk_woo_button_text", "WooCommerce" ) . $pro_version_suffix );
         }

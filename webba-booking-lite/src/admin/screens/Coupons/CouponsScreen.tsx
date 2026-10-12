@@ -11,6 +11,7 @@ import { getCellActions } from '../../components/WebbaDataTable/helpers/getCellA
 import { useWbkTable } from '../../components/WebbaDataTable/hooks/useWbkTable'
 import { Menu } from '../../components/WebbaDataTable/Menu'
 import { Table } from '../../components/WebbaDataTable/Table'
+import { getTableDocumentationLink } from '../../components/WebbaDataTable/documentationLinks'
 import { generateColumnDefsFromModel } from '../../components/WebbaDataTable/utils'
 import { couponsModel } from './model'
 import { createFormFromModel } from '../../components/Form/lib/createForm'
@@ -131,7 +132,9 @@ export const CouponsScreen = () => {
             >
                 <Table
                     title={__('Coupons', 'webba-booking-lite')}
+                    documentationLink={getTableDocumentationLink('coupons')}
                     addButtonTitle={__('Add coupon', 'webba-booking-lite')}
+                    description={__('Create and manage coupons to offer discounts or special offers to your customers.', 'webba-booking-lite')}
                     table={table}
                     loading={isLoading}
                     onDeleteSelected={onDeleteSelected}

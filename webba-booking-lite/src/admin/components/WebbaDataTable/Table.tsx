@@ -15,6 +15,9 @@ import { BulkActions } from './BulkActions'
 import { useMemo } from 'react'
 import { TableMobile } from './TableMobile'
 import { Loading } from '../Loading/Loading'
+import { SupportFooter } from './SupportFooter'
+import { DocumentationLink } from './DocumentationLink'
+import type { IDocumentationLink } from './types'
 
 interface Props {
     table: TanstackTable<any>
@@ -33,6 +36,7 @@ interface Props {
     forcePermission?: boolean
     horizontalOverflow?: boolean
     collectionName?: string
+    documentationLink?: IDocumentationLink
 }
 
 export const Table = ({
@@ -52,6 +56,7 @@ export const Table = ({
     forcePermission,
     horizontalOverflow,
     collectionName,
+    documentationLink,
 }: Props) => {
     const isEmpty = !table.getRowCount()
     const { settings } = useSelect(
@@ -71,6 +76,12 @@ export const Table = ({
                         {description && <p className="wbk_table__description">{description}</p>}
                     </div>
                     <div className="wbk_table__toolPanel">
+                        {documentationLink && (
+                            <DocumentationLink
+                                label={documentationLink.label}
+                                href={documentationLink.href}
+                            />
+                        )}
                         {exportButton && settings?.is_admin && exportButton}
                         {search && search}
                         {(forcePermission || settings?.is_admin) &&
@@ -244,6 +255,7 @@ export const Table = ({
                     </>
                 )}
                 <Pagination table={table} />
+                <SupportFooter />
             </div>
             {!!table.getSelectedRowModel().rows.length && (
                 <BulkActions
