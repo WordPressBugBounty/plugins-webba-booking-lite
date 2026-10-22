@@ -17,3 +17,14 @@ export interface IBottomSummaryProps {
     hideCost?: boolean
     onShowSummary: () => void
 }
+
+export interface ISidebarTimePill {
+    timeslot: number
+    timeLabel: string
+}
+
+export interface ISidebarDateGroup {
+    dateKey: string
+    dateLabel: string
+    times: ISidebarTimePill[]
+}

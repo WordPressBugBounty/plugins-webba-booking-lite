@@ -1,0 +1,156 @@
+.wbk_hoursAvailability {
+    margin-bottom: 24px;
+    padding: 24px 28px;
+    border-radius: 12px;
+    background-color: colors.$surface-elevated;
+    border: 1px solid colors.$input-border;
+    box-shadow: 0 0 15px rgba(161, 164, 182, 0.35);
+
+    #wbk_spa_dashboard[data-theme='dark'] & {
+        box-shadow: none;
+    }
+
+    @include mobile {
+        padding: 20px 16px;
+    }
+}
+
+.wbk_hoursAvailability__header {
+    margin-bottom: 20px;
+}
+
+.wbk_hoursAvailability__title {
+    margin: 0;
+    font-family: typography.$font-primary;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: colors.$off-black;
+}
+
+.wbk_hoursAvailability__subtitle {
+    margin: 6px 0 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: colors.$text-grey;
+}
+
+.wbk_hoursAvailability__subtitleDivider {
+    margin: 0 6px;
+}
+
+.wbk_hoursAvailability__body {
+    display: grid;
+    grid-template-columns: minmax(140px, 1fr) minmax(280px, 2fr) minmax(160px, 1fr);
+    gap: 24px;
+    align-items: center;
+
+    @include mobile {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+}
+
+.wbk_hoursAvailability__summary {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wbk_hoursAvailability__percent {
+    margin: 0;
+    font-family: typography.$font-primary;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: colors.$off-black;
+}
+
+.wbk_hoursAvailability__percentLabel {
+    margin: 0;
+    max-width: 140px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: colors.$text-grey;
+}
+
+.wbk_hoursAvailability__chart {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    min-height: 160px;
+}
+
+.wbk_hoursAvailability__day {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 74px;
+}
+
+.wbk_hoursAvailability__dayLabel {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+    color: colors.$text-grey;
+}
+
+.wbk_hoursAvailability__barTrack {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: 58px;
+    height: 110px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: none;
+    background-color: colors.$row-border;
+
+    #wbk_spa_dashboard[data-theme='dark'] & {
+        background-color: colors.$field-background;
+    }
+}
+
+.wbk_hoursAvailability__barFill {
+    width: 100%;
+    height: var(--wbk-bar-fill, 0%);
+    background-color: colors.$green;
+    transition: height 0.25s ease;
+}
+
+.wbk_hoursAvailability__dayValue {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    text-align: center;
+    color: colors.$text-grey;
+}
+
+.wbk_hoursAvailability__insight {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: right;
+
+    @include mobile {
+        text-align: left;
+    }
+}
+
+.wbk_hoursAvailability__remaining {
+    margin: 0;
+    font-family: typography.$font-primary;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: colors.$off-black;
+}
+
+.wbk_hoursAvailability__insightText {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: colors.$text-grey;
+}

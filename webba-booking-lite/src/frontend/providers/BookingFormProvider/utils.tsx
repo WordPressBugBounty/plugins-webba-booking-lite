@@ -5,7 +5,11 @@ import {
     startOfMonth,
     startOfWeek,
 } from 'date-fns'
-import { IOption, TAcceptedInputValues } from '../../components/Form/types'
+import {
+    IFieldConfig,
+    IOption,
+    TAcceptedInputValues,
+} from '../../components/Form/types'
 import {
     IFormPlace,
     IServiceProps,
@@ -18,7 +22,7 @@ import {
     normalizeQuantityFields,
 } from '../../components/Fields/QuantityFieldsInput/types'
 import { wbkFormat, wbkGetTimezoneOffset } from '../../../admin/components/Form/utils/dateTime'
-import { IBookingFormObj } from './types'
+import { IBookingFormObj, TExtraFieldEntry } from './types'
 
 export const defautlFields = [
     'first_name',
@@ -230,7 +234,7 @@ export const constructFormData = (formObj: IBookingFormObj) => {
             >,
             field
         ) => {
-            const { slug, value, type, placeholder, checkboxText } = field
+            const { slug, value, type } = field
 
             if (defautlFields.includes(slug)) {
                 acc[slug] = value
@@ -243,56 +247,10 @@ export const constructFormData = (formObj: IBookingFormObj) => {
                     [slug]: value,
                 }
             } else if (type === 'quantity_fields') {
-                const quantityOptions = normalizeQuantityFields(
-                    field.quantityFields
-                )
-                const options = quantityOptions.length
-                    ? quantityOptions
-                    : getDefaultQuantityFields()
-                const quantityValue = (value || {}) as IQuantityFieldValue
-
-                acc['extra'] = {
-                    ...((acc['extra'] || {}) as Record<
-                        string,
-                        TAcceptedInputValues
-                    >),
-                    ...options.reduce(
-                        (extraFields, option) => ({
-                            ...extraFields,
-                            [option.slug]: wbkCreateExtraFieldValue(
-                                option.slug,
-                                option.label,
-                                Number(quantityValue[option.slug]) || 0
-                            ),
-                        }),
-                        {} as Record<string, TAcceptedInputValues>
-                    ),
-                }
-
                 acc['number_of_people'] = buildNumberOfPeopleFromQuantityFields(
-                    quantityValue,
-                    options
+                    (value || {}) as IQuantityFieldValue,
+                    getQuantityFieldOptions(field)
                 )
-            } else {
-                acc['extra'] = {
-                    ...((acc['extra'] || {}) as Record<
-                        string,
-                        TAcceptedInputValues
-                    >),
-                    [slug]: wbkCreateExtraFieldValue(
-                        slug,
-                        type === 'checkbox' && checkboxText
-                            ? checkboxText
-                            : placeholder || '',
-                        type === 'dropdown' && Array.isArray(value)
-                            ? (value as IOption[])
-                                .map((item) => item.value)
-                                .join(',')
-                            : type === 'dropdown' && !Array.isArray(value)
-                                ? (value as IOption)?.value
-                                : value
-                    ),
-                }
             }
 
             return acc
@@ -303,14 +261,7 @@ export const constructFormData = (formObj: IBookingFormObj) => {
     const { staff: _staffOmitted, ...formDataWithoutStaff } =
         formData as Record<string, unknown>
 
-    const serializedExtra =
-        (fieldValues?.extra &&
-            JSON.stringify(
-                Object.values(fieldValues?.extra).map((fieldJSON) =>
-                    JSON.parse(fieldJSON)
-                )
-            )) ||
-        ''
+    const serializedExtra = serializeExtraFields(fields)
 
     const { attachments: _fieldAttachments, ...fieldValuesWithoutAttachments } =
         fieldValues as Record<string, unknown>
@@ -429,6 +380,66 @@ export const wbkCreateExtraFieldValue = (
     value: TAcceptedInputValues
 ) => {
     return JSON.stringify([slug, label, value])
+}
+
+const getQuantityFieldOptions = (field: IFieldConfig) => {
+    const quantityOptions = normalizeQuantityFields(field.quantityFields)
+
+    return quantityOptions.length ? quantityOptions : getDefaultQuantityFields()
+}
+
+const getExtraFieldValue = ({ type, value }: IFieldConfig) => {
+    if (type === 'dropdown' && Array.isArray(value)) {
+        return (value as IOption[]).map((item) => item.value).join(',')
+    }
+
+    if (type === 'dropdown') {
+        return (value as IOption)?.value
+    }
+
+    return value
+}
+
+export const buildExtraFieldEntries = (
+    fields: IFieldConfig[]
+): TExtraFieldEntry[] =>
+    fields
+        .filter(
+            ({ slug, type }) =>
+                !defautlFields.includes(slug) && type !== 'file'
+        )
+        .flatMap((field): TExtraFieldEntry[] => {
+            const { slug, type, placeholder, checkboxText, value } = field
+            const label =
+                type === 'checkbox' && checkboxText
+                    ? checkboxText
+                    : placeholder || ''
+            const fieldEntry: TExtraFieldEntry = [
+                slug,
+                label,
+                getExtraFieldValue(field),
+            ]
+
+            if (type !== 'quantity_fields') {
+                return [fieldEntry]
+            }
+
+            const quantityValue = (value || {}) as IQuantityFieldValue
+            const childEntries = getQuantityFieldOptions(field).map(
+                (option): TExtraFieldEntry => [
+                    option.slug,
+                    option.label,
+                    Number(quantityValue[option.slug]) || 0,
+                ]
+            )
+
+            return [fieldEntry, ...childEntries]
+        })
+
+export const serializeExtraFields = (fields: IFieldConfig[]) => {
+    const entries = buildExtraFieldEntries(fields)
+
+    return entries.length ? JSON.stringify(entries) : ''
 }
 
 export const extractFormValue = ({ fieldName, formData }: any) => {

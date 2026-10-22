@@ -84,6 +84,10 @@ final class WBK_Options_Processor
                 $render_callback = 'render_smtp_test';
                 $validation_callback = 'validate_smtp_test';
                 break;
+            case 'zapier_test':
+                $render_callback = 'render_zapier_test';
+                $validation_callback = 'validate_zapier_test';
+                break;
             case 'whatsapp_template':
                 $render_callback = 'render_whatsapp_template';
                 $validation_callback = 'validate_whatsapp_template';
@@ -248,6 +252,10 @@ final class WBK_Options_Processor
     {
         return '';
     }
+    public function validate_zapier_test($input)
+    {
+        return '';
+    }
     public function validate_whatsapp_template($input)
     {
         return sanitize_text_field($input);
@@ -326,6 +334,10 @@ final class WBK_Options_Processor
         WBK_Renderer::load_template('options/password_field', $args);
     }
     public function render_smtp_test($args)
+    {
+        echo '';
+    }
+    public function render_zapier_test($args)
     {
         echo '';
     }
@@ -411,7 +423,12 @@ final class WBK_Options_Processor
 
         return in_array(
             $callback,
-            ["render_push_subscribe", "render_smtp_test", "render_notice"],
+            [
+                "render_push_subscribe",
+                "render_smtp_test",
+                "render_zapier_test",
+                "render_notice",
+            ],
             true,
         );
     }

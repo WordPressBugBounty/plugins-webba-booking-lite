@@ -13,6 +13,7 @@ import { generateColumnDefsFromModel } from '../../components/WebbaDataTable/uti
 import { connectedCalendarsModel } from './model'
 import { createFormFromModel } from '../../components/Form/lib/createForm'
 import { GoogleAuthCell } from '../../components/WebbaDataTable/cells/GoogleAuth/GoogleAuth'
+import { IcloudAuthCell } from '../../components/WebbaDataTable/cells/IcloudAuth/IcloudAuth'
 import { __ } from '@wordpress/i18n'
 import './ConnectedCalendars.scss'
 import { useCallback, useState } from 'react'
@@ -27,6 +28,8 @@ import noItemsImage from '../../../../public/images/bookings-empty.png'
 import { ReactComponent as ConnectIcon } from '../../../../public/images/icon-connect.svg'
 
 export const ConnectedCalendarsScreen = () => {
+    const [currentAuth, setCurrentAuth] = useState(null)
+
     const columns = generateColumnDefsFromModel(connectedCalendarsModel, {
 
         in_provider_id: {
@@ -40,7 +43,15 @@ export const ConnectedCalendarsScreen = () => {
         },
     }, {
         access_token: {
-            cell: GoogleAuthCell,
+            cell: (props) =>
+                props.cell.row.original?.provider === 'icloud' ? (
+                    <IcloudAuthCell
+                        {...props}
+                        onOpenAuth={(row) => setCurrentAuth(row)}
+                    />
+                ) : (
+                    <GoogleAuthCell {...props} />
+                ),
         },
     })
 
@@ -70,17 +81,16 @@ export const ConnectedCalendarsScreen = () => {
         (select: any) => select(store_name).getPreset(),
         []
     )
-    const [currentAuth, setCurrentAuth] = useState(null)
     const isStartPlan =
         plan_map && plan_map['start'] && plan_map['start'] === true
 
     const dispatchAuthPopup = useCallback(
         (data: any) => {
             const id = data.id
-            const provider = data?.provider === 'outlook' ? 'outlook' : 'google'
             const authData = select(store_name).getGgAuthData(id)
             const { isAuthenticated } = authData || {}
 
+            // Open auth only when not yet authorized (all providers, including iCloud).
             if (isAuthenticated !== true) {
                 setCurrentAuth(data)
             } else {
@@ -122,13 +132,18 @@ export const ConnectedCalendarsScreen = () => {
                                         data.provider != null &&
                                         original?.provider != null &&
                                         String(data.provider) !== String(original.provider)
+                                    // access_token is stripped from list API responses for
+                                    // security; never send the form placeholder back or it
+                                    // overwrites stored credentials (critical for iCloud).
+                                    const { access_token: _omitToken, ...dataWithoutToken } =
+                                        data
                                     const payload = providerChanged
                                         ? {
-                                            ...data,
+                                            ...dataWithoutToken,
                                             in_provider_id: '',
                                             access_token: '',
                                         }
-                                        : data
+                                        : dataWithoutToken
                                     await onSubmit(payload)
                                     if (providerChanged) {
                                         setGgAuthData(original.id, {})

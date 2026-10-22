@@ -4,10 +4,12 @@ import { store_name } from '../../../../store/frontend'
 import { Form } from '../../../components/Form/Form'
 import { useBookingContext } from '../../../providers/BookingFormProvider/BookingFormProvider'
 import './Steps.scss'
-import { IOption } from '../../../components/Form/types'
 import { constructField } from '../../../components/Form/utils'
 import { IFieldConfig } from '../../../components/Form/types'
-import { extractFormValue } from '../../../providers/BookingFormProvider/utils'
+import {
+    extractFormValue,
+    serializeExtraFields,
+} from '../../../providers/BookingFormProvider/utils'
 import { Loading } from '../../../components/Loading/Loading'
 import { allocateQuantityDefaults, getDefaultQuantityFields, normalizeQuantityFields } from '../../../components/Fields/QuantityFieldsInput/types'
 
@@ -202,36 +204,12 @@ export const CheckoutStep = () => {
 
             // Check if the changed field is an "extra" field (not in excluded/default fields)
             if (!excluded.includes(changed.slug)) {
-                // Reconstruct the 'extra' field using the same logic as constructFormData
-                // Find all extra fields
-                const extraFields = fields.filter(
-                    (field) =>
-                        !excluded.includes(field.slug) && field.type !== 'file'
-                )
-
-                // Rebuild the extra array as in constructFormData
-                const extraArray = extraFields.map((field) => {
-                    // Use the same logic as wbkCreateExtraFieldValue
-                    let value = field.value
-                    if (
-                        field.type === 'dropdown' &&
-                        Array.isArray(field.value)
-                    ) {
-                        value = field.value
-                            .map((item: any) => item.value)
-                            .join(',')
-                    } else if (
-                        field.type === 'dropdown' &&
-                        !Array.isArray(field.value)
-                    ) {
-                        value = (field.value as IOption)?.value
-                    }
-                    return [field.slug, field.placeholder || '', value]
-                })
-
                 updatedFormData = {
                     ...updatedFormData,
-                    extra: JSON.stringify(extraArray) as unknown as Record<string, unknown>,
+                    extra: serializeExtraFields(fields) as unknown as Record<
+                        string,
+                        unknown
+                    >,
                 }
             }
 

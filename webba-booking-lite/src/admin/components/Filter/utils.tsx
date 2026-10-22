@@ -14,6 +14,7 @@ export const createFilterFields = (fields: any) => {
                 case 'text':
                     fieldsComponents.push(
                         <TextField
+                            key={name}
                             name={name}
                             label={label as string}
                             placeholder={placeholder}
@@ -25,6 +26,7 @@ export const createFilterFields = (fields: any) => {
                 case 'select':
                     fieldsComponents.push(
                         <SelectField
+                            key={name}
                             name={name}
                             label={label as string}
                             placeholder={placeholder}
@@ -36,6 +38,7 @@ export const createFilterFields = (fields: any) => {
                 case 'date':
                     fieldsComponents.push(
                         <DateField
+                            key={name}
                             name={name}
                             label={label as string}
                             placeholder={placeholder}
@@ -47,6 +50,7 @@ export const createFilterFields = (fields: any) => {
                 case 'date_range':
                     fieldsComponents.push(
                         <DateRangeField
+                            key={name}
                             name={name}
                             label={label as string}
                             placeholder={placeholder}
@@ -167,23 +171,33 @@ export const convertShortRange = (shortRange: string) => {
             return formatDateRange([new Date(), new Date()])
         case 'l_7':
             return formatDateRange([
-                new Date(new Date().setDate(new Date().getDate() - 7)),
+                new Date(new Date().setDate(new Date().getDate() - 6)),
                 new Date(),
             ])
         case 'u_7':
             return formatDateRange([
                 new Date(),
-                new Date(new Date().setDate(new Date().getDate() + 7)),
+                new Date(new Date().setDate(new Date().getDate() + 6)),
             ])
         case 'l_30':
             return formatDateRange([
-                new Date(new Date().setDate(new Date().getDate() - 30)),
+                new Date(new Date().setDate(new Date().getDate() - 29)),
+                new Date(),
+            ])
+        case 'l_90':
+            return formatDateRange([
+                new Date(new Date().setDate(new Date().getDate() - 89)),
                 new Date(),
             ])
         case 'u_30':
             return formatDateRange([
                 new Date(),
-                new Date(new Date().setDate(new Date().getDate() + 30)),
+                new Date(new Date().setDate(new Date().getDate() + 29)),
+            ])
+        case 'custom':
+            return formatDateRange([
+                new Date(new Date().setDate(new Date().getDate() - 29)),
+                new Date(),
             ])
         default:
             break

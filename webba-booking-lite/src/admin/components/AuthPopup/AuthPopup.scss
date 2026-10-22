@@ -55,6 +55,14 @@
     flex-flow: column;
     align-items: center;
     justify-content: center;
+
+    &.wbk_authPopup__innerWrapper--icloud {
+        max-width: 560px;
+        max-height: 90vh;
+        overflow-y: auto;
+        align-items: stretch;
+        justify-content: flex-start;
+    }
 }
 
 .wbk_authPopup__bodyWrapper {

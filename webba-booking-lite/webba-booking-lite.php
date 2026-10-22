@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.5.3
+ * Version: 6.5.4
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -74,7 +74,7 @@ if ( !defined( "WP_WEBBA_BOOKING__PLUGIN_DIR" ) ) {
     define( "WP_WEBBA_BOOKING__PLUGIN_URL", plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( "WP_WEBBA_BOOKING__VERSION" ) ) {
-    define( "WP_WEBBA_BOOKING__VERSION", "6.5.3" );
+    define( "WP_WEBBA_BOOKING__VERSION", "6.5.4" );
 }
 if ( !function_exists( "wbk_is_assistance_lab_available" ) ) {
     /**
@@ -163,6 +163,15 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     } else {
         include "includes/third-parties/class_wbk_zoom_blank.php";
     }
+    // Zapier outbound webhooks
+    if ( WBK_Feature_Gate::have_required_plan( "premium" ) ) {
+        include "includes/third-parties/class_wbk_zapier.php";
+    } else {
+        include "includes/third-parties/class_wbk_zapier_blank.php";
+    }
+    if ( class_exists( "WBK_Zapier" ) ) {
+        new WBK_Zapier();
+    }
     include "includes/third-parties/class_wbk_whatsapp_blank.php";
     add_action( "template_redirect", "wbk_template_redirect" );
     function wbk_template_redirect() {
@@ -211,6 +220,14 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     require_once "includes/processors/class-wbk-connected-calendar-processor.php";
     include "includes/processors/class-wbk-outlook-calendar-processor.php";
     include "includes/processors/class-wbk-google-calendar-processor.php";
+    include "includes/utilities/class-wbk-credential-crypto.php";
+    include "includes/caldav/class-wbk-caldav-url-validator.php";
+    include "includes/caldav/class-wbk-caldav-client.php";
+    include "includes/caldav/class-wbk-caldav-discovery.php";
+    include "includes/caldav/class-wbk-caldav-event.php";
+    include "includes/processors/class-wbk-icloud-sync-orchestrator.php";
+    include "includes/processors/class-wbk-icloud-calendar-processor.php";
+    WBK_Icloud_Sync_Orchestrator::init();
     include "includes/processors/class-wbk-price-processor.php";
     include "includes/processors/class-wbk-placeholder-processor.php";
     include "includes/processors/class-wbk-options-processor.php";
@@ -853,6 +870,9 @@ if ( !function_exists( "wbk_init" ) ) {
 if ( !function_exists( "wbk_deactivate" ) ) {
     function wbk_deactivate() {
         wp_clear_scheduled_hook( "wbk_daily_event" );
+        if ( class_exists( "WBK_Icloud_Sync_Orchestrator" ) ) {
+            WBK_Icloud_Sync_Orchestrator::clear_legacy_schedule();
+        }
     }
 
 }

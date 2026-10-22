@@ -36,9 +36,13 @@ export const useFilterField = (name: string) => {
                     field?.triggerDateRange &&
                     otherField.type === 'date_range'
                 ) {
+                    const nextRange = convertShortRange(value as string)
+                    if (nextRange === undefined) {
+                        return otherField
+                    }
                     return {
                         ...otherField,
-                        value: convertShortRange(value),
+                        value: nextRange,
                     }
                 }
 

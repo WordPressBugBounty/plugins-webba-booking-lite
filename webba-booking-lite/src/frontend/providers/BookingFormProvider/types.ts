@@ -1,11 +1,17 @@
 import { ICategory } from '../../components/Categories/types'
 import { IExtraProps } from '../../components/Extras/types'
-import { IFieldConfig } from '../../components/Form/types'
+import { IFieldConfig, TAcceptedInputValues } from '../../components/Form/types'
 import { IPaymentMethod } from '../../components/PaymentSelector/types'
 import { IServiceProps, IUnitProps } from '../../components/Services/types'
 import { IStripeObj } from '../../screens/BookingForm/PaymentHandler/payments/Stripe/types'
 import { ISquareObj } from '../../screens/BookingForm/PaymentHandler/payments/Square/types'
 import { IAmountData, IFormData } from '../../screens/BookingForm/types'
+
+export type TExtraFieldEntry = [
+    slug: string,
+    label: string,
+    value: TAcceptedInputValues,
+]
 
 export interface IBookingFormObj {
     categories: ICategory[]

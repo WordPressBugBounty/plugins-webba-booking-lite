@@ -17,6 +17,7 @@ import { stripeMethods } from '../BookingForm/PaymentHandler/payments/Stripe/Str
 import { StripeWrapper } from '../BookingForm/PaymentHandler/payments/Stripe/StripeWrapper'
 import { StripeBillingFields } from '../BookingForm/PaymentHandler/payments/Stripe/StripeBillingFields'
 import { GiftCardStripe } from './GiftCardStripe'
+import { PaymentStepSquareSection } from '../BookingForm/steps/PaymentStepSquareSection/PaymentStepSquareSection'
 import type { IFormData } from '../BookingForm/types'
 import type { IPaymentMethod } from '../../components/PaymentSelector/types'
 import sslPaymentLogo from '../../../../public/images/logos/ssl-encryption.svg'
@@ -85,6 +86,7 @@ export const GiftCardPaymentSection = ({
     const wording = useWording()
     const { preset } = useBookingContext()
     const stripeWrapperRef = useRef<HTMLDivElement>(null)
+    const squareWrapperRef = useRef<HTMLDivElement>(null)
     const [paymentElementLoading, setPaymentElementLoading] = useState(false)
     const [intentLoading, setIntentLoading] = useState(false)
     const [showStripeError, setShowStripeError] = useState(false)
@@ -94,7 +96,9 @@ export const GiftCardPaymentSection = ({
         setPaymentElementLoading(loading)
         if (!loading) {
             setTimeout(() => {
-                scrollToElementInContainer(stripeWrapperRef.current)
+                scrollToElementInContainer(
+                    stripeWrapperRef.current || squareWrapperRef.current
+                )
             }, 100)
         }
     }, [])
@@ -129,6 +133,7 @@ export const GiftCardPaymentSection = ({
     }, [wording, selectedMethod])
 
     const isStripeMethod = stripeMethods.includes(selectedMethod)
+    const isSquareMethod = selectedMethod === 'square'
     const isWalletMethod = ['google_pay', 'apple_pay'].includes(selectedMethod)
     const canShowPayments = amount > 0 && paymentMethods.length > 0
     const [debouncedAmount, setDebouncedAmount] = useState(amount)
@@ -265,8 +270,9 @@ export const GiftCardPaymentSection = ({
                     setSelectedMethod={handleSelectMethod}
                     methods={paymentMethods}
                     paymentElementLoading={
-                        isStripeMethod &&
-                        (paymentElementLoading || intentLoading)
+                        (isStripeMethod &&
+                            (paymentElementLoading || intentLoading)) ||
+                        (isSquareMethod && paymentElementLoading)
                     }
                 />
             )}
@@ -321,6 +327,26 @@ export const GiftCardPaymentSection = ({
                             </StripeWrapper>
                         </Suspense>
                     </div>
+                )}
+
+            {isSquareMethod && !preset?.settings?.square_application_id && (
+                <div
+                    className={classNames(
+                        'wbk_coupon__feedback',
+                        'wbk_coupon__feedback--failed'
+                    )}
+                >
+                    {__('Square is not configured', 'webba-booking-lite')}
+                </div>
+            )}
+
+            {isSquareMethod &&
+                preset?.settings?.square_application_id &&
+                amount > 0 && (
+                    <PaymentStepSquareSection
+                        onLoadingChange={handleLoadingChange}
+                        squareWrapperRef={squareWrapperRef}
+                    />
                 )}
 
             {isWalletMethod && (

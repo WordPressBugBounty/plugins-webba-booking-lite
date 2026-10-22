@@ -39,7 +39,7 @@ class WBK_Connected_Calendar extends WBK_Model_Object
 
     /**
      * Get calendar provider
-     * @return string calendar provider (google or outlook)
+     * @return string calendar provider (google, outlook, or icloud)
      */
     public function get_provider()
     {
@@ -51,12 +51,12 @@ class WBK_Connected_Calendar extends WBK_Model_Object
 
     /**
      * Set calendar provider
-     * @param string $provider calendar provider (google or outlook)
+     * @param string $provider calendar provider (google, outlook, or icloud)
      * @return bool true if set successfully
      */
     public function set_provider($provider)
     {
-        if (!is_string($provider) || !in_array($provider, ["google", "outlook"], true)) {
+        if (!is_string($provider) || !in_array($provider, ["google", "outlook", "icloud"], true)) {
             return false;
         }
         $this->fields["provider"] = $provider;
@@ -140,7 +140,12 @@ class WBK_Connected_Calendar extends WBK_Model_Object
         if (!is_string($in_provider_id)) {
             return false;
         }
-        $this->fields["in_provider_id"] = sanitize_text_field($in_provider_id);
+        // CalDAV hrefs are URLs; sanitize_text_field strips percent-encoded octets.
+        if (preg_match("#^https?://#i", $in_provider_id)) {
+            $this->fields["in_provider_id"] = esc_url_raw($in_provider_id);
+        } else {
+            $this->fields["in_provider_id"] = sanitize_text_field($in_provider_id);
+        }
         return true;
     }
 
@@ -212,5 +217,14 @@ class WBK_Connected_Calendar extends WBK_Model_Object
     public function is_outlook()
     {
         return $this->get_provider() === "outlook";
+    }
+
+    /**
+     * Check if calendar is for iCloud provider
+     * @return bool true if provider is icloud
+     */
+    public function is_icloud()
+    {
+        return $this->get_provider() === "icloud";
     }
 }

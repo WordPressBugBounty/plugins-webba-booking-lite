@@ -1,0 +1,59 @@
+.wbk_zapierTestField {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wbk_zapierTestField__label {
+    color: #212121;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.wbk_zapierTestField__button {
+    align-self: flex-start;
+    height: 40px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 8px;
+    background: #1f6763;
+    color: #fff;
+    font-family: typography.$font-primary;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) {
+        background: #155350;
+    }
+
+    &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+}
+
+.wbk_zapierTestField__status {
+    margin: 0;
+    font-family: typography.$font-primary;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.wbk_zapierTestField__status--success {
+    color: #1f6763;
+}
+
+.wbk_zapierTestField__status--error {
+    color: #c0392b;
+}
+
+.wbk_zapierTestField__lastStatus {
+    margin: 0;
+    color: #5a6a6a;
+    font-family: typography.$font-primary;
+    font-size: 12px;
+    line-height: 1.4;
+}

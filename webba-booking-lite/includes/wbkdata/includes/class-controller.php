@@ -153,23 +153,41 @@ class Controller
                 );
             }
         } else {
-            // this condition detects calendar provider change and reset access token if changed
+            // Detect calendar provider change and reset access token if changed.
+            // Also never overwrite stored credentials with empty/placeholder values:
+            // access_token is stripped from GET responses for security, so form saves
+            // often submit a default placeholder that would wipe iCloud (and other) auth.
             if (trim(sanitize_text_field($request["model"])) === "connected_calendars") {
                 $connected_calendar = new \WBK_Connected_Calendar($id);
                 $current_provider = $connected_calendar->get_provider();
-                if ($current_provider !== $fields["provider"] && $current_provider === "google") {
-                    $google_calendar = new \WBK_Google_Calendar_Processor($id);
-                    $google_calendar->clear_access_token();
+                $new_provider = isset($fields["provider"]) ? $fields["provider"] : $current_provider;
+                $provider_changed = $current_provider !== $new_provider;
+
+                if ($provider_changed) {
+                    if ($current_provider === "google") {
+                        $google_calendar = new \WBK_Google_Calendar_Processor($id);
+                        $google_calendar->clear_access_token();
+                    } elseif ($current_provider === "outlook") {
+                        $outlook_calendar = new \WBK_Outlook_Calendar_Processor($id);
+                        $outlook_calendar->clear_access_token();
+                    } elseif ($current_provider === "icloud") {
+                        $icloud_calendar = new \WBK_Icloud_Calendar_Processor($id);
+                        $icloud_calendar->clear_access_token();
+                    }
                     $fields["in_provider_id"] = "";
                     $fields["access_token"] = "";
-                } elseif (
-                    $current_provider !== $fields["provider"] &&
-                    $current_provider === "outlook"
-                ) {
-                    $outlook_calendar = new \WBK_Outlook_Calendar_Processor($id);
-                    $outlook_calendar->clear_access_token();
-                    $fields["in_provider_id"] = "";
-                    $fields["access_token"] = "";
+                } else {
+                    // Keep existing credentials unless a real token payload is provided.
+                    $incoming_token = isset($fields["access_token"]) ? $fields["access_token"] : null;
+                    $existing_token = $connected_calendar->get_access_token();
+                    $looks_like_real_token =
+                        is_string($incoming_token) &&
+                        $incoming_token !== "" &&
+                        $incoming_token !== "general" &&
+                        (strpos($incoming_token, "{") === 0 || strlen($incoming_token) >= 20);
+                    if (!$looks_like_real_token && !empty($existing_token)) {
+                        unset($fields["access_token"]);
+                    }
                 }
             }
 
@@ -314,6 +332,28 @@ class Controller
                         // Format: [id => name], use first key (same as Google)
                         $selected_key = array_key_first($calendars);
 
+                        $item->in_provider_id = $selected_key;
+                        $calendar = new \WBK_Connected_Calendar($item->id);
+                        $calendar->set("in_provider_id", $item->in_provider_id);
+                        $calendar->save();
+                    }
+                } elseif ($item->in_provider_id == "" && $item->provider == "icloud") {
+                    $calendar_processor = new \WBK_Icloud_Calendar_Processor($item->id);
+                    $auth_parameters = $calendar_processor->get_auth_parameters();
+                    $calendar_details =
+                        isset($auth_parameters["calendarDetails"]) &&
+                        is_array($auth_parameters["calendarDetails"])
+                            ? $auth_parameters["calendarDetails"]
+                            : [];
+                    $selected_key = null;
+                    foreach ($calendar_details as $cal) {
+                        if (!empty($cal["id"]) && empty($cal["readonly"])) {
+                            $selected_key = $cal["id"];
+                            break;
+                        }
+                    }
+
+                    if ($selected_key !== null) {
                         $item->in_provider_id = $selected_key;
                         $calendar = new \WBK_Connected_Calendar($item->id);
                         $calendar->set("in_provider_id", $item->in_provider_id);

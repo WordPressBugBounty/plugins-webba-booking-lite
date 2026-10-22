@@ -759,6 +759,14 @@ class Model
 
         $model_name = \WbkData_Model_Utils::clean_up_string($this->get_model_name());
 
+        do_action(
+            "wbkdata_on_before_item_updated",
+            $model_name,
+            $this->model_name,
+            $id,
+            $validation["valid_fields"],
+        );
+
         if (
             false ===
             $wpdb->update(

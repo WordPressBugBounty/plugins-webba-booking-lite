@@ -30,6 +30,8 @@ import './ServicesScreen.scss'
 import { LockedTableSection } from '../../components/LockedTableSection/LockedTableSection'
 import { ExtrasScreen } from '../Extras/ExtrasScreen'
 import { UnitNames } from '../../components/WebbaDataTable/cells/UnitNames/UnitNames'
+import { useServiceScreenTab } from './useServiceScreenTab'
+import { ServicesScreenTabs } from './ServicesScreenTabs'
 
 export const ServicesScreen = () => {
     const formService = createFormFromModel(servicesModel)
@@ -437,10 +439,17 @@ export const ServicesScreen = () => {
 
     const unitsRequiredPlans = ['premium', 'pro', 'proextended']
     const isUnitsAvailable = plan_map && unitsRequiredPlans.some((plan) => plan_map[plan] === true)
-
+    const { activeTab } = useServiceScreenTab()
 
     return (
-        <>
+        <div className="wbk_servicesScreen">
+            <ServicesScreenTabs />
+            {activeTab === 'hourly' && (
+            <div
+                role="tabpanel"
+                id="wbk-services-panel-hourly"
+                aria-labelledby="wbk-services-tab-hourly"
+            >
             <Table
                 title={__('Hourly Services / Rentals', 'webba-booking-lite')}
                 documentationLink={getTableDocumentationLink('services')}
@@ -472,6 +481,14 @@ export const ServicesScreen = () => {
                 search={searchField}
                 isItemsForbidden={isForbidden(services)}
             />
+            </div>
+            )}
+            {activeTab === 'daily' && (
+            <div
+                role="tabpanel"
+                id="wbk-services-panel-daily"
+                aria-labelledby="wbk-services-tab-daily"
+            >
             <LockedTableSection
                 isLocked={!isUnitsAvailable}
                 requiredPlans={unitsRequiredPlans}
@@ -507,6 +524,14 @@ export const ServicesScreen = () => {
                     isItemsForbidden={isForbidden(units)}
                 />
             </LockedTableSection>
+            </div>
+            )}
+            {activeTab === 'categories' && (
+            <div
+                role="tabpanel"
+                id="wbk-services-panel-categories"
+                aria-labelledby="wbk-services-tab-categories"
+            >
             <Table
                 title={__('Categories', 'webba-booking-lite')}
                 documentationLink={getTableDocumentationLink('categories')}
@@ -541,9 +566,19 @@ export const ServicesScreen = () => {
                 search={catSearchField}
                 isItemsForbidden={isForbidden(serviceCategories)}
             />
-            <ExtrasScreen />
+            </div>
+            )}
+            {activeTab === 'extras' && (
+                <div
+                    role="tabpanel"
+                    id="wbk-services-panel-extras"
+                    aria-labelledby="wbk-services-tab-extras"
+                >
+                    <ExtrasScreen />
+                </div>
+            )}
             <SuccessMessage />
             <FailedMessage />
-        </>
+        </div>
     )
 }

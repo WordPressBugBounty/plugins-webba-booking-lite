@@ -48,7 +48,7 @@ export const Sidebar: FC<ISidebarProps> = ({
     const wording = useWording()
     const [animatedIds, setAnimatedIds] = useState<number[]>([])
     const [showSummary, setShowSummary] = useState(false)
-    const [extrasExpanded, setExtrasExpanded] = useState(true)
+    const [extrasExpanded, setExtrasExpanded] = useState(false)
     const prevIdsRef = useRef<number[]>([])
 
     const { help_title, help_phone, help_email } = useMemo(() => {
@@ -454,37 +454,37 @@ export const Sidebar: FC<ISidebarProps> = ({
                             </div>
                         </div>
                         {(showCostBreakdown || selectedExtras.length > 0) && (
-                        <div className={'wbk_sidebar__items wbk_sidebar__items--less-gap'}>
-                            {showCostBreakdown && Number(amountData.discount) > 0 && (
-                                <div className={'wbk_sidebar__items__item'}>
-                                    <h4
-                                        className={
-                                            'wbk_sidebar__items__item__title'
-                                        }
-                                    >
-                                        {wording.discount ||
-                                            __(
-                                                'Discount (-)',
-                                                'webba-booking-lite'
-                                            )}
-                                    </h4>
-                                    <div>
-                                        <p
+                            <div className={'wbk_sidebar__items wbk_sidebar__items--less-gap'}>
+                                {showCostBreakdown && Number(amountData.discount) > 0 && (
+                                    <div className={'wbk_sidebar__items__item'}>
+                                        <h4
                                             className={
                                                 'wbk_sidebar__items__item__title'
                                             }
                                         >
-                                            {wbkFormatPrice(
-                                                amountData.discount,
-                                                priceFormat
-                                            )}
-                                        </p>
+                                            {wording.discount ||
+                                                __(
+                                                    'Discount (-)',
+                                                    'webba-booking-lite'
+                                                )}
+                                        </h4>
+                                        <div>
+                                            <p
+                                                className={
+                                                    'wbk_sidebar__items__item__title'
+                                                }
+                                            >
+                                                {wbkFormatPrice(
+                                                    amountData.discount,
+                                                    priceFormat
+                                                )}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                            {/* discount end */}
-                            {/* service fees */}
-                            {/* {Number(amountData?.service_fees) > 0 && (
+                                )}
+                                {/* discount end */}
+                                {/* service fees */}
+                                {/* {Number(amountData?.service_fees) > 0 && (
                                 <div className={'wbk_sidebar__items__item'}>
                                     <h4
                                         className={
@@ -511,9 +511,9 @@ export const Sidebar: FC<ISidebarProps> = ({
                                     </div>
                                 </div>
                             )} */}
-                            {/* service fees end */}
-                            {/* tax */}
-                            {/* {displayTax > 0 && (
+                                {/* service fees end */}
+                                {/* tax */}
+                                {/* {displayTax > 0 && (
                                 <div className={'wbk_sidebar__items__item'}>
                                     <h4
                                         className={
@@ -537,231 +537,229 @@ export const Sidebar: FC<ISidebarProps> = ({
                                     </div>
                                 </div>
                             )} */}
-                            {/* tax end */}
-                            {selectedExtras.length > 0 && (
-                                <div className={'wbk_sidebar__extras-toggle'}>
-                                    <div
-                                        role="button"
-                                        tabIndex={0}
-                                        className={classNames(
-                                            'wbk_sidebar__extras-toggle__btn',
-                                            {
-                                                ['wbk_sidebar__extras-toggle__btn--expanded']:
-                                                    extrasExpanded,
-                                            }
-                                        )}
-                                        onClick={() =>
-                                            setExtrasExpanded((expanded) => !expanded)
-                                        }
-                                        onKeyDown={(e) =>
-                                            (e.key === 'Enter' || e.key === ' ') &&
-                                            setExtrasExpanded((expanded) => !expanded)
-                                        }
-                                    >
-                                        <span>
-                                            {wording.additional_items ||
-                                                __('Additional items', 'webba-booking-lite')}
-                                        </span>
-                                        <ArrowDownIcon
+                                {/* tax end */}
+                                {selectedExtras.length > 0 && (
+                                    <div className={'wbk_sidebar__extras-toggle'}>
+                                        <div
+                                            role="button"
+                                            tabIndex={0}
                                             className={classNames(
-                                                'wbk_sidebar__extras-toggle__icon',
+                                                'wbk_sidebar__extras-toggle__btn',
                                                 {
-                                                    ['wbk_sidebar__extras-toggle__icon--expanded']:
+                                                    ['wbk_sidebar__extras-toggle__btn--expanded']:
                                                         extrasExpanded,
                                                 }
                                             )}
-                                        />
-                                    </div>
-                                    {extrasExpanded && (
-                                        <div className={'wbk_sidebar__extras-toggle__list'}>
-                                            {selectedExtras.map((extra) => {
-                                                const quantity = Math.max(
-                                                    1,
-                                                    Number(extra.quantity) || 1
-                                                )
-                                                const linePrice = getExtraLinePrice(extra)
-                                                const titlePrefix =
-                                                    quantity > 1 ? `${quantity}x ` : ''
-                                                return (
-                                                    <div
-                                                        key={extra.id}
-                                                        className={
-                                                            'wbk_sidebar__items__item__inner'
-                                                        }
-                                                    >
-                                                        <div
-                                                            className={
-                                                                'wbk_sidebar__items__item__info'
-                                                            }
-                                                        >
-                                                            <h4
-                                                                className={
-                                                                    'wbk_sidebar__items__item__title'
-                                                                }
-                                                            >
-                                                                {titlePrefix}
-                                                                {extra.label}
-                                                            </h4>
-                                                        </div>
-                                                        {showCostBreakdown && (
-                                                        <div
-                                                            className={
-                                                                'wbk_sidebar__items__item__price'
-                                                            }
-                                                        >
-                                                            {(linePrice > 0 &&
-                                                                wbkFormatPrice(
-                                                                    linePrice,
-                                                                    priceFormat
-                                                                )) ||
-                                                                wording.free ||
-                                                                __(
-                                                                    'Free',
-                                                                    'webba-booking-lite'
-                                                                )}
-                                                        </div>
-                                                        )}
-                                                    </div>
-                                                )
-                                            })}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                            {showCostBreakdown && (
-                            <div className={'wbk_sidebar__items__item'}>
-                                <h4
-                                    className={
-                                        'wbk_sidebar__items__item__title'
-                                    }
-                                >
-                                    {wording.total ||
-                                        __('TOTAL TODAY', 'webba-booking-lite')}
-                                </h4>
-                                <div className={'wbk_sidebar__items__item__price'}>
-                                    <p
-                                        className={
-                                            'wbk_sidebar__items__item__title'
-                                        }
-                                    >
-                                        <strong>
-                                            {canShowUnitPrice
-                                                ? (displayTotal &&
-                                                    displayTotal > 0 &&
-                                                    wbkFormatPrice(
-                                                        displayTotal,
-                                                        priceFormat
-                                                    )) ||
-                                                wording.free ||
-                                                __('Free', 'webba-booking-lite')
-                                                : ''}
-                                        </strong>
-                                    </p>
-                                    {canShowUnitPrice && displayTotal > 0 && (
-                                        <p
-                                            className={
-                                                'wbk_sidebar__items__item__subline'
+                                            onClick={() =>
+                                                setExtrasExpanded((expanded) => !expanded)
+                                            }
+                                            onKeyDown={(e) =>
+                                                (e.key === 'Enter' || e.key === ' ') &&
+                                                setExtrasExpanded((expanded) => !expanded)
                                             }
                                         >
-                                            {wording.tax_included ||
-                                                __(
-                                                    'Tax incl.',
-                                                    'webba-booking-lite'
+                                            <ArrowDownIcon
+                                                className={classNames(
+                                                    'wbk_sidebar__extras-toggle__icon',
+                                                    {
+                                                        ['wbk_sidebar__extras-toggle__icon--expanded']:
+                                                            extrasExpanded,
+                                                    }
                                                 )}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                            )}
-                            {hasSummaryAmounts && (
-                                <div className={'wbk_sidebar__summary-toggle'}>
-                                    <div
-                                        role="button"
-                                        tabIndex={0}
-                                        className={'wbk_sidebar__summary-toggle__btn'}
-                                        onClick={() => setShowSummary((s) => !s)}
-                                        onKeyDown={(e) =>
-                                            (e.key === 'Enter' || e.key === ' ') &&
-                                            setShowSummary((s) => !s)
-                                        }
-                                    >
-                                        <span>
-                                            {showSummary
-                                                ? wording.hide_summary || __('Hide summary', 'webba-booking-lite')
-                                                : wording.show_summary || __('Show summary', 'webba-booking-lite')}
-                                        </span>
-                                        <ArrowDownIcon
-                                            className={classNames(
-                                                'wbk_sidebar__summary-toggle__icon',
-                                                {
-                                                    ['wbk_sidebar__summary-toggle__icon--expanded']:
-                                                        showSummary,
-                                                }
-                                            )}
-                                        />
-                                    </div>
-                                    {showSummary && (
-                                        <div className={'wbk_sidebar__summary-detail'}>
-                                            {/* booked items */}
-                                            <div className={'wbk_sidebar__summary-detail__row'}>
-                                                <span>
-                                                    {wording.total_booked_items || __('Total booked items', 'webba-booking-lite')}:
-                                                </span>
-                                                <span>
-                                                    {wbkFormatPrice(
-                                                        Number(amountData?.subtotal || 0),
-                                                        priceFormat
-                                                    )}
-                                                </span>
-                                            </div>
-                                            {/* booked items end */}
-                                            {/* service fees */}
-                                            {Number(amountData?.service_fees) > 0 && (
-                                                <div className={'wbk_sidebar__summary-detail__row'}>
-                                                    <span>{wording.service_fees || __('Service fees', 'webba-booking-lite')}:</span>
-                                                    <span>{wbkFormatPrice(Number(amountData.service_fees), priceFormat)}</span>
-                                                </div>
-                                            )}
-                                            {/* service fees end */}
-                                            {/* tax */}
-                                            {displayTax > 0 && (
-                                                <div className={'wbk_sidebar__summary-detail__row'}>
-                                                    <span>{wording.tax || __('Sales tax', 'webba-booking-lite')}:</span>
-                                                    <span>{wbkFormatPrice(displayTax, priceFormat)}</span>
-                                                </div>
-                                            )}
-                                            {/* tax end */}
-                                            {/* grand total */}
-                                            <div className={'wbk_sidebar__summary-detail__row wbk_sidebar__summary-detail__row--has-bottom-border'}>
-                                                <span>
-                                                    <strong>{wording.grand_total || __('Grand total', 'webba-booking-lite')}:</strong>
-                                                </span>
-                                                <span>
-                                                    <strong>{wbkFormatPrice(Number(amountData?.total || 0), priceFormat)}</strong>
-                                                </span>
-                                            </div>
-                                            {/* grand total end */}
-                                            {/* deposits */}
-                                            {depositTotal > 0 && (
-                                                <div className={'wbk_sidebar__summary-detail__row'}>
-                                                    <span >{wording.deposits || __('Deposits', 'webba-booking-lite')}:</span>
-                                                    <span>{wbkFormatPrice(depositTotal, priceFormat)}</span>
-                                                </div>
-                                            )}
-                                            {/* deposits end */}
-                                            {/* left to pay */}
-                                            {Number(amountData?.left_to_pay) > 0 && (
-                                                <div className={'wbk_sidebar__summary-detail__row'}>
-                                                    <span>{wording.left_to_pay_later || __('Left to pay later', 'webba-booking-lite')}:</span>
-                                                    <span>{wbkFormatPrice(Number(amountData.left_to_pay), priceFormat)}</span>
-                                                </div>
-                                            )}
-                                            {/* left to pay end */}
+                                            />
+                                            <span>
+                                                {wording.additional_items ||
+                                                    __('Additional items', 'webba-booking-lite')}
+                                            </span>
                                         </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
+                                        {extrasExpanded && (
+                                            <div className={'wbk_sidebar__extras-toggle__list'}>
+                                                {selectedExtras.map((extra) => {
+                                                    const quantity = Math.max(
+                                                        1,
+                                                        Number(extra.quantity) || 1
+                                                    )
+                                                    const linePrice = getExtraLinePrice(extra)
+                                                    const titlePrefix =
+                                                        quantity > 1 ? `${quantity}x ` : ''
+                                                    return (
+                                                        <div
+                                                            key={extra.id}
+                                                            className={
+                                                                'wbk_sidebar__items__item__inner'
+                                                            }
+                                                        >
+                                                            <div
+                                                                className={
+                                                                    'wbk_sidebar__items__item__info'
+                                                                }
+                                                            >
+                                                                <h4
+                                                                    className={
+                                                                        'wbk_sidebar__items__item__title'
+                                                                    }
+                                                                >
+                                                                    {titlePrefix}
+                                                                    {extra.label}
+                                                                </h4>
+                                                            </div>
+                                                            {showCostBreakdown && (
+                                                                <div
+                                                                    className={
+                                                                        'wbk_sidebar__items__item__price'
+                                                                    }
+                                                                >
+                                                                    {(linePrice > 0 &&
+                                                                        wbkFormatPrice(
+                                                                            linePrice,
+                                                                            priceFormat
+                                                                        )) ||
+                                                                        wording.free ||
+                                                                        __(
+                                                                            'Free',
+                                                                            'webba-booking-lite'
+                                                                        )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                                {showCostBreakdown && (
+                                    <div className={'wbk_sidebar__items__item'}>
+                                        <h4
+                                            className={
+                                                'wbk_sidebar__items__item__title'
+                                            }
+                                        >
+                                            {wording.total ||
+                                                __('TOTAL TODAY', 'webba-booking-lite')}
+                                        </h4>
+                                        <div className={'wbk_sidebar__items__item__price'}>
+                                            <p
+                                                className={
+                                                    'wbk_sidebar__items__item__title'
+                                                }
+                                            >
+                                                <strong>
+                                                    {canShowUnitPrice
+                                                        ? (displayTotal &&
+                                                            displayTotal > 0 &&
+                                                            wbkFormatPrice(
+                                                                displayTotal,
+                                                                priceFormat
+                                                            )) ||
+                                                        wording.free ||
+                                                        __('Free', 'webba-booking-lite')
+                                                        : ''}
+                                                </strong>
+                                            </p>
+                                            {canShowUnitPrice && displayTotal > 0 && (
+                                                <p
+                                                    className={
+                                                        'wbk_sidebar__items__item__subline'
+                                                    }
+                                                >
+                                                    {wording.tax_included ||
+                                                        __(
+                                                            'Tax incl.',
+                                                            'webba-booking-lite'
+                                                        )}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                                {hasSummaryAmounts && (
+                                    <div className={'wbk_sidebar__summary-toggle'}>
+                                        <div
+                                            role="button"
+                                            tabIndex={0}
+                                            className={'wbk_sidebar__summary-toggle__btn'}
+                                            onClick={() => setShowSummary((s) => !s)}
+                                            onKeyDown={(e) =>
+                                                (e.key === 'Enter' || e.key === ' ') &&
+                                                setShowSummary((s) => !s)
+                                            }
+                                        >
+                                            <ArrowDownIcon
+                                                className={classNames(
+                                                    'wbk_sidebar__summary-toggle__icon',
+                                                    {
+                                                        ['wbk_sidebar__summary-toggle__icon--expanded']:
+                                                            showSummary,
+                                                    }
+                                                )}
+                                            />
+                                            <span>
+                                                {wording.price_breakdown || __('Price breakdown', 'webba-booking-lite')}
+                                            </span>
+                                        </div>
+                                        {showSummary && (
+                                            <div className={'wbk_sidebar__summary-detail'}>
+                                                {/* booked items */}
+                                                <div className={'wbk_sidebar__summary-detail__row'}>
+                                                    <span>
+                                                        {wording.total_booked_items || __('Total booked items', 'webba-booking-lite')}:
+                                                    </span>
+                                                    <span>
+                                                        {wbkFormatPrice(
+                                                            Number(amountData?.subtotal || 0) - Number(amountData?.service_fees || 0),
+                                                            priceFormat
+                                                        )}
+                                                    </span>
+                                                </div>
+                                                {/* booked items end */}
+                                                {/* service fees */}
+                                                {Number(amountData?.service_fees) > 0 && (
+                                                    <div className={'wbk_sidebar__summary-detail__row'}>
+                                                        <span>{wording.service_fees || __('Service fees', 'webba-booking-lite')}:</span>
+                                                        <span>{wbkFormatPrice(Number(amountData.service_fees), priceFormat)}</span>
+                                                    </div>
+                                                )}
+                                                {/* service fees end */}
+                                                {/* tax */}
+                                                {displayTax > 0 && (
+                                                    <div className={'wbk_sidebar__summary-detail__row'}>
+                                                        <span>{wording.tax || __('Sales tax', 'webba-booking-lite')}:</span>
+                                                        <span>{wbkFormatPrice(displayTax, priceFormat)}</span>
+                                                    </div>
+                                                )}
+                                                {/* tax end */}
+                                                {/* grand total */}
+                                                <div className={'wbk_sidebar__summary-detail__row wbk_sidebar__summary-detail__row--has-bottom-border'}>
+                                                    <span>
+                                                        <strong>{wording.grand_total || __('Grand total', 'webba-booking-lite')}:</strong>
+                                                    </span>
+                                                    <span>
+                                                        <strong>{wbkFormatPrice(Number(amountData?.total || 0), priceFormat)}</strong>
+                                                    </span>
+                                                </div>
+                                                {/* grand total end */}
+                                                {/* deposits */}
+                                                {depositTotal > 0 && (
+                                                    <div className={'wbk_sidebar__summary-detail__row'}>
+                                                        <span >{wording.deposits || __('Deposits', 'webba-booking-lite')}:</span>
+                                                        <span>{wbkFormatPrice(depositTotal, priceFormat)}</span>
+                                                    </div>
+                                                )}
+                                                {/* deposits end */}
+                                                {/* left to pay */}
+                                                {Number(amountData?.left_to_pay) > 0 && (
+                                                    <div className={'wbk_sidebar__summary-detail__row'}>
+                                                        <span>{wording.left_to_pay_later || __('Left to pay later', 'webba-booking-lite')}:</span>
+                                                        <span>{wbkFormatPrice(Number(amountData.left_to_pay), priceFormat)}</span>
+                                                    </div>
+                                                )}
+                                                {/* left to pay end */}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         )}
                         {isAddMoreVisible && (
                             <div className={'wbk_sidebar__add-more'}>

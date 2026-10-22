@@ -30,6 +30,7 @@ import { createDurationField } from '../Fields/DurationField/DurationField'
 import { createZoomAuthField } from '../Fields/ZoomAuthField/ZoomAuthField'
 import { createGmailAuthField } from '../Fields/GmailAuthField/GmailAuthField'
 import { createSmtpTestField } from '../Fields/SmtpTestField/SmtpTestField'
+import { createZapierTestField } from '../Fields/ZapierTestField/ZapierTestField'
 import { createPushSubscribeField } from '../Fields/PushSubscribeField/PushSubscribeField'
 import { createPasswordField } from '../Fields/PasswordField/PasswordField'
 import { createLimitationField } from '../Fields/LimitationField/LimitationField'
@@ -128,6 +129,8 @@ export const getFieldComponentFromType = ({
             return createGmailAuthField(constructorConfig)
         case inputType === 'smtp_test':
             return createSmtpTestField(constructorConfig)
+        case inputType === 'zapier_test':
+            return createZapierTestField(constructorConfig)
         case inputType === 'push_subscribe':
             return createPushSubscribeField(constructorConfig)
         case inputType === 'password':

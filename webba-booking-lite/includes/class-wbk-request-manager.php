@@ -95,6 +95,26 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "get_gg_auth_data"],
                 "permission_callback" => [$this, "get_gg_auth_data_permission"],
             ] );
+            register_rest_route( "wbk/v2", "/icloud-calendar/connect/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "icloud_calendar_connect"],
+                "permission_callback" => [$this, "icloud_calendar_manage_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/icloud-calendar/test/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "icloud_calendar_test"],
+                "permission_callback" => [$this, "icloud_calendar_manage_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/icloud-calendar/disconnect/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "icloud_calendar_disconnect"],
+                "permission_callback" => [$this, "icloud_calendar_manage_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/icloud-calendar/calendars/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "icloud_calendar_save_mapping"],
+                "permission_callback" => [$this, "icloud_calendar_manage_permission"],
+            ] );
             register_rest_route( "wbk/v2", "/get-gmail-auth-data/", [
                 "methods"             => "GET",
                 "callback"            => [$this, "get_gmail_auth_data"],
@@ -296,6 +316,11 @@ class WBK_Request_Manager {
                 "methods"             => "POST",
                 "callback"            => [$this, "send_test_smtp"],
                 "permission_callback" => [$this, "send_test_smtp_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/send-test-zapier/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "send_test_zapier"],
+                "permission_callback" => [$this, "send_test_zapier_permission"],
             ] );
             register_rest_route( "wbk/v2", "/whatsapp-templates/", [
                 "methods"             => "GET",
@@ -1479,6 +1504,9 @@ class WBK_Request_Manager {
         }
         $booking = new WBK_Booking($request["booking"]);
         if ( $booking->is_loaded() ) {
+            if ( class_exists( "WBK_Zapier" ) ) {
+                WBK_Zapier::remember_booking_state( $booking->get_id() );
+            }
             date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
             $booking->set( "time", $time );
             $booking->set( "day", strtotime( "midnight", $time ) );
@@ -2006,6 +2034,7 @@ class WBK_Request_Manager {
                 "no_services_found"                         => get_option( "wbk_wording_no_services_found", __( "No services found!", "webba-booking-lite" ) ),
                 "no_units_found"                            => get_option( "wbk_wording_no_units_found", __( "No units found!", "webba-booking-lite" ) ),
                 "show_summary"                              => get_option( "wbk_wording_show_summary", __( "Show summary", "webba-booking-lite" ) ),
+                "price_breakdown"                           => get_option( "wbk_wording_price_breakdown", __( "Price breakdown", "webba-booking-lite" ) ),
                 "total"                                     => get_option( "wbk_payment_total_title", __( "Total", "webba-booking-lite" ) ),
                 "free"                                      => get_option( "wbk_wording_free", __( "Free", "webba-booking-lite" ) ),
                 "select_date_time"                          => get_option( "wbk_wording_select_date_time", __( "Select date & time", "webba-booking-lite" ) ),
@@ -2283,6 +2312,21 @@ class WBK_Request_Manager {
                         }
                         if ( empty( $calendars_list ) ) {
                             $calendars_list["wbk_null"] = __( "No Outlook calendars available", "webba-booking-lite" );
+                        }
+                        $data[$model]["in_provider_id"] = $calendars_list;
+                    } elseif ( $provider === "icloud" ) {
+                        $icloud_calendar = new WBK_Icloud_Calendar_Processor($calendar_id);
+                        // Prefer cached calendars from auth (same map as auth UI).
+                        $auth_parameters = $icloud_calendar->get_auth_parameters();
+                        $calendars_list = ( isset( $auth_parameters["calendars"] ) && is_array( $auth_parameters["calendars"] ) ? $auth_parameters["calendars"] : [] );
+                        if ( empty( $calendars_list ) ) {
+                            $calendars_result = $icloud_calendar->get_calendars();
+                            if ( !is_wp_error( $calendars_result ) && is_array( $calendars_result ) ) {
+                                $calendars_list = $calendars_result;
+                            }
+                        }
+                        if ( empty( $calendars_list ) ) {
+                            $calendars_list["wbk_null"] = __( "No iCloud calendars available", "webba-booking-lite" );
                         }
                         $data[$model]["in_provider_id"] = $calendars_list;
                     } else {
@@ -2669,6 +2713,9 @@ class WBK_Request_Manager {
                 $response->set_status( 200 );
                 return $response;
             }
+        } elseif ( $connected_calendar->is_icloud() ) {
+            $icloud_calendar = new WBK_Icloud_Calendar_Processor($calendar_id);
+            $auth_parameters = $icloud_calendar->get_auth_parameters();
         } else {
             $data["isAuthenticated"] = false;
             $data["internalError"] = true;
@@ -2679,6 +2726,186 @@ class WBK_Request_Manager {
         $response = new \WP_REST_Response($auth_parameters);
         $response->set_status( 200 );
         return $response;
+    }
+
+    /**
+     * Permission for iCloud Calendar management actions.
+     *
+     * @param WP_REST_Request $request
+     * @return bool
+     */
+    public function icloud_calendar_manage_permission( $request ) : bool {
+        return current_user_can( "manage_options" );
+    }
+
+    /**
+     * Validate calendar_id + nonce for iCloud actions.
+     *
+     * @param WP_REST_Request $request
+     * @return int|WP_Error
+     */
+    private function icloud_calendar_request_id( WP_REST_Request $request ) {
+        $nonce = $request->get_header( "X-WP-Nonce" );
+        if ( !$nonce || !wp_verify_nonce( $nonce, "wp_rest" ) ) {
+            return new WP_Error("invalid_nonce", "Invalid security token.", [
+                "status" => 403,
+            ]);
+        }
+        $calendar_id = (int) $request->get_param( "calendar_id" );
+        if ( $calendar_id < 1 ) {
+            return new WP_Error("invalid_calendar", "calendar_id is required.", [
+                "status" => 400,
+            ]);
+        }
+        $connected = new WBK_Connected_Calendar($calendar_id);
+        if ( !$connected->is_loaded() || !$connected->is_icloud() ) {
+            return new WP_Error("invalid_calendar", "iCloud connected calendar not found.", [
+                "status" => 404,
+            ]);
+        }
+        return $calendar_id;
+    }
+
+    /**
+     * Connect iCloud with Apple Account email + app-specific password.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function icloud_calendar_connect( WP_REST_Request $request ) : WP_REST_Response {
+        $calendar_id = $this->icloud_calendar_request_id( $request );
+        if ( is_wp_error( $calendar_id ) ) {
+            return new WP_REST_Response([
+                "ok"      => false,
+                "message" => $calendar_id->get_error_message(),
+            ], (int) ($calendar_id->get_error_data()["status"] ?? 400));
+        }
+        $processor = new WBK_Icloud_Calendar_Processor($calendar_id);
+        $result = $processor->connect_with_credentials( (string) $request->get_param( "email" ), (string) $request->get_param( "app_password" ) );
+        if ( is_wp_error( $result ) ) {
+            return new WP_REST_Response([
+                "ok"      => false,
+                "code"    => $result->get_error_code(),
+                "message" => WBK_Icloud_Sync_Orchestrator::redact( $result->get_error_message() ),
+            ], 400);
+        }
+        // Never echo passwords.
+        return new WP_REST_Response([
+            "ok"   => true,
+            "data" => $result,
+        ], 200);
+    }
+
+    /**
+     * Test iCloud CalDAV connection.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function icloud_calendar_test( WP_REST_Request $request ) : WP_REST_Response {
+        $calendar_id = $this->icloud_calendar_request_id( $request );
+        if ( is_wp_error( $calendar_id ) ) {
+            return new WP_REST_Response([
+                "ok"      => false,
+                "message" => $calendar_id->get_error_message(),
+            ], (int) ($calendar_id->get_error_data()["status"] ?? 400));
+        }
+        $processor = new WBK_Icloud_Calendar_Processor($calendar_id);
+        $email = $request->get_param( "email" );
+        $password = $request->get_param( "app_password" );
+        $result = $processor->test_connection( ( $email ? (string) $email : null ), ( $password ? (string) $password : null ) );
+        if ( is_wp_error( $result ) ) {
+            return new WP_REST_Response([
+                "ok"      => false,
+                "code"    => $result->get_error_code(),
+                "message" => WBK_Icloud_Sync_Orchestrator::redact( $result->get_error_message() ),
+            ], 400);
+        }
+        return new WP_REST_Response([
+            "ok"   => true,
+            "data" => $result,
+        ], 200);
+    }
+
+    /**
+     * Disconnect iCloud: delete credentials and stop connection jobs/cache.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function icloud_calendar_disconnect( WP_REST_Request $request ) : WP_REST_Response {
+        $calendar_id = $this->icloud_calendar_request_id( $request );
+        if ( is_wp_error( $calendar_id ) ) {
+            return new WP_REST_Response([
+                "ok"      => false,
+                "message" => $calendar_id->get_error_message(),
+            ], (int) ($calendar_id->get_error_data()["status"] ?? 400));
+        }
+        $processor = new WBK_Icloud_Calendar_Processor($calendar_id);
+        $result = $processor->clear_access_token();
+        if ( is_wp_error( $result ) ) {
+            return new WP_REST_Response([
+                "ok"      => false,
+                "message" => $result->get_error_message(),
+            ], 400);
+        }
+        return new WP_REST_Response([
+            "ok" => true,
+        ], 200);
+    }
+
+    /**
+     * Save the single iCloud calendar used for both export and availability.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function icloud_calendar_save_mapping( WP_REST_Request $request ) : WP_REST_Response {
+        $calendar_id = $this->icloud_calendar_request_id( $request );
+        if ( is_wp_error( $calendar_id ) ) {
+            return new WP_REST_Response([
+                "ok"      => false,
+                "message" => $calendar_id->get_error_message(),
+            ], (int) ($calendar_id->get_error_data()["status"] ?? 400));
+        }
+        $provider_calendar_id = (string) $request->get_param( "provider_calendar_id" );
+        if ( $provider_calendar_id === "" ) {
+            return new WP_REST_Response([
+                "ok"      => false,
+                "message" => __( "Select a calendar.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $processor = new WBK_Icloud_Calendar_Processor($calendar_id);
+        $auth = $processor->get_auth_parameters();
+        $calendars = ( isset( $auth["calendarDetails"] ) && is_array( $auth["calendarDetails"] ) ? $auth["calendarDetails"] : [] );
+        $by_id = [];
+        foreach ( $calendars as $cal ) {
+            if ( !empty( $cal["id"] ) ) {
+                $by_id[$cal["id"]] = $cal;
+            }
+        }
+        if ( !isset( $by_id[$provider_calendar_id] ) ) {
+            return new WP_REST_Response([
+                "ok"      => false,
+                "message" => __( "Unknown calendar.", "webba-booking-lite" ),
+            ], 400);
+        }
+        if ( !empty( $by_id[$provider_calendar_id]["readonly"] ) ) {
+            return new WP_REST_Response([
+                "ok"      => false,
+                "message" => __( "Read-only calendars cannot be selected for export and availability.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $connected = new WBK_Connected_Calendar($calendar_id);
+        $connected->set_in_provider_id( $provider_calendar_id );
+        $connected->save();
+        return new WP_REST_Response([
+            "ok"   => true,
+            "data" => [
+                "message"        => __( "Calendar saved.", "webba-booking-lite" ),
+                "in_provider_id" => $connected->get_in_provider_id(),
+            ],
+        ], 200);
     }
 
     /**
@@ -5319,13 +5546,43 @@ class WBK_Request_Manager {
         return current_user_can( "manage_options" );
     }
 
+    public function send_test_zapier_permission( $request ) : bool {
+        return current_user_can( "manage_options" );
+    }
+
     /**
-        /**
-    * Permission check for WhatsApp template management endpoints.
-    *
-    * @param WP_REST_Request $request Request object.
-    * @return bool
-    */
+     * Send a synthetic Zapier Catch Hook test event.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function send_test_zapier( $request ) : WP_REST_Response {
+        if ( !class_exists( "WBK_Zapier" ) ) {
+            return new \WP_REST_Response([
+                "status"  => "error",
+                "message" => __( "Zapier integration is not available.", "webba-booking-lite" ),
+            ], 403);
+        }
+        $result = WBK_Zapier::send_test_event();
+        if ( is_wp_error( $result ) ) {
+            $code = ( $result->get_error_code() === "wbk_zapier_unavailable" ? 403 : 400 );
+            return new \WP_REST_Response([
+                "status"  => "error",
+                "message" => $result->get_error_message(),
+            ], $code);
+        }
+        return new \WP_REST_Response([
+            "status"  => "success",
+            "message" => __( "Test event was accepted by Zapier.", "webba-booking-lite" ),
+        ], 200);
+    }
+
+    /**
+     * Permission check for WhatsApp template management endpoints.
+     *
+     * @param WP_REST_Request $request Request object.
+     * @return bool
+     */
     public function whatsapp_templates_permission( $request ) : bool {
         return current_user_can( "manage_options" );
     }
@@ -5721,21 +5978,50 @@ class WBK_Request_Manager {
             ], 400);
         }
         $settings_fields = $wp_settings_fields["wbk-options"][$options["section"]];
+        $zapier_available = class_exists( "WBK_Feature_Gate" ) && WBK_Feature_Gate::have_required_plan( "premium" );
         foreach ( $settings_fields as $field ) {
             if ( WBK_Options_Processor::is_non_persistent_field( $field ) ) {
                 continue;
             }
-            if ( isset( $options[$field["id"]] ) ) {
-                $option_value = $options[$field["id"]];
+            $field_id = $field["id"];
+            $is_zapier_field = strpos( $field_id, "wbk_zapier_" ) === 0;
+            // Pro-only: ignore Zapier setting writes when Pro is unavailable.
+            if ( $is_zapier_field && !$zapier_available ) {
+                continue;
+            }
+            if ( isset( $options[$field_id] ) ) {
+                $option_value = $options[$field_id];
                 $callback = $field["callback"][1] ?? "";
                 if ( $callback === "render_nested_numbers" ) {
                     $option_value = WBK_Options_Processor::sanitize_nested_numbers( $option_value );
                 }
-                update_option( $field["id"], $option_value );
+                if ( $field_id === "wbk_zapier_webhook_url" ) {
+                    $option_value = ( is_string( $option_value ) ? trim( $option_value ) : "" );
+                    if ( $option_value !== "" && class_exists( "WBK_Zapier" ) ) {
+                        $valid = WBK_Zapier::validate_webhook_url( $option_value );
+                        if ( is_wp_error( $valid ) ) {
+                            return new \WP_REST_Response([
+                                "status"  => "error",
+                                "message" => $valid->get_error_message(),
+                            ], 400);
+                        }
+                    }
+                }
+                if ( $field_id === "wbk_zapier_enabled" && $option_value === "yes" && class_exists( "WBK_Zapier" ) ) {
+                    $url_to_check = ( isset( $options["wbk_zapier_webhook_url"] ) ? trim( (string) $options["wbk_zapier_webhook_url"] ) : WBK_Zapier::get_configured_webhook_url() );
+                    $valid = WBK_Zapier::validate_webhook_url( $url_to_check );
+                    if ( is_wp_error( $valid ) ) {
+                        return new \WP_REST_Response([
+                            "status"  => "error",
+                            "message" => $valid->get_error_message(),
+                        ], 400);
+                    }
+                }
+                update_option( $field_id, $option_value );
             } else {
-                update_option( $field["id"], "" );
+                update_option( $field_id, "" );
             }
-            if ( $field["id"] == "wbk_email_admin_daily_time" ) {
+            if ( $field_id == "wbk_email_admin_daily_time" ) {
                 date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
                 $time_corr = intval( get_option( "wbk_email_admin_daily_time", "68400" ) );
                 $midnight = strtotime( "today midnight" );
@@ -5880,6 +6166,9 @@ class WBK_Request_Manager {
                 if ( isset( $field_args["checkbox_value"] ) ) {
                     $field_data["checkbox_value"] = $field_args["checkbox_value"];
                 }
+                if ( $field_id === "wbk_zapier_last_status_notice" && class_exists( "WBK_Zapier" ) ) {
+                    $field_data["tooltip"] = WBK_Zapier::get_last_delivery_summary();
+                }
                 $section_data["fields"][] = $field_data;
             }
             $options_data[$section_id] = $section_data;
@@ -5922,6 +6211,7 @@ class WBK_Request_Manager {
             "render_notice"            => "notice",
             "render_password"          => "password",
             "render_smtp_test"         => "smtp_test",
+            "render_zapier_test"       => "zapier_test",
             "render_whatsapp_template" => "whatsapp_template",
             "render_whatsapp_validate" => "whatsapp_validate",
             "render_whatsapp_auth"     => "whatsapp_auth",
@@ -6166,6 +6456,50 @@ class WBK_Request_Manager {
                 ], 400);
             }
             $created = WBK_Gift_Card::create_from_paid_order( $gift_card_data, $payment_method, $intent_id );
+            if ( empty( $created["success"] ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => $created["message"] ?? __( "Unable to create gift card.", "webba-booking-lite" ),
+                ], 500);
+            }
+            return new WP_REST_Response([
+                "success"          => true,
+                "payment_required" => false,
+                "payment_method"   => $payment_method,
+                "gift_card"        => $created["gift_card"],
+                "message"          => __( "Gift card purchased successfully.", "webba-booking-lite" ),
+            ], 200);
+        }
+        if ( $payment_method === "square" ) {
+            if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Square is not available.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $source_id = ( isset( $params["square_source_id"] ) ? sanitize_text_field( (string) $params["square_source_id"] ) : "" );
+            $verification_token = ( isset( $params["square_verification_token"] ) ? sanitize_text_field( (string) $params["square_verification_token"] ) : "" );
+            if ( $source_id === "" ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Missing Square card details.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $square = new WBK_Square();
+            $charge_result = $square->charge_gift_card(
+                $amount,
+                $source_id,
+                wp_generate_uuid4(),
+                $verification_token,
+                $gift_card_data["buyer_email"]
+            );
+            if ( !isset( $charge_result[0] ) || intval( $charge_result[0] ) !== 1 ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => $charge_result[1] ?? __( "Unable to complete the payment", "webba-booking-lite" ),
+                ], 400);
+            }
+            $created = WBK_Gift_Card::create_from_paid_order( $gift_card_data, $payment_method, (string) $charge_result[2] );
             if ( empty( $created["success"] ) ) {
                 return new WP_REST_Response([
                     "success" => false,
@@ -6425,7 +6759,10 @@ class WBK_Request_Manager {
         $prev_time_zone = date_default_timezone_get();
         date_default_timezone_set( get_option( "wbk_timezone" ) );
         $appointment_day_values = [];
+        $business_day_values = [];
         $staff_member_filter = null;
+        $location_filter = null;
+        $business_period = "l_30";
         if ( !empty( $filters ) && is_array( $filters ) ) {
             foreach ( $filters as $filter_row ) {
                 if ( !is_array( $filter_row ) ) {
@@ -6436,20 +6773,26 @@ class WBK_Request_Manager {
                 if ( $filter_name === "appointment_day" && $filter_value !== "" ) {
                     $appointment_day_values[] = $filter_value;
                 }
+                if ( $filter_name === "business_day" && $filter_value !== "" ) {
+                    $business_day_values[] = $filter_value;
+                }
                 if ( $filter_name === "appointment_staff_member_id" && $filter_value !== "" && $filter_value !== "0" && ctype_digit( (string) $filter_value ) ) {
                     $staff_member_filter = (int) $filter_value;
                 }
+                if ( $filter_name === "appointment_location_id" && $filter_value !== "" && $filter_value !== "0" && ctype_digit( (string) $filter_value ) ) {
+                    $location_filter = (int) $filter_value;
+                }
+                if ( $filter_name === "business_period" && $filter_value !== "" ) {
+                    $business_period = (string) $filter_value;
+                }
             }
         }
-        if ( empty( $filters ) ) {
-            $start = strtotime( "today midnight" ) - 86400 * 31;
-            $end = strtotime( "today midnight" ) - 86400;
-        } elseif ( count( $appointment_day_values ) >= 2 ) {
+        if ( count( $appointment_day_values ) >= 2 ) {
             $start = strtotime( $appointment_day_values[0] );
             $end = strtotime( $appointment_day_values[1] );
         } else {
-            $start = strtotime( $filters[0]["value"] );
-            $end = strtotime( $filters[1]["value"] );
+            $start = strtotime( "today midnight" ) - 86400 * 31;
+            $end = strtotime( "today midnight" ) - 86400;
         }
         if ( $start == $end ) {
             $end = $end + 86400;
@@ -6537,9 +6880,752 @@ class WBK_Request_Manager {
         $data["pending_ids"] = $pending_ids;
         $data["priceFormat"] = $price_format;
         $data["isPro"] = $pro_version;
+        $data["hoursAvailability"] = $this->build_hours_availability_stats( $staff_member_filter );
+        $data["businessOverview"] = $this->build_business_overview_stats(
+            $business_period,
+            $staff_member_filter,
+            $location_filter,
+            $business_day_values
+        );
+        $data["welcomeMessage"] = $this->build_welcome_message_stats();
         $response = new \WP_REST_Response($data);
         $response->set_status( 200 );
         return $response;
+    }
+
+    /**
+     * Build welcome message stats for the dashboard header.
+     *
+     * @return array
+     */
+    private function build_welcome_message_stats() : array {
+        global $wpdb;
+        $prev_time_zone = date_default_timezone_get();
+        date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+        $today = strtotime( "today midnight" );
+        $now = time();
+        $table = get_option( "wbk_db_prefix", "" ) . "wbk_appointments";
+        $pending_statuses = [
+            "pending",
+            "paid",
+            "woocommerce",
+            "added_by_admin_not_paid"
+        ];
+        $status_placeholders = implode( ",", array_fill( 0, count( $pending_statuses ), "%s" ) );
+        $pending_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(id) FROM {$table} WHERE status IN ({$status_placeholders})", $pending_statuses ) );
+        $next_appointment_label = "";
+        $next_appointment_time = null;
+        $next_appointment_relation = "";
+        $next_booking_id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table}\n                WHERE time >= %d\n                AND status NOT IN ('cancelled', 'rejected')\n                ORDER BY time ASC\n                LIMIT 1", $now ) );
+        if ( $next_booking_id ) {
+            $booking = new WBK_Booking((int) $next_booking_id);
+            if ( $booking->is_loaded() ) {
+                $appointment_time = (int) $booking->get_start();
+                $next_appointment_time = $appointment_time;
+                $time_label = date_i18n( WBK_Date_Time_Utils::get_time_format(), $appointment_time );
+                $appointment_day = (int) $booking->get_day();
+                if ( $appointment_day === $today ) {
+                    $next_appointment_relation = "today";
+                    $next_appointment_label = sprintf( 
+                        /* translators: %s: time of day */
+                        esc_html__( "The next appointment is today at %s.", "webba-booking-lite" ),
+                        $time_label
+                     );
+                } elseif ( $appointment_day === strtotime( "+1 day", $today ) ) {
+                    $next_appointment_relation = "tomorrow";
+                    $next_appointment_label = sprintf( 
+                        /* translators: %s: time of day */
+                        esc_html__( "The next appointment is tomorrow at %s.", "webba-booking-lite" ),
+                        $time_label
+                     );
+                } else {
+                    $next_appointment_relation = "later";
+                    $next_appointment_label = sprintf( 
+                        /* translators: 1: date, 2: time of day */
+                        esc_html__( "The next appointment is on %1\$s at %2\$s.", "webba-booking-lite" ),
+                        date_i18n( "M j", $appointment_time ),
+                        $time_label
+                     );
+                }
+            }
+        }
+        if ( $pending_count === 0 ) {
+            $pending_title = esc_html__( "All of your bookings has been approved", "webba-booking-lite" );
+        } elseif ( $pending_count === 1 ) {
+            $pending_title = esc_html__( "1 booking needs your approval", "webba-booking-lite" );
+        } else {
+            $pending_title = sprintf( 
+                /* translators: %d: number of bookings */
+                esc_html__( "%d bookings need your approval", "webba-booking-lite" ),
+                $pending_count
+             );
+        }
+        $date_label = date_i18n( "l, F j, Y", $today );
+        date_default_timezone_set( $prev_time_zone );
+        return [
+            "title"                   => esc_html__( "Your day, at a glance", "webba-booking-lite" ),
+            "dateLabel"               => $date_label,
+            "dateTimestamp"           => (int) $today,
+            "pendingCount"            => $pending_count,
+            "pendingTitle"            => $pending_title,
+            "nextAppointmentLabel"    => $next_appointment_label,
+            "nextAppointmentTime"     => $next_appointment_time,
+            "nextAppointmentRelation" => $next_appointment_relation,
+            "hasPending"              => $pending_count > 0,
+        ];
+    }
+
+    /**
+     * Build business overview stats for the dashboard.
+     *
+     * @param string   $period             Period key (l_7, l_30, l_90, custom).
+     * @param int|null $staff_member_id    Optional staff member filter.
+     * @param int|null $location_id        Optional location filter.
+     * @param array    $custom_day_values  Optional custom date range values.
+     * @return array
+     */
+    private function build_business_overview_stats(
+        string $period = "l_30",
+        $staff_member_id = null,
+        $location_id = null,
+        array $custom_day_values = []
+    ) : array {
+        $period_days_map = [
+            "l_7"  => 7,
+            "l_30" => 30,
+            "l_90" => 90,
+        ];
+        $confirmed_statuses = [
+            "approved",
+            "paid_approved",
+            "arrived",
+            "added_by_admin_paid"
+        ];
+        $cancelled_statuses = ["cancelled", "rejected"];
+        $prev_time_zone = date_default_timezone_get();
+        date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+        $today = strtotime( "today midnight" );
+        if ( $period === "custom" && count( $custom_day_values ) >= 2 ) {
+            $selected_start = strtotime( $custom_day_values[0] . " midnight" );
+            $selected_end = strtotime( $custom_day_values[1] . " midnight" );
+            if ( $selected_start === false || $selected_end === false ) {
+                $selected_end = $today;
+                $selected_start = strtotime( "-29 days", $today );
+            }
+            if ( $selected_start > $selected_end ) {
+                $swap = $selected_start;
+                $selected_start = $selected_end;
+                $selected_end = $swap;
+            }
+            $period_days = (int) floor( ($selected_end - $selected_start) / DAY_IN_SECONDS ) + 1;
+            if ( $period_days < 1 ) {
+                $period_days = 1;
+            }
+        } else {
+            if ( $period === "custom" ) {
+                $period = "l_30";
+            }
+            $period_days = $period_days_map[$period] ?? 30;
+            $selected_end = $today;
+            $selected_start = strtotime( "-" . ($period_days - 1) . " days", $today );
+        }
+        $previous_end = strtotime( "-1 day", $selected_start );
+        $previous_start = strtotime( "-" . ($period_days - 1) . " days", $previous_end );
+        $upcoming_start = $today;
+        $upcoming_end = strtotime( "+" . ($period_days - 1) . " days", $today );
+        $staff_label = esc_html__( "All staff", "webba-booking-lite" );
+        if ( $staff_member_id !== null ) {
+            $staff_member = new WBK_Staff_Member((int) $staff_member_id);
+            if ( $staff_member->is_loaded() && $staff_member->get_name() !== "" ) {
+                $staff_label = $staff_member->get_name();
+            }
+        }
+        $location_label = esc_html__( "All locations", "webba-booking-lite" );
+        if ( $location_id !== null ) {
+            $location = new WBK_Location((int) $location_id);
+            if ( $location->is_loaded() && $location->get_name() !== "" ) {
+                $location_label = $location->get_name();
+            }
+        }
+        $period_labels = [
+            "l_7"    => esc_html__( "Last 7 days", "webba-booking-lite" ),
+            "l_30"   => esc_html__( "Last 30 days", "webba-booking-lite" ),
+            "l_90"   => esc_html__( "Last 90 days", "webba-booking-lite" ),
+            "custom" => esc_html__( "Custom", "webba-booking-lite" ),
+        ];
+        $period_label = $period_labels[$period] ?? $period_labels["l_30"];
+        $selected_bookings = $this->get_business_overview_bookings(
+            $selected_start,
+            $selected_end,
+            $staff_member_id,
+            $location_id
+        );
+        $previous_bookings = $this->get_business_overview_bookings(
+            $previous_start,
+            $previous_end,
+            $staff_member_id,
+            $location_id
+        );
+        $upcoming_bookings = $this->get_business_overview_bookings(
+            $upcoming_start,
+            $upcoming_end,
+            $staff_member_id,
+            $location_id
+        );
+        $outstanding_bookings = $this->get_business_overview_bookings(
+            null,
+            null,
+            $staff_member_id,
+            $location_id
+        );
+        $selected_metrics = $this->summarize_business_overview_bookings( $selected_bookings, $confirmed_statuses, $cancelled_statuses );
+        $previous_metrics = $this->summarize_business_overview_bookings( $previous_bookings, $confirmed_statuses, $cancelled_statuses );
+        $upcoming_metrics = $this->summarize_business_overview_bookings( $upcoming_bookings, $confirmed_statuses, $cancelled_statuses );
+        $outstanding_total = 0.0;
+        $outstanding_count = 0;
+        $overdue_total = 0.0;
+        foreach ( $outstanding_bookings as $booking ) {
+            $status = $booking->get_status();
+            if ( !in_array( $status, $confirmed_statuses, true ) ) {
+                continue;
+            }
+            $remaining = max( 0.0, (float) $booking->get_price() - (float) $booking->get( "amount_paid" ) );
+            if ( $remaining <= 0 ) {
+                continue;
+            }
+            $outstanding_total += $remaining;
+            $outstanding_count++;
+            if ( (int) $booking->get_day() < $today ) {
+                $overdue_total += $remaining;
+            }
+        }
+        $confirmed_delta = $selected_metrics["confirmed_count"] - $previous_metrics["confirmed_count"];
+        $payments_delta_percent = 0.0;
+        if ( $previous_metrics["payments_collected"] > 0 ) {
+            $payments_delta_percent = ($selected_metrics["payments_collected"] - $previous_metrics["payments_collected"]) / $previous_metrics["payments_collected"] * 100;
+        } elseif ( $selected_metrics["payments_collected"] > 0 ) {
+            $payments_delta_percent = 100.0;
+        }
+        $selected_cancellation_rate = $selected_metrics["cancellation_rate"];
+        $previous_cancellation_rate = $previous_metrics["cancellation_rate"];
+        $cancellation_delta_pp = $selected_cancellation_rate - $previous_cancellation_rate;
+        $week_count = max( 1, (int) ceil( $period_days / 7 ) );
+        $trend_labels = [];
+        $trend_label_timestamps = [];
+        $trend_selected_bookings = [];
+        $trend_previous_bookings = [];
+        $trend_selected_payments = [];
+        $trend_previous_payments = [];
+        for ($week_index = 0; $week_index < $week_count; $week_index++) {
+            $week_start = strtotime( "+" . $week_index * 7 . " days", $selected_start );
+            $week_end = strtotime( "+6 days", $week_start );
+            if ( $week_end > $selected_end ) {
+                $week_end = $selected_end;
+            }
+            $prev_week_start = strtotime( "+" . $week_index * 7 . " days", $previous_start );
+            $prev_week_end = strtotime( "+6 days", $prev_week_start );
+            if ( $prev_week_end > $previous_end ) {
+                $prev_week_end = $previous_end;
+            }
+            $trend_labels[] = date_i18n( "j M", $week_start );
+            $trend_label_timestamps[] = (int) $week_start;
+            $selected_week = $this->summarize_business_overview_bookings( $this->filter_bookings_by_day_range( $selected_bookings, $week_start, $week_end ), $confirmed_statuses, $cancelled_statuses );
+            $previous_week = $this->summarize_business_overview_bookings( $this->filter_bookings_by_day_range( $previous_bookings, $prev_week_start, $prev_week_end ), $confirmed_statuses, $cancelled_statuses );
+            $trend_selected_bookings[] = $selected_week["confirmed_count"];
+            $trend_previous_bookings[] = $previous_week["confirmed_count"];
+            $trend_selected_payments[] = round( $selected_week["payments_collected"], 2 );
+            $trend_previous_payments[] = round( $previous_week["payments_collected"], 2 );
+        }
+        $top_services = [];
+        $service_counts = $selected_metrics["service_counts"];
+        arsort( $service_counts );
+        $max_service_count = ( !empty( $service_counts ) ? max( $service_counts ) : 0 );
+        $service_index = 0;
+        foreach ( $service_counts as $service_id => $count ) {
+            if ( $service_index >= 4 ) {
+                break;
+            }
+            $service = new WBK_Service((int) $service_id);
+            $service_name = ( $service->is_loaded() ? $service->get_name() : esc_html__( "Unknown service", "webba-booking-lite" ) );
+            $top_services[] = [
+                "id"      => (int) $service_id,
+                "name"    => $service_name,
+                "count"   => (int) $count,
+                "percent" => ( $max_service_count > 0 ? (int) round( $count / $max_service_count * 100 ) : 0 ),
+            ];
+            $service_index++;
+        }
+        $comparison_summary = sprintf(
+            /* translators: 1: selected date range, 2: previous date range, 3: number of days, 4: staff label, 5: location label */
+            esc_html__( "%1\$s · Compared with %2\$s · %3\$d days each · %4\$s · %5\$s", "webba-booking-lite" ),
+            $this->format_business_overview_date_range( $selected_start, $selected_end ),
+            $this->format_business_overview_date_range( $previous_start, $previous_end ),
+            $period_days,
+            $staff_label,
+            $location_label
+        );
+        $upcoming_remaining = max( 0.0, $upcoming_metrics["confirmed_value"] - $upcoming_metrics["payments_collected"] );
+        $upcoming_paid_percent = 0;
+        if ( $upcoming_metrics["confirmed_value"] > 0 ) {
+            $upcoming_paid_percent = (int) round( $upcoming_metrics["payments_collected"] / $upcoming_metrics["confirmed_value"] * 100 );
+        }
+        date_default_timezone_set( $prev_time_zone );
+        return [
+            "title"             => esc_html__( "Business overview", "webba-booking-lite" ),
+            "period"            => $period,
+            "periodLabel"       => $period_label,
+            "comparisonSummary" => $comparison_summary,
+            "selectedStart"     => (int) $selected_start,
+            "selectedEnd"       => (int) $selected_end,
+            "previousStart"     => (int) $previous_start,
+            "previousEnd"       => (int) $previous_end,
+            "upcomingStart"     => (int) $upcoming_start,
+            "upcomingEnd"       => (int) $upcoming_end,
+            "periodDays"        => (int) $period_days,
+            "staffLabel"        => $staff_label,
+            "locationLabel"     => $location_label,
+            "upcomingValue"     => [
+                "title"                => esc_html__( "Upcoming booking value", "webba-booking-lite" ),
+                "subtitle"             => sprintf( 
+                    /* translators: 1: number of days, 2: date range */
+                    esc_html__( "Next %1\$d days · %2\$s", "webba-booking-lite" ),
+                    $period_days,
+                    $this->format_business_overview_date_range( $upcoming_start, $upcoming_end, true )
+                 ),
+                "total"                => round( $upcoming_metrics["confirmed_value"], 2 ),
+                "totalFormatted"       => WBK_Format_Utils::format_price( $upcoming_metrics["confirmed_value"] ),
+                "alreadyPaid"          => round( $upcoming_metrics["payments_collected"], 2 ),
+                "alreadyPaidFormatted" => WBK_Format_Utils::format_price( $upcoming_metrics["payments_collected"] ),
+                "remaining"            => round( $upcoming_remaining, 2 ),
+                "remainingFormatted"   => WBK_Format_Utils::format_price( $upcoming_remaining ),
+                "paidPercent"          => $upcoming_paid_percent,
+                "bookingsLabel"        => sprintf(
+                    /* translators: 1: number of bookings, 2: staff label, 3: location label */
+                    esc_html__( "%1\$d confirmed bookings · %2\$s · %3\$s", "webba-booking-lite" ),
+                    $upcoming_metrics["confirmed_count"],
+                    $staff_label,
+                    $location_label
+                ),
+                "note"                 => esc_html__( "Confirmed appointments only · Pending and cancelled excluded", "webba-booking-lite" ),
+            ],
+            "metrics"           => [
+                "confirmedBookings" => [
+                    "label"          => esc_html__( "Confirmed bookings", "webba-booking-lite" ),
+                    "value"          => $selected_metrics["confirmed_count"],
+                    "valueFormatted" => (string) $selected_metrics["confirmed_count"],
+                    "comparison"     => sprintf( 
+                        /* translators: %s: signed number delta */
+                        esc_html__( "%s vs. previous period", "webba-booking-lite" ),
+                        (( $confirmed_delta > 0 ? "+" : "" )) . $confirmed_delta
+                     ),
+                    "comparisonTone" => ( $confirmed_delta >= 0 ? "positive" : "negative" ),
+                ],
+                "paymentsCollected" => [
+                    "label"          => esc_html__( "Payments collected", "webba-booking-lite" ),
+                    "value"          => round( $selected_metrics["payments_collected"], 2 ),
+                    "valueFormatted" => WBK_Format_Utils::format_price( $selected_metrics["payments_collected"] ),
+                    "comparison"     => sprintf( 
+                        /* translators: %s: signed percent delta */
+                        esc_html__( "%s%% vs. previous period", "webba-booking-lite" ),
+                        (( $payments_delta_percent > 0 ? "+" : "" )) . rtrim( rtrim( number_format(
+                            $payments_delta_percent,
+                            1,
+                            ".",
+                            ""
+                        ), "0" ), "." )
+                     ),
+                    "comparisonTone" => ( $payments_delta_percent >= 0 ? "positive" : "negative" ),
+                ],
+                "outstanding"       => [
+                    "label"          => esc_html__( "Outstanding · all dates", "webba-booking-lite" ),
+                    "value"          => round( $outstanding_total, 2 ),
+                    "valueFormatted" => WBK_Format_Utils::format_price( $outstanding_total ),
+                    "comparison"     => sprintf( 
+                        /* translators: 1: number of bookings, 2: overdue amount */
+                        esc_html__( "%1\$d bookings · %2\$s overdue", "webba-booking-lite" ),
+                        $outstanding_count,
+                        WBK_Format_Utils::format_price( $overdue_total )
+                     ),
+                    "comparisonTone" => "neutral",
+                    "hasAction"      => true,
+                ],
+                "cancellationRate"  => [
+                    "label"          => esc_html__( "Cancellation rate", "webba-booking-lite" ),
+                    "value"          => round( $selected_cancellation_rate, 1 ),
+                    "valueFormatted" => rtrim( rtrim( number_format(
+                        $selected_cancellation_rate,
+                        1,
+                        ".",
+                        ""
+                    ), "0" ), "." ) . "%",
+                    "comparison"     => sprintf( 
+                        /* translators: %s: signed percentage-point delta */
+                        esc_html__( "%s pp vs. previous period", "webba-booking-lite" ),
+                        (( $cancellation_delta_pp > 0 ? "+" : "" )) . rtrim( rtrim( number_format(
+                            $cancellation_delta_pp,
+                            1,
+                            ".",
+                            ""
+                        ), "0" ), "." )
+                     ),
+                    "comparisonTone" => ( $cancellation_delta_pp <= 0 ? "positive" : "negative" ),
+                ],
+            ],
+            "trend"             => [
+                "title"           => esc_html__( "Booking trend", "webba-booking-lite" ),
+                "subtitle"        => esc_html__( "Confirmed bookings · grouped by appointment date", "webba-booking-lite" ),
+                "labels"          => $trend_labels,
+                "labelTimestamps" => $trend_label_timestamps,
+                "selectedLabel"   => esc_html__( "Selected period", "webba-booking-lite" ),
+                "previousLabel"   => esc_html__( "Previous period", "webba-booking-lite" ),
+                "bookings"        => [
+                    "selected" => $trend_selected_bookings,
+                    "previous" => $trend_previous_bookings,
+                ],
+                "payments"        => [
+                    "selected" => $trend_selected_payments,
+                    "previous" => $trend_previous_payments,
+                ],
+            ],
+            "topServices"       => [
+                "title"       => esc_html__( "Top services", "webba-booking-lite" ),
+                "metricLabel" => esc_html__( "Bookings", "webba-booking-lite" ),
+                "items"       => $top_services,
+            ],
+        ];
+    }
+
+    /**
+     * Load bookings for business overview within an optional day range.
+     *
+     * @param int|null $start_day Midnight timestamp inclusive, or null for no lower bound.
+     * @param int|null $end_day Midnight timestamp inclusive, or null for no upper bound.
+     * @param int|null $staff_member_id Optional staff filter.
+     * @param int|null $location_id Optional location filter.
+     * @return WBK_Booking[]
+     */
+    private function get_business_overview_bookings(
+        $start_day = null,
+        $end_day = null,
+        $staff_member_id = null,
+        $location_id = null
+    ) : array {
+        global $wpdb;
+        $table = get_option( "wbk_db_prefix", "" ) . "wbk_appointments";
+        $where = ["1=1"];
+        $params = [];
+        if ( $start_day !== null ) {
+            $where[] = "day >= %d";
+            $params[] = (int) $start_day;
+        }
+        if ( $end_day !== null ) {
+            $where[] = "day <= %d";
+            $params[] = (int) $end_day;
+        }
+        if ( $staff_member_id !== null ) {
+            $where[] = "staff_member_id = %d";
+            $params[] = (int) $staff_member_id;
+        }
+        if ( $location_id !== null ) {
+            $where[] = "location_id = %d";
+            $params[] = (int) $location_id;
+        }
+        $sql = "SELECT id FROM {$table} WHERE " . implode( " AND ", $where );
+        if ( !empty( $params ) ) {
+            $sql = $wpdb->prepare( $sql, $params );
+        }
+        $booking_ids = $wpdb->get_col( $sql );
+        if ( !is_array( $booking_ids ) || empty( $booking_ids ) ) {
+            return [];
+        }
+        $bookings = [];
+        foreach ( $booking_ids as $booking_id ) {
+            $booking = new WBK_Booking((int) $booking_id);
+            if ( $booking->is_loaded() ) {
+                $bookings[] = $booking;
+            }
+        }
+        return $bookings;
+    }
+
+    /**
+     * Filter booking objects by inclusive day range.
+     *
+     * @param WBK_Booking[] $bookings
+     * @param int $start_day
+     * @param int $end_day
+     * @return WBK_Booking[]
+     */
+    private function filter_bookings_by_day_range( array $bookings, int $start_day, int $end_day ) : array {
+        $filtered = [];
+        foreach ( $bookings as $booking ) {
+            $day = (int) $booking->get_day();
+            if ( $day >= $start_day && $day <= $end_day ) {
+                $filtered[] = $booking;
+            }
+        }
+        return $filtered;
+    }
+
+    /**
+     * Summarize bookings for confirmed/cancelled/payment metrics.
+     *
+     * @param WBK_Booking[] $bookings
+     * @param string[] $confirmed_statuses
+     * @param string[] $cancelled_statuses
+     * @return array
+     */
+    private function summarize_business_overview_bookings( array $bookings, array $confirmed_statuses, array $cancelled_statuses ) : array {
+        $confirmed_count = 0;
+        $cancelled_count = 0;
+        $confirmed_value = 0.0;
+        $payments_collected = 0.0;
+        $service_counts = [];
+        foreach ( $bookings as $booking ) {
+            $status = $booking->get_status();
+            if ( in_array( $status, $cancelled_statuses, true ) ) {
+                $cancelled_count++;
+                continue;
+            }
+            if ( !in_array( $status, $confirmed_statuses, true ) ) {
+                continue;
+            }
+            $confirmed_count++;
+            $price = (float) $booking->get_price();
+            $amount_paid = (float) $booking->get( "amount_paid" );
+            $confirmed_value += $price;
+            $payments_collected += $amount_paid;
+            $service_id = (int) $booking->get_service();
+            if ( $service_id > 0 ) {
+                if ( !isset( $service_counts[$service_id] ) ) {
+                    $service_counts[$service_id] = 0;
+                }
+                $service_counts[$service_id]++;
+            }
+        }
+        $denominator = $confirmed_count + $cancelled_count;
+        $cancellation_rate = ( $denominator > 0 ? $cancelled_count / $denominator * 100 : 0.0 );
+        return [
+            "confirmed_count"    => $confirmed_count,
+            "cancelled_count"    => $cancelled_count,
+            "confirmed_value"    => $confirmed_value,
+            "payments_collected" => $payments_collected,
+            "cancellation_rate"  => $cancellation_rate,
+            "service_counts"     => $service_counts,
+        ];
+    }
+
+    /**
+     * Format a day range label for business overview.
+     *
+     * @param int  $start_day
+     * @param int  $end_day
+     * @param bool $include_year
+     * @return string
+     */
+    private function format_business_overview_date_range( int $start_day, int $end_day, bool $include_year = false ) : string {
+        $start_month = date_i18n( "M", $start_day );
+        $end_month = date_i18n( "M", $end_day );
+        $year_suffix = ( $include_year ? ", " . date_i18n( "Y", $end_day ) : "" );
+        if ( $start_month === $end_month ) {
+            return sprintf(
+                "%s %s–%s%s",
+                date_i18n( "j", $start_day ),
+                $start_month,
+                date_i18n( "j", $end_day ),
+                $year_suffix
+            );
+        }
+        return sprintf(
+            "%s %s–%s %s%s",
+            date_i18n( "j", $start_day ),
+            $start_month,
+            date_i18n( "j", $end_day ),
+            $end_month,
+            $year_suffix
+        );
+    }
+
+    /**
+     * Build next-7-days hours availability stats for the dashboard.
+     *
+     * @param int|null $staff_member_id Optional staff member filter.
+     * @return array
+     */
+    private function build_hours_availability_stats( $staff_member_id = null ) : array {
+        $staff_label = esc_html__( "All staff", "webba-booking-lite" );
+        $service_ids = WBK_Model_Utils::get_service_ids();
+        if ( $staff_member_id !== null ) {
+            $staff_member = new WBK_Staff_Member((int) $staff_member_id);
+            if ( $staff_member->is_loaded() ) {
+                $staff_name = $staff_member->get_name();
+                if ( $staff_name !== "" ) {
+                    $staff_label = $staff_name;
+                }
+                $staff_services = $staff_member->get_services();
+                if ( is_array( $staff_services ) && !empty( $staff_services ) ) {
+                    $service_ids = array_values( array_intersect( array_map( "intval", $service_ids ), array_map( "intval", $staff_services ) ) );
+                } else {
+                    $service_ids = [];
+                }
+            } else {
+                $service_ids = [];
+            }
+        }
+        $prev_time_zone = date_default_timezone_get();
+        date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+        $week_start = strtotime( "today midnight" );
+        $days_payload = [];
+        $week_booked_minutes = 0.0;
+        $week_total_minutes = 0.0;
+        $week_free_minutes = 0.0;
+        $slot_options = [
+            "skip_gg_calendar"       => false,
+            "ignore_preparation"     => false,
+            "calculate_availability" => true,
+        ];
+        $schedule_processor = new WBK_Schedule_Processor();
+        $schedule_processor->load_data();
+        $services_cache = [];
+        foreach ( $service_ids as $service_id ) {
+            $service = new WBK_Service((int) $service_id);
+            if ( $service->is_loaded() ) {
+                $services_cache[(int) $service_id] = $service;
+            }
+        }
+        for ($day_offset = 0; $day_offset < 7; $day_offset++) {
+            $day_timestamp = strtotime( "+" . $day_offset . " days", $week_start );
+            $day_booked_minutes = 0.0;
+            $day_total_minutes = 0.0;
+            $day_free_minutes = 0.0;
+            $has_open_service = false;
+            foreach ( $services_cache as $service_id => $service ) {
+                $day_status = $schedule_processor->get_day_status( $day_timestamp, $service_id, $staff_member_id );
+                if ( (int) $day_status !== 1 ) {
+                    continue;
+                }
+                $has_open_service = true;
+                $timeslots = $schedule_processor->get_time_slots_by_day(
+                    $day_timestamp,
+                    $service_id,
+                    $slot_options,
+                    null,
+                    false,
+                    $staff_member_id
+                );
+                if ( !is_array( $timeslots ) || empty( $timeslots ) ) {
+                    continue;
+                }
+                $quantity = max( 1, (int) $service->get_quantity() );
+                foreach ( $timeslots as $slot ) {
+                    if ( !is_object( $slot ) || !method_exists( $slot, "get_start" ) ) {
+                        continue;
+                    }
+                    $duration_seconds = (int) $slot->get_end() - (int) $slot->get_start();
+                    if ( $duration_seconds <= 0 ) {
+                        continue;
+                    }
+                    $duration_minutes = $duration_seconds / 60;
+                    $free_places = (int) $slot->get_free_places();
+                    if ( $free_places < 0 ) {
+                        $free_places = 0;
+                    }
+                    if ( $free_places > $quantity ) {
+                        $free_places = $quantity;
+                    }
+                    $booked_places = $quantity - $free_places;
+                    $day_total_minutes += $quantity * $duration_minutes;
+                    $day_booked_minutes += $booked_places * $duration_minutes;
+                    $day_free_minutes += $free_places * $duration_minutes;
+                }
+            }
+            $is_closed = !$has_open_service || $day_total_minutes <= 0;
+            $booked_percent = null;
+            if ( !$is_closed ) {
+                $booked_percent = (int) round( $day_booked_minutes / $day_total_minutes * 100 );
+                $week_booked_minutes += $day_booked_minutes;
+                $week_total_minutes += $day_total_minutes;
+                $week_free_minutes += $day_free_minutes;
+            }
+            $days_payload[] = [
+                "date"           => date( "Y-m-d", $day_timestamp ),
+                "timestamp"      => (int) $day_timestamp,
+                "dayLabel"       => date_i18n( "D", $day_timestamp ),
+                "bookedPercent"  => $booked_percent,
+                "isClosed"       => $is_closed,
+                "remainingHours" => ( $is_closed ? 0 : round( $day_free_minutes / 60, 1 ) ),
+            ];
+        }
+        $first_day = $week_start;
+        $last_day = strtotime( "+6 days", $week_start );
+        $first_month = date_i18n( "M", $first_day );
+        $last_month = date_i18n( "M", $last_day );
+        if ( $first_month === $last_month ) {
+            $date_range_label = sprintf(
+                "%s %s–%s",
+                $first_month,
+                date_i18n( "j", $first_day ),
+                date_i18n( "j", $last_day )
+            );
+        } else {
+            $date_range_label = sprintf(
+                "%s %s–%s %s",
+                $first_month,
+                date_i18n( "j", $first_day ),
+                $last_month,
+                date_i18n( "j", $last_day )
+            );
+        }
+        $week_booked_percent = 0;
+        if ( $week_total_minutes > 0 ) {
+            $week_booked_percent = (int) round( $week_booked_minutes / $week_total_minutes * 100 );
+        }
+        $remaining_hours = round( $week_free_minutes / 60, 1 );
+        $open_days_with_availability = array_values( array_filter( $days_payload, function ( $day_row ) {
+            return empty( $day_row["isClosed"] ) && (float) $day_row["remainingHours"] > 0;
+        } ) );
+        usort( $open_days_with_availability, function ( $left, $right ) {
+            return (float) $right["remainingHours"] <=> (float) $left["remainingHours"];
+        } );
+        if ( empty( $open_days_with_availability ) ) {
+            $insight_text = esc_html__( "No availability in the week ahead.", "webba-booking-lite" );
+        } else {
+            $top_days = array_slice( $open_days_with_availability, 0, 2 );
+            $weekday_names = [];
+            foreach ( $top_days as $day_row ) {
+                $weekday_names[] = date_i18n( "l", strtotime( $day_row["date"] . " midnight" ) );
+            }
+            if ( count( $weekday_names ) === 1 ) {
+                $insight_text = sprintf( 
+                    /* translators: %s: weekday name */
+                    esc_html__( "Most availability on %s.", "webba-booking-lite" ),
+                    $weekday_names[0]
+                 );
+            } else {
+                $insight_text = sprintf( 
+                    /* translators: 1: weekday name, 2: weekday name */
+                    esc_html__( "Most availability on %s and %s.", "webba-booking-lite" ),
+                    esc_html( $weekday_names[0] ),
+                    esc_html( $weekday_names[1] )
+                 );
+            }
+        }
+        date_default_timezone_set( $prev_time_zone );
+        $remaining_hours_display = ( fmod( $remaining_hours, 1.0 ) === 0.0 ? (string) (int) $remaining_hours : (string) $remaining_hours );
+        return [
+            "title"               => esc_html__( "The week ahead", "webba-booking-lite" ),
+            "dateRangeLabel"      => $date_range_label,
+            "staffLabel"          => $staff_label,
+            "bookedPercent"       => $week_booked_percent,
+            "remainingHours"      => $remaining_hours,
+            "remainingHoursLabel" => sprintf( 
+                /* translators: %s: number of hours */
+                esc_html__( "%s hours available", "webba-booking-lite" ),
+                $remaining_hours_display
+             ),
+            "insightText"         => $insight_text,
+            "days"                => $days_payload,
+        ];
     }
 
     /**

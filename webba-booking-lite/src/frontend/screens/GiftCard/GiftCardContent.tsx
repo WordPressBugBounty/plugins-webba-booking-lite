@@ -7,6 +7,7 @@ import { IFormContext } from '../../components/Form/types'
 import { Validators, validateField } from '../../components/Form/validation'
 import { useBookingContext } from '../../providers/BookingFormProvider/BookingFormProvider'
 import { stripeMethods } from '../BookingForm/PaymentHandler/payments/Stripe/StripeMethods'
+import { tokenizeSquareCard } from '../../lib/chargeSquarePayment'
 import {
     GiftCardPaymentSection,
 } from './GiftCardPaymentSection'
@@ -64,7 +65,7 @@ export const GiftCardContent = ({
     paypalReturnPaymentId,
 }: GiftCardContentProps) => {
     const { anyTouched, setAnyTouched } = useForm() as IFormContext
-    const { stripeObj, preset, priceFormat } = useBookingContext()
+    const { stripeObj, squareObj, preset, priceFormat } = useBookingContext()
     const presetAmounts = useMemo(
         () => getGiftCardPresetAmounts(preset),
         [preset]
@@ -123,7 +124,11 @@ export const GiftCardContent = ({
         return !!stripeObj?.isValidated
     }, [isStripeMethod, isWalletMethod, stripeDetails, stripeObj?.isValidated])
 
-    const canPurchase = isFormValid && isStripeReady && !!selectedMethod
+    const isSquareMethod = selectedMethod === 'square'
+    const isSquareReady = !isSquareMethod || !!squareObj?.isValidated
+
+    const canPurchase =
+        isFormValid && isStripeReady && isSquareReady && !!selectedMethod
 
     const buildPayload = useCallback(() => {
         const getValue = (slug: string) =>
@@ -282,6 +287,34 @@ export const GiftCardContent = ({
                 return
             }
 
+            const squarePayload: Record<string, string> = {}
+            if (isSquareMethod) {
+                const payload = buildPayload()
+                const tokenResult = await tokenizeSquareCard({
+                    squareObj,
+                    amount: amountValue,
+                    currency:
+                        squareObj?.currency ||
+                        preset?.settings?.square_currency ||
+                        'USD',
+                    email: payload.buyer_email,
+                    givenName: payload.buyer_name,
+                })
+                if (tokenResult.error || !tokenResult.token) {
+                    setPurchaseError(
+                        tokenResult.error ||
+                            __(
+                                'Card tokenization failed',
+                                'webba-booking-lite'
+                            )
+                    )
+                    return
+                }
+                squarePayload.square_source_id = tokenResult.token
+                squarePayload.square_verification_token =
+                    tokenResult.verificationToken || ''
+            }
+
             const response = await apiFetch<{
                 success?: boolean
                 message?: string
@@ -292,7 +325,7 @@ export const GiftCardContent = ({
             }>({
                 path: '/wbk/v2/purchase-gift-card/',
                 method: 'POST',
-                data: buildPayload(),
+                data: { ...buildPayload(), ...squarePayload },
             })
 
             if (!response?.success) {
@@ -340,6 +373,10 @@ export const GiftCardContent = ({
         setPurchasing,
         stripeDetails,
         completeStripePurchase,
+        isSquareMethod,
+        squareObj,
+        amountValue,
+        preset,
         buildPayload,
         setPurchaseError,
         setPaymentUrl,

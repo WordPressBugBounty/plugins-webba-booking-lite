@@ -68,6 +68,12 @@ class WBK_Model
                 "/includes/migrations/class-wbk-migration-push-subscriptions.php";
         }
         WBK_Migration_Push_Subscriptions::run();
+
+        if (!class_exists("WBK_Migration_Zapier_Deliveries")) {
+            require_once WP_WEBBA_BOOKING__PLUGIN_DIR .
+                "/includes/migrations/class-wbk-migration-zapier-deliveries.php";
+        }
+        WBK_Migration_Zapier_Deliveries::run();
     }
 
     /**
@@ -1230,6 +1236,28 @@ class WBK_Model
             "service_google_meet_enabled",
             "google_meet_enabled",
             __("Create Google Meet meetings", "webba-booking-lite"),
+            "checkbox",
+            "integrations",
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => $tooltip,
+                "pro_version" => true,
+                "required_plan" => "premium", // TIER 3
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+        // Send Zapier webhooks for this service
+        $tooltip = __(
+            "Send booking events for this service to your Zapier Catch Hook. (Requires enabling Zapier in Integrations settings.)",
+            "webba-booking-lite",
+        );
+        $table->add_field(
+            "service_zapier",
+            "zapier",
+            __("Send to Zapier", "webba-booking-lite"),
             "checkbox",
             "integrations",
             [
@@ -2461,6 +2489,23 @@ class WBK_Model
             false,
         );
         $table->add_field(
+            "appointment_icloud_event_id",
+            "icloud_event_id",
+            "icloud_event_id",
+            "text",
+            "",
+            [
+                "tooltip" => __(
+                    "iCloud Calendar event UID mapping linked to this booking.",
+                    "webba-booking-lite",
+                ),
+            ],
+            "",
+            false,
+            false,
+            false,
+        );
+        $table->add_field(
             "appointment_prev_status",
             "prev_status",
             "prev_status",
@@ -2627,7 +2672,7 @@ class WBK_Model
             "",
             [
                 "tooltip" => __(
-                    "Select the calendar provider to connect (Google Calendar or Microsoft Outlook).",
+                    "Select the calendar provider to connect (Google Calendar, Microsoft Outlook, or iCloud Calendar).",
                     "webba-booking-lite",
                 ),
                 "options" => [
@@ -2640,6 +2685,12 @@ class WBK_Model
                         "value" => "outlook",
                         "title" => __("Microsoft/Outlook", "webba-booking-lite"),
                         "icon" => "icon-microsoft.svg",
+                        "required_plan" => "premium",
+                    ],
+                    [
+                        "value" => "icloud",
+                        "title" => __("iCloud Calendar", "webba-booking-lite"),
+                        "icon" => "icon-brand-apple.svg",
                         "required_plan" => "premium",
                     ],
                 ],

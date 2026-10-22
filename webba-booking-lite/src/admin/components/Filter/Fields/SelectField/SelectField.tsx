@@ -89,7 +89,7 @@ export const SelectField = ({
 
     const options: IOption[] = useOptions({
         options: field?.options as TFilterSelectOptions,
-        nullValue: field.null_value,
+        nullValue: field?.null_value,
     })
 
     const selectedValues = useMemo(() => {

@@ -1,3 +1,46 @@
 .wbk_servicesScreen__units {
     position: relative;
 }
+
+.wbk_servicesScreen {
+    .wbk_servicesScreen__tabs {
+        position: relative;
+        z-index: 2;
+        width: fit-content;
+        max-width: calc(100% - 40px);
+        margin: 20px 20px -1px;
+        padding: 0;
+        background: var(--wbk-admin-page-bg);
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+            height: 0;
+        }
+    }
+
+    .wbk_servicesScreen__tab {
+        margin: 0;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .wbk_table__container {
+        margin-top: 0;
+        border-top-left-radius: 0;
+    }
+
+    .wbk_table__titleContainer {
+        border-top-left-radius: 0;
+    }
+
+    @include mobile {
+        .wbk_servicesScreen__tabs {
+            max-width: calc(100% - 20px);
+            margin: 10px 10px -1px;
+        }
+    }
+}

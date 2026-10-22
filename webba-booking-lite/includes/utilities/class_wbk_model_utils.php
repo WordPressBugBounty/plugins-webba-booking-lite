@@ -997,6 +997,12 @@ class WBK_Model_Utils {
             ["%s"],
             ["%d"]
         );
+        do_action(
+            "wbk_booking_status_changed",
+            $booking_id,
+            $prev_status,
+            $status
+        );
     }
 
     public static function set_booking_end( $booking_id ) {

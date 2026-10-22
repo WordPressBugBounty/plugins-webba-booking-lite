@@ -9,3 +9,8 @@ declare module '*.module.scss' {
     const styles: CSSModule
     export default styles
 }
+
+declare module '*.scss' {
+    const content: string
+    export default content
+}

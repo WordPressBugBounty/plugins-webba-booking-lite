@@ -117,9 +117,9 @@ $transition: 0.3s all linear;
     }
 
     &__title {
-        font-weight: 400 !important;
-        font-size: 20px !important;
-        line-height: 28px !important;
+        font-weight: 600 !important;
+        font-size: 16px !important;
+        line-height: 24px !important;
         letter-spacing: 0.5%;
         vertical-align: middle;
         color: colors.$wbk-color-sidebar !important;
@@ -127,10 +127,10 @@ $transition: 0.3s all linear;
         margin: 0 !important;
         margin-bottom: 24px;
         text-align: left !important;
-        padding: 24px 24px 0;
+        padding: 12px 12px 0;
 
         @media screen and (max-width: 768px) {
-            padding-bottom: 24px;
+            padding-bottom: 12px;
         }
     }
 
@@ -143,6 +143,7 @@ $transition: 0.3s all linear;
 
         &__inner {
             @extend .wbk_sidebar__items;
+            align-items: center;
             max-height: 360px;
             overflow-y: auto;
             overflow-x: hidden;
@@ -175,7 +176,7 @@ $transition: 0.3s all linear;
             width: 100%;
             padding-top: 16px;
             border-top: 1px solid #edeff2;
-            padding: 4px 24px 4px 24px;
+            padding: 4px 12px 4px 12px;
 
             &--vertical {
                 flex-flow: column;
@@ -208,50 +209,41 @@ $transition: 0.3s all linear;
                 margin-right: auto;
             }
 
-            &__slot-wrapper {
+            &__date-row {
                 display: flex;
                 align-items: center;
-                gap: 4px;
-                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 6px;
+                width: 100%;
+            }
 
-                &:hover {
-                    .wbk_sidebar__items__item__slot-wrapper__remove-button {
-                        display: flex;
-                    }
-                }
+            &__date-label {
+                flex-shrink: 0;
+                font-weight: 400;
+                font-size: 12px;
+                line-height: 12px;
+                color: colors.$wbk-color-sidebar;
+            }
 
-                &__remove-button {
-                    border: 1px solid red;
-                    border-radius: 50%;
-                    min-width: 14px;
-                    width: 14px;
-                    height: 14px;
-                    min-height: 14px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    transition: 0.3s all linear;
-                    display: none;
-
-                    svg {
-                        path {
-                            fill: red;
-                        }
-                    }
-
-                    svg {
-                        width: 8px;
-                        height: 8px;
-                        object-fit: contain;
-                    }
-                }
+            &__time-pill {
+                display: inline-flex;
+                align-items: center;
+                padding: 2px 8px;
+                border-radius: 4px;
+                background-color: color-mix(in srgb,
+                        colors.$wbk-color-sidebar 16%,
+                        transparent);
+                font-size: 12px;
+                line-height: 12px;
+                font-weight: 400;
+                color: colors.$wbk-color-sidebar;
+                white-space: nowrap;
             }
 
             &__title {
                 font-weight: 400 !important;
                 font-size: 14px !important;
-                line-height: 22px !important;
+                line-height: 16px !important;
                 letter-spacing: 1%;
                 vertical-align: middle;
                 margin: 0;
@@ -266,12 +258,13 @@ $transition: 0.3s all linear;
                 white-space: nowrap;
                 margin-right: unset;
                 text-align: right;
+                margin-top: 0;
             }
 
             &__subline {
                 font-weight: 300;
-                font-size: 14px;
-                line-height: 18px;
+                font-size: 10px;
+                line-height: 12px;
                 letter-spacing: 1%;
                 vertical-align: middle;
                 color: colors.$wbk-color-sidebar;
@@ -358,7 +351,7 @@ $transition: 0.3s all linear;
             &__button-remove {
                 cursor: pointer;
                 display: inline-flex;
-                margin-top: 6px;
+                margin-top: 0;
                 transition: 0.2s all linear;
                 width: 16px;
                 height: 16px;
@@ -457,7 +450,7 @@ $transition: 0.3s all linear;
             gap: 0px;
 
             .wbk_sidebar__items__item {
-                padding: 8px 24px 0px 24px;
+                padding: 8px 12px 0px 12px;
             }
         }
     }
@@ -477,7 +470,7 @@ $transition: 0.3s all linear;
             font-weight: 500;
             border: none;
             background: none;
-            padding: 8px 24px 8px;
+            padding: 8px 12px 8px;
 
             &:focus {
                 outline: none;
@@ -490,13 +483,14 @@ $transition: 0.3s all linear;
 
         &__icon {
             transition: 0.3s all ease-in;
+            transform: rotate(-90deg);
 
             path {
                 fill: colors.$wbk-color-sidebar;
             }
 
             &--expanded {
-                transform: rotate(180deg);
+                transform: rotate(0deg);
             }
         }
 
@@ -504,7 +498,7 @@ $transition: 0.3s all linear;
             display: flex;
             flex-flow: column;
             gap: 8px;
-            padding: 10px 24px 4px;
+            padding: 10px 12px 4px;
 
             .wbk_sidebar__items__item__inner {
                 padding-top: 0;
@@ -533,7 +527,7 @@ $transition: 0.3s all linear;
             font-weight: 500;
             border: none;
             background: none;
-            padding: 8px 24px 0;
+            padding: 8px 12px 0;
 
             &:focus {
                 outline: none;
@@ -542,13 +536,14 @@ $transition: 0.3s all linear;
 
         &__icon {
             transition: 0.3s all ease-in;
+            transform: rotate(-90deg);
 
             path {
                 fill: colors.$wbk-color-sidebar;
             }
 
             &--expanded {
-                transform: rotate(180deg);
+                transform: rotate(0deg);
             }
         }
     }
@@ -560,18 +555,18 @@ $transition: 0.3s all linear;
         display: flex;
         flex-flow: column;
         gap: 4px;
-        font-size: 11px;
+        font-size: 12px;
         line-height: 16px;
         color: colors.$wbk-color-sidebar;
         font-family: colors.$wbk-font;
-        padding: 8px 24px 8px;
+        padding: 8px 12px 8px;
 
         &__row {
             display: flex;
             justify-content: space-between;
             align-items: center;
 
-            &--has-bottom-border{
+            &--has-bottom-border {
                 border-bottom: 1px solid #edeff2;
                 padding-bottom: 8px;
                 margin-bottom: 8px;
@@ -584,6 +579,8 @@ $transition: 0.3s all linear;
 
         &__button {
             width: 100%;
+            font-size: 14px;
+            padding: 10px 14px!important;
         }
     }
 
@@ -596,7 +593,7 @@ $transition: 0.3s all linear;
         margin: 0;
         color: colors.$wbk-color-sidebar;
         // opacity: 0.8;
-        padding: 0px 24px;
+        padding: 0px 12px;
         margin-bottom: 4px;
         text-align: left !important;
     }
@@ -605,14 +602,14 @@ $transition: 0.3s all linear;
         margin-top: auto;
 
         &__title {
-            font-weight: 400 !important;
-            font-size: 14px !important;
-            line-height: 22px !important;
+            font-weight: 600 !important;
+            font-size: 12px !important;
+            line-height: 16px !important;
             letter-spacing: 1%;
             vertical-align: middle;
             color: colors.$wbk-color-sidebar !important;
             font-family: colors.$wbk-font !important;
-            padding: 0 24px 10px;
+            padding: 0 12px 10px;
             margin-bottom: 10px;
             border-bottom: 1px solid #edeff2;
             word-break: break-word;
@@ -622,13 +619,13 @@ $transition: 0.3s all linear;
             display: flex;
             flex-flow: column;
             gap: 10px;
-            padding: 0 24px 24px 24px;
+            padding: 0 12px 12px 12px;
 
             a {
                 text-decoration: none;
                 font-weight: 300;
-                font-size: 14px;
-                line-height: 22px;
+                font-size: 12px;
+                line-height: 16px;
                 letter-spacing: 1%;
                 vertical-align: middle;
                 display: flex;
@@ -651,7 +648,7 @@ $transition: 0.3s all linear;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 24px 12px 24px;
+            padding: 12px 12px 12px 12px;
             border-top: 1px solid #edeff2;
             border-radius: 0 0 colors.$wbk-border-radius colors.$wbk-border-radius;
             gap: 16px;

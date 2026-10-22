@@ -45,6 +45,26 @@ class WBK_Square
         return [0, __('Payment method not supported')];
     }
 
+    /**
+     * Square gift card payments are not available in the lite version.
+     *
+     * @param float  $amount
+     * @param string $source_id
+     * @param string $idempotency_key
+     * @param string $verification_token
+     * @param string $buyer_email
+     * @return array
+     */
+    public function charge_gift_card(
+        $amount,
+        $source_id,
+        $idempotency_key,
+        $verification_token = '',
+        $buyer_email = ''
+    ) {
+        return [0, __('Payment method not supported', 'webba-booking-lite')];
+    }
+
     public static function render_initial_form(
         $input,
         $payment_method,

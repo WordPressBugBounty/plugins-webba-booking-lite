@@ -22,10 +22,8 @@ import { StatusCell } from '../../components/WebbaDataTable/cells/Status/Status'
 import { ServiceName } from '../../components/WebbaDataTable/cells/ServiceName/ServiceName'
 import { BookingDetail } from '../../components/WebbaDataTable/cells/BookingDetail/BookingDetail'
 import { useMemo, useState } from 'react'
-import { wbkFormat } from '../../components/Form/utils/dateTime'
 import { getUnixTime } from 'date-fns'
 import './Dashboard.scss'
-import helloIcon from '../../../../public/images/hello-dashboard.png'
 import { CustomerName } from '../../components/WebbaDataTable/cells/CustomerName/CustomerName'
 import { BookingTime } from '../../components/WebbaDataTable/cells/BookingTime/BookingTime'
 import { DurationCell } from '../../components/WebbaDataTable/cells/DurationCell/DurationCell'
@@ -123,9 +121,9 @@ export const RecentBookings = () => {
                         return (amount_paid && amount_paid > 0) ||
                             moment_price > 0
                             ? settings?.price_format.replace(
-                                  '#price',
-                                  amount_paid || 0
-                              )
+                                '#price',
+                                amount_paid || 0
+                            )
                             : __('Free', 'webba-booking-lite')
                     },
                 },
@@ -198,26 +196,6 @@ export const RecentBookings = () => {
 
     return (
         <div className="wbk_dashboard__recentBookings">
-            <div className="wbk_dashboard__welcomeMessage">
-                <h2>
-                    <img
-                        src={helloIcon}
-                        alt={__('Shaking hand', 'webba-booking-lite')}
-                    />
-                    {__('Hello', 'webba-booking-lite')}
-                </h2>
-                <p>
-                    {bookings.length > 0
-                        ? __(
-                              `You have ${bookings.length} new bookings in the past 24 hours`,
-                              'webba-booking-lite'
-                          )
-                        : __(
-                              'No bookings in the last 24 hours',
-                              'webba-booking-lite'
-                          )}
-                </p>
-            </div>
             <TableProvider table={dynamicTable}>
                 <Table
                     title={__(

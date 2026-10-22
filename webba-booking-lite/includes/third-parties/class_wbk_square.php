@@ -90,6 +90,88 @@ class WBK_Square {
         return [0, __( 'Payment method not supported' )];
     }
 
+    /**
+     * Charge a Square payment for a gift card purchase.
+     *
+     * @param float  $amount
+     * @param string $source_id
+     * @param string $idempotency_key
+     * @param string $verification_token
+     * @param string $buyer_email
+     * @return array [1, message, square_payment_id] on success, [0, message] on failure.
+     */
+    public function charge_gift_card(
+        $amount,
+        $source_id,
+        $idempotency_key,
+        $verification_token = '',
+        $buyer_email = ''
+    ) {
+        return [0, __( 'Payment method not supported', 'webba-booking-lite' )];
+    }
+
+    /**
+     * Create and complete a Square payment for the given amount.
+     *
+     * @param float  $amount
+     * @param string $source_id
+     * @param string $idempotency_key
+     * @param string $verification_token
+     * @param string $buyer_email
+     * @param string $note
+     * @return array{success:bool,payment_id?:string,error?:string}
+     */
+    protected function create_payment(
+        $amount,
+        $source_id,
+        $idempotency_key,
+        $verification_token,
+        $buyer_email,
+        $note
+    ) {
+        if ( self::is_currency_zero_decimal( $this->currency ) ) {
+            $safe_value = (int) round( $amount );
+        } else {
+            $safe_value = (int) round( $amount * 100 );
+        }
+        $body = [
+            'source_id'       => $source_id,
+            'idempotency_key' => $idempotency_key,
+            'amount_money'    => [
+                'amount'   => $safe_value,
+                'currency' => strtoupper( $this->currency ),
+            ],
+            'location_id'     => $this->location_id,
+            'autocomplete'    => true,
+            'note'            => $note,
+        ];
+        if ( !empty( $verification_token ) ) {
+            $body['verification_token'] = $verification_token;
+        }
+        if ( !empty( $buyer_email ) && filter_var( $buyer_email, FILTER_VALIDATE_EMAIL ) ) {
+            $body['buyer_email_address'] = $buyer_email;
+        }
+        $response = $this->api_request( 'payments', $body );
+        if ( empty( $response['success'] ) ) {
+            return [
+                'success' => false,
+                'error'   => ( isset( $response['error'] ) ? $response['error'] : __( 'unknown error', 'webba-booking-lite' ) ),
+            ];
+        }
+        $payment = ( isset( $response['payment'] ) ? $response['payment'] : [] );
+        $status = ( isset( $payment['status'] ) ? $payment['status'] : '' );
+        if ( $status !== 'COMPLETED' && $status !== 'APPROVED' ) {
+            return [
+                'success' => false,
+                'error'   => __( 'unknown error', 'webba-booking-lite' ),
+            ];
+        }
+        return [
+            'success'    => true,
+            'payment_id' => ( isset( $payment['id'] ) ? $payment['id'] : $idempotency_key ),
+        ];
+    }
+
     public static function render_initial_form(
         $input,
         $payment_method,

@@ -36,8 +36,8 @@ export const FilterForm = ({
     preventFilterDispatch,
     onFiltersChange,
 }: IFilterFormProps) => {
-    const fieldComponents = createFilterFields(fields)
     const [fieldsObj, setFieldsObj] = useState(fields)
+    const fieldComponents = createFilterFields(fieldsObj)
 
     useLayoutEffect(() => {
         setFieldsObj((previousFields) => {
@@ -88,7 +88,7 @@ export const FilterForm = ({
         }
 
         if (model === 'dashboard') {
-            if (query.length < 3) {
+            if (query.length < 1) {
                 return
             }
             // @ts-ignore

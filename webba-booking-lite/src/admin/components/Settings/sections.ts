@@ -61,6 +61,12 @@ export const settingsSections = [
         isPro: true
     },
     {
+        id: 'icloud-calendar',
+        title: 'iCloud Calendar',
+        icon: 'calendar',
+        isPro: true
+    },
+    {
         id: 'sms',
         title: 'SMS',
         icon: 'message',
@@ -76,6 +82,12 @@ export const settingsSections = [
         id: 'zoom',
         title: 'Zoom',
         icon: 'video',
+        isPro: true
+    },
+    {
+        id: 'zapier',
+        title: 'Zapier',
+        icon: 'integrations',
         isPro: true
     },
     {

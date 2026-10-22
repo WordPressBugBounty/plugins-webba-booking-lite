@@ -3,8 +3,6 @@ import { IServiceProps } from '../Services/types'
 import { wbkFormat } from '../../../admin/components/Form/utils/dateTime'
 import { useBookingContext } from '../../providers/BookingFormProvider/BookingFormProvider'
 import { ReactComponent as CloseIcon } from '../../../../public/images/icon-close.svg'
-import { ReactComponent as MapPinIcon } from '../../../../public/images/icon-map-pin.svg'
-import { ReactComponent as PersonIcon } from '../../../../public/images/icon-person.svg'
 import { __ } from '@wordpress/i18n'
 import { wbkFormatPrice } from '../../providers/BookingFormProvider/utils'
 import { minutesToText } from '../../../admin/components/WebbaDataTable/utils'
@@ -13,10 +11,10 @@ import { useLocale } from '../../hooks/useLocale'
 import { getDateFnsLocale } from '../../../utilities/timezones'
 import { ReactComponent as ArrowDownIcon } from '../../../../public/images/arrow-down.svg'
 import classNames from 'classnames'
-import { getPlainTextFromHtml } from '../../lib/utils'
 import { STAFF_ANY_AVAILABLE } from '../StaffSelector/StaffSelector'
 import { getServiceAssociatedLocations } from '../../lib/locationFilter/getServiceAssociatedLocations'
 import { ILocationOption } from '../LocationDropdown/types'
+import { ISidebarDateGroup } from './types'
 
 interface ISidebarItemProps extends IServiceProps {
     to_pay: number
@@ -30,13 +28,11 @@ export const SidebarItem = ({
     places,
     onUpdate,
     duration,
-    to_pay,
     hide_price,
     staffId,
 }: ISidebarItemProps) => {
     const wording = useWording()
     const {
-        dateFormat,
         timeFormat,
         userTimezone,
         attrService,
@@ -138,16 +134,85 @@ export const SidebarItem = ({
         if (!list?.length) return wording.any_available ?? __('Any Available', 'webba-booking-lite')
         const staff = list.find((s: { id: string }) => String(s.id) === String(sid))
         return staff?.label ?? wording.any_available ?? __('Any Available', 'webba-booking-lite')
-    }, [places, staffId, formData?.staff, id, preset?.staff_members])
-    const hasStaffOrLocation = !!selectedLocation || !!preset?.staff_members?.length
+    }, [places, staffId, formData?.staff, id, preset?.staff_members, wording.any_available])
+
+    const slotsByDate = useMemo(() => {
+        const groups = new Map<string, ISidebarDateGroup>()
+        const sortedPlaces = [...(places ?? [])].sort(
+            (left, right) => left.timeslot - right.timeslot
+        )
+
+        sortedPlaces.forEach((place) => {
+            const dateKey = wbkFormat(place.timeslot, 'Y-m-d', userTimezone, {
+                locale: dateFnsLocale,
+            })
+            const existingGroup = groups.get(dateKey)
+            const timePill = {
+                timeslot: place.timeslot,
+                timeLabel: wbkFormat(place.timeslot, timeFormat, userTimezone, {
+                    locale: dateFnsLocale,
+                }),
+            }
+
+            if (existingGroup) {
+                existingGroup.times.push(timePill)
+                return
+            }
+
+            groups.set(dateKey, {
+                dateKey,
+                dateLabel: wbkFormat(place.timeslot, 'j M Y', userTimezone, {
+                    locale: dateFnsLocale,
+                }),
+                times: [timePill],
+            })
+        })
+
+        return Array.from(groups.values())
+    }, [places, timeFormat, userTimezone, dateFnsLocale])
+
+    const durationText = useMemo(() => {
+        if (typeof duration === 'undefined' || duration === '') {
+            return ''
+        }
+
+        const minutes = Number(duration)
+        if (!Number.isFinite(minutes)) {
+            return ''
+        }
+
+        return minutesToText(minutes, { h: 'h', min: 'm', d: 'd' })
+    }, [duration])
+
+    const serviceHasStaff = useMemo(() => {
+        const list = preset?.staff_members as { services?: string[] }[] | undefined
+        return (
+            Array.isArray(list) &&
+            list.some((member) => member.services?.includes(String(id)))
+        )
+    }, [preset?.staff_members, id])
+
+    const hasSelectedSlots = (places?.length ?? 0) > 0
+    const titleCount =
+        (places?.length ?? 0) > 1
+            ? places?.length
+            : quantity > 1
+              ? quantity
+              : 0
+    const detailLine = [
+        hasSelectedSlots ? durationText : '',
+        selectedLocation?.label ?? '',
+    ]
+        .filter(Boolean)
+        .join(' · ')
 
     return (
         <>
             <div className={'wbk_sidebar__items__item__inner'}>
                 <div className={'wbk_sidebar__items__item__info'}>
                     <h4 className={'wbk_sidebar__items__item__title'}>
-                        {quantity && quantity > 1 && `${quantity}x `}
                         {label}
+                        {titleCount ? ` × ${titleCount}` : ''}
                     </h4>
                 </div>
                 {!hide_price && (
@@ -175,57 +240,25 @@ export const SidebarItem = ({
                     </div>
                 )}
             </div>
-            {(places && !!places.length) && (
-                <p className={'wbk_sidebar__items__item__subline'}>
-                    <span>
-                        {wording.duration ||
-                            __('Duration', 'webba-booking-lite')}
-                    </span>
-                    :{' '}
-                    {typeof duration !== 'undefined'
-                        ? __(
-                            minutesToText(Number(duration), {
-                                h: wording.hour,
-                                min: wording.minute,
-                                d: wording.day,
-                            })
-                        )
-                        : ''}
-                </p>
-            )}
-            {(places && !!places.length) ? (
-                <p className={'wbk_sidebar__items__item__subline'}>
-                    {places.map(({ timeslot }) => (
-                        <div
-                            className={'wbk_sidebar__items__item__slot-wrapper'}
-                        >
-                            <div>
-                                {wbkFormat(timeslot, dateFormat, userTimezone, {
-                                    locale: dateFnsLocale,
-                                })}
-                                ,{' '}
-                                {wbkFormat(timeslot, timeFormat, userTimezone, {
-                                    locale: dateFnsLocale,
-                                })}
-                            </div>
-                            <div
-                                className={
-                                    'wbk_sidebar__items__item__slot-wrapper__remove-button'
-                                }
-                                onClick={() =>
-                                    onUpdate({
-                                        places: places.filter(
-                                            (place) =>
-                                                place.timeslot !== timeslot
-                                        ),
-                                    })
-                                }
+            {hasSelectedSlots ? (
+                slotsByDate.map((dateGroup) => (
+                    <div
+                        key={dateGroup.dateKey}
+                        className={'wbk_sidebar__items__item__date-row'}
+                    >
+                        <span className={'wbk_sidebar__items__item__date-label'}>
+                            {dateGroup.dateLabel}
+                        </span>
+                        {dateGroup.times.map((timePill, timeIndex) => (
+                            <span
+                                key={`${timePill.timeslot}-${timeIndex}`}
+                                className={'wbk_sidebar__items__item__time-pill'}
                             >
-                                <CloseIcon />
-                            </div>
-                        </div>
-                    ))}
-                </p>
+                                {timePill.timeLabel}
+                            </span>
+                        ))}
+                    </div>
+                ))
             ) : (
                 <p className={'wbk_sidebar__items__item__subline'}>
                     <span>
@@ -234,38 +267,15 @@ export const SidebarItem = ({
                     </span>
                 </p>
             )}
-            {hasStaffOrLocation && (
-                <div className={'wbk_sidebar__items__item__meta'}>
-                    {selectedLocation && (
-                        <div className={'wbk_sidebar__items__item__meta-row'}>
-                            <span className={'wbk_sidebar__items__item__meta-icon'}>
-                                <MapPinIcon aria-hidden="true" />
-                            </span>
-                            <span className={'wbk_sidebar__items__item__meta-content'}>
-                                <span className={'wbk_sidebar__items__item__meta-label'}>
-                                    {selectedLocation.label}
-                                </span>
-                                {selectedLocation.description && (
-                                    <span className={'wbk_sidebar__items__item__meta-description'}>
-                                        {getPlainTextFromHtml(selectedLocation.description)}
-                                    </span>
-                                )}
-                            </span>
-                        </div>
-                    )}
-                    {preset?.staff_members?.length > 0 && (
-                        <div className={'wbk_sidebar__items__item__meta-row'}>
-                            <span className={'wbk_sidebar__items__item__meta-icon'}>
-                                <PersonIcon aria-hidden="true" />
-                            </span>
-                            <span className={'wbk_sidebar__items__item__meta-content'}>
-                                <span className={'wbk_sidebar__items__item__meta-label'}>
-                                    {staffLabel}
-                                </span>
-                            </span>
-                        </div>
-                    )}
-                </div>
+            {detailLine && (
+                <p className={'wbk_sidebar__items__item__subline'}>
+                    {detailLine}
+                </p>
+            )}
+            {serviceHasStaff && staffLabel && (
+                <p className={'wbk_sidebar__items__item__subline'}>
+                    {staffLabel}
+                </p>
             )}
             {expanded && (
                 <div className={'wbk_sidebar__items__item__details'}>

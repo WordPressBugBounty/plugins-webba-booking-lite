@@ -339,6 +339,13 @@ class WBK_Booking_Factory {
         WBK_Connected_Calendar_Processor::delete_event_from_connected_calendars( $booking_id );
         do_action( "webba_before_cancel_booking", $booking_id );
         if ( $force_deletion ) {
+            $force_snapshot = [
+                "status" => (string) $booking->get( "status" ),
+            ];
+            if ( class_exists( "WBK_Zapier" ) && method_exists( "WBK_Zapier", "build_payload" ) ) {
+                $force_snapshot["payload"] = WBK_Zapier::build_payload( "booking.cancelled", $booking_id );
+            }
+            do_action( "wbk_booking_force_deleted", $booking_id, $force_snapshot );
             WBK_Model_Utils::delete_booking( $booking_id );
         } else {
             if ( $by == "customer" ) {
@@ -480,7 +487,7 @@ class WBK_Booking_Factory {
             WBK_Email_Processor::send( $booking_ids, "booking_paid" );
             WBK_Push_Processor::send( $booking_ids, "booking_paid" );
         }
-        do_action( "wbk_after_set_as_paid", $booking_ids );
+        do_action( "wbk_after_set_as_paid", $booking_ids, $method );
         date_default_timezone_set( "UTC" );
     }
 
@@ -547,6 +554,7 @@ class WBK_Booking_Factory {
                 $booking->get( "status" )
             );
             WBK_Email_Processor::send( [$booking_id], "booking_updated_by_admin" );
+            do_action( "wbk_booking_updated", $booking_id );
         }
     }
 

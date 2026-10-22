@@ -228,7 +228,7 @@ class WBK_Backend_Options
                 "pro" => true,
                 "minimal_plan" => "start",
                 "description" => __(
-                    "Configure integrations with Google Calendar and Zoom.",
+                    "Configure integrations with Google Calendar, Zoom, and Zapier.",
                     "webba-booking-lite",
                 ),
             ],
@@ -738,7 +738,6 @@ OLD: When one service is booked, it will automatically lock another one on the s
                     "webba-booking-lite",
                 ),
                 "checkbox_value" => "enabled",
-                "default" => "enabled",
                 "required_plan" => "standard",
                 "available_in_old_free" => true,
                 "tab" => "restrictions",
@@ -766,6 +765,8 @@ OLD: When one service is booked, it will automatically lock another one on the s
                     "condition" => ["wbk_appointments_auto_lock", "!=", "enabled"],
                     "value" => "categories",
                 ],
+                'required_plan' => 'standard',
+                'available_in_old_free' => true,
                 "tab" => "restrictions",
             ],
         );
@@ -791,6 +792,8 @@ OLD: When one service is booked, it will automatically lock another one on the s
                     "condition" => ["wbk_appointments_auto_lock", "!=", "enabled"],
                     "value" => "lock",
                 ],
+                'required_plan' => 'standard',
+                'available_in_old_free' => true,
                 "tab" => "restrictions",
             ],
         );
@@ -3497,7 +3500,6 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                     '<a href="https://webba-booking.com/documentation/google-calendar-integration/" target="_blank">Google Calendar Integration Documentation -></a>',
                     "webba-booking-lite",
                 ),
-                "required_plan" => "start",
                 "tab" => "google-calendar",
             ],
         );
@@ -3514,7 +3516,6 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                     "Do not change this option if you do not plan to use the same Google calendars on different websites with Webba Booking.",
                     "webba-booking-lite",
                 ),
-                "required_plan" => "start",
                 "tab" => "google-calendar",
             ],
         );
@@ -3560,7 +3561,6 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                     "lock" => __("Lock time slot", "webba-booking-lite"),
                     "reduce" => __("Reduce count of available slots", "webba-booking-lite"),
                 ],
-                "required_plan" => "start",
                 "tab" => "google-calendar",
             ],
         );
@@ -3577,7 +3577,6 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                     "webba-booking-lite",
                 ),
                 "default" => "",
-                "required_plan" => "start",
                 "tab" => "google-calendar",
             ],
         );
@@ -3594,7 +3593,6 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                     "webba-booking-lite",
                 ),
                 "default" => "yes",
-                "required_plan" => "start",
                 "tab" => "google-calendar",
             ],
         );
@@ -3617,7 +3615,6 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                     ),
                     "one_event" => __("Add one event", "webba-booking-lite"),
                 ],
-                "required_plan" => "start",
                 "tab" => "google-calendar",
             ],
         );
@@ -3632,8 +3629,41 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "popup" => __('It\'s for Webba Versions below 6.x.x', "webba-booking-lite"),
                 "checkbox_value" => "yes",
                 "default" => "",
-                "required_plan" => "start",
                 "tab" => "google-calendar",
+            ],
+        );
+
+        // ========== INTEGRATIONS - iCloud Calendar ==========
+        wbk_opt()->add_option(
+            "wbk_icloud_notice",
+            "notice",
+            __(
+                "iCloud Calendar uses CalDAV with an Apple Account email and an app-specific password. Create one at account.apple.com → Sign-In and Security → App-Specific Passwords. Changes made directly in iCloud never modify Webba bookings.",
+                "webba-booking-lite"
+            ),
+            "wbk_integrations_settings_section",
+            [
+                "not_translated_title" => "iCloud Calendar notice",
+                "popup" => "",
+                "default" => "",
+                "required_plan" => "premium",
+                "tab" => "icloud-calendar",
+            ],
+        );
+        wbk_opt()->add_option(
+            "wbk_icloud_busy_horizon_days",
+            "text",
+            __("iCloud busy-event horizon (days)", "webba-booking-lite"),
+            "wbk_integrations_settings_section",
+            [
+                "default" => "90",
+                "not_translated_title" => "iCloud busy-event horizon (days)",
+                "popup" => __(
+                    "Date range used when manually syncing busy events from iCloud. Availability also fetches the requested day range on demand.",
+                    "webba-booking-lite"
+                ),
+                "required_plan" => "premium",
+                "tab" => "icloud-calendar",
             ],
         );
 
@@ -3658,7 +3688,6 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                     "Modify this setting only if you have other plugins in your WordPress that utilize a different version of the Google API and conflicts have arisen.",
                     "webba-booking-lite",
                 ),
-                "required_plan" => "start",
                 "tab" => "google-calendar",
                 "dependency" => [["wbk_gg_show_legacy_keys", "=", "yes"]],
             ],
@@ -3677,7 +3706,6 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 ),
                 "default" => "",
                 "dependency" => [["wbk_gg_show_legacy_keys", "=", "yes"]],
-                "required_plan" => "start",
                 "tab" => "google-calendar",
             ],
         );
@@ -3694,7 +3722,6 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 ),
                 "default" => "",
                 "dependency" => [["wbk_gg_show_legacy_keys", "=", "yes"]],
-                "required_plan" => "start",
                 "tab" => "google-calendar",
             ],
         );
@@ -3914,6 +3941,168 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 ],
                 "required_plan" => "premium",
                 "tab" => "zoom",
+            ],
+        );
+
+        // ========== INTEGRATIONS - Zapier ==========
+        wbk_opt()->add_option(
+            "wbk_zapier_notice",
+            "notice",
+            __("Zapier Catch Hook setup", "webba-booking-lite"),
+            "wbk_integrations_settings_section",
+            [
+                "not_translated_title" => "Zapier Catch Hook setup",
+                "popup" => __(
+                    'Create a Zap with the <strong>Webhooks by Zapier</strong> trigger and choose <strong>Catch Hook</strong>. Copy the webhook URL from Zapier and paste it below. Webba sends booking events to that URL. Events are delivered asynchronously and do not wait for your Zap to finish.',
+                    "webba-booking-lite",
+                ),
+                "required_plan" => "premium",
+                "tab" => "zapier",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_zapier_enabled",
+            "checkbox",
+            __("Enable Zapier webhooks", "webba-booking-lite"),
+            "wbk_integrations_settings_section",
+            [
+                "not_translated_title" => "Enable Zapier webhooks",
+                "popup" => __(
+                    "Send booking events to your Zapier Catch Hook URL. Requires a Pro plan.",
+                    "webba-booking-lite",
+                ),
+                "checkbox_value" => "yes",
+                "default" => "",
+                "required_plan" => "premium",
+                "tab" => "zapier",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_zapier_webhook_url",
+            "text",
+            __("Catch Hook URL", "webba-booking-lite"),
+            "wbk_integrations_settings_section",
+            [
+                "not_translated_title" => "Catch Hook URL",
+                "popup" => __(
+                    "Paste the HTTPS Catch Hook URL from Zapier (hooks.zapier.com only).",
+                    "webba-booking-lite",
+                ),
+                "placeholder" => "https://hooks.zapier.com/hooks/catch/…/…/",
+                "default" => "",
+                "required_plan" => "premium",
+                "tab" => "zapier",
+                "dependency" => [["wbk_zapier_enabled", "=", "yes"]],
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_zapier_event_created",
+            "checkbox",
+            __("New booking", "webba-booking-lite"),
+            "wbk_integrations_settings_section",
+            [
+                "not_translated_title" => "New booking",
+                "popup" => __(
+                    "Send an event when a booking is created.",
+                    "webba-booking-lite",
+                ),
+                "checkbox_value" => "yes",
+                "default" => "yes",
+                "required_plan" => "premium",
+                "tab" => "zapier",
+                "dependency" => [["wbk_zapier_enabled", "=", "yes"]],
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_zapier_event_cancelled",
+            "checkbox",
+            __("Booking cancelled", "webba-booking-lite"),
+            "wbk_integrations_settings_section",
+            [
+                "not_translated_title" => "Booking cancelled",
+                "popup" => __(
+                    "Send an event when a booking is cancelled or rejected.",
+                    "webba-booking-lite",
+                ),
+                "checkbox_value" => "yes",
+                "default" => "yes",
+                "required_plan" => "premium",
+                "tab" => "zapier",
+                "dependency" => [["wbk_zapier_enabled", "=", "yes"]],
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_zapier_event_rescheduled",
+            "checkbox",
+            __("Booking rescheduled", "webba-booking-lite"),
+            "wbk_integrations_settings_section",
+            [
+                "not_translated_title" => "Booking rescheduled",
+                "popup" => __(
+                    "Send an event when a booking start or end time changes.",
+                    "webba-booking-lite",
+                ),
+                "checkbox_value" => "yes",
+                "default" => "yes",
+                "required_plan" => "premium",
+                "tab" => "zapier",
+                "dependency" => [["wbk_zapier_enabled", "=", "yes"]],
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_zapier_event_paid",
+            "checkbox",
+            __("Booking paid", "webba-booking-lite"),
+            "wbk_integrations_settings_section",
+            [
+                "not_translated_title" => "Booking paid",
+                "popup" => __(
+                    "Send an event when a booking is paid with any payment method (PayPal, Stripe, Mollie, Square, WooCommerce, coupon, etc.).",
+                    "webba-booking-lite",
+                ),
+                "checkbox_value" => "yes",
+                "default" => "yes",
+                "required_plan" => "premium",
+                "tab" => "zapier",
+                "dependency" => [["wbk_zapier_enabled", "=", "yes"]],
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_zapier_test",
+            "zapier_test",
+            __("Send test event", "webba-booking-lite"),
+            "wbk_integrations_settings_section",
+            [
+                "not_translated_title" => "Send test event",
+                "popup" => __(
+                    "Send a synthetic test booking payload to your Catch Hook URL.",
+                    "webba-booking-lite",
+                ),
+                "required_plan" => "premium",
+                "tab" => "zapier",
+                "dependency" => [["wbk_zapier_enabled", "=", "yes"]],
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_zapier_last_status_notice",
+            "notice",
+            __("Last delivery status", "webba-booking-lite"),
+            "wbk_integrations_settings_section",
+            [
+                "not_translated_title" => "Last delivery status",
+                "popup" => class_exists("WBK_Zapier")
+                    ? WBK_Zapier::get_last_delivery_summary()
+                    : __("No deliveries yet.", "webba-booking-lite"),
+                "required_plan" => "premium",
+                "tab" => "zapier",
             ],
         );
 
@@ -5107,6 +5296,19 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "default" => __("Hide summary", "webba-booking-lite"),
                 "not_translated_title" => "Hide summary",
                 "popup" => __("Label for hide summary button.", "webba-booking-lite"),
+                "tab" => "buttons-ui",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_wording_price_breakdown',
+            "text",
+            __("Price breakdown", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Price breakdown", "webba-booking-lite"),
+                "not_translated_title" => "Price breakdown",
+                "popup" => __("Label for price breakdown.", "webba-booking-lite"),
                 "tab" => "buttons-ui",
             ],
         );

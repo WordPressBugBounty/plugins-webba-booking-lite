@@ -1,0 +1,324 @@
+.wbk_businessOverview {
+    margin-bottom: 24px;
+    padding: 24px 28px;
+    border-radius: 12px;
+    background-color: colors.$surface-elevated;
+    border: 1px solid colors.$input-border;
+    box-shadow: 0 0 15px rgba(161, 164, 182, 0.35);
+
+    #wbk_spa_dashboard[data-theme='dark'] & {
+        box-shadow: none;
+    }
+
+    @include mobile {
+        padding: 20px 16px;
+    }
+}
+
+.wbk_businessOverview__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.wbk_businessOverview__title {
+    margin: 0;
+    font-family: typography.$font-primary;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: colors.$off-black;
+}
+
+.wbk_businessOverview__filters {
+    margin: 0 0 8px !important;
+    width: 100%;
+    align-items: end;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.wbk_businessOverview__summary {
+    margin: 12px 0 20px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: colors.$text-grey;
+}
+
+.wbk_businessOverview__upcoming {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 28px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+    border-radius: 12px;
+    background-color: colors.$background-offwhite;
+    border: 1px solid colors.$input-border;
+
+    @include mobile {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 18px 16px;
+    }
+}
+
+.wbk_businessOverview__cardEyebrow {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 600;
+    color: colors.$off-black;
+}
+
+.wbk_businessOverview__cardSubtitle {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: colors.$text-grey;
+}
+
+.wbk_businessOverview__upcomingTotal {
+    margin: 16px 0 8px;
+    font-family: typography.$font-primary;
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: colors.$off-black;
+}
+
+.wbk_businessOverview__cardMeta,
+.wbk_businessOverview__cardNote {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: colors.$text-grey;
+}
+
+.wbk_businessOverview__upcomingSide {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
+
+.wbk_businessOverview__paidRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 14px;
+    color: colors.$text-grey;
+
+    strong {
+        font-weight: 700;
+        color: colors.$off-black;
+    }
+}
+
+.wbk_businessOverview__progressTrack {
+    width: 100%;
+    height: 10px;
+    margin-top: 4px;
+    border-radius: 999px;
+    overflow: hidden;
+    background-color: colors.$field-background;
+
+    #wbk_spa_dashboard:not([data-theme='dark']) & {
+        background-color: colors.$row-border;
+    }
+}
+
+.wbk_businessOverview__progressFill {
+    height: 100%;
+    width: var(--wbk-paid-percent, 0%);
+    border-radius: 999px;
+    background-color: colors.$green;
+}
+
+.wbk_businessOverview__metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 14px;
+
+    @include mobile {
+        grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 768px) and (max-width: 1100px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.wbk_businessOverview__metricCard {
+    padding: 18px 18px 16px;
+    border-radius: 12px;
+    background-color: colors.$background-offwhite;
+    border: 1px solid colors.$input-border;
+}
+
+.wbk_businessOverview__metricLabel {
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.3;
+    color: colors.$text-grey;
+}
+
+.wbk_businessOverview__metricValueRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.wbk_businessOverview__metricValue {
+    margin: 0;
+    font-family: typography.$font-primary;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: colors.$off-black;
+}
+
+.wbk_businessOverview__metricAction {
+    color: colors.$green;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.wbk_businessOverview__metricComparison {
+    margin: 10px 0 0;
+    font-size: 13px;
+    line-height: 1.35;
+    color: colors.$text-grey;
+
+    &--positive {
+        color: colors.$green;
+    }
+
+    &--negative {
+        color: colors.$red;
+    }
+}
+
+.wbk_businessOverview__bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(240px, 1fr);
+    gap: 12px;
+
+    @include mobile {
+        grid-template-columns: 1fr;
+    }
+}
+
+.wbk_businessOverview__trend,
+.wbk_businessOverview__topServices {
+    padding: 18px 20px;
+    border-radius: 12px;
+    background-color: colors.$background-offwhite;
+    border: 1px solid colors.$input-border;
+}
+
+.wbk_businessOverview__trendHeader,
+.wbk_businessOverview__topServicesHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.wbk_businessOverview__sectionTitle {
+    margin: 0 0 4px;
+    font-family: typography.$font-primary;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: colors.$off-black;
+}
+
+.wbk_businessOverview__trendToggle {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 8px;
+    background-color: colors.$surface-elevated;
+    border: 1px solid colors.$input-border;
+
+    button {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        color: colors.$text-grey;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1;
+        padding: 8px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &.is-active {
+            background-color: colors.$green;
+            color: colors.$text-white;
+        }
+    }
+}
+
+.wbk_businessOverview__trendChart {
+    height: 260px;
+}
+
+.wbk_businessOverview__serviceList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.wbk_businessOverview__serviceMeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.wbk_businessOverview__serviceName {
+    font-size: 14px;
+    font-weight: 500;
+    color: colors.$off-black;
+}
+
+.wbk_businessOverview__serviceCount {
+    font-size: 13px;
+    font-weight: 600;
+    color: colors.$text-grey;
+}
+
+.wbk_businessOverview__serviceTrack {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    overflow: hidden;
+    background-color: colors.$row-border;
+
+    #wbk_spa_dashboard[data-theme='dark'] & {
+        background-color: colors.$field-background;
+    }
+}
+
+.wbk_businessOverview__serviceFill {
+    height: 100%;
+    width: var(--wbk-service-fill, 0%);
+    border-radius: 999px;
+    background-color: colors.$green;
+}
+
+.wbk_businessOverview__serviceEmpty {
+    font-size: 13px;
+    color: colors.$text-grey;
+}
