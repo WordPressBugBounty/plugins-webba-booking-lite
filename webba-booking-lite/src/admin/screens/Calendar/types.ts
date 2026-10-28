@@ -28,3 +28,7 @@ export type TCalendarRememberedServiceSelection = {
     singleServiceId: string | null
     multiServiceIds: string[] | null
 }
+
+export type TBulkScheduleLockSuccessHandler = (
+    affectedServiceIds: string[]
+) => Promise<void> | void

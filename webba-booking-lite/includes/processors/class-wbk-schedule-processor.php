@@ -139,11 +139,28 @@ class WBK_Schedule_Processor
             $night_hours_addon = 0;
         }
 
+        $reuse_connected_breakers = !empty($options["reuse_connected_breakers"]);
+        $preloaded_connected_breakers = [];
+        $preloaded_ext_breakers = [];
+        if ($reuse_connected_breakers) {
+            $preloaded_connected_breakers = is_array($this->connected_breakers)
+                ? $this->connected_breakers
+                : [];
+            $preloaded_ext_breakers = is_array($this->ext_breakers)
+                ? $this->ext_breakers
+                : [];
+        }
+
         $timeslots = [];
         $this->appointments = [];
         $this->breakers = [];
         $this->connected_breakers = [];
         $this->ext_breakers = [];
+
+        if ($reuse_connected_breakers) {
+            $this->connected_breakers = $preloaded_connected_breakers;
+            $this->ext_breakers = $preloaded_ext_breakers;
+        }
 
         if ($preload_data) {
             $this->load_locked_days();
@@ -1350,9 +1367,60 @@ class WBK_Schedule_Processor
     {
         return is_array($this->unlocked_days) ? $this->unlocked_days : [];
     }
+    /**
+     * Set connected calendar blockers for later timeslot checks.
+     *
+     * @param array $input Connected calendar time slots.
+     * @return void
+     */
     public function set_connected_breakers($input)
     {
         $this->connected_breakers = $input;
+    }
+
+    /**
+     * Set external ICS calendar blockers for later timeslot checks.
+     *
+     * @param array $input External calendar time slots.
+     * @return void
+     */
+    public function set_ext_breakers($input)
+    {
+        $this->ext_breakers = is_array($input) ? $input : [];
+    }
+
+    /**
+     * Load blockers from a service external ICS calendar URL.
+     *
+     * @param WBK_Service $service Service model.
+     * @return array
+     */
+    public function load_ext_calendar_breakers($service)
+    {
+        $ext_breakers = [];
+        if ($service->get("extcalendar") == "") {
+            return $ext_breakers;
+        }
+
+        $extcalendars = explode(",", $service->get("extcalendar"));
+        foreach ($extcalendars as $extcalendar) {
+            try {
+                $ical = new ICal\ICal();
+                $ical->initUrl($extcalendar);
+                foreach ($ical->events() as $event) {
+                    $dtstart = $ical->iCalDateToDateTime($event->dtstart_array[3]);
+                    $dtsend = $ical->iCalDateToDateTime($event->dtend_array[3]);
+                    $ext_breakers[] = new WBK_Time_Slot(
+                        $dtstart->getTimestamp(),
+                        $dtsend->getTimestamp(),
+                    );
+                }
+            } catch (\Exception $e) {
+                continue;
+            }
+        }
+
+        return $ext_breakers;
     }
     public function get_available_count($time)
     {

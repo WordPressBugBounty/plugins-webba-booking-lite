@@ -1504,12 +1504,40 @@ class WBK_Request_Manager {
         }
         $booking = new WBK_Booking($request["booking"]);
         if ( $booking->is_loaded() ) {
+            $sp = new WBK_Schedule_Processor();
+            date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
+            $day = strtotime( "midnight", $time );
+            $timeslots = $sp->get_time_slots_by_day(
+                $day,
+                $booking->get_service(),
+                [
+                    "skip_gg_calendar"       => false,
+                    "ignore_preparation"     => true,
+                    "calculate_availability" => true,
+                    "calculate_night_hours"  => false,
+                    "filter_availability"    => false,
+                ],
+                $booking->get_id()
+            );
+            $time_slot_valid = false;
+            foreach ( $timeslots as $timeslot ) {
+                if ( $timeslot->get_start() != $time ) {
+                    continue;
+                }
+                if ( (is_array( $timeslot->get_status() ) || $timeslot->get_status() == 0 || $timeslot->get_status() == $booking->get_id()) && $booking->get_quantity() <= $timeslot->get_free_places() ) {
+                    $time_slot_valid = true;
+                    break;
+                }
+            }
+            if ( !$time_slot_valid ) {
+                date_default_timezone_set( "UTC" );
+                return $this->response_error( "Wrong time." );
+            }
             if ( class_exists( "WBK_Zapier" ) ) {
                 WBK_Zapier::remember_booking_state( $booking->get_id() );
             }
-            date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
             $booking->set( "time", $time );
-            $booking->set( "day", strtotime( "midnight", $time ) );
+            $booking->set( "day", $day );
             date_default_timezone_set( "UTC" );
             $booking->save();
             $bf = new WBK_Booking_Factory();
@@ -2670,8 +2698,19 @@ class WBK_Request_Manager {
      * @param WP_REST_Request $request
      * @return boolean
      */
-    public function get_gg_auth_data_permission( $params ) : bool {
-        return current_user_can( "read" );
+    public function get_gg_auth_data_permission( $request ) : bool {
+        if ( current_user_can( "manage_options" ) ) {
+            return true;
+        }
+        $calendar_id = (int) $request->get_param( "calendar_id" );
+        if ( $calendar_id < 1 ) {
+            return false;
+        }
+        $connected_calendar = new WBK_Connected_Calendar($calendar_id);
+        if ( !$connected_calendar->is_loaded() ) {
+            return false;
+        }
+        return $connected_calendar->get_user_id() === get_current_user_id();
     }
 
     /**

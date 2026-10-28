@@ -6,6 +6,8 @@ import Select from "react-select";
 import classNames from "classnames";
 import "react-datepicker/dist/react-datepicker.css";
 import { store_name } from "../../../../store/backend";
+import { getAffectedScheduleServiceIds } from "../getAffectedScheduleServiceIds";
+import type { TBulkScheduleLockSuccessHandler } from "../types";
 import { getAdminSelectStyles } from "../../../utils/adminSelectStyles";
 import {
   formatWbkDate,
@@ -23,7 +25,7 @@ type SelectOption = {
 };
 
 type BulkTimeSlotsLockPopupProps = {
-  onSuccess?: () => Promise<void> | void;
+  onSuccess?: TBulkScheduleLockSuccessHandler;
 };
 
 const DAYS_OF_WEEK: SelectOption[] = [
@@ -211,7 +213,14 @@ export const BulkTimeSlotsLockPopup = ({
         type: "success",
         message: response.message || __("Done.", "webba-booking-lite"),
       });
-      await onSuccess?.();
+      await onSuccess?.(
+        getAffectedScheduleServiceIds(
+          categories,
+          services,
+          serviceId?.value || null,
+          categoryId?.value || null
+        )
+      );
       sidebar.close();
     } catch (e: any) {
       const message =
@@ -237,6 +246,8 @@ export const BulkTimeSlotsLockPopup = ({
     categoryId,
     dateRange,
     daysOfWeek,
+    categories,
+    services,
     onSuccess,
     sidebar,
     setToastNotification,

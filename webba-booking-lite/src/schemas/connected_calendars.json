@@ -9,7 +9,7 @@
             "title": "Calendar provider",
             "tab": "",
             "misc": {
-                "tooltip": "Select the calendar provider to connect (Google Calendar or Microsoft Outlook).",
+                "tooltip": "Select the calendar provider to connect (Google Calendar, Microsoft Outlook, or iCloud Calendar).",
                 "options": [
                     {
                         "value": "google",
@@ -20,6 +20,12 @@
                         "value": "outlook",
                         "title": "Microsoft/Outlook",
                         "icon": "icon-microsoft.svg",
+                        "required_plan": "premium"
+                    },
+                    {
+                        "value": "icloud",
+                        "title": "iCloud Calendar",
+                        "icon": "icon-brand-apple.svg",
                         "required_plan": "premium"
                     }
                 ],

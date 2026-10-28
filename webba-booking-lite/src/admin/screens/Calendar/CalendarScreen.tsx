@@ -14,7 +14,7 @@ import {
 import * as locales from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./CalendarScreen.scss";
-import { useCallback, useEffect, useMemo, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { createFormFromModel } from "../../components/Form/lib/createForm";
 import { useSidebar } from "../../components/Sidebar/SidebarContext";
 import { Form } from "../../components/Form/Form";
@@ -215,6 +215,8 @@ export const CalendarScreen = () => {
       multiServiceIds: null,
     });
   const [isModeSwitching, setIsModeSwitching] = useState(false);
+  const staleScheduleKeysRef = useRef<Set<string>>(new Set());
+  const scheduleRefreshGenerationRef = useRef(0);
   const selectedMonth = useMemo(() => format(calendarDate, "yyyy-MM"), [calendarDate]);
   const allStatus: Record<string, string> = useMemo(
     () => metadata.properties?.appointment_status.misc?.options,
@@ -331,7 +333,11 @@ export const CalendarScreen = () => {
       return;
     }
 
-    serviceIdsKey.split(",").forEach((serviceId) => {
+    const ids = serviceIdsKey.split(",");
+    ids.forEach((serviceId) => {
+      staleScheduleKeysRef.current.delete(`${serviceId}:${selectedMonth}`);
+    });
+    ids.forEach((serviceId) => {
       fetchSchedule(serviceId, selectedMonth);
     });
   }, [serviceIdsKey, selectedMonth]);
@@ -384,6 +390,81 @@ export const CalendarScreen = () => {
 
     return values.length === 1 ? values[0] : null;
   }, [advanceScheduleToolsEnabled, customFilter]);
+
+  useEffect(() => {
+    if (!selectedServiceId || !selectedMonth) {
+      return;
+    }
+
+    const scheduleKey = `${selectedServiceId}:${selectedMonth}`;
+    if (!staleScheduleKeysRef.current.has(scheduleKey)) {
+      return;
+    }
+
+    const generation = scheduleRefreshGenerationRef.current;
+    let isActive = true;
+
+    const loadLatestSchedule = async () => {
+      try {
+        let result = await fetchSchedule(selectedServiceId, selectedMonth);
+        if (!result && isActive) {
+          await new Promise((resolve) => window.setTimeout(resolve, 300));
+          if (!isActive) {
+            return;
+          }
+          result = await fetchSchedule(selectedServiceId, selectedMonth);
+        }
+        if (!isActive || !result) {
+          return;
+        }
+        if (scheduleRefreshGenerationRef.current === generation) {
+          staleScheduleKeysRef.current.delete(scheduleKey);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    loadLatestSchedule();
+
+    return () => {
+      isActive = false;
+    };
+  }, [selectedServiceId, selectedMonth]);
+
+  const selectedMonthRef = useRef(selectedMonth);
+  const selectedServiceIdRef = useRef(selectedServiceId);
+  const serviceIdsRef = useRef(serviceIds);
+  selectedMonthRef.current = selectedMonth;
+  selectedServiceIdRef.current = selectedServiceId;
+  serviceIdsRef.current = serviceIds;
+
+  const handleBulkScheduleLockSuccess = useCallback(
+    async (affectedServiceIds: string[]) => {
+      const month = selectedMonthRef.current;
+      const currentServiceId = selectedServiceIdRef.current;
+      const knownServiceIds = serviceIdsRef.current;
+      const idsToRefresh = (affectedServiceIds.length ? affectedServiceIds : knownServiceIds)
+        .map((serviceId) => String(serviceId))
+        .filter((serviceId) => serviceId && serviceId !== "0");
+
+      scheduleRefreshGenerationRef.current += 1;
+
+      if (month) {
+        idsToRefresh.forEach((serviceId) => {
+          staleScheduleKeysRef.current.add(`${serviceId}:${month}`);
+        });
+      }
+
+      if (!currentServiceId || !month) {
+        return;
+      }
+
+      staleScheduleKeysRef.current.delete(`${currentServiceId}:${month}`);
+      await fetchSchedule(currentServiceId, month);
+    },
+    [fetchSchedule]
+  );
 
   const selectedServiceIdsForConnectedEvents = useMemo(() => {
     const fromFilter = getServiceFilterValues(customFilter).filter((serviceId) =>
@@ -780,28 +861,14 @@ export const CalendarScreen = () => {
 
   const handleOpenBulkDateLock = () => {
     sidebar.open(
-      <BulkDateLockPopup
-        onSuccess={async () => {
-          if (!selectedServiceId) {
-            return;
-          }
-          await fetchSchedule(selectedServiceId, selectedMonth);
-        }}
-      />,
+      <BulkDateLockPopup onSuccess={handleBulkScheduleLockSuccess} />,
       calendarModalOptions
     );
   };
 
   const handleOpenBulkTimeSlotsLock = () => {
     sidebar.open(
-      <BulkTimeSlotsLockPopup
-        onSuccess={async () => {
-          if (!selectedServiceId) {
-            return;
-          }
-          await fetchSchedule(selectedServiceId, selectedMonth);
-        }}
-      />,
+      <BulkTimeSlotsLockPopup onSuccess={handleBulkScheduleLockSuccess} />,
       calendarModalOptions
     );
   };

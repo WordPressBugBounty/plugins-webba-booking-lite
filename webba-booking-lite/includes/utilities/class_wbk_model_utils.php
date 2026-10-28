@@ -1154,7 +1154,9 @@ class WBK_Model_Utils {
     /**
      * Get available dates for a service in a range.
      *
-     * Days with no remaining bookable time slots are omitted.
+     * Days with no remaining bookable time slots are omitted, including
+     * days fully blocked by connected calendars (Google, Outlook, Apple)
+     * or an external ICS calendar.
      *
      * @param int         $service_id       Service ID.
      * @param string      $start_date       Start date (Y-m-d).
@@ -1183,7 +1185,35 @@ class WBK_Model_Utils {
         $arr_disabled = [];
         $day_to_render = strtotime( $start_date );
         $first_available_month_end = null;
-        $connected_events = [];
+        $is_staff_member_flow = !is_null( $staff_member_id ) && is_numeric( $staff_member_id );
+        $range_start = $day_to_render;
+        $range_end = $day_to_render + $number_of_days * 86400;
+        if ( get_option( "wbk_allow_cross_midnight", "" ) == "true" && WBK_Feature_Gate::have_required_plan( "premium", "only_old_users" ) ) {
+            $duration_seconds = (int) $service->get_duration() * 60;
+            $range_start = $range_start - $duration_seconds;
+            $range_end = $range_end + $duration_seconds;
+        }
+        $calendar_ids = [];
+        if ( $is_staff_member_flow ) {
+            $staff_member = new WBK_Staff_Member((int) $staff_member_id);
+            if ( $staff_member->is_loaded() ) {
+                $calendar_ids = $staff_member->get_connected_calendars_for_import();
+            }
+        } else {
+            $calendar_ids = $service->get_connected_calendars_for_import();
+        }
+        $connected_events = $sp->load_connected_events_in_range_by_calendar_ids(
+            $range_start,
+            $range_end,
+            $calendar_ids,
+            $service
+        );
+        $sp->set_connected_breakers( $connected_events );
+        $ext_breakers = [];
+        if ( !$is_staff_member_flow ) {
+            $ext_breakers = $sp->load_ext_calendar_breakers( $service );
+        }
+        $sp->set_ext_breakers( $ext_breakers );
         if ( !is_null( $service->get_availability_range() ) && is_array( $service->get_availability_range() ) && count( $service->get_availability_range() ) == 2 ) {
             $availability_range = $service->get_availability_range();
             $limit_start = strtotime( trim( $availability_range[0] ) );
@@ -1232,9 +1262,10 @@ class WBK_Model_Utils {
                 $day_to_render,
                 $service_id,
                 [
-                    "calculate_availability" => true,
-                    "calculate_night_hours"  => false,
-                    "skip_gg_calendar"       => true,
+                    "calculate_availability"   => true,
+                    "calculate_night_hours"    => false,
+                    "skip_gg_calendar"         => true,
+                    "reuse_connected_breakers" => true,
                 ],
                 null,
                 false,

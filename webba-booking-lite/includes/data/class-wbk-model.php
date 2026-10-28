@@ -1725,20 +1725,23 @@ class WBK_Model
             false,
         );
         $table->add_field(
-            'attach_invoice',
-            'attach_invoice',
-            __('Attach PDF invoice', 'webba-booking-lite'),
-            'checkbox',
-            '',
+            "attach_invoice",
+            "attach_invoice",
+            __("Attach PDF invoice", "webba-booking-lite"),
+            "checkbox",
+            "",
             [
-                'yes' => __('Yes', 'webba-booking-lite'),
-                'tooltip' => __('Generate and attach the PDF invoice for bookings.', 'webba-booking-lite'),
-                'required_plan' => 'premium'
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => __(
+                    "Generate and attach the PDF invoice for bookings.",
+                    "webba-booking-lite",
+                ),
+                "required_plan" => "premium",
             ],
-            '',
+            "",
             true,
             false,
-            false
+            false,
         );
         $tooltip = __(
             "Select the services for which this notification is used.",
@@ -3038,10 +3041,7 @@ class WBK_Model
             "text",
             "",
             [
-                "tooltip" => __(
-                    "Enter the name of the gift card recipient.",
-                    "webba-booking-lite",
-                ),
+                "tooltip" => __("Enter the name of the gift card recipient.", "webba-booking-lite"),
             ],
         );
 

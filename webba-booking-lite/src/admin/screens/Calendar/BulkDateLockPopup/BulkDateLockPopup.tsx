@@ -6,6 +6,8 @@ import Select from "react-select";
 import classNames from "classnames";
 import "react-datepicker/dist/react-datepicker.css";
 import { store_name } from "../../../../store/backend";
+import { getAffectedScheduleServiceIds } from "../getAffectedScheduleServiceIds";
+import type { TBulkScheduleLockSuccessHandler } from "../types";
 import { getAdminSelectStyles } from "../../../utils/adminSelectStyles";
 import { formatWbkDate } from "../../../components/Form/utils/dateTime";
 import { Button } from "../../../components/Button/Button";
@@ -20,7 +22,7 @@ type SelectOption = {
 };
 
 type BulkDateLockPopupProps = {
-  onSuccess?: () => Promise<void> | void;
+  onSuccess?: TBulkScheduleLockSuccessHandler;
 };
 
 const DAYS_OF_WEEK: SelectOption[] = [
@@ -150,7 +152,14 @@ export const BulkDateLockPopup = ({ onSuccess }: BulkDateLockPopupProps) => {
         type: "success",
         message: response.message || __("Done.", "webba-booking-lite"),
       });
-      await onSuccess?.();
+      await onSuccess?.(
+        getAffectedScheduleServiceIds(
+          categories,
+          services,
+          serviceId?.value || null,
+          categoryId?.value || null
+        )
+      );
       sidebar.close();
     } catch (e: any) {
       const message =
@@ -175,6 +184,8 @@ export const BulkDateLockPopup = ({ onSuccess }: BulkDateLockPopupProps) => {
     dateRange,
     excludeDates,
     daysOfWeek,
+    categories,
+    services,
     onSuccess,
     sidebar,
     setToastNotification,
