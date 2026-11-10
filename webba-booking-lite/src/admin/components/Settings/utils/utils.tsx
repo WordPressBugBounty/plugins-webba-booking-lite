@@ -14,6 +14,74 @@ import { ProFeatuerWrapper } from '../../ProFeatuerWrapper/ProFeatuerWrapper'
 import { useFeatureDisplayConfig } from '../../../hooks/useFeatureDisplayConfig'
 import { useConfirmationPopup } from '../../ConfirmationPopup/ConfirmationPopupContext'
 
+const addConditionFieldNames = (
+    condition: unknown,
+    addMissingField: (fieldName?: string) => void
+) => {
+    if (!Array.isArray(condition) || condition.length === 0) {
+        return
+    }
+
+    if (Array.isArray(condition[0])) {
+        condition.forEach((item) => {
+            if (Array.isArray(item) && typeof item[0] === 'string') {
+                addMissingField(item[0])
+            }
+        })
+        return
+    }
+
+    if (typeof condition[0] === 'string') {
+        addMissingField(condition[0])
+    }
+}
+
+const collectDependencyFieldNames = (
+    field: ISettingsField,
+    localFieldIds: Set<string>,
+    missingFieldIds: Set<string>
+) => {
+    const addMissingField = (fieldName?: string) => {
+        if (fieldName && !localFieldIds.has(fieldName)) {
+            missingFieldIds.add(fieldName)
+        }
+    }
+
+    addConditionFieldNames(field.dependency, addMissingField)
+    addConditionFieldNames(field.dependent_value?.condition, addMissingField)
+}
+
+const getCrossSectionDependencyFields = (
+    fields: ISettingsField[],
+    sections: Record<string, ISettingsSection>
+) => {
+    const localFieldIds = new Set(fields.map((field) => field.id))
+    const missingFieldIds = new Set<string>()
+
+    fields.forEach((field) =>
+        collectDependencyFieldNames(field, localFieldIds, missingFieldIds)
+    )
+
+    if (missingFieldIds.size === 0) {
+        return []
+    }
+
+    const resolvedFields: ISettingsField[] = []
+
+    Object.values(sections).forEach((settingsSection) => {
+        settingsSection.fields?.forEach((field) => {
+            if (!missingFieldIds.has(field.id)) {
+                return
+            }
+
+            resolvedFields.push(field)
+            missingFieldIds.delete(field.id)
+        })
+    })
+
+    return resolvedFields
+}
+
 const openSettingsSectionInModal = (
     sectionId: string,
     section: ISettingsSection,
@@ -26,15 +94,31 @@ const openSettingsSectionInModal = (
     fieldOverrides?: Record<string, string>
 ) => {
     const { fields, title, sections: subsectionTitles } = section
-    const { model } = buildModelFromSettingsFields({ fields })
+    const crossSectionFields = getCrossSectionDependencyFields(fields, sections)
+    const formFields = [...fields, ...crossSectionFields]
+    const { model } = buildModelFromSettingsFields({ fields: formFields })
+
+    crossSectionFields.forEach((field) => {
+        const property = model.properties[field.id]
+
+        if (!property) {
+            return
+        }
+
+        property.editable = false
+        property.hidden = true
+        property.misc.hidden = true
+        property.default_value = field.value ?? field.default ?? ''
+    })
+
     const form = createFormFromModel(model)
     const menuSections = createFormMenuSectionsFromModel({
         model,
         form,
         modelName: 'settings',
     })
-    const storedValues = fields.reduce((acc: any, field) => {
-        acc[field.id] = field.value
+    const storedValues = formFields.reduce((acc: any, field) => {
+        acc[field.id] = field.value ?? field.default ?? ''
         return acc
     }, {})
 
@@ -49,7 +133,11 @@ const openSettingsSectionInModal = (
             form={form}
             sections={menuSections}
             onSubmit={async (data) => {
-                await setOptions(sectionId, data)
+                const sectionData = { ...data }
+                crossSectionFields.forEach((field) => {
+                    delete sectionData[field.id]
+                })
+                await setOptions(sectionId, sectionData)
                 setToastNotification({
                     type: 'success',
                     message: __('Changes were saved.', 'webba-booking-lite'),

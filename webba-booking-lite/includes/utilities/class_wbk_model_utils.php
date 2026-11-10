@@ -1156,7 +1156,8 @@ class WBK_Model_Utils {
      *
      * Days with no remaining bookable time slots are omitted, including
      * days fully blocked by connected calendars (Google, Outlook, Apple)
-     * or an external ICS calendar.
+     * or an external ICS calendar. Fully booked days stay available when
+     * wait list is enabled for the service and booked slots are shown.
      *
      * @param int         $service_id       Service ID.
      * @param string      $start_date       Start date (Y-m-d).
@@ -1214,6 +1215,7 @@ class WBK_Model_Utils {
             $ext_breakers = $sp->load_ext_calendar_breakers( $service );
         }
         $sp->set_ext_breakers( $ext_breakers );
+        $keep_fully_booked_days_for_wait_list = WBK_Wait_List_Processor::is_enabled_for_service( (int) $service_id ) && get_option( "wbk_show_booked_slots", "" ) === "yes";
         if ( !is_null( $service->get_availability_range() ) && is_array( $service->get_availability_range() ) && count( $service->get_availability_range() ) == 2 ) {
             $availability_range = $service->get_availability_range();
             $limit_start = strtotime( trim( $availability_range[0] ) );
@@ -1272,8 +1274,10 @@ class WBK_Model_Utils {
                 $staff_member_id
             );
             if ( !$sp->has_free_time_slots() ) {
-                $day_to_render = strtotime( "tomorrow", $day_to_render );
-                continue;
+                if ( !$keep_fully_booked_days_for_wait_list || !$sp->has_time_slots() ) {
+                    $day_to_render = strtotime( "tomorrow", $day_to_render );
+                    continue;
+                }
             }
             $valid = apply_filters(
                 "wbk_check_date_availability",
@@ -2191,6 +2195,7 @@ class WBK_Model_Utils {
             "booking_finished"              => __( "Booking is finished", "webba-booking-lite" ),
             "gift_card_purchased"           => __( "Gift card is purchased", "webba-booking-lite" ),
             "gift_card_sent"                => __( "Gift card is sent", "webba-booking-lite" ),
+            "slot_wait_list_available"      => __( "Wait list: time slot became available", "webba-booking-lite" ),
         ];
         return $notification_types;
     }

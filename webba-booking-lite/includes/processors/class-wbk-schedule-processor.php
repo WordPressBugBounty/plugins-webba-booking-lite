@@ -1441,6 +1441,16 @@ class WBK_Schedule_Processor
         }
         return $has_free;
     }
+
+    /**
+     * Whether the current day has any generated time slots.
+     *
+     * @return bool
+     */
+    public function has_time_slots(): bool
+    {
+        return is_array($this->timeslots) && count($this->timeslots) > 0;
+    }
     public function get_locked_time_slots($service_id)
     {
         $service_id = (int) $service_id;

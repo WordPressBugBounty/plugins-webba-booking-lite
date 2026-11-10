@@ -41,6 +41,7 @@ export interface FormFieldMisc {
     min?: number
     max?: number
     sub_type?: string
+    requires_show_booked_slots?: boolean
     options?:
         | Record<string, string>
         | Record<string, { title: string; description?: string }>

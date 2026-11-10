@@ -683,7 +683,10 @@
             var formTypeValue = unwrapDiviValue(
                 getNested(attrs, ['content', 'advanced', 'formType'])
             )
-            var formType = formTypeValue === 'waterfall' ? 'waterfall' : 'classic'
+            var formType =
+                formTypeValue === 'waterfall' || formTypeValue === 'webba5'
+                    ? formTypeValue
+                    : 'classic'
             var categoryIds = normalizeIds(getNested(attrs, ['content', 'advanced', 'category']))
             var locationIds = normalizeIds(getNested(attrs, ['content', 'advanced', 'location']))
             var staffIds = isDaily

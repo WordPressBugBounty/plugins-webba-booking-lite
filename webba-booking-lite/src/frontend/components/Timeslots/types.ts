@@ -28,4 +28,11 @@ export interface ITimeslotsProps {
     showStaffSelector: boolean
     recurringBookingEnabled?: boolean
     onBookRecurring?: (time: number) => void
+    waitListEnabled?: boolean
+    subscribedWaitListSlots?: number[]
+    onJoinWaitList?: (slot: {
+        start_time: number
+        end_time: number
+        staff_member_ids?: string[] | null
+    }) => void
 }

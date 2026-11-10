@@ -347,4 +347,27 @@ class WBK_Options_Utils
 
         return '';
     }
+
+    /**
+     * Get Mollie credentials
+     *
+     * @return array
+     */
+    public static function get_mollie_credentials(): array
+    {
+        $test_mode = get_option('wbk_mollie_test_mode', '');
+        if ($test_mode === 'yes') {
+            return [
+                trim((string) get_option('wbk_mollie_sandbox_api_key', '')),
+                trim((string) get_option('wbk_mollie_sandbox_api_key', '')),
+                true,
+            ];
+        }
+
+        return [
+            trim((string) get_option('wbk_mollie_api_key', '')),
+            trim((string) get_option('wbk_mollie_api_key', '')),
+            false,
+        ];
+    }
 }

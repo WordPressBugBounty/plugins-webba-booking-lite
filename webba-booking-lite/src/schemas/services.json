@@ -345,8 +345,8 @@
                         "yes"
                     ]
                 ],
-                "date_format": "m/d/y",
-                "time_zone": "Europe/Warsaw",
+                "date_format": "F j, Y",
+                "time_zone": "Asia/Dhaka",
                 "required_plan": "standard"
             },
             "required": false,
@@ -362,8 +362,8 @@
             "tab": "availability",
             "misc": {
                 "tooltip": "Specify a date range if the service is only valid for a specific period of time.",
-                "date_format": "m/d/y",
-                "time_zone": "Europe/Warsaw",
+                "date_format": "F j, Y",
+                "time_zone": "Asia/Dhaka",
                 "required_plan": "start",
                 "available_in_old_free": true
             },
@@ -502,6 +502,136 @@
             "required": false,
             "dependency": [],
             "default_value": "",
+            "editable": true
+        },
+        "service_override_wait_list": {
+            "type": "string",
+            "input_type": "checkbox",
+            "hidden": true,
+            "title": "Override global wait list",
+            "tab": "availability",
+            "misc": {
+                "yes": "Yes",
+                "tooltip": "Enable this to override the global wait list setting for this service.",
+                "required_plan": "premium"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "service_wait_list_enabled": {
+            "type": "string",
+            "input_type": "checkbox",
+            "hidden": true,
+            "title": "Enable wait list",
+            "tab": "availability",
+            "misc": {
+                "yes": "Yes",
+                "tooltip": "When enabled, customers can join a wait list for full time slots of this service and get an email when the slot becomes available.",
+                "hide": [
+                    [
+                        "override_wait_list",
+                        "=",
+                        "yes"
+                    ]
+                ],
+                "dependent_value": {
+                    "condition": [
+                        "override_wait_list",
+                        "!=",
+                        "yes"
+                    ],
+                    "value": ""
+                },
+                "required_plan": "premium"
+            },
+            "required": false,
+            "dependency": [
+                [
+                    "override_wait_list",
+                    "=",
+                    "yes"
+                ]
+            ],
+            "default_value": "",
+            "editable": true
+        },
+        "service_wait_list_show_booked_slots_notice": {
+            "type": "string",
+            "input_type": "notice",
+            "hidden": true,
+            "title": "Show unavailable time slots required",
+            "tab": "availability",
+            "misc": {
+                "tooltip": "\u201cShow unavailable time slots\u201d is currently off. Turn it on in Webba Booking \u2192 Settings \u2192 Booking Form so customers can see full time slots and join the wait list.",
+                "sub_type": "warning",
+                "requires_show_booked_slots": true,
+                "required_plan": "premium"
+            },
+            "required": false,
+            "dependency": [
+                [
+                    "wait_list_enabled",
+                    "=",
+                    "yes"
+                ]
+            ],
+            "default_value": "",
+            "editable": true
+        },
+        "service_wait_list_max_per_slot": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Maximum wait-list entries per time slot",
+            "tab": "availability",
+            "misc": {
+                "sub_type": "none_negative_integer",
+                "hide": [
+                    [
+                        "wait_list_enabled",
+                        "=",
+                        "yes"
+                    ],
+                    [
+                        "override_wait_list",
+                        "=",
+                        "yes"
+                    ]
+                ],
+                "required_plan": "premium"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "50",
+            "editable": true
+        },
+        "service_wait_list_max_per_email": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Maximum pending wait-list entries per email",
+            "tab": "availability",
+            "misc": {
+                "sub_type": "none_negative_integer",
+                "hide": [
+                    [
+                        "wait_list_enabled",
+                        "=",
+                        "yes"
+                    ],
+                    [
+                        "override_wait_list",
+                        "=",
+                        "yes"
+                    ]
+                ],
+                "required_plan": "premium"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "10",
             "editable": true
         },
         "service_price": {

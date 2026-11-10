@@ -172,7 +172,10 @@ class WBK_Gutenberg_Booking_Form_Block
         }
 
         $form_type = isset($defaults['form_type']) ? (string) $defaults['form_type'] : 'classic';
-        $defaults['formType'] = $form_type === 'waterfall' ? 'waterfall' : 'classic';
+        $allowed_form_types = ['classic', 'waterfall', 'webba5'];
+        $defaults['formType'] = in_array($form_type, $allowed_form_types, true)
+            ? $form_type
+            : 'classic';
         unset($defaults['form_type']);
 
         return $defaults;
@@ -416,7 +419,11 @@ class WBK_Gutenberg_Booking_Form_Block
     {
         $form_type = is_string($value) ? $value : '';
 
-        return $form_type === 'waterfall' ? 'waterfall' : 'classic';
+        $allowed_form_types = ['classic', 'waterfall', 'webba5'];
+
+        return in_array($form_type, $allowed_form_types, true)
+            ? $form_type
+            : 'classic';
     }
 
     /**

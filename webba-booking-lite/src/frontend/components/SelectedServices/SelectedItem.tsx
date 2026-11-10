@@ -41,6 +41,8 @@ import { Value } from 'react-calendar/dist/esm/shared/types.js'
 import { RecurringBookingPopup } from '../RecurringBooking/RecurringBookingPopup'
 import { IPendingRecurringSlot } from '../RecurringBooking/types'
 import { mergeRecurringPlaces } from '../RecurringBooking/utils'
+import { WaitListPopup } from '../WaitList/WaitListPopup'
+import { IWaitListPendingSlot } from '../WaitList/types'
 
 export const SelectedItem = ({
     label,
@@ -66,6 +68,7 @@ export const SelectedItem = ({
     recurring_intervals,
     recurring_min_count,
     recurring_max_count,
+    wait_list_enabled,
 }: IServicePropsWithIndex) => {
     const wording = useWording()
     const { loading, preset, timezone, timeFormat, userTimezone } =
@@ -74,6 +77,13 @@ export const SelectedItem = ({
     const [recurringPopupOpen, setRecurringPopupOpen] = useState(false)
     const [pendingRecurringSlot, setPendingRecurringSlot] =
         useState<IPendingRecurringSlot | null>(null)
+    const [waitListPopupOpen, setWaitListPopupOpen] = useState(false)
+    const [pendingWaitListSlot, setPendingWaitListSlot] =
+        useState<IWaitListPendingSlot | null>(null)
+    const [subscribedWaitListSlots, setSubscribedWaitListSlots] = useState<
+        number[]
+    >([])
+    const waitListEnabledForService = !!wait_list_enabled
 
     const recurringServiceConfig = useMemo(
         () => ({
@@ -744,6 +754,31 @@ export const SelectedItem = ({
         [actualSelectedDate, timeslots]
     )
 
+    const handleJoinWaitList = useCallback(
+        (slot: {
+            start_time: number
+            end_time: number
+            staff_member_ids?: string[] | null
+        }) => {
+            const staffFromSlot =
+                slot.staff_member_ids && slot.staff_member_ids.length === 1
+                    ? String(slot.staff_member_ids[0])
+                    : null
+            const resolvedStaff =
+                staffId && staffId !== '0' ? String(staffId) : staffFromSlot
+            setPendingWaitListSlot({
+                serviceId: id,
+                serviceLabel: label,
+                time: slot.start_time,
+                endTime: slot.end_time,
+                staffMemberId: resolvedStaff,
+                quantity: quantity || 1,
+            })
+            setWaitListPopupOpen(true)
+        },
+        [id, label, quantity, staffId]
+    )
+
     const handleSetPlaceStaff = useCallback(
         (time: number, staffId: string) => {
             onUpdate({
@@ -990,6 +1025,9 @@ export const SelectedItem = ({
                                 !!recurring_booking_enabled
                             }
                             onBookRecurring={handleBookRecurring}
+                            waitListEnabled={waitListEnabledForService}
+                            subscribedWaitListSlots={subscribedWaitListSlots}
+                            onJoinWaitList={handleJoinWaitList}
                         />
                     </div>
                 )}
@@ -997,7 +1035,8 @@ export const SelectedItem = ({
                     !isTimeslotsLoading &&
                     (!timeslots ||
                         timeslots.length === 0 ||
-                        (currentFreeSlots.length === 0 &&
+                        (preset?.settings?.show_booked_slots === false &&
+                            currentFreeSlots.length === 0 &&
                             currentHiddenSlots.length > 0)) && (
                         <div
                             className={
@@ -1012,6 +1051,19 @@ export const SelectedItem = ({
                         </div>
                     )}
             </div>
+            <WaitListPopup
+                isOpen={waitListPopupOpen}
+                pendingSlot={pendingWaitListSlot}
+                onClose={() => {
+                    setWaitListPopupOpen(false)
+                    setPendingWaitListSlot(null)
+                }}
+                onSuccess={(slot) => {
+                    setSubscribedWaitListSlots((prev) =>
+                        prev.includes(slot.time) ? prev : [...prev, slot.time]
+                    )
+                }}
+            />
             <RecurringBookingPopup
                 isOpen={recurringPopupOpen}
                 serviceId={id}

@@ -248,6 +248,11 @@ const placeHolders: Record<"name" | "text" | "content", string | ((editor: any) 
     content: "#gift_card_policy",
   },
   {
+    name: "wbk_unsubscribe_link",
+    text: __("Wait list unsubscribe link", "webba-booking-lite"),
+    content: "#unsubscribe_link",
+  },
+  {
     name: "wbk_multiple_loop",
     text: __("Create loop", "webba-booking-lite"),
     content: (editor) => {

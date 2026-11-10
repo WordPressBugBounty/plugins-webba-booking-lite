@@ -22,6 +22,7 @@ import { FailedMessage } from '../../components/FailedMessage/FailedMessage'
 import { useSettings } from '../../providers/SettingsProvider'
 import { DurationCell } from '../../components/WebbaDataTable/cells/DurationCell/DurationCell'
 import { ServiceImageCell } from '../../components/WebbaDataTable/cells/ServiceImageCell/ServiceImageCell'
+import { ServiceTitleCell } from '../../components/WebbaDataTable/cells/ServiceTitleCell/ServiceTitleCell'
 import { formatPrice } from '../../utils/currency'
 import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
 import noItemsImage from '../../../../public/images/bookings-empty.png'
@@ -139,6 +140,9 @@ export const ServicesScreen = () => {
                     duration: {
                         cell: DurationCell,
                     },
+                    name: {
+                        cell: ServiceTitleCell,
+                    }
                 },
                 {
                     id: {

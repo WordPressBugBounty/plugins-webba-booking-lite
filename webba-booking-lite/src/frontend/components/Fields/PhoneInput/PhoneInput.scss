@@ -13,6 +13,12 @@
                 box-shadow: none !important;
                 min-height: initial !important;
             }
+
+            .PhoneInputCountryIcon {
+                &--border {
+                    box-shadow: none !important;
+                }
+            }
         }
     }
 }

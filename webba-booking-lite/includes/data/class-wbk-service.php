@@ -520,4 +520,58 @@ class WBK_Service extends WBK_Model_Object
         }
         return 0;
     }
+
+    /**
+     * Returns if wait list is overridden for that service or not
+     *
+     * @return boolean
+     */
+    public function is_wait_list_overridden(): bool
+    {
+        return $this->fields['override_wait_list'] === 'yes';
+    }
+
+    /**
+     * Returns if wait list is enabled for that service or not
+     *
+     * @return boolean
+     */
+    public function is_wait_list_enabled(): bool
+    {
+        if($this->is_wait_list_overridden() && isset($this->fields['wait_list_enabled'])) {
+            return $this->fields['wait_list_enabled'] === 'yes';
+        }
+        
+        $global_wait_list_enabled = get_option('wbk_wait_list_enabled', '');
+
+        return $global_wait_list_enabled === 'yes';
+    }
+
+    /**
+     * Returns the maximum wait list entries per slot for that service
+     *
+     * @return int
+     */
+    public function get_wait_list_max_per_slot(): int
+    {
+        if($this->is_wait_list_overridden() && isset($this->fields['wait_list_max_per_slot'])) {
+            return $this->fields['wait_list_max_per_slot'];
+        }
+
+        return get_option('wbk_wait_list_max_per_slot', 50);
+    }
+
+    /**
+     * Returns the maximum wait list entries per email for that service
+     *
+     * @return int
+     */
+    public function get_wait_list_max_per_email(): int
+    {
+        if($this->is_wait_list_overridden() && isset($this->fields['wait_list_max_per_email'])) {
+            return $this->fields['wait_list_max_per_email'];
+        }
+
+        return get_option('wbk_wait_list_max_per_email', 10);
+    }
 }

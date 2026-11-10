@@ -99,6 +99,8 @@ const CLASSIC_ONLY_APPEARANCE_KEYS = new Set([
     'color_sidebar',
 ])
 
+const ALLOWED_FORM_TYPES = ['classic', 'waterfall', 'webba5']
+
 const FORM_TYPE_OPTIONS = [
     {
         label: __('Webba 6 Classic form', 'webba-booking-lite'),
@@ -107,6 +109,10 @@ const FORM_TYPE_OPTIONS = [
     {
         label: __('Waterfall form', 'webba-booking-lite'),
         value: 'waterfall',
+    },
+    {
+        label: __('Webba 5 form', 'webba-booking-lite'),
+        value: 'webba5',
     },
 ]
 
@@ -170,8 +176,9 @@ export default function Edit({ attributes, setAttributes, clientId }) {
     }, [data])
 
     const isDailyServiceType = attributes.serviceType === 'daily'
-    const formType =
-        attributes.formType === 'waterfall' ? 'waterfall' : 'classic'
+    const formType = ALLOWED_FORM_TYPES.includes(attributes.formType)
+        ? attributes.formType
+        : 'classic'
 
     useEffect(() => {
         if (appearanceSeeded.current || !wasJustInserted) {
@@ -397,10 +404,11 @@ export default function Edit({ attributes, setAttributes, clientId }) {
                                 options={FORM_TYPE_OPTIONS}
                                 onChange={(nextFormType) =>
                                     setAttributes({
-                                        formType:
-                                            nextFormType === 'waterfall'
-                                                ? 'waterfall'
-                                                : 'classic',
+                                        formType: ALLOWED_FORM_TYPES.includes(
+                                            nextFormType
+                                        )
+                                            ? nextFormType
+                                            : 'classic',
                                     })
                                 }
                             />

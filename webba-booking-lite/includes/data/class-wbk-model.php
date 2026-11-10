@@ -74,6 +74,12 @@ class WBK_Model
                 "/includes/migrations/class-wbk-migration-zapier-deliveries.php";
         }
         WBK_Migration_Zapier_Deliveries::run();
+
+        if (!class_exists("WBK_Migration_Slot_Wait_List")) {
+            require_once WP_WEBBA_BOOKING__PLUGIN_DIR .
+                "/includes/migrations/class-wbk-migration-slot-wait-list.php";
+        }
+        WBK_Migration_Slot_Wait_List::run();
     }
 
     /**
@@ -705,6 +711,111 @@ class WBK_Model
             true,
             false,
             false,
+        );
+
+        // Override global wait list
+        $table->add_field(
+            "service_override_wait_list",
+            "override_wait_list",
+            __("Override global wait list", "webba-booking-lite"),
+            "checkbox",
+            "availability",
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => __(
+                    "Enable this to override the global wait list setting for this service.",
+                    "webba-booking-lite",
+                ),
+                'required_plan' => 'premium',
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+        $table->add_field(
+            "service_wait_list_enabled",
+            "wait_list_enabled",
+            __("Enable wait list", "webba-booking-lite"),
+            "checkbox",
+            "availability",
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => __(
+                    "When enabled, customers can join a wait list for full time slots of this service and get an email when the slot becomes available.",
+                    "webba-booking-lite",
+                ),
+                "hide" => [["override_wait_list", "=", "yes"]],
+                "dependent_value" => [
+                    "condition" => ["override_wait_list", "!=", "yes"],
+                    "value" => "",
+                ],
+                'required_plan' => 'premium',
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+        $table->add_field(
+            "service_wait_list_show_booked_slots_notice",
+            "wait_list_show_booked_slots_notice",
+            __("Show unavailable time slots required", "webba-booking-lite"),
+            "notice",
+            "availability",
+            [
+                "tooltip" => __(
+                    "“Show unavailable time slots” is currently off. Turn it on in Webba Booking → Settings → Booking Form so customers can see full time slots and join the wait list.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "warning",
+                "requires_show_booked_slots" => true,
+                'required_plan' => 'premium',
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $table->add_field(
+            "service_wait_list_max_per_slot",
+            "wait_list_max_per_slot",
+            __("Maximum wait-list entries per time slot", "webba-booking-lite"),
+            "text",
+            "availability",
+            [
+                "sub_type" => "none_negative_integer",
+                "hide" => [
+                    ["wait_list_enabled", "=", "yes"],
+                    ['override_wait_list', "=", "yes"]
+                ],
+                'required_plan' => 'premium',
+            ],
+            "50",
+            true,
+            false,
+            false
+        );
+
+        $table->add_field(
+            'service_wait_list_max_per_email',
+            'wait_list_max_per_email',
+            __("Maximum pending wait-list entries per email", "webba-booking-lite"),
+            "text",
+            "availability",
+            [
+                "sub_type" => "none_negative_integer",
+                "hide" => [
+                    ["wait_list_enabled", "=", "yes"],
+                    ['override_wait_list', "=", "yes"]
+                ],
+                'required_plan' => 'premium',
+            ],
+            "10",
+            true,
+            false,
+            false
         );
 
         // ========== PRICING TAB ==========
@@ -1401,6 +1512,7 @@ class WBK_Model
             true,
         );
         */
+
         // ========== SETTINGS TAB ==========
         // Calendar color
         $table->add_field(
@@ -1503,6 +1615,20 @@ class WBK_Model
                 ->get_element_at("service_recurring_max_appointments")
                 ->set_dependency($recurring_dep);
             // $table->fields->get_element_at("service_recurring_payment_mode")->set_dependency($recurring_dep);
+        }
+        if ($table->fields->get_element_at("service_wait_list_enabled") != false) {
+            $table->fields
+                ->get_element_at("service_wait_list_enabled")
+                ->set_dependency([["override_wait_list", "=", "yes"]]);
+        }
+        if (
+            $table->fields->get_element_at(
+                "service_wait_list_show_booked_slots_notice",
+            ) != false
+        ) {
+            $table->fields
+                ->get_element_at("service_wait_list_show_booked_slots_notice")
+                ->set_dependency([["wait_list_enabled", "=", "yes"]]);
         }
 
         $table->sync_structure();
@@ -2355,6 +2481,40 @@ class WBK_Model
             "",
             [
                 "tooltip" => __("Payment transaction identifier.", "webba-booking-lite"),
+            ],
+            "",
+            false,
+            false,
+            false,
+        );
+        $table->add_field(
+            "appointment_stripe_charge_status",
+            "stripe_charge_status",
+            __("Stripe charge status", "webba-booking-lite"),
+            "text",
+            "",
+            [
+                "tooltip" => __(
+                    "Delayed Stripe charge state: card_saved, scheduled, processing, paid, or failed. Separate from booking status.",
+                    "webba-booking-lite",
+                ),
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+        $table->add_field(
+            "appointment_stripe_delayed_meta",
+            "stripe_delayed_meta",
+            "stripe_delayed_meta",
+            "text",
+            "",
+            [
+                "tooltip" => __(
+                    "Internal JSON snapshot for delayed Stripe charges (timing, amount, currency, customer/payment method refs).",
+                    "webba-booking-lite",
+                ),
             ],
             "",
             false,

@@ -451,6 +451,70 @@ const actions = {
             return response
         }
     },
+    subscribeWaitList: (params: {
+        service_id: number
+        time: number
+        email: string
+        name?: string
+        staff_member_id?: string | number | null
+        quantity?: number
+    }) => {
+        return async () => {
+            try {
+                const response = (await apiFetch({
+                    path: addLangToQueryArgs(
+                        '/webba-booking/v1/wait-list/subscribe'
+                    ),
+                    method: 'POST',
+                    data: params,
+                })) as Record<string, unknown>
+                return response
+            } catch (error: any) {
+                if (error?.data) {
+                    return error.data
+                }
+                throw error
+            }
+        }
+    },
+    fetchWaitListSubscription: (token: string) => {
+        return async () => {
+            try {
+                const response = (await apiFetch({
+                    path: addLangToQueryArgs(
+                        '/webba-booking/v1/wait-list/subscription',
+                        { token }
+                    ),
+                    method: 'GET',
+                })) as Record<string, unknown>
+                return response
+            } catch (error: any) {
+                if (error?.data) {
+                    return error.data
+                }
+                throw error
+            }
+        }
+    },
+    unsubscribeWaitList: (params: { token: string }) => {
+        return async () => {
+            try {
+                const response = (await apiFetch({
+                    path: addLangToQueryArgs(
+                        '/webba-booking/v1/wait-list/unsubscribe'
+                    ),
+                    method: 'POST',
+                    data: params,
+                })) as Record<string, unknown>
+                return response
+            } catch (error: any) {
+                if (error?.data) {
+                    return error.data
+                }
+                throw error
+            }
+        }
+    },
     fetchUnitAvailabilityForRange: (
         unitId: number,
         range: { start: string; end: string },
@@ -816,6 +880,20 @@ const actions = {
                 path: '/webba-booking/v1/execute-stripe-payment',
                 method: 'POST',
                 data: { payment_intent_id, payment_method },
+            })
+            dispatch({
+                type: 'SET_STRIPE_EXECUTED_RESULT',
+                result: response,
+            })
+            return response
+        },
+    submitStripeSetup:
+        (setup_intent_id: string, payment_method: string) =>
+        async ({ dispatch }: any) => {
+            const response = await apiFetch({
+                path: '/webba-booking/v1/execute-stripe-setup',
+                method: 'POST',
+                data: { setup_intent_id, payment_method },
             })
             dispatch({
                 type: 'SET_STRIPE_EXECUTED_RESULT',

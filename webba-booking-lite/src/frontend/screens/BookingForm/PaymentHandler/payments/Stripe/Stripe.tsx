@@ -14,7 +14,8 @@ export const Stripe = ({ selectedMethod, onLoadingChange }: IStripeProps) => {
     const stripe = useStripe()
     const elements = useElements()
     const { setFormObj, preset, formData } = useBookingContext()
-    const { placeBooking, submitStripePayment } = useDispatch(store)
+    const { placeBooking, submitStripePayment, submitStripeSetup } =
+        useDispatch(store)
     const bookingData = useSelect(
         // @ts-ignore
         (select) => select(store).getBookingData(),
@@ -78,7 +79,7 @@ export const Stripe = ({ selectedMethod, onLoadingChange }: IStripeProps) => {
                             googlePay: 'book',
                         },
                     }}
-                    onConfirm={async (event) => {
+                    onConfirm={async () => {
                         if (!stripe || !elements) return false
 
                         const response = await placeBooking(formData)
@@ -90,24 +91,25 @@ export const Stripe = ({ selectedMethod, onLoadingChange }: IStripeProps) => {
                         const redirectUrl =
                             preset?.settings?.stripe_redirect_url ||
                             window.location.href
+                        const stripeMode =
+                            response?.stripe_mode ||
+                            // @ts-ignore amount from context may include stripe_details
+                            'payment'
 
-                        const { error, paymentIntent } =
-                            await stripe.confirmPayment({
-                                elements,
-                                confirmParams: {
-                                    return_url: `${redirectUrl}?paymentMethod=${selectedMethod}&`,
-                                },
-                                redirect: 'if_required',
-                            })
+                        const { confirmStripeForBooking } = await import(
+                            '../../../../../lib/confirmStripeForBooking'
+                        )
+                        const result = await confirmStripeForBooking({
+                            stripe,
+                            elements,
+                            paymentMethod: selectedMethod,
+                            stripeMode,
+                            redirectUrl,
+                            submitStripePayment,
+                            submitStripeSetup,
+                        })
 
-                        if (paymentIntent?.status === 'succeeded') {
-                            const paymentResponse = await submitStripePayment(
-                                paymentIntent.id,
-                                selectedMethod
-                            )
-
-                            return response
-                        }
+                        return result.confirmed ? response : false
                     }}
                 />
                 {!walletReady && (

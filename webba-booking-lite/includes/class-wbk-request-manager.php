@@ -267,6 +267,21 @@ class WBK_Request_Manager {
                 "callback"            => [$this, "create_booking"],
                 "permission_callback" => [$this, "create_booking_permission"],
             ] );
+            register_rest_route( "webba-booking/v1", "/wait-list/subscribe", [
+                "methods"             => "POST",
+                "callback"            => [$this, "wait_list_subscribe"],
+                "permission_callback" => "__return_true",
+            ] );
+            register_rest_route( "webba-booking/v1", "/wait-list/unsubscribe", [
+                "methods"             => "POST",
+                "callback"            => [$this, "wait_list_unsubscribe"],
+                "permission_callback" => "__return_true",
+            ] );
+            register_rest_route( "webba-booking/v1", "/wait-list/subscription", [
+                "methods"             => "GET",
+                "callback"            => [$this, "wait_list_subscription"],
+                "permission_callback" => "__return_true",
+            ] );
             register_rest_route( "webba-booking/v1", "/calculate-amounts/", [
                 "methods"             => "POST",
                 "callback"            => [$this, "calculate_amounts_rest"],
@@ -291,6 +306,16 @@ class WBK_Request_Manager {
                 "methods"             => "POST",
                 "callback"            => [$this, "execute_stripe_payment"],
                 "permission_callback" => [$this, "execute_stripe_payment_permission"],
+            ] );
+            register_rest_route( "webba-booking/v1", "/execute-stripe-setup", [
+                "methods"             => "POST",
+                "callback"            => [$this, "execute_stripe_setup"],
+                "permission_callback" => [$this, "execute_stripe_payment_permission"],
+            ] );
+            register_rest_route( "webba-booking/v1", "/stripe-webhook", [
+                "methods"             => "POST",
+                "callback"            => [$this, "stripe_webhook"],
+                "permission_callback" => "__return_true",
             ] );
             register_rest_route( "webba-booking/v1", "/execute-square-payment", [
                 "methods"             => "POST",
@@ -321,6 +346,11 @@ class WBK_Request_Manager {
                 "methods"             => "POST",
                 "callback"            => [$this, "send_test_zapier"],
                 "permission_callback" => [$this, "send_test_zapier_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/generate-stripe-webhook-secret/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "generate_stripe_webhook_secret"],
+                "permission_callback" => [$this, "generate_stripe_webhook_secret_permission"],
             ] );
             register_rest_route( "wbk/v2", "/whatsapp-templates/", [
                 "methods"             => "GET",
@@ -887,19 +917,56 @@ class WBK_Request_Manager {
             $should_generate_stripe_intent = !isset( $params["generate_stripe_intent"] ) || $params["generate_stripe_intent"] === true || $params["generate_stripe_intent"] === "true" || $params["generate_stripe_intent"] === 1;
             $existing_stripe_amount = ( isset( $params["stripe_details"]["amount"] ) ? floatval( $params["stripe_details"]["amount"] ) : null );
             $stripe_amount_changed = $existing_stripe_amount === null || abs( $existing_stripe_amount - floatval( $payment_data["to_pay_total"] ) ) > 0.008999999999999999;
-            if ( $should_generate_stripe_intent && $payment_data["to_pay_total"] > 0 && (!isset( $params["stripe_details"] ) || $params["stripe_details"]["service_ids"] !== $stripe_scope_ids || ($params["stripe_details"]["coupon_id"] ?? null) !== ($params["coupon"] ?? null) || $params["stripe_details"]["payment_method"] !== $params["payment_method"] || $stripe_amount_changed) && !empty( $params["email"] ) && filter_var( $params["email"], FILTER_VALIDATE_EMAIL ) ) {
+            $timing_snapshot = ( class_exists( "WBK_Stripe_Delayed_Payment" ) ? WBK_Stripe_Delayed_Payment::snapshot_timing_config() : [
+                "timing"       => "immediate",
+                "hours_before" => 0,
+            ] );
+            $use_setup_intent = class_exists( "WBK_Stripe_Delayed_Payment" ) && WBK_Stripe_Delayed_Payment::is_delayed_timing( $timing_snapshot["timing"] );
+            // Charge-at for quote-time decisions needs provisional times from the form.
+            // If delayed but the booking start is already past the charge window, fall back
+            // to immediate PaymentIntent (handled below when times are known). At quote
+            // stage we still create a SetupIntent when delayed timing is configured;
+            // create-booking may switch to immediate if charge_at has passed.
+            $existing_mode = $params["stripe_details"]["mode"] ?? null;
+            $mode_changed = $use_setup_intent && $existing_mode !== "setup" || !$use_setup_intent && $existing_mode === "setup";
+            if ( $should_generate_stripe_intent && $payment_data["to_pay_total"] > 0 && (!isset( $params["stripe_details"] ) || $params["stripe_details"]["service_ids"] !== $stripe_scope_ids || ($params["stripe_details"]["coupon_id"] ?? null) !== ($params["coupon"] ?? null) || $params["stripe_details"]["payment_method"] !== $params["payment_method"] || $stripe_amount_changed || $mode_changed) && !empty( $params["email"] ) && filter_var( $params["email"], FILTER_VALIDATE_EMAIL ) ) {
                 $stripe = new WBK_Stripe();
                 $stripe->init( $stripe_init_service_id );
-                $intent_data = $stripe->create_payment_intent( $params["payment_method"], $params["email"], $payment_data );
-                if ( $intent_data["success"] ) {
-                    $payment_data["stripe_details"]["client_secret"] = $intent_data["client_secret"];
-                    $payment_data["stripe_details"]["intent_id"] = $intent_data["intent_id"];
-                    $payment_data["stripe_details"]["amount"] = $payment_data["to_pay_total"];
-                    $payment_data["stripe_details"]["service_ids"] = $stripe_scope_ids;
-                    $payment_data["stripe_details"]["coupon_id"] = $params["coupon"];
-                    $payment_data["stripe_details"]["payment_method"] = $params["payment_method"];
+                if ( $use_setup_intent ) {
+                    $customer = $stripe->create_customer( $params["email"] );
+                    if ( !empty( $customer["success"] ) ) {
+                        $intent_data = $stripe->create_setup_intent( $customer["customer_id"], $params["payment_method"] );
+                        if ( $intent_data["success"] ) {
+                            $payment_data["stripe_details"]["client_secret"] = $intent_data["client_secret"];
+                            $payment_data["stripe_details"]["intent_id"] = $intent_data["intent_id"];
+                            $payment_data["stripe_details"]["customer_id"] = $customer["customer_id"];
+                            $payment_data["stripe_details"]["mode"] = "setup";
+                            $payment_data["stripe_details"]["amount"] = $payment_data["to_pay_total"];
+                            $payment_data["stripe_details"]["service_ids"] = $stripe_scope_ids;
+                            $payment_data["stripe_details"]["coupon_id"] = $params["coupon"];
+                            $payment_data["stripe_details"]["payment_method"] = $params["payment_method"];
+                            $payment_data["stripe_details"]["charge_timing"] = $timing_snapshot["timing"];
+                            $payment_data["stripe_details"]["charge_hours_before"] = $timing_snapshot["hours_before"];
+                            $payment_data["stripe_details"]["charge_timing_label"] = WBK_Stripe_Delayed_Payment::format_timing_label( $timing_snapshot["timing"], floatval( $timing_snapshot["hours_before"] ) );
+                        } else {
+                            $payment_data["stripe_details"]["error"] = $intent_data["error"] ?? __( "Unable to prepare card setup", "webba-booking-lite" );
+                        }
+                    } else {
+                        $payment_data["stripe_details"]["error"] = $customer["error"] ?? __( "Unable to prepare card setup", "webba-booking-lite" );
+                    }
                 } else {
-                    $payment_data["stripe_details"]["error"] = $intent_data["error"];
+                    $intent_data = $stripe->create_payment_intent( $params["payment_method"], $params["email"], $payment_data );
+                    if ( $intent_data["success"] ) {
+                        $payment_data["stripe_details"]["client_secret"] = $intent_data["client_secret"];
+                        $payment_data["stripe_details"]["intent_id"] = $intent_data["intent_id"];
+                        $payment_data["stripe_details"]["mode"] = "payment";
+                        $payment_data["stripe_details"]["amount"] = $payment_data["to_pay_total"];
+                        $payment_data["stripe_details"]["service_ids"] = $stripe_scope_ids;
+                        $payment_data["stripe_details"]["coupon_id"] = $params["coupon"];
+                        $payment_data["stripe_details"]["payment_method"] = $params["payment_method"];
+                    } else {
+                        $payment_data["stripe_details"]["error"] = $intent_data["error"];
+                    }
                 }
             } elseif ( isset( $params["stripe_details"] ) && !isset( $params["stripe_details"]["error"] ) ) {
                 $payment_data["stripe_details"] = $params["stripe_details"];
@@ -1378,6 +1445,9 @@ class WBK_Request_Manager {
                         ];
                     } else {
                         $total_locked++;
+                        if ( $lock_action != "lock" && class_exists( "WBK_Wait_List_Processor" ) ) {
+                            WBK_Wait_List_Processor::notify_slot_available( (int) $service_id, (int) $timeslot->get_start(), 0 );
+                        }
                     }
                     if ( $lock_action == "lock" ) {
                         if ( $wpdb->insert( get_option( "wbk_db_prefix", "" ) . "wbk_locked_time_slots", [
@@ -1699,6 +1769,7 @@ class WBK_Request_Manager {
                 "recurring_min_count"       => $recurring_min_count,
                 "recurring_max_count"       => $recurring_max_count,
                 "recurring_payment_mode"    => ( $service->get( "recurring_payment_mode" ) ?: "all" ),
+                "wait_list_enabled"         => WBK_Wait_List_Processor::is_enabled_for_service( (int) $id ),
             ];
             $services_arr[] = $service_data;
         }
@@ -1913,12 +1984,15 @@ class WBK_Request_Manager {
                 "price_fractional"                   => get_option( "wbk_price_fractional", "2" ),
                 "price_separator"                    => get_option( "wbk_price_separator", "." ),
                 "stripe_publishable_key"             => WBK_Options_Utils::get_stripe_credentials()[0] ?? null,
+                "stripe_charge_timing"               => ( class_exists( "WBK_Stripe_Delayed_Payment" ) ? WBK_Stripe_Delayed_Payment::get_configured_timing() : "immediate" ),
+                "stripe_charge_hours_before"         => ( class_exists( "WBK_Stripe_Delayed_Payment" ) ? WBK_Stripe_Delayed_Payment::get_configured_hours_before() : 24 ),
                 "square_application_id"              => $square_credentials[0] ?? null,
                 "square_location_id"                 => $square_credentials[2] ?? null,
                 "square_environment"                 => ( $square_credentials[3] ?? false ? "sandbox" : "production" ),
                 "square_currency"                    => get_option( "wbk_square_currency", "USD" ),
                 "square_redirect_url"                => WBK_Options_Utils::get_square_redirect_url(),
                 "show_booked_slots"                  => get_option( "wbk_show_booked_slots", "" ) === "yes",
+                "wait_list_enabled"                  => get_option( "wbk_wait_list_enabled", "" ) === "yes",
                 "allowed_multiple_service_selection" => get_option( "wbk_allow_multiple_services", "yes" ) === "yes",
                 "coupons_enabled"                    => $coupons_enabled,
                 "tax"                                => WBK_Options_Utils::get_tax(),
@@ -2114,6 +2188,7 @@ class WBK_Request_Manager {
                 "pay_full_amount"                           => get_option( "wbk_wording_pay_full_amount", __( "I want to pay full amount", "webba-booking-lite" ) ),
                 "left_to_pay_later"                         => get_option( "wbk_wording_left_to_pay_later", __( "Left to pay later", "webba-booking-lite" ) ),
                 "deposits"                                  => get_option( "wbk_wording_deposits", __( "Deposits", "webba-booking-lite" ) ),
+                "stripe_charge_agreement"                   => get_option( "wbk_wording_stripe_charge_agreement", __( "By confirming, you agree that we may save your card and charge %s %s. Your booking stays unpaid until that charge succeeds.", "webba-booking-lite" ) ),
                 "hide_summary"                              => get_option( "wbk_wording_hide_summary", __( "Hide summary", "webba-booking-lite" ) ),
                 "total_booked_items"                        => get_option( "wbk_total_booked_items_label", __( "Total booked items", "webba-booking-lite" ) ),
                 "grand_total"                               => get_option( "wbk_grand_total_label", __( "Grand total", "webba-booking-lite" ) ),
@@ -2122,6 +2197,9 @@ class WBK_Request_Manager {
                 "recurring_booking_repeat_every"            => get_option( "wbk_wording_recurring_booking_repeat_every", __( "Repeat every", "webba-booking-lite" ) ),
                 "recurring_booking_interval"                => get_option( "wbk_wording_recurring_booking_interval", __( "Interval", "webba-booking-lite" ) ),
                 "recurring_booking_number_of_time_slots"    => get_option( "wbk_wording_recurring_booking_number_of_time_slots", __( "Number of time slots", "webba-booking-lite" ) ),
+                "wait_list_button"                          => get_option( "wbk_wording_wait_list_button", __( "Join wait list", "webba-booking-lite" ) ),
+                "wait_list_popup_title"                     => get_option( "wbk_wording_wait_list_popup_title", __( "Get notified", "webba-booking-lite" ) ),
+                "wait_list_success"                         => get_option( "wbk_wording_wait_list_success", __( "You're on the wait list", "webba-booking-lite" ) ),
                 "loading_appointments"                      => get_option( "wbk_wording_loading_appointments", __( "Loading appointments...", "webba-booking-lite" ) ),
                 "no_appointments_selected"                  => get_option( "wbk_wording_no_appointments_selected", __( "No appointments selected. Add slots using the controls above or close the popup.", "webba-booking-lite" ) ),
                 "unavailable"                               => get_option( "wbk_wording_unavailable", __( "unavailable", "webba-booking-lite" ) ),
@@ -2259,7 +2337,7 @@ class WBK_Request_Manager {
                 }
                 if ( empty( $data[$model]["time"] ) ) {
                     $data[$model]["time"] = [
-                        "wbk_null" => __( "No time slots available", "webba-booking-lite" ),
+                        "" => __( "No time slots available", "webba-booking-lite" ),
                     ];
                 }
             }
@@ -4300,6 +4378,81 @@ class WBK_Request_Manager {
     }
 
     /**
+     * Subscribe to a busy time slot wait list.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function wait_list_subscribe( WP_REST_Request $request ) : WP_REST_Response {
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        if ( !is_array( $params ) ) {
+            $params = [];
+        }
+        $result = WBK_Wait_List_Processor::subscribe( $params );
+        if ( is_wp_error( $result ) ) {
+            $status = $result->get_error_data();
+            $code = ( is_array( $status ) && isset( $status["status"] ) ? (int) $status["status"] : 400 );
+            return new WP_REST_Response([
+                "success" => false,
+                "error"   => $result->get_error_message(),
+                "code"    => $result->get_error_code(),
+            ], $code);
+        }
+        return new WP_REST_Response([
+            "success" => true,
+            "data"    => $result,
+        ], 200);
+    }
+
+    /**
+     * Unsubscribe from a wait list by token.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function wait_list_unsubscribe( WP_REST_Request $request ) : WP_REST_Response {
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        $token = ( isset( $params["token"] ) ? sanitize_text_field( $params["token"] ) : "" );
+        $ok = WBK_Wait_List_Processor::unsubscribe( $token );
+        if ( !$ok ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "error"   => __( "Wait list subscription not found.", "webba-booking-lite" ),
+            ], 404);
+        }
+        return new WP_REST_Response([
+            "success" => true,
+        ], 200);
+    }
+
+    /**
+     * Get pending wait-list subscription details by token.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function wait_list_subscription( WP_REST_Request $request ) : WP_REST_Response {
+        $token = sanitize_text_field( (string) $request->get_param( "token" ) );
+        $result = WBK_Wait_List_Processor::get_pending_by_token( $token );
+        if ( is_wp_error( $result ) ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "error"   => $result->get_error_message(),
+            ], (int) ($result->get_error_data()["status"] ?? 404));
+        }
+        return new WP_REST_Response([
+            "success" => true,
+            "data"    => $result,
+        ], 200);
+    }
+
+    /**
      * Create one or multiple bookings
      *
      * @param WP_REST_Request $request The request object
@@ -5275,6 +5428,202 @@ class WBK_Request_Manager {
     }
 
     /**
+     * Finalize Stripe card setup for delayed charges after confirmSetup.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function execute_stripe_setup( $request ) {
+        WBK_Translation_Processor::switch_to_locale_from_get_param();
+        if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => "Stripe payment processing not available",
+            ], 403);
+        }
+        if ( !class_exists( "WBK_Stripe_Delayed_Payment" ) ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => "Delayed Stripe charges are not available",
+            ], 403);
+        }
+        $setup_intent_id = $request->get_param( "setup_intent_id" );
+        if ( empty( $setup_intent_id ) ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => "Missing required parameter: setup_intent_id",
+            ], 400);
+        }
+        $booking_ids = WBK_Model_Utils::get_booking_ids_by_payment_id( $setup_intent_id );
+        if ( empty( $booking_ids ) ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => "No bookings found for this setup intent",
+            ], 404);
+        }
+        $first_booking = new WBK_Booking($booking_ids[0]);
+        if ( !$first_booking->is_loaded() ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => "Unable to open booking",
+            ], 404);
+        }
+        $service_id = WBK_Model_Utils::get_service_id_by_booking_id( $booking_ids[0] );
+        $stripe = new WBK_Stripe();
+        $stripe->init( $service_id );
+        $setup_intent = $stripe->get_setup_intent( $setup_intent_id );
+        if ( !is_object( $setup_intent ) || $setup_intent->status !== "succeeded" ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => __( "Card setup was not completed successfully", "webba-booking-lite" ),
+            ], 400);
+        }
+        $customer_id = (string) ($setup_intent->customer ?? "");
+        $payment_method_id = (string) ($setup_intent->payment_method ?? "");
+        if ( $customer_id === "" || $payment_method_id === "" ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => __( "Saved payment method is missing after card setup", "webba-booking-lite" ),
+            ], 400);
+        }
+        if ( $first_booking->get( "unit_id" ) > 0 ) {
+            $payment_details = WBK_Price_Processor::get_unit_payment_items_post_booked( $booking_ids );
+        } else {
+            $payment_details = WBK_Price_Processor::get_payment_items_post_booked( $booking_ids );
+        }
+        $existing_meta = WBK_Stripe_Delayed_Payment::get_meta( $first_booking );
+        $timing_snapshot = [
+            "timing"       => $existing_meta["timing"] ?? WBK_Stripe_Delayed_Payment::get_configured_timing(),
+            "hours_before" => $existing_meta["hours_before"] ?? WBK_Stripe_Delayed_Payment::get_configured_hours_before(),
+        ];
+        if ( isset( $existing_meta["amount"] ) && floatval( $existing_meta["amount"] ) > 0 ) {
+            $payment_details["to_pay_total"] = floatval( $existing_meta["amount"] );
+        }
+        $meta = WBK_Stripe_Delayed_Payment::build_setup_meta(
+            $booking_ids,
+            ( is_array( $payment_details ) ? $payment_details : [
+                "to_pay_total" => 0,
+            ] ),
+            $timing_snapshot,
+            $customer_id,
+            $payment_method_id,
+            $setup_intent_id
+        );
+        if ( is_wp_error( $meta ) ) {
+            return new WP_REST_Response([
+                "status"  => "error",
+                "message" => $meta->get_error_message(),
+            ], 400);
+        }
+        foreach ( $booking_ids as $booking_id ) {
+            $booking = new WBK_Booking($booking_id);
+            if ( !$booking->is_loaded() ) {
+                continue;
+            }
+            if ( !(floatval( $booking->get( "amount_paid" ) ) > 0) ) {
+                $booking->set( "payment_method", "" );
+            }
+            $booking->set( "payment_id", $setup_intent_id );
+            // Card is on file for a future charge — do not auto-delete as unpaid.
+            $booking->set( "expiration_time", "0" );
+            WBK_Stripe_Delayed_Payment::save_meta( $booking, $meta );
+        }
+        if ( WBK_Stripe_Delayed_Payment::should_charge_immediately( (int) $meta["charge_at"] ) ) {
+            $charge_result = WBK_Stripe_Delayed_Payment::execute_scheduled_charge( (int) $booking_ids[0], (string) $meta["job_token"] );
+            if ( !empty( $charge_result["success"] ) && (empty( $charge_result["skipped"] ) || ($charge_result["message"] ?? "") === "already_paid") ) {
+                return new WP_REST_Response([
+                    "status"              => "success",
+                    "message"             => "Charged immediately",
+                    "charged_immediately" => true,
+                    "payment_required"    => false,
+                ], 200);
+            }
+            if ( ($charge_result["message"] ?? "") === "declined" || ($charge_result["message"] ?? "") === "requires_action" ) {
+                return new WP_REST_Response([
+                    "status"           => "error",
+                    "message"          => __( "Card was saved but the charge could not be completed", "webba-booking-lite" ),
+                    "payment_required" => true,
+                ], 402);
+            }
+        }
+        WBK_Stripe_Delayed_Payment::schedule_charge( $booking_ids, $meta );
+        return new WP_REST_Response([
+            "status"               => "success",
+            "message"              => "Card saved; charge scheduled",
+            "charged_immediately"  => false,
+            "payment_required"     => false,
+            "charge_at"            => (int) $meta["charge_at"],
+            "stripe_charge_status" => $meta["state"],
+        ], 200);
+    }
+
+    /**
+     * Stripe webhook endpoint (verified via signing secret).
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function stripe_webhook( $request ) {
+        if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+            return new WP_REST_Response([
+                "received" => false,
+            ], 403);
+        }
+        $payload = $request->get_body();
+        $sig_header = $request->get_header( "stripe-signature" );
+        if ( !$sig_header ) {
+            $sig_header = ( isset( $_SERVER["HTTP_STRIPE_SIGNATURE"] ) ? sanitize_text_field( wp_unslash( $_SERVER["HTTP_STRIPE_SIGNATURE"] ) ) : "" );
+        }
+        $stripe = new WBK_Stripe();
+        $stripe->init( 0 );
+        $event = $stripe->construct_webhook_event( (string) $payload, (string) $sig_header );
+        if ( is_wp_error( $event ) ) {
+            return new WP_REST_Response([
+                "received" => false,
+                "error"    => $event->get_error_message(),
+            ], 400);
+        }
+        if ( class_exists( "WBK_Stripe_Delayed_Payment" ) ) {
+            WBK_Stripe_Delayed_Payment::handle_webhook_event( $event );
+        }
+        $type = $event->type ?? "";
+        if ( $type === "payment_intent.succeeded" ) {
+            $pi = $event->data->object ?? null;
+            $pi_id = ( is_object( $pi ) ? $pi->id ?? "" : "" );
+            if ( $pi_id !== "" ) {
+                $booking_ids = WBK_Model_Utils::get_booking_ids_by_payment_id( $pi_id );
+                if ( !empty( $booking_ids ) && is_object( $pi ) ) {
+                    $any_unpaid = false;
+                    foreach ( $booking_ids as $bid ) {
+                        $b = new WBK_Booking((int) $bid);
+                        if ( $b->is_loaded() && class_exists( "WBK_Stripe_Delayed_Payment" ) && !WBK_Stripe_Delayed_Payment::is_booking_paid( $b ) ) {
+                            $any_unpaid = true;
+                            break;
+                        }
+                        if ( $b->is_loaded() && !(floatval( $b->get( "amount_paid" ) ) > 0) ) {
+                            $any_unpaid = true;
+                            break;
+                        }
+                    }
+                    if ( $any_unpaid ) {
+                        $currency = get_option( "wbk_stripe_currency", "" );
+                        if ( WBK_Stripe::is_currency_zero_decimal( $currency ) ) {
+                            $paid_total = floatval( $pi->amount );
+                        } else {
+                            $paid_total = floatval( $pi->amount ) / 100;
+                        }
+                        $factory = new WBK_Booking_Factory();
+                        $factory->set_as_paid( $booking_ids, "stripe", $paid_total );
+                    }
+                }
+            }
+        }
+        return new WP_REST_Response([
+            "received" => true,
+        ], 200);
+    }
+
+    /**
      * Execute a Square payment after the Web Payments SDK tokenizes the card.
      *
      * @param WP_REST_Request $request
@@ -5587,6 +5936,40 @@ class WBK_Request_Manager {
 
     public function send_test_zapier_permission( $request ) : bool {
         return current_user_can( "manage_options" );
+    }
+
+    public function generate_stripe_webhook_secret_permission( $request ) : bool {
+        return current_user_can( "manage_options" );
+    }
+
+    /**
+     * Create or regenerate the Stripe webhook signing secret via Stripe API.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function generate_stripe_webhook_secret( $request ) : WP_REST_Response {
+        if ( !class_exists( "WBK_Stripe" ) || !method_exists( "WBK_Stripe", "provision_webhook_endpoint" ) ) {
+            return new \WP_REST_Response([
+                "status"  => "error",
+                "message" => __( "Stripe integration is not available.", "webba-booking-lite" ),
+            ], 403);
+        }
+        $regenerate = (bool) $request->get_param( "regenerate" );
+        $stripe = new WBK_Stripe();
+        $result = $stripe->provision_webhook_endpoint( $regenerate );
+        if ( is_wp_error( $result ) ) {
+            return new \WP_REST_Response([
+                "status"  => "error",
+                "message" => $result->get_error_message(),
+            ], 400);
+        }
+        return new \WP_REST_Response([
+            "status"  => "success",
+            "secret"  => $result["secret"],
+            "url"     => $result["url"],
+            "message" => ( $regenerate ? __( "Webhook signing secret regenerated.", "webba-booking-lite" ) : __( "Webhook signing secret generated.", "webba-booking-lite" ) ),
+        ], 200);
     }
 
     /**
@@ -6056,8 +6439,16 @@ class WBK_Request_Manager {
                         ], 400);
                     }
                 }
+                // Never wipe a freshly API-generated webhook secret with an empty form value.
+                if ( $field_id === "wbk_stripe_webhook_secret" && (!is_string( $option_value ) || trim( $option_value ) === "") ) {
+                    continue;
+                }
                 update_option( $field_id, $option_value );
             } else {
+                // Keep existing webhook secret when the field is omitted from the payload.
+                if ( $field_id === "wbk_stripe_webhook_secret" ) {
+                    continue;
+                }
                 update_option( $field_id, "" );
             }
             if ( $field_id == "wbk_email_admin_daily_time" ) {
@@ -7774,7 +8165,7 @@ class WBK_Request_Manager {
         foreach ( $data["options"] as $key => $value ) {
             if ( in_array( $key, $appearance_fields ) ) {
                 if ( $key === "form_type" ) {
-                    $allowed_form_types = ["classic", "waterfall"];
+                    $allowed_form_types = ["classic", "waterfall", "webba5"];
                     $sanitized_form_type = sanitize_text_field( $value );
                     $appearance_options[$key] = ( in_array( $sanitized_form_type, $allowed_form_types, true ) ? $sanitized_form_type : $default_values["form_type"] ?? "classic" );
                     continue;
@@ -8536,6 +8927,9 @@ class WBK_Request_Manager {
                 return new WP_REST_Response([
                     "error" => "Internal database error.",
                 ], 500);
+            }
+            if ( class_exists( "WBK_Wait_List_Processor" ) ) {
+                WBK_Wait_List_Processor::notify_slot_available( (int) $service_id, (int) $time, 0 );
             }
             return new WP_REST_Response([
                 "status"     => "success",

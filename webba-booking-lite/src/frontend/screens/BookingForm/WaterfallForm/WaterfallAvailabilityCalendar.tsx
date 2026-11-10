@@ -21,12 +21,15 @@ import {
     wbkBackendDate,
     wbkExtractBackendDate,
 } from '../../../providers/BookingFormProvider/utils'
+import { WaitListPopup } from '../../../components/WaitList/WaitListPopup'
+import { IWaitListPendingSlot } from '../../../components/WaitList/types'
 
 interface WaterfallAvailabilityCalendarProps {
     service: IServiceProps
     locationId?: string
     staffId?: string | null
     weekStart?: number | string
+    selectFirstAvailableDate?: boolean
 }
 
 export const WaterfallAvailabilityCalendar = ({
@@ -34,11 +37,19 @@ export const WaterfallAvailabilityCalendar = ({
     locationId,
     staffId = null,
     weekStart,
+    selectFirstAvailableDate = false,
 }: WaterfallAvailabilityCalendarProps) => {
     const { userTimezone, timezone, preset, loading } = useBookingContext()
     const timeslotsRef = useRef<HTMLDivElement>(null)
     const { fetchServiceAvailability, fetchServiceTimeslots } =
         useDispatch(store_name)
+    const [waitListPopupOpen, setWaitListPopupOpen] = useState(false)
+    const [pendingWaitListSlot, setPendingWaitListSlot] =
+        useState<IWaitListPendingSlot | null>(null)
+    const [subscribedWaitListSlots, setSubscribedWaitListSlots] = useState<
+        number[]
+    >([])
+    const waitListEnabledForService = !!service.wait_list_enabled
 
     const weekStartsOn =
         typeof weekStart === 'number'
@@ -144,6 +155,23 @@ export const WaterfallAvailabilityCalendar = ({
             ) || null
         )
     }, [clickedDate, formattedAvailableDates])
+
+    useEffect(() => {
+        if (
+            !selectFirstAvailableDate ||
+            !hasAvailabilityResponse ||
+            clickedDate ||
+            formattedAvailableDates.length === 0
+        ) {
+            return
+        }
+        setClickedDate(formattedAvailableDates[0])
+    }, [
+        clickedDate,
+        formattedAvailableDates,
+        hasAvailabilityResponse,
+        selectFirstAvailableDate,
+    ])
 
     const backendDate = selectedDate ? wbkBackendDate(selectedDate) : ''
 
@@ -302,6 +330,33 @@ export const WaterfallAvailabilityCalendar = ({
         [places, selectedDate, service]
     )
 
+    const handleJoinWaitList = useCallback(
+        (slot: {
+            start_time: number
+            end_time: number
+            staff_member_ids?: string[] | null
+        }) => {
+            const staffFromSlot =
+                slot.staff_member_ids && slot.staff_member_ids.length === 1
+                    ? String(slot.staff_member_ids[0])
+                    : null
+            const resolvedStaff =
+                staffIdForApi && staffIdForApi !== '0'
+                    ? staffIdForApi
+                    : staffFromSlot
+            setPendingWaitListSlot({
+                serviceId: service.id,
+                serviceLabel: service.label,
+                time: slot.start_time,
+                endTime: slot.end_time,
+                staffMemberId: resolvedStaff,
+                quantity: service.quantity || 1,
+            })
+            setWaitListPopupOpen(true)
+        },
+        [service.id, service.label, service.quantity, staffIdForApi]
+    )
+
     const isTimeslotsLoading = Boolean(loading?.serviceTimeslots?.[service.id])
 
     useEffect(() => {
@@ -369,9 +424,25 @@ export const WaterfallAvailabilityCalendar = ({
                         group_booking={service.group_booking}
                         limited_timeslot={service.limited_timeslot}
                         showStaffSelector={showTimeslotStaffSelector}
+                        waitListEnabled={waitListEnabledForService}
+                        subscribedWaitListSlots={subscribedWaitListSlots}
+                        onJoinWaitList={handleJoinWaitList}
                     />
                 </div>
             )}
+            <WaitListPopup
+                isOpen={waitListPopupOpen}
+                pendingSlot={pendingWaitListSlot}
+                onClose={() => {
+                    setWaitListPopupOpen(false)
+                    setPendingWaitListSlot(null)
+                }}
+                onSuccess={(slot) => {
+                    setSubscribedWaitListSlots((prev) =>
+                        prev.includes(slot.time) ? prev : [...prev, slot.time]
+                    )
+                }}
+            />
         </div>
     )
 }

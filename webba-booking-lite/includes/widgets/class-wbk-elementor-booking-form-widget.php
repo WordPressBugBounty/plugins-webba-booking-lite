@@ -497,7 +497,11 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
     {
         $form_type = is_string($value) ? $value : '';
 
-        return $form_type === 'waterfall' ? 'waterfall' : 'classic';
+        $allowed_form_types = ['classic', 'waterfall', 'webba5'];
+
+        return in_array($form_type, $allowed_form_types, true)
+            ? $form_type
+            : 'classic';
     }
 
     /**
@@ -568,6 +572,7 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'options' => [
                     'classic' => __('Webba 6 Classic form', 'webba-booking-lite'),
                     'waterfall' => __('Waterfall form', 'webba-booking-lite'),
+                    'webba5' => __('Webba 5 form', 'webba-booking-lite'),
                 ],
                 'default' => $form_type_default,
             ]

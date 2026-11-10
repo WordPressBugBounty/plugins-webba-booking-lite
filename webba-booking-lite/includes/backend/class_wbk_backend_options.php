@@ -161,6 +161,11 @@ class WBK_Backend_Options
                     "Configure booking rules, restrictions, booking form behavior, and advanced options.",
                     "webba-booking-lite",
                 ),
+                "tabs" => [
+                    "wait-list" => [
+                        "title" => __("Wait list", "webba-booking-lite"),
+                    ],
+                ],
             ],
         );
 
@@ -1298,6 +1303,81 @@ OLD: When one service is booked, it will automatically lock another one on the s
                 "popup" => __("Turn on to set holidays as recurring yearly.", "webba-booking-lite"),
                 "default" => "",
                 "tab" => "holidays",
+            ],
+        );
+
+        // ========== GLOBAL AVAILABILITY & HOLIDAYS - Wait List Tab ==========
+        wbk_opt()->add_option(
+            "wbk_wait_list_enabled",
+            "checkbox",
+            __("Enable wait list", "webba-booking-lite"),
+            "wbk_global_availability_settings_section",
+            [
+                "default" => "",
+                "checkbox_value" => "yes",
+                "not_translated_title" => "Enable wait list",
+                "popup" => __(
+                    "Turn on to allow customers to join a wait list for full time slots. Individual services can override this in service Availability.",
+                    "webba-booking-lite",
+                ),
+                "tab" => "wait-list",
+                'required_plan' => 'premium',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wait_list_show_booked_slots_notice",
+            "notice",
+            __("Show unavailable time slots required", "webba-booking-lite"),
+            "wbk_global_availability_settings_section",
+            [
+                "not_translated_title" => "Show unavailable time slots required",
+                "popup" => __(
+                    "“Show unavailable time slots” is currently off. Turn it on in the Booking Form tab so customers can see full time slots and join the wait list.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "warning",
+                "dependency" => [
+                    ["wbk_wait_list_enabled", "=", "yes"],
+                    ["wbk_show_booked_slots", "!=", "yes"],
+                ],
+                "tab" => "wait-list",
+                'required_plan' => 'premium',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wait_list_max_per_slot",
+            "number",
+            __("Maximum wait-list entries per time slot", "webba-booking-lite"),
+            "wbk_global_availability_settings_section",
+            [
+                "default" => "50",
+                "not_translated_title" => "Maximum wait-list entries per time slot",
+                "popup" => __(
+                    "Limit how many customers can join the wait list for the same time slot.",
+                    "webba-booking-lite",
+                ),
+                "dependency" => [["wbk_wait_list_enabled", "=", "yes"]],
+                "tab" => "wait-list",
+                'required_plan' => 'premium',
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wait_list_max_per_email",
+            "number",
+            __("Maximum pending wait-list entries per email", "webba-booking-lite"),
+            "wbk_global_availability_settings_section",
+            [
+                "default" => "10",
+                "not_translated_title" => "Maximum pending wait-list entries per email",
+                "popup" => __(
+                    "Limit how many active wait-list subscriptions one email address can have.",
+                    "webba-booking-lite",
+                ),
+                "dependency" => [["wbk_wait_list_enabled", "=", "yes"]],
+                "tab" => "wait-list",
             ],
         );
 
@@ -3173,6 +3253,130 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "tab" => "stripe",
             ],
         );
+
+        wbk_opt()->add_option(
+            "wbk_stripe_charge_timing",
+            "select",
+            __("Charge timing", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "default" => "immediate",
+                "not_translated_title" => "Charge timing",
+                "popup" => __(
+                    "Choose when Stripe charges the customer. \"Immediately\" preserves the current behaviour. Delayed options save the card with Stripe SetupIntent and charge later off-session. Existing bookings keep the timing that was saved when they were created.",
+                    "webba-booking-lite",
+                ),
+                "extra" => [
+                    "immediate" => __("Immediately", "webba-booking-lite"),
+                    "hours_before" => __(
+                        "X hours before the booking starts",
+                        "webba-booking-lite",
+                    ),
+                    "at_start" => __("When the booking starts", "webba-booking-lite"),
+                    "at_end" => __("When the booking ends", "webba-booking-lite"),
+                ],
+                "required_plan" => "standard",
+                "tab" => "stripe",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_stripe_charge_hours_before",
+            "number",
+            __("Hours before booking", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "default" => "24",
+                "not_translated_title" => "Hours before booking",
+                "popup" => __(
+                    "Number of hours before the booking start time to charge the saved card. Must be zero or greater. If the calculated charge time has already passed when the booking is created, payment is taken immediately.",
+                    "webba-booking-lite",
+                ),
+                "dependency" => [["wbk_stripe_charge_timing", "=", "hours_before"]],
+                "dependent_value" => [
+                    "condition" => ["wbk_stripe_charge_timing", "!=", "hours_before"],
+                    "value" => "24",
+                ],
+                "required_plan" => "standard",
+                "tab" => "stripe",
+                "sub_type" => "none_negative_float",
+            ],
+        );
+
+        $stripe_webhook_url = rest_url("webba-booking/v1/stripe-webhook");
+        if (
+            class_exists("WBK_Stripe") &&
+            method_exists("WBK_Stripe", "get_webhook_url")
+        ) {
+            $stripe_webhook_url = WBK_Stripe::get_webhook_url();
+        }
+        $stripe_webhook_is_local =
+            class_exists("WBK_Stripe") &&
+            method_exists("WBK_Stripe", "is_local_webhook_host")
+                ? WBK_Stripe::is_local_webhook_host($stripe_webhook_url)
+                : in_array(
+                    strtolower((string) wp_parse_url($stripe_webhook_url, PHP_URL_HOST)),
+                    ["localhost", "127.0.0.1", "::1"],
+                    true,
+                );
+
+        if ($stripe_webhook_is_local) {
+            wbk_opt()->add_option(
+                "wbk_stripe_webhook_notice",
+                "notice",
+                __("Stripe webhook URL", "webba-booking-lite"),
+                "wbk_payment_settings_section",
+                [
+                    "not_translated_title" => "Stripe webhook URL",
+                    "popup" => __(
+                        "Stripe webhooks cannot reach a local site. Publish this site on a public URL (or expose it with a secure tunnel) before configuring delayed-payment webhooks.",
+                        "webba-booking-lite",
+                    ),
+                    "extra" => [
+                        "variant" => "warning",
+                    ],
+                    "required_plan" => "standard",
+                    "tab" => "stripe",
+                ],
+            );
+        } else {
+            wbk_opt()->add_option(
+                "wbk_stripe_webhook_notice",
+                "notice",
+                __("Stripe webhook URL", "webba-booking-lite"),
+                "wbk_payment_settings_section",
+                [
+                    "not_translated_title" => "Stripe webhook URL",
+                    "popup" => sprintf(
+                        /* translators: %s: webhook endpoint URL */
+                        __(
+                            'Create a webhook endpoint in Stripe Dashboard for this URL:<br><span class="wbk_noticeField__break">%s</span>Enable events<br><span class="wbk_noticeField__break">payment_intent.succeeded</span><span class="wbk_noticeField__break">payment_intent.payment_failed</span>Then paste the Signing secret below.',
+                            "webba-booking-lite",
+                        ),
+                        esc_html($stripe_webhook_url),
+                    ),
+                    "required_plan" => "standard",
+                    "tab" => "stripe",
+                ],
+            );
+
+            wbk_opt()->add_option(
+                "wbk_stripe_webhook_secret",
+                "password",
+                __("Stripe webhook signing secret", "webba-booking-lite"),
+                "wbk_payment_settings_section",
+                [
+                    "default" => "",
+                    "not_translated_title" => "Stripe webhook signing secret",
+                    "popup" => __(
+                        "Paste the Signing secret (whsec_…) from the Stripe webhook endpoint that uses the Webba webhook URL.",
+                        "webba-booking-lite",
+                    ),
+                    "required_plan" => "standard",
+                    "tab" => "stripe",
+                ],
+            );
+        }
 
         wbk_opt()->add_option(
             "wbk_stripe_additional_fields",
@@ -7284,6 +7488,25 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
         );
 
         wbk_opt()->add_option(
+            "wbk_wording_stripe_charge_agreement",
+            "text",
+            __("Stripe charge agreement", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __(
+                    'By confirming, you agree that we may save your card and charge %1$s %2$s. Your booking stays unpaid until that charge succeeds.',
+                    'webba-booking-lite'
+                ),
+                "not_translated_title" => "Stripe charge agreement",
+                "popup" => __(
+                    "Message shown in the payment step when the user confirms the booking and agrees to the Stripe charge agreement.",
+                    "webba-booking-lite",
+                ),
+                "tab" => "payments",
+            ],
+        );
+
+        wbk_opt()->add_option(
             "wbk_google_meet_link_text",
             "text",
             __("Google Meet link text", "webba-booking-lite"),
@@ -7412,6 +7635,45 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                 "not_translated_title" => "Number of time slots",
                 "popup" => __("Label for Number of time slots.", "webba-booking-lite"),
                 "tab" => "recurring",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_wait_list_button",
+            "text",
+            __("Wait list button text", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Join wait list", "webba-booking-lite"),
+                "not_translated_title" => "Wait list button text",
+                "popup" => __("Label for Wait list button text.", "webba-booking-lite"),
+                "tab" => "wait-list",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_wait_list_popup_title",
+            "text",
+            __("Wait list popup title", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("Get notified", "webba-booking-lite"),
+                "not_translated_title" => "Wait list popup title",
+                "popup" => __("Label for Wait list popup title.", "webba-booking-lite"),
+                "tab" => "wait-list",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_wording_wait_list_success",
+            "text",
+            __("Wait list success message", "webba-booking-lite"),
+            "wbk_translation_settings_section",
+            [
+                "default" => __("You're on the wait list", "webba-booking-lite"),
+                "not_translated_title" => "Wait list success message",
+                "popup" => __("Label for Wait list success message.", "webba-booking-lite"),
+                "tab" => "wait-list",
             ],
         );
 

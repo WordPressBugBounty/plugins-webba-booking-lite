@@ -3,7 +3,7 @@ import {
     AppearanceProvider,
     useAppearance,
 } from '../../providers/AppearanceProvider/AppearanceProvider'
-import { FORM_TYPE_WATERFALL, sections } from './sections'
+import { FORM_TYPE_WATERFALL, FORM_TYPE_WEBBA5, sections } from './sections'
 import './AppearanceEditorScreen.scss'
 import { BookingForm } from '../../../frontend/screens/BookingForm/BookingForm'
 import { BookingFormProvider } from '../../../frontend/providers/BookingFormProvider/BookingFormProvider'
@@ -15,12 +15,14 @@ import classNames from 'classnames'
 const AppearancePreview = () => {
     const { formType } = useAppearance()
     const isWaterfall = formType === FORM_TYPE_WATERFALL
+    const isWebba5 = formType === FORM_TYPE_WEBBA5
 
     return (
         <BookingFormProvider attrService={'0'} attrCategory={'0'}>
             <div
                 className={classNames({
                     wbk_appearanceEditorScreen__waterfallPreview: isWaterfall,
+                    wbk_appearanceEditorScreen__webba5Preview: isWebba5,
                 })}
             >
                 <BookingForm formType={formType} />

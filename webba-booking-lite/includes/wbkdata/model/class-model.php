@@ -625,6 +625,10 @@ class Model
                     $type = "string";
                     $input_type = "gift_card_design";
                     break;
+                case "notice":
+                    $type = "string";
+                    $input_type = "notice";
+                    break;
                 default:
                     $type = "not_defined";
                     $input_type = "not_defined";

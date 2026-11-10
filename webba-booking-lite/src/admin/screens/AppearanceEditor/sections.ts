@@ -89,6 +89,7 @@ const borderRadiusOptions = [
 
 export const FORM_TYPE_CLASSIC = 'classic'
 export const FORM_TYPE_WATERFALL = 'waterfall'
+export const FORM_TYPE_WEBBA5 = 'webba5'
 
 export const formTypeOptions = [
     {
@@ -98,6 +99,10 @@ export const formTypeOptions = [
     {
         value: FORM_TYPE_WATERFALL,
         label: __('Waterfall form', 'webba-booking-lite'),
+    },
+    {
+        value: FORM_TYPE_WEBBA5,
+        label: __('Webba 5 form', 'webba-booking-lite'),
     },
 ]
 
@@ -303,7 +308,7 @@ export const sections = [
             {
                 id: 'sidebar',
                 title: __('Sidebar styling', 'webba-booking-lite'),
-                applicableFormTypes: [FORM_TYPE_CLASSIC],
+                applicableFormTypes: [FORM_TYPE_CLASSIC, FORM_TYPE_WEBBA5],
                 fields: [
                     {
                         id: 'bg_sidebar',

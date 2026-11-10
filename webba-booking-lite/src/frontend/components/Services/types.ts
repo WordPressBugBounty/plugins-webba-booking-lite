@@ -50,6 +50,7 @@ export interface IServiceProps {
     recurring_min_count?: number
     recurring_max_count?: number
     recurring_payment_mode?: 'all' | 'first'
+    wait_list_enabled?: boolean
 }
 
 export interface IUnitAttendees {

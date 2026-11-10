@@ -11,7 +11,7 @@ $staff = isset($data[4]) ? $data[4] : '0';
 $units = isset($data[5]) ? $data[5] : 'no';
 $hide_category = isset($data[6]) ? $data[6] : 'no';
 $form_type = isset($data[7]) ? $data[7] : '';
-if ($form_type !== 'classic' && $form_type !== 'waterfall') {
+if (!in_array($form_type, ['classic', 'waterfall', 'webba5'], true)) {
     $form_type = '';
 }
 
@@ -20,6 +20,7 @@ $allowed_params = [
     'admin_cancel',
     'cancelation',
     'order_payment',
+    'wait_list_leave',
     'PayerID',
     'paymentId',
     'paypal_status',

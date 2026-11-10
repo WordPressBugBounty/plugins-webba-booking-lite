@@ -75,6 +75,35 @@
             }
         }
 
+        &--webba5 {
+            max-width: 960px;
+            width: 100%;
+
+            .wbk_thank_you__wrapper,
+            .wbk_thank_you__outer-wrapper {
+                min-height: 0;
+                max-height: none;
+                height: auto;
+                max-width: 100%;
+                overflow: visible;
+            }
+
+            .wbk_thank_you__native-scroll {
+                max-height: none;
+                overflow: visible;
+                scrollbar-gutter: auto;
+            }
+
+            .wbk_thank_you__inner-wrapper {
+                height: auto;
+            }
+
+            .wbk_webba5_form {
+                overflow: visible;
+                max-height: none;
+            }
+        }
+
         &__loading-wrapper {
             display: flex;
             align-items: center;
@@ -139,6 +168,14 @@
             &--bottom-view {
                 border-bottom-right-radius: 0;
                 border-bottom-left-radius: 0;
+
+                .wbk_timeslots__item--rangemode {
+                    min-width: 150px;
+                }
+
+                .wbk_timeslots--rangemode{
+                    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                }
             }
         }
     }

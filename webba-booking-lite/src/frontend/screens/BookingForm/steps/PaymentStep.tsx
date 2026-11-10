@@ -10,7 +10,7 @@ import {
     useState,
 } from 'react'
 import { FormNotice } from '../../../components/FormNotice/FormNotice'
-import { __ } from '@wordpress/i18n'
+import { __, sprintf } from '@wordpress/i18n'
 import './Steps.scss'
 import { Button } from '../../../components/Button/Button'
 import { useDispatch, useSelect } from '@wordpress/data'
@@ -74,6 +74,7 @@ export const PaymentStep = () => {
     const [showFeedback, setShowFeedback] = useState(false)
     const [paymentElementLoading, setPaymentElementLoading] = useState(false)
     const [showStripeError, setShowStripeError] = useState(false)
+
 
     const handleLoadingChange = useCallback((loading: boolean) => {
         setPaymentElementLoading(loading)
@@ -352,6 +353,40 @@ export const PaymentStep = () => {
                             setFormData={setFormData}
                             stripeFields={
                                 preset?.settings?.stripe_fields
+                            }
+                            chargeAgreement={
+                                amountData?.stripe_details?.mode === 'setup'
+                                    ? {
+                                        enabled: true,
+                                        message: (() => {
+                                            const amount =
+                                                amountData?.to_pay_total
+                                            const currency =
+                                                preset?.settings
+                                                    ?.currency_symbol || ''
+                                            const timingLabel =
+                                                amountData?.stripe_details
+                                                    ?.charge_timing_label ||
+                                                __('later', 'webba-booking-lite')
+
+                                            let message = __(
+                                                'By confirming, you agree that we may save your card and charge %1$s %2$s. Your booking stays unpaid until that charge succeeds.',
+                                                'webba-booking-lite'
+                                            )
+
+                                            if (wording?.stripe_charge_agreement) {
+                                                message = wording?.stripe_charge_agreement
+                                            }
+
+                                            return sprintf(
+                                                /* translators: 1: amount 2: timing description */
+                                                message,
+                                                `${currency}${amount}`,
+                                                timingLabel
+                                            )
+                                        })(),
+                                    }
+                                    : undefined
                             }
                         />
                     </Suspense>

@@ -7,6 +7,7 @@ import { useBookingContext } from '../providers/BookingFormProvider/BookingFormP
 import { serializePlacesForApi } from '../providers/BookingFormProvider/utils'
 import { stripeMethods } from '../screens/BookingForm/PaymentHandler/payments/Stripe/StripeMethods'
 import { runSquareCheckout } from '../lib/chargeSquarePayment'
+import { confirmStripeForBooking } from '../lib/confirmStripeForBooking'
 import { trackBookingFormSubmitted } from '../utils/frontendAnalytics'
 import { redirectAfterBooking } from '../lib/bookingRedirect'
 import { IFormData } from '../screens/BookingForm/types'
@@ -73,8 +74,13 @@ export const useProcessBooking = () => {
     const { formData, bookingMode, preset, stripeObj, squareObj, amountData } =
         useBookingContext()
     const formDataRef = useRef(formData)
-    const { setLoading, submitStripePayment, submitSquarePayment, setBookingData } =
-        useDispatch(store_name)
+    const {
+        setLoading,
+        submitStripePayment,
+        submitStripeSetup,
+        submitSquarePayment,
+        setBookingData,
+    } = useDispatch(store_name)
     const bookingData = useSelect(
         (select: any) => select(store_name).getBookingData(),
         []
@@ -175,55 +181,49 @@ export const useProcessBooking = () => {
 
                 const redirectUrl =
                     preset?.settings?.stripe_redirect_url || window.location.href
-                const { error, paymentIntent } = await stripe.confirmPayment({
+                const stripeMode =
+                    bookingResult?.stripe_mode ||
+                    amountData?.stripe_details?.mode ||
+                    'payment'
+
+                const result = await confirmStripeForBooking({
+                    stripe,
                     elements,
-                    confirmParams: {
-                        return_url: `${redirectUrl}?paymentMethod=${paymentMethod}&`,
-                        payment_method_data: {
-                            billing_details: {
-                                name: formDataRef.current?.stripe_details
-                                    ?.billing_details?.name,
-                                address: {
-                                    line1: formDataRef.current?.stripe_details
-                                        ?.billing_details?.line1,
-                                    line2: formDataRef.current?.stripe_details
-                                        ?.billing_details?.line2,
-                                    city: formDataRef.current?.stripe_details
-                                        ?.billing_details?.city,
-                                    state: formDataRef.current?.stripe_details
-                                        ?.billing_details?.state,
-                                    postal_code:
-                                        formDataRef.current?.stripe_details
-                                            ?.billing_details?.postal_code,
-                                    country:
-                                        formDataRef.current?.stripe_details
-                                            ?.billing_details?.country,
-                                },
-                            },
+                    paymentMethod,
+                    stripeMode,
+                    billingDetails: {
+                        name: formDataRef.current?.stripe_details
+                            ?.billing_details?.name,
+                        address: {
+                            line1: formDataRef.current?.stripe_details
+                                ?.billing_details?.line1,
+                            line2: formDataRef.current?.stripe_details
+                                ?.billing_details?.line2,
+                            city: formDataRef.current?.stripe_details
+                                ?.billing_details?.city,
+                            state: formDataRef.current?.stripe_details
+                                ?.billing_details?.state,
+                            postal_code:
+                                formDataRef.current?.stripe_details
+                                    ?.billing_details?.postal_code,
+                            country:
+                                formDataRef.current?.stripe_details
+                                    ?.billing_details?.country,
                         },
                     },
-                    redirect: 'if_required',
+                    redirectUrl,
+                    submitStripePayment,
+                    submitStripeSetup,
                 })
 
-                if (paymentIntent?.status === 'succeeded') {
-                    const paymentResponse = await submitStripePayment(
-                        paymentIntent.id,
-                        paymentMethod
-                    )
-
-                    if (paymentResponse.status === 'success') {
-                        paymentConfirmed = true
-                        setBookingData({
-                            ...bookingResult,
-                            payment_required: false,
-                        })
-                    } else {
-                        alert(paymentResponse?.message || 'Something went wrong')
-                    }
-                } else if (error) {
-                    alert(error.message)
+                if (result.confirmed) {
+                    paymentConfirmed = true
+                    setBookingData({
+                        ...bookingResult,
+                        payment_required: false,
+                    })
                 } else {
-                    alert('Something went wrong')
+                    alert(result.errorMessage || 'Something went wrong')
                 }
 
                 setLoading('createBooking', false)
@@ -244,6 +244,7 @@ export const useProcessBooking = () => {
         preset,
         setLoading,
         submitStripePayment,
+        submitStripeSetup,
         submitSquarePayment,
         setBookingData,
     ])

@@ -772,7 +772,10 @@ export const BookingFormProvider = ({
                 (s) =>
                     s.services &&
                     Array.isArray(s.services) &&
-                    s.services.includes(String(serviceId))
+                    s.services.some(
+                        (assignedServiceId) =>
+                            String(assignedServiceId) === String(serviceId)
+                    )
             )
         setFormObj((prev) => {
             const selectedIds = (prev.services || []).filter(

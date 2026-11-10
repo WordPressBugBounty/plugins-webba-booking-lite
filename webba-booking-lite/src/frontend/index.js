@@ -106,6 +106,7 @@ const mountBookingForms = (root = document) => {
             admin_cancel,
             cancelation,
             order_payment,
+            wait_list_leave,
             paypal_status,
             mollie_status,
             payment_intent,
@@ -145,6 +146,17 @@ const mountBookingForms = (root = document) => {
         let token = null
         let token_type = null
         let action = null
+
+        if (wait_list_leave) {
+            import(
+                /* webpackMode: "eager" */ './screens/BookingForm/LandingPages/WaitListLeave/WaitListLeave'
+            ).then(({ WaitListLeave }) => {
+                createRoot(bookingFormContainer).render(
+                    <WaitListLeave token={wait_list_leave} />
+                )
+            })
+            continue
+        }
 
         if (cancelation) {
             token = cancelation

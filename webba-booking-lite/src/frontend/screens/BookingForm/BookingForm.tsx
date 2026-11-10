@@ -20,9 +20,11 @@ import { BottomSummary } from '../../components/Sidebar/BottomSummary'
 import { FormProvider } from '../../components/Form/FormProvider'
 import { stripeMethods } from './PaymentHandler/payments/Stripe/StripeMethods'
 import { WaterfallForm } from './WaterfallForm/WaterfallForm'
+import { Webba5Form } from './Webba5Form/Webba5Form'
 import { useBookingSummaryTotal } from '../../hooks/useBookingSummaryTotal'
 
 const FORM_TYPE_WATERFALL = 'waterfall'
+const FORM_TYPE_WEBBA5 = 'webba5'
 const HOSTED_CHECKOUT_METHODS = ['paypal', 'woocommerce', 'mollie']
 
 const isHostedCheckoutMethod = (method?: string | null) =>
@@ -160,8 +162,10 @@ export const BookingForm = ({ formType: formTypeProp }: BookingFormProps) => {
         )
     }
 
-    if (formType === FORM_TYPE_WATERFALL) {
-        const handleWaterfallBookingComplete = (response?: any) => {
+    if (formType === FORM_TYPE_WATERFALL || formType === FORM_TYPE_WEBBA5) {
+        const isWebba5 = formType === FORM_TYPE_WEBBA5
+        const SteppedForm = isWebba5 ? Webba5Form : WaterfallForm
+        const handleSteppedBookingComplete = (response?: any) => {
             const method =
                 response?.payment_method || response?.details?.payment_method
             if (
@@ -173,24 +177,22 @@ export const BookingForm = ({ formType: formTypeProp }: BookingFormProps) => {
             setShowThankYou(true)
         }
 
-        let waterfallContent: ReactNode = (
-            <WaterfallForm onBookingComplete={handleWaterfallBookingComplete} />
+        let steppedContent: ReactNode = (
+            <SteppedForm onBookingComplete={handleSteppedBookingComplete} />
         )
 
         if (needsPaymentHandler && !showThankYou) {
-            waterfallContent = (
+            steppedContent = (
                 <PaymentHandler
                     bookingData={bookingData}
                     onPaid={() => setShowThankYou(true)}
                 />
             )
         } else if (showThankYouScreen && !isStripePaymentRequired) {
-            waterfallContent = <ThankYou />
+            steppedContent = <ThankYou />
         } else if (isStripePaymentRequired) {
-            waterfallContent = (
-                <WaterfallForm
-                    onBookingComplete={handleWaterfallBookingComplete}
-                />
+            steppedContent = (
+                <SteppedForm onBookingComplete={handleSteppedBookingComplete} />
             )
         }
 
@@ -200,7 +202,9 @@ export const BookingForm = ({ formType: formTypeProp }: BookingFormProps) => {
                 <div
                     className={classNames(
                         'wbk_booking_form__wrapper',
-                        'wbk_booking_form__wrapper--waterfall',
+                        isWebba5
+                            ? 'wbk_booking_form__wrapper--webba5'
+                            : 'wbk_booking_form__wrapper--waterfall',
                         {
                             ['wbk_booking_form__wrapper--compact-form']:
                                 needsPaymentHandler || showThankYouScreen,
@@ -208,7 +212,7 @@ export const BookingForm = ({ formType: formTypeProp }: BookingFormProps) => {
                     )}
                     ref={wrapperRef}
                 >
-                    {waterfallContent}
+                    {steppedContent}
                     <div
                         ref={handlePopupPortalRef}
                         className="wbk_booking_form__popup-portal"

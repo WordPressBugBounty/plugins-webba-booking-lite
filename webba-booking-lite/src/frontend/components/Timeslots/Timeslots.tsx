@@ -26,6 +26,9 @@ export const Timeslots = ({
     showStaffSelector,
     recurringBookingEnabled,
     onBookRecurring,
+    waitListEnabled,
+    subscribedWaitListSlots,
+    onJoinWaitList,
 }: ITimeslotsProps) => {
     const { loading, preset, timeFormat, userTimezone } = useBookingContext()
     const { locale } = useLocale()
@@ -37,6 +40,7 @@ export const Timeslots = ({
         (serviceId !== undefined && loading?.serviceTimeslots?.[serviceId]) ||
         loading?.serviceAvailability?.[Number(serviceId)]
     const wording = useWording()
+    const canJoinWaitList = !!waitListEnabled && typeof onJoinWaitList === 'function'
 
     // Enable min/max slot logic only if limited_timeslot is true or min/max values are set
     const enableSlotLimits = !!limited_timeslot || !!min_slots || !!max_slots
@@ -144,14 +148,19 @@ export const Timeslots = ({
         <div
             className={classNames('wbk_timeslots', {
                 'wbk_timeslots--noitems': !timeslots || timeslots.length === 0,
+                'wbk_timeslots--rangemode': preset?.settings?.show_endtime,
             })}
         >
             {timeslots.map(
-                ({ start_time, end_time, free_places }, index) => {
+                ({ start_time, end_time, free_places, staff_member_ids }, index) => {
                     const slotNum = Number(start_time)
                     const isSelected = selectedSlots.includes(slotNum)
-                    const isDisabled =
-                        free_places === 0 || quantity > free_places
+                    const isFull = free_places === 0 || quantity > free_places
+                    const isAlreadyOnWaitList =
+                        !!subscribedWaitListSlots?.includes(slotNum)
+                    const isWaitListSlot =
+                        isFull && canJoinWaitList && !isAlreadyOnWaitList
+                    const isDisabled = isFull && !isWaitListSlot
                     const isMaxReached =
                         enableSlotLimits &&
                         maxSlots &&
@@ -171,11 +180,13 @@ export const Timeslots = ({
                     }
                     // Prevent selection of non-adjacent slots when consecutive_timeslots is true
                     const shouldPreventClick =
-                        isDisabled || isMaxReached || isConsecutiveDisabled
+                        (isDisabled && !isWaitListSlot) ||
+                        isMaxReached ||
+                        isConsecutiveDisabled
 
                     if (
                         preset?.settings?.show_booked_slots === false &&
-                        isDisabled
+                        isFull
                     ) {
                         return null
                     }
@@ -188,23 +199,40 @@ export const Timeslots = ({
                                 {
                                     'wbk_timeslots__item--selected': isSelected,
                                     'wbk_timeslots__item--disabled':
-                                        isDisabled || isConsecutiveDisabled,
+                                        (isDisabled || isConsecutiveDisabled) &&
+                                        !isWaitListSlot,
+                                    'wbk_timeslots__item--waitlist':
+                                        isWaitListSlot,
                                     'wbk_timeslots__item--max-reached':
                                         isMaxReached,
                                     'wbk_timeslots__item--rangemode': preset?.settings?.show_endtime,
                                 }
                             )}
                             style={{ animationDelay: `${index * 80}ms` }}
-                            onClick={() =>
-                                !shouldPreventClick &&
-                                (maxSlotsLimit === 1
-                                    ? setSlot(Number(start_time)) // Replace selection if min/max is 1
-                                    : setSlot(Number(start_time)))
-                            }
+                            onClick={() => {
+                                if (isWaitListSlot) {
+                                    onJoinWaitList?.({
+                                        start_time: Number(start_time),
+                                        end_time: Number(end_time),
+                                        staff_member_ids:
+                                            staff_member_ids || null,
+                                    })
+                                    return
+                                }
+                                if (!shouldPreventClick) {
+                                    setSlot(Number(start_time))
+                                }
+                            }}
                             title={
                                 isMaxReached
                                     ? `Maximum ${maxSlots} slots reached`
-                                    : undefined
+                                    : isWaitListSlot
+                                      ? wording.wait_list_button ||
+                                        __(
+                                            'Join wait list',
+                                            'webba-booking-lite'
+                                        )
+                                      : undefined
                             }
                         >
                             <span className="wbk_timeslots__time-label">
@@ -217,6 +245,28 @@ export const Timeslots = ({
                                     })
                                 }
                             </span>
+                            {isWaitListSlot && (
+                                <button
+                                    type="button"
+                                    className="wbk_timeslots__wait-list"
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
+                                        onJoinWaitList?.({
+                                            start_time: Number(start_time),
+                                            end_time: Number(end_time),
+                                            staff_member_ids:
+                                                staff_member_ids || null,
+                                        })
+                                    }}
+                                >
+                                    {wording.wait_list_button ||
+                                        __(
+                                            'Join wait list',
+                                            'webba-booking-lite'
+                                        )}
+                                </button>
+                            )}
                             {recurringBookingEnabled &&
                                 isSelected &&
                                 onBookRecurring && (

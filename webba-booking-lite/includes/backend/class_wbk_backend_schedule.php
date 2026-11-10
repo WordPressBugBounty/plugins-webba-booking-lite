@@ -1253,6 +1253,15 @@ class WBK_Backend_Schedule
             die();
             return;
         }
+
+        if (class_exists('WBK_Wait_List_Processor')) {
+            WBK_Wait_List_Processor::notify_slot_available(
+                (int) $service_id,
+                (int) $time,
+                0
+            );
+        }
+
         date_default_timezone_set('UTC');
 
         echo '<a id="app_add_' .

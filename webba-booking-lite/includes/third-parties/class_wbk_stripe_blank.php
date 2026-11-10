@@ -195,5 +195,97 @@ class WBK_Stripe
         return $input;
     }
     public function create_payment_intent($booking_ids, $payment_details) {}
+
+    public function create_customer(string $email, string $name = '')
+    {
+        return [
+            'success' => false,
+            'error' => __('Payment method not supported', 'webba-booking-lite'),
+        ];
+    }
+
+    public function create_setup_intent(string $customer_id, string $payment_method = 'stripe')
+    {
+        return [
+            'success' => false,
+            'error' => __('Payment method not supported', 'webba-booking-lite'),
+        ];
+    }
+
+    public function get_setup_intent(string $intent_id)
+    {
+        return false;
+    }
+
+    public function create_off_session_payment_intent(array $args)
+    {
+        return [
+            'success' => false,
+            'error' => __('Payment method not supported', 'webba-booking-lite'),
+            'error_type' => 'unsupported',
+        ];
+    }
+
+    public function construct_webhook_event(string $payload, string $sig_header)
+    {
+        return new WP_Error(
+            'wbk_stripe_unavailable',
+            __('Payment method not supported', 'webba-booking-lite')
+        );
+    }
+
+    public static function get_webhook_url(): string
+    {
+        return rest_url('webba-booking/v1/stripe-webhook');
+    }
+
+    public static function is_local_webhook_host(?string $url = null): bool
+    {
+        $url = $url !== null && $url !== '' ? $url : self::get_webhook_url();
+        $host = wp_parse_url($url, PHP_URL_HOST);
+        if (!$host) {
+            return true;
+        }
+
+        $host = strtolower((string) $host);
+        if (in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
+            return true;
+        }
+        if (substr($host, -6) === '.local' || substr($host, -5) === '.test') {
+            return true;
+        }
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            return !filter_var(
+                $host,
+                FILTER_VALIDATE_IP,
+                FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
+            );
+        }
+
+        return false;
+    }
+
+    public static function get_webhook_endpoint_option_key(bool $test_mode): string
+    {
+        return $test_mode
+            ? 'wbk_stripe_webhook_endpoint_id_test'
+            : 'wbk_stripe_webhook_endpoint_id_live';
+    }
+
+    public function init_for_webhooks(): bool
+    {
+        return false;
+    }
+
+    public function provision_webhook_endpoint(bool $regenerate = false)
+    {
+        return new WP_Error(
+            'wbk_stripe_credentials',
+            __(
+                'Configure your Stripe secret key before generating the webhook signing secret.',
+                'webba-booking-lite'
+            )
+        );
+    }
 }
 ?>

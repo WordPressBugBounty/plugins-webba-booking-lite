@@ -115,6 +115,10 @@ export interface IPaymentStepStripeSectionProps {
     formData: IFormData
     setFormData: (slug: string, value: unknown) => void
     stripeFields?: StripeFieldName[]
+    chargeAgreement?: {
+        enabled: boolean
+        message?: string
+    }
 }
 
 export interface INavigationProps

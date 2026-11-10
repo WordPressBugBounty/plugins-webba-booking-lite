@@ -338,6 +338,10 @@ class WBK_Booking_Factory {
         date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
         WBK_Connected_Calendar_Processor::delete_event_from_connected_calendars( $booking_id );
         do_action( "webba_before_cancel_booking", $booking_id );
+        $wait_list_service_id = absint( $booking->get( "service_id" ) );
+        $wait_list_time = absint( $booking->get( "time" ) );
+        $wait_list_staff_raw = $booking->get( "staff_member_id" );
+        $wait_list_staff_id = ( $wait_list_staff_raw !== null && $wait_list_staff_raw !== "" && absint( $wait_list_staff_raw ) > 0 ? absint( $wait_list_staff_raw ) : 0 );
         if ( $force_deletion ) {
             $force_snapshot = [
                 "status" => (string) $booking->get( "status" ),
@@ -359,6 +363,9 @@ class WBK_Booking_Factory {
                 WBK_Model_Utils::set_booking_status( $booking_id, "cancelled" );
                 WBK_Email_Processor::send( [$booking_id], "booking_cancelled_auto" );
             }
+        }
+        if ( class_exists( "WBK_Wait_List_Processor" ) ) {
+            WBK_Wait_List_Processor::notify_slot_available( $wait_list_service_id, $wait_list_time, $wait_list_staff_id );
         }
         date_default_timezone_set( "UTC" );
         return true;

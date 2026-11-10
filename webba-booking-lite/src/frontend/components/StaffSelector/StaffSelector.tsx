@@ -50,7 +50,9 @@ export const StaffSelector = ({
                     )}
                 </div>
                 {staffOptions.map((staff: IStaffOption) => {
-                    const isSelected = selectedStaffId === staff.id
+                    const isSelected =
+                        selectedStaffId != null &&
+                        String(selectedStaffId) === String(staff.id)
                     return (
                         <div
                             key={staff.id}

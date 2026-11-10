@@ -52,13 +52,19 @@ export const createFormFromModel = <T extends Model>({
         const isIgnored = derive({
             value: (get) =>
                 dependencyMap[key]
-                    .map(([fieldName, operator, validateValue]) =>
-                        valueComparator({
+                    .map(([fieldName, operator, validateValue]) => {
+                        const dependentField = fields[fieldName]
+
+                        if (!dependentField) {
+                            return false
+                        }
+
+                        return valueComparator({
                             operator,
-                            actualValue: get(fields[fieldName].value).value,
+                            actualValue: get(dependentField.value).value,
                             toMatch: validateValue,
                         })
-                    )
+                    })
                     .some((value) => !value),
         }) as Primitive<boolean>
 

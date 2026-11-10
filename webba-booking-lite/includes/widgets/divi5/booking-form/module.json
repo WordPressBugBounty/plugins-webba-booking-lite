@@ -50,7 +50,7 @@
               "groupSlug": "contentMain",
               "attrName": "content.advanced.formType",
               "label": "Form layout",
-              "description": "Choose Classic or Waterfall booking form.",
+              "description": "Choose Classic, Waterfall, or Webba 5 booking form.",
               "priority": 1,
               "render": true,
               "defaultAttr": {
@@ -74,6 +74,9 @@
                     },
                     "waterfall": {
                       "label": "Waterfall form"
+                    },
+                    "webba5": {
+                      "label": "Webba 5 form"
                     }
                   }
                 }

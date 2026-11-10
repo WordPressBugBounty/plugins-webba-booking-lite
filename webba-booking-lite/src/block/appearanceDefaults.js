@@ -46,8 +46,10 @@ export const normalizeAppearanceFont = (font) => {
     return String(font)
 }
 
+const ALLOWED_FORM_TYPES = ['classic', 'waterfall', 'webba5']
+
 export const normalizeAppearanceFormType = (formType) => {
-    return formType === 'waterfall' ? 'waterfall' : DEFAULT_FORM_TYPE
+    return ALLOWED_FORM_TYPES.includes(formType) ? formType : DEFAULT_FORM_TYPE
 }
 
 export const mergeSavedAppearance = (saved) => {

@@ -76,6 +76,7 @@ class WBK_Model_Updater
         self::enable_email_templates_v_6_5_0();
         self::create_gift_card_email_templats_6_5_1();
         self::update_mollie_message_6_5_1();
+        self::create_wait_list_email_template_6_5_5();
     }
 
     /**
@@ -2099,5 +2100,57 @@ class WBK_Model_Updater
         }
 
         self::set_update_as_complete("update_mollie_message_6_5_1");
+    }
+
+    /**
+     * Create the default wait-list availability email template.
+     *
+     * @return void
+     */
+    public static function create_wait_list_email_template_6_5_5(): void
+    {
+        if (!self::is_update_required("create_wait_list_email_template_6_5_5")) {
+            return;
+        }
+
+        if (!WBK_Model_Utils::table_exists("wbk_email_templates")) {
+            return;
+        }
+
+        $templates = [
+            [
+                "name" => __(
+                    "Wait list: time slot available (to CUSTOMER)",
+                    "webba-booking-lite",
+                ),
+                "subject" => __(
+                    "#service_name is available on #appointment_day at #appointment_time",
+                    "webba-booking-lite",
+                ),
+                "enabled" => true,
+                "recipients" => ["customer"],
+                "trigger" => "slot_wait_list_available",
+                "use_for_all_services" => "yes",
+                "default" => true,
+                "template" => __(
+                    "Hello #customer_name,<br><br>A time slot you joined the wait list for is now available:<br><br><strong>#service_name</strong><br>#appointment_day at #appointment_time<br><br>Book soon - availability is not reserved.<br><br><a href=\"#unsubscribe_link\">Leave wait list</a><br><br>Thank you!<br>#site_name",
+                    "webba-booking-lite",
+                ),
+            ],
+        ];
+
+        global $wpdb;
+
+        $email_templates_table = WBK_Model_Utils::get_db_prefix() . "wbk_email_templates";
+        $existing_templates = $wpdb->get_col(
+            "SELECT name FROM {$email_templates_table} WHERE is_default='yes'",
+        );
+
+        $templates = array_filter($templates, function ($template) use ($existing_templates) {
+            return !in_array($template["name"], $existing_templates, true);
+        });
+
+        self::generate_email_templates($templates);
+        self::set_update_as_complete("create_wait_list_email_template_6_5_5");
     }
 }

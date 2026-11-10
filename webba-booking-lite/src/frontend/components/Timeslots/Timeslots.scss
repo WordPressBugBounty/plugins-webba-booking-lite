@@ -41,7 +41,8 @@
         }
 
         &--rangemode {
-            padding: 9px 8px;
+            padding: 9px 2px;
+            min-width: 140px;
         }
 
         &--max-reached,
@@ -51,6 +52,24 @@
             color: #6c757d;
             cursor: not-allowed;
             opacity: 0.6 !important;
+        }
+
+        &--waitlist {
+            background-color: #f8f9fa;
+            border-color: #e9ecef;
+            color: #6c757d;
+            cursor: pointer;
+            opacity: 0.85 !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            white-space: normal;
+
+            &:hover {
+                border-color: colors.$wbk-primary-500;
+                color: colors.$wbk-primary-500;
+            }
         }
 
         @include mobile {
@@ -67,7 +86,8 @@
         display: block;
     }
 
-    &__book-recurring {
+    &__book-recurring,
+    &__wait-list {
         display: block;
         width: 100%;
         margin-top: 2px;

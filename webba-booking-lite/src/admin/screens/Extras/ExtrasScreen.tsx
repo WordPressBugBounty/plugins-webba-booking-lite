@@ -189,7 +189,6 @@ export const ExtrasScreen = () => {
                     }
                 />
             </LockedTableSection>
-            <SuccessMessage />
         </>
     )
 }

@@ -2,21 +2,26 @@ import { ISelectedStaffLabelParams, IStaffOption } from './types'
 
 const ANY_AVAILABLE_STAFF_ID = '0'
 
+const toIdList = (values: Array<string | number> | undefined) =>
+    (values || []).map((value) => String(value))
+
 export const staffMatchesServiceAndLocation = (
     staff: IStaffOption,
     serviceId: number,
     locationId: string | null
 ) => {
-    if (!staff.services || !staff.services.includes(String(serviceId)))
+    const serviceIds = toIdList(staff.services)
+    if (!serviceIds.includes(String(serviceId))) {
         return false
-    if (!locationId) return true
-    if (
-        !staff.locations ||
-        !Array.isArray(staff.locations) ||
-        staff.locations.length === 0
-    )
+    }
+    if (!locationId) {
+        return true
+    }
+    const locationIds = toIdList(staff.locations)
+    if (locationIds.length === 0) {
         return false
-    return staff.locations.some((loc) => String(loc) === locationId)
+    }
+    return locationIds.includes(String(locationId))
 }
 
 export const getStaffOptionsForService = (
@@ -30,7 +35,12 @@ export const getStaffOptionsForService = (
         staffMatchesServiceAndLocation(s, serviceId, locationId)
     )
     if (extractedAttrStaff.length > 0) {
-        filtered = filtered.filter((s) => extractedAttrStaff.includes(s.id))
+        const allowedStaffIds = extractedAttrStaff.map((staffId) =>
+            String(staffId)
+        )
+        filtered = filtered.filter((staff) =>
+            allowedStaffIds.includes(String(staff.id))
+        )
     }
     return filtered
 }

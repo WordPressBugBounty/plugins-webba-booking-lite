@@ -351,7 +351,11 @@ class WBK_Divi5_Booking_Module
     {
         $form_type = is_string($value) ? $value : "";
 
-        return $form_type === "waterfall" ? "waterfall" : "classic";
+        $allowed_form_types = ["classic", "waterfall", "webba5"];
+
+        return in_array($form_type, $allowed_form_types, true)
+            ? $form_type
+            : "classic";
     }
 
     /**

@@ -17,14 +17,61 @@
         background-color: rgba(61, 155, 149, 0.16);
         border-color: rgba(61, 155, 149, 0.35);
     }
+
+    &--warning {
+        background-color: #f8f1e4;
+        border-color: #c4a35a;
+        color: #6b5420;
+
+        .wbk_noticeField__content {
+            color: #3f3214;
+
+            a {
+                color: #8a6a1f;
+            }
+        }
+
+        .wbk_noticeField__icon {
+            filter: grayscale(1) sepia(1) saturate(4) hue-rotate(5deg);
+        }
+
+        #wbk_spa_dashboard[data-theme='dark'] &,
+        .wbk_sidebar__container[data-theme='dark'] & {
+            background-color: #2a2418;
+            border-color: #b08d3e;
+            color: #d6c08a;
+
+            .wbk_noticeField__content {
+                color: #f3e7c7;
+
+                a {
+                    color: #e0c57a;
+                }
+            }
+        }
+    }
 }
 
 .wbk_noticeField__content {
     flex: 1;
+    min-width: 0;
     color: colors.$off-black;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 
     a {
         color: colors.$primary;
+    }
+
+    .wbk_noticeField__break {
+        display: block;
+        margin: 0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+        word-break: break-all;
     }
 }
 

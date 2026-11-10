@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.5.5
+ * Version: 6.5.6
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -74,7 +74,7 @@ if ( !defined( "WP_WEBBA_BOOKING__PLUGIN_DIR" ) ) {
     define( "WP_WEBBA_BOOKING__PLUGIN_URL", plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( "WP_WEBBA_BOOKING__VERSION" ) ) {
-    define( "WP_WEBBA_BOOKING__VERSION", "6.5.5" );
+    define( "WP_WEBBA_BOOKING__VERSION", "6.5.6" );
 }
 if ( !function_exists( "wbk_is_assistance_lab_available" ) ) {
     /**
@@ -145,6 +145,10 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
         require "includes/third-parties/class_wbk_stripe.php";
     } else {
         require "includes/third-parties/class_wbk_stripe_blank.php";
+    }
+    require "includes/third-parties/class_wbk_stripe_delayed_payment.php";
+    if ( class_exists( "WBK_Stripe_Delayed_Payment" ) ) {
+        new WBK_Stripe_Delayed_Payment();
     }
     if ( get_option( "wbk_square_application_id", "" ) != "" || get_option( "wbk_square_sandbox_application_id", "" ) != "" ) {
         require "includes/third-parties/class_wbk_square.php";
@@ -233,6 +237,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     include "includes/processors/class-wbk-options-processor.php";
     include "includes/processors/class-wbk-email-processor.php";
     include "includes/processors/class-wbk-push-processor.php";
+    include "includes/processors/class-wbk-wait-list-processor.php";
     include "includes/utilities/class-wbk-mailer.php";
     include "includes/processors/class-wbk-pdf-processor.php";
     include "includes/processors/class-wbk-qr-code-processor.php";

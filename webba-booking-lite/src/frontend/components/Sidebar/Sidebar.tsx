@@ -788,7 +788,7 @@ export const Sidebar: FC<ISidebarProps> = ({
                             )}
                     </p>
                 )}
-                {(!!help_phone || !!help_email) && help_title && (
+                {(!!help_phone || !!help_email) && help_title && !showSummary && (
                     <div className={'wbk_sidebar__help'}>
                         {!!help_title && (!!help_phone || !!help_email) && (
                             <h4 className={'wbk_sidebar__help__title'}>
