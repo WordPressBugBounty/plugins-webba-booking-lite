@@ -1,9 +1,5 @@
 <?php
 
-use PHPUnit\Runner\AfterIncompleteTestHook;
-
-use function PHPUnit\Framework\assertFalse;
-
 if (!defined("ABSPATH")) {
     exit();
 }

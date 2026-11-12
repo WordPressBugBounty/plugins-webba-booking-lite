@@ -261,7 +261,7 @@ class Encryption
     {
         try {
             return self::createLocalKeyObjectUsingOpenSSL();
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             return self::createLocalKeyObjectUsingPurePhpMethod();
         }
     }
@@ -272,11 +272,7 @@ class Encryption
     private static function createLocalKeyObjectUsingPurePhpMethod(): array
     {
         $curve = NistCurve::curve256();
-        $order = $curve->getGenerator()->getOrder();
-        do {
-            $secret = BigInteger::fromBytes(random_bytes(32), false);
-        } while ($secret->compareTo(BigInteger::one()) < 0 || $secret->compareTo($order) >= 0);
-        $privateKey = PrivateKey::create($secret);
+        $privateKey = $curve->createPrivateKey();
         $publicKey = $curve->createPublicKey($privateKey);
 
         if ($publicKey->getPoint()->getX() instanceof BigInteger) {
@@ -307,18 +303,10 @@ class Encryption
      */
     private static function createLocalKeyObjectUsingOpenSSL(): array
     {
-        $options = [
+        $keyResource = openssl_pkey_new([
             'curve_name'       => 'prime256v1',
             'private_key_type' => OPENSSL_KEYTYPE_EC,
-        ];
-        $keyResource = openssl_pkey_new($options);
-        if (!$keyResource) {
-            $config = getenv('OPENSSL_CONF');
-            if (is_string($config) && $config !== '') {
-                $options['config'] = $config;
-                $keyResource = openssl_pkey_new($options);
-            }
-        }
+        ]);
 
         if (!$keyResource) {
             throw new \RuntimeException('Unable to create the key');
