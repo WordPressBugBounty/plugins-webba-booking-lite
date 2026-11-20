@@ -207,6 +207,14 @@ class Model
             if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
                 return [];
             }
+        } elseif ($this->model_name == $db_prefix . "wbk_package_products") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
+        } elseif ($this->model_name == $db_prefix . "wbk_customer_packages") {
+            if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
+                return [];
+            }
         } elseif ($this->model_name == $db_prefix . "wbk_pricing_rules") {
             if (!current_user_can("manage_options") && !current_user_can("manage_sites")) {
                 return [];
@@ -503,7 +511,8 @@ class Model
             }
         }
 
-        if ($model_updated) {
+        // to do - remove options
+        if ($model_updated && true) {
             $this->generate_frontend_model();
         }
     }
@@ -991,6 +1000,12 @@ class Model
                             }
 
                             break;
+                        case "contains":
+                            if (!self::dependency_value_contains($actual, $expected)) {
+                                $rules_passed = false;
+                            }
+
+                            break;
                         default:
                             break;
                     }
@@ -1006,6 +1021,42 @@ class Model
 
         return $fields_filtered;
     }
+
+    /**
+     * Whether a dependency field value includes an expected option.
+     * Accepts a list, a JSON list, or a comma-separated string.
+     *
+     * @param mixed  $actual   Submitted field value.
+     * @param mixed  $expected Expected option.
+     * @return bool
+     */
+    private static function dependency_value_contains($actual, $expected)
+    {
+        $expected = (string) $expected;
+        if (is_string($actual)) {
+            $decoded = json_decode($actual, true);
+            if (is_array($decoded)) {
+                $actual = $decoded;
+            } elseif (strpos($actual, ",") !== false) {
+                $actual = array_map("trim", explode(",", $actual));
+            } else {
+                return $actual === $expected;
+            }
+        }
+
+        if (!is_array($actual)) {
+            return (string) $actual === $expected;
+        }
+
+        foreach ($actual as $item) {
+            if ((string) $item === $expected) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * grant full access to all fields of tables
      * @param array $roles wp user roles that obtain full access
@@ -1083,11 +1134,9 @@ class Model
                         $validated_value = $validation_result[1];
                         $skip_cleanup =
                             $field->get_type() === "wbk_app_custom_data" ||
-                            (
-                                $field->get_name() === "pdf_attachment" &&
+                            ($field->get_name() === "pdf_attachment" &&
                                 class_exists("WBK_Gift_Card_Design") &&
-                                WBK_Gift_Card_Design::parse($validated_value)
-                            );
+                                WBK_Gift_Card_Design::parse($validated_value));
                         $valid_fields[$field->get_name()] = $skip_cleanup
                             ? $validated_value
                             : $this->clean_up_value($validated_value);

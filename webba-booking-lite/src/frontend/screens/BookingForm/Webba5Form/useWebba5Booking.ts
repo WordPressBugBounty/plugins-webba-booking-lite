@@ -530,6 +530,7 @@ export const useWebba5Booking = (
             preset?.settings?.coupons_enabled === false &&
             !stripeMethods.includes(onlyMethod) &&
             onlyMethod !== 'square' &&
+            onlyMethod !== 'package' &&
             !HOSTED_CHECKOUT_METHODS.includes(onlyMethod)
         ) {
             return false
@@ -575,6 +576,7 @@ export const useWebba5Booking = (
             'google_pay',
             'apple_pay',
             'stripe_others',
+            'package',
         ]
         if (
             paymentMethod &&

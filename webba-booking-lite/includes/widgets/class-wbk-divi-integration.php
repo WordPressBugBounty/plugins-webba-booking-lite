@@ -51,6 +51,17 @@ class WBK_Divi_Integration
         if (class_exists("WBK_Divi5_Booking_Module")) {
             WBK_Divi5_Booking_Module::register();
         }
+
+        $package_module_file =
+            WP_WEBBA_BOOKING__PLUGIN_DIR .
+            "/includes/widgets/class-wbk-divi5-package-module.php";
+        if (file_exists($package_module_file)) {
+            include_once $package_module_file;
+        }
+
+        if (class_exists("WBK_Divi5_Package_Module")) {
+            WBK_Divi5_Package_Module::register();
+        }
     }
 
     /**
@@ -195,9 +206,26 @@ class WBK_Divi_Integration
             true
         );
 
+        if (!class_exists("WBK_Divi5_Package_Module")) {
+            $package_module_file =
+                WP_WEBBA_BOOKING__PLUGIN_DIR .
+                "/includes/widgets/class-wbk-divi5-package-module.php";
+            if (file_exists($package_module_file)) {
+                include_once $package_module_file;
+            }
+        }
+
+        $package_metadata = class_exists("WBK_Divi5_Package_Module")
+            ? WBK_Divi5_Package_Module::get_builder_module_metadata()
+            : [];
+
         wp_add_inline_script(
             "wbk-divi5-module-register",
-            "window.wbkDivi5ModuleMetadata = " . wp_json_encode($metadata) . ";",
+            "window.wbkDivi5ModuleMetadata = " .
+                wp_json_encode($metadata) .
+                ";window.wbkDivi5PackageModuleMetadata = " .
+                wp_json_encode($package_metadata) .
+                ";",
             "before"
         );
     }

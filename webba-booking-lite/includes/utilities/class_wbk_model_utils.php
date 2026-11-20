@@ -1497,6 +1497,9 @@ class WBK_Model_Utils {
             "arrival" => get_option( "wbk_pay_on_arrival_button_text", __( "On arrival", "webba-booking-lite" ) ),
             "bank"    => get_option( "wbk_bank_transfer_button_text", __( "Bank transfer", "webba-booking-lite" ) ),
         ];
+        if ( class_exists( "WBK_Package_Processor" ) && WBK_Package_Processor::is_enabled() ) {
+            $payment_methods["package"] = __( "Use visit package", "webba-booking-lite" );
+        }
         if ( WBK_Feature_Gate::have_required_plan( "standard" ) ) {
             $payment_methods["paypal"] = __( get_option( "wbk_payment_pay_with_paypal_btn_text", "PayPal" ), "webba-booking-lite" );
             $payment_methods["mollie"] = __( get_option( "wbk_mollie_button_text", "Mollie" ), "webba-booking-lite" );
@@ -2195,9 +2198,38 @@ class WBK_Model_Utils {
             "booking_finished"              => __( "Booking is finished", "webba-booking-lite" ),
             "gift_card_purchased"           => __( "Gift card is purchased", "webba-booking-lite" ),
             "gift_card_sent"                => __( "Gift card is sent", "webba-booking-lite" ),
+            "package_purchased"             => __( "Visit package is purchased", "webba-booking-lite" ),
+            "package_granted"               => __( "Visit package is granted", "webba-booking-lite" ),
+            "package_low_balance"           => __( "Visit package low balance", "webba-booking-lite" ),
+            "package_expiring"              => __( "Visit package expiring soon", "webba-booking-lite" ),
+            "package_expired"               => __( "Visit package expired", "webba-booking-lite" ),
+            "package_credits_restored"      => __( "Visit package credits restored", "webba-booking-lite" ),
             "slot_wait_list_available"      => __( "Wait list: time slot became available", "webba-booking-lite" ),
         ];
         return $notification_types;
+    }
+
+    /**
+     * Package products for admin select fields.
+     *
+     * @return array<int,string>
+     */
+    public static function get_package_product_options() {
+        global $wpdb;
+        $table = get_option( "wbk_db_prefix", "" ) . "wbk_package_products";
+        $query = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $table ) );
+        if ( $wpdb->get_var( $query ) !== $table ) {
+            return [];
+        }
+        $rows = $wpdb->get_results( "SELECT id, name FROM {$table} ORDER BY name ASC", ARRAY_A );
+        $result = [];
+        if ( !is_array( $rows ) ) {
+            return $result;
+        }
+        foreach ( $rows as $row ) {
+            $result[absint( $row["id"] )] = (string) $row["name"];
+        }
+        return $result;
     }
 
     /**

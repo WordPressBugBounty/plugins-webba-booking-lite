@@ -63,6 +63,40 @@ class WBK_PayPal {
         return false;
     }
 
+    /**
+     * Create a PayPal checkout for a visit package.
+     *
+     * @param WBK_Package_Product $product
+     * @return array|false { payment_url, payment_id, cancel_token } or false
+     */
+    public function create_package_payment( $product ) {
+        return false;
+    }
+
+    /**
+     * Capture a PayPal package payment and create the customer package.
+     *
+     * @param string $paymentId
+     * @param string $payerId
+     * @return array|false
+     */
+    public function execute_package_payment( $paymentId, $payerId ) {
+        return false;
+    }
+
+    /**
+     * Public package fields needed after a PayPal return.
+     *
+     * @param WBK_Customer_Package $package
+     * @return array
+     */
+    private function package_payment_payload( $package ) {
+        $payload = $package->to_public_array();
+        $payload['amount_paid'] = floatval( $package->get( 'amount_paid' ) );
+        $payload['payment_method'] = (string) $package->get( 'payment_method' );
+        return $payload;
+    }
+
     public function create_payment_v6( $booking_ids, $payment_details = null ) {
     }
 

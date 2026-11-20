@@ -1,21 +1,12 @@
 import { useCallback, useMemo, useState, useEffect, useRef } from 'react'
 import { useSelect } from '@wordpress/data'
 import { store_name } from '../../../../../store/backend'
+import { parsePhpTimeFormat } from '../../utils/dateTime'
 import './BusinessHours.scss'
 import clockIcon from '../../../../../../public/images/icon-clock.svg'
 import trashIcon from '../../../../../../public/images/icon-trash.svg'
 import { Toggle } from '../../../Toggle/Toggle'
-import { BusinessDayStatus } from './types'
-
-interface TimeSlotProps {
-    start: number
-    end: number
-    status: BusinessDayStatus
-    onStartChange: (start: number) => void
-    onEndChange: (end: number) => void
-    onStatusChange: (status: BusinessDayStatus) => void
-    onRemove: () => void
-}
+import { TimeSlotProps } from './types'
 
 export const TimeSlot = ({
     start,
@@ -33,8 +24,28 @@ export const TimeSlot = ({
         []
     )
 
-    const timeFormat = settings?.time_format || '12-hour'
-    const is24Hour = timeFormat === '24-hour'
+    const timeFormat = settings?.time_format || 'g:i a'
+    const { is24Hour, padHour, meridiem } = useMemo(
+        () => parsePhpTimeFormat(timeFormat),
+        [timeFormat]
+    )
+
+    const formatHourLabel = useCallback(
+        (hour: number) =>
+            padHour ? hour.toString().padStart(2, '0') : String(hour),
+        [padHour]
+    )
+
+    const formatMeridiem = useCallback(
+        (period: string) => {
+            if (!period || meridiem === 'none') {
+                return ''
+            }
+
+            return meridiem === 'lower' ? period.toLowerCase() : period.toUpperCase()
+        },
+        [meridiem]
+    )
 
     // Convert seconds to hours and minutes
     const startHours = Math.floor(start / 3600)
@@ -67,16 +78,13 @@ export const TimeSlot = ({
     const endDisplayMinute = endMinutes
     const endDisplayPeriod = endTime12.period
 
-    // Format display time
-    const formatDisplayTime = useCallback((hour: number, minute: number, period: string) => {
-        const minStr = minute.toString().padStart(2, '0')
-        if (is24Hour) {
-            const hourStr = hour.toString().padStart(2, '0')
-            return `${hourStr}:${minStr}`
-        }
-        const hourStr = hour.toString().padStart(2, '0')
-        return `${hourStr}:${minStr}`
-    }, [is24Hour])
+    const formatDisplayTime = useCallback(
+        (hour: number, minute: number) => {
+            const minuteLabel = minute.toString().padStart(2, '0')
+            return `${formatHourLabel(hour)}:${minuteLabel}`
+        },
+        [formatHourLabel]
+    )
 
     const [showStartDropdown, setShowStartDropdown] = useState(false)
     const [showEndDropdown, setShowEndDropdown] = useState(false)
@@ -105,24 +113,32 @@ export const TimeSlot = ({
     // Generate hour options: 12 AM, 1 AM ... 11 AM, 12 PM, 1 PM ... 11 PM
     const hourOptions = useMemo(() => {
         if (is24Hour) {
-            return Array.from({ length: 24 }, (_, i) => ({
-                value: i,
-                label: i.toString().padStart(2, '0'),
+            return Array.from({ length: 24 }, (_, hour) => ({
+                value: hour,
+                label: formatHourLabel(hour),
                 period: '',
             }))
-        } else {
-            const hours: { value: number; label: string; period: string }[] = []
-            hours.push({ value: 12, label: '12', period: 'AM' })
-            for (let i = 1; i <= 11; i++) {
-                hours.push({ value: i, label: i.toString().padStart(2, '0'), period: 'AM' })
-            }
-            hours.push({ value: 12, label: '12', period: 'PM' })
-            for (let i = 1; i <= 11; i++) {
-                hours.push({ value: i, label: i.toString().padStart(2, '0'), period: 'PM' })
-            }
-            return hours
         }
-    }, [is24Hour])
+
+        const hours: { value: number; label: string; period: string }[] = []
+        hours.push({ value: 12, label: formatHourLabel(12), period: 'AM' })
+        for (let hour = 1; hour <= 11; hour++) {
+            hours.push({
+                value: hour,
+                label: formatHourLabel(hour),
+                period: 'AM',
+            })
+        }
+        hours.push({ value: 12, label: formatHourLabel(12), period: 'PM' })
+        for (let hour = 1; hour <= 11; hour++) {
+            hours.push({
+                value: hour,
+                label: formatHourLabel(hour),
+                period: 'PM',
+            })
+        }
+        return hours
+    }, [is24Hour, formatHourLabel])
 
     // Generate minute options (every minute)
     const minuteOptions = useMemo(() => {
@@ -338,8 +354,12 @@ export const TimeSlot = ({
                 }}
             >
                 <div className="wbk_businessHours__timeDisplay">
-                    {formatDisplayTime(startDisplayHour, startDisplayMinute, startDisplayPeriod)}
-                    {!is24Hour && <span className="wbk_businessHours__periodLabel">{startDisplayPeriod}</span>}
+                    {formatDisplayTime(startDisplayHour, startDisplayMinute)}
+                    {!is24Hour && (
+                        <span className="wbk_businessHours__periodLabel">
+                            {formatMeridiem(startDisplayPeriod)}
+                        </span>
+                    )}
                 </div>
                 <img src={clockIcon} alt="clock" className="wbk_businessHours__clockIcon" />
                 {showStartDropdown && (
@@ -377,7 +397,11 @@ export const TimeSlot = ({
                                             }}
                                         >
                                             {option.label}
-                                            {!is24Hour && <span className="wbk_businessHours__periodLabel">{option.period}</span>}
+                                            {!is24Hour && (
+                                                <span className="wbk_businessHours__periodLabel">
+                                                    {formatMeridiem(option.period)}
+                                                </span>
+                                            )}
                                         </div>
                                     )
                                 })}
@@ -430,8 +454,12 @@ export const TimeSlot = ({
                 }}
             >
                 <div className="wbk_businessHours__timeDisplay">
-                    {formatDisplayTime(endDisplayHour, endDisplayMinute, endDisplayPeriod)}
-                    {!is24Hour && <span className="wbk_businessHours__periodLabel">{endDisplayPeriod}</span>}
+                    {formatDisplayTime(endDisplayHour, endDisplayMinute)}
+                    {!is24Hour && (
+                        <span className="wbk_businessHours__periodLabel">
+                            {formatMeridiem(endDisplayPeriod)}
+                        </span>
+                    )}
                 </div>
                 <img src={clockIcon} alt="clock" className="wbk_businessHours__clockIcon" />
                 {showEndDropdown && (
@@ -469,7 +497,11 @@ export const TimeSlot = ({
                                             }}
                                         >
                                             {option.label}
-                                            {!is24Hour && <span className="wbk_businessHours__periodLabel">{option.period}</span>}
+                                            {!is24Hour && (
+                                                <span className="wbk_businessHours__periodLabel">
+                                                    {formatMeridiem(option.period)}
+                                                </span>
+                                            )}
                                         </div>
                                     )
                                 })}

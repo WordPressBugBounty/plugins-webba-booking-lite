@@ -2044,6 +2044,58 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
         );
 
         wbk_opt()->add_option(
+            "wbk_packages_enabled",
+            "checkbox",
+            __("Enable visit packages", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Enable visit packages",
+                "popup" => __(
+                    "Allow customers to purchase visit packages and redeem them on bookings.",
+                    "webba-booking-lite",
+                ),
+                "checkbox_value" => "yes",
+                "default" => "yes",
+                "required_plan" => "premium",
+                "tab" => "packages",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_package_low_balance_threshold",
+            "text",
+            __("Low balance notification threshold", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Low balance notification threshold",
+                "popup" => __(
+                    "Send a low-balance email when remaining visits reach this number.",
+                    "webba-booking-lite",
+                ),
+                "default" => "2",
+                "required_plan" => "premium",
+                "tab" => "packages",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            "wbk_package_expiring_days",
+            "text",
+            __("Expiring soon (days)", "webba-booking-lite"),
+            "wbk_payment_settings_section",
+            [
+                "not_translated_title" => "Expiring soon (days)",
+                "popup" => __(
+                    "Send an expiring-soon email this many days before a package expires.",
+                    "webba-booking-lite",
+                ),
+                "default" => "7",
+                "required_plan" => "premium",
+                "tab" => "packages",
+            ],
+        );
+
+        wbk_opt()->add_option(
             "wbk_gift_card_payment_methods",
             "select_multiple",
             __("Gift card payment methods", "webba-booking-lite"),
@@ -6438,6 +6490,19 @@ When Disabled: The \'From email\' value is used as the reply-to address for noti
                     "webba-booking-lite",
                 ),
                 "tab" => "validation",
+            ],
+        );
+
+        wbk_opt()->add_option(
+            'wbk_wording_view_next_month',
+            'text',
+            __('View next month', 'webba-booking-lite'),
+            'wbk_translation_settings_section',
+            [
+                'default' => __('View next month', 'webba-booking-lite'),
+                'not_translated_title' => 'View next month',
+                'popup' => __('Label in Empty month overlay - View next month.', 'webba-booking-lite'),
+                'tab' => 'validation',
             ],
         );
 

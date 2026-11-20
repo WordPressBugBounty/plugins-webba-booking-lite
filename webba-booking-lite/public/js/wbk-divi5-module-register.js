@@ -1,5 +1,6 @@
 (function () {
     var metadata = window.wbkDivi5ModuleMetadata || null
+    var packageMetadata = window.wbkDivi5PackageModuleMetadata || null
     var pickerData = metadata && metadata.wbkPickerData ? metadata.wbkPickerData : null
     var appearanceDefaults = metadata && metadata.wbkAppearanceDefaults ? metadata.wbkAppearanceDefaults : {}
     var advancedAppearanceLocked = !!(
@@ -11,6 +12,7 @@
     var upgradeMessage =
         (metadata && metadata.wbkUpgradeMessage) || 'Available in PLUS'
     var registrationKey = '__wbkDivi5ModuleRegistered'
+    var packageRegistrationKey = '__wbkDivi5PackageModuleRegistered'
     var hookAttachedKey = '__wbkDivi5ModuleHookAttached'
     var modalNode = null
     var advancedStyleKeys = [
@@ -755,6 +757,56 @@
         }
     }
 
+    var performPackageRegistration = function () {
+        var registerModule = getRegisterModule()
+        var React = getReact()
+
+        if (
+            !registerModule ||
+            !React ||
+            !packageMetadata ||
+            !packageMetadata.name ||
+            window[packageRegistrationKey]
+        ) {
+            return !!window[packageRegistrationKey]
+        }
+
+        var editRenderer = function (props) {
+            var attrs = props && props.attrs ? props.attrs : {}
+
+            return React.createElement(
+                'div',
+                {
+                    className: 'wbk_divi_package_form_scope',
+                    style: buildAppearanceStyle(attrs),
+                },
+                React.createElement('div', {
+                    className: 'wbk_packages',
+                })
+            )
+        }
+
+        try {
+            registerModule(packageMetadata, {
+                renderers: {
+                    edit: editRenderer,
+                },
+                callbacks: {},
+            })
+            window[packageRegistrationKey] = true
+            return true
+        } catch (error) {
+            if (window.console && window.console.error) {
+                window.console.error('WBK Divi5 package register failed', error)
+            }
+            var errorMessage = error && error.message ? String(error.message) : String(error)
+            if (errorMessage.indexOf('You cannot use `divi` namespace') !== -1) {
+                window[packageRegistrationKey] = 'failed-namespace'
+            }
+            return false
+        }
+    }
+
     var attachHook = function () {
         if (window[hookAttachedKey]) {
             return
@@ -1027,8 +1079,23 @@
         markDiviAdvancedAppearanceControls()
     }
 
+    var isBookingRegistrationSettled = function () {
+        return performRegistration() || window[registrationKey] === 'failed-namespace'
+    }
+
+    var isPackageRegistrationSettled = function () {
+        if (!packageMetadata || !packageMetadata.name) {
+            return true
+        }
+        return (
+            performPackageRegistration() ||
+            window[packageRegistrationKey] === 'failed-namespace'
+        )
+    }
+
     attachHook()
-    performRegistration()
+    isBookingRegistrationSettled()
+    isPackageRegistrationSettled()
     attachAdvancedAppearanceLock()
 
     var attempts = 0
@@ -1036,7 +1103,10 @@
         attempts += 1
         attachHook()
         markDiviAdvancedAppearanceControls()
-        if (performRegistration() || window[registrationKey] === 'failed-namespace' || attempts > 1200) {
+        if (
+            (isBookingRegistrationSettled() && isPackageRegistrationSettled()) ||
+            attempts > 1200
+        ) {
             window.clearInterval(interval)
         }
     }, 250)

@@ -122,6 +122,12 @@ export interface ITab {
     lock_fields_only?: boolean
 }
 
+export interface ResolvedPhpTimeFormat {
+    is24Hour: boolean
+    padHour: boolean
+    meridiem: 'upper' | 'lower' | 'none'
+}
+
 export interface IFormProps<T extends Model> {
     id: string
     name: string

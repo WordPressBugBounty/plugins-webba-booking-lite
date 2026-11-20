@@ -21,6 +21,7 @@ import { CustomScroll } from 'react-custom-scroll'
 import classNames from 'classnames'
 import { useWording } from '../../../hooks/useWording'
 import { stripeMethods } from '../PaymentHandler/payments/Stripe/StripeMethods'
+import apiFetch from '@wordpress/api-fetch'
 
 const PaymentStepStripeSection = lazy(() =>
     import(
@@ -74,7 +75,37 @@ export const PaymentStep = () => {
     const [showFeedback, setShowFeedback] = useState(false)
     const [paymentElementLoading, setPaymentElementLoading] = useState(false)
     const [showStripeError, setShowStripeError] = useState(false)
+    const [userPackages, setUserPackages] = useState<any[]>([])
 
+    useEffect(() => {
+        if (!preset?.settings?.packages_enabled || !preset?.user) {
+            setUserPackages([])
+            return
+        }
+        let cancelled = false
+        apiFetch({ path: '/wbk/v2/get-user-packages/' })
+            .then((res: any) => {
+                if (!cancelled) {
+                    const active = (res?.packages || []).filter(
+                        (p: any) =>
+                            p.status === 'active' && p.available_credits > 0
+                    )
+                    setUserPackages(active)
+                    if (active.length > 0 && !formData.package_id) {
+                        setFormData('package_id', active[0].id)
+                    }
+                }
+            })
+            .catch(() => {
+                if (!cancelled) {
+                    setUserPackages([])
+                }
+            })
+        return () => {
+            cancelled = true
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [preset?.settings?.packages_enabled, preset?.user])
 
     const handleLoadingChange = useCallback((loading: boolean) => {
         setPaymentElementLoading(loading)
@@ -191,7 +222,8 @@ export const PaymentStep = () => {
 
     const content = (
         <div className={'wbk_step__payment-step'}>
-            {paymentMethods.length > 1 && amountData?.to_pay_total > 0 && (
+            {(paymentMethods.length > 1 && amountData?.to_pay_total > 0) ||
+            paymentMethods.some((m: any) => m.id === 'package') ? (
                 <PaymentSelector
                     selectedMethod={formData.payment_method as string}
                     setSelectedMethod={handleSelectMethod}
@@ -204,6 +236,41 @@ export const PaymentStep = () => {
                         (paymentElementLoading || isBookingAmountsLoading)
                     }
                 />
+            ) : null}
+
+            {formData.payment_method === 'package' && (
+                <div className={'wbk_coupon__wrapper'}>
+                    {userPackages.length === 0 ? (
+                        <FormNotice
+                            notice={__(
+                                'No active visit packages are available for this booking. Please log in or choose another payment method.',
+                                'webba-booking-lite'
+                            )}
+                        />
+                    ) : (
+                        <select
+                            value={String(formData.package_id || '')}
+                            className='wbk_package__select'
+                            onChange={(e) =>
+                                setFormData(
+                                    'package_id',
+                                    e.target.value
+                                        ? Number(e.target.value)
+                                        : ''
+                                )
+                            }
+                        >
+                            {userPackages.map((pkg) => (
+                                <option key={pkg.id} value={pkg.id}>
+                                    {pkg.name} (
+                                    {pkg.available_credits}/
+                                    {pkg.total_credits}{' '}
+                                    {__('left', 'webba-booking-lite')})
+                                </option>
+                            ))}
+                        </select>
+                    )}
+                </div>
             )}
 
             {['bank', 'arrival', 'woocommerce', 'paypal', 'mollie'].includes(

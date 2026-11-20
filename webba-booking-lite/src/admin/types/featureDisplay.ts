@@ -18,6 +18,7 @@ export type ProFeatureBannerKey =
     | 'extras'
     | 'coupons'
     | 'gift_cards'
+    | 'packages'
     | 'forms'
     | 'connected_calendars'
     | 'daily_services'

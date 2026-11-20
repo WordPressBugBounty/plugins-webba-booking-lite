@@ -79,6 +79,12 @@ export const settingsSections = [
         isPro: true
     },
     {
+        id: 'packages',
+        title: 'Visit Packages',
+        icon: 'credit-card',
+        isPro: true
+    },
+    {
         id: 'zoom',
         title: 'Zoom',
         icon: 'video',

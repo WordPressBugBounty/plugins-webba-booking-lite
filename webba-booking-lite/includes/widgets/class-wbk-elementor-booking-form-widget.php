@@ -98,9 +98,34 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
         ];
     }
 
+    /**
+     * Returns the wrapper class that receives appearance variables.
+     *
+     * @return string
+     */
+    protected function get_form_scope_class(): string
+    {
+        return 'wbk_elementor_booking_form_scope';
+    }
+
+    /**
+     * Returns the element that receives the form shadow control.
+     *
+     * @return string
+     */
+    protected function get_shadow_target_class(): string
+    {
+        return 'wbk_booking_form__body';
+    }
+
+    /**
+     * Returns the Elementor selector for the appearance scope.
+     *
+     * @return string
+     */
     private function get_scope_selector(): string
     {
-        return '{{WRAPPER}} .wbk_elementor_booking_form_scope';
+        return '{{WRAPPER}} .' . $this->get_form_scope_class();
     }
 
     private function get_variable_selectors(string $css_variable): array
@@ -650,6 +675,20 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
 
         $this->end_controls_section();
 
+        $this->register_appearance_style_controls($classic_form_condition);
+    }
+
+    /**
+     * Registers shared appearance controls for booking and package widgets.
+     *
+     * @param array $classic_form_condition Elementor condition for classic-only controls.
+     *
+     * @return void
+     */
+    protected function register_appearance_style_controls(array $classic_form_condition): void
+    {
+        $defaults = $this->get_appearance_defaults();
+
         $this->start_controls_section(
             'wbk_appearance_general',
             [
@@ -705,7 +744,10 @@ class WBK_Elementor_Booking_Form_Widget extends \Elementor\Widget_Base
                 'name' => 'shadow',
                 'label' => __('Form Shadow', 'webba-booking-lite'),
                 'selector' =>
-                    '{{WRAPPER}} .wbk_elementor_booking_form_scope .wbk_booking_form__body',
+                    '{{WRAPPER}} .' .
+                    $this->get_form_scope_class() .
+                    ' .' .
+                    $this->get_shadow_target_class(),
             ]
         );
 

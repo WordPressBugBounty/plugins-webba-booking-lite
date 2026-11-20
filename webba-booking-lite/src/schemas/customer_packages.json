@@ -1,0 +1,223 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "customer_package_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Package name",
+            "tab": "",
+            "misc": {
+                "tooltip": "Name copied from the package product at purchase."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "customer_package_product_id": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Package product",
+            "tab": "",
+            "misc": {
+                "tooltip": "Product this instance was created from.",
+                "options": "package_products"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "customer_package_user_id": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Customer",
+            "tab": "",
+            "misc": {
+                "tooltip": "WordPress user who owns this package.",
+                "options": "backend"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "customer_package_email": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Email",
+            "tab": "",
+            "misc": {
+                "tooltip": "Customer email snapshot.",
+                "sub_type": "email"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "customer_package_total_credits": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Total visits",
+            "tab": "",
+            "misc": {
+                "tooltip": "Original number of visits.",
+                "sub_type": "positive_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "0",
+            "editable": true
+        },
+        "customer_package_remaining_credits": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Remaining visits",
+            "tab": "",
+            "misc": {
+                "tooltip": "Visits still available.",
+                "sub_type": "none_negative_integer"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "0",
+            "editable": true
+        },
+        "customer_package_held_credits": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Held visits",
+            "tab": "",
+            "misc": {
+                "tooltip": "Visits reserved for pending bookings.",
+                "sub_type": "none_negative_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "0",
+            "editable": false
+        },
+        "customer_package_status": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Status",
+            "tab": "",
+            "misc": {
+                "tooltip": "Current package status.",
+                "options": {
+                    "active": "Active",
+                    "exhausted": "Exhausted",
+                    "expired": "Expired",
+                    "cancelled": "Cancelled",
+                    "suspended": "Suspended"
+                }
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "active",
+            "editable": true
+        },
+        "customer_package_purchased_at": {
+            "type": "string",
+            "input_type": "date",
+            "hidden": false,
+            "title": "Purchased at",
+            "tab": "",
+            "misc": {
+                "tooltip": "When the package was purchased or granted.",
+                "date_format": "F j, Y",
+                "time_zone": "Asia/Dhaka"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "customer_package_activated_at": {
+            "type": "string",
+            "input_type": "date",
+            "hidden": false,
+            "title": "Activated at",
+            "tab": "",
+            "misc": {
+                "tooltip": "When validity started.",
+                "date_format": "F j, Y",
+                "time_zone": "Asia/Dhaka"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "customer_package_expires_at": {
+            "type": "string",
+            "input_type": "date",
+            "hidden": false,
+            "title": "Expires at",
+            "tab": "",
+            "misc": {
+                "tooltip": "Package expiry date. Empty means no expiry.",
+                "date_format": "F j, Y",
+                "time_zone": "Asia/Dhaka"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "customer_package_payment_method": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Payment method",
+            "tab": "",
+            "misc": {
+                "tooltip": "How this package was paid for.",
+                "options": "backend"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "customer_package_payment_ref": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Payment reference",
+            "tab": "",
+            "misc": {
+                "tooltip": "Gateway payment reference."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": false
+        },
+        "customer_package_amount_paid": {
+            "type": "string",
+            "input_type": "price",
+            "hidden": false,
+            "title": "Amount paid",
+            "tab": "",
+            "misc": {
+                "tooltip": "Amount paid for this package.",
+                "sub_type": "none_negative_float"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "0",
+            "editable": true
+        }
+    }
+}

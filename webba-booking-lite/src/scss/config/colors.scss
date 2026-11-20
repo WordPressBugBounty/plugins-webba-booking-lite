@@ -36,6 +36,13 @@ $status-colors: (
     'cancelled': #fe0606,
     'rejected': #fe0606,
     'noshow': #fe0606,
+    'draft': #ff7e07,
+    'published': #0eb500,
+    'archived': #6b7280,
+    'active': #0eb500,
+    'exhausted': #ff7e07,
+    'expired': #6b7280,
+    'suspended': #3b82f6,
 );
 
 $wbk-primary-50: var(--wbk-primary-50);

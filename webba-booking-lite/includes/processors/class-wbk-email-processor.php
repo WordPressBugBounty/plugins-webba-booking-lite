@@ -812,6 +812,127 @@ class WBK_Email_Processor {
         return $sent_any;
     }
 
+    /**
+     * @param int    $package_id
+     * @param string $source purchase|grant
+     * @return void
+     */
+    public static function on_customer_package_created( $package_id, $source = "purchase" ) {
+        $trigger = ( $source === "grant" ? "package_granted" : "package_purchased" );
+        self::send_package_email( absint( $package_id ), $trigger );
+    }
+
+    /**
+     * @param int $package_id
+     * @param int $credits
+     * @param int $booking_id
+     * @return void
+     */
+    public static function on_package_credits_restored( $package_id, $credits = 0, $booking_id = 0 ) {
+        self::send_package_email( absint( $package_id ), "package_credits_restored" );
+    }
+
+    /**
+     * Send package notification emails for a trigger.
+     *
+     * @param int    $package_id
+     * @param string $trigger
+     * @return bool
+     */
+    public static function send_package_email( $package_id, $trigger ) {
+        if ( !class_exists( "WBK_Customer_Package" ) ) {
+            return false;
+        }
+        $package = new WBK_Customer_Package(absint( $package_id ));
+        if ( !$package->is_loaded() ) {
+            return false;
+        }
+        global $wpdb;
+        $table = get_option( "wbk_db_prefix", "" ) . "wbk_email_templates";
+        $rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE enabled=%s AND type=%s", "yes", $trigger ), ARRAY_A );
+        if ( !is_array( $rows ) || count( $rows ) === 0 ) {
+            return false;
+        }
+        $user = get_userdata( absint( $package->get( "user_id" ) ) );
+        $email = ( $user ? $user->user_email : (string) $package->get( "email" ) );
+        if ( $email === "" || !is_email( $email ) ) {
+            return false;
+        }
+        $headers = ["From: " . stripslashes( get_option( "wbk_from_name" ) ) . " <" . get_option( "wbk_from_email" ) . ">"];
+        $sent_any = false;
+        foreach ( $rows as $item ) {
+            $et = new WBK_Email_Template(absint( $item["id"] ));
+            if ( !$et->is_loaded() ) {
+                continue;
+            }
+            $message = WBK_Placeholder_Processor::process_package_placeholders( (string) $et->get( "template" ), absint( $package_id ) );
+            $subject = WBK_Placeholder_Processor::process_package_placeholders( (string) $et->get( "subject" ), absint( $package_id ) );
+            if ( !WBK_Validator::check_string_size( $message, 1, 50000 ) || !WBK_Validator::check_string_size( $subject, 1, 200 ) ) {
+                continue;
+            }
+            add_filter( "wp_mail_content_type", "wbk_wp_mail_content_type" );
+            wp_mail(
+                $email,
+                $subject,
+                $message,
+                $headers
+            );
+            remove_filter( "wp_mail_content_type", "wbk_wp_mail_content_type" );
+            $sent_any = true;
+        }
+        return $sent_any;
+    }
+
+    /**
+     * Daily: low balance + expiring soon notices.
+     *
+     * @return void
+     */
+    public static function send_scheduled_package_notices() {
+        if ( !class_exists( "WBK_Customer_Package" ) || !class_exists( "WBK_Package_Processor" ) ) {
+            return;
+        }
+        if ( !WBK_Package_Processor::is_enabled() ) {
+            return;
+        }
+        global $wpdb;
+        $table = get_option( "wbk_db_prefix", "" ) . "wbk_customer_packages";
+        $query = $wpdb->prepare( "SHOW TABLES LIKE %s", $wpdb->esc_like( $table ) );
+        if ( $wpdb->get_var( $query ) !== $table ) {
+            return;
+        }
+        $low_threshold = max( 1, absint( get_option( "wbk_package_low_balance_threshold", "2" ) ) );
+        $expire_days = max( 1, absint( get_option( "wbk_package_expiring_days", "7" ) ) );
+        $expire_before = time() + $expire_days * DAY_IN_SECONDS;
+        $low_rows = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table} WHERE status = %s AND remaining_credits > 0 AND remaining_credits <= %d", WBK_Customer_Package::STATUS_ACTIVE, $low_threshold ) );
+        if ( is_array( $low_rows ) ) {
+            foreach ( $low_rows as $id ) {
+                self::send_package_email( absint( $id ), "package_low_balance" );
+            }
+        }
+        $expiring = $wpdb->get_col( $wpdb->prepare(
+            "SELECT id FROM {$table}\n                 WHERE status = %s\n                   AND expires_at > %d\n                   AND expires_at <= %d",
+            WBK_Customer_Package::STATUS_ACTIVE,
+            time(),
+            $expire_before
+        ) );
+        if ( is_array( $expiring ) ) {
+            foreach ( $expiring as $id ) {
+                self::send_package_email( absint( $id ), "package_expiring" );
+            }
+        }
+        $expired = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$table}\n                 WHERE status = %s\n                   AND expires_at > 0\n                   AND expires_at < %d", WBK_Customer_Package::STATUS_ACTIVE, time() ) );
+        if ( is_array( $expired ) ) {
+            foreach ( $expired as $id ) {
+                $pkg = new WBK_Customer_Package(absint( $id ));
+                if ( $pkg->is_loaded() ) {
+                    $pkg->refresh_status();
+                    self::send_package_email( absint( $id ), "package_expired" );
+                }
+            }
+        }
+    }
+
 }
 
 function wbk_wp_mail_content_type() {

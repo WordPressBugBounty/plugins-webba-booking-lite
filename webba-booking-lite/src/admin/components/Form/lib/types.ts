@@ -99,7 +99,15 @@ export type FormComponentConstructor<
     P extends FormFieldProps = FormFieldProps,
 > = (config: FormComponentContstructorConfig<T>) => ComponentType<P>
 
-export type Operator = '=' | '==' | '!=' | '>' | '<' | '>=' | '<='
+export type Operator =
+    | '='
+    | '=='
+    | '!='
+    | '>'
+    | '<'
+    | '>='
+    | '<='
+    | 'contains'
 
 type FieldName = string
 

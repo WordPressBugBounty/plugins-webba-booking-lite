@@ -502,6 +502,7 @@ export const WaterfallForm = ({
             preset?.settings?.coupons_enabled === false &&
             !stripeMethods.includes(onlyMethod) &&
             onlyMethod !== 'square' &&
+            onlyMethod !== 'package' &&
             !hostedCheckoutMethods.includes(onlyMethod)
         ) {
             return false
@@ -551,6 +552,7 @@ export const WaterfallForm = ({
             'google_pay',
             'apple_pay',
             'stripe_others',
+            'package',
         ]
 
         if (

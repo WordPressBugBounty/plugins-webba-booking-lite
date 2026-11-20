@@ -65,6 +65,28 @@ class WBK_Square
         return [0, __('Payment method not supported', 'webba-booking-lite')];
     }
 
+    /**
+     * Square package payments are not available until Square is configured.
+     *
+     * @param float  $amount
+     * @param string $source_id
+     * @param string $idempotency_key
+     * @param string $verification_token
+     * @param string $buyer_email
+     * @param string $package_name
+     * @return array
+     */
+    public function charge_package(
+        $amount,
+        $source_id,
+        $idempotency_key,
+        $verification_token = '',
+        $buyer_email = '',
+        $package_name = ''
+    ) {
+        return [0, __('Payment method not supported', 'webba-booking-lite')];
+    }
+
     public static function render_initial_form(
         $input,
         $payment_method,

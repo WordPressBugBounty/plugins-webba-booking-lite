@@ -106,8 +106,8 @@ class WBK_Booking_Factory {
             $data["extra"] = json_encode( $result_array );
         }
         $data["day"] = strtotime( date( "Y-m-d", $data["time"] ) . " 00:00:00" );
-        $data["token"] = uniqid();
-        $data["admin_token"] = uniqid();
+        $data["token"] = wp_generate_password( 32, false, false );
+        $data["admin_token"] = wp_generate_password( 32, false, false );
         $data["created_on"] = time();
         $ip = "";
         if ( get_option( "wbk_gdrp", "disabled" ) == "enabled" && WBK_Feature_Gate::have_required_plan( "standard", "only_old_users" ) ) {
@@ -254,13 +254,13 @@ class WBK_Booking_Factory {
                     get_option( "wbk_db_prefix", "" ) . "wbk_appointments",
                     "appointment_token",
                     $booking->get_id(),
-                    uniqid()
+                    wp_generate_password( 32, false, false )
                 );
                 WbkData()->set_value(
                     get_option( "wbk_db_prefix", "" ) . "wbk_appointments",
                     "appointment_admin_token",
                     $booking->get_id(),
-                    uniqid()
+                    wp_generate_password( 32, false, false )
                 );
             }
             if ( get_option( "wbk_appointments_delete_not_paid_mode", "disabled" ) == "on_booking" ) {
@@ -342,6 +342,9 @@ class WBK_Booking_Factory {
         $wait_list_time = absint( $booking->get( "time" ) );
         $wait_list_staff_raw = $booking->get( "staff_member_id" );
         $wait_list_staff_id = ( $wait_list_staff_raw !== null && $wait_list_staff_raw !== "" && absint( $wait_list_staff_raw ) > 0 ? absint( $wait_list_staff_raw ) : 0 );
+        if ( class_exists( "WBK_Package_Processor" ) ) {
+            WBK_Package_Processor::handle_booking_cancel( $booking_id, ( $by === "" ? "auto" : $by ) );
+        }
         if ( $force_deletion ) {
             $force_snapshot = [
                 "status" => (string) $booking->get( "status" ),
@@ -433,11 +436,19 @@ class WBK_Booking_Factory {
                 $booking->set( "paid_with_coupon", "yes" );
                 $booking->save();
             }
+            if ( $method == "package" ) {
+                $booking->set( "payment_method", "package" );
+                $booking->save();
+            }
         }
         if ( count( $booking_ids ) > 0 ) {
         }
+        if ( $method == "package" && class_exists( "WBK_Package_Processor" ) ) {
+            // Consume against the original booking set (package bookings may be free).
+            WBK_Package_Processor::consume_for_bookings( $booking_ids_t );
+        }
         $price_per_booking = number_format(
-            $total_amount / count( $booking_ids ),
+            ( count( $booking_ids ) > 0 ? $total_amount / count( $booking_ids ) : 0 ),
             get_option( "wbk_price_fractional", "2" ),
             get_option( "wbk_price_separator", "." ),
             ""

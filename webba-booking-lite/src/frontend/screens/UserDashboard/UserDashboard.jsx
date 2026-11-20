@@ -11,6 +11,7 @@ import classNames from 'classnames'
 import { __ } from '@wordpress/i18n'
 import iconBookings from '../../../../public/images/icon-calendar.svg'
 import { Bookings } from './pages/Bookings/Bookings'
+import { Packages } from './pages/Packages/Packages'
 import { Button } from '../../components/Button/Button'
 import { BookingFormProvider } from '../../providers/BookingFormProvider/BookingFormProvider'
 import { BookingForm } from '../BookingForm/BookingForm'
@@ -25,6 +26,7 @@ export const UserDashboard = () => {
         [store_name]
     )
     const { wording } = preset || {}
+    const packagesEnabled = !!preset?.settings?.packages_enabled
     const { setUserName } = dispatch(store_name)
 
     const handleSuccessLogin = (response) => {
@@ -42,15 +44,26 @@ export const UserDashboard = () => {
     }, [render])
 
     const menuItems = useMemo(
-        () => [
-            {
-                slug: 'my-bookings',
-                label: wording?.bookings || __('My Bookings', 'webba-booking-lite'),
-                icon: iconBookings,
-                onClick: () => { },
-            },
-        ],
-        [wording]
+        () => {
+            const items = [
+                {
+                    slug: 'my-bookings',
+                    label: wording?.bookings || __('My Bookings', 'webba-booking-lite'),
+                    icon: iconBookings,
+                    onClick: () => { },
+                },
+            ]
+            if (packagesEnabled) {
+                items.push({
+                    slug: 'my-packages',
+                    label: wording?.packages || __('My Packages', 'webba-booking-lite'),
+                    icon: iconBookings,
+                    onClick: () => { },
+                })
+            }
+            return items
+        },
+        [wording, packagesEnabled]
     )
 
     return (
@@ -100,6 +113,9 @@ export const UserDashboard = () => {
                         )}
                         <div className={styles.content}>
                             {menu === 'my-bookings' && <Bookings />}
+                            {menu === 'my-packages' && packagesEnabled && (
+                                <Packages />
+                            )}
                         </div>
                     </>
                 )}

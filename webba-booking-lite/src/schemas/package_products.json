@@ -1,0 +1,331 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "package_product_name": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Name",
+            "tab": "details",
+            "misc": {
+                "tooltip": "Name of the visit package shown to customers."
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "package_product_description": {
+            "type": "string",
+            "input_type": "textarea",
+            "hidden": true,
+            "title": "Description",
+            "tab": "details",
+            "misc": {
+                "tooltip": "Short description of what this package includes."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "package_product_status": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": false,
+            "title": "Status",
+            "tab": "details",
+            "misc": {
+                "tooltip": "Draft packages are hidden. Archived packages cannot be purchased but existing instances remain usable.",
+                "options": {
+                    "draft": "Draft",
+                    "published": "Published",
+                    "archived": "Archived"
+                }
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "draft",
+            "editable": true
+        },
+        "package_product_applicable_for_all_services": {
+            "type": "string",
+            "input_type": "checkbox",
+            "hidden": true,
+            "title": "Applicable for all services",
+            "tab": "details",
+            "misc": {
+                "yes": "Yes",
+                "tooltip": "Allow this package for all services. Uncheck to choose specific services."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "yes",
+            "editable": true
+        },
+        "package_product_services": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Services",
+            "tab": "details",
+            "misc": {
+                "tooltip": "Services that can be booked with this package.",
+                "multiple": true,
+                "options": "services"
+            },
+            "required": false,
+            "dependency": [
+                [
+                    "applicable_for_all_services",
+                    "!=",
+                    "yes"
+                ]
+            ],
+            "default_value": null,
+            "editable": true
+        },
+        "package_product_visit_count": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": false,
+            "title": "Number of visits",
+            "tab": "pricing",
+            "misc": {
+                "tooltip": "How many visits are included in this package.",
+                "sub_type": "positive_integer"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "10",
+            "editable": true
+        },
+        "package_product_price": {
+            "type": "string",
+            "input_type": "price",
+            "hidden": false,
+            "title": "Price",
+            "tab": "pricing",
+            "misc": {
+                "tooltip": "Purchase price for this package.",
+                "sub_type": "none_negative_float"
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "0",
+            "editable": true
+        },
+        "package_product_payment_methods": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Payment methods",
+            "tab": "pricing",
+            "misc": {
+                "tooltip": "Select the preferred payment method(s) for this package.",
+                "multiple": true,
+                "options": "backend",
+                "description": "IMPORTANT! For Google Pay/Apple pay and Other Payment Methods to work you have to activate them in your Stripe account"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": null,
+            "editable": true
+        },
+        "service_woo_product": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "WooCommerce product ID",
+            "tab": "pricing",
+            "misc": {
+                "tooltip": "Set ID of the product associated with this service. Set only if WooCommerce is used as payment method.",
+                "sub_type": "none_negative_integer",
+                "pro_version": true,
+                "required_plan": "standard",
+                "options": "backend"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "0",
+            "editable": true
+        },
+        "package_product_expiry_type": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Expiry type",
+            "tab": "rules",
+            "misc": {
+                "tooltip": "How package validity is calculated.",
+                "options": {
+                    "none": "No expiry",
+                    "fixed": "Fixed end date",
+                    "relative": "Relative from start"
+                }
+            },
+            "required": true,
+            "dependency": [],
+            "default_value": "none",
+            "editable": true
+        },
+        "package_product_expiry_fixed_date": {
+            "type": "string",
+            "input_type": "date",
+            "hidden": true,
+            "title": "Fixed expiry date",
+            "tab": "rules",
+            "misc": {
+                "tooltip": "Package expires on this date.",
+                "date_format": "F j, Y",
+                "time_zone": "Asia/Dhaka"
+            },
+            "required": false,
+            "dependency": [
+                [
+                    "expiry_type",
+                    "=",
+                    "fixed"
+                ]
+            ],
+            "default_value": "",
+            "editable": true
+        },
+        "package_product_expiry_relative_days": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Valid for (days)",
+            "tab": "rules",
+            "misc": {
+                "tooltip": "Number of days the package stays valid after it starts.",
+                "sub_type": "positive_integer"
+            },
+            "required": true,
+            "dependency": [
+                [
+                    "expiry_type",
+                    "=",
+                    "relative"
+                ]
+            ],
+            "default_value": "90",
+            "editable": true
+        },
+        "package_product_validity_starts": {
+            "type": "string",
+            "input_type": "select",
+            "hidden": true,
+            "title": "Validity starts",
+            "tab": "rules",
+            "misc": {
+                "tooltip": "When relative expiry countdown begins.",
+                "options": {
+                    "purchase": "On purchase",
+                    "first_use": "On first use"
+                }
+            },
+            "required": true,
+            "dependency": [
+                [
+                    "expiry_type",
+                    "=",
+                    "relative"
+                ]
+            ],
+            "default_value": "purchase",
+            "editable": true
+        },
+        "package_product_min_interval_days": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Minimum days between visits",
+            "tab": "rules",
+            "misc": {
+                "tooltip": "Minimum number of days between package-covered bookings. Leave empty for no minimum.",
+                "sub_type": "none_negative_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "package_product_max_visits_per_day": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Max visits per day",
+            "tab": "rules",
+            "misc": {
+                "tooltip": "Maximum package visits allowed in a single day. Leave empty for unlimited.",
+                "sub_type": "none_negative_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "package_product_max_visits_per_week": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Max visits per week",
+            "tab": "rules",
+            "misc": {
+                "tooltip": "Maximum package visits allowed per calendar week. Leave empty for unlimited.",
+                "sub_type": "none_negative_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "package_product_max_visits_per_month": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Max visits per month",
+            "tab": "rules",
+            "misc": {
+                "tooltip": "Maximum package visits allowed per calendar month. Leave empty for unlimited.",
+                "sub_type": "none_negative_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        },
+        "package_product_cancel_restore_credits": {
+            "type": "string",
+            "input_type": "checkbox",
+            "hidden": true,
+            "title": "Restore visits on customer cancel",
+            "tab": "rules",
+            "misc": {
+                "yes": "Yes",
+                "tooltip": "When enabled, visits are returned if the customer cancels the booking."
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "yes",
+            "editable": true
+        },
+        "package_product_max_active_per_customer": {
+            "type": "string",
+            "input_type": "text",
+            "hidden": true,
+            "title": "Max active packages per customer",
+            "tab": "rules",
+            "misc": {
+                "tooltip": "Limit how many active instances of this product a customer may hold. Leave empty for unlimited.",
+                "sub_type": "none_negative_integer"
+            },
+            "required": false,
+            "dependency": [],
+            "default_value": "",
+            "editable": true
+        }
+    }
+}

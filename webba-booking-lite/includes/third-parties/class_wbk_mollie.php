@@ -83,6 +83,17 @@ class WBK_Mollie {
     }
 
     /**
+     * Create a Mollie checkout payment for a visit package.
+     *
+     * @param WBK_Package_Product $product Package being purchased.
+     * @param int                 $user_id Buyer who will receive the package.
+     * @return array|false { payment_url, payment_id } or false
+     */
+    public function create_package_payment( $product, $user_id ) {
+        return false;
+    }
+
+    /**
      * Fetch the payment from Mollie and mark bookings paid when status is paid.
      *
      * @param string $payment_id
@@ -127,6 +138,43 @@ class WBK_Mollie {
             return 'paid';
         }
         return $payment->status;
+    }
+
+    /**
+     * Create a customer package from a paid Mollie payment.
+     *
+     * @param \Mollie\Api\Resources\Payment $payment
+     * @return string|null Payment status, or null when this payment is not a package.
+     */
+    protected function complete_package_if_paid( $payment ) {
+        if ( !class_exists( 'WBK_Package_Processor' ) || !class_exists( 'WBK_Customer_Package' ) ) {
+            return null;
+        }
+        $payment_id = (string) $payment->id;
+        $existing = WBK_Customer_Package::find_by_payment_ref( $payment_id );
+        if ( $existing ) {
+            return ( $payment->isPaid() ? 'paid' : (string) $payment->status );
+        }
+        $pending = WBK_Package_Processor::get_pending_order( $payment_id );
+        $is_package = is_array( $pending ) && ($pending['type'] ?? '') === 'package' && !empty( $pending['product_id'] ) && !empty( $pending['user_id'] );
+        $metadata_type = ( !empty( $payment->metadata->type ) ? (string) $payment->metadata->type : '' );
+        if ( !$is_package && $metadata_type !== 'package' ) {
+            return null;
+        }
+        if ( !$payment->isPaid() || !$is_package ) {
+            return (string) $payment->status;
+        }
+        $package_id = WBK_Package_Processor::complete_purchase(
+            absint( $pending['product_id'] ),
+            absint( $pending['user_id'] ),
+            'mollie',
+            $payment_id
+        );
+        if ( is_wp_error( $package_id ) ) {
+            return (string) $payment->status;
+        }
+        WBK_Package_Processor::delete_pending_order( $payment_id );
+        return 'paid';
     }
 
     public static function render_initial_form(

@@ -40,6 +40,32 @@ const PREVIEW_ROWS: Record<ProFeatureBannerKey, PreviewRow[]> = {
         { id: '3', name: 'GIFT15', detail: '15%', status: __('Expired', 'webba-booking-lite') },
         { id: '4', name: 'GIFT20', detail: '20%', status: __('Active', 'webba-booking-lite') },
     ],
+    packages: [
+        {
+            id: '1',
+            name: __('10 Visits', 'webba-booking-lite'),
+            detail: '$99.00',
+            status: __('Published', 'webba-booking-lite'),
+        },
+        {
+            id: '2',
+            name: __('5 Visits', 'webba-booking-lite'),
+            detail: '$55.00',
+            status: __('Published', 'webba-booking-lite'),
+        },
+        {
+            id: '3',
+            name: __('Monthly pass', 'webba-booking-lite'),
+            detail: '$120.00',
+            status: __('Draft', 'webba-booking-lite'),
+        },
+        {
+            id: '4',
+            name: __('Intro pack', 'webba-booking-lite'),
+            detail: '$39.00',
+            status: __('Archived', 'webba-booking-lite'),
+        },
+    ],
     forms: [
         { id: '1', name: __('Default form', 'webba-booking-lite'), detail: '8 fields', status: __('Active', 'webba-booking-lite') },
         { id: '2', name: __('Corporate booking', 'webba-booking-lite'), detail: '12 fields', status: __('Active', 'webba-booking-lite') },
@@ -67,7 +93,7 @@ interface ProFeatureBannerPreviewProps {
 export const ProFeatureBannerPreview = ({
     previewType,
 }: ProFeatureBannerPreviewProps) => {
-    const rows = PREVIEW_ROWS[previewType]
+    const rows = PREVIEW_ROWS[previewType] ?? []
 
     return (
         <div className="wbk_proFeatureBannerPreview">

@@ -5,6 +5,7 @@ export const SERVICE_SCREEN_TAB_IDS = [
     'daily',
     'categories',
     'extras',
+    'packages',
 ] as const
 
 export type ServiceScreenTabId = (typeof SERVICE_SCREEN_TAB_IDS)[number]

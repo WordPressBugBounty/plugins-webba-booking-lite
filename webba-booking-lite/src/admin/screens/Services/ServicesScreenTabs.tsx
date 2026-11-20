@@ -126,6 +126,30 @@ const ExtrasIcon = (
     </svg>
 )
 
+const PackagesIcon = (
+    <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+    >
+        <path
+            d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5v-7Z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+        />
+        <path
+            d="M12 12 4 8.5M12 12l8-3.5M12 12v8"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        />
+    </svg>
+)
+
 export const ServicesScreenTabs = () => {
     const { activeTab, setActiveTab } = useServiceScreenTab()
 
@@ -149,6 +173,11 @@ export const ServicesScreenTabs = () => {
             id: 'extras',
             label: __('Extras', 'webba-booking-lite'),
             icon: ExtrasIcon,
+        },
+        {
+            id: 'packages',
+            label: __('Packages', 'webba-booking-lite'),
+            icon: PackagesIcon,
         },
     ]
 

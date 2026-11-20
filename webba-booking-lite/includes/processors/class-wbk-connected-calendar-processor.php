@@ -675,6 +675,17 @@ abstract class WBK_Connected_Calendar_Processor {
             return false;
         }
         $gg_event_id = $booking->get( "gg_event_id" );
+        if ( empty( $gg_event_id ) ) {
+            $gg_event_id = $booking->get( "appointment_gg_event_id" );
+        }
+        if ( empty( $gg_event_id ) ) {
+            return false;
+        }
+        $booking = new WBK_Booking($booking_id);
+        if ( !$booking->is_loaded() ) {
+            return false;
+        }
+        $gg_event_id = $booking->get( "gg_event_id" );
         $outlook_event_id = $booking->get( "outlook_event_id" );
         if ( empty( $gg_event_id ) ) {
             $gg_event_id = $booking->get( "appointment_gg_event_id" );
@@ -784,6 +795,9 @@ abstract class WBK_Connected_Calendar_Processor {
      * @return string|null The processor class name or null if not found
      */
     protected static function get_processor_class_for_provider( $provider ) {
+        $provider_map = [
+            "google" => "WBK_Google_Calendar_Processor",
+        ];
         return ( isset( $provider_map[$provider] ) ? $provider_map[$provider] : null );
     }
 

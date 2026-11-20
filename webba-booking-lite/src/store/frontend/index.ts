@@ -631,7 +631,12 @@ const actions = {
     fetchPaymentMethods: (
         payload:
             | number[]
-            | { ids?: number[]; unit_id?: number; scope?: string }
+            | {
+                  ids?: number[]
+                  unit_id?: number
+                  product_id?: number
+                  scope?: string
+              }
     ) => {
         return async ({ dispatch }: any) => {
             try {
@@ -641,6 +646,9 @@ const actions = {
                           ...(payload.ids ? { ids: payload.ids } : {}),
                           ...(payload.unit_id != null
                               ? { unit_id: payload.unit_id }
+                              : {}),
+                          ...(payload.product_id != null
+                              ? { product_id: payload.product_id }
                               : {}),
                           ...(payload.scope ? { scope: payload.scope } : {}),
                       }

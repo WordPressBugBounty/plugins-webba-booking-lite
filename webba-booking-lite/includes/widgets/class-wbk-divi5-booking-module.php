@@ -185,7 +185,7 @@ class WBK_Divi5_Booking_Module
      *
      * @return void
      */
-    private static function enqueue_front_assets()
+    protected static function enqueue_front_assets()
     {
         if (class_exists("WBK_Gutenberg_Booking_Form_Block")) {
             WBK_Gutenberg_Booking_Form_Block::enqueue_frontend_assets();
@@ -287,7 +287,7 @@ class WBK_Divi5_Booking_Module
      *
      * @return array
      */
-    private static function get_appearance_defaults()
+    protected static function get_appearance_defaults()
     {
         $static_defaults = [
             "bg_accent" => "#15B8A9",
@@ -383,7 +383,7 @@ class WBK_Divi5_Booking_Module
      *
      * @return array
      */
-    private static function get_border_radius_options()
+    protected static function get_border_radius_options()
     {
         return [
             "0" => __("None", "webba-booking-lite"),
@@ -417,7 +417,7 @@ class WBK_Divi5_Booking_Module
      *
      * @return array
      */
-    private static function inject_appearance_groups_into_metadata($module_json)
+    protected static function inject_appearance_groups_into_metadata($module_json)
     {
         if (!is_array($module_json)) {
             return $module_json;
@@ -465,7 +465,7 @@ class WBK_Divi5_Booking_Module
      *
      * @return array
      */
-    private static function inject_appearance_controls_into_attributes($attributes)
+    protected static function inject_appearance_controls_into_attributes($attributes)
     {
         if (!isset($attributes["content"]["settings"]["advanced"])) {
             return $attributes;
@@ -580,7 +580,7 @@ class WBK_Divi5_Booking_Module
      *
      * @return string
      */
-    private static function build_appearance_style_declarations($attrs)
+    protected static function build_appearance_style_declarations($attrs)
     {
         $defaults = self::get_appearance_defaults();
         $get = function ($key) use ($attrs, $defaults) {

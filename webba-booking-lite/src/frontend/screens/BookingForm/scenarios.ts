@@ -249,6 +249,7 @@ export const bookingScenarios: IScenario[] = [
                     'google_pay',
                     'apple_pay',
                     'stripe_others',
+                    'package',
                 ]
 
                 if (
@@ -281,7 +282,8 @@ export const bookingScenarios: IScenario[] = [
                 paymentMethods.length === 1 &&
                 preset?.settings?.coupons_enabled === false &&
                 !stripeMethods.includes(paymentMethods[0].id) &&
-                paymentMethods[0].id !== 'square'
+                paymentMethods[0].id !== 'square' &&
+                paymentMethods[0].id !== 'package'
             ) {
                 return false
             }

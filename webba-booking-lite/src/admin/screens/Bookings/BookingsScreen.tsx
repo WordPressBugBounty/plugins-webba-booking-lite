@@ -50,6 +50,9 @@ import { SuccessMessage } from '../../components/SuccessMessage/SuccessMessage'
 import noItemsImage from '../../../../public/images/bookings-empty.png'
 import { LocationNames } from '../../components/WebbaDataTable/cells/LocationNames/LocationNames'
 import { UnitName } from '../../components/WebbaDataTable/cells/UnitName/UnitName'
+import { CustomerPackagesScreen } from '../CustomerPackages/CustomerPackagesScreen'
+import { BookingsScreenTabs } from './BookingsScreenTabs'
+import { useBookingScreenTab } from './useBookingScreenTab'
 
 export const bookingsModel = removePrefixesFromModelFields(
     BookingsModel,
@@ -513,49 +516,73 @@ export const BookingsScreen = () => {
     const isExportButtonAvailable =
         plan_map &&
         exportButtonRequiredPlans.some((plan) => plan_map[plan] === true)
+    const { activeTab, setActiveTab } = useBookingScreenTab()
 
     return (
-        <TableProvider table={dynamicTable}>
-            <Table
-                title={__('Bookings', 'webba-booking-lite')}
-                documentationLink={getTableDocumentationLink('bookings')}
-                description={__('Manage, update and delete bookings for your services.', 'webba-booking-lite')}
-                collectionName="appointments"
-                addButtonTitle={__('Add booking', 'webba-booking-lite')}
-                table={dynamicTable}
-                loading={loading}
-                onDeleteSelected={onDeleteSelected}
-                onAdd={() =>
-                    sidebar.open(
-                        <Form
-                            id="add-booking-form"
-                            name={__('Add Booking', 'webba-booking-lite')}
-                            form={form}
-                            sections={menuSections}
-                            onSubmit={async (data) => {
-                                return await addBooking(normalizeBookingPayload(data))
-                            }}
-                            defaultValue={
-                                {} as FormValueFromModel<typeof bookingsModel>
-                            }
-                        />
-                    )
-                }
-                noItemsImageUrl={
-                    noItemsImage
-                }
-                filter={filterForm}
-                search={searchField}
-                isItemsForbidden={isForbidden(bookings)}
-                exportButton={
-                    isExportButtonAvailable && exportButton
-                        ? exportButton
-                        : undefined
-                }
-                forcePermission={true}
+        <div className="wbk_bookingsScreen">
+            <BookingsScreenTabs
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
             />
-            <SuccessMessage />
-            <FailedMessage />
-        </TableProvider>
+            {activeTab === 'bookings' && (
+                <div
+                    role="tabpanel"
+                    id="wbk-bookings-panel-bookings"
+                    aria-labelledby="wbk-bookings-tab-bookings"
+                >
+                    <TableProvider table={dynamicTable}>
+                        <Table
+                            title={__('Bookings', 'webba-booking-lite')}
+                            documentationLink={getTableDocumentationLink('bookings')}
+                            description={__('Manage, update and delete bookings for your services.', 'webba-booking-lite')}
+                            collectionName="appointments"
+                            addButtonTitle={__('Add booking', 'webba-booking-lite')}
+                            table={dynamicTable}
+                            loading={loading}
+                            onDeleteSelected={onDeleteSelected}
+                            onAdd={() =>
+                                sidebar.open(
+                                    <Form
+                                        id="add-booking-form"
+                                        name={__('Add Booking', 'webba-booking-lite')}
+                                        form={form}
+                                        sections={menuSections}
+                                        onSubmit={async (data) => {
+                                            return await addBooking(normalizeBookingPayload(data))
+                                        }}
+                                        defaultValue={
+                                            {} as FormValueFromModel<typeof bookingsModel>
+                                        }
+                                    />
+                                )
+                            }
+                            noItemsImageUrl={
+                                noItemsImage
+                            }
+                            filter={filterForm}
+                            search={searchField}
+                            isItemsForbidden={isForbidden(bookings)}
+                            exportButton={
+                                isExportButtonAvailable && exportButton
+                                    ? exportButton
+                                    : undefined
+                            }
+                            forcePermission={true}
+                        />
+                        <SuccessMessage />
+                        <FailedMessage />
+                    </TableProvider>
+                </div>
+            )}
+            {activeTab === 'customer-packages' && (
+                <div
+                    role="tabpanel"
+                    id="wbk-bookings-panel-customer-packages"
+                    aria-labelledby="wbk-bookings-tab-customer-packages"
+                >
+                    <CustomerPackagesScreen />
+                </div>
+            )}
+        </div>
     )
 }

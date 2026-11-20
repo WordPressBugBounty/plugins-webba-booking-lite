@@ -1,0 +1,57 @@
+{
+  "name": "webba/package-form",
+  "d4Shortcode": "webba_package_form",
+  "moduleClassName": "webba_package_form",
+  "moduleOrderClassName": "webba_package_form",
+  "title": "Webba Package Form",
+  "titles": "Webba Package Forms",
+  "moduleIcon": "divi/module-code",
+  "category": "module",
+  "keywords": ["webba", "package", "booking"],
+  "attributes": {
+    "module": {
+      "type": "object",
+      "selector": "{{selector}}",
+      "settings": {
+        "meta": {
+          "meta": {}
+        },
+        "advanced": {
+          "html": {},
+          "link": {},
+          "text": {}
+        },
+        "decoration": {
+          "background": {},
+          "border": {},
+          "boxShadow": {},
+          "spacing": {},
+          "sizing": {},
+          "position": {},
+          "transform": {},
+          "scroll": {},
+          "animation": {},
+          "conditions": {},
+          "disabledOn": {}
+        }
+      }
+    },
+    "content": {
+      "type": "object",
+      "settings": {
+        "advanced": {}
+      }
+    }
+  },
+  "customCssFields": {},
+  "settings": {
+    "content": "auto",
+    "design": "auto",
+    "advanced": "auto",
+    "groups": {}
+  },
+  "wrapper": {
+    "status": true,
+    "tag": "div"
+  }
+}

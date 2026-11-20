@@ -39,13 +39,49 @@ export const getFormState = <T extends Model>({ fields }: FormFromModel<T>) => {
     }
 }
 
+const valuesFromField = (actualValue: unknown): string[] => {
+    if (Array.isArray(actualValue)) {
+        return actualValue.map((item) => String(item))
+    }
+
+    if (typeof actualValue === 'string') {
+        const trimmed = actualValue.trim()
+        if (!trimmed) {
+            return []
+        }
+
+        if (trimmed.startsWith('[')) {
+            try {
+                const parsed = JSON.parse(trimmed)
+                if (Array.isArray(parsed)) {
+                    return parsed.map((item) => String(item))
+                }
+            } catch (error) {
+                return [trimmed]
+            }
+        }
+
+        if (trimmed.includes(',')) {
+            return trimmed.split(',').map((item) => item.trim())
+        }
+
+        return [trimmed]
+    }
+
+    if (actualValue === null || typeof actualValue === 'undefined') {
+        return []
+    }
+
+    return [String(actualValue)]
+}
+
 export const valueComparator = ({
     operator,
     actualValue,
     toMatch,
 }: {
     operator: Operator
-    actualValue: string
+    actualValue: unknown
     toMatch: string
 }) => {
     switch (operator) {
@@ -63,6 +99,8 @@ export const valueComparator = ({
             return Number(actualValue) >= Number(toMatch)
         case '<=':
             return Number(actualValue) <= Number(toMatch)
+        case 'contains':
+            return valuesFromField(actualValue).includes(String(toMatch))
         default:
             throw new Error(`Unknown operation: ${operator}`)
     }

@@ -2774,6 +2774,44 @@ class WBK_Model
             false,
         );
 
+        $table->add_field(
+            "booking_package_id",
+            "package_id",
+            __("Visit package", "webba-booking-lite"),
+            "text",
+            "",
+            [
+                "tooltip" => __(
+                    "Customer visit package used for this booking, if any.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
+            "0",
+            false,
+            false,
+            false,
+        );
+
+        $table->add_field(
+            "booking_package_credits_used",
+            "package_credits_used",
+            __("Package visits used", "webba-booking-lite"),
+            "text",
+            "",
+            [
+                "tooltip" => __(
+                    "Number of package visits consumed by this booking.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
+            "0",
+            false,
+            false,
+            false,
+        );
+
         $table->sync_structure();
 
         $table = WbkData()->models->add($table, $db_prefix . "wbk_appointments");
@@ -3396,6 +3434,670 @@ class WBK_Model
 
         $table->sync_structure();
         WbkData()->models->add($table, $db_prefix . "wbk_gift_cards");
+
+        // Visit package products (sellable templates)
+        $table = new WbkData\Model($db_prefix . "wbk_package_products");
+        $table->set_single_item_name(__("Package product", "webba-booking-lite"));
+        $table->set_multiple_item_name(__("Package products", "webba-booking-lite"));
+        $table->sections["details"] = __("Details", "webba-booking-lite");
+        $table->sections["pricing"] = __("Pricing", "webba-booking-lite");
+        $table->sections["rules"] = __("Rules", "webba-booking-lite");
+
+        $table->add_field(
+            "package_product_name",
+            "name",
+            __("Name", "webba-booking-lite"),
+            "text",
+            "details",
+            [
+                "tooltip" => __(
+                    "Name of the visit package shown to customers.",
+                    "webba-booking-lite",
+                ),
+            ],
+        );
+
+        $table->add_field(
+            "package_product_description",
+            "description",
+            __("Description", "webba-booking-lite"),
+            "textarea",
+            "details",
+            [
+                "tooltip" => __("Short description of what this package includes.", "webba-booking-lite"),
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $table->add_field(
+            "package_product_status",
+            "status",
+            __("Status", "webba-booking-lite"),
+            "select",
+            "details",
+            [
+                "tooltip" => __(
+                    "Draft packages are hidden. Archived packages cannot be purchased but existing instances remain usable.",
+                    "webba-booking-lite",
+                ),
+                "items" => WBK_Package_Product::get_status_options(),
+                "options" => WBK_Package_Product::get_status_options(),
+            ],
+            WBK_Package_Product::STATUS_DRAFT,
+            true,
+            true,
+            true,
+        );
+
+        $table->add_field(
+            "package_product_applicable_for_all_services",
+            "applicable_for_all_services",
+            __("Applicable for all services", "webba-booking-lite"),
+            "checkbox",
+            "details",
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => __(
+                    "Allow this package for all services. Uncheck to choose specific services.",
+                    "webba-booking-lite",
+                ),
+            ],
+            "yes",
+            true,
+            false,
+            false,
+        );
+
+        $table->add_field(
+            "package_product_services",
+            "services",
+            __("Services", "webba-booking-lite"),
+            "select",
+            "details",
+            [
+                "tooltip" => __(
+                    "Services that can be booked with this package.",
+                    "webba-booking-lite",
+                ),
+                "items" => WBK_Model_Utils::get_services(),
+                "multiple" => true,
+                "options" => "services",
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+
+        $table->fields
+            ->get_element_at("package_product_services")
+            ->set_dependency([["applicable_for_all_services", "!=", "yes"]]);
+
+        $table->add_field(
+            "package_product_visit_count",
+            "visit_count",
+            __("Number of visits", "webba-booking-lite"),
+            "text",
+            "pricing",
+            [
+                "tooltip" => __("How many visits are included in this package.", "webba-booking-lite"),
+                "sub_type" => "positive_integer",
+            ],
+            "10",
+            true,
+            true,
+            true,
+        );
+
+        $table->add_field(
+            "package_product_price",
+            "price",
+            __("Price", "webba-booking-lite"),
+            "price",
+            "pricing",
+            [
+                "tooltip" => __("Purchase price for this package.", "webba-booking-lite"),
+                "sub_type" => "none_negative_float",
+            ],
+            "0",
+            true,
+            true,
+            true,
+        );
+
+        $tooltip = __(
+            "Select the preferred payment method(s) for this package.",
+            "webba-booking-lite",
+        );
+        $payment_methods = WBK_Model_Utils::get_all_payment_methods();
+        $table->add_field(
+            "package_product_payment_methods",
+            "payment_methods",
+            __("Payment methods", "webba-booking-lite"),
+            "select",
+            "pricing",
+            [
+                "tooltip" => $tooltip,
+                "multiple" => true,
+                "options" => "backend",
+                "items" => $payment_methods,
+                "description" => __(
+                    "IMPORTANT! For Google Pay/Apple pay and Other Payment Methods to work you have to activate them in your Stripe account",
+                    "webba-booking-lite",
+                ),
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+
+        $table->add_field(
+            "package_product_woo_product",
+            "woo_product",
+            __("WooCommerce product", "webba-booking-lite"),
+            "select",
+            "pricing",
+            [
+                "tooltip" => __(
+                    "Set WooCommerce product associated with this package. Set only if WooCommerce is used as payment method.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "none_negative_integer",
+                "pro_version" => true,
+                "required_plan" => "standard", // TIER 2
+                "options" => "backend",
+            ],
+            null,
+            true,
+            false,
+            false,
+        );
+
+        $table->fields
+            ->get_element_at("package_product_woo_product")
+            ->set_dependency([["payment_methods", "contains", "woocommerce"]]);
+
+        $table->add_field(
+            "package_product_expiry_type",
+            "expiry_type",
+            __("Expiry type", "webba-booking-lite"),
+            "select",
+            "rules",
+            [
+                "tooltip" => __("How package validity is calculated.", "webba-booking-lite"),
+                "items" => WBK_Package_Product::get_expiry_type_options(),
+                "options" => WBK_Package_Product::get_expiry_type_options(),
+            ],
+            WBK_Package_Product::EXPIRY_NONE,
+            true,
+            false,
+            true,
+        );
+
+        $table->add_field(
+            "package_product_expiry_fixed_date",
+            "expiry_fixed_date",
+            __("Fixed expiry date", "webba-booking-lite"),
+            "wbk_date",
+            "rules",
+            [
+                "tooltip" => __("Package expires on this date.", "webba-booking-lite"),
+                "date_format" => $date_format,
+                "time_zone" => get_option("wbk_timezone", "UTC"),
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $table->fields
+            ->get_element_at("package_product_expiry_fixed_date")
+            ->set_dependency([["expiry_type", "=", WBK_Package_Product::EXPIRY_FIXED]]);
+
+        $table->add_field(
+            "package_product_expiry_relative_days",
+            "expiry_relative_days",
+            __("Valid for (days)", "webba-booking-lite"),
+            "text",
+            "rules",
+            [
+                "tooltip" => __(
+                    "Number of days the package stays valid after it starts.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "positive_integer",
+            ],
+            "90",
+            true,
+            false,
+            true,
+        );
+
+        $table->fields
+            ->get_element_at("package_product_expiry_relative_days")
+            ->set_dependency([["expiry_type", "=", WBK_Package_Product::EXPIRY_RELATIVE]]);
+
+        $table->add_field(
+            "package_product_validity_starts",
+            "validity_starts",
+            __("Validity starts", "webba-booking-lite"),
+            "select",
+            "rules",
+            [
+                "tooltip" => __(
+                    "When relative expiry countdown begins.",
+                    "webba-booking-lite",
+                ),
+                "items" => WBK_Package_Product::get_validity_starts_options(),
+                "options" => WBK_Package_Product::get_validity_starts_options(),
+            ],
+            WBK_Package_Product::START_ON_PURCHASE,
+            true,
+            false,
+            true,
+        );
+
+        $table->fields
+            ->get_element_at("package_product_validity_starts")
+            ->set_dependency([["expiry_type", "=", WBK_Package_Product::EXPIRY_RELATIVE]]);
+
+        $table->add_field(
+            "package_product_min_interval_days",
+            "min_interval_days",
+            __("Minimum days between visits", "webba-booking-lite"),
+            "text",
+            "rules",
+            [
+                "tooltip" => __(
+                    "Minimum number of days between package-covered bookings. Leave empty for no minimum.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "none_negative_integer",
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $table->add_field(
+            "package_product_max_visits_per_day",
+            "max_visits_per_day",
+            __("Max visits per day", "webba-booking-lite"),
+            "text",
+            "rules",
+            [
+                "tooltip" => __(
+                    "Maximum package visits allowed in a single day. Leave empty for unlimited.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "none_negative_integer",
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $table->add_field(
+            "package_product_max_visits_per_week",
+            "max_visits_per_week",
+            __("Max visits per week", "webba-booking-lite"),
+            "text",
+            "rules",
+            [
+                "tooltip" => __(
+                    "Maximum package visits allowed per calendar week. Leave empty for unlimited.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "none_negative_integer",
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $table->add_field(
+            "package_product_max_visits_per_month",
+            "max_visits_per_month",
+            __("Max visits per month", "webba-booking-lite"),
+            "text",
+            "rules",
+            [
+                "tooltip" => __(
+                    "Maximum package visits allowed per calendar month. Leave empty for unlimited.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "none_negative_integer",
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $table->add_field(
+            "package_product_cancel_restore_credits",
+            "cancel_restore_credits",
+            __("Restore visits on customer cancel", "webba-booking-lite"),
+            "checkbox",
+            "rules",
+            [
+                "yes" => __("Yes", "webba-booking-lite"),
+                "tooltip" => __(
+                    "When enabled, visits are returned if the customer cancels the booking.",
+                    "webba-booking-lite",
+                ),
+            ],
+            "yes",
+            true,
+            false,
+            false,
+        );
+
+        $table->add_field(
+            "package_product_max_active_per_customer",
+            "max_active_per_customer",
+            __("Max active packages per customer", "webba-booking-lite"),
+            "text",
+            "rules",
+            [
+                "tooltip" => __(
+                    "Limit how many active instances of this product a customer may hold. Leave empty for unlimited.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "none_negative_integer",
+            ],
+            "",
+            true,
+            false,
+            false,
+        );
+
+        $table->sync_structure();
+        WbkData()->models->add($table, $db_prefix . "wbk_package_products");
+
+        // Customer visit package instances
+        $table = new WbkData\Model($db_prefix . "wbk_customer_packages");
+        $table->set_single_item_name(__("Customer package", "webba-booking-lite"));
+        $table->set_multiple_item_name(__("Customer packages", "webba-booking-lite"));
+
+        $table->add_field(
+            "customer_package_name",
+            "name",
+            __("Package name", "webba-booking-lite"),
+            "text",
+            "",
+            [
+                "tooltip" => __("Name copied from the package product at purchase.", "webba-booking-lite"),
+            ],
+            "",
+            true,
+            true,
+            false,
+        );
+
+        $table->add_field(
+            "customer_package_product_id",
+            "product_id",
+            __("Package product", "webba-booking-lite"),
+            "select",
+            "",
+            [
+                "tooltip" => __("Product this instance was created from.", "webba-booking-lite"),
+                "items" => WBK_Model_Utils::get_package_product_options(),
+                "options" => "package_products",
+            ],
+            null,
+            true,
+            true,
+            false,
+        );
+
+        $table->add_field(
+            "customer_package_user_id",
+            "user_id",
+            __("Customer", "webba-booking-lite"),
+            "select",
+            "",
+            [
+                "tooltip" => __("WordPress user who owns this package.", "webba-booking-lite"),
+                "items" => WBK_User_Utils::get_none_admin_wp_users(),
+                "options" => "backend",
+            ],
+            null,
+            true,
+            true,
+            false,
+        );
+
+        $table->add_field(
+            "customer_package_email",
+            "email",
+            __("Email", "webba-booking-lite"),
+            "text",
+            "",
+            [
+                "tooltip" => __("Customer email snapshot.", "webba-booking-lite"),
+                "sub_type" => "email",
+            ],
+            "",
+            true,
+            true,
+            false,
+        );
+
+        $table->add_field(
+            "customer_package_total_credits",
+            "total_credits",
+            __("Total visits", "webba-booking-lite"),
+            "text",
+            "",
+            [
+                "tooltip" => __("Original number of visits.", "webba-booking-lite"),
+                "sub_type" => "positive_integer",
+            ],
+            "0",
+            true,
+            true,
+            false,
+        );
+
+        $table->add_field(
+            "customer_package_remaining_credits",
+            "remaining_credits",
+            __("Remaining visits", "webba-booking-lite"),
+            "text",
+            "",
+            [
+                "tooltip" => __("Visits still available.", "webba-booking-lite"),
+                "sub_type" => "none_negative_integer",
+            ],
+            "0",
+            true,
+            true,
+            true,
+        );
+
+        $table->add_field(
+            "customer_package_held_credits",
+            "held_credits",
+            __("Held visits", "webba-booking-lite"),
+            "text",
+            "",
+            [
+                "tooltip" => __(
+                    "Visits reserved for pending bookings.",
+                    "webba-booking-lite",
+                ),
+                "sub_type" => "none_negative_integer",
+            ],
+            "0",
+            false,
+            true,
+            false,
+        );
+
+        $table->add_field(
+            "customer_package_status",
+            "status",
+            __("Status", "webba-booking-lite"),
+            "select",
+            "",
+            [
+                "tooltip" => __("Current package status.", "webba-booking-lite"),
+                "items" => WBK_Customer_Package::get_status_options(),
+                "options" => WBK_Customer_Package::get_status_options(),
+            ],
+            WBK_Customer_Package::STATUS_ACTIVE,
+            true,
+            true,
+            true,
+        );
+
+        $table->add_field(
+            "customer_package_purchased_at",
+            "purchased_at",
+            __("Purchased at", "webba-booking-lite"),
+            "wbk_date",
+            "",
+            [
+                "tooltip" => __("When the package was purchased or granted.", "webba-booking-lite"),
+                "date_format" => $date_format,
+                "time_zone" => get_option("wbk_timezone", "UTC"),
+            ],
+            "",
+            true,
+            true,
+            false,
+        );
+
+        $table->add_field(
+            "customer_package_activated_at",
+            "activated_at",
+            __("Activated at", "webba-booking-lite"),
+            "wbk_date",
+            "",
+            [
+                "tooltip" => __("When validity started.", "webba-booking-lite"),
+                "date_format" => $date_format,
+                "time_zone" => get_option("wbk_timezone", "UTC"),
+            ],
+            "",
+            true,
+            true,
+            false,
+        );
+
+        $table->add_field(
+            "customer_package_expires_at",
+            "expires_at",
+            __("Expires at", "webba-booking-lite"),
+            "wbk_date",
+            "",
+            [
+                "tooltip" => __("Package expiry date. Empty means no expiry.", "webba-booking-lite"),
+                "date_format" => $date_format,
+                "time_zone" => get_option("wbk_timezone", "UTC"),
+            ],
+            "",
+            true,
+            true,
+            true,
+        );
+
+        $table->add_field(
+            "customer_package_payment_method",
+            "payment_method",
+            __("Payment method", "webba-booking-lite"),
+            "select",
+            "",
+            [
+                "tooltip" => __("How this package was paid for.", "webba-booking-lite"),
+                "options" => "backend",
+                "items" => WBK_Model_Utils::get_all_payment_methods(),
+            ],
+            "",
+            true,
+            true,
+            false,
+        );
+
+        $table->add_field(
+            "customer_package_payment_ref",
+            "payment_ref",
+            __("Payment reference", "webba-booking-lite"),
+            "text",
+            "",
+            [
+                "tooltip" => __("Gateway payment reference.", "webba-booking-lite"),
+            ],
+            "",
+            false,
+            true,
+            false,
+        );
+
+        $table->add_field(
+            "customer_package_amount_paid",
+            "amount_paid",
+            __("Amount paid", "webba-booking-lite"),
+            "price",
+            "",
+            [
+                "tooltip" => __("Amount paid for this package.", "webba-booking-lite"),
+                "sub_type" => "none_negative_float",
+            ],
+            "0",
+            true,
+            true,
+            false,
+        );
+
+        $table->add_field(
+            "customer_package_rules_snapshot",
+            "rules_snapshot",
+            __("Rules snapshot", "webba-booking-lite"),
+            "textarea",
+            "",
+            [
+                "tooltip" => __(
+                    "JSON snapshot of product rules at purchase time.",
+                    "webba-booking-lite",
+                ),
+            ],
+            "{}",
+            false,
+            false,
+            false,
+        );
+
+        $table->add_field(
+            "customer_package_ledger",
+            "ledger",
+            __("Ledger", "webba-booking-lite"),
+            "textarea",
+            "",
+            [
+                "tooltip" => __(
+                    "Append-only JSON ledger of credit movements.",
+                    "webba-booking-lite",
+                ),
+            ],
+            "[]",
+            false,
+            false,
+            false,
+        );
+
+        $table->sync_structure();
+        WbkData()->models->add($table, $db_prefix . "wbk_customer_packages");
 
         // Pricing rules
         $table = new WbkData\Model($db_prefix . "wbk_pricing_rules");

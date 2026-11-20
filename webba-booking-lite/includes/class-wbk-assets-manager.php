@@ -260,6 +260,7 @@ class WBK_Assets_Manager
             $this->has_shortcode('webba_multi_service_booking') ||
             $this->has_shortcode('webba_user_dashboard') ||
             $this->has_shortcode('webba_gc') ||
+            $this->has_shortcode('webba_packages') ||
             $this->has_booking_form_popup_trigger()
         ) {
             $has_shortcode = true;

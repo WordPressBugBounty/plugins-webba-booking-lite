@@ -4,6 +4,7 @@ import { toZonedTime, getTimezoneOffset } from 'date-fns-tz'
 import { format } from 'date-fns'
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns'
 import { getDateFnsLocale } from '../../../../utilities/timezones'
+import type { ResolvedPhpTimeFormat } from '../types'
 
 const getDocumentLocaleCode = (): string => {
     if (typeof document === 'undefined') {
@@ -40,6 +41,70 @@ export const getReadableTime = (timeInSeconds: number, format: string) => {
     const jsTimeFormat = convertToJSFormat(format)
 
     return dateFns.format(utcDate, jsTimeFormat)
+}
+
+export const parsePhpTimeFormat = (format: string): ResolvedPhpTimeFormat => {
+    const normalized = format.trim()
+
+    if (normalized === '24-hour') {
+        return { is24Hour: true, padHour: true, meridiem: 'none' }
+    }
+
+    if (normalized === '12-hour') {
+        return { is24Hour: false, padHour: true, meridiem: 'upper' }
+    }
+
+    let is24Hour = false
+    let is12Hour = false
+    let padHour = false
+    let meridiem: ResolvedPhpTimeFormat['meridiem'] = 'none'
+    let escaping = false
+
+    for (const character of normalized) {
+        if (escaping) {
+            escaping = false
+            continue
+        }
+
+        if (character === '\\') {
+            escaping = true
+            continue
+        }
+
+        if (character === 'H') {
+            is24Hour = true
+            padHour = true
+        } else if (character === 'G') {
+            is24Hour = true
+        } else if (character === 'h') {
+            is12Hour = true
+            padHour = true
+        } else if (character === 'g') {
+            is12Hour = true
+        } else if (character === 'A') {
+            is12Hour = true
+            meridiem = 'upper'
+        } else if (character === 'a') {
+            is12Hour = true
+            if (meridiem !== 'upper') {
+                meridiem = 'lower'
+            }
+        }
+    }
+
+    if (is24Hour) {
+        return { is24Hour: true, padHour, meridiem: 'none' }
+    }
+
+    if (is12Hour) {
+        return {
+            is24Hour: false,
+            padHour,
+            meridiem: meridiem === 'none' ? 'upper' : meridiem,
+        }
+    }
+
+    return { is24Hour: false, padHour: false, meridiem: 'lower' }
 }
 
 export const convertToJSFormat = (format: string) => {

@@ -30,6 +30,7 @@ import { UnitPrices } from '../../components/WebbaDataTable/cells/UnitPrices/Uni
 import './ServicesScreen.scss'
 import { LockedTableSection } from '../../components/LockedTableSection/LockedTableSection'
 import { ExtrasScreen } from '../Extras/ExtrasScreen'
+import { PackageProductsScreen } from '../PackageProducts/PackageProductsScreen'
 import { UnitNames } from '../../components/WebbaDataTable/cells/UnitNames/UnitNames'
 import { useServiceScreenTab } from './useServiceScreenTab'
 import { ServicesScreenTabs } from './ServicesScreenTabs'
@@ -579,6 +580,15 @@ export const ServicesScreen = () => {
                     aria-labelledby="wbk-services-tab-extras"
                 >
                     <ExtrasScreen />
+                </div>
+            )}
+            {activeTab === 'packages' && (
+                <div
+                    role="tabpanel"
+                    id="wbk-services-panel-packages"
+                    aria-labelledby="wbk-services-tab-packages"
+                >
+                    <PackageProductsScreen />
                 </div>
             )}
             <SuccessMessage />

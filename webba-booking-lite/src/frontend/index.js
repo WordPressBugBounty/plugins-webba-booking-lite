@@ -26,6 +26,34 @@ const mountDashboard = (root = document) => {
     createRoot(dashboardContainer).render(<UserDashboard />)
 }
 
+const mountPackages = (root = document) => {
+    const packagesContainers = root.querySelectorAll('.wbk_packages')
+    if (!packagesContainers.length) {
+        return
+    }
+
+    import(
+        /* webpackMode: "eager" */ './screens/Packages/PackagePurchaseForm'
+    ).then(({ PackagePurchaseForm }) => {
+        packagesContainers.forEach((packagesContainer) => {
+            if (isMounted(packagesContainer)) {
+                return
+            }
+
+            markAsMounted(packagesContainer)
+            createRoot(packagesContainer).render(
+                <BookingFormProvider
+                    attrService={null}
+                    attrCategory={null}
+                    attrLocation={null}
+                >
+                    <PackagePurchaseForm />
+                </BookingFormProvider>
+            )
+        })
+    })
+}
+
 const mountGiftCard = (root = document) => {
     const giftCardContainer = root.querySelector('#wbk_gift_card')
     if (!giftCardContainer || isMounted(giftCardContainer)) {
@@ -344,6 +372,7 @@ const startBookingFormPopupListener = () => {
 const mountWebbaBookingApps = (root = document) => {
     mountDashboard(root)
     mountGiftCard(root)
+    mountPackages(root)
     mountBookingForms(root)
 }
 
@@ -369,10 +398,10 @@ const startDynamicMountObserver = () => {
                 if (
                     addedNode.nodeType === 1 &&
                     (addedNode.matches?.(
-                        '.webba_booking_form_v6, #wbk_user_dashboard, #wbk_gift_card'
+                        '.webba_booking_form_v6, #wbk_user_dashboard, #wbk_gift_card, .wbk_packages'
                     ) ||
                         addedNode.querySelector?.(
-                            '.webba_booking_form_v6, #wbk_user_dashboard, #wbk_gift_card'
+                            '.webba_booking_form_v6, #wbk_user_dashboard, #wbk_gift_card, .wbk_packages'
                         ))
                 ) {
                     shouldRun = true

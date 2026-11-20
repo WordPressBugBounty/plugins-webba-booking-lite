@@ -1449,6 +1449,56 @@ class WBK_Placeholder_Processor
      * @param integer $gift_card_id
      * @return string
      */
+    /**
+     * Visit package email placeholders.
+     *
+     * @param string $message
+     * @param int    $package_id
+     * @return string
+     */
+    public static function process_package_placeholders(string $message, int $package_id): string
+    {
+        if (!class_exists("WBK_Customer_Package")) {
+            return $message;
+        }
+        $package = new WBK_Customer_Package($package_id);
+        if (!$package->is_loaded()) {
+            return $message;
+        }
+
+        $expires_at = absint($package->get("expires_at"));
+        $expiry_label = "";
+        if ($expires_at > 0) {
+            $expiry_label = wp_date(
+                WBK_Format_Utils::get_date_format(),
+                $expires_at,
+                wp_timezone(),
+            );
+        }
+
+        $dashboard = get_option("wbk_user_dashboard_page_link_new", "");
+        $dashboard_url = is_numeric($dashboard)
+            ? get_permalink(absint($dashboard))
+            : (string) $dashboard;
+
+        $message = str_replace("#package_name", (string) $package->get("name"), $message);
+        $message = str_replace(
+            "#package_remaining",
+            (string) $package->get_remaining_credits(),
+            $message,
+        );
+        $message = str_replace(
+            "#package_total",
+            (string) absint($package->get("total_credits")),
+            $message,
+        );
+        $message = str_replace("#package_expiry", $expiry_label, $message);
+        $message = str_replace("#package_dashboard_url", esc_url($dashboard_url), $message);
+        $message = self::process_site_placeholders($message);
+
+        return $message;
+    }
+
     public static function process_gift_card_placeholders(string $message, int $gift_card_id): string
     {
         $gift_card = new WBK_Gift_Card($gift_card_id);

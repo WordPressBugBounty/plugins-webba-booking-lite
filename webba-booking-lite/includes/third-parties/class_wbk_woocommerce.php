@@ -122,6 +122,16 @@ function wbk_order_cancelled_refunded(  $order_id  ) {
 
 function wbk_display_booking_data_text_cart(  $item_data, $cart_item  ) {
     date_default_timezone_set( get_option( 'wbk_timezone', 'UTC' ) );
+    if ( !empty( $cart_item['wbk_package_data'] ) && is_array( $cart_item['wbk_package_data'] ) ) {
+        $package = $cart_item['wbk_package_data'];
+        $item_data[] = [
+            'key'     => __( 'Visit package', 'webba-booking-lite' ),
+            'value'   => sanitize_text_field( $package['name'] ?? '' ),
+            'display' => '',
+        ];
+        date_default_timezone_set( 'UTC' );
+        return $item_data;
+    }
     if ( !empty( $cart_item['wbk_gift_card_data'] ) && is_array( $cart_item['wbk_gift_card_data'] ) ) {
         $gc = $cart_item['wbk_gift_card_data'];
         $item_data[] = [
@@ -175,6 +185,13 @@ function wbk_display_booking_data_text_cart(  $item_data, $cart_item  ) {
 function wbk_calculate_booking_product_price(  $cart_object  ) {
     if ( !WC()->session->__isset( 'reload_checkout' ) ) {
         foreach ( $cart_object->cart_contents as $key => $value ) {
+            if ( !empty( $value['wbk_package_data'] ) && is_array( $value['wbk_package_data'] ) ) {
+                $price = floatval( $value['wbk_package_data']['amount'] ?? 0 );
+                if ( $price > 0 ) {
+                    $value['data']->set_price( $price );
+                }
+                continue;
+            }
             if ( !empty( $value['wbk_gift_card_data'] ) && is_array( $value['wbk_gift_card_data'] ) ) {
                 $price = floatval( $value['wbk_gift_card_data']['amount'] ?? 0 );
                 if ( $price > 0 ) {
@@ -258,6 +275,12 @@ function wbk_add_booking_text_to_order_items(
     $values,
     $order
 ) {
+    if ( !empty( $values['wbk_package_data'] ) && is_array( $values['wbk_package_data'] ) ) {
+        $package = $values['wbk_package_data'];
+        $item->add_meta_data( __( 'Visit package', 'webba-booking-lite' ), sanitize_text_field( $package['name'] ?? '' ) );
+        $item->add_meta_data( '_wbk_package_data', wp_json_encode( $package ) );
+        return;
+    }
     if ( !empty( $values['wbk_gift_card_data'] ) && is_array( $values['wbk_gift_card_data'] ) ) {
         $gc = $values['wbk_gift_card_data'];
         $item->add_meta_data( __( 'Gift card', 'webba-booking-lite' ), sprintf( __( 'For %s', 'webba-booking-lite' ), sanitize_text_field( $gc['recipient_name'] ?? '' ) ) );
@@ -364,6 +387,21 @@ class WBK_WooCommerce {
      * @return string JSON { status, details }
      */
     static function add_gift_card_to_cart( $gift_card_data ) {
+        return json_encode( [
+            'status'  => 0,
+            'details' => __( 'Payment method not supported', 'webba-booking-lite' ),
+        ] );
+    }
+
+    /**
+     * Add a visit package to the WooCommerce cart.
+     * The customer package is created after WooCommerce payment completes.
+     *
+     * @param WBK_Package_Product $product Package being purchased.
+     * @param int                 $user_id Buyer who will receive the package.
+     * @return string JSON { status, details }
+     */
+    static function add_package_to_cart( $product, $user_id ) {
         return json_encode( [
             'status'  => 0,
             'details' => __( 'Payment method not supported', 'webba-booking-lite' ),
@@ -552,6 +590,31 @@ function wbk_complete_payment(  $order_id  ) {
             continue;
         }
         WBK_Gift_Card::create_from_paid_order( $gc_data, 'woocommerce', $payment_ref );
+    }
+    if ( class_exists( 'WBK_Package_Processor' ) && class_exists( 'WBK_Customer_Package' ) ) {
+        foreach ( $order->get_items() as $item_id => $item ) {
+            if ( !is_object( $item ) ) {
+                continue;
+            }
+            $package_raw = wc_get_order_item_meta( $item_id, '_wbk_package_data', true );
+            if ( empty( $package_raw ) ) {
+                continue;
+            }
+            $package_data = ( is_string( $package_raw ) ? json_decode( $package_raw, true ) : $package_raw );
+            if ( !is_array( $package_data ) || empty( $package_data['product_id'] ) || empty( $package_data['user_id'] ) ) {
+                continue;
+            }
+            $payment_ref = 'woo_' . $order_id . '_' . $item_id;
+            if ( WBK_Customer_Package::find_by_payment_ref( $payment_ref ) ) {
+                continue;
+            }
+            WBK_Package_Processor::complete_purchase(
+                absint( $package_data['product_id'] ),
+                absint( $package_data['user_id'] ),
+                'woocommerce',
+                $payment_ref
+            );
+        }
     }
     $booking_ids = [];
     foreach ( $order->get_items() as $item_id => $item ) {

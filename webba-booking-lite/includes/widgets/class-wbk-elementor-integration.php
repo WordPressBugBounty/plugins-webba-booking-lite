@@ -60,13 +60,21 @@ class WBK_Elementor_Integration
     {
         require_once WP_WEBBA_BOOKING__PLUGIN_DIR .
             '/includes/widgets/class-wbk-elementor-booking-form-widget.php';
+        require_once WP_WEBBA_BOOKING__PLUGIN_DIR .
+            '/includes/widgets/class-wbk-elementor-package-form-widget.php';
 
-        $widget_class_name = 'WBK_Elementor_Booking_Form_Widget';
-        if (!class_exists($widget_class_name)) {
-            return;
+        $widget_class_names = [
+            'WBK_Elementor_Booking_Form_Widget',
+            'WBK_Elementor_Package_Form_Widget',
+        ];
+
+        foreach ($widget_class_names as $widget_class_name) {
+            if (!class_exists($widget_class_name)) {
+                continue;
+            }
+
+            $widgets_manager->register(new $widget_class_name());
         }
-
-        $widgets_manager->register(new $widget_class_name());
     }
 
     /**

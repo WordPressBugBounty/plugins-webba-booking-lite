@@ -111,6 +111,28 @@ class WBK_Square {
     }
 
     /**
+     * Charge a Square payment for a visit package.
+     *
+     * @param float  $amount
+     * @param string $source_id
+     * @param string $idempotency_key
+     * @param string $verification_token
+     * @param string $buyer_email
+     * @param string $package_name
+     * @return array [1, message, square_payment_id] on success, [0, message] on failure.
+     */
+    public function charge_package(
+        $amount,
+        $source_id,
+        $idempotency_key,
+        $verification_token = '',
+        $buyer_email = '',
+        $package_name = ''
+    ) {
+        return [0, __( 'Payment method not supported', 'webba-booking-lite' )];
+    }
+
+    /**
      * Create and complete a Square payment for the given amount.
      *
      * @param float  $amount

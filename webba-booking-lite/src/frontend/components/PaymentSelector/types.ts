@@ -9,6 +9,7 @@ export type TAllowedMethods =
     | 'google_pay'
     | 'apple_pay'
     | 'woocommerce'
+    | 'package'
 
 export interface IPaymentMethod {
     name: TAllowedMethods

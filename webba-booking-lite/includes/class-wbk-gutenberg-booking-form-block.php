@@ -191,7 +191,8 @@ class WBK_Gutenberg_Booking_Form_Block
      */
     public static function filter_block_type_args($args, $block_name)
     {
-        if ($block_name !== 'webba-booking/form' || !is_array($args)) {
+        $appearance_blocks = ['webba-booking/form', 'webba-booking/packages'];
+        if (!in_array($block_name, $appearance_blocks, true) || !is_array($args)) {
             return $args;
         }
         if (!isset($args['attributes']) || !is_array($args['attributes'])) {
@@ -225,6 +226,23 @@ class WBK_Gutenberg_Booking_Form_Block
         if (wp_script_is('webba-booking-form-editor-script', 'registered')) {
             wp_add_inline_script('webba-booking-form-editor-script', $script, 'before');
         }
+        if (wp_script_is('webba-booking-packages-editor-script', 'registered')) {
+            wp_add_inline_script('webba-booking-packages-editor-script', $script, 'before');
+        }
+    }
+
+    /**
+     * Builds the inline appearance style for a form scope.
+     *
+     * @param array $attributes Block attributes.
+     *
+     * @return string
+     */
+    public static function build_appearance_inline_style(array $attributes)
+    {
+        return self::build_scope_inline_style(
+            self::resolve_appearance_from_attributes($attributes)
+        );
     }
 
     /**

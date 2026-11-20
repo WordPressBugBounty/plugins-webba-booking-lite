@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { useBookingContext } from '../../../../../providers/BookingFormProvider/BookingFormProvider'
-import { loadStripe, Stripe } from '@stripe/stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
 import { Elements } from '@stripe/react-stripe-js'
 import { IStripeWrapperProps } from './types'
 
@@ -9,30 +9,31 @@ export const StripeWrapper = ({
     clientSecret,
 }: IStripeWrapperProps) => {
     const { preset } = useBookingContext()
-    const [stripePromise, setStripePromise] = useState<Stripe | null>(null)
+    const publishableKey = preset?.settings?.stripe_publishable_key || ''
 
-    useEffect(() => {
-        if (preset?.settings?.stripe_publishable_key) {
-            loadStripe(preset.settings.stripe_publishable_key).then(
-                (stripe) => {
-                    setStripePromise(stripe)
-                }
-            )
+    const stripePromise = useMemo(() => {
+        if (!publishableKey) {
+            return null
         }
-    }, [preset?.settings?.stripe_publishable_key])
+        return loadStripe(publishableKey)
+    }, [publishableKey])
 
-    if (clientSecret) {
-        return (
-            <Elements
-                stripe={stripePromise}
-                options={{
-                    clientSecret,
-                }}
-            >
-                {children}
-            </Elements>
-        )
+    if (!clientSecret) {
+        return children
     }
 
-    return children
+    if (!stripePromise) {
+        return null
+    }
+
+    return (
+        <Elements
+            stripe={stripePromise}
+            options={{
+                clientSecret,
+            }}
+        >
+            {children}
+        </Elements>
+    )
 }

@@ -548,7 +548,14 @@ export const BookingFormProvider = ({
                 prevCategoryIds === newCategoryIds &&
                 prev.bookingMode === bookingMode
             ) {
-                return prev
+                if (prev.preset === preset) {
+                    return prev
+                }
+
+                return {
+                    ...prev,
+                    preset,
+                }
             }
 
             const services = allServices.map((service: IServiceProps) => {

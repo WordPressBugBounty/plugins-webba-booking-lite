@@ -143,6 +143,33 @@ export const PRO_FEATURE_BANNER_CONTENT: Record<
         ],
         previewType: 'gift_cards',
     },
+    packages: {
+        icon: 'gift-card-bow.jpg',
+        title: __('Visit Packages', 'webba-booking-lite'),
+        headline: __(
+            'Sell visit packages tied to customer accounts',
+            'webba-booking-lite'
+        ),
+        description: __(
+            'Let customers buy a set of visits and redeem them on bookings with frequency rules and expiry.',
+            'webba-booking-lite'
+        ),
+        features: [
+            __(
+                'Define packages with visit counts, price, and service eligibility',
+                'webba-booking-lite'
+            ),
+            __(
+                'Enforce min/max visit frequency rules',
+                'webba-booking-lite'
+            ),
+            __(
+                'Track remaining visits in the customer dashboard',
+                'webba-booking-lite'
+            ),
+        ],
+        previewType: 'packages',
+    },
     forms: {
         icon: 'icon-clipboard.svg',
         title: __('Booking forms', 'webba-booking-lite'),

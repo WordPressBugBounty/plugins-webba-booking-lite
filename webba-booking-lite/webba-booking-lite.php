@@ -4,7 +4,7 @@
  * Plugin Name: Webba Booking
  * Plugin URI: https://webba-booking.com
  * Description: Webba Booking is a powerful and easy-to-use WordPress booking plugin made to create, manage and accept online bookings with ease, through a modern and user-friendly booking interface.
- * Version: 6.5.7
+ * Version: 6.5.8
  * Author: WebbaPlugins
  * Author URI: https://webba-booking.com
  *   */
@@ -74,7 +74,7 @@ if ( !defined( "WP_WEBBA_BOOKING__PLUGIN_DIR" ) ) {
     define( "WP_WEBBA_BOOKING__PLUGIN_URL", plugins_url( plugin_basename( WP_WEBBA_BOOKING__PLUGIN_DIR ) ) );
 }
 if ( !defined( "WP_WEBBA_BOOKING__VERSION" ) ) {
-    define( "WP_WEBBA_BOOKING__VERSION", "6.5.7" );
+    define( "WP_WEBBA_BOOKING__VERSION", "6.5.8" );
 }
 if ( !function_exists( "wbk_is_assistance_lab_available" ) ) {
     /**
@@ -209,6 +209,8 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     include "includes/data/class-wbk-coupon.php";
     include "includes/data/class-wbk-gift-card.php";
     include "includes/data/class-wbk-gift-card-design.php";
+    include "includes/data/class-wbk-package-product.php";
+    include "includes/data/class-wbk-customer-package.php";
     include "includes/data/class-wbk-email-template.php";
     include "includes/data/class-wbk-pricing-rule.php";
     include "includes/data/class-wbk-booking.php";
@@ -238,6 +240,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     include "includes/processors/class-wbk-email-processor.php";
     include "includes/processors/class-wbk-push-processor.php";
     include "includes/processors/class-wbk-wait-list-processor.php";
+    include "includes/processors/class-wbk-package-processor.php";
     include "includes/utilities/class-wbk-mailer.php";
     include "includes/processors/class-wbk-pdf-processor.php";
     include "includes/processors/class-wbk-qr-code-processor.php";
@@ -259,6 +262,7 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
     // Renderer
     include "includes/class-wbk-renderer.php";
     include "includes/class-wbk-gutenberg-booking-form-block.php";
+    include "includes/class-wbk-gutenberg-package-form-block.php";
     include "includes/backend/class-wbk-nav-menu.php";
     // Frontend
     include "includes/class_wbk_frontend_booking.php";
@@ -280,6 +284,18 @@ if ( !function_exists( "wbk_plugins_loaded" ) && !function_exists( "wbk_load_tex
         ["WBK_Email_Processor", "on_gift_card_purchased"],
         10,
         1
+    );
+    add_action(
+        "wbk_customer_package_created",
+        ["WBK_Email_Processor", "on_customer_package_created"],
+        10,
+        2
+    );
+    add_action(
+        "wbk_package_credits_restored",
+        ["WBK_Email_Processor", "on_package_credits_restored"],
+        10,
+        3
     );
     WBK_Remote_Config::init();
     WBK_Mailer::init();
@@ -849,6 +865,7 @@ if ( !function_exists( "wbk_daily" ) ) {
             }
         }
         WBK_Email_Processor::send_scheduled_gift_cards();
+        WBK_Email_Processor::send_scheduled_package_notices();
     }
 
 }
@@ -867,6 +884,9 @@ if ( !function_exists( "wbk_init" ) ) {
         );
         register_block_type( __DIR__ . DIRECTORY_SEPARATOR . "build" . DIRECTORY_SEPARATOR . "block", [
             "render_callback" => ["WBK_Gutenberg_Booking_Form_Block", "render"],
+        ] );
+        register_block_type( __DIR__ . DIRECTORY_SEPARATOR . "build" . DIRECTORY_SEPARATOR . "packages-block", [
+            "render_callback" => ["WBK_Gutenberg_Package_Form_Block", "render"],
         ] );
         WBK_Email_Processor::send_late_notifications( "arrival" );
     }

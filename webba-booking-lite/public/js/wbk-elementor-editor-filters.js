@@ -1,5 +1,5 @@
 (function ($) {
-    const WIDGET_NAME = 'wbk_booking_form'
+    const WIDGET_NAMES = ['wbk_booking_form', 'wbk_package_form']
     const FIELD_NAMES = ['service', 'category', 'location', 'staff']
     const lockConfig = window.wbkElementorAdvancedAppearanceLock || null
 
@@ -789,18 +789,20 @@
             return
         }
 
-        window.elementor.hooks.addAction(
-            'panel/open_editor/widget/' + WIDGET_NAME,
-            function () {
-                const args = Array.prototype.slice.call(arguments)
-                const panelView =
-                    args.find((item) => item && item.$el && typeof item.$el.find === 'function') ||
-                    (window.elementor.getPanelView
-                        ? window.elementor.getPanelView()
-                        : null)
-                initWidgetPanel(panelView)
-            }
-        )
+        WIDGET_NAMES.forEach(function (widgetName) {
+            window.elementor.hooks.addAction(
+                'panel/open_editor/widget/' + widgetName,
+                function () {
+                    const args = Array.prototype.slice.call(arguments)
+                    const panelView =
+                        args.find((item) => item && item.$el && typeof item.$el.find === 'function') ||
+                        (window.elementor.getPanelView
+                            ? window.elementor.getPanelView()
+                            : null)
+                    initWidgetPanel(panelView)
+                }
+            )
+        })
         attachGlobalAdvancedAppearanceLock()
     }
 

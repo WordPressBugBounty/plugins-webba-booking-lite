@@ -217,6 +217,46 @@ class WBK_Request_Manager {
                     ],
                 ],
             ] );
+            register_rest_route( "wbk/v2", "/get-user-packages/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_user_packages"],
+                "permission_callback" => [$this, "get_user_packages_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/get-package-products/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_package_products"],
+                "permission_callback" => "__return_true",
+            ] );
+            register_rest_route( "wbk/v2", "/package-stripe-intent/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "create_package_stripe_intent"],
+                "permission_callback" => [$this, "purchase_package_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/purchase-package/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "purchase_package"],
+                "permission_callback" => [$this, "purchase_package_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/package-payment-details/", [
+                "methods"             => "GET",
+                "callback"            => [$this, "get_package_payment_details"],
+                "permission_callback" => [$this, "purchase_package_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/grant-package/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "grant_package"],
+                "permission_callback" => [$this, "grant_package_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/adjust-package-credits/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "adjust_package_credits"],
+                "permission_callback" => [$this, "grant_package_permission"],
+            ] );
+            register_rest_route( "wbk/v2", "/validate-package-redemption/", [
+                "methods"             => "POST",
+                "callback"            => [$this, "validate_package_redemption"],
+                "permission_callback" => [$this, "get_user_packages_permission"],
+            ] );
             register_rest_route( "webba-booking/v1", "/get-service-availability/", [
                 "methods"             => "GET",
                 "callback"            => [$this, "get_service_availability"],
@@ -1541,6 +1581,540 @@ class WBK_Request_Manager {
         return is_user_logged_in();
     }
 
+    public function get_user_packages_permission( $request ) {
+        return is_user_logged_in();
+    }
+
+    public function get_user_packages( $request ) {
+        if ( !class_exists( "WBK_Customer_Package" ) || !class_exists( "WBK_Package_Processor" ) ) {
+            return new WP_REST_Response([
+                "packages" => [],
+            ], 200);
+        }
+        if ( !WBK_Package_Processor::is_enabled() ) {
+            return new WP_REST_Response([
+                "packages" => [],
+            ], 200);
+        }
+        $user_id = get_current_user_id();
+        $service_id = ( isset( $request["service_id"] ) ? absint( $request["service_id"] ) : 0 );
+        $rows = WBK_Customer_Package::get_all_for_user( $user_id );
+        $packages = [];
+        foreach ( $rows as $row ) {
+            $pkg = new WBK_Customer_Package(absint( $row["id"] ));
+            if ( !$pkg->is_loaded() ) {
+                continue;
+            }
+            $pkg->refresh_status();
+            if ( $service_id > 0 && !$pkg->is_service_eligible( $service_id ) ) {
+                continue;
+            }
+            $packages[] = $pkg->to_public_array();
+        }
+        return new WP_REST_Response([
+            "packages" => $packages,
+        ], 200);
+    }
+
+    public function get_package_products( $request ) {
+        if ( !class_exists( "WBK_Package_Product" ) || !class_exists( "WBK_Package_Processor" ) ) {
+            return new WP_REST_Response([
+                "products" => [],
+            ], 200);
+        }
+        if ( !WBK_Package_Processor::is_enabled() ) {
+            return new WP_REST_Response([
+                "products" => [],
+            ], 200);
+        }
+        $products = [];
+        foreach ( WBK_Package_Product::get_published_products() as $row ) {
+            $product = new WBK_Package_Product(absint( $row["id"] ));
+            if ( !$product->is_purchasable() ) {
+                continue;
+            }
+            $products[] = [
+                "id"                          => absint( $product->get_id() ),
+                "name"                        => (string) $product->get( "name" ),
+                "description"                 => (string) $product->get( "description" ),
+                "visit_count"                 => $product->get_visit_count(),
+                "price"                       => $product->get_price(),
+                "price_formatted"             => WBK_Format_Utils::format_price( $product->get_price() ),
+                "applicable_for_all_services" => $product->get( "applicable_for_all_services" ) === "yes",
+                "services"                    => $product->get_service_ids(),
+                "min_interval_days"           => absint( $product->get( "min_interval_days" ) ),
+                "max_visits_per_week"         => absint( $product->get( "max_visits_per_week" ) ),
+                "max_visits_per_month"        => absint( $product->get( "max_visits_per_month" ) ),
+                "max_visits_per_day"          => absint( $product->get( "max_visits_per_day" ) ),
+                "expiry_type"                 => (string) $product->get( "expiry_type" ),
+                "expiry_relative_days"        => absint( $product->get( "expiry_relative_days" ) ),
+            ];
+        }
+        return new WP_REST_Response([
+            "products" => $products,
+        ], 200);
+    }
+
+    public function purchase_package_permission( $request ) {
+        return is_user_logged_in();
+    }
+
+    public function create_package_stripe_intent( $request ) {
+        if ( !class_exists( "WBK_Package_Processor" ) || !WBK_Package_Processor::is_enabled() ) {
+            return $this->response_error( __( "Packages are not available.", "webba-booking-lite" ) );
+        }
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        $product_id = ( isset( $params["product_id"] ) ? absint( $params["product_id"] ) : 0 );
+        $payment_method = ( isset( $params["payment_method"] ) ? sanitize_text_field( (string) $params["payment_method"] ) : "stripe" );
+        $stripe_methods = [
+            "stripe",
+            "stripe_others",
+            "google_pay",
+            "apple_pay"
+        ];
+        $product = new WBK_Package_Product($product_id);
+        if ( !$product->is_purchasable() ) {
+            return $this->response_error( __( "This package is not available for purchase.", "webba-booking-lite" ) );
+        }
+        $allowed_methods = array_intersect( $product->get_payment_methods(), array_keys( WBK_Model_Utils::get_available_payment_methods() ) );
+        if ( !in_array( $payment_method, $stripe_methods, true ) || !in_array( $payment_method, $allowed_methods, true ) ) {
+            return $this->response_error( __( "Selected payment method is not available for this package.", "webba-booking-lite" ) );
+        }
+        $amount = $product->get_price();
+        if ( $amount <= 0 ) {
+            return $this->response_error( __( "This package does not require payment.", "webba-booking-lite" ) );
+        }
+        $user = wp_get_current_user();
+        $email = ( $user && $user->exists() ? (string) $user->user_email : "" );
+        if ( $email === "" || !filter_var( $email, FILTER_VALIDATE_EMAIL ) ) {
+            return $this->response_error( __( "Please enter a valid email address", "webba-booking-lite" ) );
+        }
+        $stripe = new WBK_Stripe();
+        if ( !$stripe->init( 0 ) ) {
+            return $this->response_error( __( "Stripe is not configured.", "webba-booking-lite" ) );
+        }
+        $intent_data = $stripe->create_payment_intent( $payment_method, $email, [
+            "to_pay_total" => $amount,
+            "description"  => sprintf( 
+                /* translators: %s: package product name */
+                __( "Visit package: %s", "webba-booking-lite" ),
+                (string) $product->get( "name" )
+             ),
+            "items"        => [],
+        ] );
+        if ( !empty( $intent_data["success"] ) && !empty( $intent_data["intent_id"] ) ) {
+            WBK_Package_Processor::store_pending_order( $intent_data["intent_id"], [
+                "type"           => "package",
+                "product_id"     => $product_id,
+                "user_id"        => get_current_user_id(),
+                "amount"         => $amount,
+                "payment_method" => $payment_method,
+                "payment_id"     => $intent_data["intent_id"],
+            ] );
+        }
+        if ( empty( $intent_data["success"] ) ) {
+            return new WP_REST_Response([
+                "success"        => false,
+                "message"        => $intent_data["error"] ?? __( "Unable to initialize Stripe payment.", "webba-booking-lite" ),
+                "stripe_details" => [
+                    "error" => $intent_data["error"] ?? __( "Unable to initialize Stripe payment.", "webba-booking-lite" ),
+                ],
+            ], 400);
+        }
+        return new WP_REST_Response([
+            "success" => true,
+            "data"    => [
+                "to_pay_total"   => $amount,
+                "stripe_details" => [
+                    "client_secret"  => $intent_data["client_secret"],
+                    "intent_id"      => $intent_data["intent_id"],
+                    "amount"         => $amount,
+                    "payment_method" => $payment_method,
+                ],
+            ],
+        ], 200);
+    }
+
+    public function purchase_package( $request ) {
+        if ( !class_exists( "WBK_Package_Processor" ) ) {
+            return $this->response_error( __( "Packages are not available.", "webba-booking-lite" ) );
+        }
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        $product_id = ( isset( $params["product_id"] ) ? absint( $params["product_id"] ) : 0 );
+        $payment_method = ( isset( $params["payment_method"] ) ? sanitize_text_field( $params["payment_method"] ) : "arrival" );
+        $payment_ref = ( isset( $params["payment_ref"] ) ? sanitize_text_field( $params["payment_ref"] ) : "" );
+        $product = new WBK_Package_Product($product_id);
+        if ( !$product->is_purchasable() ) {
+            return $this->response_error( __( "This package is not available for purchase.", "webba-booking-lite" ) );
+        }
+        $allowed_methods = $product->get_payment_methods();
+        $available_methods = array_keys( WBK_Model_Utils::get_available_payment_methods() );
+        $allowed_methods = array_intersect( $allowed_methods, $available_methods );
+        if ( empty( $allowed_methods ) || !in_array( $payment_method, $allowed_methods, true ) ) {
+            return $this->response_error( __( "Selected payment method is not available for this package.", "webba-booking-lite" ) );
+        }
+        $amount = $product->get_price();
+        $stripe_methods = [
+            "stripe",
+            "stripe_others",
+            "google_pay",
+            "apple_pay"
+        ];
+        if ( in_array( $payment_method, $stripe_methods, true ) && $amount > 0 ) {
+            $stripe_details = ( isset( $params["stripe_details"] ) ? $params["stripe_details"] : [] );
+            if ( is_string( $stripe_details ) ) {
+                $stripe_details = json_decode( $stripe_details, true );
+            }
+            if ( !is_array( $stripe_details ) ) {
+                $stripe_details = [];
+            }
+            $intent_id = ( isset( $stripe_details["intent_id"] ) ? sanitize_text_field( (string) $stripe_details["intent_id"] ) : "" );
+            if ( $intent_id === "" && isset( $params["payment_intent_id"] ) ) {
+                $intent_id = sanitize_text_field( (string) $params["payment_intent_id"] );
+            }
+            if ( $intent_id === "" ) {
+                $intent_id = $payment_ref;
+            }
+            if ( $intent_id === "" ) {
+                return $this->response_error( __( "Missing Stripe payment intent.", "webba-booking-lite" ) );
+            }
+            $stripe = new WBK_Stripe();
+            if ( !$stripe->init( 0 ) ) {
+                return $this->response_error( __( "Stripe is not configured.", "webba-booking-lite" ) );
+            }
+            $payment_intent = $stripe->get_payment_intent( $intent_id );
+            if ( !$payment_intent || empty( $payment_intent->status ) || $payment_intent->status !== "succeeded" ) {
+                return $this->response_error( __( "Payment has not been completed.", "webba-booking-lite" ) );
+            }
+            if ( WBK_Stripe::is_currency_zero_decimal( get_option( "wbk_stripe_currency", "" ) ) ) {
+                $expected = intval( $amount );
+            } else {
+                $expected = intval( round( $amount * 100 ) );
+            }
+            if ( intval( $payment_intent->amount ) !== $expected ) {
+                return $this->response_error( __( "Paid amount does not match the package price.", "webba-booking-lite" ) );
+            }
+            $payment_ref = $intent_id;
+        }
+        if ( $payment_method === "paypal" && $amount > 0 && $payment_ref === "" ) {
+            if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "PayPal is not available.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $return_url = ( isset( $params["return_url"] ) ? esc_url_raw( (string) $params["return_url"] ) : "" );
+            $return_host = ( $return_url !== "" ? wp_parse_url( $return_url, PHP_URL_HOST ) : "" );
+            $home_host = wp_parse_url( home_url(), PHP_URL_HOST );
+            if ( $return_url === "" || !is_string( $return_host ) || strtolower( $return_host ) !== strtolower( (string) $home_host ) ) {
+                $referer = wp_get_referer();
+                $return_url = ( $referer ? strtok( $referer, "?" ) : home_url( "/" ) );
+            } else {
+                $return_url = strtok( $return_url, "?" );
+            }
+            $paypal = new WBK_PayPal();
+            if ( !$paypal->init( $return_url, [] ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Unable to initialize PayPal.", "webba-booking-lite" ),
+                ], 500);
+            }
+            $paypal_result = $paypal->create_package_payment( $product );
+            if ( $paypal_result === false || empty( $paypal_result["payment_url"] ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Unable to create PayPal payment.", "webba-booking-lite" ),
+                ], 500);
+            }
+            return new WP_REST_Response([
+                "success"          => true,
+                "payment_required" => true,
+                "payment_method"   => "paypal",
+                "payment_url"      => $paypal_result["payment_url"],
+                "payment_id"       => $paypal_result["payment_id"],
+                "message"          => __( "Please complete your PayPal payment.", "webba-booking-lite" ),
+            ], 200);
+        }
+        if ( $payment_method === "woocommerce" && $amount > 0 && $payment_ref === "" ) {
+            if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "WooCommerce is not available.", "webba-booking-lite" ),
+                ], 400);
+            }
+            if ( !class_exists( "WBK_WooCommerce" ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "WooCommerce is not available.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $cart_result = json_decode( WBK_WooCommerce::add_package_to_cart( $product, get_current_user_id() ), true );
+            if ( !is_array( $cart_result ) || intval( $cart_result["status"] ?? 0 ) !== 1 ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => ( is_array( $cart_result ) && !empty( $cart_result["details"] ) ? $cart_result["details"] : __( "Unable to add the package to the cart.", "webba-booking-lite" ) ),
+                ], 500);
+            }
+            return new WP_REST_Response([
+                "success"          => true,
+                "payment_required" => true,
+                "payment_method"   => "woocommerce",
+                "payment_url"      => $cart_result["details"],
+                "message"          => __( "Package added to cart. Please complete checkout.", "webba-booking-lite" ),
+            ], 200);
+        }
+        if ( $payment_method === "mollie" && $amount > 0 && $payment_ref === "" ) {
+            if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Mollie is not available.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $return_url = ( isset( $params["return_url"] ) ? esc_url_raw( (string) $params["return_url"] ) : "" );
+            $return_host = ( $return_url !== "" ? wp_parse_url( $return_url, PHP_URL_HOST ) : "" );
+            $home_host = wp_parse_url( home_url(), PHP_URL_HOST );
+            if ( $return_url === "" || !is_string( $return_host ) || strtolower( $return_host ) !== strtolower( (string) $home_host ) ) {
+                $referer = wp_get_referer();
+                $return_url = ( $referer ? strtok( $referer, "?" ) : home_url( "/" ) );
+            } else {
+                $return_url = strtok( $return_url, "?" );
+            }
+            $mollie = new WBK_Mollie();
+            if ( !$mollie->init( $return_url, [] ) || !method_exists( $mollie, "create_package_payment" ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Unable to initialize Mollie.", "webba-booking-lite" ),
+                ], 500);
+            }
+            $mollie_result = $mollie->create_package_payment( $product, get_current_user_id() );
+            if ( $mollie_result === false || empty( $mollie_result["payment_url"] ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Unable to create Mollie payment.", "webba-booking-lite" ),
+                ], 500);
+            }
+            return new WP_REST_Response([
+                "success"          => true,
+                "payment_required" => true,
+                "payment_method"   => "mollie",
+                "payment_url"      => $mollie_result["payment_url"],
+                "payment_id"       => $mollie_result["payment_id"],
+                "message"          => __( "Please complete your Mollie payment.", "webba-booking-lite" ),
+            ], 200);
+        }
+        if ( $payment_method === "square" && $amount > 0 && $payment_ref === "" ) {
+            if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Square is not available.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $source_id = ( isset( $params["square_source_id"] ) ? sanitize_text_field( (string) $params["square_source_id"] ) : "" );
+            $verification_token = ( isset( $params["square_verification_token"] ) ? sanitize_text_field( (string) $params["square_verification_token"] ) : "" );
+            if ( $source_id === "" ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Missing Square card details.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $buyer = wp_get_current_user();
+            $buyer_email = ( $buyer && $buyer->exists() ? (string) $buyer->user_email : "" );
+            $square = new WBK_Square();
+            if ( !method_exists( $square, "charge_package" ) ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => __( "Square is not configured.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $charge_result = $square->charge_package(
+                $amount,
+                $source_id,
+                wp_generate_uuid4(),
+                $verification_token,
+                $buyer_email,
+                (string) $product->get( "name" )
+            );
+            if ( !isset( $charge_result[0] ) || intval( $charge_result[0] ) !== 1 ) {
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => $charge_result[1] ?? __( "Unable to complete the payment.", "webba-booking-lite" ),
+                ], 400);
+            }
+            $payment_ref = ( !empty( $charge_result[2] ) ? sanitize_text_field( (string) $charge_result[2] ) : "" );
+        }
+        $paid_methods = [
+            "paypal",
+            "mollie",
+            "square",
+            "woocommerce"
+        ];
+        if ( in_array( $payment_method, $paid_methods, true ) && $payment_ref === "" && $amount > 0 ) {
+            return $this->response_error( __( "Payment reference is required.", "webba-booking-lite" ) );
+        }
+        if ( $payment_ref !== "" ) {
+            $existing_package = WBK_Customer_Package::find_by_payment_ref( $payment_ref, get_current_user_id() );
+            if ( $existing_package ) {
+                WBK_Package_Processor::delete_pending_order( $payment_ref );
+                $payload = $existing_package->to_public_array();
+                $payload["amount_paid"] = floatval( $existing_package->get( "amount_paid" ) );
+                $payload["payment_method"] = (string) $existing_package->get( "payment_method" );
+                return new WP_REST_Response([
+                    "success" => true,
+                    "package" => $payload,
+                ], 200);
+            }
+        }
+        $package_id = WBK_Package_Processor::complete_purchase(
+            $product_id,
+            get_current_user_id(),
+            $payment_method,
+            $payment_ref
+        );
+        if ( is_wp_error( $package_id ) ) {
+            return $this->response_error( $package_id->get_error_message() );
+        }
+        if ( $payment_ref !== "" ) {
+            WBK_Package_Processor::delete_pending_order( $payment_ref );
+        }
+        $package = new WBK_Customer_Package(absint( $package_id ));
+        $payload = $package->to_public_array();
+        $payload["amount_paid"] = floatval( $package->get( "amount_paid" ) );
+        $payload["payment_method"] = (string) $package->get( "payment_method" );
+        return new WP_REST_Response([
+            "success" => true,
+            "package" => $payload,
+        ], 200);
+    }
+
+    /**
+     * Return the package created from a PayPal payment after the buyer returns.
+     *
+     * @param WP_REST_Request $request
+     * @return WP_REST_Response
+     */
+    public function get_package_payment_details( $request ) {
+        $payment_id = sanitize_text_field( (string) $request->get_param( "payment_id" ) );
+        if ( $payment_id === "" ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => __( "Missing payment information.", "webba-booking-lite" ),
+            ], 400);
+        }
+        $package = WBK_Customer_Package::find_by_payment_ref( $payment_id, get_current_user_id() );
+        if ( $package ) {
+            $payload = $package->to_public_array();
+            $payload["amount_paid"] = floatval( $package->get( "amount_paid" ) );
+            $payload["payment_method"] = (string) $package->get( "payment_method" );
+            return new WP_REST_Response([
+                "success"        => true,
+                "payment_method" => $payload["payment_method"],
+                "package"        => $payload,
+            ], 200);
+        }
+        $pending = WBK_Package_Processor::get_pending_order( $payment_id );
+        if ( is_array( $pending ) && ($pending["type"] ?? "") === "package" ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "pending" => true,
+                "message" => __( "Payment is still being confirmed.", "webba-booking-lite" ),
+            ], 200);
+        }
+        return new WP_REST_Response([
+            "success" => false,
+            "message" => __( "PayPal payment could not be completed.", "webba-booking-lite" ),
+        ], 404);
+    }
+
+    public function grant_package_permission( $request ) {
+        return current_user_can( "manage_options" ) || current_user_can( "manage_sites" );
+    }
+
+    public function grant_package( $request ) {
+        if ( !class_exists( "WBK_Package_Processor" ) ) {
+            return $this->response_error( __( "Packages are not available.", "webba-booking-lite" ) );
+        }
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        $product_id = ( isset( $params["product_id"] ) ? absint( $params["product_id"] ) : 0 );
+        $user_id = ( isset( $params["user_id"] ) ? absint( $params["user_id"] ) : 0 );
+        $package_id = WBK_Package_Processor::grant( $product_id, $user_id );
+        if ( is_wp_error( $package_id ) ) {
+            return $this->response_error( $package_id->get_error_message() );
+        }
+        $package = new WBK_Customer_Package(absint( $package_id ));
+        return new WP_REST_Response([
+            "success" => true,
+            "package" => $package->to_public_array(),
+        ], 200);
+    }
+
+    public function adjust_package_credits( $request ) {
+        if ( !class_exists( "WBK_Customer_Package" ) ) {
+            return $this->response_error( __( "Packages are not available.", "webba-booking-lite" ) );
+        }
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        $package_id = ( isset( $params["package_id"] ) ? absint( $params["package_id"] ) : 0 );
+        $delta = ( isset( $params["delta"] ) ? intval( $params["delta"] ) : 0 );
+        $reason = ( isset( $params["reason"] ) ? sanitize_text_field( $params["reason"] ) : "" );
+        $package = new WBK_Customer_Package($package_id);
+        if ( !$package->is_loaded() ) {
+            return $this->response_error( __( "Package not found.", "webba-booking-lite" ) );
+        }
+        $result = $package->adjust_credits( $delta, $reason, "administrator" );
+        if ( is_wp_error( $result ) ) {
+            return $this->response_error( $result->get_error_message() );
+        }
+        return new WP_REST_Response([
+            "success" => true,
+            "package" => $package->to_public_array(),
+        ], 200);
+    }
+
+    public function validate_package_redemption( $request ) {
+        if ( !class_exists( "WBK_Package_Processor" ) ) {
+            return $this->response_error( __( "Packages are not available.", "webba-booking-lite" ) );
+        }
+        $params = $request->get_json_params();
+        if ( !is_array( $params ) ) {
+            $params = $request->get_params();
+        }
+        $package_id = ( isset( $params["package_id"] ) ? absint( $params["package_id"] ) : 0 );
+        $service_id = ( isset( $params["service_id"] ) ? absint( $params["service_id"] ) : 0 );
+        $time = ( isset( $params["time"] ) ? absint( $params["time"] ) : 0 );
+        $quantity = ( isset( $params["quantity"] ) ? absint( $params["quantity"] ) : 1 );
+        $result = WBK_Package_Processor::validate_redemption(
+            $package_id,
+            get_current_user_id(),
+            $service_id,
+            $time,
+            $quantity
+        );
+        if ( is_wp_error( $result ) ) {
+            return new WP_REST_Response([
+                "success" => false,
+                "message" => $result->get_error_message(),
+                "code"    => $result->get_error_code(),
+                "data"    => $result->get_error_data(),
+            ], 400);
+        }
+        return new WP_REST_Response([
+            "success"          => true,
+            "package"          => $result->to_public_array(),
+            "credits_required" => WBK_Package_Processor::credits_for_quantity( $quantity ),
+        ], 200);
+    }
+
     public function response_error( $error_message ) {
         $data = [
             "description" => $error_message,
@@ -1995,6 +2569,7 @@ class WBK_Request_Manager {
                 "wait_list_enabled"                  => get_option( "wbk_wait_list_enabled", "" ) === "yes",
                 "allowed_multiple_service_selection" => get_option( "wbk_allow_multiple_services", "yes" ) === "yes",
                 "coupons_enabled"                    => $coupons_enabled,
+                "packages_enabled"                   => class_exists( "WBK_Package_Processor" ) && WBK_Package_Processor::is_enabled(),
                 "tax"                                => WBK_Options_Utils::get_tax(),
                 "stripe_redirect_url"                => WBK_Options_Utils::get_stripe_redirect_url(),
                 "stripe_fields"                      => get_option( "wbk_stripe_additional_fields", [] ),
@@ -2140,6 +2715,7 @@ class WBK_Request_Manager {
                 "total"                                     => get_option( "wbk_payment_total_title", __( "Total", "webba-booking-lite" ) ),
                 "free"                                      => get_option( "wbk_wording_free", __( "Free", "webba-booking-lite" ) ),
                 "select_date_time"                          => get_option( "wbk_wording_select_date_time", __( "Select date & time", "webba-booking-lite" ) ),
+                "view_next_month"                           => get_option( "wbk_wording_view_next_month", __( "View next month", "webba-booking-lite" ) ),
                 "choosing_timeslot_for"                     => get_option( "wbk_wording_choosing_timeslot_for", __( "Choosing time slot for", "webbab-booking-lite" ) ),
                 "available"                                 => get_option( "wbk_wording_available", __( "Available", "webba-booking-lite" ) ),
                 "booked"                                    => get_option( "wbk_wording_booked", __( "Booked", "webba-booking-lite" ) ),
@@ -2447,6 +3023,45 @@ class WBK_Request_Manager {
                 case "type":
                     $notification_types = WBK_Model_Utils::get_notification_types();
                     $data[$model][$field] = $notification_types;
+                default:
+                    break;
+            }
+        } elseif ( $model === "package_products" ) {
+            switch ( $field ) {
+                case "status":
+                    $data[$model][$field] = WBK_Package_Product::get_status_options();
+                    break;
+                case "expiry_type":
+                    $data[$model][$field] = WBK_Package_Product::get_expiry_type_options();
+                    break;
+                case "validity_starts":
+                    $data[$model][$field] = WBK_Package_Product::get_validity_starts_options();
+                    break;
+                case "services":
+                    $data[$model][$field] = WBK_Model_Utils::get_services();
+                    break;
+                case "payment_methods":
+                case "package_product_payment_methods":
+                    $data[$model][$field] = WBK_Model_Utils::get_all_payment_methods();
+                    break;
+                case "woo_product":
+                case "package_product_woo_product":
+                    $data[$model][$field] = WBK_Model_Utils::get_woocommerce_products();
+                    break;
+                default:
+                    break;
+            }
+        } elseif ( $model === "customer_packages" ) {
+            switch ( $field ) {
+                case "status":
+                    $data[$model][$field] = WBK_Customer_Package::get_status_options();
+                    break;
+                case "product_id":
+                    $data[$model][$field] = WBK_Model_Utils::get_package_product_options();
+                    break;
+                case "user_id":
+                    $data[$model][$field] = WBK_User_Utils::get_none_admin_wp_users();
+                    break;
                 default:
                     break;
             }
@@ -2760,6 +3375,18 @@ class WBK_Request_Manager {
                         ];
                     }
                     $data[$model]["available_offer_virtual"] = $offer_options;
+                    break;
+                default:
+                    break;
+            }
+        }
+        if ( $model === "customer_packages" ) {
+            switch ( $field ) {
+                case "payment_method":
+                    $data[$model][$field] = WBK_Model_Utils::get_all_payment_methods();
+                    break;
+                case "user_id":
+                    $data[$model][$field] = WBK_User_Utils::get_none_admin_wp_users();
                     break;
                 default:
                     break;
@@ -4224,10 +4851,54 @@ class WBK_Request_Manager {
             $unit_id_param = $request->get_param( "unit_id" );
             $use_unit = $unit_id_param !== null && $unit_id_param !== "";
             $use_gift_card = $scope === "gift_card";
+            $use_package = $scope === "package";
             $payment_methods_result = [];
             $found_payment_methods = false;
             $service_ids = null;
             $unit_id = null;
+            if ( $use_package ) {
+                $product_id_param = $request->get_param( "product_id" );
+                if ( !is_numeric( $product_id_param ) || $product_id_param <= 0 ) {
+                    return new WP_REST_Response([
+                        "success" => false,
+                        "message" => "Invalid package product ID",
+                    ], 400);
+                }
+                $product = new WBK_Package_Product((int) $product_id_param);
+                if ( !$product->is_purchasable() ) {
+                    return new WP_REST_Response([
+                        "success" => false,
+                        "message" => "Package product not available",
+                    ], 404);
+                }
+                $payment_methods_result = $product->get_payment_methods();
+                $payment_methods_available = WBK_Model_Utils::get_available_payment_methods();
+                $payment_methods_result = array_intersect( $payment_methods_result, array_keys( $payment_methods_available ) );
+                if ( empty( $payment_methods_result ) ) {
+                    return new WP_REST_Response([
+                        "success" => false,
+                        "message" => "No payment methods found for this package",
+                    ], 404);
+                }
+                $payment_methods_formatted = [];
+                foreach ( $payment_methods_result as $method ) {
+                    if ( isset( $payment_methods_available[$method] ) ) {
+                        $payment_methods_formatted[] = [
+                            "id"   => $method,
+                            "name" => $payment_methods_available[$method],
+                            "icon" => WP_WEBBA_BOOKING__PLUGIN_URL . "/public/images/payments/" . $method . ".svg",
+                        ];
+                    }
+                }
+                return new WP_REST_Response([
+                    "success" => true,
+                    "data"    => [
+                        "payment_methods" => $payment_methods_formatted,
+                        "scope"           => "package",
+                        "product_id"      => (int) $product_id_param,
+                    ],
+                ], 200);
+            }
             if ( $use_gift_card ) {
                 $payment_methods_available = WBK_Model_Utils::get_configured_gift_card_payment_methods();
                 $payment_methods_result = array_keys( $payment_methods_available );
@@ -4325,6 +4996,22 @@ class WBK_Request_Manager {
                     "woocommerce"
                 ] );
             }
+            // Offer package payment when the logged-in user has a redeemable package.
+            // Must run before the empty-methods check so package-only services still work.
+            $has_package = false;
+            if ( !$use_unit && is_user_logged_in() && class_exists( "WBK_Package_Processor" ) && WBK_Package_Processor::is_enabled() && is_array( $service_ids ) && count( $service_ids ) > 0 ) {
+                foreach ( $service_ids as $sid ) {
+                    $pkgs = WBK_Customer_Package::get_redeemable_for_user( get_current_user_id(), absint( $sid ) );
+                    if ( count( $pkgs ) > 0 ) {
+                        $has_package = true;
+                        break;
+                    }
+                }
+                if ( $has_package && !in_array( "package", $payment_methods_result, true ) ) {
+                    $payment_methods_result[] = "package";
+                    $found_payment_methods = true;
+                }
+            }
             if ( empty( $payment_methods_result ) ) {
                 return new WP_REST_Response([
                     "success" => false,
@@ -4345,6 +5032,9 @@ class WBK_Request_Manager {
                 if ( isset( $payment_methods_all[$method] ) ) {
                     // Square uses the same credit-card icon as Stripe on the booking form.
                     $icon_slug = ( $method === "square" ? "stripe" : $method );
+                    if ( $method === "package" ) {
+                        $icon_slug = "arrival";
+                    }
                     $payment_methods_formatted[] = [
                         "id"   => $method,
                         "name" => $payment_methods_all[$method],
@@ -4900,6 +5590,27 @@ class WBK_Request_Manager {
                 $booking_factory->set_as_paid( $booking_ids, "coupon", 0 );
             }
         }
+        $package_id = ( isset( $params["package_id"] ) ? absint( $params["package_id"] ) : 0 );
+        $payment_method_param = ( isset( $params["payment_method"] ) ? sanitize_text_field( $params["payment_method"] ) : "" );
+        $package_paid = false;
+        if ( $package_id > 0 && $payment_method_param === "package" && class_exists( "WBK_Package_Processor" ) ) {
+            $applied = WBK_Package_Processor::apply_to_bookings( $booking_ids, $package_id, false );
+            if ( is_wp_error( $applied ) ) {
+                $booking_factory = new WBK_Booking_Factory();
+                foreach ( $booking_ids as $bid ) {
+                    $booking_factory->destroy( $bid, "auto", true );
+                }
+                return new WP_REST_Response([
+                    "success" => false,
+                    "message" => $applied->get_error_message(),
+                    "code"    => $applied->get_error_code(),
+                ], 400);
+            }
+            $package_amounts = WBK_Package_Processor::payment_amounts_for_bookings( $booking_ids );
+            $booking_factory->set_as_paid( $booking_ids, "package", $package_amounts["total"] );
+            WBK_Package_Processor::assign_paid_amounts( $package_amounts["per_booking"] );
+            $package_paid = true;
+        }
         // Get payment methods
         $payment_methods = WBK_Model_Utils::get_payment_methods_for_bookings_intersected( $booking_ids );
         $response_data = [
@@ -4913,6 +5624,12 @@ class WBK_Request_Manager {
             $response_data["coupon_status"] = $coupon_status;
         }
         $pay_full_amount = isset( $params["pay_full_amount"] ) && ($params["pay_full_amount"] === true || $params["pay_full_amount"] === "true" || $params["pay_full_amount"] === 1);
+        if ( $package_paid ) {
+            $response_data["payment_required"] = false;
+            $response_data["payment_method"] = "package";
+            date_default_timezone_set( "UTC" );
+            return new WP_REST_Response($response_data, 200);
+        }
         // Check if payment method is valid
         if ( isset( $params["payment_method"] ) && !empty( $payment_methods ) ) {
             if ( !in_array( $params["payment_method"], $payment_methods ) ) {
@@ -8595,11 +9312,7 @@ class WBK_Request_Manager {
         try {
             WBK_Translation_Processor::switch_to_locale_from_get_param();
             date_default_timezone_set( get_option( "wbk_timezone", "UTC" ) );
-            if ( !wbk_fs()->is__premium_only() || !wbk_fs()->can_use_premium_code() ) {
-                return new WP_REST_Response([
-                    "events" => [],
-                ], 200);
-            }
+            $allowed_providers = ['google'];
             $service_ids = $this->normalize_connected_calendar_service_ids( $request->get_param( "service_ids" ) );
             if ( empty( $service_ids ) ) {
                 return new WP_REST_Response([
@@ -8644,6 +9357,9 @@ class WBK_Request_Manager {
             foreach ( $calendar_ids as $calendar_id ) {
                 $connected_calendar = new WBK_Connected_Calendar($calendar_id);
                 if ( !$connected_calendar->is_loaded() ) {
+                    continue;
+                }
+                if ( !in_array( $connected_calendar->get_provider(), $allowed_providers, true ) ) {
                     continue;
                 }
                 $events_result = WBK_Connected_Calendar_Processor::fetch_events_for_calendar_id(

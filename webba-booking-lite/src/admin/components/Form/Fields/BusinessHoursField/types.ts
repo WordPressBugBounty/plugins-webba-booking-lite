@@ -7,3 +7,13 @@ export interface BusinessDaySlot {
     day_of_week: string
     status: BusinessDayStatus
 }
+
+export interface TimeSlotProps {
+    start: number
+    end: number
+    status: BusinessDayStatus
+    onStartChange: (start: number) => void
+    onEndChange: (end: number) => void
+    onStatusChange: (status: BusinessDayStatus) => void
+    onRemove: () => void
+}

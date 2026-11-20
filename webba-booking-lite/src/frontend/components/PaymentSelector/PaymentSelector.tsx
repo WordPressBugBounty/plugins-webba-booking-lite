@@ -130,6 +130,7 @@ export const PaymentSelector = ({
         'paypal',
         'mollie',
         'woocommerce',
+        'package',
         'arrival',
         'bank',
         'stripe_others',
